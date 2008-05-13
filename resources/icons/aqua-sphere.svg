@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2166"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/home/joseph/Рабочий стол"
+   sodipodi:docname="aquabutton.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/joseph/Рабочий стол/aquabutton2.png"
+   inkscape:export-xdpi="75"
+   inkscape:export-ydpi="75">
+  <defs
+     id="defs2168">
+    <linearGradient
+       id="linearGradient9559">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop9561" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop9563" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4142">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.73333335;"
+         offset="0"
+         id="stop4144" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop4146" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4134">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.33333334;"
+         offset="0"
+         id="stop4136" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0.26274511;"
+         offset="1"
+         id="stop4138" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3151">
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="0"
+         id="stop3153" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0.54901963;"
+         offset="1"
+         id="stop3155" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3151"
+       id="linearGradient3157"
+       x1="192.85715"
+       y1="409.50504"
+       x2="192.85715"
+       y2="238.07646"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4142"
+       id="linearGradient4148"
+       x1="192.85715"
+       y1="269.50504"
+       x2="192.85715"
+       y2="392.03534"
+       gradientUnits="userSpaceOnUse" />
+    <filter
+       inkscape:collect="always"
+       x="-0.88434589"
+       width="2.7686918"
+       y="-0.88434589"
+       height="2.7686918"
+       id="filter8582">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="51.586844"
+         id="feGaussianBlur8584" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       x="-0.26708872"
+       width="1.5341774"
+       y="-0.26708872"
+       height="1.5341774"
+       id="filter13747">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="15.580175"
+         id="feGaussianBlur13749" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="375"
+     inkscape:cy="641.21831"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="948"
+     inkscape:window-height="627"
+     inkscape:window-x="0"
+     inkscape:window-y="25" />
+  <metadata
+     id="metadata2171">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       transform="matrix(0.7301047,0,0,0.3270434,53.331873,347.05845)"
+       sodipodi:type="arc"
+       style="fill:#000000;fill-opacity:0.70081967;stroke-linejoin:round;filter:url(#filter13747)"
+       id="path8586"
+       sodipodi:cx="192.85715"
+       sodipodi:cy="339.50504"
+       sodipodi:rx="70"
+       sodipodi:ry="70"
+       d="M 262.85715 339.50504 A 70 70 0 1 1  122.85715,339.50504 A 70 70 0 1 1  262.85715 339.50504 z"
+       inkscape:export-filename="/home/joseph/Рабочий стол/aquabutton.png"
+       inkscape:export-xdpi="9.8789091"
+       inkscape:export-ydpi="9.8789091" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#2643ff;fill-opacity:1;stroke-linejoin:round"
+       id="path2174"
+       sodipodi:cx="192.85715"
+       sodipodi:cy="339.50504"
+       sodipodi:rx="70"
+       sodipodi:ry="70"
+       d="M 262.85715 339.50504 A 70 70 0 1 1  122.85715,339.50504 A 70 70 0 1 1  262.85715 339.50504 z"
+       transform="translate(0,65.714286)"
+       inkscape:export-filename="/home/joseph/Рабочий стол/aquabutton.png"
+       inkscape:export-xdpi="9.8789091"
+       inkscape:export-ydpi="9.8789091" />
+    <path
+       d="M 262.85715 339.50504 A 70 70 0 1 1  122.85715,339.50504 A 70 70 0 1 1  262.85715 339.50504 z"
+       sodipodi:ry="70"
+       sodipodi:rx="70"
+       sodipodi:cy="339.50504"
+       sodipodi:cx="192.85715"
+       id="path3147"
+       style="fill:url(#linearGradient3157);fill-opacity:1;stroke-linejoin:round"
+       sodipodi:type="arc"
+       transform="translate(0,65.714286)"
+       inkscape:export-filename="/home/joseph/Рабочий стол/aquabutton.png"
+       inkscape:export-xdpi="9.8789091"
+       inkscape:export-ydpi="9.8789091" />
+    <path
+       transform="matrix(0.6785716,0,0,0.4642857,61.632658,218.66341)"
+       d="M 262.85715 339.50504 A 70 70 0 1 1  122.85715,339.50504 A 70 70 0 1 1  262.85715 339.50504 z"
+       sodipodi:ry="70"
+       sodipodi:rx="70"
+       sodipodi:cy="339.50504"
+       sodipodi:cx="192.85715"
+       id="path3159"
+       style="fill:url(#linearGradient4148);fill-opacity:1;stroke-linejoin:round"
+       sodipodi:type="arc"
+       inkscape:export-filename="/home/joseph/Рабочий стол/aquabutton.png"
+       inkscape:export-xdpi="9.8789091"
+       inkscape:export-ydpi="9.8789091" />
+    <path
+       transform="matrix(0.4403761,0,0,0.2656688,106.48839,359.16123)"
+       sodipodi:type="arc"
+       style="fill:#71ffff;fill-opacity:1;stroke-linejoin:round;filter:url(#filter8582)"
+       id="path5119"
+       sodipodi:cx="192.85715"
+       sodipodi:cy="339.50504"
+       sodipodi:rx="70"
+       sodipodi:ry="70"
+       d="M 262.85715 339.50504 A 70 70 0 1 1  122.85715,339.50504 A 70 70 0 1 1  262.85715 339.50504 z"
+       inkscape:export-filename="/home/joseph/Рабочий стол/aquabutton.png"
+       inkscape:export-xdpi="9.8789091"
+       inkscape:export-ydpi="9.8789091" />
+  </g>
+</svg>

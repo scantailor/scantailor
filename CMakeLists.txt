@@ -1,0 +1,213 @@
+PROJECT("Scan Tailor")
+
+ENABLE_TESTING()
+
+INCLUDE(CheckIncludeFile)
+INCLUDE(CheckIncludeFileCXX)
+INCLUDE(cmake/FindPthreads.cmake)
+INCLUDE(cmake/SetDefaultBuildType.cmake)
+INCLUDE(cmake/SetDefaultGccFlags.cmake)
+
+ST_SET_DEFAULT_BUILD_TYPE(Release)
+IF(CMAKE_COMPILER_IS_GNUCC)
+	ST_SET_DEFAULT_GCC_FLAGS()
+ENDIF(CMAKE_COMPILER_IS_GNUCC)
+
+GET_FILENAME_COMPONENT(outer_dir "${PROJECT_SOURCE_DIR}/.." ABSOLUTE)
+
+IF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
+	FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
+	FIND_PROGRAM(
+		QT_QMAKE_EXECUTABLE qmake
+		PATHS dummy_dir ${qt_dirs}
+		PATH_SUFFIXES bin
+	)
+ENDIF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
+
+INCLUDE(FindQt4)
+
+FILE(GLOB jpeg_dirs "${outer_dir}/jpeg-[0-9]*")
+FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
+
+FIND_PATH(
+	JPEG_INCLUDE_DIR jpeglib.h
+	PATHS /usr/local/include /usr/include ${jpeg_dirs}
+	DOC "Path to libjpeg headers."
+)
+FIND_LIBRARY(
+	JPEG_LIBRARY jpeg
+	PATHS /usr/local/lib /usr/lib ${jpeg_dirs}
+	DOC "Path to jpeg library."
+)
+INCLUDE_DIRECTORIES("${JPEG_INCLUDE_DIR}")
+
+FIND_PATH(
+	ZLIB_INCLUDE_DIR zlib.h
+	PATHS /usr/local/include /usr/include ${zlib_dirs}
+	DOC "Path to zlib headers."
+)
+FIND_LIBRARY(
+	ZLIB_LIBRARY NAMES zlib z
+	PATHS /usr/local/lib /usr/lib ${zlib_dirs}
+	DOC "Path to zlib library."
+)
+INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
+
+FIND_PATH(
+	PNG_INCLUDE_DIR png.h
+	PATHS /usr/local/include /usr/include ${png_dirs}
+	DOC "Path to libpng headers."
+)
+FIND_LIBRARY(
+	PNG_LIBRARY png
+	PATHS /usr/local/lib /usr/lib ${png_dirs}
+	DOC "PAth to png library."
+)
+INCLUDE_DIRECTORIES("${PNG_INCLUDE_DIR}")
+
+FIND_PATH(
+	TIFF_INCLUDE_DIR tiff.h
+	PATHS /usr/local/include /usr/include ${tiff_dirs}
+	PATH_SUFFIXES libtiff
+	DOC "Path to libtiff headers."
+)
+FIND_LIBRARY(
+	TIFF_LIBRARY tiff
+	PATHS /usr/local/lib /usr/lib ${tiff_dirs}
+	PATH_SUFFIXES libtiff
+	DOC "Path to tiff library."
+)
+INCLUDE_DIRECTORIES("${TIFF_INCLUDE_DIR}")
+
+IF(UNIX)
+	# We need to manually use XRender.
+	INCLUDE_DIRECTORIES(/usr/include/X11)
+	
+	FindPthreads()
+	IF(PTHREADS_FOUND)
+		ADD_DEFINITIONS(${PTHREADS_CFLAGS})
+		LINK_LIBRARIES(${PTHREADS_LIBS})
+	ELSE(PTHREADS_FOUND)
+		MESSAGE(
+			FATAL_ERROR
+			"Could not detect threading flags.\n"
+			"Try specifying them manually in PTHREADS_CFLAGS and PTHREADS_LIBS."
+		)
+	ENDIF(PTHREADS_FOUND)
+ELSEIF(MINGW)
+	ADD_DEFINITIONS(-mthreads)
+	LINK_LIBRARIES(-mthreads)
+ENDIF(UNIX)
+
+CHECK_INCLUDE_FILE(stdint.h HAVE_STDINT_H)
+IF(NOT HAVE_STDINT_H)
+	CONFIGURE_FILE(compat/pstdint.h "${CMAKE_CURRENT_BINARY_DIR}/stdint.h" COPYONLY)
+	INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
+ELSE(NOT HAVE_STDINT_H)
+	FILE(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/stdint.h")
+ENDIF(NOT HAVE_STDINT_H)
+
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+INCLUDE_DIRECTORIES(. foundation boost ${QT_INCLUDES})
+LINK_DIRECTORIES(${QT_LIBRARY_DIR})
+
+SET(CMAKE_REQUIRED_INCLUDES ${QT_INCLUDES})
+CHECK_INCLUDE_FILE_CXX(QAtomicInt HAVE_QATOMICINT)
+IF(NOT HAVE_QATOMICINT)
+	CONFIGURE_FILE(compat/QAtomicInt "${CMAKE_CURRENT_BINARY_DIR}/QAtomicInt" COPYONLY)
+	INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
+ELSE(NOT HAVE_QATOMICINT)
+	FILE(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/QAtomicInt")
+ENDIF(NOT HAVE_QATOMICINT)
+
+
+SET(EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
+IF(WIN32)
+	LINK_DIRECTORIES("${QT_PLUGINS_DIR}/imageformats")
+	LIST(
+		APPEND EXTRA_LIBS
+		${QT_QTMAIN_LIBRARY} qjpeg
+		winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool
+	)
+ENDIF(WIN32)
+
+
+ADD_SUBDIRECTORY(boost)
+ADD_SUBDIRECTORY(foundation)
+ADD_SUBDIRECTORY(imageproc)
+ADD_SUBDIRECTORY(tests)
+
+FILE(GLOB ui_files "ui/*.ui")
+QT4_WRAP_UI(ui_sources ${ui_files})
+SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
+ADD_SUBDIRECTORY(ui)
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}") # for ui files
+
+ADD_SUBDIRECTORY(filters/fix_orientation)
+ADD_SUBDIRECTORY(filters/page_split)
+ADD_SUBDIRECTORY(filters/deskew)
+ADD_SUBDIRECTORY(filters/select_content)
+
+SET(resource_sources)
+QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
+SOURCE_GROUP("Generated Sources" FILES ${ui_sources} ${resource_sources})
+
+SET(
+	sources
+	main.cpp Application.cpp Application.h
+	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
+	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
+	ImageFileInfo.cpp ImageFileInfo.h
+	ImageMetadata.h
+	PageLayout.cpp PageLayout.h
+	FixDpiDialog.cpp FixDpiDialog.h
+	ProjectCreationContext.cpp ProjectCreationContext.h
+	ProjectOpeningContext.cpp ProjectOpeningContext.h
+	MainWindow.cpp MainWindow.h
+	ContentSpanFinder.cpp ContentSpanFinder.h
+	ImageTransformation.cpp ImageTransformation.h
+	ImageViewBase.cpp ImageViewBase.h
+	BasicImageView.cpp BasicImageView.h
+	DebugImages.cpp DebugImages.h
+	ImageId.cpp ImageId.h
+	LogicalPageId.cpp LogicalPageId.h
+	PageId.cpp PageId.h
+	PageInfo.h ImageInfo.h
+	BackgroundTask.cpp BackgroundTask.h
+	PageSequence.cpp PageSequence.h
+	FilterData.cpp FilterData.h
+	ImageMetadataLoader.cpp ImageMetadataLoader.h
+	TiffReader.cpp TiffReader.h
+	PngMetadataLoader.cpp PngMetadataLoader.h
+	TiffMetadataLoader.cpp TiffMetadataLoader.h
+	JpegMetadataLoader.cpp JpegMetadataLoader.h
+	ErrorWidget.cpp ErrorWidget.h
+	OrthogonalRotation.cpp OrthogonalRotation.h
+	NewOpenProjectDialog.cpp NewOpenProjectDialog.h
+	ProjectFilesDialog.cpp ProjectFilesDialog.h
+	WorkerThread.cpp WorkerThread.h
+	WorkerThreadDispatcher.cpp WorkerThreadDispatcher.h
+	LoadFileTask.cpp LoadFileTask.h
+	FilterOptionsWidget.cpp FilterOptionsWidget.h
+	TaskStatus.h FilterUiInterface.h
+	ProjectReader.cpp ProjectReader.h
+	ProjectWriter.cpp ProjectWriter.h
+	XmlMarshaller.cpp XmlMarshaller.h
+	XmlUnmarshaller.cpp XmlUnmarshaller.h
+	Utils.cpp Utils.h
+	AutoManualMode.h
+)
+SOURCE_GROUP("Sources" FILES ${sources})
+QT4_AUTOMOC(${sources})
+
+ADD_EXECUTABLE(scantailor WIN32 ${sources} ${ui_sources} ${resource_sources})
+TARGET_LINK_LIBRARIES(
+	scantailor
+	fix_orientation page_split deskew select_content imageproc
+	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
+)
+
+ADD_TEST(ImageProcTests imageproc/tests/tests --log_level=message)
+ADD_TEST(ScanTaylorTests tests/tests --log_level=message)

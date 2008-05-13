@@ -1,0 +1,40 @@
+<ui version="4.0" >
+ <class>NewOpenProjectDialog</class>
+ <widget class="QDialog" name="NewOpenProjectDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>109</width>
+    <height>78</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Scan Tailor</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QPushButton" name="newProjectBtn" >
+     <property name="text" >
+      <string>New Project</string>
+     </property>
+     <property name="autoDefault" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="openProjectBtn" >
+     <property name="text" >
+      <string>Open Project</string>
+     </property>
+     <property name="autoDefault" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

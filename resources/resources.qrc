@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>icons/aqua-sphere.png</file>
+        <file>icons/big-down-arrow.png</file>
+        <file>icons/big-left-arrow.png</file>
+        <file>icons/big-right-arrow.png</file>
+        <file>icons/big-up-arrow.png</file>
+        <file>icons/layout_type_auto.png</file>
+        <file>icons/object-rotate-left.png</file>
+        <file>icons/object-rotate-right.png</file>
+        <file>icons/single_page.png</file>
+        <file>icons/two_pages.png</file>
+    </qresource>
+</RCC>

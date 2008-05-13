@@ -1,0 +1,46 @@
+/*
+    Scan Tailor - Interactive post-processing tool for scanned pages.
+    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef QATOMICINT_H_
+#define QATOMICINT_H_
+
+#include <QAtomic>
+
+class QAtomicInt
+{
+public:
+	QAtomicInt() : m_val(0) {}
+	
+	QAtomicInt(int val) : m_val(val) {}
+	
+	int fetchAndStoreRelaxed(int new_val) {
+		return q_atomic_set_int(&m_val, new_val);
+	}
+	
+	int fetchAndAddRelaxed(int delta) {
+		return q_atomic_fetch_and_add_int(&m_val, delta);
+	}
+	
+	bool ref() { return q_atomic_increment(&m_val) != 0; }
+	
+	bool deref() { return q_atomic_decrement(&m_val) != 0; }
+private:
+	int m_val;
+};
+
+#endif
