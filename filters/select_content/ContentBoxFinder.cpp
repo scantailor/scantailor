@@ -63,17 +63,7 @@ ContentBoxFinder::findContentBox(
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
-#if 0
-	QTransform const scale_to_150(transformTo150DPI(data.image()));
 	
-	ImageTransformation const scaled_xform(
-		data.xform().recalculatedForScaledInput(
-			scale_to_150.mapRect(data.xform().origRect())
-		)
-	);
-
-	QTransform const resulting_xform(scale_to_150 * scaled_xform.transform());
-#endif	
 	QColor const black(0x00, 0x00, 0x00);
 	QImage const gray150(
 		transformToGray(
@@ -242,21 +232,7 @@ ContentBoxFinder::findContentBox(
 	}
 	
 	status.throwIfCancelled();
-#if 0
-	// Map from pre-scaled-then-transformed coordinates
-	// to physical image coordinates.
-	QPolygonF const phys_coord_box(
-		resulting_xform.inverted().map(QRectF(content_rect))
-	);
 	
-	// Map from physical image coordinates to
-	// transformed-without-pre-scaling coordinates.
-	QPolygonF const virt_coord_box(
-		data.xform().transform().map(phys_coord_box)
-	);
-	
-	return virt_coord_box.boundingRect();
-#endif
 	// Transform back from 150dpi.
 	QTransform combined_xform(xform_150dpi.transform().inverted());
 	combined_xform *= data.xform().transform();
