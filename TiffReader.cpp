@@ -436,12 +436,13 @@ TiffReader::extractBinaryOrIndexed8Image(
 			TIFFSwabArrayOfShort(pg, num_colors);
 			TIFFSwabArrayOfShort(pb, num_colors);
 		}
+		double const f = 255.0/65535.0;
 		for (int i = 0; i < num_colors; ++i) {
-			unsigned const r = (unsigned(pr[i]) + 128) >> 8;
-			unsigned const g = (unsigned(pg[i]) + 128) >> 8;
-			unsigned const b = (unsigned(pb[i]) + 128) >> 8;
-			unsigned c = 0xFF000000 | (r << 16) | (g << 8) | b;
-			image.setColor(i, c);
+			uint32 const r = (uint32)(pr[i] * f + 0.5);
+			uint32 const g = (uint32)(pg[i] * f + 0.5);
+			uint32 const b = (uint32)(pb[i] * f + 0.5);
+			uint32 const a = 0xFF000000;
+			image.setColor(i, a | (r << 16) | (g << 8) | b);
 		}
 	} else if (info.photometric == PHOTOMETRIC_MINISBLACK) {
 		double const f = 255.0 / (num_colors - 1);
@@ -460,7 +461,7 @@ TiffReader::extractBinaryOrIndexed8Image(
 		return QImage();
 	}
 	
-	if (info.bits_per_sample == 1 || info.bits_per_sample == 8) { 
+	if (info.bits_per_sample == 1 || info.bits_per_sample == 8) {
 		readLines(tif, image);
 	} else {
 		readAndUnpackLines(tif, info, image);
