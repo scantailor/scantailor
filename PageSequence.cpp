@@ -209,7 +209,7 @@ PageInfo
 PageSequence::curPage() const
 {
 	QMutexLocker locker(&m_mutex);
-	assert((size_t)m_curLogicalPage <= m_images.size());
+	assert((size_t)m_curImage <= m_images.size());
 	ImageDesc const& image = m_images[m_curImage];
 	PageId const id(image.id, m_curSubPage);
 	return PageInfo(id, image.metadata, image.numLogicalPages);
