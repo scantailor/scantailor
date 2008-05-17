@@ -27,7 +27,6 @@ class FilterData;
 class QImage;
 class QRect;
 class QRectF;
-class QTransform;
 
 namespace imageproc
 {
@@ -45,8 +44,6 @@ public:
 		TaskStatus const& status, FilterData const& data,
 		DebugImages* dbg = 0);
 private:
-	static QTransform transformTo150DPI(QImage const& image);
-	
 	static void filterShadows(
 		TaskStatus const& status, imageproc::BinaryImage& shadows,
 		DebugImages* dbg);

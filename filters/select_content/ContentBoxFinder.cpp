@@ -239,18 +239,6 @@ ContentBoxFinder::findContentBox(
 	return combined_xform.map(QRectF(content_rect)).boundingRect();
 }
 
-QTransform
-ContentBoxFinder::transformTo150DPI(QImage const& image)
-{
-	double const xfactor = (150.0 * constants::DPI2DPM) / image.dotsPerMeterX();
-	double const yfactor = (150.0 * constants::DPI2DPM) / image.dotsPerMeterY();
-	
-	QTransform xform;
-	xform.scale(xfactor, yfactor);
-	
-	return xform;
-}
-
 void
 ContentBoxFinder::filterShadows(
 	TaskStatus const& status, imageproc::BinaryImage& shadows, DebugImages* dbg)
