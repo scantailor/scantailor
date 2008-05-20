@@ -248,13 +248,24 @@ ContentBoxFinder::filterShadows(
 	// a black table header which white letters on it.  Here we
 	// try to filter them out.
 	
-	BinaryImage opened(openBrick(shadows, QSize(10, 4), BLACK));
+	// White dots on black background may be a problem for us.
+	// They may be misclassified as parts of white letters.
+	BinaryImage reduced_dithering(closeBrick(shadows, QSize(1, 2), BLACK));
+	reduced_dithering = closeBrick(reduced_dithering, QSize(2, 1), BLACK);
+	if (dbg) {
+		dbg->add(reduced_dithering, "reduced_dithering");
+	}
+	
+	// Join neighboring white letters.
+	BinaryImage opened(openBrick(reduced_dithering, QSize(10, 4), BLACK));
+	reduced_dithering.release();
 	if (dbg) {
 		dbg->add(opened, "opened");
 	}
 	
 	status.throwIfCancelled();
 	
+	// Extract areas that became white as a result of the last operation.
 	rasterOp<RopSubtract<RopNot<RopDst>, RopNot<RopSrc> > >(opened, shadows);
 	if (dbg) {
 		dbg->add(opened, "became white");
@@ -262,6 +273,7 @@ ContentBoxFinder::filterShadows(
 	
 	status.throwIfCancelled();
 	
+	// Join the spacings between words together.
 	BinaryImage closed(closeBrick(opened, QSize(20, 1), WHITE));
 	opened.release();
 	if (dbg) {
@@ -270,6 +282,8 @@ ContentBoxFinder::filterShadows(
 	
 	status.throwIfCancelled();
 	
+	// If we've got long enough and tall enough blocks, we assume they
+	// are the text lines.
 	opened = openBrick(closed, QSize(50, 10), WHITE);
 	closed.release();
 	if (dbg) {
