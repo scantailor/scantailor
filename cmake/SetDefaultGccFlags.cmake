@@ -26,7 +26,7 @@ MACRO(ST_SET_DEFAULT_GCC_FLAGS)
 		# Flags common for all build configurations
 		SET(
 			CMAKE_CXX_FLAGS
-			"-Wall -Wno-unused"
+			"-Wall -Wno-unused -ffast-math"
 			CACHE STRING "Common C++ flags for all build configurations." FORCE
 		)
 		SET(
