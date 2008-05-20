@@ -56,7 +56,8 @@ BinaryThreshold::otsuThreshold(GrayscaleHistogram const& pixels_by_color)
 	int const total_pixels = pixels_by_threshold[255];
 	int64_t const total_moment = moment_by_threshold[255];
 	double max_variance = 0.0;
-	int best_threshold = -1;
+	int first_best_threshold = -1;
+	int last_best_threshold = -1;
 	for (int i = 0; i < 256; ++i) {
 		int const pixels_below = pixels_by_threshold[i];
 		int const pixels_above = total_pixels - pixels_below;
@@ -69,13 +70,20 @@ BinaryThreshold::otsuThreshold(GrayscaleHistogram const& pixels_by_color)
 			double const variance = mean_diff * mean_diff * pixels_below * pixels_above;
 			if (variance > max_variance) {
 				max_variance = variance;
-				best_threshold = i;
+				first_best_threshold = i;
+				last_best_threshold = i;
+			} else if (variance == max_variance) {
+				last_best_threshold = i;
 			}
 		}
 	}
 	
 	// Compensate the "< threshold" vs "<= threshold" difference.
-	return BinaryThreshold(best_threshold + 1);
+	++first_best_threshold;
+	++last_best_threshold;
+	
+	// The middle between the two.
+	return BinaryThreshold((first_best_threshold + last_best_threshold) >> 1);
 }
 
 } // namespace imageproc
