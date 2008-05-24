@@ -139,6 +139,8 @@ public:
 	 */
 	Skew findSkew(BinaryImage const& image) const;
 private:
+	static double const LOW_SCORE;
+	
 	double process(BinaryImage const& src, BinaryImage& dst, double angle) const;
 	
 	static double calcScore(BinaryImage const& image);

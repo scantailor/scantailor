@@ -23,6 +23,7 @@
 #include "Shear.h"
 #include "ReduceThreshold.h"
 #include "Constants.h"
+#include <QDebug>
 #include <stdexcept>
 #include <stdint.h>
 #include <math.h>
@@ -39,6 +40,8 @@ double const SkewFinder::DEFAULT_ACCURACY = 0.1;
 int const SkewFinder::DEFAULT_COARSE_REDUCTION = 2;
 
 int const SkewFinder::DEFAULT_FINE_REDUCTION = 1;
+
+double const SkewFinder::LOW_SCORE = 1000.0;
 
 SkewFinder::SkewFinder()
 :	m_maxAngle(DEFAULT_MAX_ANGLE),
@@ -173,6 +176,10 @@ SkewFinder::findSkew(BinaryImage const& image) const
 	} else {
 		best_angle = angle_minus;
 		best_score = score_minus;
+	}
+	
+	if (best_score <= LOW_SCORE) {
+		return Skew(-best_angle, 0.0); // Zero confidence.
 	}
 	
 	double confidence = 0.0;
