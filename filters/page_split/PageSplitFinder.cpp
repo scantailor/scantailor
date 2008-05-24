@@ -155,10 +155,20 @@ BinaryImage
 PageSplitFinder::removeGarbageAnd2xDownscale(
 	BinaryImage const& image, DebugImages* dbg)
 {
-	// This will also remove small speckles.
-	BinaryImage reduced(ReduceThreshold(image)(3));
+	BinaryImage reduced(ReduceThreshold(image)(2));
 	if (dbg) {
 		dbg->add(reduced, "reduced");
+	}
+	
+	// Remove anything not connected to a bar of at least 4 pixels long.
+	BinaryImage non_garbage_seed(openBrick(reduced, QSize(4, 1)));
+	BinaryImage non_garbage_seed2(openBrick(reduced, QSize(1, 4)));
+	rasterOp<RopOr<RopSrc, RopDst> >(non_garbage_seed, non_garbage_seed2);
+	non_garbage_seed2.release();
+	reduced = seedFill(non_garbage_seed, reduced, CONN8);
+	non_garbage_seed.release();
+	if (dbg) {
+		dbg->add(reduced, "garbage_removed");
 	}
 	
 	BinaryImage hor_seed(openBrick(reduced, QSize(200, 14), BLACK));
@@ -321,43 +331,51 @@ PageSplitFinder::processContentSpansSinglePage(
 	std::deque<Span> const& spans, int const width, int const height,
 	bool const left_cutoff, bool const right_cutoff)
 {
-	if (left_cutoff && !right_cutoff) {
+	// Just to be able to break from it.
+	while (left_cutoff && !right_cutoff) {
 		double x;
 		if (spans.empty()) {
 			x = 0;
 		} else if (spans.front().begin() > 0) {
 			x = 0.5 * spans.front().begin();
 		} else {
-			if (spans.size() > 1) {
+			if (spans.front().width() > width / 2) {
+				break;
+			} else if (spans.size() > 1) {
 				x = Span(spans[0], spans[1]).center();
 			} else {
 				x = std::min(spans[0].end() + 20, width);
 			}
 		}
 		return PageLayout(vertLine(x), false, true);
-	} else if (right_cutoff && !left_cutoff) {
+	}
+	
+	// Just to be able to break from it.
+	while (right_cutoff && !left_cutoff) {
 		double x;
 		if (spans.empty()) {
 			x = width;
 		} else if (spans.back().end() < width) {
 			x = Span(spans.back(), width).center();
 		} else {
-			if (spans.size() > 1) {
+			if (spans.back().width() > width / 2) {
+				break;
+			} else if (spans.size() > 1) {
 				x = Span(spans[spans.size() - 2], spans.back()).center();
 			} else {
 				x = std::max(spans.back().begin() - 20, 0);
 			}
 		}
 		return PageLayout(vertLine(x), true, false);
+	}
+	
+	if (spans.empty()) {
+		return PageLayout(vertLine(0), false, true);
 	} else {
-		if (spans.empty()) {
+		if (spans.front().begin() < width - spans.back().end()) {
 			return PageLayout(vertLine(0), false, true);
 		} else {
-			if (spans.front().begin() < width - spans.back().end()) {
-				return PageLayout(vertLine(0), false, true);
-			} else {
-				return PageLayout(vertLine(width), true, false);
-			}
+			return PageLayout(vertLine(width), true, false);
 		}
 	}
 }
