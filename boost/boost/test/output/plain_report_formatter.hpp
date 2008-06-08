@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: plain_report_formatter.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.1 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : plain report formatter implementation
 // ***************************************************************************
@@ -58,14 +58,5 @@ private:
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: plain_report_formatter.hpp,v $
-//  Revision 1.1  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_PLAIN_REPORT_FORMATTER_HPP_020105GER

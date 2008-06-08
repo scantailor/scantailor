@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  (C) Copyright Beman Dawes 1995-2001.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -6,9 +6,9 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: test_main.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $$Revision: 1.8 $
+//  Version     : $$Revision: 41369 $
 //
 //  Description : implements main function for Test Execution Monitor.
 // ***************************************************************************
@@ -64,20 +64,5 @@ init_unit_test_suite( int argc, char* argv[] ) {
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: test_main.ipp,v $
-//  Revision 1.8  2005/12/20 23:50:13  rogeeff
-//  unit_test.hpp removed
-//
-//  Revision 1.7  2005/12/14 05:54:17  rogeeff
-//  change existent init API usage
-//
-//  Revision 1.6  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_TEST_MAIN_IPP_012205GER

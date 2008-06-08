@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_suite_impl.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : defines test_unit, test_case, test_case_results, test_suite and test_tree_visitor
 // ***************************************************************************
@@ -23,7 +23,6 @@
 #include <boost/test/detail/fwd_decl.hpp>
 #include <boost/test/detail/workaround.hpp>
 #include <boost/test/test_observer.hpp>
-#include <boost/test/framework.hpp>
 
 // Boost
 #include <boost/shared_ptr.hpp>
@@ -67,7 +66,10 @@ public:
     // Public r/w properties
     readwrite_property<std::string>     p_name;                 // name for this test unit
     readwrite_property<unsigned>        p_timeout;              // timeout for the test unit execution 
-    readwrite_property<counter_t>       p_expected_failures;    // number of expected failured in this test unit
+    readwrite_property<counter_t>       p_expected_failures;    // number of expected failures in this test unit
+    mutable readwrite_property<bool>    p_enabled;              // enabled status for this unit
+
+    void                                increase_exp_fail( unsigned num );
 
 private:
     // Data members
@@ -118,18 +120,23 @@ public:
     enum { type = tut_suite };
 
     // Constructor
-    explicit    test_suite( const_string ts_name );
+    explicit        test_suite( const_string ts_name );
 
-    // test case list management
-    void        add( test_unit* tu, counter_t expected_failures = 0, unsigned timeout = 0 );
-    void        add( test_unit_generator const& gen, unsigned timeout = 0 );
+    // test unit list management
+    void            add( test_unit* tu, counter_t expected_failures = 0, unsigned timeout = 0 );
+    void            add( test_unit_generator const& gen, unsigned timeout = 0 );
+    void            remove( test_unit_id id );
+
+    // access methods
+    test_unit_id    get( const_string tu_name ) const;
+    std::size_t     size() const { return m_members.size(); }
 
 protected:
-    friend BOOST_TEST_DECL void traverse_test_tree( test_suite const&, test_tree_visitor& );
+    friend BOOST_TEST_DECL 
+    void        traverse_test_tree( test_suite const&, test_tree_visitor& );
     friend class framework_impl;
     virtual     ~test_suite() {}
 
-private:
     // Data members
     std::vector<test_unit_id> m_members;
 };
@@ -172,7 +179,7 @@ protected:
 
 BOOST_TEST_DECL void    traverse_test_tree( test_case const&, test_tree_visitor& );
 BOOST_TEST_DECL void    traverse_test_tree( test_suite const&, test_tree_visitor& );
-BOOST_TEST_DECL void    traverse_test_tree( test_unit_id id, test_tree_visitor& );
+BOOST_TEST_DECL void    traverse_test_tree( test_unit_id     , test_tree_visitor& );
 
 //____________________________________________________________________________//
 
@@ -191,12 +198,16 @@ traverse_test_tree( test_unit const& tu, test_tree_visitor& V )
 // **************                test_case_counter             ************** //
 // ************************************************************************** //
 
-struct test_case_counter : test_tree_visitor {
-    test_case_counter() : m_count( 0 ) {}
+class test_case_counter : public test_tree_visitor {
+public:
+    // Constructor
+    test_case_counter() : p_count( 0 ) {}
 
-    void        visit( test_case const& ) { m_count++; }
-
-    counter_t   m_count;
+    BOOST_READONLY_PROPERTY( counter_t, (test_case_counter)) p_count;
+private:
+    // test tree visitor interface
+    virtual void    visit( test_case const& );
+    virtual bool    test_suite_start( test_suite const& ts )    { return ts.p_enabled; }
 };
 
 // ************************************************************************** //
@@ -213,16 +224,16 @@ namespace ut_detail {
 
 BOOST_TEST_DECL std::string normalize_test_case_name( const_string tu_name );
 
-template<typename UserTestCase>
+template<typename InstanceType,typename UserTestCase>
 struct user_tc_method_invoker {
     typedef void (UserTestCase::*test_method )();
 
-    user_tc_method_invoker( shared_ptr<UserTestCase> inst, test_method test_method )
+    user_tc_method_invoker( shared_ptr<InstanceType> inst, test_method test_method )
     : m_inst( inst ), m_test_method( test_method ) {}
 
     void operator()() { ((*m_inst).*m_test_method)(); }
 
-    shared_ptr<UserTestCase> m_inst;
+    shared_ptr<InstanceType> m_inst;
     test_method              m_test_method;
 };
 
@@ -238,14 +249,14 @@ make_test_case( callback0<> const& test_func, const_string tc_name )
 
 //____________________________________________________________________________//
 
-template<typename UserTestCase>
+template<typename UserTestCase, typename InstanceType>
 inline test_case*
-make_test_case( void (UserTestCase::*test_method )(),
-                  const_string tc_name,
-                  boost::shared_ptr<UserTestCase> const& user_test_case )
+make_test_case( void (UserTestCase::*           test_method )(),
+                const_string                    tc_name,
+                boost::shared_ptr<InstanceType> user_test_case )
 {
     return new test_case( ut_detail::normalize_test_case_name( tc_name ), 
-                          ut_detail::user_tc_method_invoker<UserTestCase>( user_test_case, test_method ) );
+                          ut_detail::user_tc_method_invoker<InstanceType,UserTestCase>( user_test_case, test_method ) );
 }
 
 //____________________________________________________________________________//
@@ -258,41 +269,41 @@ namespace ut_detail {
 
 struct BOOST_TEST_DECL auto_test_unit_registrar
 {
-    // Constructor
-    explicit    auto_test_unit_registrar( test_case* tc, counter_t exp_fail )
-    {
-        curr_ts_store().back()->add( tc, exp_fail );
-    }
-    explicit    auto_test_unit_registrar( test_suite* ts )
-    {
-        curr_ts_store().back()->add( ts );
-
-        curr_ts_store().push_back( ts );
-    }
-    explicit    auto_test_unit_registrar( test_unit_generator const& tc_gen )
-    {
-        curr_ts_store().back()->add( tc_gen );
-    }
-    explicit    auto_test_unit_registrar( int )
-    {
-        if( curr_ts_store().size() > 1 )
-            curr_ts_store().pop_back();
-        // else report error
-    }
+    // Constructors
+                auto_test_unit_registrar( test_case* tc, counter_t exp_fail );
+    explicit    auto_test_unit_registrar( const_string ts_name );
+    explicit    auto_test_unit_registrar( test_unit_generator const& tc_gen );
+    explicit    auto_test_unit_registrar( int );
 
 private:
-    static std::list<test_suite*>& curr_ts_store()
-    {
-        static std::list<test_suite*> inst( 1, &framework::master_test_suite() );
-        return inst;
-    }
+    static std::list<test_suite*>& curr_ts_store();
 };
 
 //____________________________________________________________________________//
 
 template<typename T>
 struct auto_tc_exp_fail {
-    enum { value = 0 };
+    auto_tc_exp_fail() : m_value( 0 ) {}
+
+    explicit    auto_tc_exp_fail( unsigned v )
+    : m_value( v )
+    {
+        instance() = this;
+    }
+
+    static auto_tc_exp_fail*& instance() 
+    {
+        static auto_tc_exp_fail     inst; 
+        static auto_tc_exp_fail*    inst_ptr = &inst; 
+
+        return inst_ptr;
+    }
+
+    unsigned    value() const { return m_value; }
+
+private:
+    // Data members
+    unsigned    m_value;
 };
 
 //____________________________________________________________________________//
@@ -306,7 +317,7 @@ struct auto_tc_exp_fail {
 class BOOST_TEST_DECL global_fixture : public test_observer { 
 public: 
     // Constructor
-    global_fixture() { framework::register_observer( *this ); } 
+    global_fixture();
 }; 
 
 //____________________________________________________________________________//
@@ -335,19 +346,6 @@ private:
 } // namespace boost
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: unit_test_suite_impl.hpp,v $
-//  Revision 1.2  2006/01/28 07:09:34  rogeeff
-//  tm->test_method
-//
-//  Revision 1.1  2005/12/14 05:24:55  rogeeff
-//  dll support introduced
-//  split into 2 files
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_UNIT_TEST_SUITE_IMPL_HPP_071894GER
 

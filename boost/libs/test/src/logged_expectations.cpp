@@ -5,23 +5,14 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: logged_expectations.cpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.1 $
+//  Version     : $Revision: 41370 $
 //
 //  Description : forwarding source
 // ***************************************************************************
 
 #define BOOST_TEST_SOURCE
 #include <boost/test/impl/logged_expectations.ipp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: logged_expectations.cpp,v $
-//  Revision 1.1  2005/12/14 06:18:50  rogeeff
-//  *** empty log message ***
-//
-// ***************************************************************************
 
 // EOF

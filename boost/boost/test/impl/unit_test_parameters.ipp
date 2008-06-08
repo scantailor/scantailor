@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_parameters.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.10 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : simple implementation for Unit Test Framework parameter
 //  handling routines. May be rewritten in future to use some kind of
@@ -24,6 +24,7 @@
 #include <boost/test/utils/basic_cstring/compare.hpp>
 #include <boost/test/utils/basic_cstring/io.hpp>
 #include <boost/test/utils/fixed_mapping.hpp>
+#include <boost/test/debug.hpp>
 
 // Boost
 #include <boost/config.hpp>
@@ -58,6 +59,9 @@ literal_string SAVE_TEST_PATTERN = "BOOST_TEST_SAVE_PATTERN";
 literal_string BUILD_INFO        = "BOOST_TEST_BUILD_INFO";
 literal_string SHOW_PROGRESS     = "BOOST_TEST_SHOW_PROGRESS";
 literal_string CATCH_SYS_ERRORS  = "BOOST_TEST_CATCH_SYSTEM_ERRORS";
+literal_string AUTO_START_DBG    = "BOOST_TEST_AUTO_START_DBG";
+literal_string USE_ALT_STACK     = "BOOST_TEST_USE_ALT_STACK";
+literal_string DETECT_FP_EXCEPT  = "BOOST_TEST_DETECT_FP_EXCEPTIONS";
 literal_string REPORT_FORMAT     = "BOOST_TEST_REPORT_FORMAT";
 literal_string LOG_FORMAT        = "BOOST_TEST_LOG_FORMAT";
 literal_string OUTPUT_FORMAT     = "BOOST_TEST_OUTPUT_FORMAT";
@@ -65,19 +69,22 @@ literal_string DETECT_MEM_LEAK   = "BOOST_TEST_DETECT_MEMORY_LEAK";
 literal_string RANDOM_SEED       = "BOOST_TEST_RANDOM";
 literal_string BREAK_EXEC_PATH   = "BOOST_TEST_BREAK_EXEC_PATH";
 
-unit_test::log_level     s_log_level;
-bool                     s_no_result_code;
-unit_test::report_level  s_report_level;
-const_string             s_tests_to_run;
-const_string             s_exec_path_to_break;
-bool                     s_save_pattern;
-bool                     s_show_build_info;
-bool                     s_show_progress;
-bool                     s_catch_sys_errors;
-output_format            s_report_format;
-output_format            s_log_format;
-long                     s_detect_mem_leaks;
-unsigned int             s_random_seed;
+unit_test::log_level    s_log_level;
+bool                    s_no_result_code;
+unit_test::report_level s_report_level;
+const_string            s_tests_to_run;
+const_string            s_exec_path_to_break;
+bool                    s_save_pattern;
+bool                    s_show_build_info;
+bool                    s_show_progress;
+bool                    s_catch_sys_errors;
+bool                    s_auto_start_dbg;
+bool                    s_use_alt_stack;
+bool                    s_detect_fp_except;
+output_format           s_report_format;
+output_format           s_log_format;
+long                    s_detect_mem_leaks;
+unsigned int            s_random_seed;
 
 // ************************************************************************** //
 // **************                 runtime_config               ************** //
@@ -95,6 +102,9 @@ retrieve_framework_parameter( const_string parameter_name, int* argc, char** arg
         BUILD_INFO        , "--build_info",
         SHOW_PROGRESS     , "--show_progress",
         CATCH_SYS_ERRORS  , "--catch_system_errors",
+        AUTO_START_DBG    , "--auto_start_dbg",
+        USE_ALT_STACK     , "--use_alt_stack",        
+        DETECT_FP_EXCEPT  , "--detect_fp_exceptions",        
         REPORT_FORMAT     , "--report_format",
         LOG_FORMAT        , "--log_format",
         OUTPUT_FORMAT     , "--output_format",
@@ -164,7 +174,8 @@ init( int* argc, char** argv )
     fixed_mapping<const_string,unit_test::log_level,case_ins_less<char const> > log_level_name(
         "all"           , log_successful_tests,
         "success"       , log_successful_tests,
-        "test_suite"    , log_test_suites,
+        "test_suite"    , log_test_units,
+        "unit_scope"    , log_test_units,
         "message"       , log_messages,
         "warning"       , log_warnings,
         "error"         , log_all_errors,
@@ -198,6 +209,8 @@ init( int* argc, char** argv )
     s_show_build_info   = retrieve_framework_parameter( BUILD_INFO, argc, argv ) == "yes";
     s_show_progress     = retrieve_framework_parameter( SHOW_PROGRESS, argc, argv ) == "yes";
     s_catch_sys_errors  = retrieve_framework_parameter( CATCH_SYS_ERRORS, argc, argv ) != "no";
+    s_use_alt_stack     = retrieve_framework_parameter( USE_ALT_STACK, argc, argv ) != "no";
+    s_detect_fp_except  = retrieve_framework_parameter( DETECT_FP_EXCEPT, argc, argv ) == "yes";
     s_tests_to_run      = retrieve_framework_parameter( TESTS_TO_RUN, argc, argv );
     s_exec_path_to_break= retrieve_framework_parameter( BREAK_EXEC_PATH, argc, argv );
 
@@ -218,6 +231,17 @@ init( int* argc, char** argv )
 
     const_string ml_str = retrieve_framework_parameter( DETECT_MEM_LEAK, argc, argv );
     s_detect_mem_leaks  =  ml_str.is_empty() ? 1 : interpret_long( ml_str );
+
+    const_string dbg = retrieve_framework_parameter( AUTO_START_DBG, argc, argv );
+
+    if( dbg.is_empty() || dbg == "no" )
+        s_auto_start_dbg = false;
+    else {
+        s_auto_start_dbg = true;
+
+        if( dbg != "yes" )
+            debug::set_debugger( dbg );
+    }
 }
 
 //____________________________________________________________________________//
@@ -294,6 +318,30 @@ catch_sys_errors()
 
 //____________________________________________________________________________//
 
+bool
+auto_start_dbg()
+{
+    return s_auto_start_dbg;
+}
+
+//____________________________________________________________________________//
+
+bool
+use_alt_stack()
+{
+    return s_use_alt_stack;
+}
+
+//____________________________________________________________________________//
+
+bool
+detect_fp_exceptions()
+{
+    return s_detect_fp_except;
+}
+
+//____________________________________________________________________________//
+
 output_format
 report_format()
 {
@@ -335,32 +383,5 @@ random_seed()
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: unit_test_parameters.ipp,v $
-//  Revision 1.10  2006/01/30 07:29:49  rogeeff
-//  split memory leaks detection API in two to get more functions with better defined roles
-//
-//  Revision 1.9  2005/12/14 05:38:47  rogeeff
-//  new parameter break_exec_path() is introduced
-//
-//  Revision 1.8  2005/05/08 08:55:09  rogeeff
-//  typos and missing descriptions fixed
-//
-//  Revision 1.7  2005/04/05 07:23:21  rogeeff
-//  restore default
-//
-//  Revision 1.6  2005/04/05 06:11:37  rogeeff
-//  memory leak allocation point detection\nextra help with _WIN32_WINNT
-//
-//  Revision 1.5  2005/02/21 10:12:22  rogeeff
-//  Support for random order of test cases implemented
-//
-//  Revision 1.4  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_UNIT_TEST_PARAMETERS_IPP_012205GER

@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2006.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: class_properties.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.10 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : simple facility that mimmic notion of read-only read-write 
 //  properties in C++ classes. Original idea by Henrik Ravn.
@@ -221,44 +221,5 @@ public:
 #include <boost/test/detail/enable_warnings.hpp>
 
 #undef BOOST_TEST_NO_PROTECTED_USING
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: class_properties.hpp,v $
-//  Revision 1.10  2006/02/21 04:24:46  rogeeff
-//  rev back
-//
-//  Revision 1.9  2006/01/28 08:57:05  rogeeff
-//  VC6.0 workaround removed
-//
-//  Revision 1.8  2005/08/25 16:27:26  johnmaddock
-//  Large patch from Ulrich Eckhardt to fix support for EVC++ 4.
-//
-//  Revision 1.7  2005/05/11 05:04:58  rogeeff
-//  borland portability fix
-//
-//  Revision 1.6  2005/04/12 06:46:17  rogeeff
-//  use add_const
-//
-//  Revision 1.5  2005/02/21 10:17:27  rogeeff
-//  base reference renamed (borland bug fix)
-//
-//  Revision 1.4  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.3  2005/02/01 06:40:07  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.2  2005/01/22 19:22:13  rogeeff
-//  implementation moved into headers section to eliminate dependency of included/minimal component on src directory
-//
-//  Revision 1.1  2005/01/22 18:21:39  rogeeff
-//  moved sharable staff into utils
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_CLASS_PROPERTIES_HPP_071894GER

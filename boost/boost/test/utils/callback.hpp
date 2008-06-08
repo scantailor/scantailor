@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the 
 //  Boost Software License, Version 1.0. (See accompanying file 
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: callback.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.7 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : 
 // ***************************************************************************
@@ -306,32 +306,5 @@ private:
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: callback.hpp,v $
-//   Revision 1.7  2006/02/21 04:27:16  rogeeff
-//   rev back
-//
-//   Revision 1.6  2006/01/28 08:57:03  rogeeff
-//   VC6.0 workaround removed
-//
-//   Revision 1.5  2005/04/13 05:09:00  rogeeff
-//   Intel 7.1 bug fix
-//
-//   Revision 1.4  2005/04/12 06:50:06  rogeeff
-//   suppress warnings
-//
-//   Revision 1.3  2005/03/22 07:05:18  rogeeff
-//   minor vc7.1 workaround
-//
-//   Revision 1.2  2005/02/24 19:28:17  turkanis
-//   removed redundant copy ctors, except for VC6
-//
-//   Revision 1.1  2005/02/20 08:27:08  rogeeff
-//   This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ************************************************************************** //
 
 #endif // BOOST_TEST_CALLBACK_020505GER

@@ -1,19 +1,22 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: trivial_singleton.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.3 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : simple helpers for creating cusom output manipulators
 // ***************************************************************************
 
 #ifndef BOOST_TEST_TRIVIAL_SIGNLETON_HPP_020505GER
 #define BOOST_TEST_TRIVIAL_SIGNLETON_HPP_020505GER
+
+#include <boost/config.hpp>
+#include <boost/detail/workaround.hpp>
 
 #include <boost/noncopyable.hpp>
 
@@ -67,21 +70,5 @@ namespace { BOOST_JOIN( inst, _t)& inst = BOOST_JOIN( inst, _t)::instance(); }
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: trivial_singleton.hpp,v $
-//  Revision 1.3  2006/01/01 17:29:38  dgregor
-//  Work around anonymous namespace bug in Apple GCC 3.3
-//
-//  Revision 1.2  2005/06/15 07:21:51  schoepflin
-//  Tru64 needs an explicit instantiation of the singleton template. Otherwise we
-//  end up with multiple singleton instances.
-//
-//  Revision 1.1  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_TRIVIAL_SIGNLETON_HPP_020505GER

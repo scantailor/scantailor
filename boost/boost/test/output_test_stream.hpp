@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: output_test_stream.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.5 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : output_test_stream class definition
 // ***************************************************************************
@@ -74,30 +74,5 @@ private:
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: output_test_stream.hpp,v $
-//  Revision 1.5  2005/12/14 05:10:34  rogeeff
-//  dll support introduced
-//  introduced an ability to match agains binary openned file
-//
-//  Revision 1.4  2005/03/23 21:02:15  rogeeff
-//  Sunpro CC 5.3 fixes
-//
-//  Revision 1.3  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.2  2005/02/01 06:40:06  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.1  2005/01/30 03:25:24  rogeeff
-//  output_test_stream moved into separate file
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_OUTPUT_TEST_STREAM_HPP_012705GER

@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: log_level.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : shared definition for unit test log levels
 // ***************************************************************************
@@ -26,7 +26,7 @@ namespace unit_test {
 enum            log_level {
     invalid_log_level        = -1,
     log_successful_tests     = 0,
-    log_test_suites          = 1,
+    log_test_units           = 1,
     log_messages             = 2,
     log_warnings             = 3,
     log_all_errors           = 4, // reported by unit test macros
@@ -39,22 +39,5 @@ enum            log_level {
 
 } // namespace unit_test
 } // namespace boost
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: log_level.hpp,v $
-//  Revision 1.2  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.1  2005/01/18 08:27:30  rogeeff
-//  unit_test_log rework:
-//     eliminated need for ::instance()
-//     eliminated need for << end and ...END macro
-//     straitend interface between log and formatters
-//     change compiler like formatter name
-//     minimized unit_test_log interface and reworked to use explicit calls
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_LOG_LEVEL_HPP_011605GER

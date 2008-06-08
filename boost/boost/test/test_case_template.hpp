@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2003-2005.
+//  (C) Copyright Gennadiy Rozental 2003-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: test_case_template.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.15 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : implements support for test cases templates instantiated with 
 //                sequence of test types
@@ -149,36 +149,6 @@ public:
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: test_case_template.hpp,v $
-//  Revision 1.15  2005/04/17 15:50:37  rogeeff
-//  portability fixes
-//
-//  Revision 1.14  2005/04/13 04:35:18  rogeeff
-//  forgot zero
-//
-//  Revision 1.13  2005/04/12 06:50:46  rogeeff
-//  assign_to -> assign_op
-//
-//  Revision 1.12  2005/03/22 06:58:47  rogeeff
-//  assign_to made free function
-//
-//  Revision 1.11  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.10  2005/02/01 06:40:06  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.9  2005/01/30 03:20:38  rogeeff
-//  use BOOST_JOIN and BOOST_TEST_STRINGIZE
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_TEST_CASE_TEMPLATE_HPP_071894GER
 

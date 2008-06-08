@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2004-2005.
+//  (C) Copyright Gennadiy Rozental 2004-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: token_iterator.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.9 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : token iterator for string and range tokenization
 // ***************************************************************************
@@ -413,44 +413,6 @@ make_range_token_iterator( Iter begin, Iter end, Modifier const& m )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: token_iterator.hpp,v $
-//  Revision 1.9  2005/12/14 05:01:13  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.8  2005/06/16 05:58:26  rogeeff
-//  make default constructed range token iterator copyable according ot standard
-//
-//  Revision 1.7  2005/06/11 19:23:28  rogeeff
-//  1. Always use clear
-//  reorder field in constructor to eliminate warning
-//  remove cw workaround - doesn't seems to be needed
-//
-//  Revision 1.6  2005/06/05 16:07:51  grafik
-//  Work around CW-8 problem parsing the switch statement.
-//
-//  Revision 1.5  2005/04/12 06:46:42  rogeeff
-//  use named_param facilites
-//
-//  Revision 1.4  2005/02/20 08:27:09  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.3  2005/02/01 06:40:08  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stylitic changes
-//  deprecated tools removed
-//
-//  Revision 1.2  2005/01/22 19:22:14  rogeeff
-//  implementation moved into headers section to eliminate dependency of included/minimal component on src directory
-//
-//  Revision 1.1  2005/01/22 18:21:40  rogeeff
-//  moved sharable staff into utils
-//
-// ***************************************************************************
 
 #endif // BOOST_TOKEN_ITERATOR_HPP_071894GER
 

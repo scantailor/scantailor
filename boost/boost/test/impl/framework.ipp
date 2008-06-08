@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: framework.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.10 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : implements framework API - main driver for the test
 // ***************************************************************************
@@ -18,6 +18,7 @@
 // Boost.Test
 #include <boost/test/framework.hpp>
 #include <boost/test/execution_monitor.hpp>
+#include <boost/test/debug.hpp>
 #include <boost/test/unit_test_suite_impl.hpp>
 #include <boost/test/unit_test_log.hpp>
 #include <boost/test/unit_test_monitor.hpp>
@@ -49,17 +50,6 @@ namespace std { using ::time; using ::srand; }
 
 //____________________________________________________________________________//
 
-#ifndef BOOST_TEST_DYN_LINK
-
-// prototype for user's unit test init function
-#ifdef BOOST_TEST_ALTERNATIVE_INIT_API
-extern bool init_unit_test();
-#else
-extern boost::unit_test::test_suite* init_unit_test_suite( int argc, char* argv[] );
-#endif
-
-#endif
-
 namespace boost {
 
 namespace unit_test {
@@ -88,6 +78,30 @@ private:
     counter_t       m_tc_amount;
 };
 
+//____________________________________________________________________________//
+
+struct test_init_caller {
+    explicit    test_init_caller( init_unit_test_func init_func ) 
+    : m_init_func( init_func )
+    {}
+    int         operator()()
+    {
+#ifdef BOOST_TEST_ALTERNATIVE_INIT_API
+        if( !(*m_init_func)() )
+            throw std::runtime_error( "test module initialization failed" );
+#else
+        test_suite*  manual_test_units = (*m_init_func)( framework::master_test_suite().argc, framework::master_test_suite().argv );
+
+        if( manual_test_units )
+            framework::master_test_suite().add( manual_test_units );
+#endif
+        return 0;
+    }
+
+    // Data members
+    init_unit_test_func m_init_func;
+};
+
 }
 
 // ************************************************************************** //
@@ -101,6 +115,7 @@ public:
     , m_curr_test_case( INV_TEST_UNIT_ID )
     , m_next_test_case_id( MIN_TEST_CASE_ID )
     , m_next_test_suite_id( MIN_TEST_SUITE_ID )
+    , m_is_initialized( false )
     , m_test_in_progress( false )
     {}
 
@@ -179,7 +194,7 @@ public:
         }
     };
 
-    typedef std::map<test_unit_id,test_unit const*> test_unit_store;
+    typedef std::map<test_unit_id,test_unit*>       test_unit_store;
     typedef std::set<test_observer*,priority_order> observer_store;
 
     master_test_suite_t* m_master_test_suite;
@@ -189,6 +204,7 @@ public:
     test_unit_id    m_next_test_case_id;
     test_unit_id    m_next_test_suite_id;
 
+    bool            m_is_initialized;
     bool            m_test_in_progress;
 
     observer_store  m_observers;
@@ -207,15 +223,15 @@ framework_impl& s_frk_impl() { static framework_impl the_inst; return the_inst; 
 namespace framework {
 
 void
-init( int argc, char* argv[] )
+init( init_unit_test_func init_func, int argc, char* argv[] )
 {
     runtime_config::init( &argc, argv );
 
-    // set the log level nad format
+    // set the log level and format
     unit_test_log.set_threshold_level( runtime_config::log_level() );
     unit_test_log.set_format( runtime_config::log_format() );
 
-    // set the report level nad format
+    // set the report level and format
     results_reporter::set_level( runtime_config::report_level() );
     results_reporter::set_format( runtime_config::report_format() );
 
@@ -226,27 +242,34 @@ init( int argc, char* argv[] )
         register_observer( progress_monitor );
 
     if( runtime_config::detect_memory_leaks() > 0 ) {
-        detect_memory_leaks( true );
-        break_memory_alloc( runtime_config::detect_memory_leaks() );
+        debug::detect_memory_leaks( true );
+        debug::break_memory_alloc( runtime_config::detect_memory_leaks() );
     }
 
     // init master unit test suite
     master_test_suite().argc = argc;
     master_test_suite().argv = argv;
 
-#ifndef BOOST_TEST_DYN_LINK
+    try {
+        boost::execution_monitor em;
 
-#ifdef BOOST_TEST_ALTERNATIVE_INIT_API
-    if( !init_unit_test() )
-        throw setup_error( BOOST_TEST_L("test tree initialization error" ) );
-#else
-    test_suite* s = init_unit_test_suite( argc, argv );
-    if( s )
-        master_test_suite().add( s );
-#endif
+        ut_detail::test_init_caller tic( init_func );
 
-#endif
+        em.execute( tic );
+    }
+    catch( execution_exception const& ex )  {
+        throw setup_error( ex.what() );
+    }
 
+    s_frk_impl().m_is_initialized = true;
+}
+
+//____________________________________________________________________________//
+
+bool
+is_initialized()
+{
+    return  s_frk_impl().m_is_initialized;
 }
 
 //____________________________________________________________________________//
@@ -335,10 +358,10 @@ current_test_case()
 
 //____________________________________________________________________________//
 
-test_unit const&
+test_unit&
 get( test_unit_id id, test_unit_type t )
 {
-    test_unit const* res = s_frk_impl().m_test_units[id];
+    test_unit* res = s_frk_impl().m_test_units[id];
 
     if( (res->p_type & t) == 0 )
         throw internal_error( "Invalid test unit type" );
@@ -357,8 +380,10 @@ run( test_unit_id id, bool continue_test )
     test_case_counter tcc;
     traverse_test_tree( id, tcc );
 
-    if( tcc.m_count == 0 )
-        throw setup_error( BOOST_TEST_L( "test tree is empty" ) );
+    if( tcc.p_count == 0 )
+        throw setup_error( runtime_config::test_to_run().is_empty() 
+                                ? BOOST_TEST_L( "test tree is empty" ) 
+                                : BOOST_TEST_L( "no test cases matching filter" ) );
 
     bool    call_start_finish   = !continue_test || !s_frk_impl().m_test_in_progress;
     bool    was_in_progress     = s_frk_impl().m_test_in_progress;
@@ -370,7 +395,7 @@ run( test_unit_id id, bool continue_test )
             boost::execution_monitor em;
 
             try {
-                em.execute( ut_detail::test_start_caller( to, tcc.m_count ) );
+                em.execute( ut_detail::test_start_caller( to, tcc.p_count ) );
             }
             catch( execution_exception const& ex )  {
                 throw setup_error( ex.what() );
@@ -453,42 +478,5 @@ test_unit_aborted( test_unit const& tu )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: framework.ipp,v $
-//  Revision 1.10  2006/03/19 07:27:52  rogeeff
-//  streamline test setup error message
-//
-//  Revision 1.9  2006/01/30 07:29:49  rogeeff
-//  split memory leaks detection API in two to get more functions with better defined roles
-//
-//  Revision 1.8  2005/12/17 02:34:11  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.7  2005/12/14 05:35:57  rogeeff
-//  DLL support implemented
-//  Alternative init API introduced
-//
-//  Revision 1.6  2005/05/08 08:55:09  rogeeff
-//  typos and missing descriptions fixed
-//
-//  Revision 1.5  2005/04/05 07:23:20  rogeeff
-//  restore default
-//
-//  Revision 1.4  2005/04/05 06:11:37  rogeeff
-//  memory leak allocation point detection\nextra help with _WIN32_WINNT
-//
-//  Revision 1.3  2005/03/23 21:02:19  rogeeff
-//  Sunpro CC 5.3 fixes
-//
-//  Revision 1.2  2005/02/21 10:12:18  rogeeff
-//  Support for random order of test cases implemented
-//
-//  Revision 1.1  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_FRAMEWORK_IPP_021005GER

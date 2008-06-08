@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: environment.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.5 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : implements model of program environment 
 // ***************************************************************************
@@ -113,26 +113,5 @@ var( cstring var_name )
 } // namespace BOOST_RT_PARAM_NAMESPACE
 
 } // namespace boost
-
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: environment.ipp,v $
-//   Revision 1.5  2005/05/14 05:41:10  rogeeff
-//   *** empty log message ***
-//
-//   Revision 1.4  2005/05/05 05:55:45  rogeeff
-//   portability fixes
-//
-//   Revision 1.3  2005/05/03 05:02:50  rogeeff
-//   como fixes
-//
-//   Revision 1.2  2005/04/27 03:29:52  rogeeff
-//   portability fix
-//
-//   Revision 1.1  2005/04/12 06:42:43  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
 
 #endif // BOOST_RT_ENV_ENVIRONMENT_IPP_062904GER

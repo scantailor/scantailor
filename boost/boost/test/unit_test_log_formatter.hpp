@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2003-2005.
+//  (C) Copyright Gennadiy Rozental 2003-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_log_formatter.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.14 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : 
 // ***************************************************************************
@@ -110,43 +110,6 @@ public:
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: unit_test_log_formatter.hpp,v $
-//  Revision 1.14  2005/12/14 05:52:16  rogeeff
-//  log API simplified
-//
-//  Revision 1.13  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.12  2005/02/01 08:59:28  rogeeff
-//  supplied_log_formatters split
-//  change formatters interface to simplify result interface
-//
-//  Revision 1.11  2005/02/01 06:40:06  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.10  2005/01/30 03:23:58  rogeeff
-//  counter type renamed
-//  log interface slightly shortened
-//
-//  Revision 1.9  2005/01/21 07:30:24  rogeeff
-//  to log testing time log formatter interfaces changed
-//
-//  Revision 1.8  2005/01/18 08:26:12  rogeeff
-//  unit_test_log rework:
-//     eliminated need for ::instance()
-//     eliminated need for << end and ...END macro
-//     straitend interface between log and formatters
-//     change compiler like formatter name
-//     minimized unit_test_log interface and reworked to use explicit calls
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_UNIT_TEST_LOG_FORMATTER_HPP_071894GER
 

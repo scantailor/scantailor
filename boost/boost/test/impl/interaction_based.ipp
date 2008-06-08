@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: interaction_based.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.7 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : Facilities to perform interaction-based testing
 // ***************************************************************************
@@ -90,36 +90,5 @@ manager::instance_ptr( bool reset, manager* new_ptr )
 #include <boost/test/detail/enable_warnings.hpp>
 
 #endif // not ancient compiler
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: interaction_based.ipp,v $
-//  Revision 1.7  2006/03/19 07:27:52  rogeeff
-//  streamline test setup error message
-//
-//  Revision 1.6  2006/02/23 15:10:00  rogeeff
-//  vc70 out
-//
-//  Revision 1.5  2006/02/22 16:13:34  rogeeff
-//  ifdef out for non supported compilers
-//
-//  Revision 1.4  2006/01/28 08:52:35  rogeeff
-//  operator new overloads made inline to:
-//  1. prevent issues with export them from DLL
-//  2. release link issue fixed
-//
-//  Revision 1.3  2006/01/15 11:14:39  rogeeff
-//  simpl_mock -> mock_object<>::prototype()
-//  operator new need to be rethinked
-//
-//  Revision 1.2  2005/12/22 15:49:32  rogeeff
-//  sunpro port
-//  made operator new conformant
-//
-//  Revision 1.1  2005/12/14 05:56:56  rogeeff
-//  Interraction based / logged expectation testing is introduced
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_INTERACTION_BASED_IPP_112105GER

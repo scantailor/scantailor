@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: workaround.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : contains mics. workarounds 
 // ***************************************************************************
@@ -58,17 +58,5 @@ namespace unit_test_framework = unit_test;
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: workaround.hpp,v $
-//  Revision 1.2  2005/02/21 10:20:04  rogeeff
-//  ignore unused vars helper
-//
-//  Revision 1.1  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_WORKAROUND_HPP_021005GER

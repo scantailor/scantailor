@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2002-2005.
+//  (C) Copyright Gennadiy Rozental 2002-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: wrap_stringstream.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.9 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : wraps strstream and stringstream (depends with one is present)
 //                to provide the unified interface
@@ -162,41 +162,5 @@ typedef basic_wrap_stringstream<wchar_t>    wrap_wstringstream;
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: wrap_stringstream.hpp,v $
-//  Revision 1.9  2005/05/13 05:55:46  rogeeff
-//  gcc 2.95 fix
-//
-//  Revision 1.8  2005/05/08 08:55:09  rogeeff
-//  typos and missing descriptions fixed
-//
-//  Revision 1.7  2005/04/30 17:55:15  rogeeff
-//  disable manipulator output for cw
-//
-//  Revision 1.6  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.5  2005/02/01 06:40:07  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.4  2005/01/31 07:50:06  rogeeff
-//  cdecl portability fix
-//
-//  Revision 1.3  2005/01/31 06:02:15  rogeeff
-//  BOOST_TEST_CALL_DECL correctness fixes
-//
-//  Revision 1.2  2005/01/30 01:43:57  rogeeff
-//  warnings suppressed
-//
-//  Revision 1.1  2005/01/22 18:21:40  rogeeff
-//  moved sharable staff into utils
-//
-// ***************************************************************************
 
 #endif  // BOOST_WRAP_STRINGSTREAM_HPP_071894GER

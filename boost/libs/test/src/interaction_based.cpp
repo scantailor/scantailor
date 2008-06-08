@@ -5,23 +5,14 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: interaction_based.cpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.1 $
+//  Version     : $Revision: 41370 $
 //
 //  Description : forwarding source
 // ***************************************************************************
 
 #define BOOST_TEST_SOURCE
 #include <boost/test/impl/interaction_based.ipp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: interaction_based.cpp,v $
-//  Revision 1.1  2005/12/14 06:18:50  rogeeff
-//  *** empty log message ***
-//
-// ***************************************************************************
 
 // EOF

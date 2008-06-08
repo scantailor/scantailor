@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: logged_expectations.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : Facilities to perform interaction based testng of logged expectations
 // ***************************************************************************
@@ -47,7 +47,7 @@ BOOST_AUTO_TC_REGISTRAR( test_name )(                                   \
     boost::unit_test::make_test_case(                                   \
         &BOOST_AUTO_TC_INVOKER( test_name ), #test_name ),              \
     boost::unit_test::ut_detail::auto_tc_exp_fail<                      \
-        BOOST_AUTO_TC_UNIQUE_ID( test_name )>::value );                 \
+        BOOST_AUTO_TC_UNIQUE_ID( test_name )>::instance()->value() );   \
                                                                         \
 void test_name::test_method()                                           \
 /**/
@@ -70,17 +70,5 @@ logged_expectations( unit_test::callback0<> const&  F,
 } // namespace boost
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: logged_expectations.hpp,v $
-//  Revision 1.2  2005/12/20 23:50:13  rogeeff
-//  unit_test.hpp removed
-//
-//  Revision 1.1  2005/12/14 05:09:21  rogeeff
-//  interraction based testing is introdused
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_LOGGED_EXPECTATIONS_HPP_120905GER

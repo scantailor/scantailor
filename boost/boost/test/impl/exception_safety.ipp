@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: exception_safety.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.7.2.1 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : Facilities to perform exception safety tests
 // ***************************************************************************
@@ -35,6 +35,7 @@
 #include <boost/test/unit_test_log.hpp>
 #include <boost/test/framework.hpp>
 #include <boost/test/test_observer.hpp>
+#include <boost/test/debug.hpp>
 
 #include <boost/test/detail/suppress_warnings.hpp>
 
@@ -390,7 +391,7 @@ void
 exception_safety_tester::failure_point()
 {
     if( m_exec_path_counter == m_break_exec_path )
-        BOOST_ASSERT( false );
+        debug::debugger_break();
     
     throw unique_exception();
 }
@@ -450,7 +451,7 @@ format_execution_path( wrap_stringstream& formatter, ExecPathIt it, ExecPathIt e
                 unsigned i;
                 for( i = 0; i < std::min<std::size_t>( it->m_alloc.size, 8 ); i++ ) {
                     unsigned char c = ((unsigned char*)it->m_alloc.ptr)[i];
-                    if( std::isprint( c ) )
+                    if( (std::isprint)( c ) )
                         formatter << c;
                     else
                         formatter << '.';
@@ -493,7 +494,7 @@ exception_safety_tester::report_error()
         if( m_invairant_failed )
             formatter << " and ";
 
-        formatter << m_memory_in_use.size() << " memory leak";
+        formatter << (unsigned int)m_memory_in_use.size() << " memory leak";
         if( m_memory_in_use.size() > 1 )
             formatter << 's';
     }
@@ -535,39 +536,5 @@ exception_safety( callback0<> const& F, const_string test_name )
 #include <boost/test/detail/enable_warnings.hpp>
 
 #endif // non-ancient compiler
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: exception_safety.ipp,v $
-//  Revision 1.7.2.1  2006/07/27 11:48:49  gennaro_prota
-//  boost guidelines (mainly from inspect tool: tabs, license reference text, etc.); more to do...
-//
-//  Revision 1.7  2006/02/23 15:10:00  rogeeff
-//  vc70 out
-//
-//  Revision 1.6  2006/02/06 10:06:56  rogeeff
-//  MSVC restored for now
-//
-//  Revision 1.5  2006/01/28 08:52:35  rogeeff
-//  operator new overloads made inline to:
-//  1. prevent issues with export them from DLL
-//  2. release link issue fixed
-//
-//  Revision 1.4  2006/01/15 11:14:39  rogeeff
-//  simpl_mock -> mock_object<>::prototype()
-//  operator new need to be rethinked
-//
-//  Revision 1.3  2005/12/22 15:49:32  rogeeff
-//  sunpro port
-//  made operator new conformant
-//
-//  Revision 1.2  2005/12/16 02:33:17  rogeeff
-//  portability fix
-//
-//  Revision 1.1  2005/12/14 05:56:09  rogeeff
-//  exception safety testing introduced
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_EXECUTION_SAFETY_IPP_112005GER

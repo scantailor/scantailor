@@ -5,26 +5,14 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_monitor.cpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.19 $
+//  Version     : $Revision: 41370 $
 //
 //  Description : forwarding source
 // ***************************************************************************
 
 #define BOOST_TEST_SOURCE
 #include <boost/test/impl/unit_test_monitor.ipp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: unit_test_monitor.cpp,v $
-//  Revision 1.19  2005/03/22 07:18:50  rogeeff
-//  no message
-//
-//  Revision 1.18  2005/01/22 19:26:37  rogeeff
-//  implementation moved into headers section to eliminate dependency of included/minimal component on src directory
-//
-// ***************************************************************************
 
 // EOF

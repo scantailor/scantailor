@@ -1,6 +1,6 @@
 ADD_LIBRARY (
 	boost_test STATIC
-	src/compiler_log_formatter.cpp
+	src/compiler_log_formatter.cpp src/debug.cpp
 	src/exception_safety.cpp src/execution_monitor.cpp
 	src/framework.cpp src/interaction_based.cpp src/logged_expectations.cpp
 	src/plain_report_formatter.cpp src/progress_monitor.cpp

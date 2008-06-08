@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: fixed_mapping.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.6 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : fixed sized mapping with specified invalid value
 // ***************************************************************************
@@ -38,7 +38,7 @@ namespace unit_test {
 // configurable maximum fixed sized mapping size supported by this header.
 // You could redefine it before inclusion of this file.
 #ifndef MAX_MAP_SIZE
-#define MAX_MAP_SIZE 15
+#define MAX_MAP_SIZE 20
 #endif
 
 #define CONSTR_DECL_MID( z, i, dummy1 ) key_param_type key##i, value_param_type v##i,
@@ -91,11 +91,8 @@ public:
     // key -> value access
     value_ref_type  operator[]( key_param_type key ) const
     {
-#if BOOST_WORKAROUND(__SUNPRO_CC,BOOST_TESTED_AT(0x530))
-        iterator it = std::lower_bound( m_map.begin(), m_map.end(), key, p1() );
-#else
         iterator it = boost::detail::lower_bound( m_map.begin(), m_map.end(), key, p1() );
-#endif
+
         return (it == m_map.end() || Compare()( key, it->first ) ) ? m_invalid_value : it->second;
     }
 
@@ -122,34 +119,6 @@ private:
 #undef CONSTR_BODY_MID
 #undef CONSTR_DECL
 #undef CONTRUCTORS
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: fixed_mapping.hpp,v $
-//  Revision 1.6  2005/06/16 14:33:42  schoepflin
-//  Added workaround for Tru64/CXX which enables boost.test to compile in strict
-//  ansi mode on that compiler.
-//
-//  Revision 1.5  2005/05/08 08:55:09  rogeeff
-//  typos and missing descriptions fixed
-//
-//  Revision 1.4  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.3  2005/02/01 06:40:07  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.2  2005/01/31 20:07:19  rogeeff
-//  Sunpro CC 5.3 workarounds
-//
-//  Revision 1.1  2005/01/22 18:21:39  rogeeff
-//  moved sharable staff into utils
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_FIXED_MAPPING_HPP_071894GER
 

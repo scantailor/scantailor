@@ -10,9 +10,9 @@
 //
 // See http://www.boost.org/libs/mpl for documentation.
 
-// $Source: /cvsroot/boost/boost/boost/mpl/aux_/range_c/tag.hpp,v $
-// $Date: 2004/11/28 01:31:44 $
-// $Revision: 1.5 $
+// $Source$
+// $Date: 2004-11-27 20:39:23 -0500 (Sat, 27 Nov 2004) $
+// $Revision: 26324 $
 
 namespace boost { namespace mpl { namespace aux {
 

@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: config.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.3 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : Runtime.Param library configuration
 // ***************************************************************************
@@ -28,6 +28,7 @@
 #include <boost/test/detail/config.hpp>
 #include <boost/test/utils/basic_cstring/basic_cstring.hpp>
 #include <boost/test/utils/wrap_stringstream.hpp>
+#include <boost/test/utils/basic_cstring/io.hpp> // operator<<(boost::runtime::cstring)
 
 // STL
 #include <string>
@@ -134,20 +135,5 @@ putenv_impl( cstring name, cstring value )
 } // namespace BOOST_RT_PARAM_NAMESPACE
 
 } // namespace boost
-
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: config.hpp,v $
-//   Revision 1.3  2005/05/06 04:02:52  rogeeff
-//   include ctdlib for setenv
-//
-//   Revision 1.2  2005/05/05 05:55:31  rogeeff
-//   portability fixes
-//
-//   Revision 1.1  2005/04/12 06:42:42  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
 
 #endif // BOOST_RT_CONFIG_HPP_062604GER

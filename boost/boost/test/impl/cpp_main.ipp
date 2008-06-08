@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  (C) Copyright Beman Dawes 1995-2001.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
@@ -6,9 +6,9 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: cpp_main.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.7 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : main function implementation for Program Executon Monitor
 // ***************************************************************************
@@ -28,15 +28,14 @@
 // STL
 #include <iostream>
 #include <cstdlib>      // std::getenv
-
-#include <boost/test/detail/suppress_warnings.hpp>
+#include <cstring>      // std::strerror
 
 #include <boost/test/detail/suppress_warnings.hpp>
 
 //____________________________________________________________________________//
 
 #ifdef BOOST_NO_STDC_NAMESPACE
-namespace std { using ::getenv; }
+namespace std { using ::getenv; using ::strerror; }
 #endif
 
 namespace {
@@ -67,15 +66,16 @@ namespace boost {
 int BOOST_TEST_DECL
 prg_exec_monitor_main( int (*cpp_main)( int argc, char* argv[] ), int argc, char* argv[] )
 {
-    int result;
+    int result = 0;
 
-    boost::unit_test::const_string p( std::getenv( "BOOST_TEST_CATCH_SYSTEM_ERRORS" ) );
-    bool catch_system_errors = p != "no";
-        
     try {
+        boost::unit_test::const_string p( std::getenv( "BOOST_TEST_CATCH_SYSTEM_ERRORS" ) );
         ::boost::execution_monitor ex_mon;
+
+        ex_mon.p_catch_system_errors.value = p != "no";
+        
         result = ex_mon.execute( 
-            ::boost::unit_test::callback0<int>( cpp_main_caller( cpp_main, argc, argv ) ), catch_system_errors );
+            ::boost::unit_test::callback0<int>( cpp_main_caller( cpp_main, argc, argv ) ) );
         
         if( result == 0 )
             result = ::boost::exit_success;
@@ -88,7 +88,13 @@ prg_exec_monitor_main( int (*cpp_main)( int argc, char* argv[] ), int argc, char
         std::cout << "\n**** exception(" << exex.code() << "): " << exex.what() << std::endl;
         result = ::boost::exit_exception_failure;
     }
-    
+    catch( ::boost::system_error const& ex ) {
+        std::cout << "\n**** failed to initialize execution monitor."
+                  << "\n**** expression at fault: " << ex.p_failed_exp 
+                  << "\n**** error(" << ex.p_errno << "): " << std::strerror( ex.p_errno ) << std::endl;
+        result = ::boost::exit_exception_failure;
+    }
+
     if( result != ::boost::exit_success ) {
         std::cerr << "******** errors detected; see standard output for details ********" << std::endl;
     }
@@ -129,17 +135,5 @@ main( int argc, char* argv[] )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: cpp_main.ipp,v $
-//  Revision 1.7  2006/03/19 11:45:26  rogeeff
-//  main function renamed for consistancy
-//
-//  Revision 1.6  2005/12/14 05:27:21  rogeeff
-//  cpp_main API modified for DLL
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_CPP_MAIN_IPP_012205GER

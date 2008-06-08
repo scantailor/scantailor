@@ -5,6 +5,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
+// See http://www.boost.org/libs/foreach for documentation
 //
 // Credits:
 //  Anson Tsao        - for the initial inspiration and several good suggestions.
@@ -13,6 +14,7 @@
 //  Russell Hind      - For help porting to Borland
 //  Alisdair Meredith - For help porting to Borland
 //  Stefan Slapeta    - For help porting to Intel
+//  David Jenkins     - For help finding a Microsoft Code Analysis bug
 
 #ifndef BOOST_FOREACH
 
@@ -28,7 +30,7 @@
 #include <boost/detail/workaround.hpp>
 
 // Some compilers let us detect even const-qualified rvalues at compile-time
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1310)                                                       \
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1310) && !defined(_PREFAST_)                                 \
  || (BOOST_WORKAROUND(__GNUC__, >= 4) && !defined(BOOST_INTEL))                                 \
  || (BOOST_WORKAROUND(__GNUC__, == 3) && (__GNUC_MINOR__ >= 4) && !defined(BOOST_INTEL))
 # define BOOST_FOREACH_COMPILE_TIME_CONST_RVALUE_DETECTION
@@ -61,12 +63,13 @@
 #endif
 
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/assert.hpp>
 #include <boost/mpl/logical.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/begin.hpp>
-#include <boost/range/result_iterator.hpp>
+#include <boost/range/iterator.hpp>
 #include <boost/type_traits/is_array.hpp>
 #include <boost/type_traits/is_const.hpp>
 #include <boost/type_traits/is_abstract.hpp>
@@ -286,13 +289,82 @@ struct type2type
 {
 };
 
+template<typename T>
+struct wrap_cstr
+{
+    typedef T type;
+};
+
+template<>
+struct wrap_cstr<char *>
+{
+    typedef wrap_cstr<char *> type;
+    typedef char *iterator;
+    typedef char *const_iterator;
+};
+
+template<>
+struct wrap_cstr<char const *>
+{
+    typedef wrap_cstr<char const *> type;
+    typedef char const *iterator;
+    typedef char const *const_iterator;
+};
+
+template<>
+struct wrap_cstr<wchar_t *>
+{
+    typedef wrap_cstr<wchar_t *> type;
+    typedef wchar_t *iterator;
+    typedef wchar_t *const_iterator;
+};
+
+template<>
+struct wrap_cstr<wchar_t const *>
+{
+    typedef wrap_cstr<wchar_t const *> type;
+    typedef wchar_t const *iterator;
+    typedef wchar_t const *const_iterator;
+};
+
+template<typename T>
+struct is_char_array
+  : mpl::and_<
+        is_array<T>
+      , mpl::or_<
+            is_convertible<T, char const *>
+          , is_convertible<T, wchar_t const *>
+        >
+    >
+{};
+
 template<typename T, typename C = boost::mpl::false_>
 struct foreach_iterator
 {
+    // **** READ THIS IF YOUR COMPILE BREAKS HERE ****
+    //
+    // There is an ambiguity about how to iterate over arrays of char and wchar_t. 
+    // Should the last array element be treated as a null terminator to be skipped, or
+    // is it just like any other element in the array? To fix the problem, you must
+    // say which behavior you want.
+    //
+    // To treat the container as a null-terminated string, merely cast it to a
+    // char const *, as in BOOST_FOREACH( char ch, (char const *)"hello" ) ...
+    //
+    // To treat the container as an array, use boost::as_array() in <boost/range/as_array.hpp>,
+    // as in BOOST_FOREACH( char ch, boost::as_array("hello") ) ...
+    #if BOOST_MSVC > 1300
+    BOOST_MPL_ASSERT_MSG( (!is_char_array<T>::value), IS_THIS_AN_ARRAY_OR_A_NULL_TERMINATED_STRING, (T) );
+    #endif
+
+    // If the type is a pointer to a null terminated string (as opposed 
+    // to an array type), there is no ambiguity.
+    typedef BOOST_DEDUCED_TYPENAME wrap_cstr<T>::type container;
+
     typedef BOOST_DEDUCED_TYPENAME boost::mpl::eval_if<
         C
-      , range_const_iterator<T>
-      , range_iterator<T>
+      , range_const_iterator<container>
+      , range_mutable_iterator<container>
     >::type type;
 };
 
@@ -557,6 +629,15 @@ auto_any<BOOST_DEDUCED_TYPENAME foreach_iterator<T, const_>::type>
 begin(auto_any_t col, type2type<T, const_> *, bool *)
 {
     return boost::begin(*auto_any_cast<simple_variant<T>, boost::mpl::false_>(col).get());
+}
+#endif
+
+#ifndef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
+template<typename T, typename C>
+inline auto_any<T *>
+begin(auto_any_t col, type2type<T *, C> *, boost::mpl::true_ *) // null-terminated C-style strings
+{
+    return auto_any_cast<T *, boost::mpl::false_>(col);
 }
 #endif
 

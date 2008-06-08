@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_suite.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.13 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : privide core implementation for Unit Test Framework.
 //  Extensions could be provided in separate files
@@ -54,6 +54,7 @@ test_unit::test_unit( const_string name, test_unit_type t )
 , p_type_name( t == tut_case ? "case" : "suite" )
 , p_id( INV_TEST_UNIT_ID )
 , p_name( std::string( name.begin(), name.size() ) )
+, p_enabled( true )
 {
 }
 
@@ -70,16 +71,23 @@ test_unit::depends_on( test_unit* tu )
 bool
 test_unit::check_dependencies() const
 {
-#if BOOST_WORKAROUND(__SUNPRO_CC, BOOST_TESTED_AT(0x530) )
-    BOOST_TEST_FOREACH( test_unit_id, tu_id, const_cast<test_unit*>(this)->m_dependencies ) {
-#else
     BOOST_TEST_FOREACH( test_unit_id, tu_id, m_dependencies ) {
-#endif
         if( !unit_test::results_collector.results( tu_id ).passed() )
             return false;
     }
 
     return true;
+}
+
+//____________________________________________________________________________//
+
+void
+test_unit::increase_exp_fail( unsigned num )
+{
+    p_expected_failures.value += num;
+
+    if( p_parent_id != 0 )
+        framework::get<test_suite>( p_parent_id ).increase_exp_fail( num );
 }
 
 //____________________________________________________________________________//
@@ -115,21 +123,20 @@ test_suite::test_suite( const_string name )
 
 //____________________________________________________________________________//
 
-// !! need to prevent modifing test unit once it is added to tree
-
 void
 test_suite::add( test_unit* tu, counter_t expected_failures, unsigned timeout )
 {
-    if( expected_failures != 0 )
-        tu->p_expected_failures.value = expected_failures;
-
-    p_expected_failures.value += tu->p_expected_failures;
-
     if( timeout != 0 )
         tu->p_timeout.value = timeout;
 
     m_members.push_back( tu->p_id );
     tu->p_parent_id.value = p_id;
+
+    if( tu->p_expected_failures )
+        increase_exp_fail( tu->p_expected_failures );
+
+    if( expected_failures )
+        tu->increase_exp_fail( expected_failures );
 }
 
 //____________________________________________________________________________//
@@ -144,6 +151,30 @@ test_suite::add( test_unit_generator const& gen, unsigned timeout )
 
 //____________________________________________________________________________//
 
+void
+test_suite::remove( test_unit_id id )
+{
+    std::vector<test_unit_id>::iterator it = std::find( m_members.begin(), m_members.begin(), id );
+
+    if( it != m_members.end() )
+        m_members.erase( it );
+}
+
+//____________________________________________________________________________//
+
+test_unit_id
+test_suite::get( const_string tu_name ) const
+{
+    BOOST_TEST_FOREACH( test_unit_id, id, m_members ) {
+        if( tu_name == framework::get( id, test_id_2_unit_type( id ) ).p_name.get() )
+            return id;
+    }
+
+    return INV_TEST_UNIT_ID;
+}
+
+//____________________________________________________________________________//
+
 // ************************************************************************** //
 // **************               traverse_test_tree             ************** //
 // ************************************************************************** //
@@ -151,6 +182,7 @@ test_suite::add( test_unit_generator const& gen, unsigned timeout )
 void
 traverse_test_tree( test_case const& tc, test_tree_visitor& V )
 {
+    if( tc.p_enabled )
     V.visit( tc );
 }
 
@@ -159,7 +191,7 @@ traverse_test_tree( test_case const& tc, test_tree_visitor& V )
 void
 traverse_test_tree( test_suite const& suite, test_tree_visitor& V )
 {
-    if( !V.test_suite_start( suite ) )
+    if( !suite.p_enabled || !V.test_suite_start( suite ) )
         return;
 
     try {
@@ -198,6 +230,19 @@ traverse_test_tree( test_unit_id id, test_tree_visitor& V )
 //____________________________________________________________________________//
 
 // ************************************************************************** //
+// **************                test_case_counter             ************** //
+// ************************************************************************** //
+
+void
+test_case_counter::visit( test_case const& tc )
+{
+    if( tc.p_enabled )
+        ++p_count.value;
+}
+
+//____________________________________________________________________________//
+
+// ************************************************************************** //
 // **************               object generators              ************** //
 // ************************************************************************** //
 
@@ -213,7 +258,75 @@ normalize_test_case_name( const_string name )
 
 //____________________________________________________________________________//
 
+// ************************************************************************** //
+// **************           auto_test_unit_registrar           ************** //
+// ************************************************************************** //
+
+auto_test_unit_registrar::auto_test_unit_registrar( test_case* tc, counter_t exp_fail )
+{
+    curr_ts_store().back()->add( tc, exp_fail );
+}
+
+//____________________________________________________________________________//
+
+auto_test_unit_registrar::auto_test_unit_registrar( const_string ts_name )
+{
+    test_unit_id id = curr_ts_store().back()->get( ts_name );
+
+    test_suite* ts;
+
+    if( id != INV_TEST_UNIT_ID ) {
+        ts = &framework::get<test_suite>( id ); // !! test for invalid tu type
+        BOOST_ASSERT( ts->p_parent_id == curr_ts_store().back()->p_id );
+    }
+    else {
+        ts = new test_suite( ts_name );
+        curr_ts_store().back()->add( ts );
+    }
+
+    curr_ts_store().push_back( ts );
+}
+
+//____________________________________________________________________________//
+
+auto_test_unit_registrar::auto_test_unit_registrar( test_unit_generator const& tc_gen )
+{
+    curr_ts_store().back()->add( tc_gen );
+}
+
+//____________________________________________________________________________//
+
+auto_test_unit_registrar::auto_test_unit_registrar( int )
+{
+    if( curr_ts_store().size() == 0 )
+        return; // report error?
+
+    curr_ts_store().pop_back();
+}
+
+//____________________________________________________________________________//
+
+std::list<test_suite*>&
+auto_test_unit_registrar::curr_ts_store()
+{
+    static std::list<test_suite*> inst( 1, &framework::master_test_suite() );
+    return inst;
+}
+
+//____________________________________________________________________________//
+
 } // namespace ut_detail
+
+// ************************************************************************** //
+// **************                global_fixture                ************** //
+// ************************************************************************** //
+
+global_fixture::global_fixture()
+{
+    framework::register_observer( *this );
+} 
+
+//____________________________________________________________________________//
 
 } // namespace unit_test
 
@@ -222,38 +335,5 @@ normalize_test_case_name( const_string name )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: unit_test_suite.ipp,v $
-//  Revision 1.13  2006/02/23 15:33:15  rogeeff
-//  workaround restored
-//
-//  Revision 1.12  2006/01/28 08:53:57  rogeeff
-//  VC6.0 workaround removed
-//
-//  Revision 1.11  2005/12/14 05:54:41  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.10  2005/04/18 04:55:36  rogeeff
-//  test unit name made read/write
-//
-//  Revision 1.9  2005/03/23 21:02:25  rogeeff
-//  Sunpro CC 5.3 fixes
-//
-//  Revision 1.8  2005/03/21 15:33:15  rogeeff
-//  check reworked
-//
-//  Revision 1.7  2005/02/25 21:27:44  turkanis
-//  fix for random_shuffle on Borland 5.x w/ STLPort
-//
-//  Revision 1.6  2005/02/21 10:12:24  rogeeff
-//  Support for random order of test cases implemented
-//
-//  Revision 1.5  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_UNIT_TEST_SUITE_IPP_012205GER

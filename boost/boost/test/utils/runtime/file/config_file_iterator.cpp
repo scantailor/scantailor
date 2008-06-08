@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: config_file_iterator.cpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.1 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : flexible configuration file iterator implementation
 // ***************************************************************************
@@ -677,11 +677,4 @@ config_file_iterator::set_parameter( rtti::id_t id, std::size_t value )
 
 } // namespace boost
 
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: config_file_iterator.cpp,v $
-//   Revision 1.1  2005/04/12 06:42:44  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
+// EOF

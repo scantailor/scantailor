@@ -11,9 +11,9 @@
 //
 // See http://www.boost.org/libs/mpl for documentation.
 
-// $Source: /cvsroot/boost/boost/boost/mpl/aux_/order_impl.hpp,v $
-// $Date: 2004/10/13 18:23:20 $
-// $Revision: 1.5 $
+// $Source$
+// $Date: 2004-10-13 14:25:11 -0400 (Wed, 13 Oct 2004) $
+// $Revision: 25712 $
 
 #include <boost/mpl/order_fwd.hpp>
 #include <boost/mpl/if.hpp>

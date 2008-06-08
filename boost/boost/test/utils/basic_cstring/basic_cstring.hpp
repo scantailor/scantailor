@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2004-2005.
+//  (C) Copyright Gennadiy Rozental 2004-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: basic_cstring.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.10 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : class basic_cstring wraps C string and provide std_string like 
 //                interface
@@ -713,11 +713,7 @@ last_char( basic_cstring<CharT> source )
 
 template<typename CharT1, typename CharT2>
 inline void
-#if BOOST_WORKAROUND(__SUNPRO_CC, BOOST_TESTED_AT(0x530) )
-assign_op( std::basic_string<CharT1>& target, basic_cstring<CharT2> const& src, int )
-#else
 assign_op( std::basic_string<CharT1>& target, basic_cstring<CharT2> src, int )
-#endif
 {
     target.assign( src.begin(), src.size() );
 }
@@ -731,47 +727,5 @@ assign_op( std::basic_string<CharT1>& target, basic_cstring<CharT2> src, int )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: basic_cstring.hpp,v $
-//  Revision 1.10  2005/12/14 05:01:13  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.9  2005/07/13 21:49:46  danieljames
-//  Boost.Test workarounds for Digital Mars bugs.
-//
-//  Revision 1.8  2005/04/12 06:49:05  rogeeff
-//  assign_to -> assign_op
-//
-//  Revision 1.7  2005/03/23 21:02:37  rogeeff
-//  Sunpro CC 5.3 fixes
-//
-//  Revision 1.6  2005/03/22 07:02:57  rogeeff
-//  assign_to made free function
-//
-//  Revision 1.5  2005/03/22 07:00:56  rogeeff
-//  assign_to made free function
-//
-//  Revision 1.4  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.3  2005/02/01 06:40:08  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.2  2005/01/22 19:22:13  rogeeff
-//  implementation moved into headers section to eliminate dependency of included/minimal component on src directory
-//
-//  Revision 1.1  2005/01/22 18:21:40  rogeeff
-//  moved sharable staff into utils
-//
-//  Revision 1.12  2005/01/21 07:33:51  rogeeff
-//  small aCC fix
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_BASIC_CSTRING_HPP_071894GER

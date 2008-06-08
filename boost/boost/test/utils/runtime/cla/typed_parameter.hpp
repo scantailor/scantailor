@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the 
 //  Boost Software License, Version 1.0. (See accompanying file 
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: typed_parameter.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.1 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : generic typed parameter model
 // ***************************************************************************
@@ -64,14 +64,5 @@ private:
 } // namespace BOOST_RT_PARAM_NAMESPACE
 
 } // namespace boost
-
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: typed_parameter.hpp,v $
-//   Revision 1.1  2005/04/12 06:42:43  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
 
 #endif // BOOST_RT_CLA_TYPED_PARAMETER_HPP_062604GER

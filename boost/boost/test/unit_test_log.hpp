@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_log.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.32 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : defines singleton class unit_test_log and all manipulators.
 //  unit_test_log has output stream like interface. It's implementation is
@@ -167,47 +167,6 @@ BOOST_TEST_SINGLETON_INST( unit_test_log )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: unit_test_log.hpp,v $
-//  Revision 1.32  2006/01/28 08:57:02  rogeeff
-//  VC6.0 workaround removed
-//
-//  Revision 1.31  2005/12/14 05:23:21  rogeeff
-//  dll support introduced
-//  Minor interface simplifications
-//  BOOST_TEST_MESSAGE and BOOST_TEST_CHECKPOINT moved into log realm
-//  BOOST_TEST_PASSPOINT is introduced
-//
-//  Revision 1.30  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.29  2005/02/02 12:08:14  rogeeff
-//  namespace log added for log manipulators
-//
-//  Revision 1.28  2005/02/01 06:40:06  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.27  2005/01/30 03:26:29  rogeeff
-//  return an ability for explicit end()
-//
-//  Revision 1.26  2005/01/21 07:30:24  rogeeff
-//  to log testing time log formatter interfaces changed
-//
-//  Revision 1.25  2005/01/18 08:26:12  rogeeff
-//  unit_test_log rework:
-//     eliminated need for ::instance()
-//     eliminated need for << end and ...END macro
-//     straitend interface between log and formatters
-//     change compiler like formatter name
-//     minimized unit_test_log interface and reworked to use explicit calls
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_UNIT_TEST_LOG_HPP_071894GER
 

@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: plain_report_formatter.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.4 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : plain report formatter definition
 // ***************************************************************************
@@ -194,29 +194,5 @@ plain_report_formatter::do_confirmation_report( test_unit const& tu, std::ostrea
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: plain_report_formatter.ipp,v $
-//  Revision 1.4  2006/01/28 08:55:52  rogeeff
-//  results collection bug fixed
-//
-//  Revision 1.3  2005/12/14 05:31:06  rogeeff
-//  report all aborted test units
-//
-//  Revision 1.2  2005/12/08 03:19:01  dgregor
-//  Merged from Version_1_33_1
-//
-//  Revision 1.1.2.2  2005/11/28 11:57:07  dgregor
-//  Make that.... iostream
-//
-//  Revision 1.1.2.1  2005/11/28 00:02:36  dgregor
-//  Include ostream
-//
-//  Revision 1.1  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_PLAIN_REPORT_FORMATTER_IPP_020105GER

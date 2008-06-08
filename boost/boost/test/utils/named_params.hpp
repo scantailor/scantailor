@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: named_params.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.5 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : facilities for named function parameters support
 // ***************************************************************************
@@ -97,20 +97,6 @@ struct named_parameter_base {
 
 //____________________________________________________________________________//
 
-#if BOOST_WORKAROUND( __SUNPRO_CC, == 0x530 )
-
-struct unknown_id_helper {
-    template<typename UnknownId>
-    nil     operator[]( keyword<UnknownId,false> kw ) const { return nil(); }
-
-    template<typename UnknownId>
-    bool    has( keyword<UnknownId,false> ) const           { return false; }
-};
-
-#endif
-
-//____________________________________________________________________________//
-
 // ************************************************************************** //
 // **************             named_parameter_combine          ************** //
 // ************************************************************************** //
@@ -162,9 +148,6 @@ private:
 template<typename T, typename unique_id,typename ReferenceType=T&>
 struct named_parameter
 : nfp_detail::named_parameter_base<named_parameter<T, unique_id,ReferenceType> >
-#if BOOST_WORKAROUND( __SUNPRO_CC, == 0x530 )
-, nfp_detail::unknown_id_helper
-#endif
 {
     typedef T               data_type;
     typedef ReferenceType   ref_type;
@@ -176,20 +159,12 @@ struct named_parameter
     // Access methods
     ref_type        operator[]( keyword<unique_id,true> ) const     { return m_value; }
     ref_type        operator[]( keyword<unique_id,false> ) const    { return m_value; }
-#if BOOST_WORKAROUND( __SUNPRO_CC, == 0x530 )
-    using           nfp_detail::unknown_id_helper::operator[];
-#else
     template<typename UnknownId>
     nfp_detail::nil  operator[]( keyword<UnknownId,false> ) const   { return nfp_detail::nil(); }
-#endif
 
     bool            has( keyword<unique_id,false> ) const           { return true; }
-#if BOOST_WORKAROUND( __SUNPRO_CC, == 0x530 )
-    using           nfp_detail::unknown_id_helper::has;
-#else
     template<typename UnknownId>
     bool            has( keyword<UnknownId,false> ) const           { return false; }
-#endif
 
     // Visitation support
     template<typename Visitor>
@@ -314,28 +289,6 @@ optionally_assign( T& target, Params const& p, Keyword k )
 } // namespace boost
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//   Revision History:
-//  
-//  $Log: named_params.hpp,v $
-//  Revision 1.5  2005/12/14 05:01:13  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.4  2005/06/13 10:35:08  schoepflin
-//  Enable optionally_assign() overload workaround for Tru64/CXX-6.5 as well.
-//
-//  Revision 1.3  2005/06/05 18:10:59  grafik
-//  named_param.hpp; Work around CW not handling operator, using declaration, by using a real operator,().
-//  token_iterator_test.cpp; Work around CW-8 confused with array initialization.
-//
-//  Revision 1.2  2005/05/03 05:02:49  rogeeff
-//  como fixes
-//
-//  Revision 1.1  2005/04/12 06:48:12  rogeeff
-//  Runtime.Param library initial commit
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_NAMED_PARAM_022505GER
 

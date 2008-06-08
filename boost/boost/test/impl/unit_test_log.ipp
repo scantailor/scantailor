@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: unit_test_log.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.11 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : implemets Unit Test Log
 // ***************************************************************************
@@ -22,7 +22,6 @@
 #include <boost/test/execution_monitor.hpp>
 
 #include <boost/test/detail/unit_test_parameters.hpp>
-#include <boost/test/detail/wrap_io_saver.hpp>
 
 #include <boost/test/utils/basic_cstring/compare.hpp>
 
@@ -31,6 +30,8 @@
 
 // Boost
 #include <boost/scoped_ptr.hpp>
+#include <boost/io/ios_state.hpp>
+typedef ::boost::io::ios_base_all_saver io_saver_type;
 
 // STL
 #include <iostream>
@@ -124,6 +125,9 @@ unit_test_log_impl& s_log_impl() { static unit_test_log_impl the_inst; return th
 void
 unit_test_log_t::test_start( counter_t test_cases_amount )
 {
+    if( s_log_impl().m_threshold_level == log_nothing )
+        return;
+
     s_log_impl().m_log_formatter->log_start( s_log_impl().stream(), test_cases_amount );
 
     if( runtime_config::show_build_info() )
@@ -137,7 +141,12 @@ unit_test_log_t::test_start( counter_t test_cases_amount )
 void
 unit_test_log_t::test_finish()
 {
+    if( s_log_impl().m_threshold_level == log_nothing )
+        return;
+
     s_log_impl().m_log_formatter->log_finish( s_log_impl().stream() );
+
+    s_log_impl().stream().flush();
 }
 
 //____________________________________________________________________________//
@@ -153,7 +162,7 @@ unit_test_log_t::test_aborted()
 void
 unit_test_log_t::test_unit_start( test_unit const& tu )
 {
-    if( s_log_impl().m_threshold_level > log_test_suites )
+    if( s_log_impl().m_threshold_level > log_test_units )
         return;
 
     if( s_log_impl().m_entry_in_progress )
@@ -167,7 +176,7 @@ unit_test_log_t::test_unit_start( test_unit const& tu )
 void
 unit_test_log_t::test_unit_finish( test_unit const& tu, unsigned long elapsed )
 {
-    if( s_log_impl().m_threshold_level > log_test_suites )
+    if( s_log_impl().m_threshold_level > log_test_units )
         return;
 
     s_log_impl().m_checkpoint_data.clear();
@@ -183,7 +192,7 @@ unit_test_log_t::test_unit_finish( test_unit const& tu, unsigned long elapsed )
 void
 unit_test_log_t::test_unit_skipped( test_unit const& tu )
 {
-    if( s_log_impl().m_threshold_level > log_test_suites )
+    if( s_log_impl().m_threshold_level > log_test_units )
         return;
 
     if( s_log_impl().m_entry_in_progress )
@@ -331,7 +340,7 @@ unit_test_log_t::operator<<( const_string value )
                                                                unit_test_log_formatter::BOOST_UTL_ET_FATAL_ERROR );
                 break;
             case log_nothing:
-            case log_test_suites:
+            case log_test_units:
             case invalid_log_level:
                 return *this;
             }
@@ -397,29 +406,5 @@ unit_test_log_t::set_formatter( unit_test_log_formatter* the_formatter )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: unit_test_log.ipp,v $
-//  Revision 1.11  2005/12/14 05:34:21  rogeeff
-//  log API simplified
-//
-//  Revision 1.10  2005/04/30 16:48:51  rogeeff
-//  io saver warkaround for classic io is shared
-//
-//  Revision 1.9  2005/04/29 06:28:35  rogeeff
-//  bug fix for manipulator handling
-//
-//  Revision 1.8  2005/04/12 06:50:46  rogeeff
-//  assign_to -> assign_op
-//
-//  Revision 1.7  2005/03/22 07:06:58  rogeeff
-//  assign_to made free function
-//
-//  Revision 1.6  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_UNIT_TEST_LOG_IPP_012205GER

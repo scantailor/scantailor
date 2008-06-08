@@ -11,9 +11,9 @@
 //
 // See http://www.boost.org/libs/mpl for documentation.
 
-// $Source: /cvsroot/boost/boost/boost/mpl/map/aux_/item.hpp,v $
-// $Date: 2004/12/14 14:05:32 $
-// $Revision: 1.5 $
+// $Source$
+// $Date: 2004-12-14 09:05:33 -0500 (Tue, 14 Dec 2004) $
+// $Revision: 26498 $
 
 #include <boost/mpl/void.hpp>
 #include <boost/mpl/pair.hpp>

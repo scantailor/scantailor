@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2004-2005.
+//  (C) Copyright Gennadiy Rozental 2004-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: algorithm.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.5 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : addition to STL algorithms
 // ***************************************************************************
@@ -16,6 +16,8 @@
 #define BOOST_ALGORITHM_HPP_062304GER
 
 #include <utility>
+#include <algorithm> // std::find
+#include <functional> // std::bind1st
 
 #include <boost/test/detail/suppress_warnings.hpp>
 
@@ -221,30 +223,6 @@ find_last_not_of( BidirectionalIterator1 first1, BidirectionalIterator1 last1,
 
 #include <boost/test/detail/enable_warnings.hpp>
 
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: algorithm.hpp,v $
-//  Revision 1.5  2005/04/12 06:50:06  rogeeff
-//  suppress warnings
-//
-//  Revision 1.4  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.3  2005/02/01 08:59:39  rogeeff
-//  supplied_log_formatters split
-//  change formatters interface to simplify result interface
-//
-//  Revision 1.2  2005/02/01 06:40:07  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.1  2005/01/22 18:21:39  rogeeff
-//  moved sharable staff into utils
-//
-// ***************************************************************************
-
 #endif // BOOST_ALGORITHM_HPP_062304GER
+
 

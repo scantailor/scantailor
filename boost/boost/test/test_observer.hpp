@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: test_observer.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.3 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : defines abstract interface for test observer
 // ***************************************************************************
@@ -60,23 +60,6 @@ protected:
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: test_observer.hpp,v $
-//  Revision 1.3  2006/03/13 18:28:26  rogeeff
-//  warnings eliminated
-//
-//  Revision 1.2  2005/12/14 05:15:34  rogeeff
-//  dll support introduced
-//  priority interface added
-//  provide default implementation for interface function
-//
-//  Revision 1.1  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_TEST_OBSERVER_HPP_021005GER
 

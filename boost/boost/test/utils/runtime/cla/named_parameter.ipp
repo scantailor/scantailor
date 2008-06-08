@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the 
 //  Boost Software License, Version 1.0. (See accompanying file 
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: named_parameter.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : implements model of named parameter
 // ***************************************************************************
@@ -112,17 +112,5 @@ string_name_policy::match_name( argv_traverser& tr ) const
 } // namespace BOOST_RT_PARAM_NAMESPACE
 
 } // namespace boost
-
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: named_parameter.ipp,v $
-//   Revision 1.2  2005/04/12 07:01:36  rogeeff
-//   exclude polymorphic_downcast
-//
-//   Revision 1.1  2005/04/12 06:42:43  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
 
 #endif // BOOST_RT_CLA_NAMED_PARAMETER_IPP_062904GER

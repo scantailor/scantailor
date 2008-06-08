@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: progress_monitor.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : implements simple text based progress monitor
 // ***************************************************************************
@@ -84,7 +84,7 @@ progress_monitor_t::test_unit_skipped( test_unit const& tu )
     test_case_counter tcc;
     traverse_test_tree( tu, tcc );
     
-    (*s_pm_impl().m_progress_display) += tcc.m_count;
+    (*s_pm_impl().m_progress_display) += tcc.p_count;
 }
 
 //____________________________________________________________________________//
@@ -104,17 +104,5 @@ progress_monitor_t::set_stream( std::ostream& ostr )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: progress_monitor.ipp,v $
-//  Revision 1.2  2005/12/14 05:52:49  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.1  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_PROGRESS_MONITOR_IPP_020105GER

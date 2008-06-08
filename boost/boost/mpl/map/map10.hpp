@@ -11,9 +11,9 @@
 //
 // See http://www.boost.org/libs/mpl for documentation.
 
-// $Source: /cvsroot/boost/boost/boost/mpl/map/map10.hpp,v $
-// $Date: 2004/09/05 09:42:58 $
-// $Revision: 1.3 $
+// $Source$
+// $Date: 2004-09-05 05:45:19 -0400 (Sun, 05 Sep 2004) $
+// $Revision: 24912 $
 
 #if !defined(BOOST_MPL_PREPROCESSING_MODE)
 #   include <boost/mpl/map/map0.hpp>

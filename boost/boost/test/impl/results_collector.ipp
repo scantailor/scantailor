@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: results_collector.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.5 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : implements Unit Test results collecting facility.
 // ***************************************************************************
@@ -213,7 +213,11 @@ results_collector_t::test_unit_finish( test_unit const& tu, unsigned long )
         
         bool num_failures_match = tr.p_aborted || tr.p_assertions_failed >= tr.p_expected_failures;
         if( !num_failures_match )
-            BOOST_TEST_MESSAGE( "Test case has less failures then expected" );
+            BOOST_TEST_MESSAGE( "Test case " << tu.p_name << " has fewer failures than expected" );
+
+        bool has_any_assertions = tr.p_aborted || (tr.p_assertions_failed != 0) || (tr.p_assertions_passed != 0);
+        if( !has_any_assertions )
+            BOOST_TEST_MESSAGE( "Test case " << tu.p_name << " doesn't include any assertions" );
     }
 }
 
@@ -231,7 +235,7 @@ results_collector_t::test_unit_skipped( test_unit const& tu )
         tr.clear();
     
         tr.p_skipped.value              = true;
-        tr.p_test_cases_skipped.value   = tcc.m_count;
+        tr.p_test_cases_skipped.value   = tcc.p_count;
     }
 }
 
@@ -286,26 +290,5 @@ results_collector_t::results( test_unit_id id ) const
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: results_collector.ipp,v $
-//  Revision 1.5  2006/02/26 15:24:00  rogeeff
-//  vc65 workaround
-//
-//  Revision 1.4  2006/01/28 08:55:52  rogeeff
-//  results collection bug fixed
-//
-//  Revision 1.3  2005/12/14 05:53:22  rogeeff
-//  collect amount of aborted test cases
-//
-//  Revision 1.2  2005/03/24 04:02:33  rogeeff
-//  portability fixes
-//
-//  Revision 1.1  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_RESULTS_COLLECTOR_IPP_021105GER

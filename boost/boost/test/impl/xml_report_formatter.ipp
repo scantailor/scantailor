@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: xml_report_formatter.ipp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.3 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : XML report formatter
 // ***************************************************************************
@@ -111,20 +111,5 @@ xml_report_formatter::do_confirmation_report( test_unit const& tu, std::ostream&
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//
-//  $Log: xml_report_formatter.ipp,v $
-//  Revision 1.3  2005/12/14 05:39:43  rogeeff
-//  *** empty log message ***
-//
-//  Revision 1.2  2005/04/29 06:30:07  rogeeff
-//  bug fix for incorect XML output
-//
-//  Revision 1.1  2005/02/20 08:27:07  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_XML_REPORT_FORMATTER_IPP_020105GER

@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2002-2005.
+//  (C) Copyright Gennadiy Rozental 2002-2007.
 //  (C) Copyright Daryle Walker 2000-2001. 
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
@@ -6,9 +6,9 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: nullstream.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.4 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : simulate /dev/null stream
 // ***************************************************************************
@@ -96,26 +96,5 @@ typedef basic_onullstream<wchar_t>  wonullstream;
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: nullstream.hpp,v $
-//  Revision 1.4  2005/02/20 08:27:08  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.3  2005/02/01 06:40:07  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.2  2005/01/30 01:42:49  rogeeff
-//  warnings suppressed
-//
-//  Revision 1.1  2005/01/22 18:21:40  rogeeff
-//  moved sharable staff into utils
-//
-// ***************************************************************************
 
 #endif  // BOOST_NULLSTREAM_HPP_071894GER

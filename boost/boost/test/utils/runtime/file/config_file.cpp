@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: config_file.cpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.1 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : implements models configuration file, it's parameter and parameter namespaces
 // ***************************************************************************
@@ -246,11 +246,4 @@ config_file::config_file( cstring file_name )
 
 } // namespace boost
 
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: config_file.cpp,v $
-//   Revision 1.1  2005/04/12 06:42:43  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
+// EOF

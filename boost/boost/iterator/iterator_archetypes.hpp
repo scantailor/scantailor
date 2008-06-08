@@ -196,6 +196,8 @@ namespace detail
           explicit archetype(ctor_arg arg)
             : traversal_archetype_<Derived, Value, incrementable_traversal_tag>(arg)
           {}
+          
+          typedef std::ptrdiff_t difference_type;
       };
   };
 
@@ -219,7 +221,6 @@ namespace detail
           archetype() 
             : traversal_archetype_<Derived, Value, single_pass_traversal_tag>(ctor_arg())
           {}
-          typedef std::ptrdiff_t difference_type;
       };
   };
 

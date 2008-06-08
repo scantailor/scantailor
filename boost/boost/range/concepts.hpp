@@ -13,8 +13,8 @@
 
 #include <boost/concept_check.hpp>
 #include <boost/iterator/iterator_concepts.hpp>
-#include <boost/range/functions.hpp>
-#include <boost/range/metafunctions.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 
 /*!
  * \file
@@ -57,10 +57,11 @@ namespace boost {
 
     //! Check if a type T models the SinglePassRange range concept.
     template<typename T>
-    struct SinglePassRangeConcept {
-        typedef typename range_value<T>::type range_value;
-        typedef typename range_iterator<T>::type range_iterator;
-        typedef typename range_const_iterator<T>::type range_const_iterator;
+    struct SinglePassRangeConcept 
+    {
+        typedef typename range_iterator<T const>::type  range_const_iterator;
+        typedef typename range_iterator<T>::type        range_iterator;
+
         void constraints()
         {
             function_requires<
@@ -70,9 +71,9 @@ namespace boost {
             >();
             i = boost::begin(a);
             i = boost::end(a);
-            b = boost::empty(a);
             const_constraints(a);
         }
+        
         void const_constraints(const T& a)
         {
             ci = boost::begin(a);
@@ -81,14 +82,12 @@ namespace boost {
         T a;
         range_iterator i;
         range_const_iterator ci;
-        bool b;
     };
 
     //! Check if a type T models the ForwardRange range concept.
     template<typename T>
-    struct ForwardRangeConcept {
-        typedef typename range_difference<T>::type range_difference;
-        typedef typename range_size<T>::type range_size;
+    struct ForwardRangeConcept 
+    {
         void constraints()
         {
             function_requires<
@@ -99,17 +98,13 @@ namespace boost {
                     typename range_iterator<T>::type
                 >
             >();
-            s = boost::size(a);
         }
-        T a;
-        range_size s;
     };
 
     //! Check if a type T models the BidirectionalRange range concept.
     template<typename T>
-    struct BidirectionalRangeConcept {
-        typedef typename range_reverse_iterator<T>::type range_reverse_iterator;
-        typedef typename range_const_reverse_iterator<T>::type range_const_reverse_iterator;
+    struct BidirectionalRangeConcept 
+    {
         void constraints()
         {
             function_requires<
@@ -120,23 +115,13 @@ namespace boost {
                     typename range_iterator<T>::type
                 >
             >();
-            i = boost::rbegin(a);
-            i = boost::rend(a);
-            const_constraints(a);
-            }
-        void const_constraints(const T& a)
-        {
-            ci = boost::rbegin(a);
-            ci = boost::rend(a);
         }
-        T a;
-        range_reverse_iterator i;
-        range_const_reverse_iterator ci;
     };
 
     //! Check if a type T models the RandomAccessRange range concept.
     template<typename T>
-    struct RandomAccessRangeConcept {
+    struct RandomAccessRangeConcept 
+    {
         void constraints()
         {
             function_requires<
@@ -147,7 +132,7 @@ namespace boost {
                     typename range_iterator<T>::type
                 >
             >();
-            }
+         }
     };
 
 } // namespace boost

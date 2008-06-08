@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2005.
+//  (C) Copyright Gennadiy Rozental 2005-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: environment.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.3 $
+//  Version     : $Revision: 43798 $
 //
 //  Description : defines and implements inline model of program environment 
 // ***************************************************************************
@@ -164,20 +164,5 @@ namespace env = environment;
 #include <boost/test/utils/runtime/env/environment.ipp>
 
 #endif
-
-// ************************************************************************** //
-//   Revision History:
-//
-//   $Log: environment.hpp,v $
-//   Revision 1.3  2005/05/14 05:41:10  rogeeff
-//   *** empty log message ***
-//
-//   Revision 1.2  2005/05/14 05:34:57  rogeeff
-//   *** empty log message ***
-//
-//   Revision 1.1  2005/04/12 06:42:43  rogeeff
-//   Runtime.Param library initial commit
-//
-// ************************************************************************** //
 
 #endif // BOOST_RT_ENV_ENVIRONMENT_HPP_062604GER

@@ -5,26 +5,14 @@
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: test_tools.cpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.45 $
+//  Version     : $Revision: 41370 $
 //
 //  Description : forwarding source
 // ***************************************************************************
 
 #define BOOST_TEST_SOURCE
 #include <boost/test/impl/test_tools.ipp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: test_tools.cpp,v $
-//  Revision 1.45  2005/03/22 07:18:50  rogeeff
-//  no message
-//
-//  Revision 1.44  2005/01/22 19:26:37  rogeeff
-//  implementation moved into headers section to eliminate dependency of included/minimal component on src directory
-//
-// ***************************************************************************
 
 // EOF

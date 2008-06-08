@@ -1,13 +1,13 @@
-//  (C) Copyright Gennadiy Rozental 2001-2005.
+//  (C) Copyright Gennadiy Rozental 2001-2007.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org/libs/test for the library home page.
 //
-//  File        : $RCSfile: results_collector.hpp,v $
+//  File        : $RCSfile$
 //
-//  Version     : $Revision: 1.2 $
+//  Version     : $Revision: 41369 $
 //
 //  Description : defines class unit_test_result that is responsible for 
 //  gathering test results and presenting this information to end-user
@@ -107,34 +107,6 @@ BOOST_TEST_SINGLETON_INST( results_collector )
 //____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
-
-// ***************************************************************************
-//  Revision History :
-//  
-//  $Log: results_collector.hpp,v $
-//  Revision 1.2  2005/12/14 05:12:24  rogeeff
-//  dll support introduced
-//  amount of aborted test cases in now computed. If test case is aborted - the whole
-//  test subtree is marked as aborted
-//
-//  Revision 1.1  2005/02/20 08:27:06  rogeeff
-//  This a major update for Boost.Test framework. See release docs for complete list of fixes/updates
-//
-//  Revision 1.25  2005/02/01 08:59:29  rogeeff
-//  supplied_log_formatters split
-//  change formatters interface to simplify result interface
-//
-//  Revision 1.24  2005/02/01 06:40:06  rogeeff
-//  copyright update
-//  old log entries removed
-//  minor stilistic changes
-//  depricated tools removed
-//
-//  Revision 1.23  2005/01/30 03:23:06  rogeeff
-//  result_tracker class removed
-//  counter type renamed
-//
-// ***************************************************************************
 
 #endif // BOOST_TEST_RESULTS_COLLECTOR_HPP_071894GER
 
