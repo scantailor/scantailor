@@ -19,9 +19,17 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet" >
-   <string/>
+   <string notr="true" />
   </property>
   <widget class="QWidget" name="centralwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>26</y>
+     <width>613</width>
+     <height>419</height>
+    </rect>
+   </property>
    <property name="sizePolicy" >
     <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
      <horstretch>0</horstretch>
@@ -31,57 +39,74 @@
    <property name="cursor" >
     <cursorShape>ArrowCursor</cursorShape>
    </property>
-   <layout class="QVBoxLayout" >
+   <layout class="QVBoxLayout" name="verticalLayout" >
     <item>
-     <widget class="QSplitter" name="splitter" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="orientation" >
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="childrenCollapsible" >
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" name="layoutWidget" >
-       <layout class="QVBoxLayout" >
-        <property name="spacing" >
-         <number>6</number>
+     <layout class="QHBoxLayout" name="horizontalLayout" >
+      <item>
+       <widget class="QSplitter" name="splitter" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <item>
-         <widget class="QListView" name="filterList" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="childrenCollapsible" >
+         <bool>false</bool>
+        </property>
+        <widget class="QWidget" name="layoutWidget" >
+         <layout class="QVBoxLayout" >
+          <property name="spacing" >
+           <number>6</number>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QFrame" name="filterOptions" >
-          <property name="frameShape" >
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QFrame" name="imageViewFrame" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
-         <horstretch>1</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape" >
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-      </widget>
-     </widget>
+          <item>
+           <widget class="QListView" name="filterList" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="filterOptions" >
+            <property name="frameShape" >
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QFrame" name="imageViewFrame" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+           <horstretch>1</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGraphicsView" name="thumbView" >
+        <property name="maximumSize" >
+         <size>
+          <width>249</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignHCenter|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" >
@@ -108,7 +133,7 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug" >

@@ -14,6 +14,7 @@ SET(
 	TestTransform.cpp
 	TestMorphology.cpp
 	TestDentFinder.cpp
+	TestBinarize.cpp
 	Utils.cpp Utils.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
@@ -24,5 +25,5 @@ SET(
 	${EXTRA_LIBS}
 )
 
-ADD_EXECUTABLE(tests ${sources})
-TARGET_LINK_LIBRARIES(tests ${libs})
+ADD_EXECUTABLE(imageproc_tests ${sources})
+TARGET_LINK_LIBRARIES(imageproc_tests ${libs})

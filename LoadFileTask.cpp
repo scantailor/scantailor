@@ -24,15 +24,14 @@
 #include "FilterUiInterface.h"
 #include "AbstractFilter.h"
 #include "FilterOptionsWidget.h"
+#include "ThumbnailPixmapCache.h"
 #include "PageInfo.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include "FilterData.h"
-#include "TiffReader.h"
+#include "ImageLoader.h"
 #include "imageproc/BinaryThreshold.h"
 #include <QImage>
-#include <QFile>
-#include <QIODevice>
 #include <QString>
 #include <assert.h>
 
@@ -53,9 +52,11 @@ private:
 };
 
 
-LoadFileTask::LoadFileTask(PageInfo const& page,
+LoadFileTask::LoadFileTask(
+	PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
 	IntrusivePtr<fix_orientation::Task> const& next_task)
-:	m_imageId(page.id()),
+:	m_rThumbnailCache(thumbnail_cache),
+	m_imageId(page.id()),
 	m_imageMetadata(page.metadata()),
 	m_ptrNextTask(next_task)
 {
@@ -69,23 +70,16 @@ LoadFileTask::~LoadFileTask()
 FilterResultPtr
 LoadFileTask::operator()()
 {
+	QImage image(ImageLoader::load(m_imageId.filePath(), m_imageId.page()));
+	
 	try {
 		throwIfCancelled();
-		
-		QImage image;
-		QFile file(m_imageId.filePath());
-		if (file.open(QIODevice::ReadOnly)) {
-			if (TiffReader::canRead(file)) {
-				image = TiffReader::readImage(file, m_imageId.page());
-			} else {
-				image.load(&file, 0);
-			}
-		}
 		
 		if (image.isNull()) {
 			return FilterResultPtr(new ErrorResult(m_imageId.filePath()));
 		} else {
 			addMissingMetadata(image);
+			m_rThumbnailCache.ensureThumbnailExists(m_imageId, image);
 			return m_ptrNextTask->process(*this, FilterData(image));
 		}
 	} catch (CancelledException const&) {

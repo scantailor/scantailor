@@ -22,12 +22,14 @@
 #include "Settings.h"
 #include "Task.h"
 #include "OrthogonalRotation.h"
+#include "PageId.h"
 #include "ImageId.h"
 #include "PageSequence.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "ThumbnailTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -143,6 +145,15 @@ Filter::createTask(
 			page_id, IntrusivePtr<Filter>(this),
 			m_ptrSettings, next_task
 		)
+	);
+}
+
+IntrusivePtr<ThumbnailTask>
+Filter::createThumbnailTask(
+	IntrusivePtr<page_split::ThumbnailTask> const& next_task)
+{
+	return IntrusivePtr<ThumbnailTask>(
+		new ThumbnailTask(m_ptrSettings, next_task)
 	);
 }
 

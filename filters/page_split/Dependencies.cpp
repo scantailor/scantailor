@@ -19,8 +19,6 @@
 #include "Dependencies.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
-#include "Dpm.h"
-#include <QImage>
 #include <QString>
 #include <QDomDocument>
 #include <QDomElement>
@@ -36,31 +34,24 @@ Dependencies::Dependencies()
 
 Dependencies::Dependencies(QDomElement const& el)
 :	m_imageSize(XmlUnmarshaller::size(el.namedItem("size").toElement())),
-	m_imageDpi(XmlUnmarshaller::dpi(el.namedItem("dpi").toElement())),
 	m_rotation(XmlUnmarshaller::rotation(el.namedItem("rotation").toElement())),
 	m_singlePage(el.namedItem("sub-pages").toElement().text() == "1")
 {
 }
 
-Dependencies::Dependencies(
-	QImage const& image, OrthogonalRotation const rotation, bool const single_page)
-:	m_imageSize(image.size()),
-	m_imageDpi(Dpm(image.dotsPerMeterX(), image.dotsPerMeterY())),
+Dependencies::Dependencies(QSize const& image_size,
+	OrthogonalRotation const rotation, bool const single_page)
+:	m_imageSize(image_size),
 	m_rotation(rotation),
 	m_singlePage(single_page)
 {
 }
 
 bool
-Dependencies::matches(Dependencies const& other, AutoManualMode const mode) const
+Dependencies::matches(Dependencies const& other) const
 {
 	if (m_imageSize != other.m_imageSize) {
 		return false;
-	}
-	if (mode == MODE_AUTO) {
-		if (m_imageDpi != other.m_imageDpi) {
-			return false;
-		}
 	}
 	if (m_rotation != other.m_rotation) {
 		return false;
@@ -83,7 +74,6 @@ Dependencies::toXml(QDomDocument& doc, QString const& tag_name) const
 	QDomElement el(doc.createElement(tag_name));
 	el.appendChild(marshaller.rotation(m_rotation, "rotation"));
 	el.appendChild(marshaller.size(m_imageSize, "size"));
-	el.appendChild(marshaller.dpi(m_imageDpi, "dpi"));
 	
 	QDomElement subpages_el(doc.createElement("sub-pages"));
 	el.appendChild(subpages_el);

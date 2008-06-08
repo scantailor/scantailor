@@ -19,6 +19,7 @@
 #ifndef PAGELAYOUT_H_
 #define PAGELAYOUT_H_
 
+#include "LogicalPageId.h"
 #include <QLineF>
 #include <QString>
 
@@ -89,6 +90,8 @@ public:
 	 * \brief Get the right page outline, even if the right page is invalid.
 	 */
 	QPolygonF rightPage(QRectF const& rect) const;
+	
+	QPolygonF pageOutline(QRectF const& rect, LogicalPageId::SubPage page) const;
 	
 	PageLayout transformed(QTransform const& xform) const;
 	

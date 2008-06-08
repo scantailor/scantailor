@@ -49,7 +49,7 @@ Settings::applyRule(
 	setImageRotationLocked(image_id, rotation);
 }
 
-void
+std::vector<ImageId>
 Settings::applyRule(
 	Scope const& scope, OrthogonalRotation const rotation)
 {
@@ -58,14 +58,19 @@ Settings::applyRule(
 	);
 	int const num_images = snapshot.numPages();
 	
+	std::vector<ImageId> image_ids;
+	
 	QMutexLocker locker(&m_mutex);
 	
 	for (int i = scope.from(); i <= scope.to() && i < num_images; ++i) {
 		if ((scope.origin() - i) % scope.step() == 0) {
 			ImageId const image_id(snapshot.pageAt(i).id());
+			image_ids.push_back(image_id);
 			setImageRotationLocked(image_id, rotation);
 		}
 	}
+	
+	return image_ids;
 }
 
 OrthogonalRotation

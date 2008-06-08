@@ -22,6 +22,7 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "Rule.h"
+#include "PageInfo.h"
 #include "PageSplitFinder.h"
 #include "PageLayout.h"
 #include "Dependencies.h"
@@ -52,7 +53,8 @@ class Task::UiUpdater : public FilterResult
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		std::auto_ptr<DebugImages> dbg_img,
-		QImage const& image, ImageTransformation const& xform,
+		QImage const& image, ImageId const& image_id,
+		ImageTransformation const& xform,
 		OptionsWidget::UiData const& ui_data);
 	
 	virtual void updateUI(FilterUiInterface* ui);
@@ -62,6 +64,7 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
+	ImageId m_imageId;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
 };
@@ -120,7 +123,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	}
 	
 	bool const single_page = (num_logical_pages == 1);
-	Dependencies const deps(data.image(), pre_rotation, single_page);
+	Dependencies const deps(data.image().size(), pre_rotation, single_page);
 	PageLayout layout;
 	AutoManualMode mode = MODE_AUTO;
 	
@@ -129,7 +132,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_imageId));
 	if (params.get()) {
 		mode = params->mode();
-		if (deps.matches(params->dependencies(), mode)) {
+		if (deps.matches(params->dependencies())) {
 			layout = params->pageLayout();
 		}
 	}
@@ -157,7 +160,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrDbg, data.image(),
-				data.xform(), ui_data
+				m_imageId, data.xform(), ui_data
 			)
 		);
 	}
@@ -169,11 +172,13 @@ Task::process(TaskStatus const& status, FilterData const& data)
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
 	std::auto_ptr<DebugImages> dbg_img,
-	QImage const& image, ImageTransformation const& xform,
+	QImage const& image, ImageId const& image_id,
+	ImageTransformation const& xform,
 	OptionsWidget::UiData const& ui_data)
 :	m_ptrFilter(filter),
 	m_ptrDbg(dbg_img),
 	m_image(image),
+	m_imageId(image_id),
 	m_xform(xform),
 	m_uiData(ui_data)
 {
@@ -190,6 +195,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	ImageView* view = new ImageView(m_image, m_xform, m_uiData.pageLayout());
 	ui->setImageWidget(view, m_ptrDbg.get());
+	
+	ui->invalidateThumbnail(m_imageId);
 	
 	QObject::connect(
 		view, SIGNAL(manualPageLayoutSet(PageLayout const&)),

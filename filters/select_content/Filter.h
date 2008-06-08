@@ -23,8 +23,8 @@
 #include "AbstractFilter.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
-#include <memory>
 
+class PageId;
 class LogicalPageId;
 class QString;
 
@@ -33,6 +33,7 @@ namespace select_content
 
 class OptionsWidget;
 class Task;
+class ThumbnailTask;
 class Settings;
 
 class Filter : public AbstractFilter
@@ -55,7 +56,9 @@ public:
 	virtual void loadSettings(
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
-	IntrusivePtr<Task> createTask(LogicalPageId const& page_id, bool debug);
+	IntrusivePtr<Task> createTask(PageId const& page_id, bool batch, bool debug);
+	
+	IntrusivePtr<ThumbnailTask> createThumbnailTask();
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

@@ -23,7 +23,9 @@
 #include "Settings.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
+#include "PageId.h"
 #include "LogicalPageId.h"
+#include "ThumbnailTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -145,6 +147,15 @@ Filter::createTask(
 			IntrusivePtr<Filter>(this),
 			m_ptrSettings, next_task, page_id, debug
 		)
+	);
+}
+
+IntrusivePtr<ThumbnailTask>
+Filter::createThumbnailTask(
+	IntrusivePtr<select_content::ThumbnailTask> const& next_task)
+{
+	return IntrusivePtr<ThumbnailTask>(
+		new ThumbnailTask(m_ptrSettings, next_task)
 	);
 }
 

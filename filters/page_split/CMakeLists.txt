@@ -11,6 +11,7 @@ SET(
 	sources
 	AutoDetectedLayout.h
 	ImageView.cpp ImageView.h
+	Thumbnail.cpp Thumbnail.h
 	Params.cpp Params.h
 	Dependencies.cpp Dependencies.h
 	PageSplitFinder.cpp PageSplitFinder.h
@@ -19,6 +20,7 @@ SET(
 	SplitModeDialog.cpp SplitModeDialog.h
 	Settings.cpp Settings.h
 	Task.cpp Task.h
+	ThumbnailTask.cpp ThumbnailTask.h
 	Rule.cpp Rule.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

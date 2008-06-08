@@ -26,6 +26,7 @@
 #include "ImageId.h"
 #include "ImageMetadata.h"
 
+class ThumbnailPixmapCache;
 class PageInfo;
 class QImage;
 
@@ -38,7 +39,7 @@ class LoadFileTask : public BackgroundTask
 {
 	DECLARE_NON_COPYABLE(LoadFileTask)
 public:
-	LoadFileTask(PageInfo const& page,
+	LoadFileTask(PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
 		IntrusivePtr<fix_orientation::Task> const& next_task);
 	
 	virtual ~LoadFileTask();
@@ -49,6 +50,7 @@ private:
 	
 	void addMissingMetadata(QImage& image) const;
 	
+	ThumbnailPixmapCache& m_rThumbnailCache;
 	ImageId m_imageId;
 	ImageMetadata m_imageMetadata;
 	IntrusivePtr<fix_orientation::Task> const m_ptrNextTask;

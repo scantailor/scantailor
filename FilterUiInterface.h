@@ -19,6 +19,8 @@
 #ifndef FILTERUIINTERFACE_H_
 #define FILTERUIINTERFACE_H_
 
+#include "PageId.h"
+
 class DebugImages;
 class FilterOptionsWidget;
 class QWidget;
@@ -35,6 +37,8 @@ public:
 	
 	virtual void setImageWidget(
 		QWidget* widget, DebugImages const* debug_images = 0) = 0;
+	
+	virtual void invalidateThumbnail(PageId const& page_id) = 0;
 };
 
 #endif

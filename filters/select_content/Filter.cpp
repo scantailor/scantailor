@@ -20,11 +20,13 @@
 #include "FilterUiInterface.h"
 #include "OptionsWidget.h"
 #include "Task.h"
+#include "PageId.h"
 #include "LogicalPageId.h"
 #include "Settings.h"
 #include "Params.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
+#include "ThumbnailTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -140,11 +142,20 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 }
 
 IntrusivePtr<Task>
-Filter::createTask(LogicalPageId const& page_id, bool debug)
+Filter::createTask(PageId const& page_id, bool batch, bool debug)
 {
 	return IntrusivePtr<Task>(
-		new Task(IntrusivePtr<Filter>(this), m_ptrSettings, page_id, debug)
+		new Task(
+			IntrusivePtr<Filter>(this), m_ptrSettings,
+			page_id, batch, debug
+		)
 	);
+}
+
+IntrusivePtr<ThumbnailTask>
+Filter::createThumbnailTask()
+{
+	return IntrusivePtr<ThumbnailTask>(new ThumbnailTask(m_ptrSettings));
 }
 
 } // namespace select_content

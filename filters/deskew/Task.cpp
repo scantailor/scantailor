@@ -64,7 +64,8 @@ class Task::UiUpdater : public FilterResult
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		std::auto_ptr<DebugImages> dbg_img,
-		QImage const& image, ImageTransformation const& xform,
+		QImage const& image, LogicalPageId const& page_id,
+		ImageTransformation const& xform,
 		OptionsWidget::UiData const& ui_data);
 	
 	virtual void updateUI(FilterUiInterface* ui);
@@ -74,6 +75,7 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
+	LogicalPageId m_pageId;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
 };
@@ -105,19 +107,10 @@ Task::process(
 	status.throwIfCancelled();
 	
 	QRectF const rect(data.xform().rectBeforeCropping());
-	std::vector<QPolygonF> subpages;
-	subpages.reserve(page_layout.numSubPages());
 	
-	if (page_layout.leftPageValid()) {
-		subpages.push_back(page_layout.leftPage(rect));
-	}
-	if (page_layout.rightPageValid()) {
-		subpages.push_back(page_layout.rightPage(rect));
-	}
-	
-	assert(!subpages.empty());
-	int const subpage_num = std::min<int>(m_pageId.subPageNum(), subpages.size() - 1);
-	QPolygonF const& page_outline = subpages[subpage_num];
+	QPolygonF const page_outline(
+		page_layout.pageOutline(rect, m_pageId.subPage())
+	);
 	Dependencies const deps(page_outline, data.xform().preRotation());
 	
 	OptionsWidget::UiData ui_data;
@@ -201,7 +194,7 @@ Task::process(
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrDbg, data.image(),
-				new_xform, ui_data
+				m_pageId, new_xform, ui_data
 			)
 		);
 	}
@@ -273,11 +266,13 @@ Task::from150dpi(QSize const& size, Dpi const& target_dpi)
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
 	std::auto_ptr<DebugImages> dbg_img,
-	QImage const& image, ImageTransformation const& xform,
+	QImage const& image, LogicalPageId const& page_id,
+	ImageTransformation const& xform,
 	OptionsWidget::UiData const& ui_data)
 :	m_ptrFilter(filter),
 	m_ptrDbg(dbg_img),
 	m_image(image),
+	m_pageId(page_id),
 	m_xform(xform),
 	m_uiData(ui_data)
 {
@@ -294,6 +289,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	ImageView* view = new ImageView(m_image, m_xform);
 	ui->setImageWidget(view, m_ptrDbg.get());
+	
+	ui->invalidateThumbnail(m_pageId);
 	
 	QObject::connect(
 		view, SIGNAL(manualDeskewAngleSet(double)),

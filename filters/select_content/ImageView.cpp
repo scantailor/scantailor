@@ -47,7 +47,7 @@ ImageView::ImageView(
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
-	QAction* remove = m_pInsideBoxMenu->addAction(tr("Remove Conetnt Box"));
+	QAction* remove = m_pInsideBoxMenu->addAction(tr("Remove Content Box"));
 	connect(create, SIGNAL(triggered(bool)), this, SLOT(createContentBox()));
 	connect(remove, SIGNAL(triggered(bool)), this, SLOT(removeContentBox()));
 }

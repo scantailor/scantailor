@@ -70,7 +70,9 @@ public:
 	
 	int curImageIdx() const;
 	
-	PageInfo curPage() const;
+	ImageId curImage() const;
+	
+	PageInfo curPage(View view) const;
 	
 	PageInfo setPrevPage(View view);
 	
@@ -102,6 +104,8 @@ private:
 	PageInfo setPrevPageImpl(View view, bool* modified);
 	
 	PageInfo setNextPageImpl(View view, bool* modified);
+	
+	LogicalPageId::SubPage curSubPageLocked(View view) const;
 	
 	mutable QMutex m_mutex;
 	std::vector<ImageDesc> m_images;

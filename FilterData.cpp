@@ -27,8 +27,6 @@ FilterData::FilterData(QImage const& image)
 	m_xform(image.rect(), Dpm(image)),
 	m_bwThreshold(BinaryThreshold::otsuThreshold(m_image))
 {
-	// Compensate differences of horizontal vs vertical DPI.
-	m_xform.preScaleToEqualizeDpi();
 }
 
 FilterData::FilterData(FilterData const& other, ImageTransformation const& xform)

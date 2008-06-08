@@ -57,6 +57,8 @@ OptionsWidget::manualDeskewAngleSetExternally(double const degrees)
 	updateModeIndication(MODE_MANUAL);
 	setSpinBoxKnownState(degreesToSpinBox(degrees));
 	commitCurrentParams();
+	
+	emit invalidateThumbnail(m_pageId);
 }
 
 void
@@ -92,7 +94,9 @@ OptionsWidget::spinBoxValueChanged(double const value)
 	m_uiData.setEffectiveDeskewAngle(degrees);
 	m_uiData.setMode(MODE_MANUAL);
 	updateModeIndication(MODE_MANUAL);
+	
 	emit manualDeskewAngleSet(degrees);
+	emit invalidateThumbnail(m_pageId);
 }
 
 void

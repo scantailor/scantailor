@@ -25,6 +25,7 @@
 #include "OrthogonalRotation.h"
 #include "ImageId.h"
 #include <QMutex>
+#include <vector>
 #include <map>
 
 class PageSequence;
@@ -46,7 +47,7 @@ public:
 	
 	void applyRule(ImageId const& image_id, OrthogonalRotation rotation);
 	
-	void applyRule(Scope const& scope, OrthogonalRotation rotation);
+	std::vector<ImageId> applyRule(Scope const& scope, OrthogonalRotation rotation);
 	
 	OrthogonalRotation getRotationFor(ImageId const& image_id) const;
 private:

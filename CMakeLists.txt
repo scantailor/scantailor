@@ -1,3 +1,5 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7)
+
 PROJECT("Scan Tailor")
 
 ENABLE_TESTING()
@@ -109,7 +111,10 @@ ELSE(NOT HAVE_STDINT_H)
 	FILE(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/stdint.h")
 ENDIF(NOT HAVE_STDINT_H)
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+ADD_DEFINITIONS(
+	${QT_DEFINITIONS} -DBOOST_SIGNALS_NAMESPACE=signals
+	-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION
+)
 INCLUDE_DIRECTORIES(. foundation boost ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
@@ -157,6 +162,7 @@ SOURCE_GROUP("Generated Sources" FILES ${ui_sources} ${resource_sources})
 SET(
 	sources
 	main.cpp Application.cpp Application.h
+	PixmapRenderer.cpp PixmapRenderer.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
 	ImageFileInfo.cpp ImageFileInfo.h
@@ -170,6 +176,11 @@ SET(
 	ImageTransformation.cpp ImageTransformation.h
 	ImageViewBase.cpp ImageViewBase.h
 	BasicImageView.cpp BasicImageView.h
+	ThumbnailLoadResult.h
+	ThumbnailPixmapCache.cpp ThumbnailPixmapCache.h
+	ThumbnailBase.cpp ThumbnailBase.h
+	ThumbnailSequence.cpp ThumbnailSequence.h
+	ThumbnailFactory.cpp ThumbnailFactory.h
 	DebugImages.cpp DebugImages.h
 	ImageId.cpp ImageId.h
 	LogicalPageId.cpp LogicalPageId.h
@@ -183,6 +194,7 @@ SET(
 	PngMetadataLoader.cpp PngMetadataLoader.h
 	TiffMetadataLoader.cpp TiffMetadataLoader.h
 	JpegMetadataLoader.cpp JpegMetadataLoader.h
+	ImageLoader.cpp ImageLoader.h
 	ErrorWidget.cpp ErrorWidget.h
 	OrthogonalRotation.cpp OrthogonalRotation.h
 	NewOpenProjectDialog.cpp NewOpenProjectDialog.h
@@ -198,6 +210,10 @@ SET(
 	XmlUnmarshaller.cpp XmlUnmarshaller.h
 	Utils.cpp Utils.h
 	AutoManualMode.h
+	AbstractCommand.h
+	AbstractFilter.h
+	FilterResult.h
+	boost_signals.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
@@ -205,7 +221,7 @@ QT4_AUTOMOC(${sources})
 ADD_EXECUTABLE(scantailor WIN32 ${sources} ${ui_sources} ${resource_sources})
 TARGET_LINK_LIBRARIES(
 	scantailor
-	fix_orientation page_split deskew select_content imageproc
+	fix_orientation page_split deskew select_content imageproc boost_signals
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 

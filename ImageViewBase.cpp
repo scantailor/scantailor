@@ -17,10 +17,10 @@
 */
 
 #include "ImageViewBase.h.moc"
+#include "PixmapRenderer.h"
 #include "Dpm.h"
 #include "Dpi.h"
 #include <QPainter>
-#include <QPaintDevice>
 #include <QBrush>
 #include <QLineF>
 #include <QMouseEvent>
@@ -28,12 +28,6 @@
 #include <algorithm>
 #include <math.h>
 #include <assert.h>
-
-#ifdef Q_WS_X11
-#include <QX11Info>
-#include <QRegion>
-#include <extensions/Xrender.h>
-#endif
 
 ImageViewBase::ImageViewBase(QImage const& image)
 :	m_pixmap(QPixmap::fromImage(image)),
@@ -71,11 +65,13 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	
 	// Width of a source pixel in mm, as it's displayed on screen.
 	double const pixel_width = widthMM() * xscale / width();
+#if !defined(Q_WS_X11)
+	// On X11 SmoothPixmapTransform is too slow.
 	painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
-	
+#endif
 	painter.setWorldTransform(m_physToVirt.transform() * m_virtualToWidget);
 	
-	drawPixmap(painter);
+	PixmapRenderer::drawPixmap(painter, m_pixmap);
 	
 	painter.setWorldTransform(m_virtualToWidget);
 	
@@ -85,121 +81,6 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 void
 ImageViewBase::paintOverImage(QPainter& painter)
 {
-}
-
-void
-ImageViewBase::drawPixmap(QPainter& painter)
-{
-	/*
-	Now we could just do:
-	---------------------------------------------------------------
-	painter.drawPixmap(0, 0, m_pixmap);
-	---------------------------------------------------------------
-	but there are 2 problems with it:
-	1. Qt's software renderer (as of Qt 4.3.2) seems to actually
-	scale the image according to the world transform.  This is very
-	bad if a large zoom is applied.
-	2. On X11, Qt (as of version 4.3.2) doesn't try to use XRender
-	to draw an image if it's transformed.  This results in very slow
-	performance.
-	
-	We are going to solve the first problem by specifying only
-	a portion of the image to be drawn, while the second problem
-	is solved by utilizing XRender manually.
-	*/
-	
-#if !defined(Q_WS_X11)
-	QTransform const inv_transform(painter.worldTransform().inverted());
-	QRectF const src_rect(inv_transform.map(QRectF(rect())).boundingRect());
-	QRectF const bounded_src_rect(src_rect.intersected(m_pixmap.rect()));
-	
-	// Note: the default composition mode with alpha blending can be very slow.
-	QPainter::CompositionMode const composition = painter.compositionMode();
-	painter.setCompositionMode(QPainter::CompositionMode_Source);
-	painter.drawPixmap(bounded_src_rect, m_pixmap, bounded_src_rect);
-	painter.setCompositionMode(composition);
-#else
-	QRectF const src_rect(m_pixmap.rect());
-	
-	QPoint offset; // both x and y will be either zero or negative.
-	QPaintDevice* pd = QPainter::redirected(this, &offset);
-	
-	Display* dpy = QX11Info::display();
-	Picture src_pict = m_pixmap.x11PictureHandle();
-	Picture dst_pict;
-	if (pd) {
-		dst_pict = ((QPixmap*)pd)->x11PictureHandle();
-	} else {
-		pd = this;
-		dst_pict = x11PictureHandle();
-	}
-	
-	// Note that device transform already accounts for offset
-	// within a destination surface.
-	QTransform const src_to_dst(painter.deviceTransform());
-	QTransform const dst_to_src(src_to_dst.inverted());
-	QPolygonF const dst_poly(src_to_dst.map(src_rect));	
-	
-	XTransform xform = {{
-		{
-			XDoubleToFixed(dst_to_src.m11()),
-			XDoubleToFixed(dst_to_src.m21()),
-			XDoubleToFixed(dst_to_src.m31())
-		},
-		{
-			XDoubleToFixed(dst_to_src.m12()),
-			XDoubleToFixed(dst_to_src.m22()),
-			XDoubleToFixed(dst_to_src.m32())
-		},
-		{
-			XDoubleToFixed(dst_to_src.m13()),
-			XDoubleToFixed(dst_to_src.m23()),
-			XDoubleToFixed(dst_to_src.m33())
-		}
-	}};
-	
-	XRenderSetPictureTransform(dpy, src_pict, &xform);
-	
-	QRegion clip_reg(painter.clipRegion());
-	if (!clip_reg.isEmpty()) {
-		clip_reg = src_to_dst.map(clip_reg);
-		XRenderSetPictureClipRegion(dpy, dst_pict, clip_reg.handle());
-	} else {
-		// No clipping.
-		XRectangle clip_rect = { 0, 0, width() - offset.x(), height() - offset.y() };
-		XRenderSetPictureClipRectangles(dpy, dst_pict, 0, 0, &clip_rect, 1);
-	}
-	
-	char const* filter = "fast";
-	/*
-	if (painter.testRenderHint(QPainter::SmoothPixmapTransform)) {
-		filter = "good"; // too slow
-	}
-	*/
-	XRenderSetPictureFilter(dpy, src_pict, filter, 0, 0);
-	
-	QRectF const dst_rect_precise(dst_poly.boundingRect());
-	QRect const dst_rect_fitting(
-		QPoint(
-			int(ceil(dst_rect_precise.left())),
-			int(ceil(dst_rect_precise.top()))
-		),
-		QPoint(
-			int(floor(dst_rect_precise.right())) - 1,
-			int(floor(dst_rect_precise.bottom())) - 1
-		)
-	);
-	QRect const dst_bounding_rect(rect().translated(-offset.x(), -offset.y()));
-	QRect const dst_rect(dst_rect_fitting.intersect(dst_bounding_rect));
-	
-	// Note that XRenderComposite() expects destination coordinates
-	// everywhere, even for source picture origin.
-	XRenderComposite(
-		dpy, PictOpSrc,
-		src_pict, 0, dst_pict, dst_rect.left(), dst_rect.top(), 0, 0,
-		dst_rect.left(), dst_rect.top(), dst_rect.width(), dst_rect.height()
-	);
-#endif
 }
 
 void
@@ -338,6 +219,15 @@ ImageViewBase::updateTransformPreservingScale(
 	updateWidgetTransform();
 	
 	update();
+}
+
+void
+ImageViewBase::ensureCursorShape(Qt::CursorShape const cursor_shape)
+{
+	if (cursor_shape != m_currentCursorShape) {
+		m_currentCursorShape = cursor_shape;
+		setCursor(cursor_shape);
+	}
 }
 
 /**

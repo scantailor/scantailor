@@ -28,6 +28,7 @@
 #include "ImageId.h"
 #include "Rule.h"
 #include "Params.h"
+#include "ThumbnailTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -172,21 +173,13 @@ Filter::createTask(
 	);
 }
 
-void
-Filter::recalculateLayoutTypes()
+IntrusivePtr<ThumbnailTask>
+Filter::createThumbnailTask(
+	IntrusivePtr<deskew::ThumbnailTask> const& next_task)
 {
-	PageSequenceSnapshot const snapshot(
-		m_ptrPages->snapshot(PageSequence::IMAGE_VIEW)
+	return IntrusivePtr<ThumbnailTask>(
+		new ThumbnailTask(m_ptrSettings, next_task)
 	);
-	
-	size_t const num_images = snapshot.numPages();
-	for (size_t i = 0; i < num_images; ++i) {
-		ImageId const image_id(snapshot.pageAt(i).id());
-		Rule const rule(m_ptrSettings->getRuleFor(image_id));
-		if (rule.layoutType() == Rule::AUTO_DETECT) {
-			
-		}
-	}
 }
 
 } // page_split

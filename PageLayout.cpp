@@ -168,6 +168,26 @@ PageLayout::rightPage(QRectF const& rect) const
 	return poly.intersected(rect);
 }
 
+QPolygonF
+PageLayout::pageOutline(QRectF const& rect, LogicalPageId::SubPage const page) const
+{
+	switch (page) {
+		case LogicalPageId::LEFT_PAGE:
+			return leftPage(rect);
+		case LogicalPageId::RIGHT_PAGE:
+			return rightPage(rect);
+		default:;
+	}
+	
+	if (m_leftPageValid) {
+		return leftPage(rect);
+	} else if (m_rightPageValid) {
+		return rightPage(rect);
+	} else {
+		return QPolygonF();
+	}
+}
+
 PageLayout
 PageLayout::transformed(QTransform const& xform) const
 {

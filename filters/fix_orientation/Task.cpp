@@ -23,7 +23,6 @@
 #include "FilterData.h"
 #include "ImageTransformation.h"
 #include "filters/page_split/Task.h"
-#include "PageId.h"
 #include "TaskStatus.h"
 #include "ImageView.h"
 #include "FilterUiInterface.h"
@@ -38,7 +37,8 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
-		QImage const& image, ImageTransformation const& xform);
+		QImage const& image, ImageId const& image_id,
+		ImageTransformation const& xform);
 	
 	virtual void updateUI(FilterUiInterface* wnd);
 	
@@ -46,6 +46,7 @@ public:
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	QImage m_image;
+	ImageId m_imageId;
 	ImageTransformation m_xform;
 };
 
@@ -79,7 +80,11 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	if (m_ptrNextTask) {
 		return m_ptrNextTask->process(status, FilterData(data, xform));
 	} else {
-		return FilterResultPtr(new UiUpdater(m_ptrFilter, data.image(), xform));
+		return FilterResultPtr(
+			new UiUpdater(
+				m_ptrFilter, data.image(), m_imageId, xform
+			)
+		);
 	}
 }
 
@@ -88,9 +93,11 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
-	QImage const& image, ImageTransformation const& xform)
+	QImage const& image, ImageId const& image_id,
+	ImageTransformation const& xform)
 :	m_ptrFilter(filter),
 	m_image(image),
+	m_imageId(image_id),
 	m_xform(xform)
 {
 }
@@ -103,6 +110,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
 	opt_widget->postUpdateUI(m_xform.preRotation());
 	ui->setOptionsWidget(opt_widget);
+	
+	ui->invalidateThumbnail(m_imageId);
 	
 	ImageView* view = new ImageView(m_image, m_xform);
 	ui->setImageWidget(view);

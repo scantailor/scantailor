@@ -19,12 +19,9 @@
 #ifndef PAGE_SPLIT_DEPENDENCIES_H_
 #define PAGE_SPLIT_DEPENDENCIES_H_
 
-#include "AutoManualMode.h"
-#include "Dpi.h"
 #include "OrthogonalRotation.h"
 #include <QSize>
 
-class QImage;
 class QString;
 class QDomDocument;
 class QDomElement;
@@ -45,17 +42,16 @@ public:
 	
 	Dependencies(QDomElement const& el);
 	
-	Dependencies(
-		QImage const& image, OrthogonalRotation rotation, bool single_page);
+	Dependencies(QSize const& image_size,
+		OrthogonalRotation rotation, bool single_page);
 	
-	bool matches(Dependencies const& other, AutoManualMode mode) const;
+	bool matches(Dependencies const& other) const;
 	
 	bool isNull() const { return m_imageSize.isNull(); }
 	
 	QDomElement toXml(QDomDocument& doc, QString const& tag_name) const;
 private:
 	QSize m_imageSize;
-	Dpi m_imageDpi;
 	OrthogonalRotation m_rotation;
 	bool m_singlePage;
 };

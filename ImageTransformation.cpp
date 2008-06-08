@@ -27,6 +27,7 @@ ImageTransformation::ImageTransformation(
 	m_resultingRect(orig_image_rect),
 	m_origDpi(orig_dpi)
 {
+	preScaleToEqualizeDpi();
 }
 
 ImageTransformation::~ImageTransformation()

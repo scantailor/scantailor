@@ -19,10 +19,8 @@
 #ifndef FILTEROPTIONSWIDGET_H_
 #define FILTEROPTIONSWIDGET_H_
 
-#include "IntrusivePtr.h"
+#include "PageId.h"
 #include <QWidget>
-
-class AbstractFilter;
 
 class FilterOptionsWidget : public QWidget
 {
@@ -32,6 +30,12 @@ signals:
 	 * \brief To be emitted by subclasses when they want to reload the page.
 	 */
 	void reloadRequested();
+	
+	void startBatchProcessing();
+	
+	void stopBatchProcessing();
+	
+	void invalidateThumbnail(PageId const& page_id);
 };
 
 #endif

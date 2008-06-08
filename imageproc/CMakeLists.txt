@@ -23,6 +23,8 @@ SET(
 	Transform.cpp Transform.h
 	Morphology.cpp Morphology.h
 	DentFinder.cpp DentFinder.h
+	IntegralImage.h
+	Binarize.cpp Binarize.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

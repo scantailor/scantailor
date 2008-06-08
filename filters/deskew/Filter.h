@@ -23,15 +23,16 @@
 #include "AbstractFilter.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
-#include <memory>
 
 class PageId;
 class LogicalPageId;
+class PageLayout;
 class QString;
 
 namespace select_content
 {
 	class Task;
+	class ThumbnailTask;
 }
 
 namespace deskew
@@ -39,6 +40,7 @@ namespace deskew
 
 class OptionsWidget;
 class Task;
+class ThumbnailTask;
 class Settings;
 
 class Filter : public AbstractFilter
@@ -64,6 +66,9 @@ public:
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,
 		IntrusivePtr<select_content::Task> const& next_task, bool debug);
+	
+	IntrusivePtr<ThumbnailTask> createThumbnailTask(
+		IntrusivePtr<select_content::ThumbnailTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

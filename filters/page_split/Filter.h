@@ -23,7 +23,6 @@
 #include "AbstractFilter.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
-#include <memory>
 
 class PageId;
 class ImageId;
@@ -32,6 +31,7 @@ class PageSequence;
 namespace deskew
 {
 	class Task;
+	class ThumbnailTask;
 }
 
 namespace page_split
@@ -39,6 +39,7 @@ namespace page_split
 
 class OptionsWidget;
 class Task;
+class ThumbnailTask;
 class Settings;
 class Params;
 
@@ -65,12 +66,10 @@ public:
 	IntrusivePtr<Task> createTask(PageId const& page_id,
 		IntrusivePtr<deskew::Task> const& next_task, bool debug);
 	
-	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
+	IntrusivePtr<ThumbnailTask> createThumbnailTask(
+		IntrusivePtr<deskew::ThumbnailTask> const& next_task);
 	
-	/**
-	 * \brief Recalculate the layout types (one vs two pages per image).
-	 */
-	void recalculateLayoutTypes();
+	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:
 	void writeImageSettings(
 		QDomDocument& doc, QDomElement& filter_el,

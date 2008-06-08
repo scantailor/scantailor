@@ -33,6 +33,8 @@
 #include <memory>
 
 class AbstractFilter;
+class ThumbnailPixmapCache;
+class ThumbnailSequence;
 class FilterOptionsWidget;
 class PageInfo;
 class QStackedLayout;
@@ -59,7 +61,13 @@ private slots:
 	
 	void workerThreadReady();
 	
-	void filterOptionsChanged();
+	void reloadRequested();
+	
+	void startBatchProcessing();
+	
+	void stopBatchProcessing();
+	
+	void invalidateThumbnailSlot(PageId const& page_id);
 	
 	void filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result);
 	
@@ -80,6 +88,10 @@ private:
 	virtual void setImageWidget(
 		QWidget* widget, DebugImages const* debug_images = 0);
 	
+	virtual void invalidateThumbnail(PageId const& page_id);
+	
+	std::auto_ptr<ThumbnailPixmapCache> createThumbnailCache();
+	
 	void construct();
 	
 	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
@@ -98,6 +110,8 @@ private:
 	PageSequenceSnapshot m_frozenPages;
 	QString m_outDir;
 	QString m_projectFile;
+	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
+	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence;
 	WorkerThread* m_pWorkerThread;
 	QStackedLayout* m_pImageFrameLayout;
 	QStackedLayout* m_pOptionsFrameLayout;
@@ -110,6 +124,7 @@ private:
 	bool m_workerThreadReady;
 	bool m_debug;
 	bool m_projectModified;
+	bool m_batchProcessing;
 };
 
 #endif

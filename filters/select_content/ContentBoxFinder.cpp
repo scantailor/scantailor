@@ -26,6 +26,7 @@
 #include "Dpi.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
+#include "imageproc/Binarize.h"
 #include "imageproc/BWColor.h"
 #include "imageproc/Constants.h"
 #include "imageproc/Connectivity.h"
@@ -80,6 +81,7 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
+	//BinaryImage bw150(binarizeWolf(gray150));
 	BinaryImage bw150(gray150, data.bwThreshold());
 	if (dbg) {
 		dbg->add(bw150, "bw150");
@@ -256,6 +258,18 @@ ContentBoxFinder::filterShadows(
 		dbg->add(reduced_dithering, "reduced_dithering");
 	}
 	
+	status.throwIfCancelled();
+	
+	// Long white vertical lines are definately not spaces between letters.
+	BinaryImage vert_whitespace(
+		closeBrick(reduced_dithering, QSize(1, 150), BLACK)
+	);
+	if (dbg) {
+		dbg->add(vert_whitespace, "vert_whitespace");
+	}
+	
+	status.throwIfCancelled();
+	
 	// Join neighboring white letters.
 	BinaryImage opened(openBrick(reduced_dithering, QSize(10, 4), BLACK));
 	reduced_dithering.release();
@@ -276,6 +290,8 @@ ContentBoxFinder::filterShadows(
 	// Join the spacings between words together.
 	BinaryImage closed(closeBrick(opened, QSize(20, 1), WHITE));
 	opened.release();
+	rasterOp<RopAnd<RopSrc, RopDst> >(closed, vert_whitespace);
+	vert_whitespace.release();
 	if (dbg) {
 		dbg->add(closed, "closed");
 	}
@@ -600,10 +616,8 @@ ContentBoxFinder::processRow(
 			continue;
 		}
 		
-		bool const long_hline = (
-			(cc.width() > area.width() * 0.8)
-			&& (cc.width() > cc.height() * 20)
-		);
+		bool const hline = (cc.width() > cc.height() * 20);
+		bool const long_hline = hline && (cc.width() > area.width() * 0.7);
 		
 		bool const short_vline = (
 			(cc.height() > cc.width() * 2)
@@ -612,7 +626,7 @@ ContentBoxFinder::processRow(
 		
 		bool const big_and_dark = isBigAndDark(cc);
 		
-		if (!(short_vline || long_hline || big_and_dark)) {
+		if (!(short_vline || hline || big_and_dark)) {
 			BinaryImage const cc_img(eraser.computeConnCompImage());
 			
 			if (!isWindingComponent(cc_img)) {
@@ -629,8 +643,15 @@ ContentBoxFinder::processRow(
 			}
 		}
 		
-		top = std::min(top, area.top() + cc.rect().top());
-		bottom = std::max(bottom, area.top() + cc.rect().bottom());
+		// We don't insist the horizontal line is necessarily
+		// non-garbage.  It may for example be the edge of a page.
+		// On the other hand, we still append it to non_garbage_pixels,
+		// or otherwise it may overwhelm any other non-garbage content
+		// in that area.
+		if (!hline || long_hline) {
+			top = std::min(top, area.top() + cc.rect().top());
+			bottom = std::max(bottom, area.top() + cc.rect().bottom());
+		}
 		non_garbage_pixels += cc.pixCount();
 	}
 	

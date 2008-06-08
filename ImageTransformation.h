@@ -64,8 +64,11 @@ public:
 	 * Suppose the original image DPI is 300x600.  This will scale it to
 	 * 300x300, the minimum of two.
 	 *
+	 * \note This transformation is applied automatically on construction.
+	 *
 	 * \see \ref transformations Transformations.
 	 */
+	
 	void preScaleToEqualizeDpi();
 	
 	/**

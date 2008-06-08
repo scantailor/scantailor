@@ -19,6 +19,7 @@
 #include "MainWindow.h.moc"
 #include "WorkerThread.h"
 #include "PageSequence.h"
+#include "ThumbnailSequence.h"
 #include "PageInfo.h"
 #include "ImageId.h"
 #include "FilterOptionsWidget.h"
@@ -26,14 +27,20 @@
 #include "BasicImageView.h"
 #include "ProjectWriter.h"
 #include "ProjectReader.h"
+#include "ThumbnailPixmapCache.h"
+#include "ThumbnailFactory.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
+#include "filters/fix_orientation/ThumbnailTask.h"
 #include "filters/page_split/Filter.h"
 #include "filters/page_split/Task.h"
+#include "filters/page_split/ThumbnailTask.h"
 #include "filters/deskew/Filter.h"
 #include "filters/deskew/Task.h"
+#include "filters/deskew/ThumbnailTask.h"
 #include "filters/select_content/Filter.h"
 #include "filters/select_content/Task.h"
+#include "filters/select_content/ThumbnailTask.h"
 #include "LoadFileTask.h"
 #include "ScopedIncDec.h"
 #include <QLineF>
@@ -46,6 +53,8 @@
 #include <QModelIndex>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QGraphicsItem>
+#include <QDebug>
 #include <algorithm>
 #include <stddef.h>
 #include <assert.h>
@@ -54,8 +63,7 @@ class MainWindow::FilterListModel : public QAbstractListModel
 {
 	DECLARE_NON_COPYABLE(FilterListModel)
 public:
-	FilterListModel(MainWindow* wnd,
-		IntrusivePtr<PageSequence> const& page_sequence);
+	FilterListModel(IntrusivePtr<PageSequence> const& page_sequence);
 	
 	virtual ~FilterListModel();
 	
@@ -66,7 +74,12 @@ public:
 	int getFilterIndex(FilterPtr const& filter) const;
 	
 	BackgroundTaskPtr createCompositeTask(
-		PageInfo const& page, int last_filter_idx, bool debug);
+		PageInfo const& page, int last_filter_idx,
+		ThumbnailPixmapCache& thumbnail_cache,
+		bool batch_processing, bool debug);
+	
+	IntrusivePtr<fix_orientation::ThumbnailTask>
+	createCompositeThumbnailTask(int last_filter_idx);
 	
 	virtual int rowCount(QModelIndex const& parent) const;
 	
@@ -85,6 +98,8 @@ MainWindow::MainWindow(
 :	m_ptrPages(new PageSequence(files, PageSequence::AUTO_PAGES)),
 	m_frozenPages(PageSequence::IMAGE_VIEW),
 	m_outDir(out_dir),
+	m_ptrThumbnailCache(createThumbnailCache()),
+	m_ptrThumbSequence(new ThumbnailSequence),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageChanges(0),
@@ -92,7 +107,7 @@ MainWindow::MainWindow(
 	m_debug(false),
 	m_projectModified(true)
 {
-	m_ptrFilterListModel.reset(new FilterListModel(this, m_ptrPages));
+	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
 	
 	construct();
 }
@@ -103,14 +118,17 @@ MainWindow::MainWindow(
 	m_frozenPages(PageSequence::IMAGE_VIEW),
 	m_outDir(project_reader.outputDirectory()),
 	m_projectFile(project_file),
+	m_ptrThumbnailCache(createThumbnailCache()),
+	m_ptrThumbSequence(new ThumbnailSequence),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageChanges(0),
 	m_workerThreadReady(false),
 	m_debug(false),
-	m_projectModified(false)
+	m_projectModified(false),
+	m_batchProcessing(false)
 {
-	m_ptrFilterListModel.reset(new FilterListModel(this, m_ptrPages));
+	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
 	project_reader.readFilterSettings(m_ptrFilterListModel->filters());
 	
 	construct();
@@ -126,10 +144,30 @@ MainWindow::~MainWindow()
 	m_pWorkerThread->wait();
 }
 
+std::auto_ptr<ThumbnailPixmapCache>
+MainWindow::createThumbnailCache()
+{
+	return std::auto_ptr<ThumbnailPixmapCache>(
+		new ThumbnailPixmapCache(
+			m_outDir+"/cache/thumbs", QSize(200, 200), 40, 5
+		)
+	);
+}
+
 void
 MainWindow::construct()
 {
 	setupUi(this);
+	
+	m_ptrThumbSequence->setThumbnailFactory(
+		IntrusivePtr<ThumbnailFactory>(
+			new ThumbnailFactory(
+				*m_ptrThumbnailCache,
+				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
+			)
+		)
+	);
+	m_ptrThumbSequence->attachView(thumbView);
 	
 	addAction(actionNextPageOnPgDown);
 	addAction(actionPrevPageOnPgUp);
@@ -198,7 +236,19 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 	if (m_ptrOptionsWidget) {
 		disconnect(
 			m_ptrOptionsWidget, SIGNAL(reloadRequested()),
-			this, SLOT(filterOptionsChanged())
+			this, SLOT(reloadRequested())
+		);
+		disconnect(
+			m_ptrOptionsWidget, SIGNAL(startBatchProcessing()),
+			this, SLOT(startBatchProcessing())
+		);
+		disconnect(
+			m_ptrOptionsWidget, SIGNAL(stopBatchProcessing()),
+			this, SLOT(stopBatchProcessing())
+		);
+		disconnect(
+			m_ptrOptionsWidget, SIGNAL(invalidateThumbnail(PageId const&)),
+			this, SLOT(invalidateThumbnailSlot(PageId const&))
 		);
 	}
 	
@@ -206,7 +256,13 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 	m_pOptionsFrameLayout->addWidget(widget);
 	m_ptrOptionsWidget = widget;
 	
-	connect(widget, SIGNAL(reloadRequested()), this, SLOT(filterOptionsChanged()));
+	connect(widget, SIGNAL(reloadRequested()), this, SLOT(reloadRequested()));
+	connect(widget, SIGNAL(startBatchProcessing()), this, SLOT(startBatchProcessing()));
+	connect(widget, SIGNAL(stopBatchProcessing()), this, SLOT(stopBatchProcessing()));
+	connect(
+		widget, SIGNAL(invalidateThumbnail(PageId const&)),
+		this, SLOT(invalidateThumbnailSlot(PageId const&))
+	);
 }
 
 void
@@ -230,6 +286,12 @@ MainWindow::setImageWidget(
 }
 
 void
+MainWindow::invalidateThumbnail(PageId const& page_id)
+{
+	m_ptrThumbSequence->invalidateThumbnail(page_id);
+}
+
+void
 MainWindow::pageChanged(int const page)
 {
 	if (m_ignorePageChanges) {
@@ -247,6 +309,7 @@ MainWindow::pageChanged(int const page)
 		m_ptrPages->setCurPage(page_info.id());
 	}
 	
+	m_batchProcessing = false;
 	loadImage(page_info);
 }
 
@@ -263,6 +326,17 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	
 	m_curFilter = selected.front().top();
 	syncPageSequence();
+	
+	m_ptrThumbSequence->setThumbnailFactory(
+		IntrusivePtr<ThumbnailFactory>(
+			new ThumbnailFactory(
+				*m_ptrThumbnailCache,
+				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
+			)
+		)
+	);
+	m_ptrThumbSequence->reset(m_frozenPages);
+	
 	loadImage();
 }
 
@@ -274,20 +348,62 @@ MainWindow::workerThreadReady()
 }
 
 void
-MainWindow::filterOptionsChanged()
+MainWindow::reloadRequested()
 {
 	loadImage();
+}
+
+void
+MainWindow::startBatchProcessing()
+{
+	m_batchProcessing = true;
+	
+	{
+		ScopedIncDec<int> guard(m_ignorePageChanges);
+		pageSpinBox->setEnabled(false);
+		pageSlider->setEnabled(false);
+		pageSpinBox->setValue(1);
+	}
+	
+	PageInfo const page_info(m_frozenPages.pageAt(0));
+	m_ptrPages->setCurPage(page_info.id());
+	loadImage(page_info);
+}
+
+void
+MainWindow::stopBatchProcessing()
+{
+	pageSpinBox->setEnabled(true);
+	pageSlider->setEnabled(true);
+	if (m_ptrCurTask) {
+		m_ptrCurTask->cancel();
+		m_ptrCurTask.reset();
+	}
+	m_batchProcessing = false;
+}
+
+void
+MainWindow::invalidateThumbnailSlot(PageId const& page_id)
+{
+	invalidateThumbnail(page_id);
 }
 
 void
 MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result)
 {
 	if (task != m_ptrCurTask || task->isCancelled()) {
+		// The page sequence may still have changed.
 		syncPageSequence();
 		return;
 	}
 	
-	if (result->filter() && result->filter() != m_ptrFilterListModel->getFilter(m_curFilter)) {
+	if (!result->filter()) {
+		// Error loading file.
+		m_batchProcessing = false;
+	} else if (result->filter() != m_ptrFilterListModel->getFilter(m_curFilter)) {
+		// Error from one of the previous filters.
+		m_batchProcessing = false;
+		
 		int const idx = m_ptrFilterListModel->getFilterIndex(result->filter());
 		assert(idx >= 0);
 		m_curFilter = idx;
@@ -301,6 +417,14 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 	
 	syncPageSequence(); // must be done after m_curFilter is modified.
 	result->updateUI(this);
+	
+	if (m_batchProcessing) {
+		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
+			m_batchProcessing = false;
+		} else {
+			loadImage(m_ptrPages->setNextPage(m_frozenPages.view()));
+		}
+	}
 }
 
 void
@@ -369,7 +493,7 @@ MainWindow::loadImage()
 		return;
 	}
 	
-	loadImage(m_ptrPages->curPage());
+	loadImage(m_ptrPages->curPage(m_frozenPages.view()));
 }
 
 void
@@ -387,7 +511,7 @@ MainWindow::loadImage(PageInfo const& page)
 		m_ptrCurTask.reset();
 	}
 	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
-		page, m_curFilter, m_debug
+		page, m_curFilter, *m_ptrThumbnailCache, m_batchProcessing, m_debug
 	);
 	if (m_ptrCurTask) {
 		m_pWorkerThread->executeCommand(m_ptrCurTask);
@@ -399,6 +523,16 @@ MainWindow::syncPageSequence()
 {
 	FilterPtr const& filter = m_ptrFilterListModel->getFilter(m_curFilter);
 	m_frozenPages = m_ptrPages->snapshot(filter->getView());
+	
+	m_ptrThumbSequence->setThumbnailFactory(
+		IntrusivePtr<ThumbnailFactory>(
+			new ThumbnailFactory(
+				*m_ptrThumbnailCache,
+				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
+			)
+		)
+	);
+	m_ptrThumbSequence->syncWith(m_frozenPages);
 	
 	int const from = 1;
 	int const to = m_frozenPages.numPages();
@@ -446,11 +580,11 @@ MainWindow::saveProjectWithFeedback(QString const& project_file)
 /*====================== MainWindow::FilterListModel =====================*/
 
 MainWindow::FilterListModel::FilterListModel(
-	MainWindow* wnd, IntrusivePtr<PageSequence> const& page_sequence)
+	IntrusivePtr<PageSequence> const& page_sequence)
 :	m_ptrFixOrientationFilter(new fix_orientation::Filter(page_sequence)),
 	m_ptrPageSplitFilter(new page_split::Filter(page_sequence)),
-	m_ptrDeskewFilter(new deskew::Filter),
-	m_ptrSelectContentFilter(new select_content::Filter)
+	m_ptrDeskewFilter(new deskew::Filter()),
+	m_ptrSelectContentFilter(new select_content::Filter())
 {
 	m_filters.push_back(m_ptrFixOrientationFilter);
 	m_filters.push_back(m_ptrPageSplitFilter);
@@ -483,7 +617,9 @@ MainWindow::FilterListModel::getFilterIndex(FilterPtr const& filter) const
 
 BackgroundTaskPtr
 MainWindow::FilterListModel::createCompositeTask(
-	PageInfo const& page, int const last_filter_idx, bool const debug)
+	PageInfo const& page, int const last_filter_idx,
+	ThumbnailPixmapCache& thumbnail_cache,
+	bool const batch_processing, bool const debug)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
 	IntrusivePtr<page_split::Task> page_split_task;
@@ -493,7 +629,7 @@ MainWindow::FilterListModel::createCompositeTask(
 	switch (last_filter_idx) {
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createTask(
-			page.id(), debug
+			page.id(), batch_processing, debug
 		);
 	case 2:
 		deskew_task = m_ptrDeskewFilter->createTask(
@@ -510,7 +646,32 @@ MainWindow::FilterListModel::createCompositeTask(
 	}
 	assert(fix_orientation_task);
 	
-	return BackgroundTaskPtr(new LoadFileTask(page, fix_orientation_task));
+	return BackgroundTaskPtr(
+		new LoadFileTask(page, thumbnail_cache, fix_orientation_task)
+	);
+}
+
+IntrusivePtr<fix_orientation::ThumbnailTask>
+MainWindow::FilterListModel::createCompositeThumbnailTask(int const last_filter_idx)
+{
+	IntrusivePtr<fix_orientation::ThumbnailTask> fix_orientation_task;
+	IntrusivePtr<page_split::ThumbnailTask> page_split_task;
+	IntrusivePtr<deskew::ThumbnailTask> deskew_task;
+	IntrusivePtr<select_content::ThumbnailTask> select_content_task;
+	
+	switch (last_filter_idx) {
+	case 3:
+		select_content_task = m_ptrSelectContentFilter->createThumbnailTask();
+	case 2:
+		deskew_task = m_ptrDeskewFilter->createThumbnailTask(select_content_task);
+	case 1:
+		page_split_task = m_ptrPageSplitFilter->createThumbnailTask(deskew_task);
+	case 0:
+		fix_orientation_task = m_ptrFixOrientationFilter->createThumbnailTask(page_split_task);
+	}
+	assert(fix_orientation_task);
+	
+	return fix_orientation_task;
 }
 
 int

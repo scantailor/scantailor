@@ -22,6 +22,10 @@
 #include "Scope.h"
 #include "Settings.h"
 #include "PageSequence.h"
+#include "ImageId.h"
+#include "PageId.h"
+#include <boost/foreach.hpp>
+#include <vector>
 #include <assert.h>
 
 namespace fix_orientation
@@ -100,7 +104,13 @@ OptionsWidget::showApplyToDialog()
 void
 OptionsWidget::scopeSet(Scope const& scope)
 {
-	m_ptrSettings->applyRule(scope, m_rotation);
+	std::vector<ImageId> const image_ids(
+		m_ptrSettings->applyRule(scope, m_rotation)
+	);
+	
+	BOOST_FOREACH(ImageId const& image_id, image_ids) {
+		emit invalidateThumbnail(image_id);
+	}
 }
 
 void
@@ -113,8 +123,11 @@ OptionsWidget::setRotation(OrthogonalRotation const rotation)
 	m_rotation = rotation;
 	setRotationPixmap();
 	
-	m_ptrSettings->applyRule(m_ptrPageSequence->curPage().id(), rotation);
+	ImageId const image_id(m_ptrPageSequence->curImage());
+	m_ptrSettings->applyRule(image_id, rotation);
+	
 	emit rotated(rotation);
+	emit invalidateThumbnail(image_id);
 }
 
 void

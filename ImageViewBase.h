@@ -138,19 +138,11 @@ protected:
 	 * \note Calls to this method must not be mixed with calls to setCursor()
 	 *       and unsetCursor().
 	 */
-	void ensureCursorShape(Qt::CursorShape cursor_shape) {
-		// WTF?  It refuses to compile unless it's inline.
-		if (cursor_shape != m_currentCursorShape) {
-			m_currentCursorShape = cursor_shape;
-			setCursor(cursor_shape);
-		}
-	}
+	void ensureCursorShape(Qt::CursorShape cursor_shape);
 private:
 	void updateWidgetTransform();
 	
 	void updateWidgetTransformAndFixFocalPoint();
-	
-	void drawPixmap(QPainter& painter);
 	
 	QPointF getIdealFocalPoint() const;
 	

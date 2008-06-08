@@ -23,6 +23,7 @@
 #include "OrthogonalRotation.h"
 #include <QMutexLocker>
 #include <QSize>
+#include <QDebug>
 #include <algorithm>
 #include <stddef.h>
 #include <assert.h>
@@ -205,13 +206,22 @@ PageSequence::curImageIdx() const
 	return m_curImage;
 }
 
-PageInfo
-PageSequence::curPage() const
+ImageId
+PageSequence::curImage() const
 {
 	QMutexLocker locker(&m_mutex);
 	assert((size_t)m_curImage <= m_images.size());
 	ImageDesc const& image = m_images[m_curImage];
-	PageId const id(image.id, m_curSubPage);
+	return m_images[m_curImage].id;
+}
+
+PageInfo
+PageSequence::curPage(View const view) const
+{
+	QMutexLocker locker(&m_mutex);
+	assert((size_t)m_curImage <= m_images.size());
+	ImageDesc const& image = m_images[m_curImage];
+	PageId const id(image.id, curSubPageLocked(view));
 	return PageInfo(id, image.metadata, image.numLogicalPages);
 }
 
@@ -371,7 +381,7 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 		*modified = true;
 	}
 	
-	PageId const id(image->id, m_curSubPage);
+	PageId const id(image->id, curSubPageLocked(view));
 	return PageInfo(id, image->metadata, image->numLogicalPages);
 }
 
@@ -401,8 +411,17 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 		*modified = true;
 	}
 	
-	PageId const id(image->id, m_curSubPage);
+	PageId const id(image->id, curSubPageLocked(view));
 	return PageInfo(id, image->metadata, image->numLogicalPages);
+}
+
+LogicalPageId::SubPage
+PageSequence::curSubPageLocked(View const view) const
+{
+	if (view == IMAGE_VIEW) {
+		return LogicalPageId::SINGLE_PAGE;
+	}
+	return m_curSubPage;
 }
 
 

@@ -29,9 +29,9 @@
 #include "ContentBoxFinder.h"
 #include "FilterUiInterface.h"
 #include "ImageView.h"
+#include "OrthogonalRotation.h"
 #include "ImageTransformation.h"
 #include <QObject>
-#include <QRectF>
 #include <QDebug>
 
 namespace select_content
@@ -41,28 +41,33 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
+		LogicalPageId const& page_id,
 		std::auto_ptr<DebugImages> dbg,
-		QImage const& image, ImageTransformation const& xform,
-		OptionsWidget::UiData const& ui_data);
+		QImage const& image,
+		ImageTransformation const& xform,
+		OptionsWidget::UiData const& ui_data, bool batch);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
+	LogicalPageId m_pageId;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
+	bool m_batchProcessing;
 };
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
-	LogicalPageId const& page_id, bool const debug)
+	LogicalPageId const& page_id, bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
-	m_pageId(page_id)
+	m_pageId(page_id),
+	m_batchProcessing(batch)
 {
 	if (debug) {
 		m_ptrDbg.reset(new DebugImages);
@@ -107,8 +112,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	return FilterResultPtr(
 		new UiUpdater(
-			m_ptrFilter, m_ptrDbg, data.image(),
-			data.xform(), ui_data
+			m_ptrFilter, m_pageId, m_ptrDbg, data.image(),
+			data.xform(), ui_data, m_batchProcessing
 		)
 	);
 }
@@ -118,14 +123,18 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
+	LogicalPageId const& page_id,
 	std::auto_ptr<DebugImages> dbg,
-	QImage const& image, ImageTransformation const& xform,
-	OptionsWidget::UiData const& ui_data)
+	QImage const& image,
+	ImageTransformation const& xform,
+	OptionsWidget::UiData const& ui_data, bool const batch)
 :	m_ptrFilter(filter),
+	m_pageId(page_id),
 	m_ptrDbg(dbg),
 	m_image(image),
 	m_xform(xform),
-	m_uiData(ui_data)
+	m_uiData(ui_data),
+	m_batchProcessing(batch)
 {
 }
 
@@ -137,6 +146,12 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
 	opt_widget->postUpdateUI(m_uiData);
 	ui->setOptionsWidget(opt_widget);
+	
+	ui->invalidateThumbnail(m_pageId);
+	
+	if (m_batchProcessing) {
+		return;
+	}
 	
 	ImageView* view = new ImageView(m_image, m_xform, m_uiData.contentRect());
 	ui->setImageWidget(view, m_ptrDbg.get());

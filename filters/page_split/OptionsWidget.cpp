@@ -108,6 +108,8 @@ OptionsWidget::manualPageLayoutSet(PageLayout const& page_layout)
 	commitCurrentParams();
 	
 	manualBtn->setChecked(true);
+	
+	emit invalidateThumbnail(m_imageId);
 }
 
 void

@@ -23,7 +23,6 @@
 #include "AbstractFilter.h"
 #include "FilterResult.h"
 #include "IntrusivePtr.h"
-#include <memory>
 
 class PageId;
 class ImageId;
@@ -35,6 +34,7 @@ class QDomElement;
 namespace page_split
 {
 	class Task;
+	class ThumbnailTask;
 }
 
 namespace fix_orientation
@@ -42,6 +42,7 @@ namespace fix_orientation
 
 class OptionsWidget;
 class Task;
+class ThumbnailTask;
 class Settings;
 
 /**
@@ -71,6 +72,9 @@ public:
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,
 		IntrusivePtr<page_split::Task> const& next_task);
+	
+	IntrusivePtr<ThumbnailTask> createThumbnailTask(
+		IntrusivePtr<page_split::ThumbnailTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

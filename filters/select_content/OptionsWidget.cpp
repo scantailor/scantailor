@@ -20,21 +20,35 @@
 #include "Settings.h"
 #include "Params.h"
 #include "ScopedIncDec.h"
+#include "Utils.h"
+#include <QSize>
 
 namespace select_content
 {
 
 OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 :	m_ptrSettings(settings),
-	m_ignoreAutoManualToggle(0)
+	m_ignoreAutoManualToggle(0),
+	m_thumbSpaceUsed(0),
+	m_thumbSpacing(20),
+	m_batchProcessingActive(false)
 {
 	setupUi(this);
 	
 	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+	connect(batchProcessingBtn, SIGNAL(clicked()), this, SLOT(batchProcessingToggled()));
 }
 
 OptionsWidget::~OptionsWidget()
 {
+}
+
+QSize
+OptionsWidget::getMaxThumbSize()
+{
+	int const max_width = 150;
+	int const max_height = max_width * 3; // Doesn't really matter.
+	return QSize(max_width, max_height);
 }
 
 void
@@ -64,6 +78,8 @@ OptionsWidget::manualContentRectSet(QRectF const& content_rect)
 	m_uiData.setMode(MODE_MANUAL);
 	updateModeIndication(MODE_MANUAL);
 	commitCurrentParams();
+	
+	emit invalidateThumbnail(m_pageId);
 }
 
 void
@@ -80,6 +96,24 @@ OptionsWidget::modeChanged(bool const auto_mode)
 	} else {
 		m_uiData.setMode(MODE_MANUAL);
 		commitCurrentParams();
+	}
+}
+
+void
+OptionsWidget::batchProcessingToggled()
+{
+	if (m_batchProcessingActive) {
+		m_batchProcessingActive = false;
+		QPixmap pixmap;
+		Utils::loadAndCachePixmap(pixmap, ":/icons/media-playback-start.png");
+		batchProcessingBtn->setIcon(pixmap);
+		emit stopBatchProcessing();
+	} else {
+		m_batchProcessingActive = true;
+		QPixmap pixmap;
+		Utils::loadAndCachePixmap(pixmap, ":/icons/media-playback-stop.png");
+		batchProcessingBtn->setIcon(pixmap);
+		emit startBatchProcessing();
 	}
 }
 

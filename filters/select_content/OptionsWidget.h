@@ -25,7 +25,13 @@
 #include "AutoManualMode.h"
 #include "Dependencies.h"
 #include "LogicalPageId.h"
+#include <QGraphicsScene>
+#include <QGraphicsItem>
 #include <QRect>
+#include <memory>
+
+class QImage;
+class QSize;
 
 namespace select_content
 {
@@ -69,19 +75,27 @@ public:
 	void preUpdateUI(LogicalPageId const& page_id);
 	
 	void postUpdateUI(UiData const& ui_data);
+	
+	static QSize getMaxThumbSize();
 public slots:
 	void manualContentRectSet(QRectF const& content_rect);
 private slots:
 	void modeChanged(bool auto_mode);
+	
+	void batchProcessingToggled();
 private:
 	void updateModeIndication(AutoManualMode const mode);
 	
 	void commitCurrentParams();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
+	QGraphicsScene* m_pThumbScene;
 	UiData m_uiData;
 	LogicalPageId m_pageId;
 	int m_ignoreAutoManualToggle;
+	int m_thumbSpaceUsed;
+	int m_thumbSpacing;
+	bool m_batchProcessingActive;
 };
 
 } // namespace select_content

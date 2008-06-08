@@ -22,6 +22,7 @@
 #include "ui_OrientationOptionsWidget.h"
 #include "FilterOptionsWidget.h"
 #include "OrthogonalRotation.h"
+#include "IntrusivePtr.h"
 
 class PageSequence;
 
