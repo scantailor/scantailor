@@ -41,8 +41,6 @@ public:
 	
 	void attachView(QGraphicsView* view);
 	
-	void syncWith(PageSequenceSnapshot const& pages);
-	
 	void reset(PageSequenceSnapshot const& pages);
 	
 	void invalidateThumbnail(PageId const& page_id);
@@ -50,6 +48,7 @@ private:
 	class Item;
 	class Impl;
 	class PlaceholderThumb;
+	class CompositeItem;
 	
 	std::auto_ptr<Impl> m_ptrImpl;
 };

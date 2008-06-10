@@ -165,6 +165,7 @@ SET(
 	PixmapRenderer.cpp PixmapRenderer.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
+	ImageInfo.cpp ImageInfo.h
 	ImageFileInfo.cpp ImageFileInfo.h
 	ImageMetadata.h
 	PageLayout.cpp PageLayout.h
@@ -185,7 +186,7 @@ SET(
 	ImageId.cpp ImageId.h
 	LogicalPageId.cpp LogicalPageId.h
 	PageId.cpp PageId.h
-	PageInfo.h ImageInfo.h
+	PageInfo.cpp PageInfo.h
 	BackgroundTask.cpp BackgroundTask.h
 	PageSequence.cpp PageSequence.h
 	FilterData.cpp FilterData.h

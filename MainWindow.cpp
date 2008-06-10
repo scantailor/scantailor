@@ -183,6 +183,7 @@ MainWindow::construct()
 	);
 	
 	syncPageSequence();
+	m_ptrThumbSequence->reset(m_frozenPages);
 	
 	connect(
 		filterList->selectionModel(),
@@ -532,7 +533,6 @@ MainWindow::syncPageSequence()
 			)
 		)
 	);
-	m_ptrThumbSequence->syncWith(m_frozenPages);
 	
 	int const from = 1;
 	int const to = m_frozenPages.numPages();

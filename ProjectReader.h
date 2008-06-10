@@ -55,8 +55,21 @@ public:
 	
 	LogicalPageId pageId(int numeric_id) const;
 private:
+	struct FileInfo
+	{
+		QString path;
+		bool multiPageFile;
+		
+		FileInfo() : multiPageFile(false) {}
+		
+		FileInfo(QString path, bool multi_page)
+		: path(path), multiPageFile(multi_page) {}
+		
+		bool isNull() const { return path.isEmpty(); }
+	};
+	
 	typedef std::map<int, QString> DirMap;
-	typedef std::map<int, QString> FileMap;
+	typedef std::map<int, FileInfo> FileMap;
 	typedef std::map<int, ImageInfo> ImageMap;
 	typedef std::map<int, LogicalPageId> PageMap;
 	
@@ -72,7 +85,7 @@ private:
 	
 	QString getDirPath(int id) const;
 	
-	QString getFilePath(int id) const;
+	FileInfo getFileInfo(int id) const;
 	
 	ImageInfo getImageInfo(int id) const;
 	

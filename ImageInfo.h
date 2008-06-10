@@ -26,20 +26,23 @@ class ImageInfo
 {
 	// Member-wise copying is OK.
 public:
-	ImageInfo() : m_numSubPages(0) {}
+	ImageInfo();
 	
-	ImageInfo(ImageId const& id, ImageMetadata const& metadata, int num_sub_pages)
-	: m_id(id), m_metadata(metadata), m_numSubPages(num_sub_pages) {}
+	ImageInfo(ImageId const& id, ImageMetadata const& metadata,
+		bool multi_page_file, int num_sub_pages);
 	
 	ImageId const& id() const { return m_id; }
 	
 	ImageMetadata const& metadata() const { return m_metadata; }
+	
+	bool isMultiPageFile() const { return m_multiPageFile; }
 	
 	int numSubPages() const { return m_numSubPages; }
 private:
 	ImageId m_id;
 	ImageMetadata m_metadata;
 	int m_numSubPages;
+	bool m_multiPageFile;
 };
 
 #endif

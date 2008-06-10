@@ -51,7 +51,8 @@ ProjectWriter::ProjectWriter(
 			++next_id;
 		}
 		
-		if (m_fileIds.insert(FileIds::value_type(file_path, next_id)).second) {
+		FileData const file_data(next_id, page.isMultiPageFile());
+		if (m_fileIds.insert(FileIds::value_type(file_path, file_data)).second) {
 			++next_id;
 		}
 		
@@ -127,12 +128,14 @@ ProjectWriter::processFiles(QDomDocument& doc) const
 	FileIds::const_iterator const end(m_fileIds.end());
 	for (; it != end; ++it) {
 		QString const& file_path = it->first;
+		FileData const& file_data = it->second;
 		QFileInfo const file_info(file_path);
 		QString const& dir_path = file_info.absolutePath();
 		QDomElement file_el(doc.createElement("file"));
-		file_el.setAttribute("id", it->second);
+		file_el.setAttribute("id", file_data.id);
 		file_el.setAttribute("dirId", dirId(dir_path));
 		file_el.setAttribute("name", file_info.fileName());
+		file_el.setAttribute("multiPage", file_data.multiPageFile ? "1" : "0");
 		files_el.appendChild(file_el);
 	}
 	
@@ -215,7 +218,7 @@ ProjectWriter::fileId(QString const& file_path) const
 {
 	FileIds::const_iterator it(m_fileIds.find(file_path));
 	assert(it != m_fileIds.end());
-	return it->second;
+	return it->second.id;
 }
 
 int

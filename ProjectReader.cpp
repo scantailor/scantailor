@@ -134,12 +134,15 @@ ProjectReader::processFiles(QDomElement const& files_el)
 			continue;
 		}
 		
+		bool multi_page = el.attribute("multiPage") == "1";
+		
 		QString const dir_path(getDirPath(dir_id));
 		if (dir_path.isEmpty()) {
 			continue;
 		}
 		
-		m_fileMap.insert(FileMap::value_type(id, QDir(dir_path).filePath(name)));
+		FileInfo const file_info(QDir(dir_path).filePath(name), multi_page);
+		m_fileMap.insert(FileMap::value_type(id, file_info));
 	}
 }
 
@@ -178,14 +181,16 @@ ProjectReader::processImages(QDomElement const& images_el)
 			continue;
 		}
 		
-		QString const file_path(getFilePath(file_id));
-		if (file_path.isEmpty()) {
+		FileInfo const file_info(getFileInfo(file_id));
+		if (file_info.isNull()) {
 			continue;
 		}
 		
-		ImageId const image_id(file_path, file_image);
+		ImageId const image_id(file_info.path, file_image);
 		ImageMetadata const metadata(processImageMetadata(el));
-		ImageInfo const image_info(image_id, metadata, sub_pages);
+		ImageInfo const image_info(
+			image_id, metadata, file_info.multiPageFile, sub_pages
+		);
 		
 		images.push_back(image_info);
 		m_imageMap.insert(ImageMap::value_type(id, image_info));
@@ -272,14 +277,14 @@ ProjectReader::getDirPath(int const id) const
 	return QString();
 }
 
-QString
-ProjectReader::getFilePath(int const id) const
+ProjectReader::FileInfo
+ProjectReader::getFileInfo(int const id) const
 {
 	FileMap::const_iterator const it(m_fileMap.find(id));
 	if (it != m_fileMap.end()) {
 		return it->second;
 	}
-	return QString();
+	return FileInfo();
 }
 
 ImageInfo

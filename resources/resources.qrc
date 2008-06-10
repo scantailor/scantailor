@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/right_page_thumb.png</file>
+    <file>icons/left_page_thumb.png</file>
     <file>icons/media-playback-start.png</file>
     <file>icons/media-playback-stop.png</file>
     <file>icons/aqua-sphere.png</file>

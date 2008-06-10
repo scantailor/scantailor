@@ -21,6 +21,7 @@
 #include "ImageMetadata.h"
 #include "ImageInfo.h"
 #include "OrthogonalRotation.h"
+#include <boost/foreach.hpp>
 #include <QMutexLocker>
 #include <QSize>
 #include <QDebug>
@@ -42,12 +43,12 @@ PageSequence::PageSequence(std::vector<ImageInfo> const& info)
 	m_curLogicalPage(0),
 	m_curSubPage(LogicalPageId::SINGLE_PAGE)
 {
-	std::vector<ImageInfo>::const_iterator it(info.begin());
-	std::vector<ImageInfo>::const_iterator const end(info.end());
-	for (; it != end; ++it) {
-		ImageInfo const& image = *it;
+	BOOST_FOREACH(ImageInfo const& image, info) {
 		m_images.push_back(
-			ImageDesc(image.id(), image.metadata(), image.numSubPages())
+			ImageDesc(
+				image.id(), image.metadata(),
+				image.isMultiPageFile(), image.numSubPages()
+			)
 		);
 	}
 	
@@ -63,17 +64,15 @@ PageSequence::PageSequence(
 	m_curLogicalPage(0),
 	m_curSubPage(LogicalPageId::SINGLE_PAGE)
 {
-	std::vector<ImageFileInfo>::const_iterator it(files.begin());
-	std::vector<ImageFileInfo>::const_iterator const end(files.end());
-	for (; it != end; ++it) {
-		ImageFileInfo const& file = *it;
+	BOOST_FOREACH(ImageFileInfo const& file, files) {
 		QString const& file_path = file.fileInfo().absoluteFilePath();
 		std::vector<ImageMetadata> const& images = file.imageInfo();
 		int const num_images = images.size();
+		bool multi_page = num_images > 1;
 		for (int i = 0; i < num_images; ++i) {
 			ImageMetadata const& metadata = images[i];
 			ImageId const id(file_path, i);
-			m_images.push_back(ImageDesc(id, metadata, pages));
+			m_images.push_back(ImageDesc(id, metadata, multi_page, pages));
 			m_totalLogicalPages += m_images.back().numLogicalPages;
 		}
 	}
@@ -104,8 +103,13 @@ PageSequence::snapshot(View const view) const
 			assert(image.numLogicalPages >= 1 && image.numLogicalPages <= 2);
 			for (int j = 0; j < image.numLogicalPages; ++j) {
 				PageId const id(image.id, image.logicalPageToSubPage(j));
-				PageInfo const page(id, image.metadata, image.numLogicalPages);
-				pages.push_back(page);
+				pages.push_back(
+					PageInfo(
+						id, image.metadata,
+						image.multiPageFile,
+						image.numLogicalPages
+					)
+				);
 			}
 		}
 	} else {
@@ -119,7 +123,13 @@ PageSequence::snapshot(View const view) const
 		for (int i = 0; i < num_images; ++i) {
 			ImageDesc const& image = m_images[i];
 			PageId const id(image.id, LogicalPageId::SINGLE_PAGE);
-			pages.push_back(PageInfo(id, image.metadata, image.numLogicalPages));
+			pages.push_back(
+				PageInfo(
+					id, image.metadata,
+					image.multiPageFile,
+					image.numLogicalPages
+				)
+			);
 		}
 	}
 	
@@ -222,7 +232,10 @@ PageSequence::curPage(View const view) const
 	assert((size_t)m_curImage <= m_images.size());
 	ImageDesc const& image = m_images[m_curImage];
 	PageId const id(image.id, curSubPageLocked(view));
-	return PageInfo(id, image.metadata, image.numLogicalPages);
+	return PageInfo(
+		id, image.metadata,
+		image.multiPageFile, image.numLogicalPages
+	);
 }
 
 PageInfo
@@ -382,7 +395,10 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 	}
 	
 	PageId const id(image->id, curSubPageLocked(view));
-	return PageInfo(id, image->metadata, image->numLogicalPages);
+	return PageInfo(
+		id, image->metadata,
+		image->multiPageFile, image->numLogicalPages
+	);
 }
 
 PageInfo
@@ -412,7 +428,10 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 	}
 	
 	PageId const id(image->id, curSubPageLocked(view));
-	return PageInfo(id, image->metadata, image->numLogicalPages);
+	return PageInfo(
+		id, image->metadata,
+		image->multiPageFile, image->numLogicalPages
+	);
 }
 
 LogicalPageId::SubPage
@@ -453,17 +472,21 @@ PageSequenceSnapshot::pageAt(size_t const idx) const
 /*========================= PageSequence::ImageDesc ======================*/
 
 PageSequence::ImageDesc::ImageDesc(
-	ImageId const& id, ImageMetadata const& metadata, int sub_pages)
+	ImageId const& id, ImageMetadata const& metadata,
+	bool const multi_page, int sub_pages)
 :	id(id),
 	metadata(metadata),
-	numLogicalPages(sub_pages)
+	numLogicalPages(sub_pages),
+	multiPageFile(multi_page)
 {
 }
 
 PageSequence::ImageDesc::ImageDesc(
-	ImageId const& id, ImageMetadata const& metadata, Pages const pages)
+	ImageId const& id, ImageMetadata const& metadata,
+	bool const multi_page, Pages const pages)
 :	id(id),
-	metadata(metadata)
+	metadata(metadata),
+	multiPageFile(multi_page)
 {
 	switch (pages) {
 		case ONE_PAGE:

@@ -16,33 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGEINFO_H_
-#define PAGEINFO_H_
+#include "PageInfo.h"
 
-#include "PageId.h"
-#include "ImageMetadata.h"
-
-class PageInfo
+PageInfo::PageInfo()
+:	m_imageSubPages(0),
+	m_multiPageFile(false)
 {
-	// Member-wise copying is OK.
-public:
-	PageInfo();
-	
-	PageInfo(PageId const& id, ImageMetadata const& metadata,
-		bool multi_page_file, int image_sub_pages);
-	
-	PageId const& id() const { return m_id; }
-	
-	ImageMetadata const& metadata() const { return m_metadata; }
-	
-	bool isMultiPageFile() const { return m_multiPageFile; }
-	
-	int imageSubPages() const { return m_imageSubPages; }
-private:
-	PageId m_id;
-	ImageMetadata m_metadata;
-	int m_imageSubPages;
-	bool m_multiPageFile;
-};
+}
 
-#endif
+PageInfo::PageInfo(
+	PageId const& id, ImageMetadata const& metadata,
+	bool multi_page_file, int image_sub_pages)
+:	m_id(id),
+	m_metadata(metadata),
+	m_imageSubPages(image_sub_pages),
+	m_multiPageFile(multi_page_file)
+{
+}

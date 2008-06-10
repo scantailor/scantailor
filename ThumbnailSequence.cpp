@@ -21,14 +21,21 @@
 #include "PageSequence.h"
 #include "PageInfo.h"
 #include "PageId.h"
+#include "ImageId.h"
 #include "LogicalPageId.h"
+#include "Utils.h"
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QGraphicsItemGroup>
+#include <QGraphicsSimpleTextItem>
+#include <QGraphicsPixmapItem>
 #include <QGraphicsView>
+#include <QFileInfo>
+#include <QPixmap>
 #include <QRectF>
 #include <QSizeF>
 #include <QPointF>
@@ -36,6 +43,8 @@
 #include <QTransform>
 #include <QBrush>
 #include <QColor>
+#include <QString>
+#include <QObject>
 #include <QDebug>
 #include <stddef.h>
 #include <assert.h>
@@ -47,13 +56,13 @@ using namespace ::boost::multi_index;
 class ThumbnailSequence::Item
 {
 public:
-	Item(PageInfo const& page_info, QGraphicsItem* thumb, bool tag = false)
-	: pageInfo(page_info), thumbnail(thumb), tagged(tag) {}
+	Item(PageInfo const& page_info, CompositeItem* comp_item, bool tag = false)
+	: pageInfo(page_info), composite(comp_item), tagged(tag) {}
 	
 	LogicalPageId const& pageId() const { return pageInfo.id(); }
 	
 	PageInfo pageInfo;
-	mutable QGraphicsItem* thumbnail;
+	mutable CompositeItem* composite;
 	mutable bool tagged;
 };
 
@@ -68,8 +77,6 @@ public:
 	void setThumbnailFactory(IntrusivePtr<ThumbnailFactory> const& factory);
 	
 	void attachView(QGraphicsView* view);
-	
-	void syncWith(PageSequenceSnapshot const& pages);
 	
 	void reset(PageSequenceSnapshot const& pages);
 	
@@ -94,9 +101,15 @@ private:
 	
 	void setThumbnail(
 		ItemsById::iterator const& id_it,
-		std::auto_ptr<QGraphicsItem> thumb_ptr);
+		std::auto_ptr<CompositeItem> composite);
 	
 	void clear();
+	
+	std::auto_ptr<QGraphicsItem> getThumbnail(PageInfo const& page_info);
+	
+	std::auto_ptr<QGraphicsItem> getLabel(PageInfo const& page_info);
+	
+	std::auto_ptr<CompositeItem> getCompositeItem(PageInfo const& page_info);
 	
 	void commitSceneRect();
 	
@@ -122,6 +135,21 @@ public:
 };
 
 
+class ThumbnailSequence::CompositeItem : public QGraphicsItemGroup
+{
+public:
+	CompositeItem(
+		std::auto_ptr<QGraphicsItem> thumbnail,
+		std::auto_ptr<QGraphicsItem> label);
+	
+	void positionAtOffset(double offset);
+	
+	void updateSceneRect(QRectF& scene_rect);
+private:
+	QGraphicsItem* m_pThumb;
+};
+
+
 /*============================= ThumbnailSequence ===========================*/
 
 ThumbnailSequence::ThumbnailSequence()
@@ -143,12 +171,6 @@ void
 ThumbnailSequence::attachView(QGraphicsView* const view)
 {
 	m_ptrImpl->attachView(view);
-}
-
-void
-ThumbnailSequence::syncWith(PageSequenceSnapshot const& pages)
-{
-	m_ptrImpl->syncWith(pages);
 }
 
 void
@@ -191,57 +213,6 @@ ThumbnailSequence::Impl::attachView(QGraphicsView* const view)
 }
 
 void
-ThumbnailSequence::Impl::syncWith(PageSequenceSnapshot const& pages)
-{
-	double offset = 0;
-	size_t const num_pages = pages.numPages();
-	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info(pages.pageAt(i));
-		ItemsById::iterator const id_it(m_itemsById.find(page_info.id()));
-		
-		QGraphicsItem* thumb = 0;
-		ItemsInOrder::iterator insert_pos(m_itemsInOrder.begin());
-		
-		if (id_it == m_itemsById.end()) {
-			std::auto_ptr<QGraphicsItem> thumb_ptr;
-			if (m_ptrFactory.get()) {
-				thumb_ptr = m_ptrFactory->get(page_info);
-			}
-			if (!thumb_ptr.get()) {
-				thumb_ptr.reset(new PlaceholderThumb);
-			}
-			thumb_ptr->setPos(-0.5 * thumb_ptr->boundingRect().width(), offset);
-			thumb = thumb_ptr.release();
-			m_itemsInOrder.insert(insert_pos, Item(page_info, thumb, true));
-			m_graphicsScene.addItem(thumb);
-		} else {
-			thumb = id_it->thumbnail;
-			id_it->tagged = true;
-			ItemsInOrder::iterator const ord_it(m_items.project<ItemsInOrderTag>(id_it));
-			m_itemsInOrder.relocate(insert_pos, ord_it);
-		}
-		
-		m_sceneRect |= thumb->boundingRect().translated(thumb->pos());
-		offset += thumb->boundingRect().height() + SPACING;
-	}
-	
-	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
-	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
-	while (ord_it != ord_end) {
-		if (ord_it->tagged) {
-			ord_it->tagged = false;
-			++ord_it;
-		} else {
-			m_graphicsScene.removeItem(ord_it->thumbnail);
-			delete ord_it->thumbnail;
-			m_itemsInOrder.erase(ord_it++);
-		}
-	}
-	
-	commitSceneRect();
-}
-
-void
 ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 {
 	clear();
@@ -250,21 +221,15 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 	size_t const num_pages = pages.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page_info(pages.pageAt(i));
-		std::auto_ptr<QGraphicsItem> thumb_ptr;
-		if (m_ptrFactory.get()) {
-			thumb_ptr = m_ptrFactory->get(page_info);
-		}
-		if (!thumb_ptr.get()) {
-			thumb_ptr.reset(new PlaceholderThumb);
-		}
-		thumb_ptr->setPos(-0.5 * thumb_ptr->boundingRect().width(), offset);
-		QGraphicsItem* thumb = thumb_ptr.release();
 		
-		m_itemsInOrder.push_back(Item(page_info, thumb));
-		m_graphicsScene.addItem(thumb);
+		std::auto_ptr<CompositeItem> composite(getCompositeItem(page_info));
+		composite->positionAtOffset(offset);
+		composite->updateSceneRect(m_sceneRect);
 		
-		m_sceneRect |= thumb->boundingRect().translated(thumb->pos());
-		offset += thumb->boundingRect().height() + SPACING;
+		offset += composite->boundingRect().height() + SPACING;
+		
+		m_itemsInOrder.push_back(Item(page_info, composite.get()));
+		m_graphicsScene.addItem(composite.release());
 	}
 	
 	commitSceneRect();
@@ -274,45 +239,41 @@ void
 ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_id));
-	if (id_it == m_itemsById.end()) {
-		return;
+	if (id_it != m_itemsById.end()) {
+		setThumbnail(id_it, getCompositeItem(id_it->pageInfo));
 	}
-	
-	std::auto_ptr<QGraphicsItem> thumb_ptr;
-	if (m_ptrFactory.get()) {
-		thumb_ptr = m_ptrFactory->get(id_it->pageInfo);
-	}
-	if (!thumb_ptr.get()) {
-		thumb_ptr.reset(new PlaceholderThumb);
-	}
-	
-	setThumbnail(id_it, thumb_ptr);
 }
 
 void
 ThumbnailSequence::Impl::setThumbnail(
-	ItemsById::iterator const& id_it, std::auto_ptr<QGraphicsItem> thumb_ptr)
+	ItemsById::iterator const& id_it, std::auto_ptr<CompositeItem> composite)
 {
-	QGraphicsItem* old_thumb = id_it->thumbnail;
-	QGraphicsItem* new_thumb = thumb_ptr.get();
-	new_thumb->setPos(-0.5 * new_thumb->boundingRect().width(), old_thumb->pos().y());
-	QRectF const old_rect(old_thumb->boundingRect());
-	QRectF const new_rect(new_thumb->boundingRect());
-	QPointF const pos_delta(0.0, new_rect.height() - old_rect.height());
-	m_graphicsScene.removeItem(old_thumb);
-	delete old_thumb;
+	QGraphicsItem* const old_composite = id_it->composite;
+	CompositeItem* const new_composite = composite.get();
+	QSizeF const old_size(old_composite->boundingRect().size());
+	QSizeF const new_size(new_composite->boundingRect().size());
+	
+	new_composite->positionAtOffset(old_composite->pos().y());
+	composite->updateSceneRect(m_sceneRect);
+	
+	QPointF const pos_delta(0.0, new_size.height() - old_size.height());
+	
+	m_graphicsScene.removeItem(old_composite);
+	delete old_composite;
+	
 	if (!pos_delta.isNull()) {
 		ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
 		ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
-		++ord_it; // skip the item itself
+		++ord_it; // Skip the item itself.
 		for (; ord_it != ord_end; ++ord_it) {
-			ord_it->thumbnail->setPos(ord_it->thumbnail->pos() + pos_delta);
+			ord_it->composite->setPos(ord_it->composite->pos() + pos_delta);
+			ord_it->composite->updateSceneRect(m_sceneRect);
 		}
 	}
-	m_graphicsScene.addItem(thumb_ptr.release());
-	id_it->thumbnail = new_thumb;
 	
-	m_sceneRect |= new_rect.translated(new_thumb->pos());
+	id_it->composite = new_composite;
+	m_graphicsScene.addItem(composite.release());
+	
 	commitSceneRect();
 }
 
@@ -322,8 +283,8 @@ ThumbnailSequence::Impl::clear()
 	ItemsInOrder::iterator it(m_itemsInOrder.begin());
 	ItemsInOrder::iterator const end(m_itemsInOrder.end());
 	while (it != end) {
-		m_graphicsScene.removeItem(it->thumbnail);
-		delete it->thumbnail;
+		m_graphicsScene.removeItem(it->composite);
+		delete it->composite;
 		m_itemsInOrder.erase(it++);
 	}
 	
@@ -331,6 +292,85 @@ ThumbnailSequence::Impl::clear()
 	
 	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
 	commitSceneRect();
+}
+
+std::auto_ptr<QGraphicsItem>
+ThumbnailSequence::Impl::getThumbnail(PageInfo const& page_info)
+{
+	std::auto_ptr<QGraphicsItem> thumb;
+	
+	if (m_ptrFactory.get()) {
+		thumb = m_ptrFactory->get(page_info);
+	}
+	
+	if (!thumb.get()) {
+		thumb.reset(new PlaceholderThumb);
+	}
+	
+	return thumb;
+}
+
+std::auto_ptr<QGraphicsItem>
+ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
+{
+	LogicalPageId const& page_id = page_info.id();
+	QFileInfo const file_info(page_id.imageId().filePath());
+	QString const file_name(file_info.fileName());
+	int const page_num = page_id.imageId().page();
+	
+	QString text(file_name);
+	if (page_info.isMultiPageFile() || page_num > 0) {
+		text = QObject::tr("%1 (page %2)").arg(file_name).arg(page_num + 1);
+	}
+	
+	std::auto_ptr<QGraphicsSimpleTextItem> text_item(new QGraphicsSimpleTextItem);
+	text_item->setText(text);
+	QSizeF const text_item_size(text_item->boundingRect().size());
+	
+	char const* pixmap_resource = 0;
+	switch (page_id.subPage()) {
+		case LogicalPageId::SINGLE_PAGE:
+			return std::auto_ptr<QGraphicsItem>(text_item);
+		case LogicalPageId::LEFT_PAGE:
+			pixmap_resource = ":/icons/left_page_thumb.png";
+			break;
+		case LogicalPageId::RIGHT_PAGE:
+			pixmap_resource = ":/icons/right_page_thumb.png";
+			break;
+	}
+	
+	QPixmap pixmap;
+	Utils::loadAndCachePixmap(pixmap, pixmap_resource);
+	
+	int const label_pixmap_spacing = 5;
+	std::auto_ptr<QGraphicsPixmapItem> pixmap_item(new QGraphicsPixmapItem(pixmap));
+	if (text_item_size.height() >= pixmap.height()) {
+		pixmap_item->setPos(
+			text_item_size.width() + label_pixmap_spacing,
+			0.5 * (text_item_size.height() - pixmap.height())
+		);
+	} else {
+		pixmap_item->setPos(
+			text_item_size.width() + label_pixmap_spacing, 0.0
+		);
+		text_item->setPos(
+			0.0, 0.5 * (pixmap.height() - text_item_size.height())
+		);
+	}
+	
+	std::auto_ptr<QGraphicsItemGroup> group(new QGraphicsItemGroup);
+	group->addToGroup(text_item.release());
+	group->addToGroup(pixmap_item.release());
+	
+	return std::auto_ptr<QGraphicsItem>(group);
+}
+
+std::auto_ptr<ThumbnailSequence::CompositeItem>
+ThumbnailSequence::Impl::getCompositeItem(PageInfo const& page_info)
+{
+	std::auto_ptr<QGraphicsItem> thumb(getThumbnail(page_info));
+	std::auto_ptr<QGraphicsItem> label(getLabel(page_info));
+	return std::auto_ptr<CompositeItem>(new CompositeItem(thumb, label));
 }
 
 void
@@ -377,3 +417,41 @@ ThumbnailSequence::PlaceholderThumb::paint(
 	painter->setWorldTransform(xform, true);
 	painter->drawText(xform.inverted().mapRect(boundingRect()), Qt::AlignHCenter|Qt::AlignVCenter, "?");
 }
+
+
+/*==================== ThumbnailSequence::CompositeItem =====================*/
+
+ThumbnailSequence::CompositeItem::CompositeItem(
+	std::auto_ptr<QGraphicsItem> thumbnail, std::auto_ptr<QGraphicsItem> label)
+:	m_pThumb(thumbnail.get())
+{
+	QSizeF const thumb_size(thumbnail->boundingRect().size());
+	QSizeF const label_size(label->boundingRect().size());
+	
+	int const thumb_label_spacing = 1;
+	thumbnail->setPos(-0.5 * thumb_size.width(), 0.0);
+	label->setPos(
+		thumbnail->pos().x() + thumb_size.width() - label_size.width(),
+		thumb_size.height() + thumb_label_spacing
+	);
+	
+	addToGroup(thumbnail.release());
+	addToGroup(label.release());
+}
+
+void
+ThumbnailSequence::CompositeItem::positionAtOffset(double const offset)
+{
+	setPos(-0.5 * boundingRect().width(), offset);
+}
+
+void
+ThumbnailSequence::CompositeItem::updateSceneRect(QRectF& scene_rect)
+{
+	QRectF rect(m_pThumb->boundingRect());
+	rect.translate(m_pThumb->pos());
+	rect.translate(pos());
+	
+	scene_rect |= rect;
+}
+

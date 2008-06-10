@@ -56,6 +56,15 @@ public:
 	template<typename OutFunc>
 	void enumPages(OutFunc out) const;
 private:
+	struct FileData
+	{
+		int id;
+		bool multiPageFile;
+		
+		FileData(int id, bool multi_page)
+		: id(id), multiPageFile(multi_page) {}
+	};
+	
 	struct ImageData
 	{
 		int id;
@@ -66,7 +75,7 @@ private:
 	};
 	
 	typedef std::map<QString, int> DirectoryIds;
-	typedef std::map<QString, int> FileIds;
+	typedef std::map<QString, FileData> FileIds;
 	typedef std::map<ImageId, ImageData> ImageIds;
 	typedef std::map<LogicalPageId, int> PageIds;
 	typedef std::map<ImageId, ImageMetadata> MetadataByImage;

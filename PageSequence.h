@@ -85,10 +85,13 @@ private:
 		ImageId id;
 		ImageMetadata metadata;
 		int numLogicalPages; // 1 or 2
+		bool multiPageFile;
 		
-		ImageDesc(ImageId const& id, ImageMetadata const& metadata, int sub_pages);
+		ImageDesc(ImageId const& id, ImageMetadata const& metadata,
+			bool multi_page_file, int sub_pages);
 		
-		ImageDesc(ImageId const& id, ImageMetadata const& metadata, Pages pages);
+		ImageDesc(ImageId const& id, ImageMetadata const& metadata,
+			bool multi_page_file, Pages pages);
 		
 		LogicalPageId::SubPage logicalPageToSubPage(int logical_page) const;
 	};
