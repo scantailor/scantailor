@@ -45,10 +45,7 @@ ThumbnailBase::ThumbnailBase(
 	scaled_size.scale(QSize(250, 160), Qt::KeepAspectRatio);
 	// FIXME: don't hardcode sizes.
 	
-	// Note: the reason to round the size is to ensure every thumbnail
-	// is placed at integer coordinates.  This helps us do draw
-	// non-antialiased lines over the thumbnail.
-	m_boundingRect = QRectF(QPointF(0.0, 0.0), scaled_size.toSize());
+	m_boundingRect = QRectF(QPointF(0.0, 0.0), scaled_size);
 	
 	double const x_post_scale = m_boundingRect.width() / unscaled_size.width();
 	double const y_post_scale = m_boundingRect.height() / unscaled_size.height();

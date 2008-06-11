@@ -18,6 +18,7 @@
 
 #include "ThumbnailTask.h"
 #include "Thumbnail.h"
+#include "IncompleteThumbnail.h"
 #include "Settings.h"
 #include "PageInfo.h"
 #include "ImageTransformation.h"
@@ -72,7 +73,9 @@ ThumbnailTask::process(
 	
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	if (!params.get() || !deps.matches(params->dependencies())) {
-		return std::auto_ptr<QGraphicsItem>();
+		return std::auto_ptr<QGraphicsItem>(
+			new IncompleteThumbnail(thumbnail_cache, page_info.id(), xform)
+		);
 	}
 	
 	PageLayout const layout(params->pageLayout());

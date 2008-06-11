@@ -17,10 +17,11 @@
 */
 
 #include "ThumbnailTask.h"
+#include "Thumbnail.h"
+#include "IncompleteThumbnail.h"
 #include "PageInfo.h"
 #include "ImageTransformation.h"
 #include "Settings.h"
-#include "Thumbnail.h"
 
 namespace select_content
 {
@@ -42,7 +43,11 @@ ThumbnailTask::process(
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	Dependencies const deps(xform.resultingCropArea());
 	if (!params.get() || !params->dependencies().matches(deps)) {
-		return std::auto_ptr<QGraphicsItem>();
+		return std::auto_ptr<QGraphicsItem>(
+			new IncompleteThumbnail(
+				thumbnail_cache, page_info.id(), xform
+			)
+		);
 	}
 	
 	return std::auto_ptr<QGraphicsItem>(

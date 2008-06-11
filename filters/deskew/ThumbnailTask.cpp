@@ -18,6 +18,7 @@
 
 #include "ThumbnailTask.h"
 #include "Thumbnail.h"
+#include "IncompleteThumbnail.h"
 #include "Settings.h"
 #include "PageInfo.h"
 #include "PageLayout.h"
@@ -48,15 +49,19 @@ ThumbnailTask::process(
 	QPolygonF const page_outline(
 		layout.pageOutline(rect, page_info.id().logicalPageId().subPage())
 	);
-	Dependencies const deps(page_outline, xform.preRotation());
-		
-	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
-	if (!params.get() || !deps.matches(params->dependencies())) {
-		return std::auto_ptr<QGraphicsItem>();
-	}
-	
 	ImageTransformation new_xform(xform);
 	new_xform.setCropArea(page_outline);
+	
+	Dependencies const deps(page_outline, xform.preRotation());
+	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
+	if (!params.get() || !deps.matches(params->dependencies())) {
+		return std::auto_ptr<QGraphicsItem>(
+			new IncompleteThumbnail(
+				thumbnail_cache, page_info.id(), new_xform
+			)
+		);
+	}
+	
 	new_xform.setPostRotation(params->deskewAngle());
 	
 	if (m_ptrNextTask) {

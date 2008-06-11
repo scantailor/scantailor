@@ -182,6 +182,7 @@ SET(
 	ThumbnailBase.cpp ThumbnailBase.h
 	ThumbnailSequence.cpp ThumbnailSequence.h
 	ThumbnailFactory.cpp ThumbnailFactory.h
+	IncompleteThumbnail.cpp IncompleteThumbnail.h
 	DebugImages.cpp DebugImages.h
 	ImageId.cpp ImageId.h
 	LogicalPageId.cpp LogicalPageId.h
