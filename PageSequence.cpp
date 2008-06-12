@@ -50,6 +50,7 @@ PageSequence::PageSequence(std::vector<ImageInfo> const& info)
 				image.isMultiPageFile(), image.numSubPages()
 			)
 		);
+		m_totalLogicalPages += m_images.back().numLogicalPages;
 	}
 	
 	if (!m_images.empty() && m_images.front().numLogicalPages > 1) {
@@ -280,6 +281,8 @@ void
 PageSequence::setLogicalPagesInImageImpl(
 	ImageId const& image_id, int const num_pages, bool* modified)
 {
+	assert(num_pages >= 1 && num_pages <= 2);
+	
 	int logical_pages_seen = 0;
 	int const num_images = m_images.size();
 	for (int i = 0; i < num_images; ++i) {
