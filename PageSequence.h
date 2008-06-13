@@ -108,21 +108,14 @@ private:
 	
 	PageInfo setNextPageImpl(View view, bool* modified);
 	
-	LogicalPageId::SubPage curSubPageLocked(View view) const;
+	LogicalPageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
 	
 	mutable QMutex m_mutex;
 	std::vector<ImageDesc> m_images;
 	int m_totalLogicalPages;
 	int m_curImage;
 	int m_curLogicalPage; // Not within the current image, but overall.
-	
-	/**
-	 * \brief The sub-page within the current image.
-	 *
-	 * If the image has just one logical page, this value
-	 * is allowed to be both LEFT_SUB_PAGE and RIGHT_SUB_PAGE.
-	 */
-	LogicalPageId::SubPage m_curSubPage;
+	int m_curSubPage; // 0 or 1
 };
 
 

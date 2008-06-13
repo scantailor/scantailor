@@ -42,6 +42,7 @@ class WorkerThread;
 class ProjectReader;
 class DebugImages;
 class QLineF;
+class QRectF;
 class QLayout;
 
 class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::MainWindow
@@ -56,6 +57,10 @@ public:
 	virtual ~MainWindow();
 private slots:
 	void pageChanged(int page);
+	
+	void pageSelected(
+		PageInfo const& page_info, QRectF const& thumb_rect,
+		bool by_user, bool was_already_selected);
 	
 	void filterSelectionChanged(QItemSelection const& selected);
 	
@@ -121,7 +126,7 @@ private:
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
 	int m_ignorePageChanges;
-	bool m_workerThreadReady;
+	int m_disableImageLoading;
 	bool m_debug;
 	bool m_projectModified;
 	bool m_batchProcessing;

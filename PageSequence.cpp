@@ -33,7 +33,7 @@ PageSequence::PageSequence()
 :	m_totalLogicalPages(0),
 	m_curImage(0),
 	m_curLogicalPage(0),
-	m_curSubPage(LogicalPageId::SINGLE_PAGE)
+	m_curSubPage(0)
 {
 }
 
@@ -41,7 +41,7 @@ PageSequence::PageSequence(std::vector<ImageInfo> const& info)
 :	m_totalLogicalPages(0),
 	m_curImage(0),
 	m_curLogicalPage(0),
-	m_curSubPage(LogicalPageId::SINGLE_PAGE)
+	m_curSubPage(0)
 {
 	BOOST_FOREACH(ImageInfo const& image, info) {
 		m_images.push_back(
@@ -52,10 +52,6 @@ PageSequence::PageSequence(std::vector<ImageInfo> const& info)
 		);
 		m_totalLogicalPages += m_images.back().numLogicalPages;
 	}
-	
-	if (!m_images.empty() && m_images.front().numLogicalPages > 1) {
-		m_curSubPage = LogicalPageId::LEFT_PAGE;
-	}
 }
 
 PageSequence::PageSequence(
@@ -63,7 +59,7 @@ PageSequence::PageSequence(
 :	m_totalLogicalPages(0),
 	m_curImage(0),
 	m_curLogicalPage(0),
-	m_curSubPage(LogicalPageId::SINGLE_PAGE)
+	m_curSubPage(0)
 {
 	BOOST_FOREACH(ImageFileInfo const& file, files) {
 		QString const& file_path = file.fileInfo().absoluteFilePath();
@@ -76,10 +72,6 @@ PageSequence::PageSequence(
 			m_images.push_back(ImageDesc(id, metadata, multi_page, pages));
 			m_totalLogicalPages += m_images.back().numLogicalPages;
 		}
-	}
-	
-	if (!m_images.empty() && m_images.front().numLogicalPages > 1) {
-		m_curSubPage = LogicalPageId::LEFT_PAGE;
 	}
 }
 
@@ -232,7 +224,7 @@ PageSequence::curPage(View const view) const
 	QMutexLocker locker(&m_mutex);
 	assert((size_t)m_curImage <= m_images.size());
 	ImageDesc const& image = m_images[m_curImage];
-	PageId const id(image.id, curSubPageLocked(view));
+	PageId const id(image.id, curSubPageLocked(image, view));
 	return PageInfo(
 		id, image.metadata,
 		image.multiPageFile, image.numLogicalPages
@@ -298,11 +290,7 @@ PageSequence::setLogicalPagesInImageImpl(
 			if (logical_pages_seen < m_curLogicalPage) {
 				m_curLogicalPage += delta;
 			}
-			if (num_pages == 1) {
-				m_curSubPage = LogicalPageId::SINGLE_PAGE;
-			} else if (num_pages == 2) {
-				m_curSubPage = LogicalPageId::LEFT_PAGE;
-			}
+			m_curSubPage = 0;
 			
 			*modified = true;
 			break;
@@ -333,11 +321,7 @@ PageSequence::autoSetLogicalPagesInImageImpl(
 			if (logical_pages_seen < m_curLogicalPage) {
 				m_curLogicalPage += delta;
 			}
-			if (num_pages == 1) {
-				m_curSubPage = LogicalPageId::SINGLE_PAGE;
-			} else if (num_pages == 2) {
-				m_curSubPage = LogicalPageId::LEFT_PAGE;
-			}
+			m_curSubPage = 0;
 			
 			*modified = true;
 			break;
@@ -354,17 +338,18 @@ PageSequence::setCurPageImpl(PageId const& page_id, bool* modified)
 	for (int i = 0; i < num_images; ++i) {
 		ImageDesc const& image = m_images[i];
 		if (image.id == page_id.imageId()) {
-			LogicalPageId::SubPage sub_page = page_id.logicalPageId().subPage();
+			int sub_page = page_id.logicalPageId().subPageNum();
+			if (sub_page >= image.numLogicalPages) {
+				sub_page = image.numLogicalPages - 1;
+			}
+			
 			if (m_curImage != i || sub_page != m_curSubPage) {
 				*modified = true;
 			}
+			
 			m_curImage = i;
 			m_curSubPage = sub_page;
-			int sub_page_num = page_id.logicalPageId().subPageNum();
-			if (sub_page_num >= image.numLogicalPages) {
-				sub_page_num = image.numLogicalPages - 1;
-			}
-			m_curLogicalPage = logical_pages_seen + sub_page_num;
+			m_curLogicalPage = logical_pages_seen + sub_page;
 			break;
 		}
 		logical_pages_seen += image.numLogicalPages;
@@ -377,27 +362,22 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 	assert((size_t)m_curImage <= m_images.size());
 	
 	ImageDesc const* image = &m_images[m_curImage];
-	if (view == PAGE_VIEW && m_curSubPage == LogicalPageId::RIGHT_PAGE
-	    && image->numLogicalPages > 1) {
+	if (view == PAGE_VIEW && m_curSubPage == 1) {
+		// Move to the previous sub-page within the same image.
+		assert(image->numLogicalPages > 1);
 		--m_curLogicalPage;
-		m_curSubPage = LogicalPageId::LEFT_PAGE;
+		--m_curSubPage;
 		*modified = true;
 	} else if (m_curImage > 0) {
-		if (m_curSubPage == LogicalPageId::RIGHT_PAGE) {
-			--m_curLogicalPage; // move to LEFT_PAGE
-		}
-		--m_curLogicalPage; // move to previous page
+		// Move to the last sub-page of the previous image.
+		m_curLogicalPage -= m_curSubPage - 1;
 		--m_curImage;
 		--image;
-		if (image->numLogicalPages > 1) {
-			m_curSubPage = LogicalPageId::RIGHT_PAGE;
-		} else {
-			m_curSubPage = LogicalPageId::SINGLE_PAGE;
-		}
+		m_curSubPage = image->numLogicalPages - 1;
 		*modified = true;
 	}
 	
-	PageId const id(image->id, curSubPageLocked(view));
+	PageId const id(image->id, curSubPageLocked(*image, view));
 	return PageInfo(
 		id, image->metadata,
 		image->multiPageFile, image->numLogicalPages
@@ -410,27 +390,21 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 	assert((size_t)m_curImage <= m_images.size());
 	
 	ImageDesc const* image = &m_images[m_curImage];
-	if (view == PAGE_VIEW && m_curSubPage == LogicalPageId::LEFT_PAGE
-	    && image->numLogicalPages > 1) {
+	if (view == PAGE_VIEW && m_curSubPage == 0 && image->numLogicalPages > 1) {
+		// Move to the next sub-page within the same image.
 		++m_curLogicalPage;
-		m_curSubPage = LogicalPageId::RIGHT_PAGE;
+		++m_curSubPage;
 		*modified = true;
 	} else if (m_curImage < (int)m_images.size() - 1) {
-		if (m_curSubPage == LogicalPageId::LEFT_PAGE) {
-			++m_curLogicalPage; // move to RIGHT_PAGE
-		}
-		++m_curLogicalPage; // move to the next page
+		// Move to the first sub-page of the next image.
+		m_curLogicalPage += image->numLogicalPages - m_curSubPage;
+		m_curSubPage = 0;
 		++m_curImage;
 		++image;
-		if (image->numLogicalPages > 1) {
-			m_curSubPage = LogicalPageId::LEFT_PAGE;
-		} else {
-			m_curSubPage = LogicalPageId::SINGLE_PAGE;
-		}
 		*modified = true;
 	}
 	
-	PageId const id(image->id, curSubPageLocked(view));
+	PageId const id(image->id, curSubPageLocked(*image, view));
 	return PageInfo(
 		id, image->metadata,
 		image->multiPageFile, image->numLogicalPages
@@ -438,12 +412,16 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 }
 
 LogicalPageId::SubPage
-PageSequence::curSubPageLocked(View const view) const
+PageSequence::curSubPageLocked(ImageDesc const& image, View const view) const
 {
-	if (view == IMAGE_VIEW) {
+	if (view == IMAGE_VIEW || image.numLogicalPages == 1) {
 		return LogicalPageId::SINGLE_PAGE;
+	} else if (m_curSubPage == 0) {
+		return LogicalPageId::LEFT_PAGE;
+	} else {
+		assert(m_curSubPage == 1);
+		return LogicalPageId::RIGHT_PAGE;
 	}
-	return m_curSubPage;
 }
 
 

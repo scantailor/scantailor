@@ -28,6 +28,10 @@
 #include <QPen>
 #include <QBrush>
 #include <QPainterPath>
+#include <QStyleOptionGraphicsItem>
+#include <QPalette>
+#include <QStyle>
+#include <QApplication>
 #include <QSizeF>
 #include <QPointF>
 #include <QDebug>
@@ -121,8 +125,14 @@ ThumbnailBase::paint(QPainter* painter,
 		rect_path.addRect(m_boundingRect.adjusted(-1, -1, 1, 1));
 		QPainterPath outline_path;
 		outline_path.addPolygon(m_postScaleXform.map(m_imageXform.resultingCropArea()));
+		QPainterPath const background_path(rect_path.subtracted(outline_path));
 		
-		painter->fillPath(rect_path.subtracted(outline_path), painter->background());
+		if (option->state & QStyle::State_Selected) {
+			QPalette const palette(QApplication::palette());
+			painter->fillPath(background_path, palette.highlight());
+		} else {
+			painter->fillPath(background_path, painter->background());
+		}
 		
 		painter->restore();
 	}

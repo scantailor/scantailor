@@ -103,7 +103,7 @@ MainWindow::MainWindow(
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageChanges(0),
-	m_workerThreadReady(false),
+	m_disableImageLoading(1), // Disabled until the worker thread is ready.
 	m_debug(false),
 	m_projectModified(true)
 {
@@ -123,7 +123,7 @@ MainWindow::MainWindow(
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageChanges(0),
-	m_workerThreadReady(false),
+	m_disableImageLoading(1), // Disabled until the worker thread is ready.
 	m_debug(false),
 	m_projectModified(false),
 	m_batchProcessing(false)
@@ -201,6 +201,11 @@ MainWindow::construct()
 	connect(
 		pageSpinBox, SIGNAL(valueChanged(int)),
 		this, SLOT(pageChanged(int))
+	);
+	connect(
+		m_ptrThumbSequence.get(),
+		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
+		this, SLOT(pageSelected(PageInfo const&, QRectF const&, bool, bool))
 	);
 	
 	connect(
@@ -315,6 +320,24 @@ MainWindow::pageChanged(int const page)
 }
 
 void
+MainWindow::pageSelected(
+	PageInfo const& page_info, QRectF const& thumb_rect,
+	bool const by_user, bool const was_already_selected)
+{
+	if (m_ignorePageChanges) { // ???
+		return;
+	}
+	
+	thumbView->ensureVisible(thumb_rect, 0, 0);
+	
+	if (by_user) {
+		m_ptrPages->setCurPage(page_info.id());
+		m_batchProcessing = false;
+		loadImage(page_info);
+	}
+}
+
+void
 MainWindow::filterSelectionChanged(QItemSelection const& selected)
 {
 	if (m_ignoreSelectionChanges) {
@@ -344,7 +367,7 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 void
 MainWindow::workerThreadReady()
 {
-	m_workerThreadReady = true;
+	--m_disableImageLoading;
 	loadImage();
 }
 
@@ -368,6 +391,7 @@ MainWindow::startBatchProcessing()
 	
 	PageInfo const page_info(m_frozenPages.pageAt(0));
 	m_ptrPages->setCurPage(page_info.id());
+	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
 	loadImage(page_info);
 }
 
@@ -381,6 +405,7 @@ MainWindow::stopBatchProcessing()
 		m_ptrCurTask.reset();
 	}
 	m_batchProcessing = false;
+	loadImage();
 }
 
 void
@@ -416,11 +441,15 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		);
 	}
 	
-	syncPageSequence(); // must be done after m_curFilter is modified.
+	syncPageSequence(); // Must be done after m_curFilter is modified.
 	result->updateUI(this);
+	
+	m_ptrThumbSequence->setCurrentThumbnail(m_frozenPages.curPage().id());
 	
 	if (m_batchProcessing) {
 		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
+			// TODO: notify the current filter.
+			loadImage(m_frozenPages.curPage());
 			m_batchProcessing = false;
 		} else {
 			loadImage(m_ptrPages->setNextPage(m_frozenPages.view()));
@@ -490,7 +519,7 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 void
 MainWindow::loadImage()
 {
-	if (!m_workerThreadReady) {
+	if (m_disableImageLoading) {
 		return;
 	}
 	
@@ -500,7 +529,7 @@ MainWindow::loadImage()
 void
 MainWindow::loadImage(PageInfo const& page)
 {
-	if (!m_workerThreadReady) {
+	if (m_disableImageLoading) {
 		return;
 	}
 	

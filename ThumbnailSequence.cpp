@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ThumbnailSequence.h"
+#include "ThumbnailSequence.h.moc"
 #include "ThumbnailFactory.h"
 #include "PageSequence.h"
 #include "PageInfo.h"
@@ -24,6 +24,7 @@
 #include "ImageId.h"
 #include "LogicalPageId.h"
 #include "Utils.h"
+#include "ScopedIncDec.h"
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -34,6 +35,11 @@
 #include <QGraphicsSimpleTextItem>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsView>
+#include <QStyle>
+#include <QStyleOptionGraphicsItem>
+#include <QPalette>
+#include <QApplication>
+#include <QVariant>
 #include <QFileInfo>
 #include <QPixmap>
 #include <QRectF>
@@ -72,7 +78,7 @@ public:
 class ThumbnailSequence::Impl
 {
 public:
-	Impl();
+	Impl(ThumbnailSequence& owner);
 	
 	~Impl();
 	
@@ -83,6 +89,10 @@ public:
 	void reset(PageSequenceSnapshot const& pages);
 	
 	void invalidateThumbnail(PageId const& page_id);
+	
+	void setCurrentThumbnail(PageId const& page_id);
+	
+	void itemSelected(PageInfo const& page_info, CompositeItem* item);
 private:
 	class ItemsByIdTag;
 	class ItemsInOrderTag;
@@ -115,13 +125,16 @@ private:
 	
 	void commitSceneRect();
 	
-	static int const SPACING = 20;
+	static int const SPACING = 10;
+	ThumbnailSequence& m_rOwner;
 	Container m_items;
 	ItemsById& m_itemsById;
 	ItemsInOrder& m_itemsInOrder;
+	CompositeItem* m_pSelectedItem;
 	IntrusivePtr<ThumbnailFactory> m_ptrFactory;
 	QGraphicsScene m_graphicsScene;
 	QRectF m_sceneRect;
+	int m_syntheticSelectionScope;
 };
 
 
@@ -143,19 +156,39 @@ class ThumbnailSequence::CompositeItem : public QGraphicsItemGroup
 {
 public:
 	CompositeItem(
+		ThumbnailSequence::Impl& owner,
+		PageInfo const& page_info,
 		std::auto_ptr<QGraphicsItem> thumbnail,
 		std::auto_ptr<QGraphicsItem> label);
 	
 	void updateSceneRect(QRectF& scene_rect);
+	
+	virtual QRectF boundingRect() const;
+	
+	virtual void paint(QPainter* painter,
+		QStyleOptionGraphicsItem const* option, QWidget *widget);
+protected:
+	QVariant itemChange(GraphicsItemChange change, QVariant const& value);
 private:
+	ThumbnailSequence::Impl& m_rOwner;
 	QGraphicsItem* m_pThumb;
+	PageInfo m_pageInfo;
+};
+
+
+template<typename Base>
+class ThumbnailSequence::NoSelectionItem : public Base
+{
+public:
+	virtual void paint(QPainter* painter,
+		QStyleOptionGraphicsItem const* option, QWidget *widget);
 };
 
 
 /*============================= ThumbnailSequence ===========================*/
 
 ThumbnailSequence::ThumbnailSequence()
-:	m_ptrImpl(new Impl)
+:	m_ptrImpl(new Impl(*this))
 {
 }
 
@@ -187,13 +220,32 @@ ThumbnailSequence::invalidateThumbnail(PageId const& page_id)
 	m_ptrImpl->invalidateThumbnail(page_id);
 }
 
+void
+ThumbnailSequence::setCurrentThumbnail(PageId const& page_id)
+{
+	m_ptrImpl->setCurrentThumbnail(page_id);
+}
+
+void
+ThumbnailSequence::emitPageSelected(
+	PageInfo const& page_info, CompositeItem const* composite,
+	bool const by_user, bool const was_already_selected)
+{
+	QRectF const thumb_rect(
+		composite->mapToScene(composite->boundingRect()).boundingRect()
+	);
+	emit pageSelected(page_info, thumb_rect, by_user, was_already_selected);
+}
 
 /*======================== ThumbnailSequence::Impl ==========================*/
 
-ThumbnailSequence::Impl::Impl()
-:	m_items(),
+ThumbnailSequence::Impl::Impl(ThumbnailSequence& owner)
+:	m_rOwner(owner),
+	m_items(),
 	m_itemsById(m_items.get<ItemsByIdTag>()),
-	m_itemsInOrder(m_items.get<ItemsInOrderTag>())
+	m_itemsInOrder(m_items.get<ItemsInOrderTag>()),
+	m_pSelectedItem(0),
+	m_syntheticSelectionScope(0)
 {
 }
 
@@ -217,7 +269,13 @@ ThumbnailSequence::Impl::attachView(QGraphicsView* const view)
 void
 ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 {
+	ScopedIncDec<int> const scope_manager(m_syntheticSelectionScope);
+	
 	clear();
+	
+	PageId const cur_page(pages.curPage().id());
+	
+	CompositeItem* cur_item = 0;
 	
 	double offset = 0;
 	size_t const num_pages = pages.numPages();
@@ -230,11 +288,20 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 		
 		offset += composite->boundingRect().height() + SPACING;
 		
+		if (page_info.id().logicalPageId() == cur_page.logicalPageId()) {
+			cur_item = composite.get();
+		}
+		
 		m_itemsInOrder.push_back(Item(page_info, composite.get()));
 		m_graphicsScene.addItem(composite.release());
 	}
 	
 	commitSceneRect();
+	
+	if (cur_item) {
+		assert(!cur_item->isSelected()); // Because it was just created.
+		cur_item->setSelected(true); // This will cause a callback.
+	}
 }
 
 void
@@ -247,13 +314,56 @@ ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 }
 
 void
+ThumbnailSequence::Impl::setCurrentThumbnail(PageId const& page_id)
+{
+	ItemsById::iterator const id_it(m_itemsById.find(page_id));
+	if (id_it == m_itemsById.end()) {
+		return;
+	}
+	
+	bool const was_already_selected = (id_it->composite == m_pSelectedItem);
+	if (!was_already_selected) {
+		assert(!id_it->composite->isSelected());
+		ScopedIncDec<int> const scope_manager(m_syntheticSelectionScope);
+		id_it->composite->setSelected(true); // This will cause a callback.
+		return;
+	}
+	
+	bool const by_user = false;
+	m_rOwner.emitPageSelected(
+		id_it->pageInfo, id_it->composite, by_user, was_already_selected
+	);
+}
+
+void
+ThumbnailSequence::Impl::itemSelected(
+	PageInfo const& page_info, CompositeItem* const item)
+{
+	bool const was_already_selected = (m_pSelectedItem == item);
+	if (!was_already_selected) {
+		if (m_pSelectedItem) {
+			m_pSelectedItem->setSelected(false);
+		}
+		m_pSelectedItem = item;
+	}
+	
+	bool const by_user = !m_syntheticSelectionScope;
+	m_rOwner.emitPageSelected(
+		page_info, item, by_user, was_already_selected
+	);
+}
+
+void
 ThumbnailSequence::Impl::setThumbnail(
 	ItemsById::iterator const& id_it, std::auto_ptr<CompositeItem> composite)
 {
+	ScopedIncDec<int> const scope_manager(m_syntheticSelectionScope);
+	
 	QGraphicsItem* const old_composite = id_it->composite;
 	CompositeItem* const new_composite = composite.get();
 	QSizeF const old_size(old_composite->boundingRect().size());
 	QSizeF const new_size(new_composite->boundingRect().size());
+	bool old_selected = old_composite->isSelected();
 	
 	new_composite->setPos(old_composite->pos());
 	composite->updateSceneRect(m_sceneRect);
@@ -261,6 +371,9 @@ ThumbnailSequence::Impl::setThumbnail(
 	QPointF const pos_delta(0.0, new_size.height() - old_size.height());
 	
 	m_graphicsScene.removeItem(old_composite);
+	if (m_pSelectedItem == old_composite) {
+		m_pSelectedItem = 0;
+	}
 	delete old_composite;
 	
 	if (!pos_delta.isNull()) {
@@ -277,11 +390,18 @@ ThumbnailSequence::Impl::setThumbnail(
 	m_graphicsScene.addItem(composite.release());
 	
 	commitSceneRect();
+	
+	if (old_selected) {
+		assert(!new_composite->isSelected()); // Because it was just created.
+		new_composite->setSelected(true); // This will cause a callback.
+	}
 }
 
 void
 ThumbnailSequence::Impl::clear()
 {
+	m_pSelectedItem = 0;
+	
 	ItemsInOrder::iterator it(m_itemsInOrder.begin());
 	ItemsInOrder::iterator const end(m_itemsInOrder.end());
 	while (it != end) {
@@ -325,7 +445,9 @@ ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
 		text = QObject::tr("%1 (page %2)").arg(file_name).arg(page_num + 1);
 	}
 	
-	std::auto_ptr<QGraphicsSimpleTextItem> text_item(new QGraphicsSimpleTextItem);
+	std::auto_ptr<QGraphicsSimpleTextItem> text_item(
+		new NoSelectionItem<QGraphicsSimpleTextItem>()
+	);
 	text_item->setText(text);
 	QSizeF const text_item_size(text_item->boundingRect().size());
 	
@@ -345,7 +467,10 @@ ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
 	Utils::loadAndCachePixmap(pixmap, pixmap_resource);
 	
 	int const label_pixmap_spacing = 5;
-	std::auto_ptr<QGraphicsPixmapItem> pixmap_item(new QGraphicsPixmapItem(pixmap));
+	std::auto_ptr<QGraphicsPixmapItem> pixmap_item(
+		new NoSelectionItem<QGraphicsPixmapItem>()
+	);
+	pixmap_item->setPixmap(pixmap);
 	if (text_item_size.height() >= pixmap.height()) {
 		pixmap_item->setPos(
 			text_item_size.width() + label_pixmap_spacing,
@@ -360,7 +485,9 @@ ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
 		);
 	}
 	
-	std::auto_ptr<QGraphicsItemGroup> group(new QGraphicsItemGroup);
+	std::auto_ptr<QGraphicsItemGroup> group(
+		new NoSelectionItem<QGraphicsItemGroup>()
+	);
 	group->addToGroup(text_item.release());
 	group->addToGroup(pixmap_item.release());
 	
@@ -372,7 +499,9 @@ ThumbnailSequence::Impl::getCompositeItem(PageInfo const& page_info)
 {
 	std::auto_ptr<QGraphicsItem> thumb(getThumbnail(page_info));
 	std::auto_ptr<QGraphicsItem> label(getLabel(page_info));
-	return std::auto_ptr<CompositeItem>(new CompositeItem(thumb, label));
+	return std::auto_ptr<CompositeItem>(
+		new CompositeItem(*this, page_info, thumb, label)
+	);
 }
 
 void
@@ -450,8 +579,12 @@ ThumbnailSequence::PlaceholderThumb::paint(
 /*==================== ThumbnailSequence::CompositeItem =====================*/
 
 ThumbnailSequence::CompositeItem::CompositeItem(
-	std::auto_ptr<QGraphicsItem> thumbnail, std::auto_ptr<QGraphicsItem> label)
-:	m_pThumb(thumbnail.get())
+	ThumbnailSequence::Impl& owner, PageInfo const& page_info,
+	std::auto_ptr<QGraphicsItem> thumbnail,
+	std::auto_ptr<QGraphicsItem> label)
+:	m_rOwner(owner),
+	m_pThumb(thumbnail.get()),
+	m_pageInfo(page_info)
 {
 	QSizeF const thumb_size(thumbnail->boundingRect().size());
 	QSizeF const label_size(label->boundingRect().size());
@@ -465,6 +598,9 @@ ThumbnailSequence::CompositeItem::CompositeItem(
 	
 	addToGroup(thumbnail.release());
 	addToGroup(label.release());
+	
+	setFlag(QGraphicsItem::ItemIsSelectable);
+	setZValue(-1);
 }
 
 void
@@ -477,3 +613,46 @@ ThumbnailSequence::CompositeItem::updateSceneRect(QRectF& scene_rect)
 	scene_rect |= rect;
 }
 
+QRectF
+ThumbnailSequence::CompositeItem::boundingRect() const
+{
+	QRectF rect(QGraphicsItemGroup::boundingRect());
+	rect.adjust(-100, -5, 100, 5);
+	return rect;
+}
+
+void
+ThumbnailSequence::CompositeItem::paint(
+	QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget *widget)
+{
+	if (option->state & QStyle::State_Selected) {
+		painter->fillRect(boundingRect(), QApplication::palette().highlight());
+	}
+}
+
+QVariant
+ThumbnailSequence::CompositeItem::itemChange(
+	GraphicsItemChange const change, QVariant const& value)
+{
+	if (change == QGraphicsItem::ItemSelectedChange && value.toBool()) {
+		m_rOwner.itemSelected(m_pageInfo, this);
+	}
+	return value;
+}
+
+
+/*=================== ThumbnailSequence::NoSelectionItem ===================*/
+
+template<typename Base>
+void
+ThumbnailSequence::NoSelectionItem<Base>::paint(
+	QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget *widget)
+{
+	if (option->state & QStyle::State_Selected) {
+		QStyleOptionGraphicsItem new_opt(*option);
+		new_opt.state &= ~QStyle::State_Selected;
+		Base::paint(painter, &new_opt, widget);
+	} else {
+		Base::paint(painter, option, widget);
+	}
+}

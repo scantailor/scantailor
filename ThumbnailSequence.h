@@ -21,16 +21,20 @@
 
 #include "NonCopyable.h"
 #include "IntrusivePtr.h"
+#include <QObject>
 #include <memory>
 
 class QGraphicsItem;
 class QGraphicsView;
 class PageId;
+class PageInfo;
 class PageSequenceSnapshot;
 class ThumbnailFactory;
+class QRectF;
 
-class ThumbnailSequence
+class ThumbnailSequence : public QObject
 {
+	Q_OBJECT
 	DECLARE_NON_COPYABLE(ThumbnailSequence)
 public:
 	ThumbnailSequence();
@@ -44,11 +48,22 @@ public:
 	void reset(PageSequenceSnapshot const& pages);
 	
 	void invalidateThumbnail(PageId const& page_id);
+	
+	void setCurrentThumbnail(PageId const& page_id);
+signals:
+	void pageSelected(
+		PageInfo const& page_info, QRectF const& thumb_rect,
+		bool by_user, bool was_already_selected);
 private:
 	class Item;
 	class Impl;
 	class PlaceholderThumb;
 	class CompositeItem;
+	template<typename Base> class NoSelectionItem;
+	
+	void emitPageSelected(
+		PageInfo const& page_info, CompositeItem const* composite,
+		bool by_user, bool was_already_selected);
 	
 	std::auto_ptr<Impl> m_ptrImpl;
 };
