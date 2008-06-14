@@ -131,6 +131,8 @@ OptionsWidget::updateModeIndication(AutoManualMode const mode)
 void
 OptionsWidget::setSpinBoxUnknownState()
 {
+	ScopedIncDec<int> guard(m_ignoreSpinBoxChanges);
+	
 	angleSpinBox->setRange(0, 0);
 	angleSpinBox->setEnabled(false);
 }
