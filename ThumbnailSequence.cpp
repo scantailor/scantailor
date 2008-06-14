@@ -53,6 +53,8 @@
 #include <QColor>
 #include <QString>
 #include <QObject>
+#include <QCursor>
+#include <Qt>
 #include <QDebug>
 #include <stddef.h>
 #include <assert.h>
@@ -600,6 +602,7 @@ ThumbnailSequence::CompositeItem::CompositeItem(
 	addToGroup(label.release());
 	
 	setFlag(QGraphicsItem::ItemIsSelectable);
+	setCursor(Qt::PointingHandCursor);
 	setZValue(-1);
 }
 
