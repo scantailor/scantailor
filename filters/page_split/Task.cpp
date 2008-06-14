@@ -55,7 +55,8 @@ public:
 		std::auto_ptr<DebugImages> dbg_img,
 		QImage const& image, ImageId const& image_id,
 		ImageTransformation const& xform,
-		OptionsWidget::UiData const& ui_data);
+		OptionsWidget::UiData const& ui_data,
+		bool batch_processing);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -67,6 +68,7 @@ private:
 	ImageId m_imageId;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
+	bool m_batchProcessing;
 };
 
 
@@ -75,12 +77,14 @@ Task::Task(
 	IntrusivePtr<Settings> const& settings,
 	IntrusivePtr<PageSequence> const& page_sequence,
 	IntrusivePtr<deskew::Task> const& next_task,
-	ImageId const& image_id, bool debug)
+	ImageId const& image_id,
+	bool const batch_processing, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrPageSequence(page_sequence),
 	m_ptrNextTask(next_task),
-	m_imageId(image_id)
+	m_imageId(image_id),
+	m_batchProcessing(batch_processing)
 {
 	if (debug) {
 		m_ptrDbg.reset(new DebugImages);
@@ -159,8 +163,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, m_ptrDbg, data.image(),
-				m_imageId, data.xform(), ui_data
+				m_ptrFilter, m_ptrDbg, data.image(), m_imageId,
+				data.xform(), ui_data, m_batchProcessing
 			)
 		);
 	}
@@ -174,13 +178,15 @@ Task::UiUpdater::UiUpdater(
 	std::auto_ptr<DebugImages> dbg_img,
 	QImage const& image, ImageId const& image_id,
 	ImageTransformation const& xform,
-	OptionsWidget::UiData const& ui_data)
+	OptionsWidget::UiData const& ui_data,
+	bool const batch_processing)
 :	m_ptrFilter(filter),
 	m_ptrDbg(dbg_img),
 	m_image(image),
 	m_imageId(image_id),
 	m_xform(xform),
-	m_uiData(ui_data)
+	m_uiData(ui_data),
+	m_batchProcessing(batch_processing)
 {
 }
 
@@ -193,10 +199,14 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI(m_uiData);
 	ui->setOptionsWidget(opt_widget);
 	
+	ui->invalidateThumbnail(m_imageId);
+	
+	if (m_batchProcessing) {
+		return;
+	}
+	
 	ImageView* view = new ImageView(m_image, m_xform, m_uiData.pageLayout());
 	ui->setImageWidget(view, m_ptrDbg.get());
-	
-	ui->invalidateThumbnail(m_imageId);
 	
 	QObject::connect(
 		view, SIGNAL(manualPageLayoutSet(PageLayout const&)),

@@ -20,7 +20,6 @@
 #include "Settings.h"
 #include "Params.h"
 #include "ScopedIncDec.h"
-#include "Utils.h"
 #include <QSize>
 
 namespace select_content
@@ -28,15 +27,11 @@ namespace select_content
 
 OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 :	m_ptrSettings(settings),
-	m_ignoreAutoManualToggle(0),
-	m_thumbSpaceUsed(0),
-	m_thumbSpacing(20),
-	m_batchProcessingActive(false)
+	m_ignoreAutoManualToggle(0)
 {
 	setupUi(this);
 	
 	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
-	connect(batchProcessingBtn, SIGNAL(clicked()), this, SLOT(batchProcessingToggled()));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -96,24 +91,6 @@ OptionsWidget::modeChanged(bool const auto_mode)
 	} else {
 		m_uiData.setMode(MODE_MANUAL);
 		commitCurrentParams();
-	}
-}
-
-void
-OptionsWidget::batchProcessingToggled()
-{
-	if (m_batchProcessingActive) {
-		m_batchProcessingActive = false;
-		QPixmap pixmap;
-		Utils::loadAndCachePixmap(pixmap, ":/icons/media-playback-start.png");
-		batchProcessingBtn->setIcon(pixmap);
-		emit stopBatchProcessing();
-	} else {
-		m_batchProcessingActive = true;
-		QPixmap pixmap;
-		Utils::loadAndCachePixmap(pixmap, ":/icons/media-playback-stop.png");
-		batchProcessingBtn->setIcon(pixmap);
-		emit startBatchProcessing();
 	}
 }
 

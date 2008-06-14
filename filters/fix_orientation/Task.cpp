@@ -38,7 +38,8 @@ class Task::UiUpdater : public FilterResult
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		QImage const& image, ImageId const& image_id,
-		ImageTransformation const& xform);
+		ImageTransformation const& xform,
+		bool batch_processing);
 	
 	virtual void updateUI(FilterUiInterface* wnd);
 	
@@ -48,6 +49,7 @@ private:
 	QImage m_image;
 	ImageId m_imageId;
 	ImageTransformation m_xform;
+	bool m_batchProcessing;
 };
 
 
@@ -55,11 +57,13 @@ Task::Task(
 	ImageId const& image_id,
 	IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<page_split::Task> const& next_task)
+	IntrusivePtr<page_split::Task> const& next_task,
+	bool const batch_processing)
 :	m_ptrFilter(filter),
 	m_ptrNextTask(next_task),
 	m_ptrSettings(settings),
-	m_imageId(image_id)
+	m_imageId(image_id),
+	m_batchProcessing(batch_processing)
 {
 }
 
@@ -82,7 +86,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, data.image(), m_imageId, xform
+				m_ptrFilter, data.image(), m_imageId, xform,
+				m_batchProcessing
 			)
 		);
 	}
@@ -94,11 +99,13 @@ Task::process(TaskStatus const& status, FilterData const& data)
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
 	QImage const& image, ImageId const& image_id,
-	ImageTransformation const& xform)
+	ImageTransformation const& xform,
+	bool const batch_processing)
 :	m_ptrFilter(filter),
 	m_image(image),
 	m_imageId(image_id),
-	m_xform(xform)
+	m_xform(xform),
+	m_batchProcessing(batch_processing)
 {
 }
 
@@ -112,6 +119,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	ui->setOptionsWidget(opt_widget);
 	
 	ui->invalidateThumbnail(m_imageId);
+	
+	if (m_batchProcessing) {
+		return;
+	}
 	
 	ImageView* view = new ImageView(m_image, m_xform);
 	ui->setImageWidget(view);

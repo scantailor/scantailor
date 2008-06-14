@@ -71,7 +71,8 @@ public:
 	
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,
-		IntrusivePtr<page_split::Task> const& next_task);
+		IntrusivePtr<page_split::Task> const& next_task,
+		bool batch_processing);
 	
 	IntrusivePtr<ThumbnailTask> createThumbnailTask(
 		IntrusivePtr<page_split::ThumbnailTask> const& next_task);

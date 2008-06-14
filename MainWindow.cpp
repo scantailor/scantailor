@@ -102,7 +102,6 @@ MainWindow::MainWindow(
 	m_ptrThumbSequence(new ThumbnailSequence),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
-	m_ignorePageChanges(0),
 	m_disableImageLoading(1), // Disabled until the worker thread is ready.
 	m_debug(false),
 	m_projectModified(true)
@@ -122,7 +121,6 @@ MainWindow::MainWindow(
 	m_ptrThumbSequence(new ThumbnailSequence),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
-	m_ignorePageChanges(0),
 	m_disableImageLoading(1), // Disabled until the worker thread is ready.
 	m_debug(false),
 	m_projectModified(false),
@@ -159,18 +157,10 @@ MainWindow::construct()
 {
 	setupUi(this);
 	
-	m_ptrThumbSequence->setThumbnailFactory(
-		IntrusivePtr<ThumbnailFactory>(
-			new ThumbnailFactory(
-				*m_ptrThumbnailCache,
-				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
-			)
-		)
-	);
 	m_ptrThumbSequence->attachView(thumbView);
 	
-	addAction(actionNextPageOnPgDown);
-	addAction(actionPrevPageOnPgUp);
+	addAction(actionNextPage);
+	addAction(actionPrevPage);
 	
 	m_debug = actionDebug->isChecked();
 	m_pImageFrameLayout = new QStackedLayout(imageViewFrame);
@@ -182,8 +172,9 @@ MainWindow::construct()
 		QItemSelectionModel::SelectCurrent
 	);
 	
-	syncPageSequence();
-	m_ptrThumbSequence->reset(m_frozenPages);
+	resetPageAndThumbSequences();
+	
+	setBatchProcessing(false);
 	
 	connect(
 		filterList->selectionModel(),
@@ -199,13 +190,21 @@ MainWindow::construct()
 		this, SLOT(filterResult(BackgroundTaskPtr const&, FilterResultPtr const&))
 	);
 	connect(
-		pageSpinBox, SIGNAL(valueChanged(int)),
-		this, SLOT(pageChanged(int))
-	);
-	connect(
 		m_ptrThumbSequence.get(),
 		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
 		this, SLOT(pageSelected(PageInfo const&, QRectF const&, bool, bool))
+	);
+	
+	connect(actionNextPage, SIGNAL(triggered(bool)), this, SLOT(nextPage()));
+	connect(actionPrevPage, SIGNAL(triggered(bool)), this, SLOT(prevPage()));
+	
+	connect(
+		actionStartBatchProcessing, SIGNAL(triggered(bool)),
+		this, SLOT(startBatchProcessing())
+	);
+	connect(
+		actionStopBatchProcessing, SIGNAL(triggered(bool)),
+		this, SLOT(stopBatchProcessing())
 	);
 	
 	connect(
@@ -233,6 +232,30 @@ MainWindow::construct()
 }
 
 void
+MainWindow::resetPageAndThumbSequences()
+{
+	updateFrozenPages();
+	
+	m_ptrThumbSequence->setThumbnailFactory(
+		IntrusivePtr<ThumbnailFactory>(
+			new ThumbnailFactory(
+				*m_ptrThumbnailCache,
+				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
+			)
+		)
+	);
+	m_ptrThumbSequence->reset(m_frozenPages);
+}
+
+void
+MainWindow::setBatchProcessing(bool const val)
+{
+	m_batchProcessing = val;
+	actionStartBatchProcessing->setEnabled(!val);
+	actionStopBatchProcessing->setEnabled(val);
+}
+
+void
 MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 {
 	if (m_ptrOptionsWidget == widget) {
@@ -245,14 +268,6 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 			this, SLOT(reloadRequested())
 		);
 		disconnect(
-			m_ptrOptionsWidget, SIGNAL(startBatchProcessing()),
-			this, SLOT(startBatchProcessing())
-		);
-		disconnect(
-			m_ptrOptionsWidget, SIGNAL(stopBatchProcessing()),
-			this, SLOT(stopBatchProcessing())
-		);
-		disconnect(
 			m_ptrOptionsWidget, SIGNAL(invalidateThumbnail(PageId const&)),
 			this, SLOT(invalidateThumbnailSlot(PageId const&))
 		);
@@ -263,8 +278,6 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 	m_ptrOptionsWidget = widget;
 	
 	connect(widget, SIGNAL(reloadRequested()), this, SLOT(reloadRequested()));
-	connect(widget, SIGNAL(startBatchProcessing()), this, SLOT(startBatchProcessing()));
-	connect(widget, SIGNAL(stopBatchProcessing()), this, SLOT(stopBatchProcessing()));
 	connect(
 		widget, SIGNAL(invalidateThumbnail(PageId const&)),
 		this, SLOT(invalidateThumbnailSlot(PageId const&))
@@ -298,25 +311,27 @@ MainWindow::invalidateThumbnail(PageId const& page_id)
 }
 
 void
-MainWindow::pageChanged(int const page)
+MainWindow::nextPage()
 {
-	if (m_ignorePageChanges) {
+	if (m_batchProcessing) {
 		return;
 	}
 	
-	unsigned const zero_based_page = page - 1;
-	PageInfo page_info(m_frozenPages.pageAt(zero_based_page));
-	
-	if (zero_based_page == m_frozenPages.curPageIdx() - 1) {
-		page_info = m_ptrPages->setPrevPage(m_frozenPages.view());
-	} else if (zero_based_page == m_frozenPages.curPageIdx() + 1) {
-		page_info = m_ptrPages->setNextPage(m_frozenPages.view());
-	} else {
-		m_ptrPages->setCurPage(page_info.id());
+	PageInfo const next_page(m_ptrPages->setNextPage(m_frozenPages.view()));
+	m_ptrThumbSequence->setCurrentThumbnail(next_page.id());
+	loadImage(next_page);
+}
+
+void
+MainWindow::prevPage()
+{
+	if (m_batchProcessing) {
+		return;
 	}
 	
-	m_batchProcessing = false;
-	loadImage(page_info);
+	PageInfo const prev_page(m_ptrPages->setPrevPage(m_frozenPages.view()));
+	m_ptrThumbSequence->setCurrentThumbnail(prev_page.id());
+	loadImage(prev_page);
 }
 
 void
@@ -324,15 +339,11 @@ MainWindow::pageSelected(
 	PageInfo const& page_info, QRectF const& thumb_rect,
 	bool const by_user, bool const was_already_selected)
 {
-	if (m_ignorePageChanges) { // ???
-		return;
-	}
-	
 	thumbView->ensureVisible(thumb_rect, 0, 0);
 	
 	if (by_user) {
+		setBatchProcessing(false);
 		m_ptrPages->setCurPage(page_info.id());
-		m_batchProcessing = false;
 		loadImage(page_info);
 	}
 }
@@ -349,18 +360,8 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	}
 	
 	m_curFilter = selected.front().top();
-	syncPageSequence();
 	
-	m_ptrThumbSequence->setThumbnailFactory(
-		IntrusivePtr<ThumbnailFactory>(
-			new ThumbnailFactory(
-				*m_ptrThumbnailCache,
-				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
-			)
-		)
-	);
-	m_ptrThumbSequence->reset(m_frozenPages);
-	
+	resetPageAndThumbSequences();
 	loadImage();
 }
 
@@ -380,14 +381,14 @@ MainWindow::reloadRequested()
 void
 MainWindow::startBatchProcessing()
 {
-	m_batchProcessing = true;
-	
-	{
-		ScopedIncDec<int> guard(m_ignorePageChanges);
-		pageSpinBox->setEnabled(false);
-		pageSlider->setEnabled(false);
-		pageSpinBox->setValue(1);
+	if (m_ptrCurTask) {
+		// The current task is being cancelled because
+		// it's probably not a batch processing task.
+		m_ptrCurTask->cancel();
+		m_ptrCurTask.reset();
 	}
+	
+	setBatchProcessing(true);
 	
 	PageInfo const page_info(m_frozenPages.pageAt(0));
 	m_ptrPages->setCurPage(page_info.id());
@@ -398,13 +399,14 @@ MainWindow::startBatchProcessing()
 void
 MainWindow::stopBatchProcessing()
 {
-	pageSpinBox->setEnabled(true);
-	pageSlider->setEnabled(true);
 	if (m_ptrCurTask) {
+		// The current task is being cancelled because
+		// it's probably a batch processing task.
 		m_ptrCurTask->cancel();
 		m_ptrCurTask.reset();
 	}
-	m_batchProcessing = false;
+	
+	setBatchProcessing(false);
 	loadImage();
 }
 
@@ -419,16 +421,16 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 {
 	if (task != m_ptrCurTask || task->isCancelled()) {
 		// The page sequence may still have changed.
-		syncPageSequence();
+		updateFrozenPages();
 		return;
 	}
 	
 	if (!result->filter()) {
 		// Error loading file.
-		m_batchProcessing = false;
+		setBatchProcessing(false);
 	} else if (result->filter() != m_ptrFilterListModel->getFilter(m_curFilter)) {
 		// Error from one of the previous filters.
-		m_batchProcessing = false;
+		setBatchProcessing(false);
 		
 		int const idx = m_ptrFilterListModel->getFilterIndex(result->filter());
 		assert(idx >= 0);
@@ -441,16 +443,20 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		);
 	}
 	
-	syncPageSequence(); // Must be done after m_curFilter is modified.
+	updateFrozenPages(); // Must be done after m_curFilter is modified.
 	result->updateUI(this);
 	
-	m_ptrThumbSequence->setCurrentThumbnail(m_frozenPages.curPage().id());
-	
 	if (m_batchProcessing) {
+		// During batch processing we prefer to select the thumbnail
+		// after it has been processed, not before.  Otherwise selected
+		// thumbnail will always be an unprocessed one, with the
+		// question mark or it.
+		m_ptrThumbSequence->setCurrentThumbnail(m_frozenPages.curPage().id());
+		
 		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
 			// TODO: notify the current filter.
+			setBatchProcessing(false);
 			loadImage(m_frozenPages.curPage());
-			m_batchProcessing = false;
 		} else {
 			loadImage(m_ptrPages->setNextPage(m_frozenPages.view()));
 		}
@@ -549,28 +555,10 @@ MainWindow::loadImage(PageInfo const& page)
 }
 
 void
-MainWindow::syncPageSequence()
+MainWindow::updateFrozenPages()
 {
 	FilterPtr const& filter = m_ptrFilterListModel->getFilter(m_curFilter);
 	m_frozenPages = m_ptrPages->snapshot(filter->getView());
-	
-	m_ptrThumbSequence->setThumbnailFactory(
-		IntrusivePtr<ThumbnailFactory>(
-			new ThumbnailFactory(
-				*m_ptrThumbnailCache,
-				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
-			)
-		)
-	);
-	
-	int const from = 1;
-	int const to = m_frozenPages.numPages();
-	
-	ScopedIncDec<int> guard(m_ignorePageChanges);
-	pageSlider->setRange(from, to);
-	pageSpinBox->setRange(from, to);
-	pageSpinBox->setSuffix(QString(" / %1").arg(to));
-	pageSpinBox->setValue(m_frozenPages.curPageIdx() + 1);
 }
 
 void
@@ -662,15 +650,15 @@ MainWindow::FilterListModel::createCompositeTask(
 		);
 	case 2:
 		deskew_task = m_ptrDeskewFilter->createTask(
-			page.id(), select_content_task, debug
+			page.id(), select_content_task, batch_processing, debug
 		);
 	case 1:
 		page_split_task = m_ptrPageSplitFilter->createTask(
-			page.id(), deskew_task, debug
+			page.id(), deskew_task, batch_processing, debug
 		);
 	case 0:
 		fix_orientation_task = m_ptrFixOrientationFilter->createTask(
-			page.id(), page_split_task
+			page.id(), page_split_task, batch_processing
 		);
 	}
 	assert(fix_orientation_task);

@@ -56,7 +56,8 @@ public:
 	Task(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<select_content::Task> const& next_task,
-		LogicalPageId const& page_id, bool debug);
+		LogicalPageId const& page_id,
+		bool batch_processing, bool debug);
 	
 	virtual ~Task();
 	
@@ -79,7 +80,7 @@ private:
 	IntrusivePtr<select_content::Task> m_ptrNextTask;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	LogicalPageId m_pageId;
-	
+	bool m_batchProcessing;
 };
 
 } // namespace deskew

@@ -108,23 +108,6 @@
       </item>
      </layout>
     </item>
-    <item>
-     <layout class="QHBoxLayout" >
-      <item>
-       <widget class="QSpinBox" name="pageSpinBox" />
-      </item>
-      <item>
-       <widget class="QSlider" name="pageSlider" >
-        <property name="tracking" >
-         <bool>true</bool>
-        </property>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar" >
@@ -149,7 +132,15 @@
     <addaction name="actionSaveProject" />
     <addaction name="actionSaveProjectAs" />
    </widget>
+   <widget class="QMenu" name="menuProcess" >
+    <property name="title" >
+     <string>Process</string>
+    </property>
+    <addaction name="actionStartBatchProcessing" />
+    <addaction name="actionStopBatchProcessing" />
+   </widget>
    <addaction name="menuFile" />
+   <addaction name="menuProcess" />
    <addaction name="menuDebug" />
   </widget>
   <action name="actionDebug" >
@@ -176,7 +167,7 @@
     <string>Save Project As ...</string>
    </property>
   </action>
-  <action name="actionNextPageOnPgDown" >
+  <action name="actionNextPage" >
    <property name="text" >
     <string>Next Page</string>
    </property>
@@ -187,7 +178,7 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionPrevPageOnPgUp" >
+  <action name="actionPrevPage" >
    <property name="text" >
     <string>Previous Page</string>
    </property>
@@ -198,74 +189,27 @@
     <bool>false</bool>
    </property>
   </action>
+  <action name="actionStartBatchProcessing" >
+   <property name="icon" >
+    <iconset resource="../resources/resources.qrc" >
+     <normaloff>:/icons/16x16/media-playback-start.png</normaloff>:/icons/16x16/media-playback-start.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Start Batch Processing</string>
+   </property>
+  </action>
+  <action name="actionStopBatchProcessing" >
+   <property name="icon" >
+    <iconset resource="../resources/resources.qrc" >
+     <normaloff>:/icons/16x16/media-playback-stop.png</normaloff>:/icons/16x16/media-playback-stop.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Stop Batch Processing</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../resources/resources.qrc" />
  </resources>
- <connections>
-  <connection>
-   <sender>pageSlider</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>pageSpinBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>263</x>
-     <y>431</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>55</x>
-     <y>437</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pageSpinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>pageSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>55</x>
-     <y>437</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>301</x>
-     <y>431</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionNextPageOnPgDown</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>pageSpinBox</receiver>
-   <slot>stepUp()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>37</x>
-     <y>424</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionPrevPageOnPgUp</sender>
-   <signal>triggered(bool)</signal>
-   <receiver>pageSpinBox</receiver>
-   <slot>stepDown()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>37</x>
-     <y>424</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

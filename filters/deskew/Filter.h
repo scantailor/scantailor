@@ -65,7 +65,8 @@ public:
 	
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,
-		IntrusivePtr<select_content::Task> const& next_task, bool debug);
+		IntrusivePtr<select_content::Task> const& next_task,
+		bool batch_processing, bool debug);
 	
 	IntrusivePtr<ThumbnailTask> createThumbnailTask(
 		IntrusivePtr<select_content::ThumbnailTask> const& next_task);

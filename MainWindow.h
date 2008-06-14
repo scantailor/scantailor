@@ -56,7 +56,9 @@ public:
 	
 	virtual ~MainWindow();
 private slots:
-	void pageChanged(int page);
+	void nextPage();
+	
+	void prevPage();
 	
 	void pageSelected(
 		PageInfo const& page_info, QRectF const& thumb_rect,
@@ -99,13 +101,17 @@ private:
 	
 	void construct();
 	
+	void resetPageAndThumbSequences();
+	
+	void setBatchProcessing(bool val);
+	
 	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
 	
 	void loadImage();
 	
 	void loadImage(PageInfo const& page);
 	
-	void syncPageSequence();
+	void updateFrozenPages();
 	
 	void updateWindowTitle();
 	
@@ -125,7 +131,6 @@ private:
 	BackgroundTaskPtr m_ptrCurTask;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
-	int m_ignorePageChanges;
 	int m_disableImageLoading;
 	bool m_debug;
 	bool m_projectModified;

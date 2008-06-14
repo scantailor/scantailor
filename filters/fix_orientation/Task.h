@@ -48,7 +48,8 @@ public:
 		ImageId const& image_id,
 		IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<page_split::Task> const& next_task);
+		IntrusivePtr<page_split::Task> const& next_task,
+		bool batch_processing);
 	
 	virtual ~Task();
 	
@@ -60,6 +61,7 @@ private:
 	IntrusivePtr<page_split::Task> m_ptrNextTask; // if null, this task is the final one
 	IntrusivePtr<Settings> m_ptrSettings;
 	ImageId m_imageId;
+	bool m_batchProcessing;
 };
 
 } // namespace fix_orientation

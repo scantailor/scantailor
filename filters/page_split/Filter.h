@@ -64,7 +64,8 @@ public:
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
 	IntrusivePtr<Task> createTask(PageId const& page_id,
-		IntrusivePtr<deskew::Task> const& next_task, bool debug);
+		IntrusivePtr<deskew::Task> const& next_task,
+		bool batch_processing, bool debug);
 	
 	IntrusivePtr<ThumbnailTask> createThumbnailTask(
 		IntrusivePtr<deskew::ThumbnailTask> const& next_task);

@@ -163,12 +163,13 @@ Filter::writeImageSettings(
 IntrusivePtr<Task>
 Filter::createTask(
 	PageId const& page_id,
-	IntrusivePtr<deskew::Task> const& next_task, bool debug)
+	IntrusivePtr<deskew::Task> const& next_task,
+	bool const batch_processing, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
-			IntrusivePtr<Filter>(this),
-			m_ptrSettings, m_ptrPages, next_task, page_id, debug
+			IntrusivePtr<Filter>(this), m_ptrSettings, m_ptrPages,
+			next_task, page_id, batch_processing, debug
 		)
 	);
 }

@@ -1,9 +1,9 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/16x16/media-playback-start.png</file>
+    <file>icons/16x16/media-playback-stop.png</file>
     <file>icons/right_page_thumb.png</file>
     <file>icons/left_page_thumb.png</file>
-    <file>icons/media-playback-start.png</file>
-    <file>icons/media-playback-stop.png</file>
     <file>icons/aqua-sphere.png</file>
     <file>icons/big-down-arrow.png</file>
     <file>icons/big-left-arrow.png</file>

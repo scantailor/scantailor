@@ -31,10 +31,6 @@ signals:
 	 */
 	void reloadRequested();
 	
-	void startBatchProcessing();
-	
-	void stopBatchProcessing();
-	
 	void invalidateThumbnail(PageId const& page_id);
 };
 

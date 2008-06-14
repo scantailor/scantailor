@@ -81,8 +81,6 @@ public slots:
 	void manualContentRectSet(QRectF const& content_rect);
 private slots:
 	void modeChanged(bool auto_mode);
-	
-	void batchProcessingToggled();
 private:
 	void updateModeIndication(AutoManualMode const mode);
 	
@@ -93,9 +91,6 @@ private:
 	UiData m_uiData;
 	LogicalPageId m_pageId;
 	int m_ignoreAutoManualToggle;
-	int m_thumbSpaceUsed;
-	int m_thumbSpacing;
-	bool m_batchProcessingActive;
 };
 
 } // namespace select_content

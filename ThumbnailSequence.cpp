@@ -37,6 +37,7 @@
 #include <QGraphicsView>
 #include <QStyle>
 #include <QStyleOptionGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
 #include <QPalette>
 #include <QApplication>
 #include <QVariant>
@@ -170,7 +171,9 @@ public:
 	virtual void paint(QPainter* painter,
 		QStyleOptionGraphicsItem const* option, QWidget *widget);
 protected:
-	QVariant itemChange(GraphicsItemChange change, QVariant const& value);
+	virtual QVariant itemChange(GraphicsItemChange change, QVariant const& value);
+	
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 private:
 	ThumbnailSequence::Impl& m_rOwner;
 	QGraphicsItem* m_pThumb;
@@ -620,7 +623,7 @@ QRectF
 ThumbnailSequence::CompositeItem::boundingRect() const
 {
 	QRectF rect(QGraphicsItemGroup::boundingRect());
-	rect.adjust(-100, -5, 100, 5);
+	rect.adjust(-100, -5, 100, 3);
 	return rect;
 }
 
@@ -641,6 +644,20 @@ ThumbnailSequence::CompositeItem::itemChange(
 		m_rOwner.itemSelected(m_pageInfo, this);
 	}
 	return value;
+}
+
+void
+ThumbnailSequence::CompositeItem::mousePressEvent(
+	QGraphicsSceneMouseEvent* const event)
+{
+	// We won't receive the itemChange() even if we are already selected.
+	bool const force_selection = (event->button() == Qt::LeftButton && isSelected());
+	
+	QGraphicsItemGroup::mousePressEvent(event);
+	
+	if (force_selection) {
+		m_rOwner.itemSelected(m_pageInfo, this);
+	}
 }
 
 

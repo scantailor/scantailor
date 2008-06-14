@@ -51,7 +51,8 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<PageSequence> const& page_sequence,
 		IntrusivePtr<deskew::Task> const& next_task,
-		ImageId const& image_id, bool debug);
+		ImageId const& image_id,
+		bool batch_processing, bool debug);
 	
 	virtual ~Task();
 	
@@ -65,6 +66,7 @@ private:
 	IntrusivePtr<deskew::Task> m_ptrNextTask;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	ImageId m_imageId;
+	bool m_batchProcessing;
 };
 
 } // namespace PageSplit

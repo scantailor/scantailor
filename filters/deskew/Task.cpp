@@ -66,7 +66,8 @@ public:
 		std::auto_ptr<DebugImages> dbg_img,
 		QImage const& image, LogicalPageId const& page_id,
 		ImageTransformation const& xform,
-		OptionsWidget::UiData const& ui_data);
+		OptionsWidget::UiData const& ui_data,
+		bool batch_processing);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -78,17 +79,20 @@ private:
 	LogicalPageId m_pageId;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
+	bool m_batchProcessing;
 };
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	IntrusivePtr<select_content::Task> const& next_task,
-	LogicalPageId const& page_id, bool const debug)
+	LogicalPageId const& page_id,
+	bool const batch_processing, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrNextTask(next_task),
-	m_pageId(page_id)
+	m_pageId(page_id),
+	m_batchProcessing(batch_processing)
 {
 	if (debug) {
 		m_ptrDbg.reset(new DebugImages);
@@ -194,7 +198,7 @@ Task::process(
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrDbg, data.image(),
-				m_pageId, new_xform, ui_data
+				m_pageId, new_xform, ui_data, m_batchProcessing
 			)
 		);
 	}
@@ -268,13 +272,15 @@ Task::UiUpdater::UiUpdater(
 	std::auto_ptr<DebugImages> dbg_img,
 	QImage const& image, LogicalPageId const& page_id,
 	ImageTransformation const& xform,
-	OptionsWidget::UiData const& ui_data)
+	OptionsWidget::UiData const& ui_data,
+	bool const batch_processing)
 :	m_ptrFilter(filter),
 	m_ptrDbg(dbg_img),
 	m_image(image),
 	m_pageId(page_id),
 	m_xform(xform),
-	m_uiData(ui_data)
+	m_uiData(ui_data),
+	m_batchProcessing(batch_processing)
 {
 }
 
@@ -287,10 +293,14 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI(m_uiData);
 	ui->setOptionsWidget(opt_widget);
 	
+	ui->invalidateThumbnail(m_pageId);
+	
+	if (m_batchProcessing) {
+		return;
+	}
+	
 	ImageView* view = new ImageView(m_image, m_xform);
 	ui->setImageWidget(view, m_ptrDbg.get());
-	
-	ui->invalidateThumbnail(m_pageId);
 	
 	QObject::connect(
 		view, SIGNAL(manualDeskewAngleSet(double)),
