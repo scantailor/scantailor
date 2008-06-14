@@ -370,7 +370,8 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 		*modified = true;
 	} else if (m_curImage > 0) {
 		// Move to the last sub-page of the previous image.
-		m_curLogicalPage -= m_curSubPage - 1;
+		m_curLogicalPage -= m_curSubPage; // Move to sub-page 0
+		--m_curLogicalPage; // Previous image, last page.
 		--m_curImage;
 		--image;
 		m_curSubPage = image->numLogicalPages - 1;
@@ -397,7 +398,8 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 		*modified = true;
 	} else if (m_curImage < (int)m_images.size() - 1) {
 		// Move to the first sub-page of the next image.
-		m_curLogicalPage += image->numLogicalPages - m_curSubPage;
+		m_curLogicalPage -= m_curSubPage; // Move to sub-page 0.
+		m_curLogicalPage += image->numLogicalPages; // Next image, first page.
 		m_curSubPage = 0;
 		++m_curImage;
 		++image;
