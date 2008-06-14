@@ -41,6 +41,8 @@ public:
 		ImageId const& image_id, ImageTransformation const& image_xform);
 	
 	virtual ~IncompleteThumbnail();
+	
+	static void drawQuestionMark(QPainter& painter, QRectF const& bounding_rect);
 protected:
 	virtual void paintOverImage(
 		QPainter& painter, QTransform const& image_to_display,

@@ -18,6 +18,7 @@
 
 #include "ThumbnailSequence.h.moc"
 #include "ThumbnailFactory.h"
+#include "IncompleteThumbnail.h"
 #include "PageSequence.h"
 #include "PageInfo.h"
 #include "PageId.h"
@@ -559,48 +560,9 @@ ThumbnailSequence::PlaceholderThumb::boundingRect() const
 
 void
 ThumbnailSequence::PlaceholderThumb::paint(
-	QPainter* painter, QStyleOptionGraphicsItem const* option,
-	QWidget *widget)
+	QPainter* painter, QStyleOptionGraphicsItem const*, QWidget*)
 {
-	QString const text(QString::fromAscii("?"));
-	QRectF const bounding_rect(boundingRect());
-	
-	// Because painting happens only from the main thread, we don't
-	// need to care about concurrent access.
-	if (m_sCachedPath.isEmpty()) {
-		QFont font(painter->font());
-		font.setWeight(QFont::DemiBold);
-		font.setStyleStrategy(QFont::ForceOutline);
-		m_sCachedPath.addText(0, 0, font, text);
-	}
-	QRectF const text_rect(m_sCachedPath.boundingRect());
-	
-	QTransform xform1;
-	xform1.translate(-text_rect.left(), -text_rect.top());
-	
-	QSizeF const unscaled_size(text_rect.size());
-	QSizeF scaled_size(unscaled_size);
-	scaled_size.scale(bounding_rect.size() * 0.9, Qt::KeepAspectRatio);
-	
-	double const hscale = scaled_size.width() / unscaled_size.width();
-	double const vscale = scaled_size.height() / unscaled_size.height();
-	QTransform xform2;
-	xform2.scale(hscale, vscale);
-	
-	// Position the text at the center of our bounding rect.
-	QSizeF const translation(bounding_rect.size() * 0.5 - scaled_size * 0.5);
-	QTransform xform3;
-	xform3.translate(translation.width(), translation.height());
-	
-	painter->setWorldTransform(xform1 * xform2 * xform3, true);
-	painter->setRenderHint(QPainter::Antialiasing);
-	
-	QPen pen(QColor(0x00, 0x00, 0x00, 60));
-	pen.setWidth(2);
-	pen.setCosmetic(true);
-	painter->setPen(pen);
-	
-	painter->drawPath(m_sCachedPath);
+	IncompleteThumbnail::drawQuestionMark(*painter, boundingRect());
 }
 
 
