@@ -71,7 +71,16 @@ Application::openProject()
 void
 Application::projectContextDestroyed()
 {
-	if (topLevelWidgets().size() == 1) {
+	int num_visible_widgets = 0;
+	foreach (QWidget *widget, topLevelWidgets()) {
+		// Note that topLevelWidgets() returns all kinds
+		// of internal widgets, but they are hidden.
+		if (!widget->isHidden()) {
+			++num_visible_widgets;
+		}
+	}
+	
+	if (num_visible_widgets == 0) {
 		showNewOpenProjectDialog();
 	}
 }
