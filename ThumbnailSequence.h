@@ -59,6 +59,7 @@ private:
 	class Impl;
 	class PlaceholderThumb;
 	class CompositeItem;
+	class TextItem;
 	template<typename Base> class NoSelectionItem;
 	
 	void emitPageSelected(

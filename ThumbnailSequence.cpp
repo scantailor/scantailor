@@ -141,6 +141,15 @@ private:
 };
 
 
+template<typename Base>
+class ThumbnailSequence::NoSelectionItem : public Base
+{
+public:
+	virtual void paint(QPainter* painter,
+		QStyleOptionGraphicsItem const* option, QWidget *widget);
+};
+
+
 class ThumbnailSequence::PlaceholderThumb : public QGraphicsItem
 {
 public:
@@ -181,8 +190,7 @@ private:
 };
 
 
-template<typename Base>
-class ThumbnailSequence::NoSelectionItem : public Base
+class ThumbnailSequence::TextItem : public NoSelectionItem<QGraphicsSimpleTextItem>
 {
 public:
 	virtual void paint(QPainter* painter,
@@ -450,9 +458,7 @@ ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
 		text = QObject::tr("%1 (page %2)").arg(file_name).arg(page_num + 1);
 	}
 	
-	std::auto_ptr<QGraphicsSimpleTextItem> text_item(
-		new NoSelectionItem<QGraphicsSimpleTextItem>()
-	);
+	std::auto_ptr<QGraphicsSimpleTextItem> text_item(new TextItem());
 	text_item->setText(text);
 	QSizeF const text_item_size(text_item->boundingRect().size());
 	
@@ -520,6 +526,23 @@ ThumbnailSequence::Impl::commitSceneRect()
 }
 
 
+/*=================== ThumbnailSequence::NoSelectionItem ===================*/
+
+template<typename Base>
+void
+ThumbnailSequence::NoSelectionItem<Base>::paint(
+	QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget *widget)
+{
+	if (option->state & QStyle::State_Selected) {
+		QStyleOptionGraphicsItem new_opt(*option);
+		new_opt.state &= ~QStyle::State_Selected;
+		Base::paint(painter, &new_opt, widget);
+	} else {
+		Base::paint(painter, option, widget);
+	}
+}
+
+
 /*================== ThumbnailSequence::PlaceholderThumb ====================*/
 
 QPainterPath ThumbnailSequence::PlaceholderThumb::m_sCachedPath;
@@ -531,7 +554,7 @@ ThumbnailSequence::PlaceholderThumb::PlaceholderThumb()
 QRectF
 ThumbnailSequence::PlaceholderThumb::boundingRect() const
 {
-	return QRect(0.0, 0.0, 160.0, 160.0); // FIXME: don't hardcode sizes
+	return QRectF(0.0, 0.0, 160.0, 160.0); // FIXME: don't hardcode sizes
 }
 
 void
@@ -661,18 +684,19 @@ ThumbnailSequence::CompositeItem::mousePressEvent(
 }
 
 
-/*=================== ThumbnailSequence::NoSelectionItem ===================*/
+/*==================== ThumbnailSequence::TextItem =========================*/
 
-template<typename Base>
 void
-ThumbnailSequence::NoSelectionItem<Base>::paint(
-	QPainter* painter, QStyleOptionGraphicsItem const* option, QWidget *widget)
+ThumbnailSequence::TextItem::paint(QPainter* painter,
+	QStyleOptionGraphicsItem const* option, QWidget *widget)
 {
+	QPalette const palette(QApplication::palette());
+	
 	if (option->state & QStyle::State_Selected) {
-		QStyleOptionGraphicsItem new_opt(*option);
-		new_opt.state &= ~QStyle::State_Selected;
-		Base::paint(painter, &new_opt, widget);
+		setBrush(palette.highlightedText());
 	} else {
-		Base::paint(painter, option, widget);
+		setBrush(palette.text());
 	}
+	
+	NoSelectionItem<QGraphicsSimpleTextItem>::paint(painter, option, widget);
 }
