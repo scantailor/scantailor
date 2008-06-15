@@ -653,10 +653,10 @@ ThumbnailSequence::CompositeItem::itemChange(
 		QPalette const palette(QApplication::palette());
 		if (value.toBool()) {
 			m_pLabel->setBrush(palette.highlightedText());
+			m_rOwner.itemSelected(m_pageInfo, this);
 		} else {
 			m_pLabel->setBrush(palette.text());
 		}
-		m_rOwner.itemSelected(m_pageInfo, this);
 	}
 	return value;
 }
