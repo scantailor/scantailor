@@ -123,7 +123,7 @@ private:
 	
 	std::auto_ptr<QGraphicsItem> getThumbnail(PageInfo const& page_info);
 	
-	std::auto_ptr<QGraphicsItem> getLabel(PageInfo const& page_info);
+	std::auto_ptr<LabelGroup> getLabelGroup(PageInfo const& page_info);
 	
 	std::auto_ptr<CompositeItem> getCompositeItem(PageInfo const& page_info);
 	
@@ -165,6 +165,21 @@ private:
 };
 
 
+class ThumbnailSequence::LabelGroup : public NoSelectionItem<QGraphicsItemGroup>
+{
+public:
+	LabelGroup(std::auto_ptr<QGraphicsSimpleTextItem> label);
+	
+	LabelGroup(
+		std::auto_ptr<QGraphicsSimpleTextItem> label,
+		std::auto_ptr<QGraphicsPixmapItem> pixmap);
+	
+	QGraphicsSimpleTextItem* label() { return m_pLabel; }
+private:
+	QGraphicsSimpleTextItem* m_pLabel;
+};
+
+
 class ThumbnailSequence::CompositeItem : public QGraphicsItemGroup
 {
 public:
@@ -172,7 +187,7 @@ public:
 		ThumbnailSequence::Impl& owner,
 		PageInfo const& page_info,
 		std::auto_ptr<QGraphicsItem> thumbnail,
-		std::auto_ptr<QGraphicsItem> label);
+		std::auto_ptr<LabelGroup> label_group);
 	
 	void updateSceneRect(QRectF& scene_rect);
 	
@@ -187,15 +202,8 @@ protected:
 private:
 	ThumbnailSequence::Impl& m_rOwner;
 	QGraphicsItem* m_pThumb;
+	QGraphicsSimpleTextItem* m_pLabel;
 	PageInfo m_pageInfo;
-};
-
-
-class ThumbnailSequence::TextItem : public NoSelectionItem<QGraphicsSimpleTextItem>
-{
-public:
-	virtual void paint(QPainter* painter,
-		QStyleOptionGraphicsItem const* option, QWidget *widget);
 };
 
 
@@ -446,8 +454,8 @@ ThumbnailSequence::Impl::getThumbnail(PageInfo const& page_info)
 	return thumb;
 }
 
-std::auto_ptr<QGraphicsItem>
-ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
+std::auto_ptr<ThumbnailSequence::LabelGroup>
+ThumbnailSequence::Impl::getLabelGroup(PageInfo const& page_info)
 {
 	LogicalPageId const& page_id = page_info.id();
 	QFileInfo const file_info(page_id.imageId().filePath());
@@ -459,14 +467,16 @@ ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
 		text = QObject::tr("%1 (page %2)").arg(file_name).arg(page_num + 1);
 	}
 	
-	std::auto_ptr<QGraphicsSimpleTextItem> text_item(new TextItem());
+	std::auto_ptr<QGraphicsSimpleTextItem> text_item(
+		new NoSelectionItem<QGraphicsSimpleTextItem>()
+	);
 	text_item->setText(text);
 	QSizeF const text_item_size(text_item->boundingRect().size());
 	
 	char const* pixmap_resource = 0;
 	switch (page_id.subPage()) {
 		case LogicalPageId::SINGLE_PAGE:
-			return std::auto_ptr<QGraphicsItem>(text_item);
+			return std::auto_ptr<LabelGroup>(new LabelGroup(text_item));
 		case LogicalPageId::LEFT_PAGE:
 			pixmap_resource = ":/icons/left_page_thumb.png";
 			break;
@@ -497,22 +507,16 @@ ThumbnailSequence::Impl::getLabel(PageInfo const& page_info)
 		);
 	}
 	
-	std::auto_ptr<QGraphicsItemGroup> group(
-		new NoSelectionItem<QGraphicsItemGroup>()
-	);
-	group->addToGroup(text_item.release());
-	group->addToGroup(pixmap_item.release());
-	
-	return std::auto_ptr<QGraphicsItem>(group);
+	return std::auto_ptr<LabelGroup>(new LabelGroup(text_item, pixmap_item));
 }
 
 std::auto_ptr<ThumbnailSequence::CompositeItem>
 ThumbnailSequence::Impl::getCompositeItem(PageInfo const& page_info)
 {
 	std::auto_ptr<QGraphicsItem> thumb(getThumbnail(page_info));
-	std::auto_ptr<QGraphicsItem> label(getLabel(page_info));
+	std::auto_ptr<LabelGroup> label_group(getLabelGroup(page_info));
 	return std::auto_ptr<CompositeItem>(
-		new CompositeItem(*this, page_info, thumb, label)
+		new CompositeItem(*this, page_info, thumb, label_group)
 	);
 }
 
@@ -566,28 +570,48 @@ ThumbnailSequence::PlaceholderThumb::paint(
 }
 
 
+/*====================== ThumbnailSequence::LabelGroup ======================*/
+
+ThumbnailSequence::LabelGroup::LabelGroup(
+	std::auto_ptr<QGraphicsSimpleTextItem> label)
+:	m_pLabel(label.get())
+{
+	addToGroup(label.release());
+}
+
+ThumbnailSequence::LabelGroup::LabelGroup(
+	std::auto_ptr<QGraphicsSimpleTextItem> label,
+	std::auto_ptr<QGraphicsPixmapItem> pixmap)
+:	m_pLabel(label.get())
+{
+	addToGroup(label.release());
+	addToGroup(pixmap.release());
+}
+
+
 /*==================== ThumbnailSequence::CompositeItem =====================*/
 
 ThumbnailSequence::CompositeItem::CompositeItem(
 	ThumbnailSequence::Impl& owner, PageInfo const& page_info,
 	std::auto_ptr<QGraphicsItem> thumbnail,
-	std::auto_ptr<QGraphicsItem> label)
+	std::auto_ptr<LabelGroup> label_group)
 :	m_rOwner(owner),
 	m_pThumb(thumbnail.get()),
+	m_pLabel(label_group->label()),
 	m_pageInfo(page_info)
 {
 	QSizeF const thumb_size(thumbnail->boundingRect().size());
-	QSizeF const label_size(label->boundingRect().size());
+	QSizeF const label_size(label_group->boundingRect().size());
 	
 	int const thumb_label_spacing = 1;
 	thumbnail->setPos(-0.5 * thumb_size.width(), 0.0);
-	label->setPos(
+	label_group->setPos(
 		thumbnail->pos().x() + thumb_size.width() - label_size.width(),
 		thumb_size.height() + thumb_label_spacing
 	);
 	
 	addToGroup(thumbnail.release());
-	addToGroup(label.release());
+	addToGroup(label_group.release());
 	
 	setFlag(QGraphicsItem::ItemIsSelectable);
 	setCursor(Qt::PointingHandCursor);
@@ -625,7 +649,13 @@ QVariant
 ThumbnailSequence::CompositeItem::itemChange(
 	GraphicsItemChange const change, QVariant const& value)
 {
-	if (change == QGraphicsItem::ItemSelectedChange && value.toBool()) {
+	if (change == QGraphicsItem::ItemSelectedChange) {
+		QPalette const palette(QApplication::palette());
+		if (value.toBool()) {
+			m_pLabel->setBrush(palette.highlightedText());
+		} else {
+			m_pLabel->setBrush(palette.text());
+		}
 		m_rOwner.itemSelected(m_pageInfo, this);
 	}
 	return value;
@@ -645,20 +675,3 @@ ThumbnailSequence::CompositeItem::mousePressEvent(
 	}
 }
 
-
-/*==================== ThumbnailSequence::TextItem =========================*/
-
-void
-ThumbnailSequence::TextItem::paint(QPainter* painter,
-	QStyleOptionGraphicsItem const* option, QWidget *widget)
-{
-	QPalette const palette(QApplication::palette());
-	
-	if (option->state & QStyle::State_Selected) {
-		setBrush(palette.highlightedText());
-	} else {
-		setBrush(palette.text());
-	}
-	
-	NoSelectionItem<QGraphicsSimpleTextItem>::paint(painter, option, widget);
-}
