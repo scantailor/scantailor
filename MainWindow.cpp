@@ -156,6 +156,7 @@ void
 MainWindow::construct()
 {
 	setupUi(this);
+	actionStopBatchProcessing->setEnabled(false);
 	
 	m_ptrThumbSequence->attachView(thumbView);
 	
@@ -173,8 +174,6 @@ MainWindow::construct()
 	);
 	
 	resetPageAndThumbSequences();
-	
-	setBatchProcessing(false);
 	
 	connect(
 		filterList->selectionModel(),
@@ -245,14 +244,6 @@ MainWindow::resetPageAndThumbSequences()
 		)
 	);
 	m_ptrThumbSequence->reset(m_frozenPages);
-}
-
-void
-MainWindow::setBatchProcessing(bool const val)
-{
-	m_batchProcessing = val;
-	actionStartBatchProcessing->setEnabled(!val);
-	actionStopBatchProcessing->setEnabled(val);
 }
 
 void
@@ -342,9 +333,12 @@ MainWindow::pageSelected(
 	thumbView->ensureVisible(thumb_rect, 0, 0);
 	
 	if (by_user) {
-		setBatchProcessing(false);
 		m_ptrPages->setCurPage(page_info.id());
-		loadImage(page_info);
+		if (m_batchProcessing) {
+			stopBatchProcessing();
+		} else {
+			loadImage(page_info);
+		}
 	}
 }
 
@@ -388,7 +382,11 @@ MainWindow::startBatchProcessing()
 		m_ptrCurTask.reset();
 	}
 	
-	setBatchProcessing(true);
+	m_batchProcessing = true;
+	actionStartBatchProcessing->setEnabled(false);
+	actionStopBatchProcessing->setEnabled(true);
+	
+	splitter->widget(0)->setVisible(false);
 	
 	PageInfo const page_info(m_frozenPages.pageAt(0));
 	m_ptrPages->setCurPage(page_info.id());
@@ -399,6 +397,10 @@ MainWindow::startBatchProcessing()
 void
 MainWindow::stopBatchProcessing()
 {
+	if (!m_batchProcessing) {
+		return;
+	}
+	
 	if (m_ptrCurTask) {
 		// The current task is being cancelled because
 		// it's probably a batch processing task.
@@ -406,7 +408,12 @@ MainWindow::stopBatchProcessing()
 		m_ptrCurTask.reset();
 	}
 	
-	setBatchProcessing(false);
+	splitter->widget(0)->setVisible(true);
+	
+	m_batchProcessing = false;
+	actionStartBatchProcessing->setEnabled(true);
+	actionStopBatchProcessing->setEnabled(false);
+	
 	loadImage();
 }
 
@@ -425,22 +432,21 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		return;
 	}
 	
-	if (!result->filter()) {
-		// Error loading file.
-		setBatchProcessing(false);
-	} else if (result->filter() != m_ptrFilterListModel->getFilter(m_curFilter)) {
-		// Error from one of the previous filters.
-		setBatchProcessing(false);
-		
-		int const idx = m_ptrFilterListModel->getFilterIndex(result->filter());
-		assert(idx >= 0);
-		m_curFilter = idx;
-		
-		ScopedIncDec<int> selection_guard(m_ignoreSelectionChanges);
-		filterList->selectionModel()->select(
-			m_ptrFilterListModel->index(idx, 0),
-			QItemSelectionModel::SelectCurrent
-		);
+	if (!m_batchProcessing) {
+		if (!result->filter()) {
+			// Error loading file.  No special action is necessary.
+		} else if (result->filter() != m_ptrFilterListModel->getFilter(m_curFilter)) {
+			// Error from one of the previous filters.
+			int const idx = m_ptrFilterListModel->getFilterIndex(result->filter());
+			assert(idx >= 0);
+			m_curFilter = idx;
+			
+			ScopedIncDec<int> selection_guard(m_ignoreSelectionChanges);
+			filterList->selectionModel()->select(
+				m_ptrFilterListModel->index(idx, 0),
+				QItemSelectionModel::SelectCurrent
+			);
+		}
 	}
 	
 	updateFrozenPages(); // Must be done after m_curFilter is modified.
@@ -454,9 +460,7 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		m_ptrThumbSequence->setCurrentThumbnail(m_frozenPages.curPage().id());
 		
 		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
-			// TODO: notify the current filter.
-			setBatchProcessing(false);
-			loadImage(m_frozenPages.curPage());
+			stopBatchProcessing();
 		} else {
 			loadImage(m_ptrPages->setNextPage(m_frozenPages.view()));
 		}
@@ -535,6 +539,8 @@ MainWindow::loadImage()
 void
 MainWindow::loadImage(PageInfo const& page)
 {
+	static int counter = 0;
+	
 	if (m_disableImageLoading) {
 		return;
 	}

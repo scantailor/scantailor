@@ -103,8 +103,6 @@ private:
 	
 	void resetPageAndThumbSequences();
 	
-	void setBatchProcessing(bool val);
-	
 	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
 	
 	void loadImage();
