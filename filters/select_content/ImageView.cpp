@@ -78,8 +78,8 @@ ImageView::paintOverImage(QPainter& painter)
 	
 	painter.setWorldMatrixEnabled(true);
 	
-	// Draw the content bounding box.
-	{
+	if (!m_contentRect.isNull()) {
+		// Draw the content bounding box.
 		QPen pen(QColor(0x00, 0x00, 0xff));
 		pen.setWidth(1);
 		pen.setCosmetic(true);

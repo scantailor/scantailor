@@ -41,6 +41,10 @@ Thumbnail::paintOverImage(
 	QPainter& painter, QTransform const& image_to_display,
 	QTransform const& thumb_to_display)
 {
+	if (m_contentRect.isNull()) {
+		return;
+	}
+	
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
 	QPen pen(QColor(0x00, 0x00, 0xff));

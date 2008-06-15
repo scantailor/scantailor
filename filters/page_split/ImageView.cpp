@@ -96,28 +96,27 @@ ImageView::paintOverImage(QPainter& painter)
 		painter.drawPolygon(m_pageLayout.rightPage(virt_rect));
 	}
 	
-	PageLayout const widget_layout(m_pageLayout.transformed(virtualToWidget()));
-	QRectF const widget_rect(virtualToWidget().mapRect(virt_rect));
+	PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
+	QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
 	
-	// We want to keep the handles at the top and bottom of the widget,
-	// while we want to allow them to go off screen to the left or to the right.
+	double const handle_half_height = 0.5 * m_imgSkewingHandle.height();
+	
+	QRectF image_adjusted_rect(image_rect);
+	image_adjusted_rect.adjust(0.0, -handle_half_height, 0.0, handle_half_height);
+	
 	QRectF widget_adjusted_rect(this->rect());
-	widget_adjusted_rect.adjust(
-		0.0, // left
-		0.5 * m_imgSkewingHandle.height(), // top
-		0.0, // right
-		-0.5 * m_imgSkewingHandle.height() // bottom
-	);
-	if (widget_adjusted_rect.left() > widget_rect.left()) {
-		widget_adjusted_rect.setLeft(widget_rect.left());
-	}
-	if (widget_adjusted_rect.right() < widget_rect.right()) {
-		widget_adjusted_rect.setRight(widget_rect.right());
-	}
+	widget_adjusted_rect.adjust(0.0, handle_half_height, 0.0, -handle_half_height);
 	
-	QLineF const widget_split_line(
-		widget_layout.inscribedSplitLine(widget_adjusted_rect)
-	);
+	QRectF const united(image_adjusted_rect | widget_adjusted_rect);
+	QRectF const intersected(image_adjusted_rect & widget_adjusted_rect);
+	
+	QRectF resulting_rect;
+	resulting_rect.setLeft(united.left());
+	resulting_rect.setRight(united.right());
+	resulting_rect.setTop(intersected.top());
+	resulting_rect.setBottom(intersected.bottom());
+	
+	QLineF const widget_split_line(layout.inscribedSplitLine(resulting_rect));
 	
 	painter.setRenderHints(QPainter::Antialiasing, true);
 	painter.setWorldMatrixEnabled(false);
