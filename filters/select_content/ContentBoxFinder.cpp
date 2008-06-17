@@ -39,14 +39,17 @@
 #include "imageproc/Grayscale.h"
 #include "imageproc/SlicedHistogram.h"
 #include "imageproc/DentFinder.h"
+#include "imageproc/PolygonRasterizer.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QRect>
 #include <QRectF>
+#include <QPolygonF>
 #include <QImage>
 #include <QColor>
 #include <QPainter>
 #include <QTransform>
+#include <Qt>
 #include <deque>
 #include <algorithm>
 
@@ -147,6 +150,15 @@ ContentBoxFinder::findContentBox(
 	shadows.release();
 	if (dbg) {
 		dbg->add(content, "content");
+	}
+	
+	status.throwIfCancelled();
+	
+	PolygonRasterizer::fillExcept(
+		content, WHITE, data.xform().resultingCropArea(), Qt::WindingFill
+	);
+	if (dbg) {
+		dbg->add(content, "page_mask_applied");
 	}
 	
 	status.throwIfCancelled();
