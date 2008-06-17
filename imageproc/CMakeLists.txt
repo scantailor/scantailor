@@ -25,6 +25,7 @@ SET(
 	DentFinder.cpp DentFinder.h
 	IntegralImage.h
 	Binarize.cpp Binarize.h
+	PolygonRasterizer.cpp PolygonRasterizer.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})
