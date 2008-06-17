@@ -32,13 +32,13 @@ namespace tests
 using namespace utils;
 
 BOOST_AUTO_TEST_SUITE(BinarizeTestSuite);
-
+#if 0
 BOOST_AUTO_TEST_CASE(test)
 {
 	QImage img("test.png");
 	binarizeWolf(img).toQImage().save("out.png");
 }
-
+#endif
 BOOST_AUTO_TEST_SUITE_END();
 
 } // namespace tests
