@@ -227,5 +227,5 @@ TARGET_LINK_LIBRARIES(
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 
-ADD_TEST(ImageProcTests imageproc/tests/tests --log_level=message)
+ADD_TEST(ImageProcTests imageproc/tests/imageproc_tests --log_level=message)
 ADD_TEST(ScanTaylorTests tests/tests --log_level=message)
