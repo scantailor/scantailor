@@ -15,6 +15,7 @@ SET(
 	TestMorphology.cpp
 	TestDentFinder.cpp
 	TestBinarize.cpp
+	TestPolygonRasterizer.cpp
 	Utils.cpp Utils.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
