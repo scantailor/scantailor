@@ -18,6 +18,7 @@
 
 #include "PolygonRasterizer.h"
 #include "BinaryImage.h"
+#include <QRectF>
 #include <QPolygonF>
 #include <QPainterPath>
 #include <QPointF>
@@ -151,13 +152,22 @@ PolygonRasterizer::clipAndFill(
 	path2.closeSubpath();
 	
 	QPolygonF const fill_poly(path1.intersected(path2).toFillPolygon());
-	fillImpl(image, color, fill_poly, fill_rule, invert);
+	
+	QRectF bounding_box;
+	if (invert) {
+		bounding_box = path1.subtracted(path2).boundingRect();
+	} else {
+		bounding_box = fill_poly.boundingRect();
+	}
+	
+	fillImpl(image, color, fill_poly, fill_rule, bounding_box, invert);
 }
 
 void
 PolygonRasterizer::fillImpl(
 	BinaryImage& image, BWColor const color,
-	QPolygonF const& poly, Qt::FillRule const fill_rule, bool const invert)
+	QPolygonF const& poly, Qt::FillRule const fill_rule,
+	QRectF const& bounding_box, bool const invert)
 {
 	int const num_verts = poly.size();
 	if (num_verts == 0) {
@@ -238,9 +248,9 @@ PolygonRasterizer::fillImpl(
 	int const wpl = image.wordsPerLine();
 	uint32_t const pattern = (color == WHITE) ? 0 : ~uint32_t(0);
 	
-	int i = qRound(y_values.front());
+	int i = qRound(bounding_box.top());
 	line += i * wpl;
-	int const limit = qRound(y_values.back());
+	int const limit = qRound(bounding_box.bottom());
 	for (; i < limit; ++i, line += wpl, edges_for_line.clear()) {
 		double const y = i + 0.5;
 		

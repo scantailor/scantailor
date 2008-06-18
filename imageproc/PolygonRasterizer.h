@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 class QPolygonF;
+class QRectF;
 
 namespace imageproc
 {
@@ -52,7 +53,8 @@ private:
 	
 	static void fillImpl(
 		BinaryImage& image, BWColor color,
-		QPolygonF const& poly, Qt::FillRule fill_rule, bool invert);
+		QPolygonF const& poly, Qt::FillRule fill_rule,
+		QRectF const& bounding_box, bool invert);
 	
 	static void oddEvenFillLine(
 		EdgeComponent const* edges, int num_edges,
