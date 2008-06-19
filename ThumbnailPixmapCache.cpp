@@ -19,6 +19,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ImageId.h"
 #include "ImageLoader.h"
+#include "imageproc/Scale.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QThread>
@@ -608,8 +609,16 @@ ThumbnailPixmapCache::Impl::makeThumbnail(
 		return image;
 	}
 	
+	QSize to_size(image.size());
+	to_size.scale(max_thumb_size, Qt::KeepAspectRatio);
+	
+	if (image.format() == QImage::Format_Indexed8 && image.isGrayscale()) {
+		// This will be faster than QImage::scale().
+		return imageproc::scaleToGray(image, to_size);
+	}
+	
 	return image.scaled(
-		max_thumb_size,
+		to_size,
 		Qt::KeepAspectRatio, Qt::SmoothTransformation
 	);
 }
