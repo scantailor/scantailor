@@ -30,9 +30,9 @@
 QPainterPath IncompleteThumbnail::m_sCachedPath;
 
 IncompleteThumbnail::IncompleteThumbnail(
-	ThumbnailPixmapCache& thumbnail_cache,
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 	ImageId const& image_id, ImageTransformation const& image_xform)
-:	ThumbnailBase(thumbnail_cache, image_id, image_xform)
+:	ThumbnailBase(thumbnail_cache, max_size, image_id, image_xform)
 {
 }
 

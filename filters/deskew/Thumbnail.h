@@ -21,6 +21,7 @@
 
 #include "ThumbnailBase.h"
 
+class QSizeF;
 class ThumbnailPixmapCache;
 class ImageId;
 class ImageTransformation;
@@ -31,7 +32,7 @@ namespace deskew
 class Thumbnail : public ThumbnailBase
 {
 public:
-	Thumbnail(ThumbnailPixmapCache& thumbnail_cache,
+	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 		ImageId const& image_id, ImageTransformation const& xform);
 	
 	virtual void paintOverImage(

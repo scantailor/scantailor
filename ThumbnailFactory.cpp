@@ -21,9 +21,10 @@
 #include <QGraphicsItem>
 
 ThumbnailFactory::ThumbnailFactory(
-	ThumbnailPixmapCache& pixmap_cache,
+	ThumbnailPixmapCache& pixmap_cache, QSizeF const& max_size,
 	IntrusivePtr<fix_orientation::ThumbnailTask> const& task_chain)
 :	m_rPixmapCache(pixmap_cache),
+	m_maxSize(max_size),
 	m_ptrTaskChain(task_chain)
 {
 }
@@ -35,5 +36,5 @@ ThumbnailFactory::~ThumbnailFactory()
 std::auto_ptr<QGraphicsItem>
 ThumbnailFactory::get(PageInfo const& page_info)
 {
-	return m_ptrTaskChain->process(m_rPixmapCache, page_info);
+	return m_ptrTaskChain->process(m_rPixmapCache, m_maxSize, page_info);
 }

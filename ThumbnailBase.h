@@ -24,16 +24,17 @@
 #include "boost_signals.h"
 #include <QTransform>
 #include <QGraphicsItem>
+#include <QSizeF>
 #include <QRectF>
 
-class QSizeF;
 class ThumbnailPixmapCache;
 class ThumbnailLoadResult;
 
 class ThumbnailBase : public QGraphicsItem, public boost::signalslib::trackable
 {
 public:
-	ThumbnailBase(ThumbnailPixmapCache& thumbnail_cache,
+	ThumbnailBase(
+		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 		ImageId const& image_id, ImageTransformation const& image_xform);
 	
 	virtual ~ThumbnailBase();
@@ -72,6 +73,7 @@ private:
 	void handleLoadResult(ThumbnailLoadResult const& result);
 	
 	ThumbnailPixmapCache& m_rThumbnailCache;
+	QSizeF m_maxSize;
 	ImageId m_imageId;
 	ImageTransformation m_imageXform;
 	QRectF m_boundingRect;

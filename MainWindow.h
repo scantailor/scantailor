@@ -30,6 +30,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QPointer>
+#include <QSizeF>
 #include <memory>
 
 class AbstractFilter;
@@ -115,6 +116,7 @@ private:
 	
 	bool saveProjectWithFeedback(QString const& project_file);
 	
+	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<PageSequence> m_ptrPages;
 	PageSequenceSnapshot m_frozenPages;
 	QString m_outDir;

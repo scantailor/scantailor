@@ -29,9 +29,10 @@ namespace page_split
 {
 
 Thumbnail::Thumbnail(
-	ThumbnailPixmapCache& thumbnail_cache, ImageId const& image_id,
-	ImageTransformation const& xform, PageLayout const& layout)
-:	ThumbnailBase(thumbnail_cache, image_id, xform),
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+	ImageId const& image_id, ImageTransformation const& xform,
+	PageLayout const& layout)
+:	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
 	m_layout(layout)
 {
 }

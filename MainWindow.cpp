@@ -99,7 +99,6 @@ MainWindow::MainWindow(
 	m_frozenPages(PageSequence::IMAGE_VIEW),
 	m_outDir(out_dir),
 	m_ptrThumbnailCache(createThumbnailCache()),
-	m_ptrThumbSequence(new ThumbnailSequence),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_disableImageLoading(1), // Disabled until the worker thread is ready.
@@ -118,7 +117,6 @@ MainWindow::MainWindow(
 	m_outDir(project_reader.outputDirectory()),
 	m_projectFile(project_file),
 	m_ptrThumbnailCache(createThumbnailCache()),
-	m_ptrThumbSequence(new ThumbnailSequence),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_disableImageLoading(1), // Disabled until the worker thread is ready.
@@ -145,9 +143,11 @@ MainWindow::~MainWindow()
 std::auto_ptr<ThumbnailPixmapCache>
 MainWindow::createThumbnailCache()
 {
+	QSize const max_pixmap_size(200, 200);
+	
 	return std::auto_ptr<ThumbnailPixmapCache>(
 		new ThumbnailPixmapCache(
-			m_outDir+"/cache/thumbs", QSize(200, 200), 40, 5
+			m_outDir+"/cache/thumbs", max_pixmap_size, 40, 5
 		)
 	);
 }
@@ -155,6 +155,10 @@ MainWindow::createThumbnailCache()
 void
 MainWindow::construct()
 {
+	// This needs to horizontally fit into thumbView.
+	m_maxLogicalThumbSize = QSize(250, 160);
+	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
+	
 	setupUi(this);
 	actionStopBatchProcessing->setEnabled(false);
 	
@@ -238,7 +242,7 @@ MainWindow::resetPageAndThumbSequences()
 	m_ptrThumbSequence->setThumbnailFactory(
 		IntrusivePtr<ThumbnailFactory>(
 			new ThumbnailFactory(
-				*m_ptrThumbnailCache,
+				*m_ptrThumbnailCache, m_maxLogicalThumbSize,
 				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
 			)
 		)

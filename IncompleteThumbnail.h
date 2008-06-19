@@ -22,6 +22,9 @@
 #include "ThumbnailBase.h"
 #include <QPainterPath>
 
+class QSizeF;
+class QRectF;
+
 /**
  * \brief A thumbnail represeting a page not completely processed.
  *
@@ -37,7 +40,8 @@
 class IncompleteThumbnail : public ThumbnailBase
 {
 public:
-	IncompleteThumbnail(ThumbnailPixmapCache& thumbnail_cache,
+	IncompleteThumbnail(
+		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 		ImageId const& image_id, ImageTransformation const& image_xform);
 	
 	virtual ~IncompleteThumbnail();

@@ -22,6 +22,7 @@
 #include "ThumbnailBase.h"
 #include "PageLayout.h"
 
+class QSizeF;
 class ThumbnailPixmapCache;
 class ImageId;
 class ImageTransformation;
@@ -32,8 +33,9 @@ namespace page_split
 class Thumbnail : public ThumbnailBase
 {
 public:
-	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, ImageId const& image_id,
-		ImageTransformation const& xform, PageLayout const& layout);
+	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+		ImageId const& image_id, ImageTransformation const& xform,
+		PageLayout const& layout);
 	
 	virtual void paintOverImage(
 		QPainter& painter,

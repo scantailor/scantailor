@@ -40,17 +40,22 @@ ThumbnailTask::~ThumbnailTask()
 
 std::auto_ptr<QGraphicsItem>
 ThumbnailTask::process(
-	ThumbnailPixmapCache& thumbnail_cache, PageInfo const& page_info)
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+	PageInfo const& page_info)
 {
 	QRectF const initial_rect(QPointF(0.0, 0.0), page_info.metadata().size());
 	ImageTransformation xform(initial_rect, page_info.metadata().dpi());
 	xform.setPreRotation(m_ptrSettings->getRotationFor(page_info.id()));
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(thumbnail_cache, page_info, xform);
+		return m_ptrNextTask->process(
+			thumbnail_cache, max_size, page_info, xform
+		);
 	} else {
 		return std::auto_ptr<QGraphicsItem>(
-			new ThumbnailBase(thumbnail_cache, page_info.id(), xform)
+			new ThumbnailBase(
+				thumbnail_cache, max_size, page_info.id(), xform
+			)
 		);
 	}
 }

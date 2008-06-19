@@ -30,6 +30,7 @@ class PageId;
 class PageInfo;
 class PageSequenceSnapshot;
 class ThumbnailFactory;
+class QSizeF;
 class QRectF;
 
 class ThumbnailSequence : public QObject
@@ -37,7 +38,7 @@ class ThumbnailSequence : public QObject
 	Q_OBJECT
 	DECLARE_NON_COPYABLE(ThumbnailSequence)
 public:
-	ThumbnailSequence();
+	ThumbnailSequence(QSizeF const& max_logical_thumb_size);
 	
 	~ThumbnailSequence();
 	

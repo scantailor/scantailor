@@ -22,6 +22,7 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
+#include <QSizeF>
 #include <memory>
 
 class PageInfo;
@@ -37,7 +38,8 @@ class ThumbnailFactory : public RefCountable
 {
 	DECLARE_NON_COPYABLE(ThumbnailFactory)
 public:
-	ThumbnailFactory(ThumbnailPixmapCache& pixmap_cache,
+	ThumbnailFactory(
+		ThumbnailPixmapCache& pixmap_cache, QSizeF const& max_size,
 		IntrusivePtr<fix_orientation::ThumbnailTask> const& task_chain);
 	
 	virtual ~ThumbnailFactory();
@@ -45,6 +47,7 @@ public:
 	std::auto_ptr<QGraphicsItem> get(PageInfo const& page_info);
 private:
 	ThumbnailPixmapCache& m_rPixmapCache;
+	QSizeF m_maxSize;
 	IntrusivePtr<fix_orientation::ThumbnailTask> m_ptrTaskChain;
 };
 

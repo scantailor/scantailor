@@ -82,7 +82,7 @@ public:
 class ThumbnailSequence::Impl
 {
 public:
-	Impl(ThumbnailSequence& owner);
+	Impl(ThumbnailSequence& owner, QSizeF const& max_logical_thumb_size);
 	
 	~Impl();
 	
@@ -131,6 +131,7 @@ private:
 	
 	static int const SPACING = 10;
 	ThumbnailSequence& m_rOwner;
+	QSizeF m_maxLogicalThumbSize;
 	Container m_items;
 	ItemsById& m_itemsById;
 	ItemsInOrder& m_itemsInOrder;
@@ -154,7 +155,7 @@ public:
 class ThumbnailSequence::PlaceholderThumb : public QGraphicsItem
 {
 public:
-	PlaceholderThumb();
+	PlaceholderThumb(QSizeF const& max_size);
 	
 	virtual QRectF boundingRect() const;
 	
@@ -162,6 +163,7 @@ public:
 		QStyleOptionGraphicsItem const* option, QWidget *widget);
 private:
 	static QPainterPath m_sCachedPath;
+	QSizeF m_maxSize;
 };
 
 
@@ -209,8 +211,8 @@ private:
 
 /*============================= ThumbnailSequence ===========================*/
 
-ThumbnailSequence::ThumbnailSequence()
-:	m_ptrImpl(new Impl(*this))
+ThumbnailSequence::ThumbnailSequence(QSizeF const& max_logical_thumb_size)
+:	m_ptrImpl(new Impl(*this, max_logical_thumb_size))
 {
 }
 
@@ -261,8 +263,10 @@ ThumbnailSequence::emitPageSelected(
 
 /*======================== ThumbnailSequence::Impl ==========================*/
 
-ThumbnailSequence::Impl::Impl(ThumbnailSequence& owner)
+ThumbnailSequence::Impl::Impl(
+	ThumbnailSequence& owner, QSizeF const& max_logical_thumb_size)
 :	m_rOwner(owner),
+	m_maxLogicalThumbSize(max_logical_thumb_size),
 	m_items(),
 	m_itemsById(m_items.get<ItemsByIdTag>()),
 	m_itemsInOrder(m_items.get<ItemsInOrderTag>()),
@@ -448,7 +452,7 @@ ThumbnailSequence::Impl::getThumbnail(PageInfo const& page_info)
 	}
 	
 	if (!thumb.get()) {
-		thumb.reset(new PlaceholderThumb);
+		thumb.reset(new PlaceholderThumb(m_maxLogicalThumbSize));
 	}
 	
 	return thumb;
@@ -552,14 +556,15 @@ ThumbnailSequence::NoSelectionItem<Base>::paint(
 
 QPainterPath ThumbnailSequence::PlaceholderThumb::m_sCachedPath;
 
-ThumbnailSequence::PlaceholderThumb::PlaceholderThumb()
+ThumbnailSequence::PlaceholderThumb::PlaceholderThumb(QSizeF const& max_size)
+:	m_maxSize(max_size)
 {
 }
 
 QRectF
 ThumbnailSequence::PlaceholderThumb::boundingRect() const
 {
-	return QRectF(0.0, 0.0, 160.0, 160.0); // FIXME: don't hardcode sizes
+	return QRectF(QPointF(0.0, 0.0), m_maxSize);
 }
 
 void

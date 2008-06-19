@@ -29,9 +29,10 @@ namespace select_content
 {
 
 Thumbnail::Thumbnail(
-	ThumbnailPixmapCache& thumbnail_cache, ImageId const& image_id,
-	ImageTransformation const& xform, QRectF const& content_rect)
-:	ThumbnailBase(thumbnail_cache, image_id, xform),
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+	ImageId const& image_id, ImageTransformation const& xform,
+	QRectF const& content_rect)
+:	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
 	m_contentRect(content_rect)
 {
 }

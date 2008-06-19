@@ -22,6 +22,7 @@
 #include "ThumbnailBase.h"
 #include <QRectF>
 
+class QSizeF;
 class ThumbnailPixmapCache;
 class ImageId;
 class ImageTransformation;
@@ -32,8 +33,9 @@ namespace select_content
 class Thumbnail : public ThumbnailBase
 {
 public:
-	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, ImageId const& image_id,
-		ImageTransformation const& xform, QRectF const& content_rect);
+	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+		ImageId const& image_id, ImageTransformation const& xform,
+		QRectF const& content_rect);
 	
 	virtual void paintOverImage(
 		QPainter& painter,

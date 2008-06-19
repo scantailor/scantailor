@@ -42,8 +42,9 @@ ThumbnailTask::~ThumbnailTask()
 
 std::auto_ptr<QGraphicsItem>
 ThumbnailTask::process(
-	ThumbnailPixmapCache& thumbnail_cache, PageInfo const& page_info,
-	ImageTransformation const& xform, PageLayout const& layout)
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+	PageInfo const& page_info, ImageTransformation const& xform,
+	PageLayout const& layout)
 {
 	QRectF const rect(xform.rectBeforeCropping());
 	QPolygonF const page_outline(
@@ -57,7 +58,8 @@ ThumbnailTask::process(
 	if (!params.get() || !deps.matches(params->dependencies())) {
 		return std::auto_ptr<QGraphicsItem>(
 			new IncompleteThumbnail(
-				thumbnail_cache, page_info.id(), new_xform
+				thumbnail_cache, max_size,
+				page_info.id(), new_xform
 			)
 		);
 	}
@@ -65,10 +67,15 @@ ThumbnailTask::process(
 	new_xform.setPostRotation(params->deskewAngle());
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(thumbnail_cache, page_info, new_xform);
+		return m_ptrNextTask->process(
+			thumbnail_cache, max_size, page_info, new_xform
+		);
 	} else {
 		return std::auto_ptr<QGraphicsItem>(
-			new Thumbnail(thumbnail_cache, page_info.id(), new_xform)
+			new Thumbnail(
+				thumbnail_cache, max_size,
+				page_info.id(), new_xform
+			)
 		);
 	}
 }

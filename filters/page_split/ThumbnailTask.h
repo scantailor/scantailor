@@ -24,6 +24,7 @@
 #include "IntrusivePtr.h"
 #include <memory>
 
+class QSizeF;
 class PageInfo;
 class ImageTransformation;
 class ThumbnailPixmapCache;
@@ -50,10 +51,10 @@ public:
 	virtual ~ThumbnailTask();
 	
 	std::auto_ptr<QGraphicsItem> process(
-		ThumbnailPixmapCache& thumbnail_cache, PageInfo const& page_info,
-		ImageTransformation const& xform);
+		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+		PageInfo const& page_info, ImageTransformation const& xform);
 private:
-	IntrusivePtr<deskew::ThumbnailTask> m_ptrNextTask; // if null, this task is the final one
+	IntrusivePtr<deskew::ThumbnailTask> m_ptrNextTask;
 	IntrusivePtr<Settings> m_ptrSettings;
 };
 

@@ -44,8 +44,8 @@ ThumbnailTask::~ThumbnailTask()
 
 std::auto_ptr<QGraphicsItem>
 ThumbnailTask::process(
-	ThumbnailPixmapCache& thumbnail_cache, PageInfo const& page_info,
-	ImageTransformation const& xform)
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+	PageInfo const& page_info, ImageTransformation const& xform)
 {
 	OrthogonalRotation const pre_rotation(xform.preRotation());
 	
@@ -74,17 +74,24 @@ ThumbnailTask::process(
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	if (!params.get() || !deps.matches(params->dependencies())) {
 		return std::auto_ptr<QGraphicsItem>(
-			new IncompleteThumbnail(thumbnail_cache, page_info.id(), xform)
+			new IncompleteThumbnail(
+				thumbnail_cache, max_size, page_info.id(), xform
+			)
 		);
 	}
 	
 	PageLayout const layout(params->pageLayout());
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(thumbnail_cache, page_info, xform, layout);
+		return m_ptrNextTask->process(
+			thumbnail_cache, max_size, page_info, xform, layout
+		);
 	} else {
 		return std::auto_ptr<QGraphicsItem>(
-			new Thumbnail(thumbnail_cache, page_info.id(), xform, layout)
+			new Thumbnail(
+				thumbnail_cache, max_size,
+				page_info.id(), xform, layout
+			)
 		);
 	}
 }

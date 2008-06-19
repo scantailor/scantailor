@@ -32,22 +32,21 @@
 #include <QPalette>
 #include <QStyle>
 #include <QApplication>
-#include <QSizeF>
 #include <QPointF>
 #include <QDebug>
 
 ThumbnailBase::ThumbnailBase(
-	ThumbnailPixmapCache& thumbnail_cache, ImageId const& image_id,
-	ImageTransformation const& image_xform)
+	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+	ImageId const& image_id, ImageTransformation const& image_xform)
 :	m_rThumbnailCache(thumbnail_cache),
+	m_maxSize(max_size),
 	m_imageId(image_id),
 	m_imageXform(image_xform),
 	m_pixmapLoadPending(false)
 {
 	QSizeF const unscaled_size(m_imageXform.resultingRect().size());
 	QSizeF scaled_size(unscaled_size);
-	scaled_size.scale(QSize(250, 160), Qt::KeepAspectRatio);
-	// FIXME: don't hardcode sizes.
+	scaled_size.scale(max_size, Qt::KeepAspectRatio);
 	
 	m_boundingRect = QRectF(QPointF(0.0, 0.0), scaled_size);
 	
