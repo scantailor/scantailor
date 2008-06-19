@@ -629,6 +629,12 @@ ThumbnailSequence::CompositeItem::updateSceneRect(QRectF& scene_rect)
 	rect.translate(m_pThumb->pos());
 	rect.translate(pos());
 	
+	QRectF bounding_rect(boundingRect());
+	bounding_rect.translate(pos());
+	
+	rect.setTop(bounding_rect.top());
+	rect.setBottom(bounding_rect.bottom());
+	
 	scene_rect |= rect;
 }
 
