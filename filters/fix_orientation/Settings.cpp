@@ -64,7 +64,7 @@ Settings::applyRule(
 	
 	for (int i = scope.from(); i <= scope.to() && i < num_images; ++i) {
 		if ((scope.origin() - i) % scope.step() == 0) {
-			ImageId const image_id(snapshot.pageAt(i).id());
+			ImageId const image_id(snapshot.pageAt(i).imageId());
 			image_ids.push_back(image_id);
 			setImageRotationLocked(image_id, rotation);
 		}

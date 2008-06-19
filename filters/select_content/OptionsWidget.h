@@ -24,7 +24,7 @@
 #include "IntrusivePtr.h"
 #include "AutoManualMode.h"
 #include "Dependencies.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QRect>
@@ -72,7 +72,7 @@ public:
 	
 	virtual ~OptionsWidget();
 	
-	void preUpdateUI(LogicalPageId const& page_id);
+	void preUpdateUI(PageId const& page_id);
 	
 	void postUpdateUI(UiData const& ui_data);
 	
@@ -89,7 +89,7 @@ private:
 	IntrusivePtr<Settings> m_ptrSettings;
 	QGraphicsScene* m_pThumbScene;
 	UiData m_uiData;
-	LogicalPageId m_pageId;
+	PageId m_pageId;
 	int m_ignoreAutoManualToggle;
 };
 

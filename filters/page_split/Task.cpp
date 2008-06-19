@@ -23,6 +23,7 @@
 #include "Settings.h"
 #include "Rule.h"
 #include "PageInfo.h"
+#include "PageId.h"
 #include "PageSplitFinder.h"
 #include "PageLayout.h"
 #include "Dependencies.h"
@@ -199,7 +200,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI(m_uiData);
 	ui->setOptionsWidget(opt_widget);
 	
-	ui->invalidateThumbnail(m_imageId);
+	ui->invalidateThumbnail(PageId(m_imageId));
 	
 	if (m_batchProcessing) {
 		return;

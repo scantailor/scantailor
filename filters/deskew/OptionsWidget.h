@@ -22,7 +22,7 @@
 #include "ui_DeskewOptionsWidget.h"
 #include "FilterOptionsWidget.h"
 #include "IntrusivePtr.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include "Dependencies.h"
 #include "AutoManualMode.h"
 
@@ -69,7 +69,7 @@ signals:
 public slots:
 	void manualDeskewAngleSetExternally(double degrees);
 public:
-	void preUpdateUI(LogicalPageId const& page_id);
+	void preUpdateUI(PageId const& page_id);
 	
 	void postUpdateUI(UiData const& ui_data);
 private slots:
@@ -92,7 +92,7 @@ private:
 	static double const MAX_ANGLE;
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	LogicalPageId m_pageId;
+	PageId m_pageId;
 	UiData m_uiData;
 	int m_ignoreAutoManualToggle;
 	int m_ignoreSpinBoxChanges;

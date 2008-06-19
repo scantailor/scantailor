@@ -21,7 +21,7 @@
 
 #include "RefCountable.h"
 #include "NonCopyable.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include "Params.h"
 #include <QMutex>
 #include <memory>
@@ -40,13 +40,13 @@ public:
 	
 	void clear();
 	
-	void setPageParams(LogicalPageId const& page_id, Params const& params);
+	void setPageParams(PageId const& page_id, Params const& params);
 	
-	void clearPageParams(LogicalPageId const& page_id);
+	void clearPageParams(PageId const& page_id);
 	
-	std::auto_ptr<Params> getPageParams(LogicalPageId const& page_id) const;
+	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
 private:
-	typedef std::map<LogicalPageId, Params> PageParams;
+	typedef std::map<PageId, Params> PageParams;
 	
 	mutable QMutex m_mutex;
 	PageParams m_pageParams;

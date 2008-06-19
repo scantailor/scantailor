@@ -48,7 +48,7 @@ ThumbnailTask::process(
 {
 	QRectF const rect(xform.rectBeforeCropping());
 	QPolygonF const page_outline(
-		layout.pageOutline(rect, page_info.id().logicalPageId().subPage())
+		layout.pageOutline(rect, page_info.id().subPage())
 	);
 	ImageTransformation new_xform(xform);
 	new_xform.setCropArea(page_outline);
@@ -59,7 +59,7 @@ ThumbnailTask::process(
 		return std::auto_ptr<QGraphicsItem>(
 			new IncompleteThumbnail(
 				thumbnail_cache, max_size,
-				page_info.id(), new_xform
+				page_info.imageId(), new_xform
 			)
 		);
 	}
@@ -74,7 +74,7 @@ ThumbnailTask::process(
 		return std::auto_ptr<QGraphicsItem>(
 			new Thumbnail(
 				thumbnail_cache, max_size,
-				page_info.id(), new_xform
+				page_info.imageId(), new_xform
 			)
 		);
 	}

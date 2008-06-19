@@ -64,7 +64,7 @@ class Task::UiUpdater : public FilterResult
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		std::auto_ptr<DebugImages> dbg_img,
-		QImage const& image, LogicalPageId const& page_id,
+		QImage const& image, PageId const& page_id,
 		ImageTransformation const& xform,
 		OptionsWidget::UiData const& ui_data,
 		bool batch_processing);
@@ -76,7 +76,7 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
-	LogicalPageId m_pageId;
+	PageId m_pageId;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
 	bool m_batchProcessing;
@@ -86,8 +86,7 @@ private:
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	IntrusivePtr<select_content::Task> const& next_task,
-	LogicalPageId const& page_id,
-	bool const batch_processing, bool const debug)
+	PageId const& page_id, bool const batch_processing, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrNextTask(next_task),
@@ -270,7 +269,7 @@ Task::from150dpi(QSize const& size, Dpi const& target_dpi)
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
 	std::auto_ptr<DebugImages> dbg_img,
-	QImage const& image, LogicalPageId const& page_id,
+	QImage const& image, PageId const& page_id,
 	ImageTransformation const& xform,
 	OptionsWidget::UiData const& ui_data,
 	bool const batch_processing)

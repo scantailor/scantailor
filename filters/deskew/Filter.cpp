@@ -24,7 +24,6 @@
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "PageId.h"
-#include "LogicalPageId.h"
 #include "ThumbnailTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -105,7 +104,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		
-		LogicalPageId const page_id(reader.pageId(id));
+		PageId const page_id(reader.pageId(id));
 		if (page_id.isNull()) {
 			continue;
 		}
@@ -123,7 +122,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 void
 Filter::writePageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
-	LogicalPageId const& page_id, int const numeric_id) const
+	PageId const& page_id, int const numeric_id) const
 {
 	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(page_id));
 	if (!params.get()) {

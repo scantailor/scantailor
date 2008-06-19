@@ -23,7 +23,6 @@
 #include "PageInfo.h"
 #include "PageId.h"
 #include "ImageId.h"
-#include "LogicalPageId.h"
 #include "Utils.h"
 #include "ScopedIncDec.h"
 #include <boost/multi_index_container.hpp>
@@ -71,7 +70,7 @@ public:
 	Item(PageInfo const& page_info, CompositeItem* comp_item, bool tag = false)
 	: pageInfo(page_info), composite(comp_item), tagged(tag) {}
 	
-	LogicalPageId const& pageId() const { return pageInfo.id(); }
+	PageId const& pageId() const { return pageInfo.id(); }
 	
 	PageInfo pageInfo;
 	mutable CompositeItem* composite;
@@ -106,7 +105,7 @@ private:
 		indexed_by<
 			ordered_unique<
 				tag<ItemsByIdTag>,
-				const_mem_fun<Item, LogicalPageId const&, &Item::pageId>
+				const_mem_fun<Item, PageId const&, &Item::pageId>
 			>,
 			sequenced<tag<ItemsInOrderTag> >
 		>
@@ -314,7 +313,7 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 		
 		offset += composite->boundingRect().height() + SPACING;
 		
-		if (page_info.id().logicalPageId() == cur_page.logicalPageId()) {
+		if (page_info.id() == cur_page) {
 			cur_item = composite.get();
 		}
 		
@@ -461,7 +460,7 @@ ThumbnailSequence::Impl::getThumbnail(PageInfo const& page_info)
 std::auto_ptr<ThumbnailSequence::LabelGroup>
 ThumbnailSequence::Impl::getLabelGroup(PageInfo const& page_info)
 {
-	LogicalPageId const& page_id = page_info.id();
+	PageId const& page_id = page_info.id();
 	QFileInfo const file_info(page_id.imageId().filePath());
 	QString const file_name(file_info.fileName());
 	int const page_num = page_id.imageId().page();
@@ -479,12 +478,12 @@ ThumbnailSequence::Impl::getLabelGroup(PageInfo const& page_info)
 	
 	char const* pixmap_resource = 0;
 	switch (page_id.subPage()) {
-		case LogicalPageId::SINGLE_PAGE:
+		case PageId::SINGLE_PAGE:
 			return std::auto_ptr<LabelGroup>(new LabelGroup(text_item));
-		case LogicalPageId::LEFT_PAGE:
+		case PageId::LEFT_PAGE:
 			pixmap_resource = ":/icons/left_page_thumb.png";
 			break;
-		case LogicalPageId::RIGHT_PAGE:
+		case PageId::RIGHT_PAGE:
 			pixmap_resource = ":/icons/right_page_thumb.png";
 			break;
 	}

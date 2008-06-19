@@ -51,7 +51,7 @@ ThumbnailTask::process(
 	
 	// TODO: maybe make the Dependencies CTOR taking rule and xform?
 	
-	Rule const rule(m_ptrSettings->getRuleFor(page_info.id()));
+	Rule const rule(m_ptrSettings->getRuleFor(page_info.imageId()));
 	int num_logical_pages = 1;
 	switch (rule.layoutType()) {
 		case Rule::AUTO_DETECT: {
@@ -71,11 +71,11 @@ ThumbnailTask::process(
 	bool const single_page = (num_logical_pages == 1);
 	Dependencies const deps(page_info.metadata().size(), pre_rotation, single_page);
 	
-	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
+	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.imageId()));
 	if (!params.get() || !deps.matches(params->dependencies())) {
 		return std::auto_ptr<QGraphicsItem>(
 			new IncompleteThumbnail(
-				thumbnail_cache, max_size, page_info.id(), xform
+				thumbnail_cache, max_size, page_info.imageId(), xform
 			)
 		);
 	}
@@ -90,7 +90,7 @@ ThumbnailTask::process(
 		return std::auto_ptr<QGraphicsItem>(
 			new Thumbnail(
 				thumbnail_cache, max_size,
-				page_info.id(), xform, layout
+				page_info.imageId(), xform, layout
 			)
 		);
 	}

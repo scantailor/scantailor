@@ -56,7 +56,7 @@ LoadFileTask::LoadFileTask(
 	PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
 	IntrusivePtr<fix_orientation::Task> const& next_task)
 :	m_rThumbnailCache(thumbnail_cache),
-	m_imageId(page.id()),
+	m_imageId(page.imageId()),
 	m_imageMetadata(page.metadata()),
 	m_ptrNextTask(next_task)
 {

@@ -41,7 +41,7 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
-		LogicalPageId const& page_id,
+		PageId const& page_id,
 		std::auto_ptr<DebugImages> dbg,
 		QImage const& image,
 		ImageTransformation const& xform,
@@ -52,7 +52,7 @@ public:
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
-	LogicalPageId m_pageId;
+	PageId m_pageId;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
 	ImageTransformation m_xform;
@@ -63,7 +63,7 @@ private:
 
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
-	LogicalPageId const& page_id, bool const batch, bool const debug)
+	PageId const& page_id, bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
@@ -122,12 +122,10 @@ Task::process(TaskStatus const& status, FilterData const& data)
 /*============================ Task::UiUpdater ==========================*/
 
 Task::UiUpdater::UiUpdater(
-	IntrusivePtr<Filter> const& filter,
-	LogicalPageId const& page_id,
-	std::auto_ptr<DebugImages> dbg,
-	QImage const& image,
-	ImageTransformation const& xform,
-	OptionsWidget::UiData const& ui_data, bool const batch)
+	IntrusivePtr<Filter> const& filter, PageId const& page_id,
+	std::auto_ptr<DebugImages> dbg, QImage const& image,
+	ImageTransformation const& xform, OptionsWidget::UiData const& ui_data,
+	bool const batch)
 :	m_ptrFilter(filter),
 	m_pageId(page_id),
 	m_ptrDbg(dbg),

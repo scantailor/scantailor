@@ -27,6 +27,7 @@
 class QGraphicsItem;
 class QGraphicsView;
 class PageId;
+class ImageId;
 class PageInfo;
 class PageSequenceSnapshot;
 class ThumbnailFactory;
@@ -49,6 +50,8 @@ public:
 	void reset(PageSequenceSnapshot const& pages);
 	
 	void invalidateThumbnail(PageId const& page_id);
+	
+	void invalidateThumbnail(ImageId const& image_id);
 	
 	void setCurrentThumbnail(PageId const& page_id);
 signals:

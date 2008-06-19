@@ -256,7 +256,7 @@ ProjectReader::processPages(QDomElement const& pages_el)
 			continue;
 		}
 		
-		PageId const page_id(image.id(), (LogicalPageId::SubPage)sub_page);
+		PageId const page_id(image.id(), (PageId::SubPage)sub_page);
 		m_pageMap.insert(PageMap::value_type(id, page_id));
 		
 		if (el.attribute("selected") == "selected") {
@@ -307,7 +307,7 @@ ProjectReader::imageId(int const numeric_id) const
 	return ImageId();
 }
 
-LogicalPageId
+PageId
 ProjectReader::pageId(int numeric_id) const
 {
 	PageMap::const_iterator it(m_pageMap.find(numeric_id));

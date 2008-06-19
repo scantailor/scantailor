@@ -23,7 +23,6 @@
 #include "RefCountable.h"
 #include "ImageMetadata.h"
 #include "ImageId.h"
-#include "LogicalPageId.h"
 #include "PageId.h"
 #include "PageInfo.h"
 #include <QObject>
@@ -93,7 +92,7 @@ private:
 		ImageDesc(ImageId const& id, ImageMetadata const& metadata,
 			bool multi_page_file, Pages pages);
 		
-		LogicalPageId::SubPage logicalPageToSubPage(int logical_page) const;
+		PageId::SubPage logicalPageToSubPage(int logical_page) const;
 	};
 	
 	void setLogicalPagesInImageImpl(
@@ -108,7 +107,7 @@ private:
 	
 	PageInfo setNextPageImpl(View view, bool* modified);
 	
-	LogicalPageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
+	PageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
 	
 	mutable QMutex m_mutex;
 	std::vector<ImageDesc> m_images;

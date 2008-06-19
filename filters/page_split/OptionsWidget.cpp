@@ -21,6 +21,7 @@
 #include "SplitModeDialog.h"
 #include "Settings.h"
 #include "Params.h"
+#include "PageId.h"
 #include "ScopedIncDec.h"
 #include <QIcon>
 #include <assert.h>
@@ -109,7 +110,7 @@ OptionsWidget::manualPageLayoutSet(PageLayout const& page_layout)
 	
 	manualBtn->setChecked(true);
 	
-	emit invalidateThumbnail(m_imageId);
+	emit invalidateThumbnail(PageId(m_imageId));
 }
 
 void

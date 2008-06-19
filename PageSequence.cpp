@@ -115,7 +115,7 @@ PageSequence::snapshot(View const view) const
 		pages.reserve(num_images);
 		for (int i = 0; i < num_images; ++i) {
 			ImageDesc const& image = m_images[i];
-			PageId const id(image.id, LogicalPageId::SINGLE_PAGE);
+			PageId const id(image.id, PageId::SINGLE_PAGE);
 			pages.push_back(
 				PageInfo(
 					id, image.metadata,
@@ -338,7 +338,7 @@ PageSequence::setCurPageImpl(PageId const& page_id, bool* modified)
 	for (int i = 0; i < num_images; ++i) {
 		ImageDesc const& image = m_images[i];
 		if (image.id == page_id.imageId()) {
-			int sub_page = page_id.logicalPageId().subPageNum();
+			int sub_page = page_id.subPageNum();
 			if (sub_page >= image.numLogicalPages) {
 				sub_page = image.numLogicalPages - 1;
 			}
@@ -413,16 +413,16 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 	);
 }
 
-LogicalPageId::SubPage
+PageId::SubPage
 PageSequence::curSubPageLocked(ImageDesc const& image, View const view) const
 {
 	if (view == IMAGE_VIEW || image.numLogicalPages == 1) {
-		return LogicalPageId::SINGLE_PAGE;
+		return PageId::SINGLE_PAGE;
 	} else if (m_curSubPage == 0) {
-		return LogicalPageId::LEFT_PAGE;
+		return PageId::LEFT_PAGE;
 	} else {
 		assert(m_curSubPage == 1);
-		return LogicalPageId::RIGHT_PAGE;
+		return PageId::RIGHT_PAGE;
 	}
 }
 
@@ -486,17 +486,17 @@ PageSequence::ImageDesc::ImageDesc(
 	}
 }
 
-LogicalPageId::SubPage
+PageId::SubPage
 PageSequence::ImageDesc::logicalPageToSubPage(int const logical_page) const
 {
 	assert(numLogicalPages >= 1 && numLogicalPages <= 2);
 	assert(logical_page >= 0 && logical_page < numLogicalPages);
 	
 	if (numLogicalPages == 1) {
-		return LogicalPageId::SINGLE_PAGE;
+		return PageId::SINGLE_PAGE;
 	} else if (logical_page == 0) {
-		return LogicalPageId::LEFT_PAGE;
+		return PageId::LEFT_PAGE;
 	} else {
-		return LogicalPageId::RIGHT_PAGE;
+		return PageId::RIGHT_PAGE;
 	}
 }

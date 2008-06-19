@@ -22,6 +22,7 @@
 #include "ImageTransformation.h"
 #include "Settings.h"
 #include "PageInfo.h"
+#include "PageId.h"
 
 namespace select_content
 {
@@ -45,14 +46,15 @@ ThumbnailTask::process(
 	if (!params.get() || !params->dependencies().matches(deps)) {
 		return std::auto_ptr<QGraphicsItem>(
 			new IncompleteThumbnail(
-				thumbnail_cache, max_size, page_info.id(), xform
+				thumbnail_cache, max_size,
+				page_info.imageId(), xform
 			)
 		);
 	}
 	
 	return std::auto_ptr<QGraphicsItem>(
 		new Thumbnail(
-			thumbnail_cache, max_size, page_info.id(),
+			thumbnail_cache, max_size, page_info.imageId(),
 			xform, params->contentRect()
 		)
 	);

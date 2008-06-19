@@ -21,7 +21,6 @@
 #include "OptionsWidget.h"
 #include "Task.h"
 #include "PageId.h"
-#include "LogicalPageId.h"
 #include "Settings.h"
 #include "Params.h"
 #include "ProjectReader.h"
@@ -86,7 +85,7 @@ Filter::saveSettings(
 void
 Filter::writePageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
-	LogicalPageId const& page_id, int numeric_id) const
+	PageId const& page_id, int numeric_id) const
 {
 	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(page_id));
 	if (!params.get()) {
@@ -126,7 +125,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		
-		LogicalPageId const page_id(reader.pageId(id));
+		PageId const page_id(reader.pageId(id));
 		if (page_id.isNull()) {
 			continue;
 		}

@@ -20,37 +20,36 @@
 #define PAGEID_H_
 
 #include "ImageId.h"
-#include "LogicalPageId.h"
 
 /**
- * \brief Either an ImageId or a LogicalPageId, depending on context.
+ * \brief A logical page on an image.
  *
- * This class is convertable to and from both ImageId and LogicalPageId.
- * As a safeguard, no comparison operators are provided for this class.
+ * An image can contain one or two logical pages.
  */
 class PageId
 {
 	// Member-wise copying is OK.
 public:
-	PageId() {}
+	enum SubPage { SINGLE_PAGE, LEFT_PAGE, RIGHT_PAGE };
 	
-	PageId(ImageId const& image_id);
+	PageId();
 	
-	PageId(LogicalPageId const& page_id);
+	explicit PageId(ImageId const& image_id, SubPage subpage = SINGLE_PAGE);
 	
-	PageId(ImageId const& image_id, LogicalPageId::SubPage subpage);
+	bool isNull() const { return m_imageId.isNull(); }
 	
-	~PageId();
+	ImageId const& imageId() const { return m_imageId; }
 	
-	ImageId const& imageId() const { return m_pageId.imageId(); }
+	SubPage subPage() const { return m_subPage; }
 	
-	LogicalPageId const& logicalPageId() const { return m_pageId; }
-	
-	operator ImageId const&() const { return m_pageId.imageId(); }
-	
-	operator LogicalPageId const&() const { return m_pageId; }
+	int subPageNum() const { return m_subPage == RIGHT_PAGE ? 1 : 0; }
 private:
-	LogicalPageId m_pageId;
+	ImageId m_imageId;
+	SubPage m_subPage;
 };
+
+bool operator==(PageId const& lhs, PageId const& rhs);
+bool operator!=(PageId const& lhs, PageId const& rhs);
+bool operator<(PageId const& lhs, PageId const& rhs);
 
 #endif

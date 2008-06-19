@@ -19,6 +19,8 @@
 #include "ThumbnailTask.h"
 #include "Settings.h"
 #include "PageInfo.h"
+#include "PageId.h"
+#include "ImageId.h"
 #include "ImageTransformation.h"
 #include "ThumbnailBase.h"
 #include "filters/page_split/ThumbnailTask.h"
@@ -45,7 +47,7 @@ ThumbnailTask::process(
 {
 	QRectF const initial_rect(QPointF(0.0, 0.0), page_info.metadata().size());
 	ImageTransformation xform(initial_rect, page_info.metadata().dpi());
-	xform.setPreRotation(m_ptrSettings->getRotationFor(page_info.id()));
+	xform.setPreRotation(m_ptrSettings->getRotationFor(page_info.imageId()));
 	
 	if (m_ptrNextTask) {
 		return m_ptrNextTask->process(
@@ -54,7 +56,7 @@ ThumbnailTask::process(
 	} else {
 		return std::auto_ptr<QGraphicsItem>(
 			new ThumbnailBase(
-				thumbnail_cache, max_size, page_info.id(), xform
+				thumbnail_cache, max_size, page_info.imageId(), xform
 			)
 		);
 	}

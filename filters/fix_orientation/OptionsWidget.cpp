@@ -109,7 +109,7 @@ OptionsWidget::scopeSet(Scope const& scope)
 	);
 	
 	BOOST_FOREACH(ImageId const& image_id, image_ids) {
-		emit invalidateThumbnail(image_id);
+		emit invalidateThumbnail(PageId(image_id));
 	}
 }
 
@@ -127,7 +127,7 @@ OptionsWidget::setRotation(OrthogonalRotation const rotation)
 	m_ptrSettings->applyRule(image_id, rotation);
 	
 	emit rotated(rotation);
-	emit invalidateThumbnail(image_id);
+	emit invalidateThumbnail(PageId(image_id));
 }
 
 void

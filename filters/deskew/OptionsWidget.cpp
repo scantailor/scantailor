@@ -62,7 +62,7 @@ OptionsWidget::manualDeskewAngleSetExternally(double const degrees)
 }
 
 void
-OptionsWidget::preUpdateUI(LogicalPageId const& page_id)
+OptionsWidget::preUpdateUI(PageId const& page_id)
 {
 	ScopedIncDec<int> guard(m_ignoreAutoManualToggle);
 	

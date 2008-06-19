@@ -169,12 +169,12 @@ PageLayout::rightPage(QRectF const& rect) const
 }
 
 QPolygonF
-PageLayout::pageOutline(QRectF const& rect, LogicalPageId::SubPage const page) const
+PageLayout::pageOutline(QRectF const& rect, PageId::SubPage const page) const
 {
 	switch (page) {
-		case LogicalPageId::LEFT_PAGE:
+		case PageId::LEFT_PAGE:
 			return leftPage(rect);
-		case LogicalPageId::RIGHT_PAGE:
+		case PageId::RIGHT_PAGE:
 			return rightPage(rect);
 		default:;
 	}

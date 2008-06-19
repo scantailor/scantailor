@@ -19,7 +19,7 @@
 #include "ProjectWriter.h"
 #include "PageSequence.h"
 #include "PageInfo.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include "ImageId.h"
 #include "ImageMetadata.h"
 #include "AbstractFilter.h"
@@ -39,8 +39,8 @@ ProjectWriter::ProjectWriter(
 	size_t const num_pages = m_pages.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page = m_pages.pageAt(i);
-		ImageId const& image_id = page.id().imageId();
-		LogicalPageId const& page_id = page.id().logicalPageId();
+		PageId const& page_id = page.id();
+		ImageId const& image_id = page_id.imageId();
 		QString const& file_path = image_id.filePath();
 		QFileInfo const file_info(file_path);
 		QString const dir_path(file_info.absolutePath());
@@ -191,10 +191,10 @@ ProjectWriter::processPages(QDomDocument& doc) const
 	size_t const num_pages = m_pages.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page = m_pages.pageAt(i);
-		LogicalPageId const& page_id = page.id().logicalPageId();
+		PageId const& page_id = page.id();
 		QDomElement page_el(doc.createElement("page"));
-		page_el.setAttribute("id", pageId(page.id()));
-		page_el.setAttribute("imageId", imageId(page.id()));
+		page_el.setAttribute("id", pageId(page_id));
+		page_el.setAttribute("imageId", imageId(page_id.imageId()));
 		page_el.setAttribute("subPage", page_id.subPage());
 		if (cur_page == i) {
 			page_el.setAttribute("selected", "selected");
@@ -230,7 +230,7 @@ ProjectWriter::imageId(ImageId const& image_id) const
 }
 
 int
-ProjectWriter::pageId(LogicalPageId const& page_id) const
+ProjectWriter::pageId(PageId const& page_id) const
 {
 	PageIds::const_iterator it(m_pageIds.find(page_id));
 	assert(it != m_pageIds.end());
@@ -248,7 +248,7 @@ ProjectWriter::enumImagesImpl(VirtualFunction2<void, ImageId const&, int>& out) 
 }
 
 void
-ProjectWriter::enumPagesImpl(VirtualFunction2<void, LogicalPageId const&, int>& out) const
+ProjectWriter::enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) const
 {
 	PageIds::const_iterator it(m_pageIds.begin());
 	PageIds::const_iterator const end(m_pageIds.end());

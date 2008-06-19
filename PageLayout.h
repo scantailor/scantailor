@@ -19,7 +19,7 @@
 #ifndef PAGELAYOUT_H_
 #define PAGELAYOUT_H_
 
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include <QLineF>
 #include <QString>
 
@@ -43,7 +43,7 @@ public:
 	 * \param split_line The line that splits pages. Endpoints don't matter.
 	 *        They only define the line, not a line segment. The split line
 	 *        may be null.  In this case \p left_page_valid  and
-	 *        \p right_page_validmust be false.
+	 *        \p right_page_valid must be false.
 	 * \param left_page_valid True if there is a page to the left of
 	 *        \p split_line.
 	 * \param right_page_valid True if there is a page to the right of
@@ -91,7 +91,7 @@ public:
 	 */
 	QPolygonF rightPage(QRectF const& rect) const;
 	
-	QPolygonF pageOutline(QRectF const& rect, LogicalPageId::SubPage page) const;
+	QPolygonF pageOutline(QRectF const& rect, PageId::SubPage page) const;
 	
 	PageLayout transformed(QTransform const& xform) const;
 	

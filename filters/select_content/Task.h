@@ -22,7 +22,7 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "FilterResult.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 
 class TaskStatus;
 class FilterData;
@@ -40,7 +40,7 @@ class Task : public RefCountable
 public:
 	Task(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
-		LogicalPageId const& page_id, bool batch, bool debug);
+		PageId const& page_id, bool batch, bool debug);
 	
 	virtual ~Task();
 	
@@ -51,7 +51,7 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<DebugImages> m_ptrDbg;
-	LogicalPageId m_pageId;
+	PageId m_pageId;
 	bool m_batchProcessing;
 };
 

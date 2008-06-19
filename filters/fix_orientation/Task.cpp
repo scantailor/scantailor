@@ -118,7 +118,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI(m_xform.preRotation());
 	ui->setOptionsWidget(opt_widget);
 	
-	ui->invalidateThumbnail(m_imageId);
+	ui->invalidateThumbnail(PageId(m_imageId));
 	
 	if (m_batchProcessing) {
 		return;

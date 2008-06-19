@@ -65,7 +65,7 @@ Filter::getView() const
 void
 Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
-	m_ptrOptionsWidget->preUpdateUI(page_id);
+	m_ptrOptionsWidget->preUpdateUI(page_id.imageId());
 	ui->setOptionsWidget(m_ptrOptionsWidget.get());
 }
 
@@ -169,7 +169,7 @@ Filter::createTask(
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings, m_ptrPages,
-			next_task, page_id, batch_processing, debug
+			next_task, page_id.imageId(), batch_processing, debug
 		)
 	);
 }

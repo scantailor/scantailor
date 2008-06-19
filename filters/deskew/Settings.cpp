@@ -39,21 +39,21 @@ Settings::clear()
 }
 
 void
-Settings::setPageParams(LogicalPageId const& page_id, Params const& params)
+Settings::setPageParams(PageId const& page_id, Params const& params)
 {
 	QMutexLocker locker(&m_mutex);
 	Utils::mapSetValue(m_perPageParams, page_id, params);
 }
 
 void
-Settings::clearPageParams(LogicalPageId const& page_id)
+Settings::clearPageParams(PageId const& page_id)
 {
 	QMutexLocker locker(&m_mutex);
 	m_perPageParams.erase(page_id);
 }
 
 std::auto_ptr<Params>
-Settings::getPageParams(LogicalPageId const& page_id) const
+Settings::getPageParams(PageId const& page_id) const
 {
 	QMutexLocker locker(&m_mutex);
 	

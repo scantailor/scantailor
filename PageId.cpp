@@ -18,21 +18,34 @@
 
 #include "PageId.h"
 
-PageId::PageId(ImageId const& image_id)
-:	m_pageId(image_id, LogicalPageId::SINGLE_PAGE)
+PageId::PageId()
+:	m_subPage(SINGLE_PAGE)
 {
 }
 
-PageId::PageId(LogicalPageId const& page_id)
-:	m_pageId(page_id)
+PageId::PageId(ImageId const& image_id, SubPage subpage)
+:	m_imageId(image_id),
+	m_subPage(subpage)
 {
 }
 
-PageId::PageId(ImageId const& image_id, LogicalPageId::SubPage const subpage)
-:	m_pageId(image_id, subpage)
+bool operator==(PageId const& lhs, PageId const& rhs)
 {
+	return lhs.subPage() == rhs.subPage() && lhs.imageId() == rhs.imageId();
 }
 
-PageId::~PageId()
+bool operator!=(PageId const& lhs, PageId const& rhs)
 {
+	return !(lhs == rhs);
+}
+
+bool operator<(PageId const& lhs, PageId const& rhs)
+{
+	if (lhs.imageId() < rhs.imageId()) {
+		return true;
+	} else if (rhs.imageId() < lhs.imageId()) {
+		return false;
+	} else {
+		return lhs.subPage() < rhs.subPage();
+	}
 }

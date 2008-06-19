@@ -25,7 +25,6 @@
 #include "FilterResult.h"
 
 class PageId;
-class LogicalPageId;
 class PageLayout;
 class QString;
 
@@ -75,7 +74,7 @@ public:
 private:
 	void writePageSettings(
 		QDomDocument& doc, QDomElement& filter_el,
-		LogicalPageId const& page_id, int numeric_id) const;
+		PageId const& page_id, int numeric_id) const;
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<OptionsWidget> m_ptrOptionsWidget;

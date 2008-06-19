@@ -70,7 +70,7 @@ Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
 	if (m_ptrOptionsWidget.get()) {
 		OrthogonalRotation const rotation(
-			m_ptrSettings->getRotationFor(page_id)
+			m_ptrSettings->getRotationFor(page_id.imageId())
 		);
 		m_ptrOptionsWidget->preUpdateUI(
 			rotation, m_ptrPages->numImages(),
@@ -144,7 +144,7 @@ Filter::createTask(
 {
 	return IntrusivePtr<Task>(
 		new Task(
-			page_id, IntrusivePtr<Filter>(this),
+			page_id.imageId(), IntrusivePtr<Filter>(this),
 			m_ptrSettings, next_task, batch_processing
 		)
 	);

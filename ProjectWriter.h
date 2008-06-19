@@ -22,7 +22,7 @@
 #include "IntrusivePtr.h"
 #include "PageSequence.h"
 #include "ImageId.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include "VirtualFunction.h"
 #include <QString>
 #include <vector>
@@ -77,7 +77,7 @@ private:
 	typedef std::map<QString, int> DirectoryIds;
 	typedef std::map<QString, FileData> FileIds;
 	typedef std::map<ImageId, ImageData> ImageIds;
-	typedef std::map<LogicalPageId, int> PageIds;
+	typedef std::map<PageId, int> PageIds;
 	typedef std::map<ImageId, ImageMetadata> MetadataByImage;
 	
 	QDomElement processDirectories(QDomDocument& doc) const;
@@ -98,18 +98,18 @@ private:
 	
 	int imageId(ImageId const& image_id) const;
 	
-	int pageId(LogicalPageId const& logical_id) const;
+	int pageId(PageId const& page_id) const;
 	
 	void enumImagesImpl(VirtualFunction2<void, ImageId const&, int>& out) const;
 	
-	void enumPagesImpl(VirtualFunction2<void, LogicalPageId const&, int>& out) const;
+	void enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) const;
 	
 	QString m_outDir;
 	PageSequenceSnapshot m_pages;
 	DirectoryIds m_dirIds; // directory -> numeric id
 	FileIds m_fileIds; // file path -> numeric id
 	ImageIds m_imageIds; // image id -> numeric id
-	PageIds m_pageIds; // logical page id -> numeric id
+	PageIds m_pageIds; // page id -> numeric id
 	MetadataByImage m_metadataByImage;
 };
 
@@ -125,7 +125,7 @@ template<typename OutFunc>
 void
 ProjectWriter::enumPages(OutFunc out) const
 {
-	ProxyFunction2<OutFunc, void, LogicalPageId const&, int> proxy(out);
+	ProxyFunction2<OutFunc, void, PageId const&, int> proxy(out);
 	enumPagesImpl(proxy);
 }
 

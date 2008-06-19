@@ -185,7 +185,6 @@ SET(
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
 	DebugImages.cpp DebugImages.h
 	ImageId.cpp ImageId.h
-	LogicalPageId.cpp LogicalPageId.h
 	PageId.cpp PageId.h
 	PageInfo.cpp PageInfo.h
 	BackgroundTask.cpp BackgroundTask.h

@@ -20,7 +20,7 @@
 #define PROJECTREADER_H_
 
 #include "ImageId.h"
-#include "LogicalPageId.h"
+#include "PageId.h"
 #include "ImageInfo.h"
 #include "ImageMetadata.h"
 #include "IntrusivePtr.h"
@@ -53,7 +53,7 @@ public:
 	
 	ImageId imageId(int numeric_id) const;
 	
-	LogicalPageId pageId(int numeric_id) const;
+	PageId pageId(int numeric_id) const;
 private:
 	struct FileInfo
 	{
@@ -71,7 +71,7 @@ private:
 	typedef std::map<int, QString> DirMap;
 	typedef std::map<int, FileInfo> FileMap;
 	typedef std::map<int, ImageInfo> ImageMap;
-	typedef std::map<int, LogicalPageId> PageMap;
+	typedef std::map<int, PageId> PageMap;
 	
 	void processDirectories(QDomElement const& dirs_el);
 	

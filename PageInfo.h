@@ -28,10 +28,12 @@ class PageInfo
 public:
 	PageInfo();
 	
-	PageInfo(PageId const& id, ImageMetadata const& metadata,
+	PageInfo(PageId const& page_id, ImageMetadata const& metadata,
 		bool multi_page_file, int image_sub_pages);
 	
-	PageId const& id() const { return m_id; }
+	PageId const& id() const { return m_pageId; }
+	
+	ImageId const& imageId() const { return m_pageId.imageId(); }
 	
 	ImageMetadata const& metadata() const { return m_metadata; }
 	
@@ -39,7 +41,7 @@ public:
 	
 	int imageSubPages() const { return m_imageSubPages; }
 private:
-	PageId m_id;
+	PageId m_pageId;
 	ImageMetadata m_metadata;
 	int m_imageSubPages;
 	bool m_multiPageFile;
