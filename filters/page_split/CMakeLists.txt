@@ -10,6 +10,7 @@ ADD_SUBDIRECTORY(ui)
 SET(
 	sources
 	AutoDetectedLayout.h
+	LayoutTypeResolver.cpp LayoutTypeResolver.h
 	ImageView.cpp ImageView.h
 	Thumbnail.cpp Thumbnail.h
 	Params.cpp Params.h

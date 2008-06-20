@@ -22,6 +22,7 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "Rule.h"
+#include "LayoutTypeResolver.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "PageSplitFinder.h"
@@ -33,7 +34,6 @@
 #include "Dpm.h"
 #include "Dpi.h"
 #include "AutoDetectedLayout.h"
-#include "PageSequence.h"
 #include "OrthogonalRotation.h"
 #include "ImageTransformation.h"
 #include "filters/deskew/Task.h"
@@ -105,29 +105,15 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	OptionsWidget::UiData ui_data;
 	
 	Rule const rule(m_ptrSettings->getRuleFor(m_imageId));
-	int num_logical_pages = 1;
-	switch (rule.layoutType()) {
-		case Rule::AUTO_DETECT: {
-			ImageMetadata const metadata(
-				data.image().size(), Dpm(data.image())
-			);
-			num_logical_pages = PageSequence::adviseNumberOfLogicalPages(
-				metadata, pre_rotation
-			);
-			ui_data.setAutoDetectedLayout(
-				num_logical_pages == 1 ? SINGLE_PAGE : TWO_PAGES
-			);
-			break;
-		}
-		case Rule::SINGLE_PAGE:
-			num_logical_pages = true;
-			break;
-		case Rule::TWO_PAGES:
-			num_logical_pages = false;
-			break;
+	LayoutTypeResolver const resolver(rule.layoutType());
+	ImageMetadata const metadata(data.image().size(), Dpm(data.image()));
+	int const num_logical_pages = resolver.numLogicalPages(metadata, pre_rotation);
+	bool const single_page = (num_logical_pages == 1);
+	
+	if (rule.layoutType() == Rule::AUTO_DETECT) {
+		ui_data.setAutoDetectedLayout(single_page ? SINGLE_PAGE : TWO_PAGES);
 	}
 	
-	bool const single_page = (num_logical_pages == 1);
 	Dependencies const deps(data.image().size(), pre_rotation, single_page);
 	PageLayout layout;
 	AutoManualMode mode = MODE_AUTO;

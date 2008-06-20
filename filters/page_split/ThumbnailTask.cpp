@@ -18,12 +18,11 @@
 
 #include "ThumbnailTask.h"
 #include "Thumbnail.h"
+#include "LayoutTypeResolver.h"
 #include "IncompleteThumbnail.h"
 #include "Settings.h"
 #include "PageInfo.h"
 #include "ImageTransformation.h"
-#include "OrthogonalRotation.h"
-#include "PageSequence.h"
 #include "filters/deskew/ThumbnailTask.h"
 #include <QDebug>
 
@@ -49,26 +48,13 @@ ThumbnailTask::process(
 {
 	OrthogonalRotation const pre_rotation(xform.preRotation());
 	
-	// TODO: maybe make the Dependencies CTOR taking rule and xform?
-	
 	Rule const rule(m_ptrSettings->getRuleFor(page_info.imageId()));
-	int num_logical_pages = 1;
-	switch (rule.layoutType()) {
-		case Rule::AUTO_DETECT: {
-			num_logical_pages = PageSequence::adviseNumberOfLogicalPages(
-				page_info.metadata(), pre_rotation
-			);
-			break;
-		}
-		case Rule::SINGLE_PAGE:
-			num_logical_pages = true;
-			break;
-		case Rule::TWO_PAGES:
-			num_logical_pages = false;
-			break;
-	}
-	
+	LayoutTypeResolver const resolver(rule.layoutType());
+	int const num_logical_pages = resolver.numLogicalPages(
+		page_info.metadata(), pre_rotation
+	);
 	bool const single_page = (num_logical_pages == 1);
+	
 	Dependencies const deps(page_info.metadata().size(), pre_rotation, single_page);
 	
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.imageId()));
