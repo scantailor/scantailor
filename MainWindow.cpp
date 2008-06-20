@@ -48,6 +48,7 @@
 #include <QLayoutItem>
 #include <QAbstractListModel>
 #include <QFileInfo>
+#include <QDir>
 #include <QString>
 #include <QVariant>
 #include <QModelIndex>
@@ -484,9 +485,13 @@ MainWindow::saveProjectTriggered()
 void
 MainWindow::saveProjectAsTriggered()
 {
+	QDir dir(m_outDir);
+	if (!m_projectFile.isEmpty()) {
+		dir = QFileInfo(m_projectFile).absoluteDir();
+	}
 	QString project_file(
 		QFileDialog::getSaveFileName(
-			this, QString(), m_projectFile,
+			this, QString(), dir.absolutePath(),
 			tr("Scan Tailor Projects")+" (*.ScanTailor)"
 		)
 	);
