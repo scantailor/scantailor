@@ -181,7 +181,8 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 		QRectF const arc_square(getRotationArcSquare());
 		double const arc_radius = 0.5 * arc_square.width();
 		double const abs_y = event->y() - m_mouseVertOffset;
-		double const rel_y = abs_y - arc_square.center().y();
+		double rel_y = abs_y - arc_square.center().y();
+		rel_y = qBound(-arc_radius, rel_y, arc_radius);
 		
 		double angle_rad = asin(rel_y / arc_radius);
 		if (m_state == DRAGGING_LEFT_HANDLE) {
