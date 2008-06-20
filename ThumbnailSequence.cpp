@@ -23,7 +23,6 @@
 #include "PageInfo.h"
 #include "PageId.h"
 #include "ImageId.h"
-#include "Utils.h"
 #include "ScopedIncDec.h"
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -488,9 +487,7 @@ ThumbnailSequence::Impl::getLabelGroup(PageInfo const& page_info)
 			break;
 	}
 	
-	QPixmap pixmap;
-	Utils::loadAndCachePixmap(pixmap, pixmap_resource);
-	
+	QPixmap const pixmap(pixmap_resource);
 	int const label_pixmap_spacing = 5;
 	std::auto_ptr<QGraphicsPixmapItem> pixmap_item(
 		new NoSelectionItem<QGraphicsPixmapItem>()

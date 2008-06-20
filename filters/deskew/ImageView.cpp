@@ -19,7 +19,6 @@
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
 #include "imageproc/Constants.h"
-#include "Utils.h"
 #include <QRect>
 #include <QSizeF>
 #include <QPainter>
@@ -38,13 +37,12 @@ double const ImageView::m_maxRotationSin = sin(
 
 ImageView::ImageView(QImage const& image, ImageTransformation const& xform)
 :	ImageViewBase(image, xform),
+	m_imgRotationHandle(":/icons/aqua-sphere.png"),
 	m_mouseVertOffset(0.0),
 	m_state(DEFAULT_STATE)
 {
 	setMouseTracking(true);
 	setAttribute(Qt::WA_OpaquePaintEvent);
-	
-	Utils::loadAndCachePixmap(m_imgRotationHandle, ":/icons/aqua-sphere.png");
 }
 
 ImageView::~ImageView()

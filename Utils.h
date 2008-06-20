@@ -21,13 +21,9 @@
 
 #include <QString>
 
-class QPixmap;
-
 class Utils
 {
 public:
-	static bool loadAndCachePixmap(QPixmap& pixmap, QString const& file);
-	
 	template<typename M, typename K, typename V>
 	static void mapSetValue(M& map, K const& key, V const& val);
 };

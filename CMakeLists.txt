@@ -209,7 +209,7 @@ SET(
 	ProjectWriter.cpp ProjectWriter.h
 	XmlMarshaller.cpp XmlMarshaller.h
 	XmlUnmarshaller.cpp XmlUnmarshaller.h
-	Utils.cpp Utils.h
+	Utils.h
 	AutoManualMode.h
 	AbstractCommand.h
 	AbstractFilter.h

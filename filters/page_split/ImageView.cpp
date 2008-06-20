@@ -47,6 +47,7 @@ ImageView::ImageView(QImage const& image,
 	m_pContextMenu(new QMenu(this)),
 	m_pLeftHalfAction(0),
 	m_pRightHalfAction(0),
+	m_imgSkewingHandle(":/icons/aqua-sphere.png"),
 	m_pageLayout(layout),
 	m_state(DEFAULT_STATE)
 {
@@ -68,8 +69,6 @@ ImageView::ImageView(QImage const& image,
 		m_pLeftHalfAction, SIGNAL(toggled(bool)),
 		this, SLOT(leftHalfToggled(bool))
 	);
-	
-	Utils::loadAndCachePixmap(m_imgSkewingHandle, ":/icons/aqua-sphere.png");
 }
 
 ImageView::~ImageView()
