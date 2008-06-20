@@ -201,7 +201,6 @@ SET(
 	NewOpenProjectDialog.cpp NewOpenProjectDialog.h
 	ProjectFilesDialog.cpp ProjectFilesDialog.h
 	WorkerThread.cpp WorkerThread.h
-	WorkerThreadDispatcher.cpp WorkerThreadDispatcher.h
 	LoadFileTask.cpp LoadFileTask.h
 	FilterOptionsWidget.cpp FilterOptionsWidget.h
 	TaskStatus.h FilterUiInterface.h

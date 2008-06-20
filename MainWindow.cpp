@@ -99,9 +99,9 @@ MainWindow::MainWindow(
 	m_frozenPages(PageSequence::IMAGE_VIEW),
 	m_outDir(out_dir),
 	m_ptrThumbnailCache(createThumbnailCache()),
+	m_ptrWorkerThread(new WorkerThread),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
-	m_disableImageLoading(1), // Disabled until the worker thread is ready.
 	m_debug(false),
 	m_projectModified(true)
 {
@@ -117,9 +117,9 @@ MainWindow::MainWindow(
 	m_outDir(project_reader.outputDirectory()),
 	m_projectFile(project_file),
 	m_ptrThumbnailCache(createThumbnailCache()),
+	m_ptrWorkerThread(new WorkerThread),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
-	m_disableImageLoading(1), // Disabled until the worker thread is ready.
 	m_debug(false),
 	m_projectModified(false),
 	m_batchProcessing(false)
@@ -136,8 +136,7 @@ MainWindow::~MainWindow()
 		m_ptrCurTask->cancel();
 		m_ptrCurTask.reset();
 	}
-	m_pWorkerThread->exit();
-	m_pWorkerThread->wait();
+	m_ptrWorkerThread->shutdown();
 }
 
 std::auto_ptr<ThumbnailPixmapCache>
@@ -185,13 +184,12 @@ MainWindow::construct()
 		this, SLOT(filterSelectionChanged(QItemSelection const&))
 	);
 	
-	m_pWorkerThread = new WorkerThread(this);
-	connect(m_pWorkerThread, SIGNAL(ready()), this, SLOT(workerThreadReady()));
 	connect(
-		m_pWorkerThread,
-		SIGNAL(finished(BackgroundTaskPtr const&, FilterResultPtr const&)),
+		m_ptrWorkerThread.get(),
+		SIGNAL(taskResult(BackgroundTaskPtr const&, FilterResultPtr const&)),
 		this, SLOT(filterResult(BackgroundTaskPtr const&, FilterResultPtr const&))
 	);
+	
 	connect(
 		m_ptrThumbSequence.get(),
 		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
@@ -230,8 +228,7 @@ MainWindow::construct()
 	);
 	
 	updateWindowTitle();
-	
-	m_pWorkerThread->start();
+	loadImage();
 }
 
 void
@@ -360,13 +357,6 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	m_curFilter = selected.front().top();
 	
 	resetPageAndThumbSequences();
-	loadImage();
-}
-
-void
-MainWindow::workerThreadReady()
-{
-	--m_disableImageLoading;
 	loadImage();
 }
 
@@ -533,22 +523,12 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 void
 MainWindow::loadImage()
 {
-	if (m_disableImageLoading) {
-		return;
-	}
-	
 	loadImage(m_ptrPages->curPage(m_frozenPages.view()));
 }
 
 void
 MainWindow::loadImage(PageInfo const& page)
 {
-	static int counter = 0;
-	
-	if (m_disableImageLoading) {
-		return;
-	}
-	
 	removeWidgetsFromLayout(m_pImageFrameLayout, true);
 	m_ptrFilterListModel->getFilter(m_curFilter)->preUpdateUI(this, page.id());
 	
@@ -560,7 +540,7 @@ MainWindow::loadImage(PageInfo const& page)
 		page, m_curFilter, *m_ptrThumbnailCache, m_batchProcessing, m_debug
 	);
 	if (m_ptrCurTask) {
-		m_pWorkerThread->executeCommand(m_ptrCurTask);
+		m_ptrWorkerThread->performTask(m_ptrCurTask);
 	}
 }
 

@@ -67,8 +67,6 @@ private slots:
 	
 	void filterSelectionChanged(QItemSelection const& selected);
 	
-	void workerThreadReady();
-	
 	void reloadRequested();
 	
 	void startBatchProcessing();
@@ -123,7 +121,7 @@ private:
 	QString m_projectFile;
 	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence;
-	WorkerThread* m_pWorkerThread;
+	std::auto_ptr<WorkerThread> m_ptrWorkerThread;
 	QStackedLayout* m_pImageFrameLayout;
 	QStackedLayout* m_pOptionsFrameLayout;
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
@@ -131,7 +129,6 @@ private:
 	BackgroundTaskPtr m_ptrCurTask;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
-	int m_disableImageLoading;
 	bool m_debug;
 	bool m_projectModified;
 	bool m_batchProcessing;

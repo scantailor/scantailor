@@ -18,8 +18,6 @@
 
 #include "Application.h"
 #include "NewOpenProjectDialog.h"
-#include "BackgroundTask.h"
-#include "FilterResult.h"
 #include "PngMetadataLoader.h"
 #include "TiffMetadataLoader.h"
 #include "JpegMetadataLoader.h"
@@ -34,9 +32,6 @@ Q_IMPORT_PLUGIN(qjpeg)
 int main(int argc, char** argv)
 {
 	Application app(argc, argv);
-	
-	qRegisterMetaType<BackgroundTaskPtr>("BackgroundTaskPtr");
-	qRegisterMetaType<FilterResultPtr>("FilterResultPtr");
 	
 	PngMetadataLoader::registerMyself();
 	TiffMetadataLoader::registerMyself();

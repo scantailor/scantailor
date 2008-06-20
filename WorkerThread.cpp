@@ -17,35 +17,184 @@
 */
 
 #include "WorkerThread.h.moc"
-#include <WorkerThreadDispatcher.h>
+#include <QCoreApplication>
+#include <QThread>
+#include <QEvent>
+#include <assert.h>
+
+class WorkerThread::Dispatcher : public QObject
+{
+public:
+	Dispatcher(Impl& owner);
+protected:
+	virtual void customEvent(QEvent* event);
+private:
+	Impl& m_rOwner;
+};
+
+
+class WorkerThread::Impl : public QThread
+{
+public:
+	Impl(WorkerThread& owner);
+	
+	~Impl();
+	
+	void performTask(BackgroundTaskPtr const& task);
+protected:
+	virtual void run();
+	
+	virtual void customEvent(QEvent* event);
+private:
+	WorkerThread& m_rOwner;
+	Dispatcher m_dispatcher;
+	bool m_threadStarted;
+};
+
+
+class WorkerThread::PerformTaskEvent : public QEvent
+{
+public:
+	PerformTaskEvent(BackgroundTaskPtr const& task);
+	
+	BackgroundTaskPtr const& task() const { return m_ptrTask; }
+private:
+	BackgroundTaskPtr m_ptrTask;
+};
+
+
+class WorkerThread::TaskResultEvent : public QEvent
+{
+public:
+	TaskResultEvent(BackgroundTaskPtr const& task, FilterResultPtr const& result);
+	
+	BackgroundTaskPtr const& task() const { return m_ptrTask; }
+	
+	FilterResultPtr const& result() const { return m_ptrResult; }
+private:
+	BackgroundTaskPtr m_ptrTask;
+	FilterResultPtr m_ptrResult;
+};
+
+
+/*=============================== WorkerThread ==============================*/
 
 WorkerThread::WorkerThread(QObject* parent)
-:	QThread(parent)
+:	QObject(parent),
+	m_ptrImpl(new Impl(*this))
+{
+}
+
+WorkerThread::~WorkerThread()
 {
 }
 
 void
-WorkerThread::executeCommand(BackgroundTaskPtr const& task)
+WorkerThread::shutdown()
 {
-	emit executeCommandSignal(task);
+	m_ptrImpl.reset();
 }
 
 void
-WorkerThread::run()
+WorkerThread::performTask(BackgroundTaskPtr const& task)
 {
-	WorkerThreadDispatcher dispatcher;
-	connect(
-		&dispatcher, SIGNAL(finished(BackgroundTaskPtr const&, FilterResultPtr const&)),
-		this, SIGNAL(finished(BackgroundTaskPtr const&, FilterResultPtr const&)),
-		Qt::QueuedConnection
-	);
-	connect(
-		this, SIGNAL(executeCommandSignal(BackgroundTaskPtr const&)),
-		&dispatcher, SLOT(executeCommand(BackgroundTaskPtr const&)),
-		Qt::QueuedConnection
-	);
+	if (m_ptrImpl.get()) {
+		m_ptrImpl->performTask(task);
+	}
+}
+
+void
+WorkerThread::emitTaskResult(
+	BackgroundTaskPtr const& task, FilterResultPtr const& result)
+{
+	emit taskResult(task, result);
+}
+
+
+/*======================== WorkerThread::Dispatcher ========================*/
+
+WorkerThread::Dispatcher::Dispatcher(Impl& owner)
+:	m_rOwner(owner)
+{
+}
+
+void
+WorkerThread::Dispatcher::customEvent(QEvent* event)
+{
+	PerformTaskEvent* evt = dynamic_cast<PerformTaskEvent*>(event);
+	assert(evt);
+	BackgroundTaskPtr const& task = evt->task();
 	
-	emit ready();
+	if (task->isCancelled()) {
+		return;
+	}
 	
+	FilterResultPtr const result((*task)());
+	if (result) {
+		QCoreApplication::postEvent(
+			&m_rOwner, new TaskResultEvent(task, result)
+		);
+	}
+}
+
+
+/*========================== WorkerThread::Impl ============================*/
+
+WorkerThread::Impl::Impl(WorkerThread& owner)
+:	m_rOwner(owner),
+	m_dispatcher(*this),
+	m_threadStarted(false)
+{
+	m_dispatcher.moveToThread(this);
+}
+
+WorkerThread::Impl::~Impl()
+{
+	exit();
+	wait();
+}
+
+void
+WorkerThread::Impl::performTask(BackgroundTaskPtr const& task)
+{
+	QCoreApplication::postEvent(&m_dispatcher, new PerformTaskEvent(task));
+	if (!m_threadStarted) {
+		start();
+		m_threadStarted = true;
+	}
+}
+
+void
+WorkerThread::Impl::run()
+{
 	exec();
+}
+
+void
+WorkerThread::Impl::customEvent(QEvent* event)
+{
+	TaskResultEvent* evt = dynamic_cast<TaskResultEvent*>(event);
+	assert(evt);
+	m_rOwner.emitTaskResult(evt->task(), evt->result());
+}
+
+
+/*====================== WorkerThread::PerformTaskEvent ====================*/
+
+WorkerThread::PerformTaskEvent::PerformTaskEvent(
+	BackgroundTaskPtr const& task)
+:	QEvent(User),
+	m_ptrTask(task)
+{
+}
+
+
+/*====================== WorkerThread::TaskResultEvent =====================*/
+
+WorkerThread::TaskResultEvent::TaskResultEvent(
+	BackgroundTaskPtr const& task, FilterResultPtr const& result)
+:	QEvent(User),
+	m_ptrTask(task),
+	m_ptrResult(result)
+{
 }

@@ -19,25 +19,41 @@
 #ifndef WORKERTHREAD_H_
 #define WORKERTHREAD_H_
 
+#include "NonCopyable.h"
 #include "BackgroundTask.h"
 #include "FilterResult.h"
-#include <QThread>
+#include <QObject>
+#include <memory>
 
-class WorkerThread : public QThread
+class WorkerThread : public QObject
 {
 	Q_OBJECT
+	DECLARE_NON_COPYABLE(WorkerThread)
 public:
-	WorkerThread(QObject* parent);
+	WorkerThread(QObject* parent = 0);
+	
+	~WorkerThread();
+	
+	/**
+	 * \brief Waits for pending jobs to finish and stop the thread.
+	 *
+	 * The destructor also performs these tasks, so this method is only
+	 * useful to prematuraly stop task processing.
+	 */
+	void shutdown();
 public slots:
-	void executeCommand(BackgroundTaskPtr const& task);
+	void performTask(BackgroundTaskPtr const& task);
 signals:
-	void ready();
+	void taskResult(BackgroundTaskPtr const& task, FilterResultPtr const& result);
+private:
+	void emitTaskResult(BackgroundTaskPtr const& task, FilterResultPtr const& result);
 	
-	void executeCommandSignal(BackgroundTaskPtr const& task);
+	class Impl;
+	class Dispatcher;
+	class PerformTaskEvent;
+	class TaskResultEvent;
 	
-	void finished(BackgroundTaskPtr const& task, FilterResultPtr const& result);
-protected:
-	virtual void run();
+	std::auto_ptr<Impl> m_ptrImpl;
 };
 
 #endif
