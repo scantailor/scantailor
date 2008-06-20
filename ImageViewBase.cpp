@@ -23,6 +23,8 @@
 #include <QPainter>
 #include <QBrush>
 #include <QLineF>
+#include <QPolygonF>
+#include <QPalette>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <algorithm>
@@ -37,6 +39,7 @@ ImageViewBase::ImageViewBase(QImage const& image)
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_isDraggingInProgress(false)
 {
+	setAttribute(Qt::WA_OpaquePaintEvent);
 	updateWidgetTransform();
 }
 
@@ -62,6 +65,7 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	double const xscale = m_virtualToWidget.m11();
 	
 	QPainter painter(this);
+	painter.save();
 	
 	// Width of a source pixel in mm, as it's displayed on screen.
 	double const pixel_width = widthMM() * xscale / width();
@@ -73,8 +77,25 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	
 	PixmapRenderer::drawPixmap(painter, m_pixmap);
 	
-	painter.setWorldTransform(m_virtualToWidget);
+	painter.setRenderHints(QPainter::Antialiasing, true);
+	painter.setWorldMatrixEnabled(false);
 	
+	// Cover parts of the image that should not be visible with background.
+	// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
+	// to paint the whole widget, which we do here.
+	QPolygonF const image_area(
+		virtualToWidget().map(physToVirt().resultingCropArea())
+	);
+	QPolygonF const containing_area(
+		image_area.boundingRect().adjusted(-1.0, -1.0, 1.0, 1.0).united(rect())
+	);
+	painter.setPen(Qt::NoPen);
+	painter.setBrush(palette().brush(QPalette::Background));
+	painter.drawPolygon(containing_area.subtracted(image_area));
+	
+	painter.restore();
+	
+	painter.setWorldTransform(m_virtualToWidget);
 	paintOverImage(painter);
 }
 

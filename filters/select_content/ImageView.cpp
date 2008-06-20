@@ -24,7 +24,6 @@
 #include <QAction>
 #include <QString>
 #include <QPainter>
-#include <QPainterPath>
 #include <QBrush>
 #include <QPen>
 #include <QColor>
@@ -44,7 +43,6 @@ ImageView::ImageView(
 	m_resizingMask(0)
 {
 	setMouseTracking(true);
-	setAttribute(Qt::WA_OpaquePaintEvent);
 	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
 	QAction* remove = m_pInsideBoxMenu->addAction(tr("Remove Content Box"));
@@ -59,37 +57,22 @@ ImageView::~ImageView()
 void
 ImageView::paintOverImage(QPainter& painter)
 {
+	if (m_contentRect.isNull()) {
+		return;
+	}
+	
 	painter.setRenderHints(QPainter::Antialiasing, true);
-	painter.setWorldMatrixEnabled(false);
 	
-	// Cover parts of the image with background.
-	{
-		QRect widget_area(rect());
-		widget_area.adjust(-1, -1, 1, 1); // workaround Qt's clipping bug
-		QPainterPath rect_path;
-		rect_path.addRect(widget_area);
-		QPainterPath outline_path;
-		outline_path.addPolygon(
-			virtualToWidget().map(physToVirt().resultingCropArea())
-		);
-		QBrush const brush(palette().brush(QPalette::Background));
-		painter.fillPath(rect_path.subtracted(outline_path), brush);
-	}
+	// Draw the content bounding box.
+	QPen pen(QColor(0x00, 0x00, 0xff));
+	pen.setWidth(1);
+	pen.setCosmetic(true);
+	painter.setPen(pen);
 	
-	painter.setWorldMatrixEnabled(true);
+	painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
 	
-	if (!m_contentRect.isNull()) {
-		// Draw the content bounding box.
-		QPen pen(QColor(0x00, 0x00, 0xff));
-		pen.setWidth(1);
-		pen.setCosmetic(true);
-		painter.setPen(pen);
-		
-		painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
-		
-		// Adjust to compensate for pen width.
-		painter.drawRect(m_contentRect.adjusted(-0.5, -0.5, 0.5, 0.5));
-	}
+	// Adjust to compensate for pen width.
+	painter.drawRect(m_contentRect.adjusted(-0.5, -0.5, 0.5, 0.5));
 }
 
 void

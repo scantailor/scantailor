@@ -42,7 +42,6 @@ ImageView::ImageView(QImage const& image, ImageTransformation const& xform)
 	m_state(DEFAULT_STATE)
 {
 	setMouseTracking(true);
-	setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
 ImageView::~ImageView()
@@ -64,18 +63,7 @@ ImageView::manualDeskewAngleSetExternally(double const degrees)
 void
 ImageView::paintOverImage(QPainter& painter)
 {
-	painter.setRenderHints(QPainter::Antialiasing, true);
 	painter.setWorldMatrixEnabled(false);
-	
-	QRect widget_area(rect());
-	widget_area.adjust(-1, -1, 1, 1); // workaround Qt's clipping bug
-	QPainterPath rect_path;
-	rect_path.addRect(widget_area);
-	QPainterPath outline_path;
-	outline_path.addPolygon(virtualToWidget().map(physToVirt().resultingCropArea()));
-	QBrush const brush(palette().brush(QPalette::Background));
-	painter.fillPath(rect_path.subtracted(outline_path), brush);
-	
 	painter.setRenderHints(QPainter::Antialiasing, false);
 	
 	// Draw the horizontal and vertical line crossing at the center.
@@ -122,9 +110,6 @@ ImageView::paintOverImage(QPainter& painter)
 	handle_rect.moveCenter(handles.second);
 	m_rightRotationHandle = handle_rect;
 	painter.drawPixmap(handle_rect.topLeft(), m_imgRotationHandle);
-	
-	// Restore the world transform as it was.
-	painter.setWorldMatrixEnabled(true);
 }
 
 void
