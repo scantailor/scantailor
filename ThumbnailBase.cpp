@@ -126,11 +126,11 @@ ThumbnailBase::paint(QPainter* painter,
 		outline_path.addPolygon(m_postScaleXform.map(m_imageXform.resultingCropArea()));
 		QPainterPath const background_path(rect_path.subtracted(outline_path));
 		
+		QPalette const palette(QApplication::palette());
 		if (option->state & QStyle::State_Selected) {
-			QPalette const palette(QApplication::palette());
 			painter->fillPath(background_path, palette.highlight());
 		} else {
-			painter->fillPath(background_path, painter->background());
+			painter->fillPath(background_path, palette.window());
 		}
 		
 		painter->restore();
