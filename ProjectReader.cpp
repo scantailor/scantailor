@@ -235,19 +235,21 @@ ProjectReader::processPages(QDomElement const& pages_el)
 		QDomElement el(node.toElement());
 		
 		bool ok = true;
+		
 		int const id = el.attribute("id").toInt(&ok);
 		if (!ok) {
 			continue;
 		}
+		
 		int const image_id = el.attribute("imageId").toInt(&ok);
 		if (!ok) {
 			continue;
 		}
-		int const sub_page = el.attribute("subPage").toInt(&ok);
+		
+		PageId::SubPage const sub_page = PageId::subPageFromString(
+			el.attribute("subPage"), &ok
+		);
 		if (!ok) {
-			continue;
-		}
-		if (sub_page != 0 && sub_page != 1) {
 			continue;
 		}
 		
@@ -256,7 +258,7 @@ ProjectReader::processPages(QDomElement const& pages_el)
 			continue;
 		}
 		
-		PageId const page_id(image.id(), (PageId::SubPage)sub_page);
+		PageId const page_id(image.id(), sub_page);
 		m_pageMap.insert(PageMap::value_type(id, page_id));
 		
 		if (el.attribute("selected") == "selected") {

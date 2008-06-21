@@ -195,7 +195,7 @@ ProjectWriter::processPages(QDomDocument& doc) const
 		QDomElement page_el(doc.createElement("page"));
 		page_el.setAttribute("id", pageId(page_id));
 		page_el.setAttribute("imageId", imageId(page_id.imageId()));
-		page_el.setAttribute("subPage", page_id.subPage());
+		page_el.setAttribute("subPage", page_id.subPageAsString());
 		if (cur_page == i) {
 			page_el.setAttribute("selected", "selected");
 		}

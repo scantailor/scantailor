@@ -21,6 +21,8 @@
 
 #include "ImageId.h"
 
+class QString;
+
 /**
  * \brief A logical page on an image.
  *
@@ -43,6 +45,12 @@ public:
 	SubPage subPage() const { return m_subPage; }
 	
 	int subPageNum() const { return m_subPage == RIGHT_PAGE ? 1 : 0; }
+	
+	QString subPageAsString() const { return subPageToString(m_subPage); }
+	
+	static QString subPageToString(SubPage sub_page);
+	
+	static SubPage subPageFromString(QString const& string, bool* ok = 0);
 private:
 	ImageId m_imageId;
 	SubPage m_subPage;

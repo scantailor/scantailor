@@ -17,6 +17,8 @@
 */
 
 #include "PageId.h"
+#include <QString>
+#include <assert.h>
 
 PageId::PageId()
 :	m_subPage(SINGLE_PAGE)
@@ -27,6 +29,49 @@ PageId::PageId(ImageId const& image_id, SubPage subpage)
 :	m_imageId(image_id),
 	m_subPage(subpage)
 {
+}
+
+QString
+PageId::subPageToString(SubPage const sub_page)
+{
+	char const* str = 0;
+	
+	switch (sub_page) {
+		case SINGLE_PAGE:
+			str = "single";
+			break;
+		case LEFT_PAGE:
+			str = "left";
+			break;
+		case RIGHT_PAGE:
+			str = "right";
+			break;
+	}
+	
+	assert(str);
+	return QString::fromAscii(str);
+}
+
+PageId::SubPage
+PageId::subPageFromString(QString const& string, bool* ok)
+{
+	bool recognized = true;
+	SubPage sub_page = SINGLE_PAGE;
+	
+	if (string == "single") {
+		sub_page = SINGLE_PAGE;
+	} else if (string == "left") {
+		sub_page = LEFT_PAGE;
+	} else if (string == "right") {
+		sub_page = RIGHT_PAGE;
+	} else {
+		recognized = false;
+	}
+	
+	if (ok) {
+		*ok = recognized;
+	}
+	return sub_page;
 }
 
 bool operator==(PageId const& lhs, PageId const& rhs)
