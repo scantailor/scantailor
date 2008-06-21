@@ -54,7 +54,7 @@
 #include <QModelIndex>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QGraphicsItem>
+#include <QPalette>
 #include <QDebug>
 #include <algorithm>
 #include <stddef.h>
@@ -104,7 +104,8 @@ MainWindow::MainWindow(
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_debug(false),
-	m_projectModified(true)
+	m_projectModified(true),
+	m_batchProcessing(false)
 {
 	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
 	
@@ -161,6 +162,7 @@ MainWindow::construct()
 	
 	setupUi(this);
 	actionStopBatchProcessing->setEnabled(false);
+	thumbView->setBackgroundBrush(palette().brush(QPalette::Window));
 	
 	m_ptrThumbSequence->attachView(thumbView);
 	
