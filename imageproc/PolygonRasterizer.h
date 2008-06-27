@@ -25,6 +25,7 @@
 
 class QPolygonF;
 class QRectF;
+class QPointF;
 
 namespace imageproc
 {
@@ -50,6 +51,12 @@ private:
 	static void clipAndFill(
 		BinaryImage& image, BWColor color,
 		QPolygonF const& poly, Qt::FillRule fill_rule, bool invert);
+	
+	static QPolygonF roundPolygon(QPolygonF const& poly);
+	
+	static QPointF roundPoint(QPointF const& p);
+	
+	static double roundValue(double val);
 	
 	static void fillImpl(
 		BinaryImage& image, BWColor color,

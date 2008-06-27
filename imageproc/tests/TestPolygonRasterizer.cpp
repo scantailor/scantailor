@@ -18,8 +18,8 @@
 
 #include "PolygonRasterizer.h"
 #include "BinaryImage.h"
+#include "BinaryThreshold.h"
 #include "RasterOp.h"
-#include "Morphology.h"
 #include "BWColor.h"
 #include "Utils.h"
 #include <QPolygonF>
@@ -63,34 +63,25 @@ static QPolygonF createShape(QSize const& image_size, double radius)
 	return poly;
 }
 
-static bool fuzzyCompare(BinaryImage const& img1, BinaryImage const& img2)
+static bool fuzzyCompare(BinaryImage const& img, QImage const& control)
 {
-	// Get pixels that are different in img1 and img2.
-	BinaryImage diff(img1);
-	rasterOp<RopXor<RopSrc, RopDst> >(diff, img2);
+	// Make two binary images from the QImage with slightly different thresholds.
+	BinaryImage control1(control, BinaryThreshold(128 - 30));
+	BinaryImage control2(control, BinaryThreshold(128 + 30));
 	
-	// If there are at least 2 adjacent pixels that are different
-	// (either horizontally or vertically adjacent), then we consider
-	// the images to be significantly different.
+	// Take the difference with each control image.
+	rasterOp<RopXor<RopSrc, RopDst> >(control1, img);
+	rasterOp<RopXor<RopSrc, RopDst> >(control2, img);
 	
-	BinaryImage const hor_eroded(erodeBrick(diff, Brick(QSize(2, 1))));
-	if (hor_eroded.countBlackPixels() != 0) {
-		return false;
-	}
+	// Are there pixels different in both cases?
+	rasterOp<RopAnd<RopSrc, RopDst> >(control1, control2);
 	
-	BinaryImage const ver_eroded(erodeBrick(diff, Brick(QSize(1, 2))));
-	if (ver_eroded.countBlackPixels() != 0) {
-		return false;
-	}
-	
-	return true;
+	return control1.countBlackPixels() == 0;
 }
 
 static bool testFillShape(
-	QSize const& image_size, double radius, Qt::FillRule fill_rule)
+	QSize const& image_size, QPolygonF const& shape, Qt::FillRule fill_rule)
 {
-	QPolygonF const shape(createShape(image_size, radius));
-	
 	BinaryImage b_image(image_size, WHITE);
 	PolygonRasterizer::fill(b_image, BLACK, shape, fill_rule);
 	
@@ -105,14 +96,12 @@ static bool testFillShape(
 		painter.drawPolygon(shape, fill_rule);
 	}
 	
-	return fuzzyCompare(b_image, BinaryImage(q_image));
+	return fuzzyCompare(b_image, q_image);
 }
 
 static bool testFillExceptShape(
-	QSize const& image_size, double radius, Qt::FillRule fill_rule)
+	QSize const& image_size, QPolygonF const& shape, Qt::FillRule fill_rule)
 {
-	QPolygonF const shape(createShape(image_size, radius));
-	
 	BinaryImage b_image(image_size, WHITE);
 	PolygonRasterizer::fillExcept(b_image, BLACK, shape, fill_rule);
 	
@@ -127,24 +116,65 @@ static bool testFillExceptShape(
 		painter.drawPolygon(shape, fill_rule);
 	}
 	
-	return fuzzyCompare(b_image, BinaryImage(q_image));
+	return fuzzyCompare(b_image, q_image);
 }
 
-BOOST_AUTO_TEST_CASE(test)
+BOOST_AUTO_TEST_CASE(test_complex_shape)
 {
-	QSize image_size(500, 500);
+	QSize const image_size(500, 500);
 	
-	// Shapes of radius 230 fit inside the image, while those
-	// with radius 300 are clipped.
+	// This one fits the image.
+	QPolygonF const smaller_shape(createShape(image_size, 230));
 	
-	BOOST_CHECK(testFillShape(image_size, 230, Qt::OddEvenFill));
-	BOOST_CHECK(testFillShape(image_size, 230, Qt::WindingFill));
-	BOOST_CHECK(testFillShape(image_size, 300, Qt::OddEvenFill));
-	BOOST_CHECK(testFillShape(image_size, 300, Qt::WindingFill));
-	BOOST_CHECK(testFillExceptShape(image_size, 230, Qt::OddEvenFill));
-	BOOST_CHECK(testFillExceptShape(image_size, 230, Qt::WindingFill));
-	BOOST_CHECK(testFillExceptShape(image_size, 300, Qt::OddEvenFill));
-	BOOST_CHECK(testFillExceptShape(image_size, 300, Qt::WindingFill));
+	// This one doesn't fit the image and will be clipped.
+	QPolygonF const bigger_shape(createShape(image_size, 300));
+	
+	BOOST_CHECK(testFillShape(image_size, smaller_shape, Qt::OddEvenFill));
+	BOOST_CHECK(testFillShape(image_size, smaller_shape, Qt::WindingFill));
+	BOOST_CHECK(testFillShape(image_size, bigger_shape, Qt::OddEvenFill));
+	BOOST_CHECK(testFillShape(image_size, bigger_shape, Qt::WindingFill));
+	BOOST_CHECK(testFillExceptShape(image_size, smaller_shape, Qt::OddEvenFill));
+	BOOST_CHECK(testFillExceptShape(image_size, smaller_shape, Qt::WindingFill));
+	BOOST_CHECK(testFillExceptShape(image_size, bigger_shape, Qt::OddEvenFill));
+	BOOST_CHECK(testFillExceptShape(image_size, bigger_shape, Qt::WindingFill));
+}
+
+BOOST_AUTO_TEST_CASE(test_corner_cases)
+{
+	QSize const image_size(500, 500);
+	QPolygonF const shape(QRectF(QPointF(0, 0), image_size));
+	QPolygonF const shape2(QRectF(QPointF(-1, -1), image_size));
+	
+	// This one touches clip rectangle's corners.
+	QPolygonF shape3;
+	shape3.push_back(QPointF(-250.0, 250.0));
+	shape3.push_back(QPointF(250.0, -250.0));
+	shape3.push_back(QPointF(750.0, -250.0));
+	shape3.push_back(QPointF(-250.0, 750.0));
+	
+	BOOST_CHECK(testFillShape(image_size, shape, Qt::OddEvenFill));
+	BOOST_CHECK(testFillShape(image_size, shape, Qt::WindingFill));
+	BOOST_CHECK(testFillShape(image_size, shape2, Qt::OddEvenFill));
+	BOOST_CHECK(testFillShape(image_size, shape2, Qt::WindingFill));
+	BOOST_CHECK(testFillShape(image_size, shape3, Qt::OddEvenFill));
+	BOOST_CHECK(testFillShape(image_size, shape3, Qt::WindingFill));
+	BOOST_CHECK(testFillExceptShape(image_size, shape, Qt::OddEvenFill));
+	BOOST_CHECK(testFillExceptShape(image_size, shape, Qt::WindingFill));
+	BOOST_CHECK(testFillExceptShape(image_size, shape2, Qt::OddEvenFill));
+	BOOST_CHECK(testFillExceptShape(image_size, shape2, Qt::WindingFill));
+	BOOST_CHECK(testFillExceptShape(image_size, shape3, Qt::OddEvenFill));
+	BOOST_CHECK(testFillExceptShape(image_size, shape3, Qt::WindingFill));
+}
+
+BOOST_AUTO_TEST_CASE(regression_test_1)
+{
+	QPolygonF shape;
+	shape.push_back(QPointF(937.872, 24.559));
+	shape.push_back(QPointF(-1.23235e-14, -1.70697e-15));
+	shape.push_back(QPointF(2.73578e-11, 1275.44));
+	shape.push_back(QPointF(904.496, 1299.12));
+	shape.push_back(QPointF(937.872, 24.559));
+	BOOST_CHECK(testFillExceptShape(QSize(938, 1299), shape, Qt::WindingFill));
 }
 
 BOOST_AUTO_TEST_SUITE_END();

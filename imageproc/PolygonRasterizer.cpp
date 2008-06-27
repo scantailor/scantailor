@@ -28,6 +28,7 @@
 #include <iterator>
 #include <algorithm>
 #include <stdexcept>
+#include <math.h>
 #include <assert.h>
 
 namespace imageproc
@@ -148,7 +149,7 @@ PolygonRasterizer::clipAndFill(
 	
 	QPainterPath path2;
 	path2.setFillRule(fill_rule);
-	path2.addPolygon(poly);
+	path2.addPolygon(roundPolygon(poly));
 	path2.closeSubpath();
 	
 	QPolygonF const fill_poly(path1.intersected(path2).toFillPolygon());
@@ -161,6 +162,37 @@ PolygonRasterizer::clipAndFill(
 	}
 	
 	fillImpl(image, color, fill_poly, fill_rule, bounding_box, invert);
+}
+
+QPolygonF
+PolygonRasterizer::roundPolygon(QPolygonF const& poly)
+{
+	// Here we round the coordinates of polygon's vertices a bit.
+	// This way we workaround a problem in QPainterPath::intersected()
+	// that is demonstrated in one of the test cases.
+	
+	QPolygonF rounded;
+	rounded.reserve(poly.size());
+	
+	BOOST_FOREACH(QPointF const& p, poly) {
+		rounded.push_back(roundPoint(p));
+	}
+	
+	return rounded;
+}
+
+QPointF
+PolygonRasterizer::roundPoint(QPointF const& p)
+{
+	return QPointF(roundValue(p.x()), roundValue(p.y()));
+}
+
+double
+PolygonRasterizer::roundValue(double const val)
+{
+	double const multiplier = 1 << 20;
+	double const r_multiplier = 1.0 / multiplier;
+	return floor(val * multiplier + 0.5) * r_multiplier;
 }
 
 void
