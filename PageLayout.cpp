@@ -171,12 +171,14 @@ PageLayout::rightPage(QRectF const& rect) const
 QPolygonF
 PageLayout::pageOutline(QRectF const& rect, PageId::SubPage const page) const
 {
-	switch (page) {
-		case PageId::LEFT_PAGE:
-			return leftPage(rect);
-		case PageId::RIGHT_PAGE:
-			return rightPage(rect);
-		default:;
+	if (m_leftPageValid && m_rightPageValid) {
+		switch (page) {
+			case PageId::LEFT_PAGE:
+				return leftPage(rect);
+			case PageId::RIGHT_PAGE:
+				return rightPage(rect);
+			default:;
+		}
 	}
 	
 	if (m_leftPageValid) {
