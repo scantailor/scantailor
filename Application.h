@@ -20,6 +20,7 @@
 #define APPLICATION_H_
 
 #include <QApplication>
+#include <memory>
 
 class NewOpenProjectDialog;
 
@@ -29,10 +30,6 @@ class Application : public QApplication
 public:
 	Application(int& argc, char** argv);
 	
-	static Application* instance() {
-		return qobject_cast<Application*>(QCoreApplication::instance());
-	}
-	
 	void showNewOpenProjectDialog();
 private slots:
 	void newProject();
@@ -41,7 +38,7 @@ private slots:
 	
 	void projectContextDestroyed();
 private:
-	NewOpenProjectDialog* m_pNewOpenProjectDialog;
+	std::auto_ptr<NewOpenProjectDialog> m_ptrNewOpenProjectDialog;
 };
 
 #endif

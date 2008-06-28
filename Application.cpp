@@ -22,33 +22,32 @@
 #include "ProjectOpeningContext.h"
 
 Application::Application(int& argc, char** argv)
-:	QApplication(argc, argv),
-	m_pNewOpenProjectDialog(0)
+:	QApplication(argc, argv)
 {
 }
 
 void
 Application::showNewOpenProjectDialog()
 {
-	if (!m_pNewOpenProjectDialog) {
-		m_pNewOpenProjectDialog = new NewOpenProjectDialog;
+	if (!m_ptrNewOpenProjectDialog.get()) {
+		m_ptrNewOpenProjectDialog.reset(new NewOpenProjectDialog);
 		connect(
-			m_pNewOpenProjectDialog, SIGNAL(newProject()),
+			m_ptrNewOpenProjectDialog.get(), SIGNAL(newProject()),
 			this, SLOT(newProject())
 		);
 		connect(
-			m_pNewOpenProjectDialog, SIGNAL(openProject()),
+			m_ptrNewOpenProjectDialog.get(), SIGNAL(openProject()),
 			this, SLOT(openProject())
 		);
 	}
 	
-	m_pNewOpenProjectDialog->show();
+	m_ptrNewOpenProjectDialog->show();
 }
 
 void
 Application::newProject()
 {
-	m_pNewOpenProjectDialog->hide();
+	m_ptrNewOpenProjectDialog->hide();
 	ProjectCreationContext* context = new ProjectCreationContext();
 	connect(
 		context, SIGNAL(destroyed(QObject*)),
@@ -59,7 +58,7 @@ Application::newProject()
 void
 Application::openProject()
 {
-	m_pNewOpenProjectDialog->hide();
+	m_ptrNewOpenProjectDialog->hide();
 	ProjectOpeningContext* context = new ProjectOpeningContext();
 	connect(
 		context, SIGNAL(destroyed(QObject*)),
