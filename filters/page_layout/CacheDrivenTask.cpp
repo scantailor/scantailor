@@ -16,48 +16,42 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ThumbnailTask.h"
-#include "Thumbnail.h"
+#include "CacheDrivenTask.h"
 #include "IncompleteThumbnail.h"
 #include "ImageTransformation.h"
-#include "Settings.h"
 #include "PageInfo.h"
 #include "PageId.h"
+#include "filter_dc/AbstractFilterDataCollector.h"
+#include "filter_dc/ThumbnailCollector.h"
 
-namespace select_content
+namespace page_layout
 {
 
-ThumbnailTask::ThumbnailTask(IntrusivePtr<Settings> const& settings)
-:	m_ptrSettings(settings)
-{
-}
-
-ThumbnailTask::~ThumbnailTask()
+CacheDrivenTask::CacheDrivenTask()
 {
 }
 
-std::auto_ptr<QGraphicsItem>
-ThumbnailTask::process(
-	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-	PageInfo const& page_info, ImageTransformation const& xform)
+CacheDrivenTask::~CacheDrivenTask()
 {
-	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
-	Dependencies const deps(xform.resultingCropArea());
-	if (!params.get() || !params->dependencies().matches(deps)) {
-		return std::auto_ptr<QGraphicsItem>(
-			new IncompleteThumbnail(
-				thumbnail_cache, max_size,
-				page_info.imageId(), xform
+}
+
+void
+CacheDrivenTask::process(
+	PageInfo const& page_info, AbstractFilterDataCollector* collector,
+	ImageTransformation const& xform)
+{
+	
+	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+		thumb_col->processThumbnail(
+			std::auto_ptr<QGraphicsItem>(
+				new IncompleteThumbnail(
+					thumb_col->thumbnailCache(),
+					thumb_col->maxLogicalThumbSize(),
+					page_info.imageId(), xform
+				)
 			)
 		);
 	}
-	
-	return std::auto_ptr<QGraphicsItem>(
-		new Thumbnail(
-			thumbnail_cache, max_size, page_info.imageId(),
-			xform, params->contentRect()
-		)
-	);
 }
 
-} // namespace select_content
+} // namespace page_layout

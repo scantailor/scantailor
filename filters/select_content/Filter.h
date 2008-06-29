@@ -27,12 +27,18 @@
 class PageId;
 class QString;
 
+namespace page_layout
+{
+	class Task;
+	class CacheDrivenTask;
+}
+
 namespace select_content
 {
 
 class OptionsWidget;
 class Task;
-class ThumbnailTask;
+class CacheDrivenTask;
 class Settings;
 
 class Filter : public AbstractFilter
@@ -55,15 +61,20 @@ public:
 	virtual void loadSettings(
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
-	IntrusivePtr<Task> createTask(PageId const& page_id, bool batch, bool debug);
+	IntrusivePtr<Task> createTask(
+		PageId const& page_id,
+		IntrusivePtr<page_layout::Task> const& next_task,
+		bool batch, bool debug);
 	
-	IntrusivePtr<ThumbnailTask> createThumbnailTask();
+	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
+		IntrusivePtr<page_layout::CacheDrivenTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:
 	void writePageSettings(
 		QDomDocument& doc, QDomElement& filter_el,
 		PageId const& page_id, int numeric_id) const;
+	
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<OptionsWidget> m_ptrOptionsWidget;

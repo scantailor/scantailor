@@ -16,44 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_CONSTANTS_H_
-#define IMAGEPROC_CONSTANTS_H_
+#include "OptionsWidget.h.moc"
 
-namespace imageproc
+namespace page_layout
 {
 
-namespace constants
+OptionsWidget::OptionsWidget()
 {
+}
 
-extern double const PI;
+OptionsWidget::~OptionsWidget()
+{
+}
 
-/**
- * angle_rad = angle_deg * RED2RAD
- */
-extern double const DEG2RAD;
+void
+OptionsWidget::preUpdateUI(PageId const& page_id)
+{
+}
 
-/**
- * angle_deg = angle_rad * RAD2DEG
- */
-extern double const RAD2DEG;
+//void postUpdateUI(UiData const& ui_data);
 
-/**
- * mm = inch * INCH2MM
- */
-extern double const INCH2MM;
+} // namespace page_layout
 
-/**
- * dots_per_meter = dots_per_inch * DPI2DPM
- */
-extern double const DPI2DPM;
-
-/**
- * dots_per_inch = dots_per_meter * DPM2DPI
- */
-extern double const DPM2DPI;
-
-} // namespace constants
-
-} // namespace imageproc
-
-#endif

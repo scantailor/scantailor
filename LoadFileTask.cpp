@@ -110,6 +110,6 @@ LoadFileTask::ErrorResult::updateUI(FilterUiInterface* ui)
 {
 	QString err_msg(QObject::tr("The following file could not be loaded:\n"));
 	err_msg += m_filePath;
-	ui->setImageWidget(new ErrorWidget(err_msg));
-	ui->setOptionsWidget(new FilterOptionsWidget);
+	ui->setImageWidget(new ErrorWidget(err_msg), ui->TRANSFER_OWNERSHIP);
+	ui->setOptionsWidget(new FilterOptionsWidget, ui->TRANSFER_OWNERSHIP);
 }

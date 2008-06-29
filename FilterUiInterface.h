@@ -31,12 +31,16 @@ class QWidget;
 class FilterUiInterface
 {
 public:
+	enum Ownership { KEEP_OWNERSHIP, TRANSFER_OWNERSHIP };
+	
 	virtual ~FilterUiInterface() {}
 	
-	virtual void setOptionsWidget(FilterOptionsWidget* widget) = 0;
+	virtual void setOptionsWidget(
+		FilterOptionsWidget* widget, Ownership ownership) = 0;
 	
 	virtual void setImageWidget(
-		QWidget* widget, DebugImages const* debug_images = 0) = 0;
+		QWidget* widget, Ownership ownership,
+		DebugImages const* debug_images = 0) = 0;
 	
 	virtual void invalidateThumbnail(PageId const& page_id) = 0;
 };

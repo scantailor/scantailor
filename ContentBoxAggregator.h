@@ -16,44 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_CONSTANTS_H_
-#define IMAGEPROC_CONSTANTS_H_
+#ifndef CONTENTBOXAGGREGATOR_H_
+#define CONTENTBOXAGGREGATOR_H_
 
-namespace imageproc
+#include "IntrusivePtr.h"
+#include <QSizeF>
+
+class CompositeCacheDrivenTask;
+class PageSequence;
+class Dpi;
+class QLineF;
+
+class ContentBoxAggregator
 {
-
-namespace constants
-{
-
-extern double const PI;
-
-/**
- * angle_rad = angle_deg * RED2RAD
- */
-extern double const DEG2RAD;
-
-/**
- * angle_deg = angle_rad * RAD2DEG
- */
-extern double const RAD2DEG;
-
-/**
- * mm = inch * INCH2MM
- */
-extern double const INCH2MM;
-
-/**
- * dots_per_meter = dots_per_inch * DPI2DPM
- */
-extern double const DPI2DPM;
-
-/**
- * dots_per_inch = dots_per_meter * DPM2DPI
- */
-extern double const DPM2DPI;
-
-} // namespace constants
-
-} // namespace imageproc
+public:
+	ContentBoxAggregator(IntrusivePtr<CompositeCacheDrivenTask> const& task);
+	
+	~ContentBoxAggregator();
+	
+	void aggregate(PageSequence const& pages);
+	
+	QSizeF const& maxContentBoxMM() const { return m_maxContentBoxMM; }
+	
+	bool haveUndefinedItems() const { return m_haveUndefinedItems; }
+private:
+	class Collector;
+	
+	static double lineLength(QLineF const& line, Dpi const& dpi);
+	
+	IntrusivePtr<CompositeCacheDrivenTask> m_ptrTask;
+	QSizeF m_maxContentBoxMM;
+	bool m_haveUndefinedItems;
+};
 
 #endif

@@ -31,7 +31,7 @@ class QString;
 namespace select_content
 {
 	class Task;
-	class ThumbnailTask;
+	class CacheDrivenTask;
 }
 
 namespace deskew
@@ -39,7 +39,7 @@ namespace deskew
 
 class OptionsWidget;
 class Task;
-class ThumbnailTask;
+class CacheDrivenTask;
 class Settings;
 
 class Filter : public AbstractFilter
@@ -67,8 +67,8 @@ public:
 		IntrusivePtr<select_content::Task> const& next_task,
 		bool batch_processing, bool debug);
 	
-	IntrusivePtr<ThumbnailTask> createThumbnailTask(
-		IntrusivePtr<select_content::ThumbnailTask> const& next_task);
+	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
+		IntrusivePtr<select_content::CacheDrivenTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

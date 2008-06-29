@@ -30,6 +30,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QPointer>
+#include <QObjectCleanupHandler>
 #include <QSizeF>
 #include <memory>
 
@@ -42,6 +43,7 @@ class QStackedLayout;
 class WorkerThread;
 class ProjectReader;
 class DebugImages;
+class ContentBoxAggregator;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -89,10 +91,12 @@ private:
 	
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
 	
-	virtual void setOptionsWidget(FilterOptionsWidget* widget);
+	virtual void setOptionsWidget(
+		FilterOptionsWidget* widget, Ownership ownership);
 	
 	virtual void setImageWidget(
-		QWidget* widget, DebugImages const* debug_images = 0);
+		QWidget* widget, Ownership ownership,
+		DebugImages const* debug_images = 0);
 	
 	virtual void invalidateThumbnail(PageId const& page_id);
 	
@@ -103,6 +107,12 @@ private:
 	void resetPageAndThumbSequences();
 	
 	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
+	
+	void updateBatchProcessingActions();
+	
+	bool isBelowSelectContent() const;
+	
+	bool isBelowSelectContent(int filter_idx) const;
 	
 	void loadImage();
 	
@@ -125,8 +135,12 @@ private:
 	QStackedLayout* m_pImageFrameLayout;
 	QStackedLayout* m_pOptionsFrameLayout;
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
+	std::auto_ptr<QTabWidget> m_ptrTabbedDebugImages;
 	std::auto_ptr<FilterListModel> m_ptrFilterListModel;
+	std::auto_ptr<ContentBoxAggregator> m_ptrContentBoxAggregator;
 	BackgroundTaskPtr m_ptrCurTask;
+	QObjectCleanupHandler m_optionsWidgetCleanup;
+	QObjectCleanupHandler m_imageWidgetCleanup;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
 	bool m_debug;

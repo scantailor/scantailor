@@ -68,8 +68,12 @@ public:
 	 *
 	 * \see \ref transformations Transformations.
 	 */
-	
 	void preScaleToEqualizeDpi();
+	
+	/**
+	 * \brief Get the original image DPI.
+	 */
+	Dpi const& origDpi() const { return m_origDpi; }
 	
 	/**
 	 * \brief Set the 2nd step transformation, resetting the following ones.

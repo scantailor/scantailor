@@ -20,7 +20,6 @@
 #include "Settings.h"
 #include "Params.h"
 #include "ScopedIncDec.h"
-#include <QSize>
 
 namespace select_content
 {
@@ -36,14 +35,6 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 
 OptionsWidget::~OptionsWidget()
 {
-}
-
-QSize
-OptionsWidget::getMaxThumbSize()
-{
-	int const max_width = 150;
-	int const max_height = max_width * 3; // Doesn't really matter.
-	return QSize(max_width, max_height);
 }
 
 void

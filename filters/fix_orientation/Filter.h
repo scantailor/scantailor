@@ -34,7 +34,7 @@ class QDomElement;
 namespace page_split
 {
 	class Task;
-	class ThumbnailTask;
+	class CacheDrivenTask;
 }
 
 namespace fix_orientation
@@ -42,7 +42,7 @@ namespace fix_orientation
 
 class OptionsWidget;
 class Task;
-class ThumbnailTask;
+class CacheDrivenTask;
 class Settings;
 
 /**
@@ -74,8 +74,8 @@ public:
 		IntrusivePtr<page_split::Task> const& next_task,
 		bool batch_processing);
 	
-	IntrusivePtr<ThumbnailTask> createThumbnailTask(
-		IntrusivePtr<page_split::ThumbnailTask> const& next_task);
+	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
+		IntrusivePtr<page_split::CacheDrivenTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

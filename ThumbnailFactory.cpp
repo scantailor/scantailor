@@ -17,15 +17,36 @@
 */
 
 #include "ThumbnailFactory.h"
-#include "filters/fix_orientation/ThumbnailTask.h"
+#include "CompositeCacheDrivenTask.h"
+#include "filter_dc/ThumbnailCollector.h"
 #include <QGraphicsItem>
+#include <QSizeF>
+
+class ThumbnailFactory::Collector : public ThumbnailCollector
+{
+public:
+	Collector(ThumbnailPixmapCache& cache, QSizeF const& max_size);
+	
+	virtual void processThumbnail(std::auto_ptr<QGraphicsItem> thumbnail);
+	
+	virtual ThumbnailPixmapCache& thumbnailCache();
+	
+	virtual QSizeF maxLogicalThumbSize() const;
+	
+	std::auto_ptr<QGraphicsItem> retrieveThumbnail() { return m_ptrThumbnail; }
+private:
+	ThumbnailPixmapCache& m_rCache;
+	QSizeF m_maxSize;
+	std::auto_ptr<QGraphicsItem> m_ptrThumbnail;
+};
+
 
 ThumbnailFactory::ThumbnailFactory(
 	ThumbnailPixmapCache& pixmap_cache, QSizeF const& max_size,
-	IntrusivePtr<fix_orientation::ThumbnailTask> const& task_chain)
+	IntrusivePtr<CompositeCacheDrivenTask> const& task)
 :	m_rPixmapCache(pixmap_cache),
 	m_maxSize(max_size),
-	m_ptrTaskChain(task_chain)
+	m_ptrTask(task)
 {
 }
 
@@ -36,5 +57,36 @@ ThumbnailFactory::~ThumbnailFactory()
 std::auto_ptr<QGraphicsItem>
 ThumbnailFactory::get(PageInfo const& page_info)
 {
-	return m_ptrTaskChain->process(m_rPixmapCache, m_maxSize, page_info);
+	Collector collector(m_rPixmapCache, m_maxSize);
+	m_ptrTask->process(page_info, &collector);
+	return collector.retrieveThumbnail();
+}
+
+
+/*======================= ThumbnailFactory::Collector ======================*/
+
+ThumbnailFactory::Collector::Collector(
+	ThumbnailPixmapCache& cache, QSizeF const& max_size)
+:	m_rCache(cache),
+	m_maxSize(max_size)
+{
+}
+
+void
+ThumbnailFactory::Collector::processThumbnail(
+	std::auto_ptr<QGraphicsItem> thumbnail)
+{
+	m_ptrThumbnail = thumbnail;
+}
+
+ThumbnailPixmapCache&
+ThumbnailFactory::Collector::thumbnailCache()
+{
+	return m_rCache;
+}
+
+QSizeF
+ThumbnailFactory::Collector::maxLogicalThumbSize() const
+{
+	return m_maxSize;
 }

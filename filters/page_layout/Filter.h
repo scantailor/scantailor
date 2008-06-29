@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_FILTER_H_
-#define PAGE_SPLIT_FILTER_H_
+#ifndef PAGE_LAYOUT_FILTER_H_
+#define PAGE_LAYOUT_FILTER_H_
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
@@ -25,29 +25,21 @@
 #include "FilterResult.h"
 
 class PageId;
-class ImageId;
-class PageSequence;
+class QString;
 
-namespace deskew
-{
-	class Task;
-	class CacheDrivenTask;
-}
-
-namespace page_split
+namespace page_layout
 {
 
 class OptionsWidget;
 class Task;
 class CacheDrivenTask;
 class Settings;
-class Params;
 
 class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& page_sequence);
+	Filter();
 	
 	virtual ~Filter();
 	
@@ -58,29 +50,25 @@ public:
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
 	virtual QDomElement saveSettings(
-		ProjectWriter const& wirter, QDomDocument& doc) const;
+		ProjectWriter const& writer, QDomDocument& doc) const;
 	
 	virtual void loadSettings(
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
-	IntrusivePtr<Task> createTask(PageId const& page_id,
-		IntrusivePtr<deskew::Task> const& next_task,
-		bool batch_processing, bool debug);
+	IntrusivePtr<Task> createTask(PageId const& page_id, bool batch, bool debug);
 	
-	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
-		IntrusivePtr<deskew::CacheDrivenTask> const& next_task);
+	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask();
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:
-	void writeImageSettings(
+	void writePageSettings(
 		QDomDocument& doc, QDomElement& filter_el,
-		ImageId const& image_id, int const numeric_id) const;
+		PageId const& page_id, int numeric_id) const;
 	
-	IntrusivePtr<PageSequence> m_ptrPages;
-	IntrusivePtr<Settings> m_ptrSettings;
+	//IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<OptionsWidget> m_ptrOptionsWidget;
 };
 
-} // namespace page_split
+} // namespace page_layout
 
 #endif

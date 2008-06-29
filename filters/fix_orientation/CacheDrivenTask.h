@@ -16,37 +16,43 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef THUMBNAILFACTORY_H_
-#define THUMBNAILFACTORY_H_
+#ifndef FIX_ORIENTATION_CACHEDRIVENTASK_H_
+#define FIX_ORIENTATION_CACHEDRIVENTASK_H_
 
 #include "NonCopyable.h"
-#include "RefCountable.h"
+#include "CompositeCacheDrivenTask.h"
 #include "IntrusivePtr.h"
-#include <QSizeF>
-#include <memory>
 
 class PageInfo;
-class CompositeCacheDrivenTask;
-class ThumbnailPixmapCache;
-class QGraphicsItem;
+class AbstractFilterDataCollector;
 
-class ThumbnailFactory : public RefCountable
+namespace page_split
 {
-	DECLARE_NON_COPYABLE(ThumbnailFactory)
+	class CacheDrivenTask;
+}
+
+namespace fix_orientation
+{
+
+class Settings;
+
+class CacheDrivenTask : public CompositeCacheDrivenTask
+{
+	DECLARE_NON_COPYABLE(CacheDrivenTask)
 public:
-	ThumbnailFactory(
-		ThumbnailPixmapCache& pixmap_cache, QSizeF const& max_size,
-		IntrusivePtr<CompositeCacheDrivenTask> const& task);
+	CacheDrivenTask(
+		IntrusivePtr<Settings> const& settings,
+		IntrusivePtr<page_split::CacheDrivenTask> const& next_task);
 	
-	virtual ~ThumbnailFactory();
+	virtual ~CacheDrivenTask();
 	
-	std::auto_ptr<QGraphicsItem> get(PageInfo const& page_info);
+	virtual void process(
+		PageInfo const& page_info, AbstractFilterDataCollector* collector);
 private:
-	class Collector;
-	
-	ThumbnailPixmapCache& m_rPixmapCache;
-	QSizeF m_maxSize;
-	IntrusivePtr<CompositeCacheDrivenTask> m_ptrTask;
+	IntrusivePtr<page_split::CacheDrivenTask> m_ptrNextTask;
+	IntrusivePtr<Settings> m_ptrSettings;
 };
+
+} // namespace fix_orientation
 
 #endif

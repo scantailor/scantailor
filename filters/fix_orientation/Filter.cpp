@@ -21,6 +21,7 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "Task.h"
+#include "CacheDrivenTask.h"
 #include "OrthogonalRotation.h"
 #include "PageId.h"
 #include "ImageId.h"
@@ -29,7 +30,6 @@
 #include "ProjectWriter.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
-#include "ThumbnailTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -76,7 +76,7 @@ Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 			rotation, m_ptrPages->numImages(),
 			m_ptrPages->curImageIdx()
 		);
-		ui->setOptionsWidget(m_ptrOptionsWidget.get());
+		ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 	}
 }
 
@@ -150,12 +150,12 @@ Filter::createTask(
 	);
 }
 
-IntrusivePtr<ThumbnailTask>
-Filter::createThumbnailTask(
-	IntrusivePtr<page_split::ThumbnailTask> const& next_task)
+IntrusivePtr<CacheDrivenTask>
+Filter::createCacheDrivenTask(
+	IntrusivePtr<page_split::CacheDrivenTask> const& next_task)
 {
-	return IntrusivePtr<ThumbnailTask>(
-		new ThumbnailTask(m_ptrSettings, next_task)
+	return IntrusivePtr<CacheDrivenTask>(
+		new CacheDrivenTask(m_ptrSettings, next_task)
 	);
 }
 

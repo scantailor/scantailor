@@ -23,26 +23,33 @@
 #include "PageInfo.h"
 #include "ImageId.h"
 #include "FilterOptionsWidget.h"
+#include "ErrorWidget.h"
 #include "DebugImages.h"
 #include "BasicImageView.h"
 #include "ProjectWriter.h"
 #include "ProjectReader.h"
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailFactory.h"
+#include "ContentBoxAggregator.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
-#include "filters/fix_orientation/ThumbnailTask.h"
+#include "filters/fix_orientation/CacheDrivenTask.h"
 #include "filters/page_split/Filter.h"
 #include "filters/page_split/Task.h"
-#include "filters/page_split/ThumbnailTask.h"
+#include "filters/page_split/CacheDrivenTask.h"
 #include "filters/deskew/Filter.h"
 #include "filters/deskew/Task.h"
-#include "filters/deskew/ThumbnailTask.h"
+#include "filters/deskew/CacheDrivenTask.h"
 #include "filters/select_content/Filter.h"
 #include "filters/select_content/Task.h"
-#include "filters/select_content/ThumbnailTask.h"
+#include "filters/select_content/CacheDrivenTask.h"
+#include "filters/page_layout/Filter.h"
+#include "filters/page_layout/Task.h"
+#include "filters/page_layout/CacheDrivenTask.h"
 #include "LoadFileTask.h"
+#include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
+#include <boost/foreach.hpp>
 #include <QLineF>
 #include <QStackedLayout>
 #include <QLayoutItem>
@@ -79,8 +86,10 @@ public:
 		ThumbnailPixmapCache& thumbnail_cache,
 		bool batch_processing, bool debug);
 	
-	IntrusivePtr<fix_orientation::ThumbnailTask>
-	createCompositeThumbnailTask(int last_filter_idx);
+	IntrusivePtr<CompositeCacheDrivenTask>
+	createCompositeCacheDrivenTask(int last_filter_idx);
+	
+	int getSelectContentFilterIdx() const { return m_selectContentFilterIdx; }
 	
 	virtual int rowCount(QModelIndex const& parent) const;
 	
@@ -90,7 +99,9 @@ private:
 	IntrusivePtr<page_split::Filter> m_ptrPageSplitFilter;
 	IntrusivePtr<deskew::Filter> m_ptrDeskewFilter;
 	IntrusivePtr<select_content::Filter> m_ptrSelectContentFilter;
+	IntrusivePtr<page_layout::Filter> m_ptrPageLayoutFilter;
 	std::vector<FilterPtr> m_filters;
+	int m_selectContentFilterIdx;
 };
 
 
@@ -139,6 +150,9 @@ MainWindow::~MainWindow()
 		m_ptrCurTask.reset();
 	}
 	m_ptrWorkerThread->shutdown();
+	
+	removeWidgetsFromLayout(m_pImageFrameLayout, false);
+	removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
 }
 
 std::auto_ptr<ThumbnailPixmapCache>
@@ -161,10 +175,18 @@ MainWindow::construct()
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
+	m_ptrTabbedDebugImages.reset(new QTabWidget);
 	actionStopBatchProcessing->setEnabled(false);
 	thumbView->setBackgroundBrush(palette().brush(QPalette::Window));
 	
 	m_ptrThumbSequence->attachView(thumbView);
+	
+	IntrusivePtr<CompositeCacheDrivenTask> cb_task(
+		m_ptrFilterListModel->createCompositeCacheDrivenTask(
+			m_ptrFilterListModel->getSelectContentFilterIdx()
+		)
+	);
+	m_ptrContentBoxAggregator.reset(new ContentBoxAggregator(cb_task));
 	
 	addAction(actionNextPage);
 	addAction(actionPrevPage);
@@ -239,20 +261,35 @@ MainWindow::resetPageAndThumbSequences()
 {
 	updateFrozenPages();
 	
+	IntrusivePtr<CompositeCacheDrivenTask> const task(
+		m_ptrFilterListModel->createCompositeCacheDrivenTask(m_curFilter)
+	);
+	
 	m_ptrThumbSequence->setThumbnailFactory(
 		IntrusivePtr<ThumbnailFactory>(
 			new ThumbnailFactory(
-				*m_ptrThumbnailCache, m_maxLogicalThumbSize,
-				m_ptrFilterListModel->createCompositeThumbnailTask(m_curFilter)
+				*m_ptrThumbnailCache, m_maxLogicalThumbSize, task
 			)
 		)
 	);
+	
 	m_ptrThumbSequence->reset(m_frozenPages);
 }
 
 void
-MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
+MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const ownership)
 {
+	if (m_ptrOptionsWidget != widget) {
+		removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
+	}
+	
+	// Delete the old widget we were owning, if any.
+	m_optionsWidgetCleanup.clear();
+	
+	if (ownership == TRANSFER_OWNERSHIP) {
+		m_optionsWidgetCleanup.add(widget);
+	}
+	
 	if (m_ptrOptionsWidget == widget) {
 		return;
 	}
@@ -268,7 +305,6 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 		);
 	}
 	
-	m_pOptionsFrameLayout->removeWidget(m_ptrOptionsWidget);
 	m_pOptionsFrameLayout->addWidget(widget);
 	m_ptrOptionsWidget = widget;
 	
@@ -281,21 +317,29 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget)
 
 void
 MainWindow::setImageWidget(
-	QWidget* widget, DebugImages const* debug_images)
+	QWidget* widget, Ownership const ownership, DebugImages const* debug_images)
 {
-	removeWidgetsFromLayout(m_pImageFrameLayout, true);
+	removeWidgetsFromLayout(m_pImageFrameLayout, false);
+	
+	m_ptrTabbedDebugImages->clear();
+	
+	// Delete the old widget we were owning, if any.
+	m_imageWidgetCleanup.clear();
+	
+	if (ownership == TRANSFER_OWNERSHIP) {
+		m_imageWidgetCleanup.add(widget);
+	}
+	
 	if (!debug_images || debug_images->items().empty()) {
 		m_pImageFrameLayout->addWidget(widget);
 	} else {
-		QTabWidget* tab_widget = new QTabWidget;
-		tab_widget->addTab(widget, "Main");
-		std::list<DebugImages::Item> const& items = debug_images->items();
-		std::list<DebugImages::Item>::const_iterator it(items.begin());
-		std::list<DebugImages::Item>::const_iterator const end(items.end());
-		for (; it != end; ++it) {
-			tab_widget->addTab(new BasicImageView(it->image()), it->label());
+		m_ptrTabbedDebugImages->addTab(widget, "Main");
+		BOOST_FOREACH (DebugImages::Item const& item, debug_images->items()) {
+			m_ptrTabbedDebugImages->addTab(
+				new BasicImageView(item.image()), item.label()
+			);
 		}
-		m_pImageFrameLayout->addWidget(tab_widget);
+		m_pImageFrameLayout->addWidget(m_ptrTabbedDebugImages.get());
 	}
 }
 
@@ -357,9 +401,18 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 		return;
 	}
 	
+	bool const was_below_select_content = isBelowSelectContent(m_curFilter);
 	m_curFilter = selected.front().top();
+	bool const now_below_select_content = isBelowSelectContent(m_curFilter);
 	
 	resetPageAndThumbSequences();
+	
+	if (!was_below_select_content && now_below_select_content) {
+		m_ptrContentBoxAggregator->aggregate(*m_ptrPages);
+	}
+	
+	updateBatchProcessingActions();
+	
 	loadImage();
 }
 
@@ -380,8 +433,7 @@ MainWindow::startBatchProcessing()
 	}
 	
 	m_batchProcessing = true;
-	actionStartBatchProcessing->setEnabled(false);
-	actionStopBatchProcessing->setEnabled(true);
+	updateBatchProcessingActions();
 	
 	splitter->widget(0)->setVisible(false);
 	
@@ -408,8 +460,7 @@ MainWindow::stopBatchProcessing()
 	splitter->widget(0)->setVisible(true);
 	
 	m_batchProcessing = false;
-	actionStartBatchProcessing->setEnabled(true);
-	actionStopBatchProcessing->setEnabled(false);
+	updateBatchProcessingActions();
 	
 	loadImage();
 }
@@ -528,6 +579,27 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 }
 
 void
+MainWindow::updateBatchProcessingActions()
+{
+	bool const ok = !isBelowSelectContent()
+		|| !m_ptrContentBoxAggregator->haveUndefinedItems();
+	actionStartBatchProcessing->setEnabled(ok && !m_batchProcessing);
+	actionStopBatchProcessing->setEnabled(ok && m_batchProcessing);
+}
+
+bool
+MainWindow::isBelowSelectContent() const
+{
+	return isBelowSelectContent(m_curFilter);
+}
+
+bool
+MainWindow::isBelowSelectContent(int const filter_idx) const
+{
+	return (filter_idx > m_ptrFilterListModel->getSelectContentFilterIdx());
+}
+
+void
 MainWindow::loadImage()
 {
 	loadImage(m_ptrPages->curPage(m_frozenPages.view()));
@@ -537,6 +609,17 @@ void
 MainWindow::loadImage(PageInfo const& page)
 {
 	removeWidgetsFromLayout(m_pImageFrameLayout, true);
+	
+	if (isBelowSelectContent() && m_ptrContentBoxAggregator->haveUndefinedItems()) {
+		QString const err_text(
+			tr("You have to process all pages with the"
+			" \"Select Content\" filter first.")
+		);
+		setOptionsWidget(new FilterOptionsWidget, TRANSFER_OWNERSHIP);
+		setImageWidget(new ErrorWidget(err_text), TRANSFER_OWNERSHIP);
+		return;
+	}
+	
 	m_ptrFilterListModel->getFilter(m_curFilter)->preUpdateUI(this, page.id());
 	
 	if (m_ptrCurTask) {
@@ -598,12 +681,17 @@ MainWindow::FilterListModel::FilterListModel(
 :	m_ptrFixOrientationFilter(new fix_orientation::Filter(page_sequence)),
 	m_ptrPageSplitFilter(new page_split::Filter(page_sequence)),
 	m_ptrDeskewFilter(new deskew::Filter()),
-	m_ptrSelectContentFilter(new select_content::Filter())
+	m_ptrSelectContentFilter(new select_content::Filter()),
+	m_ptrPageLayoutFilter(new page_layout::Filter())
 {
 	m_filters.push_back(m_ptrFixOrientationFilter);
 	m_filters.push_back(m_ptrPageSplitFilter);
 	m_filters.push_back(m_ptrDeskewFilter);
+	
+	m_selectContentFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrSelectContentFilter);
+	
+	m_filters.push_back(m_ptrPageLayoutFilter);
 }
 
 MainWindow::FilterListModel::~FilterListModel()
@@ -639,11 +727,16 @@ MainWindow::FilterListModel::createCompositeTask(
 	IntrusivePtr<page_split::Task> page_split_task;
 	IntrusivePtr<deskew::Task> deskew_task;
 	IntrusivePtr<select_content::Task> select_content_task;
+	IntrusivePtr<page_layout::Task> page_layout_task;
 	
 	switch (last_filter_idx) {
+	case 4:
+		page_layout_task = m_ptrPageLayoutFilter->createTask(
+			page.id(), batch_processing, debug
+		);
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createTask(
-			page.id(), batch_processing, debug
+			page.id(), page_layout_task, batch_processing, debug
 		);
 	case 2:
 		deskew_task = m_ptrDeskewFilter->createTask(
@@ -665,23 +758,30 @@ MainWindow::FilterListModel::createCompositeTask(
 	);
 }
 
-IntrusivePtr<fix_orientation::ThumbnailTask>
-MainWindow::FilterListModel::createCompositeThumbnailTask(int const last_filter_idx)
+IntrusivePtr<CompositeCacheDrivenTask>
+MainWindow::FilterListModel::createCompositeCacheDrivenTask(int const last_filter_idx)
 {
-	IntrusivePtr<fix_orientation::ThumbnailTask> fix_orientation_task;
-	IntrusivePtr<page_split::ThumbnailTask> page_split_task;
-	IntrusivePtr<deskew::ThumbnailTask> deskew_task;
-	IntrusivePtr<select_content::ThumbnailTask> select_content_task;
+	IntrusivePtr<fix_orientation::CacheDrivenTask> fix_orientation_task;
+	IntrusivePtr<page_split::CacheDrivenTask> page_split_task;
+	IntrusivePtr<deskew::CacheDrivenTask> deskew_task;
+	IntrusivePtr<select_content::CacheDrivenTask> select_content_task;
+	IntrusivePtr<page_layout::CacheDrivenTask> page_layout_task;
 	
 	switch (last_filter_idx) {
+	case 4:
+		page_layout_task = m_ptrPageLayoutFilter->createCacheDrivenTask();
 	case 3:
-		select_content_task = m_ptrSelectContentFilter->createThumbnailTask();
+		select_content_task = m_ptrSelectContentFilter->createCacheDrivenTask(
+			page_layout_task
+		);
 	case 2:
-		deskew_task = m_ptrDeskewFilter->createThumbnailTask(select_content_task);
+		deskew_task = m_ptrDeskewFilter->createCacheDrivenTask(select_content_task);
 	case 1:
-		page_split_task = m_ptrPageSplitFilter->createThumbnailTask(deskew_task);
+		page_split_task = m_ptrPageSplitFilter->createCacheDrivenTask(deskew_task);
 	case 0:
-		fix_orientation_task = m_ptrFixOrientationFilter->createThumbnailTask(page_split_task);
+		fix_orientation_task = m_ptrFixOrientationFilter->createCacheDrivenTask(
+			page_split_task
+		);
 	}
 	assert(fix_orientation_task);
 	

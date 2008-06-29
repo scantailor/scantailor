@@ -16,47 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_ORIENTATION_THUMBNAILTASK_H_
-#define FIX_ORIENTATION_THUMBNAILTASK_H_
+#ifndef THUMBNAILCOLLECTOR_H_
+#define THUMBNAILCOLLECTOR_H_
 
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
+#include "AbstractFilterDataCollector.h"
 #include <memory>
 
-class QSizeF;
-class PageInfo;
 class ThumbnailPixmapCache;
 class QGraphicsItem;
+class QSizeF;
 
-namespace page_split
+class ThumbnailCollector : public AbstractFilterDataCollector
 {
-	class ThumbnailTask;
-}
-
-namespace fix_orientation
-{
-
-class Settings;
-
-class ThumbnailTask : public RefCountable
-{
-	DECLARE_NON_COPYABLE(ThumbnailTask)
 public:
-	ThumbnailTask(
-		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<page_split::ThumbnailTask> const& next_task);
+	virtual void processThumbnail(std::auto_ptr<QGraphicsItem>) = 0;
 	
-	virtual ~ThumbnailTask();
+	virtual ThumbnailPixmapCache& thumbnailCache() = 0;
 	
-	std::auto_ptr<QGraphicsItem> process(
-		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		PageInfo const& page_info);
-private:
-	IntrusivePtr<page_split::ThumbnailTask> m_ptrNextTask;
-	IntrusivePtr<Settings> m_ptrSettings;
+	virtual QSizeF maxLogicalThumbSize() const = 0;
 };
-
-} // namespace fix_orientation
 
 #endif

@@ -16,44 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_CONSTANTS_H_
-#define IMAGEPROC_CONSTANTS_H_
+#ifndef CONTENTBOXCOLLECTOR_H_
+#define CONTENTBOXCOLLECTOR_H_
 
-namespace imageproc
+#include "AbstractFilterDataCollector.h"
+
+class ImageTransformation;
+class QRectF;
+
+class ContentBoxCollector : public AbstractFilterDataCollector
 {
-
-namespace constants
-{
-
-extern double const PI;
-
-/**
- * angle_rad = angle_deg * RED2RAD
- */
-extern double const DEG2RAD;
-
-/**
- * angle_deg = angle_rad * RAD2DEG
- */
-extern double const RAD2DEG;
-
-/**
- * mm = inch * INCH2MM
- */
-extern double const INCH2MM;
-
-/**
- * dots_per_meter = dots_per_inch * DPI2DPM
- */
-extern double const DPI2DPM;
-
-/**
- * dots_per_inch = dots_per_meter * DPM2DPI
- */
-extern double const DPM2DPI;
-
-} // namespace constants
-
-} // namespace imageproc
+public:
+	virtual void processContentBox(
+		ImageTransformation const& xform, QRectF const& content_box) = 0;
+};
 
 #endif

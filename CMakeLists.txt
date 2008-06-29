@@ -154,6 +154,7 @@ ADD_SUBDIRECTORY(filters/fix_orientation)
 ADD_SUBDIRECTORY(filters/page_split)
 ADD_SUBDIRECTORY(filters/deskew)
 ADD_SUBDIRECTORY(filters/select_content)
+ADD_SUBDIRECTORY(filters/page_layout)
 
 SET(resource_sources)
 QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
@@ -183,6 +184,7 @@ SET(
 	ThumbnailSequence.cpp ThumbnailSequence.h
 	ThumbnailFactory.cpp ThumbnailFactory.h
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
+	ContentBoxAggregator.cpp ContentBoxAggregator.h
 	DebugImages.cpp DebugImages.h
 	ImageId.cpp ImageId.h
 	PageId.cpp PageId.h
@@ -213,7 +215,11 @@ SET(
 	AbstractCommand.h
 	AbstractFilter.h
 	FilterResult.h
+	CompositeCacheDrivenTask.h
 	boost_signals.h
+	filter_dc/AbstractFilterDataCollector.h
+	filter_dc/ThumbnailCollector.h
+	filter_dc/ContentBoxCollector.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
@@ -221,7 +227,8 @@ QT4_AUTOMOC(${sources})
 ADD_EXECUTABLE(scantailor WIN32 ${sources} ${ui_sources} ${resource_sources})
 TARGET_LINK_LIBRARIES(
 	scantailor
-	fix_orientation page_split deskew select_content imageproc boost_signals
+	fix_orientation page_split deskew select_content page_layout
+	imageproc boost_signals
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 

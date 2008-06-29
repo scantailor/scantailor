@@ -38,5 +38,6 @@ int main(int argc, char** argv)
 	JpegMetadataLoader::registerMyself();
 	
 	app.showNewOpenProjectDialog();
+	
 	return app.exec();
 }

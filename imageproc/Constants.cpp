@@ -30,6 +30,8 @@ double const DEG2RAD = PI / 180.0;
 
 double const RAD2DEG = 180.0 / PI;
 
+double const INCH2MM = 25.4;
+
 double const DPM2DPI = 0.0254;
 
 double const DPI2DPM = 1.0 / DPM2DPI;

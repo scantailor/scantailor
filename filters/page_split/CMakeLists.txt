@@ -21,7 +21,7 @@ SET(
 	SplitModeDialog.cpp SplitModeDialog.h
 	Settings.cpp Settings.h
 	Task.cpp Task.h
-	ThumbnailTask.cpp ThumbnailTask.h
+	CacheDrivenTask.cpp CacheDrivenTask.h
 	Rule.cpp Rule.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

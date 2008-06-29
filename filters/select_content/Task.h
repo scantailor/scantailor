@@ -28,6 +28,11 @@ class TaskStatus;
 class FilterData;
 class DebugImages;
 
+namespace page_layout
+{
+	class Task;
+}
+
 namespace select_content
 {
 
@@ -39,6 +44,7 @@ class Task : public RefCountable
 	DECLARE_NON_COPYABLE(Task)
 public:
 	Task(IntrusivePtr<Filter> const& filter,
+		IntrusivePtr<page_layout::Task> const& next_task,
 		IntrusivePtr<Settings> const& settings,
 		PageId const& page_id, bool batch, bool debug);
 	
@@ -49,6 +55,7 @@ private:
 	class UiUpdater;
 	
 	IntrusivePtr<Filter> m_ptrFilter;
+	IntrusivePtr<page_layout::Task> m_ptrNextTask;
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;

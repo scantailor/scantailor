@@ -20,11 +20,12 @@
 #include "FilterUiInterface.h"
 #include "OptionsWidget.h"
 #include "Task.h"
-#include "CacheDrivenTask.h"
-#include "Settings.h"
+#include "PageId.h"
+//#include "Settings.h"
+//#include "Params.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
-#include "PageId.h"
+#include "CacheDrivenTask.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -32,13 +33,12 @@
 #include <QDomDocument>
 #include <QDomElement>
 
-namespace deskew
+namespace page_layout
 {
 
 Filter::Filter()
-:	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
+	m_ptrOptionsWidget.reset(new OptionsWidget);
 }
 
 Filter::~Filter()
@@ -48,7 +48,7 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return QObject::tr("Deskew");
+	return QObject::tr("Page Layout");
 }
 
 PageSequence::View
@@ -58,18 +58,20 @@ Filter::getView() const
 }
 
 void
-Filter::preUpdateUI(FilterUiInterface* const ui, PageId const& page_id)
+Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
 	m_ptrOptionsWidget->preUpdateUI(page_id);
 	ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 }
 
 QDomElement
-Filter::saveSettings(ProjectWriter const& writer, QDomDocument& doc) const
+Filter::saveSettings(
+	ProjectWriter const& writer, QDomDocument& doc) const
 {
+	
 	using namespace boost::lambda;
 	
-	QDomElement filter_el(doc.createElement("deskew"));
+	QDomElement filter_el(doc.createElement("page-layout"));
 	writer.enumPages(
 		bind(
 			&Filter::writePageSettings,
@@ -81,11 +83,33 @@ Filter::saveSettings(ProjectWriter const& writer, QDomDocument& doc) const
 }
 
 void
+Filter::writePageSettings(
+	QDomDocument& doc, QDomElement& filter_el,
+	PageId const& page_id, int numeric_id) const
+{
+#if 0
+	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(page_id));
+	if (!params.get()) {
+		return;
+	}
+	
+	QDomElement page_el(doc.createElement("page"));
+	page_el.setAttribute("id", numeric_id);
+	page_el.appendChild(params->toXml(doc, "params"));
+	
+	filter_el.appendChild(page_el);
+#endif
+}
+
+void
 Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 {
+#if 0
 	m_ptrSettings->clear();
 	
-	QDomElement const filter_el(filters_el.namedItem("deskew").toElement());
+	QDomElement const filter_el(
+		filters_el.namedItem("select-content").toElement()
+	);
 	
 	QString const page_tag_name("page");
 	QDomNode node(filter_el.firstChild());
@@ -117,46 +141,24 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 		Params const params(params_el);
 		m_ptrSettings->setPageParams(page_id, params);
 	}
-}
-
-void
-Filter::writePageSettings(
-	QDomDocument& doc, QDomElement& filter_el,
-	PageId const& page_id, int const numeric_id) const
-{
-	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(page_id));
-	if (!params.get()) {
-		return;
-	}
-	
-	QDomElement page_el(doc.createElement("page"));
-	page_el.setAttribute("id", numeric_id);
-	page_el.appendChild(params->toXml(doc, "params"));
-	
-	filter_el.appendChild(page_el);
+#endif
 }
 
 IntrusivePtr<Task>
-Filter::createTask(
-	PageId const& page_id,
-	IntrusivePtr<select_content::Task> const& next_task,
-	bool const batch_processing, bool const debug)
+Filter::createTask(PageId const& page_id, bool batch, bool debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
-			IntrusivePtr<Filter>(this), m_ptrSettings,
-			next_task, page_id, batch_processing, debug
+			IntrusivePtr<Filter>(this),
+			page_id, batch, debug
 		)
 	);
 }
 
 IntrusivePtr<CacheDrivenTask>
-Filter::createCacheDrivenTask(
-	IntrusivePtr<select_content::CacheDrivenTask> const& next_task)
+Filter::createCacheDrivenTask()
 {
-	return IntrusivePtr<CacheDrivenTask>(
-		new CacheDrivenTask(m_ptrSettings, next_task)
-	);
+	return IntrusivePtr<CacheDrivenTask>(new CacheDrivenTask);
 }
 
-} // namespace deskew
+} // namespace page_layout

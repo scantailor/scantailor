@@ -16,40 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECT_CONTENT_THUMBNAILTASK_H_
-#define SELECT_CONTENT_THUMBNAILTASK_H_
+#ifndef ABSTRACTFILTERDATACOLLECTOR_H_
+#define ABSTRACTFILTERDATACOLLECTOR_H_
 
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
-#include <memory>
-
-class QSizeF;
-class PageInfo;
-class ImageTransformation;
-class ThumbnailPixmapCache;
-class QGraphicsItem;
-
-namespace select_content
+class AbstractFilterDataCollector
 {
-
-class Settings;
-
-class ThumbnailTask : public RefCountable
-{
-	DECLARE_NON_COPYABLE(ThumbnailTask)
 public:
-	ThumbnailTask(IntrusivePtr<Settings> const& settings);
-	
-	virtual ~ThumbnailTask();
-	
-	std::auto_ptr<QGraphicsItem> process(
-		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		PageInfo const& page_info, ImageTransformation const& xform);
-private:
-	IntrusivePtr<Settings> m_ptrSettings;
+	virtual ~AbstractFilterDataCollector() {}
 };
-
-} // namespace select_content
 
 #endif

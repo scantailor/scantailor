@@ -16,35 +16,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ThumbnailTask.h"
+#include "CacheDrivenTask.h"
 #include "Thumbnail.h"
 #include "IncompleteThumbnail.h"
 #include "Settings.h"
 #include "PageInfo.h"
 #include "PageLayout.h"
 #include "ImageTransformation.h"
-#include "filters/select_content/ThumbnailTask.h"
+#include "filter_dc/AbstractFilterDataCollector.h"
+#include "filter_dc/ThumbnailCollector.h"
+#include "filters/select_content/CacheDrivenTask.h"
 
 namespace deskew
 {
 
-ThumbnailTask::ThumbnailTask(
+CacheDrivenTask::CacheDrivenTask(
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<select_content::ThumbnailTask> const& next_task)
+	IntrusivePtr<select_content::CacheDrivenTask> const& next_task)
 :	m_ptrNextTask(next_task),
 	m_ptrSettings(settings)
 {
 }
 
-ThumbnailTask::~ThumbnailTask()
+CacheDrivenTask::~CacheDrivenTask()
 {
 }
 
-std::auto_ptr<QGraphicsItem>
-ThumbnailTask::process(
-	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-	PageInfo const& page_info, ImageTransformation const& xform,
-	PageLayout const& layout)
+void
+CacheDrivenTask::process(
+	PageInfo const& page_info, AbstractFilterDataCollector* collector,
+	ImageTransformation const& xform, PageLayout const& layout)
 {
 	QRectF const rect(xform.rectBeforeCropping());
 	QPolygonF const page_outline(
@@ -56,25 +57,37 @@ ThumbnailTask::process(
 	Dependencies const deps(page_outline, xform.preRotation());
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	if (!params.get() || !deps.matches(params->dependencies())) {
-		return std::auto_ptr<QGraphicsItem>(
-			new IncompleteThumbnail(
-				thumbnail_cache, max_size,
-				page_info.imageId(), new_xform
-			)
-		);
+		
+		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+			thumb_col->processThumbnail(
+				std::auto_ptr<QGraphicsItem>(
+					new IncompleteThumbnail(
+						thumb_col->thumbnailCache(),
+						thumb_col->maxLogicalThumbSize(),
+						page_info.imageId(), new_xform
+					)
+				)
+			);
+		}
+		
+		return;
 	}
 	
 	new_xform.setPostRotation(params->deskewAngle());
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(
-			thumbnail_cache, max_size, page_info, new_xform
-		);
-	} else {
-		return std::auto_ptr<QGraphicsItem>(
-			new Thumbnail(
-				thumbnail_cache, max_size,
-				page_info.imageId(), new_xform
+		m_ptrNextTask->process(page_info, collector, new_xform);
+		return;
+	}
+	
+	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+		thumb_col->processThumbnail(
+			std::auto_ptr<QGraphicsItem>(
+				new Thumbnail(
+					thumb_col->thumbnailCache(),
+					thumb_col->maxLogicalThumbSize(),
+					page_info.imageId(), new_xform
+				)
 			)
 		);
 	}

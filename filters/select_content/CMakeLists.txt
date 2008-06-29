@@ -14,11 +14,11 @@ SET(
 	OptionsWidget.cpp OptionsWidget.h
 	ContentBoxFinder.cpp ContentBoxFinder.h
 	Task.cpp Task.h
+	CacheDrivenTask.cpp CacheDrivenTask.h
 	Dependencies.cpp Dependencies.h
 	Params.cpp Params.h
 	Settings.cpp Settings.h
 	Thumbnail.cpp Thumbnail.h
-	ThumbnailTask.cpp ThumbnailTask.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

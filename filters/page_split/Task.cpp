@@ -184,7 +184,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
 	opt_widget->postUpdateUI(m_uiData);
-	ui->setOptionsWidget(opt_widget);
+	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
 	ui->invalidateThumbnail(PageId(m_imageId));
 	
@@ -193,7 +193,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	}
 	
 	ImageView* view = new ImageView(m_image, m_xform, m_uiData.pageLayout());
-	ui->setImageWidget(view, m_ptrDbg.get());
+	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	
 	QObject::connect(
 		view, SIGNAL(manualPageLayoutSet(PageLayout const&)),

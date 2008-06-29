@@ -16,48 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_THUMBNAILTASK_H_
-#define PAGE_SPLIT_THUMBNAILTASK_H_
+#ifndef COMPOSITECACHEDRIVENTASK_H_
+#define COMPOSITECACHEDRIVENTASK_H_
 
-#include "NonCopyable.h"
 #include "RefCountable.h"
-#include "IntrusivePtr.h"
-#include <memory>
 
-class QSizeF;
 class PageInfo;
-class ImageTransformation;
-class ThumbnailPixmapCache;
-class QGraphicsItem;
+class AbstractFilterDataCollector;
 
-namespace deskew
+class CompositeCacheDrivenTask : public RefCountable
 {
-	class ThumbnailTask;
-}
-
-namespace page_split
-{
-
-class Settings;
-
-class ThumbnailTask : public RefCountable
-{
-	DECLARE_NON_COPYABLE(ThumbnailTask)
 public:
-	ThumbnailTask(
-		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<deskew::ThumbnailTask> const& next_task);
+	virtual ~CompositeCacheDrivenTask() {}
 	
-	virtual ~ThumbnailTask();
-	
-	std::auto_ptr<QGraphicsItem> process(
-		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		PageInfo const& page_info, ImageTransformation const& xform);
-private:
-	IntrusivePtr<deskew::ThumbnailTask> m_ptrNextTask;
-	IntrusivePtr<Settings> m_ptrSettings;
+	virtual void process(
+		PageInfo const& page_info, AbstractFilterDataCollector* collector) = 0;
 };
-
-} // namespace page_split
 
 #endif

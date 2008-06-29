@@ -31,6 +31,7 @@
 #include "ImageView.h"
 #include "OrthogonalRotation.h"
 #include "ImageTransformation.h"
+#include "filters/page_layout/Task.h"
 #include <QObject>
 #include <QDebug>
 
@@ -62,9 +63,11 @@ private:
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<page_layout::Task> const& next_task,
 	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id, bool const batch, bool const debug)
 :	m_ptrFilter(filter),
+	m_ptrNextTask(next_task),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_batchProcessing(batch)
@@ -110,12 +113,16 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	status.throwIfCancelled();
 	
-	return FilterResultPtr(
-		new UiUpdater(
-			m_ptrFilter, m_pageId, m_ptrDbg, data.image(),
-			data.xform(), ui_data, m_batchProcessing
-		)
-	);
+	if (m_ptrNextTask) {
+		return m_ptrNextTask->process(status, FilterData(data, data.xform()));
+	} else {
+		return FilterResultPtr(
+			new UiUpdater(
+				m_ptrFilter, m_pageId, m_ptrDbg, data.image(),
+				data.xform(), ui_data, m_batchProcessing
+			)
+		);
+	}
 }
 
 
@@ -143,7 +150,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
 	opt_widget->postUpdateUI(m_uiData);
-	ui->setOptionsWidget(opt_widget);
+	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
 	ui->invalidateThumbnail(m_pageId);
 	
@@ -152,7 +159,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	}
 	
 	ImageView* view = new ImageView(m_image, m_xform, m_uiData.contentRect());
-	ui->setImageWidget(view, m_ptrDbg.get());
+	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	
 	QObject::connect(
 		view, SIGNAL(manualContentRectSet(QRectF const&)),
