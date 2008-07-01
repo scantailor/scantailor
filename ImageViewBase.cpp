@@ -83,7 +83,11 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	// Cover parts of the image that should not be visible with background.
 	// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
 	// to paint the whole widget, which we do here.
+	
 	QPolygonF const image_area(
+		virtualToWidget().map(physToVirt().transform().map(physToVirt().origRect()))
+	);
+	QPolygonF const crop_area(
 		virtualToWidget().map(physToVirt().resultingCropArea())
 	);
 	QPolygonF const containing_area(
@@ -91,7 +95,7 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	);
 	painter.setPen(Qt::NoPen);
 	painter.setBrush(palette().brush(QPalette::Background));
-	painter.drawPolygon(containing_area.subtracted(image_area));
+	painter.drawPolygon(containing_area.subtracted(image_area.intersected(crop_area)));
 	
 	painter.restore();
 	

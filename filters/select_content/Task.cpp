@@ -114,7 +114,10 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	status.throwIfCancelled();
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(status, FilterData(data, data.xform()));
+		return m_ptrNextTask->process(
+			status, FilterData(data, data.xform()),
+			ui_data.contentRect()
+		);
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(

@@ -22,7 +22,8 @@
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
-#include "BasicImageView.h"
+#include "ImageView.h"
+#include <QRectF>
 
 namespace page_layout
 {
@@ -33,7 +34,9 @@ public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		PageId const& page_id,
 		QImage const& image,
-		ImageTransformation const& xform, bool batch);
+		ImageTransformation const& xform,
+		QRectF const& content_rect,
+		QSizeF const& aggregated_content_size_mm, bool batch);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -43,14 +46,19 @@ private:
 	PageId m_pageId;
 	QImage m_image;
 	ImageTransformation m_xform;
+	QRectF m_contentRect;
+	QSizeF m_aggregatedContentSizeMM;
 	bool m_batchProcessing;
 };
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
-	PageId const& page_id, bool batch, bool debug)
+	PageId const& page_id,
+	QSizeF const& aggregated_content_size_mm,
+	bool batch, bool debug)
 :	m_ptrFilter(filter),
 	m_pageId(page_id),
+	m_aggregatedContentSizeMM(aggregated_content_size_mm),
 	m_batchProcessing(batch)
 {
 }
@@ -60,14 +68,17 @@ Task::~Task()
 }
 
 FilterResultPtr
-Task::process(TaskStatus const& status, FilterData const& data)
+Task::process(
+	TaskStatus const& status, FilterData const& data,
+	QRectF const& content_rect)
 {
 	status.throwIfCancelled();
 	
 	return FilterResultPtr(
 		new UiUpdater(
 			m_ptrFilter, m_pageId, data.image(),
-			data.xform(), m_batchProcessing
+			data.xform(), content_rect,
+			m_aggregatedContentSizeMM, m_batchProcessing
 		)
 	);
 }
@@ -77,11 +88,15 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter, PageId const& page_id,
-	QImage const& image, ImageTransformation const& xform, bool const batch)
+	QImage const& image, ImageTransformation const& xform,
+	QRectF const& content_rect,
+	QSizeF const& aggregated_content_size_mm, bool const batch)
 :	m_ptrFilter(filter),
 	m_pageId(page_id),
 	m_image(image),
 	m_xform(xform),
+	m_contentRect(content_rect),
+	m_aggregatedContentSizeMM(aggregated_content_size_mm),
 	m_batchProcessing(batch)
 {
 }
@@ -101,7 +116,11 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		return;
 	}
 	
-	BasicImageView* view = new BasicImageView(m_image);
+	QSizeF const margins_mm(20, 20); // FIXME
+	ImageView* view = new ImageView(
+		m_image, m_xform, m_contentRect, margins_mm,
+		m_aggregatedContentSizeMM
+	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 }
 

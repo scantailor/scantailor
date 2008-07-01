@@ -26,6 +26,7 @@
 
 class PageId;
 class QString;
+class QSizeF;
 
 namespace page_layout
 {
@@ -55,7 +56,9 @@ public:
 	virtual void loadSettings(
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
-	IntrusivePtr<Task> createTask(PageId const& page_id, bool batch, bool debug);
+	IntrusivePtr<Task> createTask(
+		PageId const& page_id, QSizeF const& aggregate_content_size_mm,
+		bool batch, bool debug);
 	
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask();
 	

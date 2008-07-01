@@ -16,49 +16,46 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_TASK_H_
-#define PAGE_LAYOUT_TASK_H_
+#ifndef PAGE_LAYOUT_IMAGEVIEW_H_
+#define PAGE_LAYOUT_IMAGEVIEW_H_
 
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "FilterResult.h"
-#include "PageId.h"
+#include "ImageViewBase.h"
 #include <QSizeF>
+#include <QRectF>
 
-class TaskStatus;
-class FilterData;
-class DebugImages;
-class QRectF;
+class ImageTransformation;
 
 namespace page_layout
 {
 
-class Filter;
-class Settings;
-
-class Task : public RefCountable
+class ImageView : public ImageViewBase
 {
-	DECLARE_NON_COPYABLE(Task)
+	Q_OBJECT
 public:
-	Task(IntrusivePtr<Filter> const& filter,
-		//IntrusivePtr<Settings> const& settings,
-		PageId const& page_id, QSizeF const& aggregated_content_size_mm,
-		bool batch, bool debug);
+	ImageView(
+		QImage const& image, ImageTransformation const& xform,
+		QRectF const& content_rect, QSizeF const& margins_mm,
+		QSizeF const& aggregate_content_size_mm);
 	
-	virtual ~Task();
+	virtual ~ImageView();
+protected:
+	virtual void paintOverImage(QPainter& painter);
 	
-	FilterResultPtr process(
-		TaskStatus const& status, FilterData const& data,
-		QRectF const& content_rect);
+	virtual void wheelEvent(QWheelEvent* event);
+	
+	virtual void mousePressEvent(QMouseEvent* event);
+	
+	virtual void mouseReleaseEvent(QMouseEvent* event);
+	
+	virtual void mouseMoveEvent(QMouseEvent* event);
+	
+	virtual void hideEvent(QHideEvent* event);
 private:
-	class UiUpdater;
+	ImageTransformation adjustedXform(ImageTransformation const& xform) const;
 	
-	IntrusivePtr<Filter> m_ptrFilter;
-	//IntrusivePtr<Settings> m_ptrSettings;
-	//std::auto_ptr<DebugImages> m_ptrDbg;
-	PageId m_pageId;
-	QSizeF m_aggregatedContentSizeMM;
-	bool m_batchProcessing;
+	QRectF m_contentRect;
+	QSizeF m_marginsMM;
+	QSizeF m_aggregateContentSizeMM;
 };
 
 } // namespace page_layout

@@ -84,6 +84,7 @@ public:
 	BackgroundTaskPtr createCompositeTask(
 		PageInfo const& page, int last_filter_idx,
 		ThumbnailPixmapCache& thumbnail_cache,
+		QSizeF const& aggregate_content_size_mm,
 		bool batch_processing, bool debug);
 	
 	IntrusivePtr<CompositeCacheDrivenTask>
@@ -627,7 +628,9 @@ MainWindow::loadImage(PageInfo const& page)
 		m_ptrCurTask.reset();
 	}
 	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
-		page, m_curFilter, *m_ptrThumbnailCache, m_batchProcessing, m_debug
+		page, m_curFilter, *m_ptrThumbnailCache,
+		m_ptrContentBoxAggregator->maxContentBoxMM(),
+		m_batchProcessing, m_debug
 	);
 	if (m_ptrCurTask) {
 		m_ptrWorkerThread->performTask(m_ptrCurTask);
@@ -721,6 +724,7 @@ BackgroundTaskPtr
 MainWindow::FilterListModel::createCompositeTask(
 	PageInfo const& page, int const last_filter_idx,
 	ThumbnailPixmapCache& thumbnail_cache,
+	QSizeF const& aggregate_content_size_mm,
 	bool const batch_processing, bool const debug)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
@@ -732,7 +736,8 @@ MainWindow::FilterListModel::createCompositeTask(
 	switch (last_filter_idx) {
 	case 4:
 		page_layout_task = m_ptrPageLayoutFilter->createTask(
-			page.id(), batch_processing, debug
+			page.id(), aggregate_content_size_mm,
+			batch_processing, debug
 		);
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createTask(

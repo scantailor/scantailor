@@ -145,12 +145,14 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 }
 
 IntrusivePtr<Task>
-Filter::createTask(PageId const& page_id, bool batch, bool debug)
+Filter::createTask(
+	PageId const& page_id,
+	QSizeF const& aggregate_content_size_mm, bool batch, bool debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this),
-			page_id, batch, debug
+			page_id, aggregate_content_size_mm, batch, debug
 		)
 	);
 }

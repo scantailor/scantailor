@@ -175,6 +175,7 @@ SET(
 	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	MainWindow.cpp MainWindow.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
+	PhysicalTransformation.cpp PhysicalTransformation.h
 	ImageTransformation.cpp ImageTransformation.h
 	ImageViewBase.cpp ImageViewBase.h
 	BasicImageView.cpp BasicImageView.h

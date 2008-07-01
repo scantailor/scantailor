@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
 
 SET(
 	sources
-#	ImageView.cpp ImageView.h
+	ImageView.cpp ImageView.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
 #	ContentBoxFinder.cpp ContentBoxFinder.h
