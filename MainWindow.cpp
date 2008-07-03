@@ -154,6 +154,7 @@ MainWindow::~MainWindow()
 	
 	removeWidgetsFromLayout(m_pImageFrameLayout, false);
 	removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
+	m_ptrTabbedDebugImages->clear();
 }
 
 std::auto_ptr<ThumbnailPixmapCache>
@@ -336,9 +337,9 @@ MainWindow::setImageWidget(
 	} else {
 		m_ptrTabbedDebugImages->addTab(widget, "Main");
 		BOOST_FOREACH (DebugImages::Item const& item, debug_images->items()) {
-			m_ptrTabbedDebugImages->addTab(
-				new BasicImageView(item.image()), item.label()
-			);
+			QWidget* widget = new BasicImageView(item.image());
+			m_imageWidgetCleanup.add(widget);
+			m_ptrTabbedDebugImages->addTab(widget, item.label());
 		}
 		m_pImageFrameLayout->addWidget(m_ptrTabbedDebugImages.get());
 	}
@@ -609,7 +610,9 @@ MainWindow::loadImage()
 void
 MainWindow::loadImage(PageInfo const& page)
 {
-	removeWidgetsFromLayout(m_pImageFrameLayout, true);
+	removeWidgetsFromLayout(m_pImageFrameLayout, false);
+	m_ptrTabbedDebugImages->clear();
+	m_imageWidgetCleanup.clear();
 	
 	if (isBelowSelectContent() && m_ptrContentBoxAggregator->haveUndefinedItems()) {
 		QString const err_text(
