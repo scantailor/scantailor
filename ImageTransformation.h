@@ -90,6 +90,10 @@ public:
 	/**
 	 * \brief Set the 3rd step transformation, resetting the following ones.
 	 *
+	 * Providing a null polygon has the same effect as providing a polygon
+	 * that covers the entire image.  A crop area that exceedes the image
+	 * is allowed.
+	 *
 	 * \see \ref transformations Transformations.
 	 */
 	void setCropArea(QPolygonF const& area);
