@@ -20,16 +20,21 @@
 #include "PixmapRenderer.h"
 #include "Dpm.h"
 #include "Dpi.h"
+#include "imageproc/PolygonUtils.h"
 #include <QPainter>
+#include <QPainterPath>
 #include <QBrush>
 #include <QLineF>
 #include <QPolygonF>
 #include <QPalette>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QDebug>
 #include <algorithm>
-#include <math.h>
 #include <assert.h>
+#include <math.h>
+
+using namespace imageproc;
 
 ImageViewBase::ImageViewBase(QImage const& image)
 :	m_pixmap(QPixmap::fromImage(image)),
@@ -85,17 +90,41 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	// to paint the whole widget, which we do here.
 	
 	QPolygonF const image_area(
-		virtualToWidget().map(physToVirt().transform().map(physToVirt().origRect()))
+		PolygonUtils::round(
+			virtualToWidget().map(
+				physToVirt().transform().map(
+					physToVirt().origRect()
+				)
+			)
+		)
 	);
 	QPolygonF const crop_area(
-		virtualToWidget().map(physToVirt().resultingCropArea())
+		PolygonUtils::round(
+			virtualToWidget().map(physToVirt().resultingCropArea())
+		)
 	);
-	QPolygonF const containing_area(
-		image_area.boundingRect().adjusted(-1.0, -1.0, 1.0, 1.0).united(rect())
+	
+	QPolygonF const intersected_area(
+		PolygonUtils::round(image_area.intersected(crop_area))
 	);
-	painter.setPen(Qt::NoPen);
-	painter.setBrush(palette().brush(QPalette::Background));
-	painter.drawPolygon(containing_area.subtracted(image_area.intersected(crop_area)));
+	
+	QPainterPath intersected_path;
+	intersected_path.addPolygon(intersected_area);
+	
+	QPainterPath containing_path;
+	containing_path.addRect(rect());
+	
+	QBrush const brush(palette().brush(QPalette::Background));
+	QPen pen(brush, 1.0);
+	pen.setCosmetic(true);
+	
+	// By using a pen with the same color as the brush, we essentially
+	// expanding the area we are going to draw.  It's necessary because
+	// XRender doesn't provide subpixel accuracy.
+	
+	painter.setPen(pen);
+	painter.setBrush(brush);
+	painter.drawPath(containing_path.subtracted(intersected_path));
 	
 	painter.restore();
 	

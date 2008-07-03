@@ -20,6 +20,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailLoadResult.h"
 #include "PixmapRenderer.h"
+#include "imageproc/PolygonUtils.h"
 #include "boost_signals.h"
 #include <boost/bind.hpp>
 #include <QPixmap>
@@ -34,6 +35,8 @@
 #include <QApplication>
 #include <QPointF>
 #include <QDebug>
+
+using namespace imageproc;
 
 ThumbnailBase::ThumbnailBase(
 	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
@@ -118,20 +121,54 @@ ThumbnailBase::paint(QPainter* painter,
 		
 		painter->setWorldTransform(thumb_to_display);
 		
-		QPainterPath rect_path;
-		// Adjusting bounding rect fixes a clipping bug in Qt,
-		// which is still present in 4.4.0
-		rect_path.addRect(m_boundingRect.adjusted(-1, -1, 1, 1));
-		QPainterPath outline_path;
-		outline_path.addPolygon(m_postScaleXform.map(m_imageXform.resultingCropArea()));
-		QPainterPath const background_path(rect_path.subtracted(outline_path));
+		// Cover parts of the image that should not be visible with background.
+		// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
+		// to paint the whole widget, which we do here.
+		
+		QPolygonF const image_area(
+			PolygonUtils::round(
+				m_postScaleXform.map(
+					m_imageXform.transform().map(
+						m_imageXform.origRect()
+					)
+				)
+			)
+		);
+		QPolygonF const crop_area(
+			PolygonUtils::round(
+				m_postScaleXform.map(m_imageXform.resultingCropArea())
+			)
+		);
+		
+		QPolygonF const intersected_area(
+			PolygonUtils::round(image_area.intersected(crop_area))
+		);
+		
+		QPainterPath intersected_path;
+		intersected_path.addPolygon(intersected_area);
+		
+		QPainterPath containing_path;
+		containing_path.addRect(m_boundingRect);
+		
+		QBrush brush;
 		
 		QPalette const palette(QApplication::palette());
 		if (option->state & QStyle::State_Selected) {
-			painter->fillPath(background_path, palette.highlight());
+			brush = palette.highlight();
 		} else {
-			painter->fillPath(background_path, palette.window());
+			brush = palette.window();
 		}
+		
+		QPen pen(brush, 1.0);
+		pen.setCosmetic(true);
+		
+		// By using a pen with the same color as the brush, we essentially
+		// expanding the area we are going to draw.  It's necessary because
+		// XRender doesn't provide subpixel accuracy.
+		
+		painter->setPen(pen);
+		painter->setBrush(brush);
+		painter->drawPath(containing_path.subtracted(intersected_path));
 		
 		painter->restore();
 	}
