@@ -20,6 +20,7 @@
 #define PAGE_LAYOUT_IMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "ImageTransformation.h"
 #include <QSizeF>
 #include <QRectF>
 
@@ -51,11 +52,14 @@ protected:
 	
 	virtual void hideEvent(QHideEvent* event);
 private:
-	ImageTransformation adjustedXform(ImageTransformation const& xform) const;
+	void updateLayout();
 	
-	QRectF m_contentRect;
+	ImageTransformation m_origXform;
+	QRectF m_origContentRect;
 	QSizeF m_marginsMM;
 	QSizeF m_aggregateContentSizeMM;
+	QRectF m_contentRect;
+	QRectF m_contentPlusMargins;
 };
 
 } // namespace page_layout

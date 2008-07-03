@@ -38,13 +38,14 @@ ImageView::ImageView(
 	QRectF const& content_rect, QSizeF const& margins_mm,
 	QSizeF const& aggregate_content_size_mm)
 :	ImageViewBase(image, xform),
-	m_contentRect(content_rect),
+	m_origXform(xform),
+	m_origContentRect(content_rect),
 	m_marginsMM(margins_mm),
 	m_aggregateContentSizeMM(aggregate_content_size_mm)
 {
 	//setMouseTracking(true);
 	
-	updateTransformAndFixFocalPoint(adjustedXform(xform));
+	updateLayout();
 }
 
 ImageView::~ImageView()
@@ -54,7 +55,17 @@ ImageView::~ImageView()
 void
 ImageView::paintOverImage(QPainter& painter)
 {
-	// TODO
+	QPainterPath margins;
+	margins.addRect(m_contentPlusMargins);
+	
+	QPainterPath content;
+	content.addRect(m_contentRect);
+	
+	painter.setRenderHint(QPainter::Antialiasing, false);
+	
+	painter.setPen(Qt::NoPen);
+	painter.setBrush(QColor(0xff, 0xff, 0xff));
+	painter.drawPath(margins.subtracted(content));
 }
 
 void
@@ -87,13 +98,14 @@ ImageView::hideEvent(QHideEvent* const event)
 	// TODO
 }
 
-ImageTransformation
-ImageView::adjustedXform(ImageTransformation const& xform) const
+void
+ImageView::updateLayout()
 {
-	PhysicalTransformation const phys_xform(xform.origDpi());
-	QTransform const virt_to_mm(xform.transformBack() * phys_xform.pixelsToMM());
+	PhysicalTransformation const phys_xform(m_origXform.origDpi());
+	QTransform const virt_to_mm(m_origXform.transformBack() * phys_xform.pixelsToMM());
+	//QTransform const mm_to_virt(phys_xform.mmToPixels() * m_origXform.transform());
 	
-	QPolygonF poly_mm(virt_to_mm.map(m_contentRect));
+	QPolygonF poly_mm(virt_to_mm.map(m_origContentRect));
 	
 	QLineF const down_uv_line(QLineF(poly_mm[0], poly_mm[3]).unitVector());
 	QLineF const right_uv_line(QLineF(poly_mm[0], poly_mm[1]).unitVector());
@@ -119,14 +131,17 @@ ImageView::adjustedXform(ImageTransformation const& xform) const
 	
 	poly_mm[4] = poly_mm[3];
 	
-	ImageTransformation new_xform(xform);
-	new_xform.setCropArea(QPolygonF()); // TODO: document this behaviour
+	ImageTransformation new_xform(m_origXform);
+	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
 	new_xform.setCropArea(
 		(phys_xform.mmToPixels() * new_xform.transform()).map(poly_mm)
 	);
-	new_xform.setPostRotation(xform.postRotation());
+	new_xform.setPostRotation(m_origXform.postRotation());
 	
-	return new_xform;
+	updateTransformAndFixFocalPoint(new_xform);
+	
+	m_contentPlusMargins = new_xform.resultingRect();
+	m_contentRect = (m_origXform.transformBack() * new_xform.transform()).mapRect(m_origContentRect);
 }
 
 } // namespace page_layout
