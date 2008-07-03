@@ -25,6 +25,7 @@ SET(
 	DentFinder.cpp DentFinder.h
 	IntegralImage.h
 	Binarize.cpp Binarize.h
+	PolygonUtils.cpp PolygonUtils.h
 	PolygonRasterizer.cpp PolygonRasterizer.h
 )
 
