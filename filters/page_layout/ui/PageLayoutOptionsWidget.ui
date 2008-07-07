@@ -1,0 +1,220 @@
+<ui version="4.0" >
+ <class>PageLayoutOptionsWidget</class>
+ <widget class="QWidget" name="PageLayoutOptionsWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>184</width>
+    <height>262</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Margins</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout" >
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <item>
+         <spacer name="horizontalSpacer_4" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QComboBox" name="unitsComboBox" >
+          <item>
+           <property name="text" >
+            <string>Millimeters (mm)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Inches (in)</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>24</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <item>
+         <spacer name="horizontalSpacer_3" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label" >
+            <property name="text" >
+             <string>Top</string>
+            </property>
+           </widget>
+          </item>
+          <item rowspan="2" row="0" column="2" >
+           <widget class="QToolButton" name="toolButton" >
+            <property name="text" >
+             <string>...</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="../../../resources/resources.qrc" >
+              <normaloff>:/icons/stock-vchain-broken-24.png</normaloff>
+              <normalon>:/icons/stock-vchain-24.png</normalon>:/icons/stock-vchain-broken-24.png</iconset>
+            </property>
+            <property name="iconSize" >
+             <size>
+              <width>9</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="autoRaise" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Bottom</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QDoubleSpinBox" name="bottomMarginSpinBox" >
+            <property name="decimals" >
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QLabel" name="label_3" >
+            <property name="text" >
+             <string>Left</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <widget class="QDoubleSpinBox" name="leftMarginSpinBox" >
+            <property name="decimals" >
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item rowspan="2" row="2" column="2" >
+           <widget class="QToolButton" name="toolButton_3" >
+            <property name="text" >
+             <string>...</string>
+            </property>
+            <property name="icon" >
+             <iconset resource="../../../resources/resources.qrc" >
+              <normaloff>:/icons/stock-vchain-broken-24.png</normaloff>
+              <normalon>:/icons/stock-vchain-24.png</normalon>:/icons/stock-vchain-broken-24.png</iconset>
+            </property>
+            <property name="iconSize" >
+             <size>
+              <width>9</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="autoRaise" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" >
+           <widget class="QLabel" name="label_4" >
+            <property name="text" >
+             <string>Right</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QDoubleSpinBox" name="rightMarginSpinBox" >
+            <property name="decimals" >
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QDoubleSpinBox" name="topMarginSpinBox" >
+            <property name="decimals" >
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>78</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../resources/resources.qrc" />
+ </resources>
+ <connections/>
+</ui>

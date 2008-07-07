@@ -20,6 +20,7 @@
 #define IMAGEVIEWBASE_H_
 
 #include "ImageTransformation.h"
+#include "Margins.h"
 #include <QWidget>
 #include <QPixmap>
 #include <QImage>
@@ -52,10 +53,14 @@ class ImageViewBase : public QWidget
 public:
 	ImageViewBase(QImage const& image);
 	
-	ImageViewBase(QImage const& image, ImageTransformation const& pre_transform);
+	ImageViewBase(
+		QImage const& image, ImageTransformation const& pre_transform,
+		Margins const& margins = Margins());
 	
 	virtual ~ImageViewBase();
 protected:
+	enum FocalPointMode { CENTER_IF_FITS, DONT_CENTER };
+	
 	/**
 	 * \brief Repaint the widget.
 	 *
@@ -108,6 +113,11 @@ protected:
 	bool isDraggingPossible() const;
 	
 	/**
+	 * Returns the widget area reduced by margins.
+	 */
+	QRectF marginsRect() const;
+	
+	/**
 	 * Get the bounding box of the image as it appears on the screen,
 	 * in widget coordinates.
 	 */
@@ -123,7 +133,8 @@ protected:
 	 * \brief Same as updateTransform(), but adjusts the focal point
 	 *        to improve screen space usage.
 	 */
-	void updateTransformAndFixFocalPoint(ImageTransformation const& phys_to_virt);
+	void updateTransformAndFixFocalPoint(
+		ImageTransformation const& phys_to_virt, FocalPointMode mode);
 	
 	/**
 	 * \brief Same as updateTransform(), but preserves the visual image scale.
@@ -142,9 +153,9 @@ protected:
 private:
 	void updateWidgetTransform();
 	
-	void updateWidgetTransformAndFixFocalPoint();
+	void updateWidgetTransformAndFixFocalPoint(FocalPointMode mode);
 	
-	QPointF getIdealFocalPoint() const;
+	QPointF getIdealFocalPoint(FocalPointMode mode) const;
 	
 	void adjustAndSetNewFocalPoint(QPointF new_focal_point);
 	
@@ -180,6 +191,8 @@ private:
 	 * (in widget coordinates) that was processed in this dragging session.
 	 */
 	QPoint m_lastMousePos;
+	
+	Margins m_margins;
 	
 	/**
 	 * The zoom factor.  A value of 1.0 corresponds to fit-to-widget zoom.

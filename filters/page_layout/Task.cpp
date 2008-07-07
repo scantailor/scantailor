@@ -18,12 +18,15 @@
 
 #include "Task.h"
 #include "Filter.h"
+#include "Settings.h"
+#include "Margins.h"
 #include "OptionsWidget.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
 #include <QRectF>
+#include <QObject>
 
 namespace page_layout
 {
@@ -32,6 +35,7 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
+		IntrusivePtr<Settings> const& settings,
 		PageId const& page_id,
 		QImage const& image,
 		ImageTransformation const& xform,
@@ -43,6 +47,7 @@ public:
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
+	IntrusivePtr<Settings> m_ptrSettings;
 	PageId m_pageId;
 	QImage m_image;
 	ImageTransformation m_xform;
@@ -53,10 +58,12 @@ private:
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id,
 	QSizeF const& aggregated_content_size_mm,
 	bool batch, bool debug)
 :	m_ptrFilter(filter),
+	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_aggregatedContentSizeMM(aggregated_content_size_mm),
 	m_batchProcessing(batch)
@@ -76,7 +83,7 @@ Task::process(
 	
 	return FilterResultPtr(
 		new UiUpdater(
-			m_ptrFilter, m_pageId, data.image(),
+			m_ptrFilter, m_ptrSettings, m_pageId, data.image(),
 			data.xform(), content_rect,
 			m_aggregatedContentSizeMM, m_batchProcessing
 		)
@@ -87,11 +94,14 @@ Task::process(
 /*============================ Task::UiUpdater ==========================*/
 
 Task::UiUpdater::UiUpdater(
-	IntrusivePtr<Filter> const& filter, PageId const& page_id,
+	IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<Settings> const& settings,
+	PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
 	QRectF const& content_rect,
 	QSizeF const& aggregated_content_size_mm, bool const batch)
 :	m_ptrFilter(filter),
+	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_image(image),
 	m_xform(xform),
@@ -106,8 +116,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 {
 	// This function is executed from the GUI thread.
 	
+	Margins const margins_mm(m_ptrSettings->getPageMarginsMM(m_pageId));
+	
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
-	//opt_widget->postUpdateUI(m_uiData);
+	opt_widget->postUpdateUI(margins_mm);
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
 	ui->invalidateThumbnail(m_pageId);
@@ -116,12 +128,16 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		return;
 	}
 	
-	QSizeF const margins_mm(20, 20); // FIXME
 	ImageView* view = new ImageView(
 		m_image, m_xform, m_contentRect, margins_mm,
 		m_aggregatedContentSizeMM
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
+	
+	QObject::connect(
+		view, SIGNAL(marginsSetManually(Margins const&)),
+		opt_widget, SLOT(marginsSetExternally(Margins const&))
+	);
 }
 
 } // namespace page_layout

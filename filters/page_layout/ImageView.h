@@ -21,10 +21,10 @@
 
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
+#include "Margins.h"
 #include <QSizeF>
 #include <QRectF>
-
-class ImageTransformation;
+#include <QPoint>
 
 namespace page_layout
 {
@@ -35,10 +35,12 @@ class ImageView : public ImageViewBase
 public:
 	ImageView(
 		QImage const& image, ImageTransformation const& xform,
-		QRectF const& content_rect, QSizeF const& margins_mm,
+		QRectF const& content_rect, Margins const& margins_mm,
 		QSizeF const& aggregate_content_size_mm);
 	
 	virtual ~ImageView();
+signals:
+	void marginsSetManually(Margins const& margins_mm);
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	
@@ -52,14 +54,59 @@ protected:
 	
 	virtual void hideEvent(QHideEvent* event);
 private:
-	void updateLayout();
+	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
 	
-	ImageTransformation m_origXform;
-	QRectF m_origContentRect;
-	QSizeF m_marginsMM;
-	QSizeF m_aggregateContentSizeMM;
-	QRectF m_contentRect;
+	void fitMarginBox(FocalPointMode fp_mode);
+	
+	void calcAndFitMarginBox(Margins const& margins_mm, FocalPointMode fp_mode);
+	
+	int cursorLocationMask(QPoint const& cursor_pos) const;
+	
+	void forceNonNegativeMargins(QRectF& content_plus_margins) const;
+	
+	Margins calculateMarginsMM() const;
+	
+	/**
+	 * Image transformation, as provided by the previous filter.
+	 * We pass another transformation to ImageViewBase, in order to
+	 * be able to display margins, that may be outside the image area.
+	 */
+	ImageTransformation const m_origXform;
+	
+	/**
+	 * Content box in m_origXform coordinates.
+	 */
+	QRectF const m_contentRect;
+	
+	/**
+	 * Content + margins box in m_origXform coordinates.
+	 */
 	QRectF m_contentPlusMargins;
+	
+	QSizeF m_aggregateContentSizeMM;
+	
+	
+	/**
+	 * Transformation from widget coordinates to m_origXform coordinates
+	 * in the beginning of resizing.
+	 */
+	QTransform m_widgetToOrigBeforeResizing;
+	
+	/**
+	 * m_contentPlusMargins in widget coordinates in the beginning of resizing.
+	 */
+	QRectF m_widgetRectBeforeResizing;
+	
+	/**
+	 * Cursor position in widget coordinates in the beginning of resizing.
+	 */
+	QPoint m_cursorPosBeforeResizing;
+	
+	/**
+	 * A bitwise OR of *_EDGE values.  If non-zero, that means
+	 * a resizing operation is in progress.
+	 */
+	int m_resizingMask;
 };
 
 } // namespace page_layout

@@ -21,7 +21,7 @@
 #include "OptionsWidget.h"
 #include "Task.h"
 #include "PageId.h"
-//#include "Settings.h"
+#include "Settings.h"
 //#include "Params.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
@@ -37,8 +37,9 @@ namespace page_layout
 {
 
 Filter::Filter()
+:	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget);
+	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
 }
 
 Filter::~Filter()
@@ -151,7 +152,7 @@ Filter::createTask(
 {
 	return IntrusivePtr<Task>(
 		new Task(
-			IntrusivePtr<Filter>(this),
+			IntrusivePtr<Filter>(this), m_ptrSettings,
 			page_id, aggregate_content_size_mm, batch, debug
 		)
 	);

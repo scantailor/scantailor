@@ -49,15 +49,17 @@ ImageViewBase::ImageViewBase(QImage const& image)
 }
 
 ImageViewBase::ImageViewBase(
-	QImage const& image, ImageTransformation const& pre_transform)
+	QImage const& image, ImageTransformation const& pre_transform,
+	Margins const& margins)
 :	m_pixmap(QPixmap::fromImage(image)),
 	m_physToVirt(pre_transform),
 	m_focalPoint(0.5 * image.width(), 0.5 * image.height()),
+	m_margins(margins),
 	m_zoom(1.0),
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_isDraggingInProgress(false)
 {
-	updateWidgetTransformAndFixFocalPoint();
+	updateWidgetTransformAndFixFocalPoint(CENTER_IF_FITS);
 }
 
 ImageViewBase::~ImageViewBase()
@@ -227,11 +229,25 @@ ImageViewBase::isDraggingPossible() const
 }
 
 QRectF
+ImageViewBase::marginsRect() const
+{
+	QRectF r(rect());
+	r.adjust(
+		m_margins.left(), m_margins.top(),
+		-m_margins.right(), -m_margins.bottom()
+	);
+	if (r.isEmpty()) {
+		return QRectF(r.center(), r.center());
+	}
+	return r;
+}
+
+QRectF
 ImageViewBase::getVisibleWidgetRect() const
 {
 	QRectF const image_rect(m_physToVirt.resultingRect());
 	QRectF const widget_rect(m_virtualToWidget.mapRect(image_rect));
-	return widget_rect.intersected(rect());
+	return widget_rect.intersected(marginsRect());
 }
 
 void
@@ -244,10 +260,10 @@ ImageViewBase::updateTransform(ImageTransformation const& phys_to_virt)
 
 void
 ImageViewBase::updateTransformAndFixFocalPoint(
-	ImageTransformation const& phys_to_virt)
+	ImageTransformation const& phys_to_virt, FocalPointMode const mode)
 {
 	m_physToVirt = phys_to_virt;
-	updateWidgetTransformAndFixFocalPoint();
+	updateWidgetTransformAndFixFocalPoint(mode);
 	update();
 }
 
@@ -296,7 +312,7 @@ ImageViewBase::updateWidgetTransform()
 	QPointF const widget_origin(0.5 * width(), 0.5 * height());
 	
 	QSizeF zoom1_widget_size(virt_rect.size());
-	zoom1_widget_size.scale(size(), Qt::KeepAspectRatio);
+	zoom1_widget_size.scale(marginsRect().size(), Qt::KeepAspectRatio);
 	
 	double const zoom1_x = zoom1_widget_size.width() / virt_rect.width();
 	double const zoom1_y = zoom1_widget_size.height() / virt_rect.height();
@@ -321,11 +337,11 @@ ImageViewBase::updateWidgetTransform()
  * may invalidate the focal point.
  */
 void
-ImageViewBase::updateWidgetTransformAndFixFocalPoint()
+ImageViewBase::updateWidgetTransformAndFixFocalPoint(FocalPointMode const mode)
 {
 	updateWidgetTransform();
 	
-	QPointF const ideal_focal_point(getIdealFocalPoint());
+	QPointF const ideal_focal_point(getIdealFocalPoint(mode));
 	if (ideal_focal_point != m_focalPoint) {
 		m_focalPoint = ideal_focal_point;
 		// Move the image so that the new focal point
@@ -338,26 +354,32 @@ ImageViewBase::updateWidgetTransformAndFixFocalPoint()
  * An ideal focal point is an adjustment to the current focal point,
  * which ensures that no widget space is wasted.  For example if the
  * focal point is at the corner of an image, the image would cover
- * at most 1/4 of the widget space, which is a waste.\n
- * If some widget space has to be wasted because the image is smaller
- * than the widget (maybe just in one direction), the focal point
- * is adjusted to center the image at that direction.
+ * at most 1/4 of the widget space, which is a waste.
+ *
+ * \param mode If set to CENTER_IF_FITS, then the focal point will center
+ *        the image if it completely fits into the widget.  This works in
+ *        horizontal and vertical directions independently.\n
+ *        If \p mode is set to DONT_CENTER and the image completely fits
+ *        the widget, then the focal point will cause a minimal move to
+ *        force the whole image to be visible.
+ *
  * In case the image already covers the whole widget, the ideal
  * focal point is the current focal point.
  */
 QPointF
-ImageViewBase::getIdealFocalPoint() const
+ImageViewBase::getIdealFocalPoint(FocalPointMode const mode) const
 {
+	QRectF const margins_rect(marginsRect());
 	QRectF const viewport(m_virtualToWidget.mapRect(m_physToVirt.resultingRect()));
-	double const left_margin = viewport.left();
-	double const right_margin = width() - viewport.right();
-	double const top_margin = viewport.top();
-	double const bottom_margin = height() - viewport.bottom();
+	double const left_margin = viewport.left() - margins_rect.left();
+	double const right_margin = margins_rect.right() - viewport.right();
+	double const top_margin = viewport.top() - margins_rect.top();
+	double const bottom_margin = margins_rect.bottom() - viewport.bottom();
 	
 	// The focal point in widget coordinates.
-	QPointF widget_focal_point(0.5 * width(), 0.5 * height());
+	QPointF widget_focal_point(margins_rect.center());
 	
-	if (left_margin + right_margin >= 0.0) {
+	if (mode == CENTER_IF_FITS && left_margin + right_margin >= 0.0) {
 		// Image fits horizontally, so center it in that direction.
 		widget_focal_point.setX(viewport.left() + 0.5 * viewport.width());
 	} else if (left_margin < 0.0 && right_margin > 0.0) {
@@ -372,7 +394,7 @@ ImageViewBase::getIdealFocalPoint() const
 		widget_focal_point.rx() += movement;
 	}
 	
-	if (top_margin + bottom_margin >= 0.0) {
+	if (mode == CENTER_IF_FITS && top_margin + bottom_margin >= 0.0) {
 		// Image fits vertically, so center it in that direction.
 		widget_focal_point.setY(viewport.top() + 0.5 * viewport.height());
 	} else if (top_margin < 0.0 && bottom_margin > 0.0) {
@@ -401,7 +423,7 @@ ImageViewBase::adjustAndSetNewFocalPoint(QPointF const new_focal_point)
 	QPointF const old_focal_point(m_focalPoint);
 	m_focalPoint = new_focal_point;
 	updateWidgetTransform();
-	QPointF const ideal_focal_point(getIdealFocalPoint());
+	QPointF const ideal_focal_point(getIdealFocalPoint(CENTER_IF_FITS));
 	
 	QPointF adjusted_focal_point(old_focal_point);
 	

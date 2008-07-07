@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/stock-vchain-24.png</file>
+    <file>icons/stock-vchain-broken-24.png</file>
     <file>icons/16x16/media-playback-start.png</file>
     <file>icons/16x16/media-playback-stop.png</file>
     <file>icons/right_page_thumb.png</file>

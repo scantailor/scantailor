@@ -68,7 +68,7 @@ private:
 		QDomDocument& doc, QDomElement& filter_el,
 		PageId const& page_id, int numeric_id) const;
 	
-	//IntrusivePtr<Settings> m_ptrSettings;
+	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<OptionsWidget> m_ptrOptionsWidget;
 };
 

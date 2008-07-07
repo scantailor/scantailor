@@ -16,49 +16,41 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_CONSTANTS_H_
-#define IMAGEPROC_CONSTANTS_H_
+#include "Settings.h"
+#include "Utils.h"
+#include <QMutexLocker>
 
-namespace imageproc
+namespace page_layout
 {
 
-namespace constants
+Settings::Settings()
 {
+	m_defaultMarginsMM.setTop(10.0);
+	m_defaultMarginsMM.setBottom(10.0);
+	m_defaultMarginsMM.setLeft(10.0);
+	m_defaultMarginsMM.setRight(10.0);
+}
 
-extern double const PI;
+Settings::~Settings()
+{
+}
 
-/**
- * angle_rad = angle_deg * RED2RAD
- */
-extern double const DEG2RAD;
+Margins
+Settings::getPageMarginsMM(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+	PerPageMargins::const_iterator it(m_perPageMarginsMM.find(page_id));
+	if (it != m_perPageMarginsMM.end()) {
+		return it->second;
+	}
+	return m_defaultMarginsMM;
+}
 
-/**
- * angle_deg = angle_rad * RAD2DEG
- */
-extern double const RAD2DEG;
+void
+Settings::setPageMarginsMM(PageId const& page_id, Margins const& margins)
+{
+	QMutexLocker const locker(&m_mutex);
+	Utils::mapSetValue(m_perPageMarginsMM, page_id, margins);
+}
 
-/**
- * mm = inch * INCH2MM
- */
-extern double const INCH2MM;
-
-/**
- * inch = mm * MM2INCH
- */
-extern double const MM2INCH;
-
-/**
- * dots_per_meter = dots_per_inch * DPI2DPM
- */
-extern double const DPI2DPM;
-
-/**
- * dots_per_inch = dots_per_meter * DPM2DPI
- */
-extern double const DPM2DPI;
-
-} // namespace constants
-
-} // namespace imageproc
-
-#endif
+} // namespace page_layout

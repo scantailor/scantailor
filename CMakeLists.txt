@@ -217,6 +217,7 @@ SET(
 	AbstractFilter.h
 	FilterResult.h
 	CompositeCacheDrivenTask.h
+	Margins.h
 	boost_signals.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h

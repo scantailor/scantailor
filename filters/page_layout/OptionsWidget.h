@@ -19,9 +19,10 @@
 #ifndef PAGE_LAYOUT_OPTIONSWIDGET_H_
 #define PAGE_LAYOUT_OPTIONSWIDGET_H_
 
-//#include "ui_SelectContentOptionsWidget.h"
+#include "ui_PageLayoutOptionsWidget.h"
 #include "FilterOptionsWidget.h"
 #include "IntrusivePtr.h"
+#include "Margins.h"
 //#include "AutoManualMode.h"
 //#include "Dependencies.h"
 #include "PageId.h"
@@ -35,21 +36,31 @@ namespace page_layout
 class Settings;
 
 class OptionsWidget :
-	public FilterOptionsWidget
+	public FilterOptionsWidget,
+	public Ui::PageLayoutOptionsWidget
 {
 	Q_OBJECT
 public:
-	OptionsWidget();
+	OptionsWidget(IntrusivePtr<Settings> const& settings);
 	
 	virtual ~OptionsWidget();
 	
 	void preUpdateUI(PageId const& page_id);
 	
-	//void postUpdateUI(UiData const& ui_data);
-private:	
-	//IntrusivePtr<Settings> m_ptrSettings;
+	void postUpdateUI(Margins const& margins_mm);
+public slots:
+	void marginsSetExternally(Margins const& margins_mm);
+private slots:
+	void unitsChanged(int idx);
+private:
+	void updateMarginsDisplay();
+	
+	IntrusivePtr<Settings> m_ptrSettings;
 	//UiData m_uiData;
 	PageId m_pageId;
+	double m_mmToUnit;
+	double m_unitToMM;
+	Margins m_marginsMM;
 };
 
 } // namespace page_layout

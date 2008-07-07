@@ -17,12 +17,24 @@
 */
 
 #include "OptionsWidget.h.moc"
+#include "Settings.h"
+#include "imageproc/Constants.h"
+
+using namespace imageproc::constants;
 
 namespace page_layout
 {
 
-OptionsWidget::OptionsWidget()
+OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+:	m_ptrSettings(settings),
+	m_mmToUnit(1.0),
+	m_unitToMM(1.0)
 {
+	setupUi(this);
+	connect(
+		unitsComboBox, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(unitsChanged(int))
+	);
 }
 
 OptionsWidget::~OptionsWidget()
@@ -32,9 +44,45 @@ OptionsWidget::~OptionsWidget()
 void
 OptionsWidget::preUpdateUI(PageId const& page_id)
 {
+	m_marginsMM = m_ptrSettings->getPageMarginsMM(page_id);
+	updateMarginsDisplay();
 }
 
-//void postUpdateUI(UiData const& ui_data);
+void
+OptionsWidget::postUpdateUI(Margins const& margins_mm)
+{
+	m_marginsMM = margins_mm;
+	updateMarginsDisplay();
+}
+
+void
+OptionsWidget::marginsSetExternally(Margins const& margins_mm)
+{
+	m_marginsMM = margins_mm;
+	updateMarginsDisplay();
+}
+
+void
+OptionsWidget::unitsChanged(int const idx)
+{
+	if (idx == 0) { // mm
+		m_mmToUnit = 1.0;
+		m_unitToMM = 1.0;
+	} else { // in
+		m_mmToUnit = MM2INCH;
+		m_unitToMM = INCH2MM;
+	}
+	updateMarginsDisplay();
+}
+
+void
+OptionsWidget::updateMarginsDisplay()
+{
+	topMarginSpinBox->setValue(m_marginsMM.top() * m_mmToUnit);
+	bottomMarginSpinBox->setValue(m_marginsMM.bottom() * m_mmToUnit);
+	leftMarginSpinBox->setValue(m_marginsMM.left() * m_mmToUnit);
+	rightMarginSpinBox->setValue(m_marginsMM.right() * m_mmToUnit);
+}
 
 } // namespace page_layout
 

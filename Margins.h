@@ -16,49 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_CONSTANTS_H_
-#define IMAGEPROC_CONSTANTS_H_
+#ifndef MARGINS_H_
+#define MARGINS_H_
 
-namespace imageproc
+class Margins
 {
-
-namespace constants
-{
-
-extern double const PI;
-
-/**
- * angle_rad = angle_deg * RED2RAD
- */
-extern double const DEG2RAD;
-
-/**
- * angle_deg = angle_rad * RAD2DEG
- */
-extern double const RAD2DEG;
-
-/**
- * mm = inch * INCH2MM
- */
-extern double const INCH2MM;
-
-/**
- * inch = mm * MM2INCH
- */
-extern double const MM2INCH;
-
-/**
- * dots_per_meter = dots_per_inch * DPI2DPM
- */
-extern double const DPI2DPM;
-
-/**
- * dots_per_inch = dots_per_meter * DPM2DPI
- */
-extern double const DPM2DPI;
-
-} // namespace constants
-
-} // namespace imageproc
+public:
+	Margins() : m_top(), m_bottom(), m_left(), m_right() {}
+	
+	Margins(double left, double top, double right, double bottom)
+	: m_top(top), m_bottom(bottom), m_left(left), m_right(right) {}
+	
+	double top() const { return m_top; }
+	
+	void setTop(double val) { m_top = val; }
+	
+	double bottom() const { return m_bottom; }
+	
+	void setBottom(double val) { m_bottom = val; }
+	
+	double left() const { return m_left; }
+	
+	void setLeft(double val) { m_left = val; }
+	
+	double right() const { return m_right; }
+	
+	void setRight(double val) { m_right = val; }
+private:
+	double m_top;
+	double m_bottom;
+	double m_left;
+	double m_right;
+};
 
 #endif

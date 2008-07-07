@@ -16,49 +16,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_TASK_H_
-#define PAGE_LAYOUT_TASK_H_
+#ifndef PAGE_LAYOUT_SETTINGS_H_
+#define PAGE_LAYOUT_SETTINGS_H_
 
 #include "NonCopyable.h"
 #include "RefCountable.h"
-#include "FilterResult.h"
+#include "Margins.h"
 #include "PageId.h"
-#include <QSizeF>
-
-class TaskStatus;
-class FilterData;
-class DebugImages;
-class QRectF;
+#include <QMutex>
+#include <map>
 
 namespace page_layout
 {
 
-class Filter;
-class Settings;
-
-class Task : public RefCountable
+class Settings : public RefCountable
 {
-	DECLARE_NON_COPYABLE(Task)
+	DECLARE_NON_COPYABLE(Settings)
 public:
-	Task(IntrusivePtr<Filter> const& filter,
-		IntrusivePtr<Settings> const& settings,
-		PageId const& page_id, QSizeF const& aggregated_content_size_mm,
-		bool batch, bool debug);
+	Settings();
 	
-	virtual ~Task();
+	virtual ~Settings();
 	
-	FilterResultPtr process(
-		TaskStatus const& status, FilterData const& data,
-		QRectF const& content_rect);
+	Margins getPageMarginsMM(PageId const& page_id) const;
+	
+	void setPageMarginsMM(PageId const& page_id, Margins const& margins);
 private:
-	class UiUpdater;
+	typedef std::map<PageId, Margins> PerPageMargins;
 	
-	IntrusivePtr<Filter> m_ptrFilter;
-	IntrusivePtr<Settings> m_ptrSettings;
-	//std::auto_ptr<DebugImages> m_ptrDbg;
-	PageId m_pageId;
-	QSizeF m_aggregatedContentSizeMM;
-	bool m_batchProcessing;
+	mutable QMutex m_mutex;
+	PerPageMargins m_perPageMarginsMM;
+	Margins m_defaultMarginsMM;
 };
 
 } // namespace page_layout
