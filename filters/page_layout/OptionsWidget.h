@@ -47,7 +47,11 @@ public:
 	
 	void preUpdateUI(PageId const& page_id);
 	
-	void postUpdateUI(Margins const& margins_mm);
+	bool leftRightLinked() const { return m_leftRightLinked; }
+	
+	bool topBottomLinked() const { return m_topBottomLinked; }
+	
+	Margins const& marginsMM() const { return m_marginsMM; }
 public slots:
 	void marginsSetExternally(Margins const& margins_mm);
 private slots:
@@ -61,6 +65,8 @@ private:
 	double m_mmToUnit;
 	double m_unitToMM;
 	Margins m_marginsMM;
+	bool m_leftRightLinked;
+	bool m_topBottomLinked;
 };
 
 } // namespace page_layout

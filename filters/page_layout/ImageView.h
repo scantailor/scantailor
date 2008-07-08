@@ -21,13 +21,17 @@
 
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
-#include "Margins.h"
 #include <QSizeF>
 #include <QRectF>
+#include <QPointF>
 #include <QPoint>
+
+class Margins;
 
 namespace page_layout
 {
+
+class OptionsWidget;
 
 class ImageView : public ImageViewBase
 {
@@ -35,8 +39,8 @@ class ImageView : public ImageViewBase
 public:
 	ImageView(
 		QImage const& image, ImageTransformation const& xform,
-		QRectF const& content_rect, Margins const& margins_mm,
-		QSizeF const& aggregate_content_size_mm);
+		QRectF const& content_rect, QSizeF const& aggregate_content_size_mm,
+		OptionsWidget const& opt_widget);
 	
 	virtual ~ImageView();
 signals:
@@ -56,11 +60,18 @@ protected:
 private:
 	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
 	
+	void resizeInnerRect(QPoint delta);
+	
+	void resizeOuterRect(QPoint delta);
+	
 	void fitMarginBox(FocalPointMode fp_mode);
 	
 	void calcAndFitMarginBox(Margins const& margins_mm, FocalPointMode fp_mode);
 	
-	int cursorLocationMask(QPoint const& cursor_pos) const;
+	int cursorLocationMask(QPoint const& cursor_pos, QRectF const& virt_rect) const;
+	
+	void forceInsideWidgetExceptInitiallyOutside(
+		QRectF& rect, QRectF const& initial) const;
 	
 	void forceNonNegativeMargins(QRectF& content_plus_margins) const;
 	
@@ -85,7 +96,6 @@ private:
 	
 	QSizeF m_aggregateContentSizeMM;
 	
-	
 	/**
 	 * Transformation from widget coordinates to m_origXform coordinates
 	 * in the beginning of resizing.
@@ -95,7 +105,7 @@ private:
 	/**
 	 * m_contentPlusMargins in widget coordinates in the beginning of resizing.
 	 */
-	QRectF m_widgetRectBeforeResizing;
+	QRectF m_outerWidgetRectBeforeResizing;
 	
 	/**
 	 * Cursor position in widget coordinates in the beginning of resizing.
@@ -103,10 +113,30 @@ private:
 	QPoint m_cursorPosBeforeResizing;
 	
 	/**
-	 * A bitwise OR of *_EDGE values.  If non-zero, that means
-	 * a resizing operation is in progress.
+	 * A focal point (the point in image that is to be centered on the screen)
+	 * in physical image coordinates in the beginning of resizing.
 	 */
-	int m_resizingMask;
+	QPointF m_focalPointBeforeResizing;
+	
+	/**
+	 * A bitwise OR of *_EDGE values.  If non-zero, it means
+	 * we are currently resizing the inner edge of the margin zone.
+	 * \note Both m_innerResizingMask and m_outerResizingMask can't
+	 * be non-zero at the same time.
+	 */
+	int m_innerResizingMask;
+	
+	/**
+	 * A bitwise OR of *_EDGE values.  If non-zero, it means
+	 * we are currently resizing the outer edge of the margin zone.
+	 * \note Both m_innerResizingMask and m_outerResizingMask can't
+	 * be non-zero at the same time.
+	 */
+	int m_outerResizingMask;
+	
+	bool m_leftRightLinked;
+	
+	bool m_topBottomLinked;
 };
 
 } // namespace page_layout

@@ -34,14 +34,12 @@ namespace page_layout
 {
 
 class Filter;
-class Settings;
 
 class Task : public RefCountable
 {
 	DECLARE_NON_COPYABLE(Task)
 public:
 	Task(IntrusivePtr<Filter> const& filter,
-		IntrusivePtr<Settings> const& settings,
 		PageId const& page_id, QSizeF const& aggregated_content_size_mm,
 		bool batch, bool debug);
 	
@@ -54,7 +52,6 @@ private:
 	class UiUpdater;
 	
 	IntrusivePtr<Filter> m_ptrFilter;
-	IntrusivePtr<Settings> m_ptrSettings;
 	//std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;
 	QSizeF m_aggregatedContentSizeMM;

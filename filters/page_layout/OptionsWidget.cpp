@@ -28,7 +28,9 @@ namespace page_layout
 OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 :	m_ptrSettings(settings),
 	m_mmToUnit(1.0),
-	m_unitToMM(1.0)
+	m_unitToMM(1.0),
+	m_leftRightLinked(true),
+	m_topBottomLinked(true)
 {
 	setupUi(this);
 	connect(
@@ -45,13 +47,6 @@ void
 OptionsWidget::preUpdateUI(PageId const& page_id)
 {
 	m_marginsMM = m_ptrSettings->getPageMarginsMM(page_id);
-	updateMarginsDisplay();
-}
-
-void
-OptionsWidget::postUpdateUI(Margins const& margins_mm)
-{
-	m_marginsMM = margins_mm;
 	updateMarginsDisplay();
 }
 
