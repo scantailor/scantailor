@@ -251,6 +251,16 @@ ImageViewBase::getVisibleWidgetRect() const
 }
 
 void
+ImageViewBase::setFocalPoint(QPointF const& focal_point)
+{
+	if (focal_point != m_focalPoint) {
+		m_focalPoint = focal_point;
+		updateWidgetTransform();
+		update();
+	}
+}
+
+void
 ImageViewBase::updateTransform(ImageTransformation const& phys_to_virt)
 {
 	m_physToVirt = phys_to_virt;

@@ -124,6 +124,22 @@ protected:
 	QRectF getVisibleWidgetRect() const;
 	
 	/**
+	 * \brief Get the focal point in physical image coordinates.
+	 *
+	 * The focal point is the image point that will be displayed at the
+	 * center of the widget.
+	 */
+	QPointF getFocalPoint() const { return m_focalPoint; }
+	
+	/**
+	 * \brief Set the focal point in physical image coordinates.
+	 *
+	 * The focal point is the image point that will be displayed at the
+	 * center of the widget.
+	 */
+	void setFocalPoint(QPointF const& focal_point);
+	
+	/**
 	 * \brief Updates physical-to-virtual and recalculates
 	 *        virtual-to-physical transformations.
 	 */
@@ -192,6 +208,9 @@ private:
 	 */
 	QPoint m_lastMousePos;
 	
+	/**
+	 * The number of pixels to be left blank at each side of the widget.
+	 */
 	Margins m_margins;
 	
 	/**
