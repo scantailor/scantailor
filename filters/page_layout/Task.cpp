@@ -128,6 +128,14 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		view, SIGNAL(marginsSetManually(Margins const&)),
 		opt_widget, SLOT(marginsSetExternally(Margins const&))
 	);
+	QObject::connect(
+		opt_widget, SIGNAL(topBottomLinkToggled(bool)),
+		view, SLOT(topBottomLinkToggled(bool))
+	);
+	QObject::connect(
+		opt_widget, SIGNAL(leftRightLinkToggled(bool)),
+		view, SLOT(leftRightLinkToggled(bool))
+	);
 }
 
 } // namespace page_layout

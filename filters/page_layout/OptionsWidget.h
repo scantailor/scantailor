@@ -26,9 +26,8 @@
 //#include "AutoManualMode.h"
 //#include "Dependencies.h"
 #include "PageId.h"
+#include <QIcon>
 #include <memory>
-
-#include <QWidget>
 
 namespace page_layout
 {
@@ -52,15 +51,27 @@ public:
 	bool topBottomLinked() const { return m_topBottomLinked; }
 	
 	Margins const& marginsMM() const { return m_marginsMM; }
+signals:
+	void leftRightLinkToggled(bool linked);
+	
+	void topBottomLinkToggled(bool linked);
 public slots:
 	void marginsSetExternally(Margins const& margins_mm);
 private slots:
 	void unitsChanged(int idx);
+	
+	void topBottomLinkClicked();
+	
+	void leftRightLinkClicked();
 private:
 	void updateMarginsDisplay();
 	
+	void updateLinkDisplay(QToolButton* button, bool linked);
+	
 	IntrusivePtr<Settings> m_ptrSettings;
 	//UiData m_uiData;
+	QIcon m_chainIcon;
+	QIcon m_brokenChainIcon;
 	PageId m_pageId;
 	double m_mmToUnit;
 	double m_unitToMM;

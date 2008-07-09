@@ -19,6 +19,8 @@
 #include "OptionsWidget.h.moc"
 #include "Settings.h"
 #include "imageproc/Constants.h"
+#include <QPixmap>
+#include <QString>
 
 using namespace imageproc::constants;
 
@@ -32,11 +34,23 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	m_leftRightLinked(true),
 	m_topBottomLinked(true)
 {
+	m_chainIcon.addPixmap(
+		QPixmap(QString::fromAscii(":/icons/stock-vchain-24.png"))
+	);
+	m_brokenChainIcon.addPixmap(
+		QPixmap(QString::fromAscii(":/icons/stock-vchain-broken-24.png"))
+	);
+	
 	setupUi(this);
+	updateLinkDisplay(topBottomLink, m_topBottomLinked);
+	updateLinkDisplay(leftRightLink, m_leftRightLinked);
+	
 	connect(
 		unitsComboBox, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(unitsChanged(int))
 	);
+	connect(topBottomLink, SIGNAL(clicked()), this, SLOT(topBottomLinkClicked()));
+	connect(leftRightLink, SIGNAL(clicked()), this, SLOT(leftRightLinkClicked()));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -60,14 +74,39 @@ OptionsWidget::marginsSetExternally(Margins const& margins_mm)
 void
 OptionsWidget::unitsChanged(int const idx)
 {
+	int decimals = 0;
 	if (idx == 0) { // mm
 		m_mmToUnit = 1.0;
 		m_unitToMM = 1.0;
+		decimals = 1;
 	} else { // in
 		m_mmToUnit = MM2INCH;
 		m_unitToMM = INCH2MM;
+		decimals = 2;
 	}
+	
+	topMarginSpinBox->setDecimals(decimals);
+	bottomMarginSpinBox->setDecimals(decimals);
+	leftMarginSpinBox->setDecimals(decimals);
+	rightMarginSpinBox->setDecimals(decimals);
+	
 	updateMarginsDisplay();
+}
+
+void
+OptionsWidget::topBottomLinkClicked()
+{
+	m_topBottomLinked = !m_topBottomLinked;
+	updateLinkDisplay(topBottomLink, m_topBottomLinked);
+	topBottomLinkToggled(m_topBottomLinked);
+}
+
+void
+OptionsWidget::leftRightLinkClicked()
+{
+	m_leftRightLinked = !m_leftRightLinked;
+	updateLinkDisplay(leftRightLink, m_leftRightLinked);
+	leftRightLinkToggled(m_leftRightLinked);
 }
 
 void
@@ -77,6 +116,12 @@ OptionsWidget::updateMarginsDisplay()
 	bottomMarginSpinBox->setValue(m_marginsMM.bottom() * m_mmToUnit);
 	leftMarginSpinBox->setValue(m_marginsMM.left() * m_mmToUnit);
 	rightMarginSpinBox->setValue(m_marginsMM.right() * m_mmToUnit);
+}
+
+void
+OptionsWidget::updateLinkDisplay(QToolButton* button, bool const linked)
+{
+	button->setIcon(linked ? m_chainIcon : m_brokenChainIcon);
 }
 
 } // namespace page_layout

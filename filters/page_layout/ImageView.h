@@ -45,6 +45,10 @@ public:
 	virtual ~ImageView();
 signals:
 	void marginsSetManually(Margins const& margins_mm);
+public slots:
+	void leftRightLinkToggled(bool linked);
+	
+	void topBottomLinkToggled(bool linked);
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	

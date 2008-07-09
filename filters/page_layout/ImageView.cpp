@@ -36,6 +36,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <Qt>
+#include <algorithm>
 
 using namespace imageproc;
 
@@ -62,6 +63,44 @@ ImageView::ImageView(
 
 ImageView::~ImageView()
 {
+}
+
+void
+ImageView::leftRightLinkToggled(bool const linked)
+{
+	m_leftRightLinked = linked;
+	if (linked) {
+		// TODO: if resizing is in progress, cancel it.
+		Margins margins(calculateMarginsMM());
+		if (margins.left() != margins.right()) {
+			double const new_margin = std::min(
+				margins.left(), margins.right()
+			);
+			margins.setLeft(new_margin);
+			margins.setRight(new_margin);
+			calcAndFitMarginBox(margins, CENTER_IF_FITS);
+			emit marginsSetManually(margins);
+		}
+	}
+}
+
+void
+ImageView::topBottomLinkToggled(bool const linked)
+{
+	m_topBottomLinked = linked;
+	if (linked) {
+		// TODO: if resizing is in progress, cancel it.
+		Margins margins(calculateMarginsMM());
+		if (margins.top() != margins.bottom()) {
+			double const new_margin = std::min(
+				margins.top(), margins.bottom()
+			);
+			margins.setTop(new_margin);
+			margins.setBottom(new_margin);
+			calcAndFitMarginBox(margins, CENTER_IF_FITS);
+			emit marginsSetManually(margins);
+		}
+	}
 }
 
 void
@@ -165,7 +204,14 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 		return;
 	}
 	
-	if (!(m_innerResizingMask | m_outerResizingMask)) { // not resizing
+	if (m_innerResizingMask | m_outerResizingMask) {
+		QPoint const delta(event->pos() - m_cursorPosBeforeResizing);
+		if (m_innerResizingMask) {
+			resizeInnerRect(delta);
+		} else {
+			resizeOuterRect(delta);
+		}
+	} else {
 		int const outer_mask = cursorLocationMask(event->pos(), m_contentPlusMargins);
 		int const inner_mask = cursorLocationMask(event->pos(), m_contentRect);
 		int const mask = inner_mask ? inner_mask : outer_mask;
@@ -187,13 +233,19 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 				ensureCursorShape(Qt::SizeBDiagCursor);
 			}
 		}
-	} else {
-		QPoint const delta(event->pos() - m_cursorPosBeforeResizing);
-		if (m_innerResizingMask) {
-			resizeInnerRect(delta);
-		} else {
-			resizeOuterRect(delta);
-		}
+	}
+}
+
+void
+ImageView::hideEvent(QHideEvent* const event)
+{
+	ImageViewBase::hideEvent(event);
+	int const old_resizing_mask = m_innerResizingMask | m_outerResizingMask;
+	m_innerResizingMask = 0;
+	m_outerResizingMask = 0;
+	ensureCursorShape(Qt::ArrowCursor);
+	if (old_resizing_mask) {
+		emit marginsSetManually(calculateMarginsMM());
 	}
 }
 
@@ -209,13 +261,25 @@ ImageView::resizeInnerRect(QPoint const delta)
 	
 	if (m_innerResizingMask & LEFT_EDGE) {
 		left_adjust = effective_dx = delta.x();
+		if (m_leftRightLinked) {
+			right_adjust = -left_adjust;
+		}
 	} else if (m_innerResizingMask & RIGHT_EDGE) {
 		right_adjust = effective_dx = delta.x();
+		if (m_leftRightLinked) {
+			left_adjust = -right_adjust;
+		}
 	}
 	if (m_innerResizingMask & TOP_EDGE) {
 		top_adjust = effective_dy = delta.y();
+		if (m_topBottomLinked) {
+			bottom_adjust = -top_adjust;
+		}
 	} else if (m_innerResizingMask & BOTTOM_EDGE) {
 		bottom_adjust = effective_dy = delta.y();
+		if (m_topBottomLinked) {
+			top_adjust = -bottom_adjust;
+		}
 	}
 	
 	{
@@ -248,15 +312,25 @@ ImageView::resizeOuterRect(QPoint const delta)
 	
 	if (m_outerResizingMask & LEFT_EDGE) {
 		left_adjust = delta.x();
-	}
-	if (m_outerResizingMask & RIGHT_EDGE) {
+		if (m_leftRightLinked) {
+			right_adjust = -left_adjust;
+		}
+	} else if (m_outerResizingMask & RIGHT_EDGE) {
 		right_adjust = delta.x();
+		if (m_leftRightLinked) {
+			left_adjust = -right_adjust;
+		}
 	}
 	if (m_outerResizingMask & TOP_EDGE) {
 		top_adjust = delta.y();
-	}
-	if (m_outerResizingMask & BOTTOM_EDGE) {
+		if (m_topBottomLinked) {
+			bottom_adjust = -top_adjust;
+		}
+	} else if (m_outerResizingMask & BOTTOM_EDGE) {
 		bottom_adjust = delta.y();
+		if (m_topBottomLinked) {
+			top_adjust = -bottom_adjust;
+		}
 	}
 	
 	{
@@ -273,19 +347,6 @@ ImageView::resizeOuterRect(QPoint const delta)
 	
 	update();
 	emit marginsSetManually(calculateMarginsMM());
-}
-
-void
-ImageView::hideEvent(QHideEvent* const event)
-{
-	ImageViewBase::hideEvent(event);
-	int const old_resizing_mask = m_innerResizingMask | m_outerResizingMask;
-	m_innerResizingMask = 0;
-	m_outerResizingMask = 0;
-	ensureCursorShape(Qt::ArrowCursor);
-	if (old_resizing_mask) {
-		emit marginsSetManually(calculateMarginsMM());
-	}
 }
 
 /**
