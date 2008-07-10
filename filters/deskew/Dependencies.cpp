@@ -19,10 +19,11 @@
 #include "Dependencies.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
-#include <QRectF>
+#include "imageproc/PolygonUtils.h"
 #include <QDomDocument>
 #include <QDomElement>
-#include <math.h>
+
+using namespace imageproc;
 
 namespace deskew
 {
@@ -62,7 +63,7 @@ Dependencies::matches(Dependencies const& other) const
 	if (m_rotation != other.m_rotation) {
 		return false;
 	}
-	if (!arePolygonsSimilar(m_pageOutline, other.m_pageOutline)) {
+	if (!PolygonUtils::fuzzyCompare(m_pageOutline, other.m_pageOutline)) {
 		return false;
 	}
 	return true;
@@ -78,26 +79,6 @@ Dependencies::toXml(QDomDocument& doc, QString const& name) const
 	el.appendChild(marshaller.polygonF(m_pageOutline, "page-outline"));
 	
 	return el;
-}
-
-bool
-Dependencies::arePolygonsSimilar(QPolygonF const& p1, QPolygonF const& p2)
-{
-	// Let's compare just the bounding boxes for now.
-	// We could use QPolygonF::intersected(), but it's buggy in Qt < 4.3.3
-	QRectF const bb1(p1.boundingRect());
-	QRectF const bb2(p2.boundingRect());
-	if (fabs(bb1.top() - bb2.top()) >= 1.0) {
-		return false;
-	} else if (fabs(bb1.bottom() - bb2.bottom()) >= 1.0) {
-		return false;
-	} else if (fabs(bb1.left() - bb2.left()) >= 1.0) {
-		return false;
-	} else if (fabs(bb1.right() - bb2.right()) >= 1.0) {
-		return false;
-	} else {
-		return true;
-	}
 }
 
 } // namespace deskew

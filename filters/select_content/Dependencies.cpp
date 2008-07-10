@@ -19,10 +19,11 @@
 #include "Dependencies.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
-#include <QRectF>
+#include "imageproc/PolygonUtils.h"
 #include <QDomDocument>
 #include <QDomElement>
-#include <math.h>
+
+using namespace imageproc;
 
 namespace select_content
 {
@@ -52,7 +53,9 @@ Dependencies::~Dependencies()
 bool
 Dependencies::matches(Dependencies const& other) const
 {
-	return arePolygonsSimilar(m_rotatedPageOutline, other.m_rotatedPageOutline);
+	return PolygonUtils::fuzzyCompare(
+		m_rotatedPageOutline, other.m_rotatedPageOutline
+	);
 }
 
 QDomElement
@@ -68,26 +71,6 @@ Dependencies::toXml(QDomDocument& doc, QString const& name) const
 	);
 	
 	return el;
-}
-
-bool
-Dependencies::arePolygonsSimilar(QPolygonF const& p1, QPolygonF const& p2)
-{
-	// Let's compare just the bounding boxes for now.
-	// We could use QPolygonF::intersected(), but it's buggy in Qt < 4.3.3
-	QRectF const bb1(p1.boundingRect());
-	QRectF const bb2(p2.boundingRect());
-	if (fabs(bb1.top() - bb2.top()) >= 1.0) {
-		return false;
-	} else if (fabs(bb1.bottom() - bb2.bottom()) >= 1.0) {
-		return false;
-	} else if (fabs(bb1.left() - bb2.left()) >= 1.0) {
-		return false;
-	} else if (fabs(bb1.right() - bb2.right()) >= 1.0) {
-		return false;
-	} else {
-		return true;
-	}
 }
 
 } // namespace select_content

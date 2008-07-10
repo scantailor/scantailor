@@ -19,8 +19,11 @@
 #ifndef IMAGEPROC_POLYGONUTILS_H_
 #define IMAGEPROC_POLYGONUTILS_H_
 
+#include <vector>
+
 class QPolygonF;
 class QPointF;
+class QLineF;
 
 namespace imageproc
 {
@@ -37,10 +40,29 @@ public:
 	 * only make a very minor adjustments.
 	 */
 	static QPolygonF round(QPolygonF const& poly);
+	
+	/**
+	 * \brief Test if two polygons are logically equal.
+	 *
+	 * By logical equality we mean that the following differences don't matter:
+	 * \li Direction (clockwise vs counter-clockwise).
+	 * \li Closed vs unclosed.
+	 * \li Tiny differences in vertex coordinates.
+	 *
+	 * \return true if polygons are logically equal, false otherwise.
+	 */
+	static bool fuzzyCompare(QPolygonF const& poly1, QPolygonF const& poly2);
 private:
+	class Before;
+	
 	static QPointF roundPoint(QPointF const& p);
 	
 	static double roundValue(double val);
+	
+	static std::vector<QLineF> extractAndNormalizeEdges(QPolygonF const& poly);
+	
+	static void maybeAddNormalizedEdge(
+		std::vector<QLineF>& edges, QPointF const& p1, QPointF const& p2);
 };
 
 } // namespace imageproc

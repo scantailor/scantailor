@@ -50,8 +50,6 @@ public:
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
-	static bool arePolygonsSimilar(QPolygonF const& p1, QPolygonF const& p2);
-	
 	QPolygonF m_rotatedPageOutline;
 };
 
