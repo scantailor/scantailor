@@ -72,10 +72,9 @@ private:
 	
 	void calcAndFitMarginBox(Margins const& margins_mm, FocalPointMode fp_mode);
 	
-	int cursorLocationMask(QPoint const& cursor_pos, QRectF const& virt_rect) const;
+	void updatePresentationTransform();
 	
-	void forceInsideWidgetExceptInitiallyOutside(
-		QRectF& rect, QRectF const& initial) const;
+	int cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const;
 	
 	void forceNonNegativeMargins(QRectF& content_plus_margins) const;
 	
@@ -83,8 +82,9 @@ private:
 	
 	/**
 	 * Image transformation, as provided by the previous filter.
-	 * We pass another transformation to ImageViewBase, in order to
-	 * be able to display margins, that may be outside the image area.
+	 * We pass another transformation to ImageViewBase, which we call
+	 * "presentation transform" in order to be able to display margins that
+	 * may be outside the image area.
 	 */
 	ImageTransformation const m_origXform;
 	
@@ -97,8 +97,6 @@ private:
 	 * Content + margins box in m_origXform coordinates.
 	 */
 	QRectF m_contentPlusMargins;
-	
-	QSizeF m_aggregateContentSizeMM;
 	
 	/**
 	 * Transformation from widget coordinates to m_origXform coordinates

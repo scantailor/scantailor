@@ -45,12 +45,11 @@ namespace page_layout
 
 ImageView::ImageView(
 	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect, QSizeF const& aggregate_content_size_mm,
+	QRectF const& content_rect, QSizeF const& aggregate_content_size_mm, // TODO: remove me
 	OptionsWidget const& opt_widget)
 :	ImageViewBase(image, xform, Margins(5.0, 5.0, 5.0, 5.0)),
 	m_origXform(xform),
 	m_contentRect(content_rect),
-	m_aggregateContentSizeMM(aggregate_content_size_mm),
 	m_innerResizingMask(0),
 	m_outerResizingMask(0),
 	m_leftRightLinked(opt_widget.leftRightLinked()),
@@ -290,6 +289,8 @@ ImageView::resizeInnerRect(QPoint const delta)
 		forceNonNegativeMargins(m_contentPlusMargins); // invalidates widget_rect
 	}
 	
+	// Updating the focal point is what makes the image move
+	// as we drag an inner edge.
 	QPointF fp(m_focalPointBeforeResizing);
 	fp = physToVirt().transform().map(fp);
 	fp = virtualToWidget().map(fp);
@@ -298,6 +299,9 @@ ImageView::resizeInnerRect(QPoint const delta)
 	fp = physToVirt().transformBack().map(fp);
 	setFocalPoint(fp);
 	
+	// This clips image by the outer rect.
+	updatePresentationTransform();
+	
 	update();
 	emit marginsSetManually(calculateMarginsMM());
 }
@@ -305,29 +309,43 @@ ImageView::resizeInnerRect(QPoint const delta)
 void
 ImageView::resizeOuterRect(QPoint const delta)
 {
-	int left_adjust = 0;
-	int right_adjust = 0;
-	int top_adjust = 0;
-	int bottom_adjust = 0;
+	double left_adjust = 0.0;
+	double right_adjust = 0.0;
+	double top_adjust = 0.0;
+	double bottom_adjust = 0.0;
+	
+	QRectF const bounds(marginsRect());
 	
 	if (m_outerResizingMask & LEFT_EDGE) {
 		left_adjust = delta.x();
+		if (m_outerWidgetRectBeforeResizing.left() + left_adjust < bounds.left()) {
+			left_adjust = bounds.left() - m_outerWidgetRectBeforeResizing.left();
+		}
 		if (m_leftRightLinked) {
 			right_adjust = -left_adjust;
 		}
 	} else if (m_outerResizingMask & RIGHT_EDGE) {
 		right_adjust = delta.x();
+		if (m_outerWidgetRectBeforeResizing.right() + right_adjust > bounds.right()) {
+			right_adjust = bounds.right() - m_outerWidgetRectBeforeResizing.right();
+		}
 		if (m_leftRightLinked) {
 			left_adjust = -right_adjust;
 		}
 	}
 	if (m_outerResizingMask & TOP_EDGE) {
 		top_adjust = delta.y();
+		if (m_outerWidgetRectBeforeResizing.top() + top_adjust < bounds.top()) {
+			top_adjust = bounds.top() - m_outerWidgetRectBeforeResizing.top();
+		}
 		if (m_topBottomLinked) {
 			bottom_adjust = -top_adjust;
 		}
 	} else if (m_outerResizingMask & BOTTOM_EDGE) {
 		bottom_adjust = delta.y();
+		if (m_outerWidgetRectBeforeResizing.bottom() + bottom_adjust > bounds.bottom()) {
+			bottom_adjust = bounds.bottom() - m_outerWidgetRectBeforeResizing.bottom();
+		}
 		if (m_topBottomLinked) {
 			top_adjust = -bottom_adjust;
 		}
@@ -337,22 +355,20 @@ ImageView::resizeOuterRect(QPoint const delta)
 		QRectF widget_rect(m_outerWidgetRectBeforeResizing);
 		widget_rect.adjust(left_adjust, top_adjust, right_adjust, bottom_adjust);
 		
-		forceInsideWidgetExceptInitiallyOutside(
-			widget_rect, m_outerWidgetRectBeforeResizing
-		);
-		
 		m_contentPlusMargins = m_widgetToOrigBeforeResizing.mapRect(widget_rect);
 		forceNonNegativeMargins(m_contentPlusMargins); // invalidates widget_rect
 	}
+	
+	// This clips image by the outer rect.
+	updatePresentationTransform();
 	
 	update();
 	emit marginsSetManually(calculateMarginsMM());
 }
 
 /**
- * Fits the image with margins into the widget by feeding ImageViewBase
- * an adjusted transformation that makes it think the visible image area
- * is bigger than it really is.
+ * Fits the image with margins into the widget by updating the presentation
+ * transform and adjusting the focal point.
  */
 void
 ImageView::fitMarginBox(FocalPointMode const fp_mode)
@@ -369,6 +385,10 @@ ImageView::fitMarginBox(FocalPointMode const fp_mode)
 	updateTransformAndFixFocalPoint(new_xform, fp_mode);
 }
 
+/**
+ * Updates m_contentPlusMargins based on \p margins_mm, then does what
+ * fitMarginBox() does.
+ */
 void
 ImageView::calcAndFitMarginBox(
 	Margins const& margins_mm, FocalPointMode const fp_mode)
@@ -419,14 +439,42 @@ ImageView::calcAndFitMarginBox(
 	updateTransformAndFixFocalPoint(new_xform, fp_mode);
 }
 
+/**
+ * Updates the presentation transform in such a way that ImageViewBase
+ * sees the image extended / clipped by m_contentPlusMargins.
+ */
+void
+ImageView::updatePresentationTransform()
+{
+	QPolygonF const poly_phys(
+		m_origXform.transformBack().map(m_contentPlusMargins)
+	);
+	
+	ImageTransformation new_xform(m_origXform);
+	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
+	new_xform.setCropArea(new_xform.transform().map(poly_phys));
+	new_xform.setPostRotation(m_origXform.postRotation());
+	
+	updateTransformPreservingScale(new_xform);
+}
+
+/**
+ * \brief Checks if mouse pointer is near the edges of a rectangle.
+ *
+ * \param cursor_pos The mouse pointer position in widget coordinates.
+ * \param orig_rect The rectangle for edge proximity testing, in m_origXform
+ *        coordinates.
+ * \return A bitwise OR of *_EDGE values, corresponding to the proximity of
+ *         the \p cursor_pos to a particular edge of \p orig_rect.
+ */
 int
-ImageView::cursorLocationMask(QPoint const& cursor_pos, QRectF const& virt_rect) const
+ImageView::cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const
 {
 	QTransform const orig_to_widget(
 		m_origXform.transformBack() * physToVirt().transform()
 		* virtualToWidget()
 	);
-	QRect const rect(orig_to_widget.mapRect(virt_rect).toRect());
+	QRect const rect(orig_to_widget.mapRect(orig_rect).toRect());
 	int const adj = 5;
 	int mask = 0;
 	
@@ -458,25 +506,6 @@ ImageView::cursorLocationMask(QPoint const& cursor_pos, QRectF const& virt_rect)
 }
 
 void
-ImageView::forceInsideWidgetExceptInitiallyOutside(
-	QRectF& rect, QRectF const& initial) const
-{
-	QRectF const bounds(marginsRect());
-	if (rect.left() < bounds.left() && initial.left() >= bounds.left()) {
-		rect.setLeft(bounds.left());
-	}
-	if (rect.right() > bounds.right() && initial.right() <= bounds.right()) {
-		rect.setRight(bounds.right());
-	}
-	if (rect.top() < bounds.top() && initial.top() >= bounds.top()) {
-		rect.setTop(bounds.top());
-	}
-	if (rect.bottom() > bounds.bottom() && initial.bottom() <= bounds.bottom()) {
-		rect.setBottom(bounds.bottom());
-	}
-}
-
-void
 ImageView::forceNonNegativeMargins(QRectF& content_plus_margins) const
 {
 	if (content_plus_margins.left() > m_contentRect.left()) {
@@ -493,6 +522,10 @@ ImageView::forceNonNegativeMargins(QRectF& content_plus_margins) const
 	}
 }
 
+/**
+ * \brief Calculates margins in millimeters based on m_contentRect
+ *        and m_contentPlusMargins.
+ */
 Margins
 ImageView::calculateMarginsMM() const
 {
