@@ -140,6 +140,13 @@ protected:
 	void setFocalPoint(QPointF const& focal_point);
 	
 	/**
+	 * \brief Resets the zoom to the default value.
+	 *
+	 * The default zoom is such that the image can fit into the widget.
+	 */
+	void resetZoom();
+	
+	/**
 	 * \brief Updates physical-to-virtual and recalculates
 	 *        virtual-to-physical transformations.
 	 */

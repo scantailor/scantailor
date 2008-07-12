@@ -261,6 +261,15 @@ ImageViewBase::setFocalPoint(QPointF const& focal_point)
 }
 
 void
+ImageViewBase::resetZoom()
+{
+	if (m_zoom != 1.0) {
+		m_zoom = 1.0;
+		update();
+	}
+}
+
+void
 ImageViewBase::updateTransform(ImageTransformation const& phys_to_virt)
 {
 	m_physToVirt = phys_to_virt;
