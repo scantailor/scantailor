@@ -157,17 +157,17 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 			widgetToVirtual() * physToVirt().transformBack()
 			* m_origXform.transform()
 		);
-		m_outerWidgetRectBeforeResizing = orig_to_widget.mapRect(
+		m_beforeResizing.outerWidgetRect = orig_to_widget.mapRect(
 			m_contentPlusMargins
 		);
-		m_widgetToOrigBeforeResizing = widget_to_orig;
-		m_cursorPosBeforeResizing = event->pos();
-		m_focalPointBeforeResizing = getFocalPoint();
+		m_beforeResizing.widgetToOrig = widget_to_orig;
+		m_beforeResizing.mousePos = event->pos();
+		m_beforeResizing.focalPoint = getFocalPoint();
 		
-		// We mare sure that only one of inner mask and outer mask
+		// We make sure that only one of inner mask and outer mask
 		// is non-zero.  Note that inner mask takes precedence, as
-		// the outer mask may be unmovable if it's on the edge of the
-		// widget.
+		// an outer edge may be unmovable if it's on the edge of the
+		// widget and very close to an inner edge.
 		if (inner_mask) {
 			m_innerResizingMask = inner_mask;
 			m_outerResizingMask = 0;
@@ -190,7 +190,12 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 			&& (m_innerResizingMask | m_outerResizingMask)) {
 		m_innerResizingMask = 0;
 		m_outerResizingMask = 0;
-		fitMarginBox(CENTER_IF_FITS);
+		
+		if (QRectF(rect()).contains(m_beforeResizing.outerWidgetRect)) {
+			resetZoom();
+			fitMarginBox(CENTER_IF_FITS);
+		}
+		
 	//	emit marginsSetManually(calculateMarginsMM());
 	}
 }
@@ -204,7 +209,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 	}
 	
 	if (m_innerResizingMask | m_outerResizingMask) {
-		QPoint const delta(event->pos() - m_cursorPosBeforeResizing);
+		QPoint const delta(event->pos() - m_beforeResizing.mousePos);
 		if (m_innerResizingMask) {
 			resizeInnerRect(delta);
 		} else {
@@ -282,16 +287,16 @@ ImageView::resizeInnerRect(QPoint const delta)
 	}
 	
 	{
-		QRectF widget_rect(m_outerWidgetRectBeforeResizing);
+		QRectF widget_rect(m_beforeResizing.outerWidgetRect);
 		widget_rect.adjust(-left_adjust, -top_adjust, -right_adjust, -bottom_adjust);
 		
-		m_contentPlusMargins = m_widgetToOrigBeforeResizing.mapRect(widget_rect);
+		m_contentPlusMargins = m_beforeResizing.widgetToOrig.mapRect(widget_rect);
 		forceNonNegativeMargins(m_contentPlusMargins); // invalidates widget_rect
 	}
 	
 	// Updating the focal point is what makes the image move
 	// as we drag an inner edge.
-	QPointF fp(m_focalPointBeforeResizing);
+	QPointF fp(m_beforeResizing.focalPoint);
 	fp = physToVirt().transform().map(fp);
 	fp = virtualToWidget().map(fp);
 	fp -= QPointF(effective_dx, effective_dy);
@@ -315,19 +320,20 @@ ImageView::resizeOuterRect(QPoint const delta)
 	double bottom_adjust = 0.0;
 	
 	QRectF const bounds(marginsRect());
+	QRectF const old_outer_rect(m_beforeResizing.outerWidgetRect);
 	
 	if (m_outerResizingMask & LEFT_EDGE) {
 		left_adjust = delta.x();
-		if (m_outerWidgetRectBeforeResizing.left() + left_adjust < bounds.left()) {
-			left_adjust = bounds.left() - m_outerWidgetRectBeforeResizing.left();
+		if (old_outer_rect.left() + left_adjust < bounds.left()) {
+			left_adjust = bounds.left() - old_outer_rect.left();
 		}
 		if (m_leftRightLinked) {
 			right_adjust = -left_adjust;
 		}
 	} else if (m_outerResizingMask & RIGHT_EDGE) {
 		right_adjust = delta.x();
-		if (m_outerWidgetRectBeforeResizing.right() + right_adjust > bounds.right()) {
-			right_adjust = bounds.right() - m_outerWidgetRectBeforeResizing.right();
+		if (old_outer_rect.right() + right_adjust > bounds.right()) {
+			right_adjust = bounds.right() - old_outer_rect.right();
 		}
 		if (m_leftRightLinked) {
 			left_adjust = -right_adjust;
@@ -335,16 +341,16 @@ ImageView::resizeOuterRect(QPoint const delta)
 	}
 	if (m_outerResizingMask & TOP_EDGE) {
 		top_adjust = delta.y();
-		if (m_outerWidgetRectBeforeResizing.top() + top_adjust < bounds.top()) {
-			top_adjust = bounds.top() - m_outerWidgetRectBeforeResizing.top();
+		if (old_outer_rect.top() + top_adjust < bounds.top()) {
+			top_adjust = bounds.top() - old_outer_rect.top();
 		}
 		if (m_topBottomLinked) {
 			bottom_adjust = -top_adjust;
 		}
 	} else if (m_outerResizingMask & BOTTOM_EDGE) {
 		bottom_adjust = delta.y();
-		if (m_outerWidgetRectBeforeResizing.bottom() + bottom_adjust > bounds.bottom()) {
-			bottom_adjust = bounds.bottom() - m_outerWidgetRectBeforeResizing.bottom();
+		if (old_outer_rect.bottom() + bottom_adjust > bounds.bottom()) {
+			bottom_adjust = bounds.bottom() - old_outer_rect.bottom();
 		}
 		if (m_topBottomLinked) {
 			top_adjust = -bottom_adjust;
@@ -352,10 +358,10 @@ ImageView::resizeOuterRect(QPoint const delta)
 	}
 	
 	{
-		QRectF widget_rect(m_outerWidgetRectBeforeResizing);
+		QRectF widget_rect(old_outer_rect);
 		widget_rect.adjust(left_adjust, top_adjust, right_adjust, bottom_adjust);
 		
-		m_contentPlusMargins = m_widgetToOrigBeforeResizing.mapRect(widget_rect);
+		m_contentPlusMargins = m_beforeResizing.widgetToOrig.mapRect(widget_rect);
 		forceNonNegativeMargins(m_contentPlusMargins); // invalidates widget_rect
 	}
 	

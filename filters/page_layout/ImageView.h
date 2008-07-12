@@ -64,6 +64,30 @@ protected:
 private:
 	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
 	
+	struct StateBeforeResizing
+	{
+		/**
+		 * Transformation from widget coordinates to m_origXform coordinates
+		 */
+		QTransform widgetToOrig;
+		
+		/**
+		 * m_contentPlusMargins in widget coordinates.
+		 */
+		QRectF outerWidgetRect;
+		
+		/**
+		 * Mouse pointer position in widget coordinates.
+		 */
+		QPoint mousePos;
+		
+		/**
+		 * The point in image that is to be centered on the screen
+		 * in physical image coordinates.
+		 */
+		QPointF focalPoint;
+	};
+	
 	void resizeInnerRect(QPoint delta);
 	
 	void resizeOuterRect(QPoint delta);
@@ -99,26 +123,9 @@ private:
 	QRectF m_contentPlusMargins;
 	
 	/**
-	 * Transformation from widget coordinates to m_origXform coordinates
-	 * in the beginning of resizing.
+	 * Some data saved at the beginning of a resizing operation.
 	 */
-	QTransform m_widgetToOrigBeforeResizing;
-	
-	/**
-	 * m_contentPlusMargins in widget coordinates in the beginning of resizing.
-	 */
-	QRectF m_outerWidgetRectBeforeResizing;
-	
-	/**
-	 * Cursor position in widget coordinates in the beginning of resizing.
-	 */
-	QPoint m_cursorPosBeforeResizing;
-	
-	/**
-	 * A focal point (the point in image that is to be centered on the screen)
-	 * in physical image coordinates in the beginning of resizing.
-	 */
-	QPointF m_focalPointBeforeResizing;
+	StateBeforeResizing m_beforeResizing;
 	
 	/**
 	 * A bitwise OR of *_EDGE values.  If non-zero, it means
