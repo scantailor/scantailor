@@ -23,11 +23,15 @@
 #include "FilterOptionsWidget.h"
 #include "IntrusivePtr.h"
 #include "Margins.h"
+#include "Alignment.h"
 //#include "AutoManualMode.h"
 //#include "Dependencies.h"
 #include "PageId.h"
 #include <QIcon>
 #include <memory>
+#include <map>
+
+class QToolButton;
 
 namespace page_layout
 {
@@ -46,15 +50,21 @@ public:
 	
 	void preUpdateUI(PageId const& page_id);
 	
+	void postUpdateUI();
+	
 	bool leftRightLinked() const { return m_leftRightLinked; }
 	
 	bool topBottomLinked() const { return m_topBottomLinked; }
 	
 	Margins const& marginsMM() const { return m_marginsMM; }
+	
+	Alignment alignment() const;
 signals:
 	void leftRightLinkToggled(bool linked);
 	
 	void topBottomLinkToggled(bool linked);
+	
+	void alignmentChanged(Alignment const& alignment);
 public slots:
 	void marginsSetExternally(Margins const& margins_mm);
 private slots:
@@ -63,16 +73,25 @@ private slots:
 	void topBottomLinkClicked();
 	
 	void leftRightLinkClicked();
+	
+	void alignWithOthersToggled();
+	
+	void alignmentButtonClicked();
 private:
+	typedef std::map<QToolButton*, Alignment> AlignmentByButton;
+	
 	void updateMarginsDisplay();
 	
 	void updateLinkDisplay(QToolButton* button, bool linked);
+	
+	void updateAlignmentButtons();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	//UiData m_uiData;
 	QIcon m_chainIcon;
 	QIcon m_brokenChainIcon;
 	PageId m_pageId;
+	AlignmentByButton m_alignmentByButton;
 	double m_mmToUnit;
 	double m_unitToMM;
 	Margins m_marginsMM;

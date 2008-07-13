@@ -1,5 +1,14 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/stock-center-24.png</file>
+    <file>icons/stock-gravity-east-24.png</file>
+    <file>icons/stock-gravity-north-24.png</file>
+    <file>icons/stock-gravity-north-east-24.png</file>
+    <file>icons/stock-gravity-north-west-24.png</file>
+    <file>icons/stock-gravity-south-24.png</file>
+    <file>icons/stock-gravity-south-east-24.png</file>
+    <file>icons/stock-gravity-south-west-24.png</file>
+    <file>icons/stock-gravity-west-24.png</file>
     <file>icons/stock-vchain-24.png</file>
     <file>icons/stock-vchain-broken-24.png</file>
     <file>icons/16x16/media-playback-start.png</file>

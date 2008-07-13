@@ -21,6 +21,9 @@
 
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
+#include "Alignment.h"
+#include "IntrusivePtr.h"
+#include "PageId.h"
 #include <QSizeF>
 #include <QRectF>
 #include <QPointF>
@@ -32,15 +35,16 @@ namespace page_layout
 {
 
 class OptionsWidget;
+class Settings;
 
 class ImageView : public ImageViewBase
 {
 	Q_OBJECT
 public:
 	ImageView(
+		IntrusivePtr<Settings> const& settings, PageId const& page_id,
 		QImage const& image, ImageTransformation const& xform,
-		QRectF const& content_rect, QSizeF const& aggregate_content_size_mm,
-		OptionsWidget const& opt_widget);
+		QRectF const& content_rect, OptionsWidget const& opt_widget);
 	
 	virtual ~ImageView();
 signals:
@@ -49,6 +53,8 @@ public slots:
 	void leftRightLinkToggled(bool linked);
 	
 	void topBottomLinkToggled(bool linked);
+	
+	void alignmentChanged(Alignment const& alignment);
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	
@@ -63,6 +69,7 @@ protected:
 	virtual void hideEvent(QHideEvent* event);
 private:
 	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
+	enum FitMode { FIT, DONT_FIT };
 	
 	struct StateBeforeResizing
 	{
@@ -92,17 +99,25 @@ private:
 	
 	void resizeOuterRect(QPoint delta);
 	
-	void fitMarginBox(FocalPointMode fp_mode);
-	
 	void calcAndFitMarginBox(Margins const& margins_mm, FocalPointMode fp_mode);
 	
-	void updatePresentationTransform();
+	void updatePresentationTransform(FitMode fit_mode);
 	
 	int cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const;
 	
 	void forceNonNegativeMargins(QRectF& content_plus_margins) const;
 	
-	Margins calculateMarginsMM() const;
+	Margins calcMarginsMM() const;
+	
+	Margins getAdditionalMarginsMM(QSizeF const& content_plus_margins_mm) const;
+	
+	void recalcAdditionalMarginsMM();
+	
+	QSizeF origRectToSizeMM(QRectF const& rect);
+	
+	IntrusivePtr<Settings> m_ptrSettings;
+	
+	PageId const m_pageId;
 	
 	/**
 	 * Image transformation, as provided by the previous filter.
@@ -121,6 +136,12 @@ private:
 	 * Content + margins box in m_origXform coordinates.
 	 */
 	QRectF m_contentPlusMargins;
+	
+	QRectF m_contentPlusAllMargins;
+	
+	QSizeF m_aggregatePageSizeMM;
+	
+	Alignment m_alignment;
 	
 	/**
 	 * Some data saved at the beginning of a resizing operation.

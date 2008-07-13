@@ -19,6 +19,7 @@
 #include "ImageView.h.moc"
 #include "OptionsWidget.h"
 #include "Margins.h"
+#include "Settings.h"
 #include "ImageTransformation.h"
 #include "PhysicalTransformation.h"
 #include "imageproc/PolygonUtils.h"
@@ -44,12 +45,16 @@ namespace page_layout
 {
 
 ImageView::ImageView(
+	IntrusivePtr<Settings> const& settings, PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect, QSizeF const& aggregate_content_size_mm, // TODO: remove me
-	OptionsWidget const& opt_widget)
+	QRectF const& content_rect, OptionsWidget const& opt_widget)
 :	ImageViewBase(image, xform, Margins(5.0, 5.0, 5.0, 5.0)),
+	m_ptrSettings(settings),
+	m_pageId(page_id),
 	m_origXform(xform),
 	m_contentRect(content_rect),
+	m_aggregatePageSizeMM(settings->getAggregatePageSizeMM()),
+	m_alignment(opt_widget.alignment()),
 	m_innerResizingMask(0),
 	m_outerResizingMask(0),
 	m_leftRightLinked(opt_widget.leftRightLinked()),
@@ -70,7 +75,7 @@ ImageView::leftRightLinkToggled(bool const linked)
 	m_leftRightLinked = linked;
 	if (linked) {
 		// TODO: if resizing is in progress, cancel it.
-		Margins margins(calculateMarginsMM());
+		Margins margins(calcMarginsMM());
 		if (margins.left() != margins.right()) {
 			double const new_margin = std::min(
 				margins.left(), margins.right()
@@ -89,7 +94,7 @@ ImageView::topBottomLinkToggled(bool const linked)
 	m_topBottomLinked = linked;
 	if (linked) {
 		// TODO: if resizing is in progress, cancel it.
-		Margins margins(calculateMarginsMM());
+		Margins margins(calcMarginsMM());
 		if (margins.top() != margins.bottom()) {
 			double const new_margin = std::min(
 				margins.top(), margins.bottom()
@@ -100,6 +105,13 @@ ImageView::topBottomLinkToggled(bool const linked)
 			emit marginsSetManually(margins);
 		}
 	}
+}
+
+void
+ImageView::alignmentChanged(Alignment const& alignment)
+{
+	m_alignment = alignment;
+	calcAndFitMarginBox(calcMarginsMM(), CENTER_IF_FITS);
 }
 
 void
@@ -130,6 +142,10 @@ ImageView::paintOverImage(QPainter& painter)
 	painter.setBrush(Qt::NoBrush);
 	painter.drawRect(m_contentPlusMargins);
 	painter.drawRect(m_contentRect);
+	
+	pen.setStyle(Qt::DashLine);
+	painter.setPen(pen);
+	painter.drawRect(m_contentPlusAllMargins);
 }
 
 void
@@ -191,9 +207,16 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 		m_innerResizingMask = 0;
 		m_outerResizingMask = 0;
 		
+		// TODO: make a function that does both.
+		m_ptrSettings->setPageMarginsMM(m_pageId, calcMarginsMM());
+		m_aggregatePageSizeMM = m_ptrSettings->getAggregatePageSizeMM();
+		
+		recalcAdditionalMarginsMM();
+		
 		if (QRectF(rect()).contains(m_beforeResizing.outerWidgetRect)) {
-			resetZoom();
-			fitMarginBox(CENTER_IF_FITS);
+			updatePresentationTransform(FIT);
+		} else {
+			updatePresentationTransform(DONT_FIT);
 		}
 		
 	//	emit marginsSetManually(calculateMarginsMM());
@@ -249,7 +272,7 @@ ImageView::hideEvent(QHideEvent* const event)
 	m_outerResizingMask = 0;
 	ensureCursorShape(Qt::ArrowCursor);
 	if (old_resizing_mask) {
-		emit marginsSetManually(calculateMarginsMM());
+		emit marginsSetManually(calcMarginsMM());
 	}
 }
 
@@ -304,11 +327,16 @@ ImageView::resizeInnerRect(QPoint const delta)
 	fp = physToVirt().transformBack().map(fp);
 	setFocalPoint(fp);
 	
-	// This clips image by the outer rect.
-	updatePresentationTransform();
+	m_aggregatePageSizeMM = m_ptrSettings->getAggregatePageSizeMM(
+		m_pageId, origRectToSizeMM(m_contentPlusMargins)
+	);
 	
-	update();
-	emit marginsSetManually(calculateMarginsMM());
+	// Recalculate m_contentPlusAllMargins.
+	recalcAdditionalMarginsMM();
+	
+	updatePresentationTransform(DONT_FIT);
+	
+	emit marginsSetManually(calcMarginsMM());
 }
 
 void
@@ -365,30 +393,16 @@ ImageView::resizeOuterRect(QPoint const delta)
 		forceNonNegativeMargins(m_contentPlusMargins); // invalidates widget_rect
 	}
 	
-	// This clips image by the outer rect.
-	updatePresentationTransform();
-	
-	update();
-	emit marginsSetManually(calculateMarginsMM());
-}
-
-/**
- * Fits the image with margins into the widget by updating the presentation
- * transform and adjusting the focal point.
- */
-void
-ImageView::fitMarginBox(FocalPointMode const fp_mode)
-{
-	QPolygonF const poly_phys(
-		m_origXform.transformBack().map(m_contentPlusMargins)
+	m_aggregatePageSizeMM = m_ptrSettings->getAggregatePageSizeMM(
+		m_pageId, origRectToSizeMM(m_contentPlusMargins)
 	);
 	
-	ImageTransformation new_xform(m_origXform);
-	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
-	new_xform.setCropArea(new_xform.transform().map(poly_phys));
-	new_xform.setPostRotation(m_origXform.postRotation());
+	// Recalculate m_contentPlusAllMargins.
+	recalcAdditionalMarginsMM();
 	
-	updateTransformAndFixFocalPoint(new_xform, fp_mode);
+	updatePresentationTransform(DONT_FIT);
+	
+	emit marginsSetManually(calcMarginsMM());
 }
 
 /**
@@ -433,6 +447,36 @@ ImageView::calcAndFitMarginBox(
 	
 	poly_mm[4] = poly_mm[3];
 	
+	QRectF const content_plus_margins(mm_to_orig.map(poly_mm).boundingRect());
+	
+	QSizeF const content_plus_margins_mm(
+		QLineF(poly_mm[0], poly_mm[1]).length(),
+		QLineF(poly_mm[0], poly_mm[3]).length()
+	);
+	Margins const add_margins_mm(
+		getAdditionalMarginsMM(content_plus_margins_mm)
+	);
+	
+	// top-left
+	poly_mm[0] -= down_uv * add_margins_mm.top();
+	poly_mm[0] -= right_uv * add_margins_mm.left();
+	
+	// top-right
+	poly_mm[1] -= down_uv * add_margins_mm.top();
+	poly_mm[1] += right_uv * add_margins_mm.right();
+	
+	// bottom-right
+	poly_mm[2] += down_uv * add_margins_mm.bottom();
+	poly_mm[2] += right_uv * add_margins_mm.right();
+	
+	// bottom-left
+	poly_mm[3] += down_uv * add_margins_mm.bottom();
+	poly_mm[3] -= right_uv * add_margins_mm.left();
+	
+	poly_mm[4] = poly_mm[3];
+	
+	QRectF const content_plus_all_margins(mm_to_orig.map(poly_mm).boundingRect());
+	
 	ImageTransformation new_xform(m_origXform);
 	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
 	new_xform.setCropArea(
@@ -440,20 +484,22 @@ ImageView::calcAndFitMarginBox(
 	);
 	new_xform.setPostRotation(m_origXform.postRotation());
 	
-	m_contentPlusMargins = mm_to_orig.map(poly_mm).boundingRect();
-	
 	updateTransformAndFixFocalPoint(new_xform, fp_mode);
+	m_contentPlusMargins = content_plus_margins;
+	m_contentPlusAllMargins = content_plus_all_margins;
 }
 
 /**
  * Updates the presentation transform in such a way that ImageViewBase
- * sees the image extended / clipped by m_contentPlusMargins.
+ * sees the image extended / clipped by m_contentPlusAllMargins.
+ * Additionally, if \p fit_mode is set to FIT, ensures that the whole area
+ * defined by m_contentPlusAllMargins is visible.
  */
 void
-ImageView::updatePresentationTransform()
+ImageView::updatePresentationTransform(FitMode const fit_mode)
 {
 	QPolygonF const poly_phys(
-		m_origXform.transformBack().map(m_contentPlusMargins)
+		m_origXform.transformBack().map(m_contentPlusAllMargins)
 	);
 	
 	ImageTransformation new_xform(m_origXform);
@@ -461,7 +507,12 @@ ImageView::updatePresentationTransform()
 	new_xform.setCropArea(new_xform.transform().map(poly_phys));
 	new_xform.setPostRotation(m_origXform.postRotation());
 	
-	updateTransformPreservingScale(new_xform);
+	if (fit_mode == DONT_FIT) {
+		updateTransformPreservingScale(new_xform);
+	} else {
+		resetZoom();
+		updateTransformAndFixFocalPoint(new_xform, CENTER_IF_FITS);
+	}
 }
 
 /**
@@ -533,7 +584,7 @@ ImageView::forceNonNegativeMargins(QRectF& content_plus_margins) const
  *        and m_contentPlusMargins.
  */
 Margins
-ImageView::calculateMarginsMM() const
+ImageView::calcMarginsMM() const
 {
 	QPointF const center(m_contentRect.center());
 	
@@ -569,6 +620,127 @@ ImageView::calculateMarginsMM() const
 	margins.setRight(virt_to_mm.map(right_margin_line).length());
 	
 	return margins;
+}
+
+Margins
+ImageView::getAdditionalMarginsMM(QSizeF const& content_plus_margins_mm) const
+{
+	if (m_alignment.isNull()) {
+		// This means we are not aligning this page with others.
+		return Margins();
+	}
+	
+	double top = 0.0;
+	double bottom = 0.0;
+	double left = 0.0;
+	double right = 0.0;
+	
+	double const delta_width = m_aggregatePageSizeMM.width()
+			- content_plus_margins_mm.width();
+	if (delta_width > 0.0) {
+		switch (m_alignment.horizontal()) {
+			case Alignment::LEFT:
+				right = delta_width;
+				break;
+			case Alignment::HCENTER:
+				left = right = 0.5 * delta_width;
+				break;
+			case Alignment::RIGHT:
+				left = delta_width;
+				break;
+		}
+	}
+	
+	double const delta_height = m_aggregatePageSizeMM.height()
+			- content_plus_margins_mm.height();
+	if (delta_height > 0.0) {
+		switch (m_alignment.vertical()) {
+			case Alignment::TOP:
+				bottom = delta_height;
+				break;
+			case Alignment::VCENTER:
+				top = bottom = 0.5 * delta_height;
+				break;
+			case Alignment::BOTTOM:
+				top = delta_height;
+				break;
+		}
+	}
+	
+	return Margins(left, top, right, bottom);
+}
+
+/**
+ * Recalculates m_contentPlusAllMargins based on m_contentPlusMargins,
+ * m_aggregatePageSizeMM and m_alignment.
+ */
+void
+ImageView::recalcAdditionalMarginsMM()
+{
+	PhysicalTransformation const phys_xform(m_origXform.origDpi());
+	QTransform const orig_to_mm(
+		m_origXform.transformBack() * phys_xform.pixelsToMM()
+	);
+	QTransform const mm_to_orig(
+		phys_xform.mmToPixels() * m_origXform.transform()
+	);
+	
+	QPolygonF poly_mm(orig_to_mm.map(m_contentPlusMargins));
+	
+	QLineF const down_uv_line(QLineF(poly_mm[0], poly_mm[3]).unitVector());
+	QLineF const right_uv_line(QLineF(poly_mm[0], poly_mm[1]).unitVector());
+	
+	QPointF const down_uv(down_uv_line.p2() - down_uv_line.p1());
+	QPointF const right_uv(right_uv_line.p2() - right_uv_line.p1());
+	
+	QSizeF const content_plus_margins_mm(
+		QLineF(poly_mm[0], poly_mm[1]).length(),
+		QLineF(poly_mm[0], poly_mm[3]).length()
+	);
+	Margins const add_margins_mm(
+		getAdditionalMarginsMM(content_plus_margins_mm)
+	);
+	
+	// top-left
+	poly_mm[0] -= down_uv * add_margins_mm.top();
+	poly_mm[0] -= right_uv * add_margins_mm.left();
+	
+	// top-right
+	poly_mm[1] -= down_uv * add_margins_mm.top();
+	poly_mm[1] += right_uv * add_margins_mm.right();
+	
+	// bottom-right
+	poly_mm[2] += down_uv * add_margins_mm.bottom();
+	poly_mm[2] += right_uv * add_margins_mm.right();
+	
+	// bottom-left
+	poly_mm[3] += down_uv * add_margins_mm.bottom();
+	poly_mm[3] -= right_uv * add_margins_mm.left();
+	
+	poly_mm[4] = poly_mm[3];
+	
+	m_contentPlusAllMargins = mm_to_orig.map(poly_mm).boundingRect();
+}
+
+QSizeF
+ImageView::origRectToSizeMM(QRectF const& rect)
+{
+	// TODO: make physical transform a const member of this class.
+	// TODO: orig_to_mm and mm_to_orig can also be const members.
+	PhysicalTransformation phys_xform(m_origXform.origDpi());
+	QTransform const orig_to_mm(
+		m_origXform.transformBack() * phys_xform.pixelsToMM()
+	);
+	
+	QLineF const hor_line(rect.topLeft(), rect.topRight());
+	QLineF const vert_line(rect.topLeft(), rect.bottomLeft());
+	
+	QSizeF const size_mm(
+		orig_to_mm.map(hor_line).length(),
+		orig_to_mm.map(vert_line).length()
+	);
+	
+	return size_mm;
 }
 
 } // namespace page_layout

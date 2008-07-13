@@ -12,13 +12,13 @@ SET(
 	ImageView.cpp ImageView.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
-#	ContentBoxFinder.cpp ContentBoxFinder.h
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
-#	Dependencies.cpp Dependencies.h
+	Dependencies.cpp Dependencies.h
 #	Params.cpp Params.h
 	Settings.cpp Settings.h
 #	Thumbnail.cpp Thumbnail.h
+	Alignment.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

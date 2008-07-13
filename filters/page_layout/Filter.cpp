@@ -152,7 +152,7 @@ Filter::createTask(
 {
 	return IntrusivePtr<Task>(
 		new Task(
-			IntrusivePtr<Filter>(this),
+			IntrusivePtr<Filter>(this), m_ptrSettings,
 			page_id, aggregate_content_size_mm, batch, debug
 		)
 	);

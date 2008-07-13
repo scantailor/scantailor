@@ -22,8 +22,10 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "Margins.h"
+#include "Dependencies.h"
 #include "PageId.h"
 #include <QMutex>
+#include <QSizeF>
 #include <map>
 
 namespace page_layout
@@ -40,11 +42,37 @@ public:
 	Margins getPageMarginsMM(PageId const& page_id) const;
 	
 	void setPageMarginsMM(PageId const& page_id, Margins const& margins);
+	
+	void setContentSizeMM(PageId const& page_id,
+		QSizeF const& content_size_mm, Dependencies const& deps);
+	
+	QSizeF getAggregatePageSizeMM() const;
+	
+	QSizeF getAggregatePageSizeMM(
+		PageId const& page_id, QSizeF const& content_plus_margins_size_mm);
 private:
+	class Item;
+	
+	class ContentSizePlusDeps
+	{
+	public:
+		ContentSizePlusDeps(QSizeF const& content_size_mm, Dependencies const& deps)
+		: m_contentSizeMM(content_size_mm), m_deps(deps) {}
+		
+		QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
+		
+		Dependencies const& dependencies() const { return m_deps; }
+	private:
+		QSizeF m_contentSizeMM;
+		Dependencies m_deps;
+	};
+	
 	typedef std::map<PageId, Margins> PerPageMargins;
+	typedef std::map<PageId, ContentSizePlusDeps> PerPageContentSize;
 	
 	mutable QMutex m_mutex;
 	PerPageMargins m_perPageMarginsMM;
+	PerPageContentSize m_perPageContentSizeMM;
 	Margins m_defaultMarginsMM;
 };
 

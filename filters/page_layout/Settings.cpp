@@ -18,7 +18,9 @@
 
 #include "Settings.h"
 #include "Utils.h"
+#include <boost/foreach.hpp>
 #include <QMutexLocker>
+#include <algorithm>
 
 namespace page_layout
 {
@@ -51,6 +53,93 @@ Settings::setPageMarginsMM(PageId const& page_id, Margins const& margins)
 {
 	QMutexLocker const locker(&m_mutex);
 	Utils::mapSetValue(m_perPageMarginsMM, page_id, margins);
+}
+
+void
+Settings::setContentSizeMM(
+	PageId const& page_id,
+	QSizeF const& content_size_mm, Dependencies const& deps)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	ContentSizePlusDeps const value(content_size_mm, deps);
+	Utils::mapSetValue(m_perPageContentSizeMM, page_id, value);
+}
+
+QSizeF
+Settings::getAggregatePageSizeMM() const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	double max_width = 0.0;
+	double max_height = 0.0;
+	
+	typedef PerPageContentSize::value_type KeyVal;
+	BOOST_FOREACH (KeyVal const& kv, m_perPageContentSizeMM) {
+		double width = kv.second.contentSizeMM().width();
+		double height = kv.second.contentSizeMM().height();
+		Margins const* margins;
+		
+		PerPageMargins::const_iterator const it(
+			m_perPageMarginsMM.find(kv.first)
+		);
+		if (it != m_perPageMarginsMM.end()) {
+			margins = &it->second;
+		} else {
+			margins = &m_defaultMarginsMM;
+		}
+		
+		width += margins->left() + margins->right();
+		height += margins->top() + margins->bottom();
+		
+		max_width = std::max(max_width, width);
+		max_height = std::max(max_height, height);
+	}
+	
+	return QSizeF(max_width, max_height);
+}
+
+QSizeF
+Settings::getAggregatePageSizeMM(
+	PageId const& page_id, QSizeF const& content_plus_margins_size_mm)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	double max_width = 0.0;
+	double max_height = 0.0;
+	
+	typedef PerPageContentSize::value_type KeyVal;
+	BOOST_FOREACH (KeyVal const& kv, m_perPageContentSizeMM) {
+		double width;
+		double height;
+		
+		if (kv.first == page_id) {
+			width = content_plus_margins_size_mm.width();
+			height = content_plus_margins_size_mm.height();
+		} else {
+			width = kv.second.contentSizeMM().width();
+			height = kv.second.contentSizeMM().height();
+			
+			Margins const* margins;
+			
+			PerPageMargins::const_iterator const it(
+				m_perPageMarginsMM.find(kv.first)
+			);
+			if (it != m_perPageMarginsMM.end()) {
+				margins = &it->second;
+			} else {
+				margins = &m_defaultMarginsMM;
+			}
+			
+			width += margins->left() + margins->right();
+			height += margins->top() + margins->bottom();
+		}
+		
+		max_width = std::max(max_width, width);
+		max_height = std::max(max_height, height);
+	}
+	
+	return QSizeF(max_width, max_height);
 }
 
 } // namespace page_layout

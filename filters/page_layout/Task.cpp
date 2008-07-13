@@ -18,13 +18,20 @@
 
 #include "Task.h"
 #include "Filter.h"
-#include "Margins.h"
+#include "Dependencies.h"
 #include "OptionsWidget.h"
+#include "Settings.h"
+#include "Margins.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
+#include "ImageTransformation.h"
+#include "PhysicalTransformation.h"
+#include <QSizeF>
 #include <QRectF>
+#include <QLineF>
+#include <QTransform>
 #include <QObject>
 
 namespace page_layout
@@ -34,6 +41,7 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
+		IntrusivePtr<Settings> const& settings,
 		PageId const& page_id,
 		QImage const& image,
 		ImageTransformation const& xform,
@@ -45,6 +53,7 @@ public:
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
+	IntrusivePtr<Settings> m_ptrSettings;
 	PageId m_pageId;
 	QImage m_image;
 	ImageTransformation m_xform;
@@ -55,10 +64,12 @@ private:
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id,
 	QSizeF const& aggregated_content_size_mm,
 	bool batch, bool debug)
 :	m_ptrFilter(filter),
+	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_aggregatedContentSizeMM(aggregated_content_size_mm),
 	m_batchProcessing(batch)
@@ -76,13 +87,32 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
+	Dependencies const deps(data.xform().transformBack().map(content_rect));
+	QSizeF const content_size_mm(calcContentSizeMM(data.xform(), content_rect));
+	m_ptrSettings->setContentSizeMM(m_pageId, content_size_mm, deps);
+	
 	return FilterResultPtr(
 		new UiUpdater(
-			m_ptrFilter, m_pageId, data.image(),
+			m_ptrFilter, m_ptrSettings, m_pageId, data.image(),
 			data.xform(), content_rect,
 			m_aggregatedContentSizeMM, m_batchProcessing
 		)
 	);
+}
+
+QSizeF
+Task::calcContentSizeMM(
+	ImageTransformation const& xform, QRectF const& content_rect)
+{
+	PhysicalTransformation const phys_xform(xform.origDpi());
+	QTransform const virt_to_mm(xform.transformBack() * phys_xform.pixelsToMM());
+	
+	QLineF const hor_line(content_rect.topLeft(), content_rect.topRight());
+	QLineF const ver_line(content_rect.topLeft(), content_rect.bottomLeft());
+	
+	double const width = virt_to_mm.map(hor_line).length();
+	double const height = virt_to_mm.map(ver_line).length();
+	return QSizeF(width, height);
 }
 
 
@@ -90,11 +120,13 @@ Task::process(
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
 	QRectF const& content_rect,
 	QSizeF const& aggregated_content_size_mm, bool const batch)
 :	m_ptrFilter(filter),
+	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_image(image),
 	m_xform(xform),
@@ -110,6 +142,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	// This function is executed from the GUI thread.
 	
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
+	opt_widget->postUpdateUI();
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
 	ui->invalidateThumbnail(m_pageId);
@@ -119,8 +152,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	}
 	
 	ImageView* view = new ImageView(
-		m_image, m_xform, m_contentRect, m_aggregatedContentSizeMM,
-		*opt_widget
+		m_ptrSettings, m_pageId, m_image, m_xform,
+		m_contentRect, *opt_widget
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 	
@@ -135,6 +168,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	QObject::connect(
 		opt_widget, SIGNAL(leftRightLinkToggled(bool)),
 		view, SLOT(leftRightLinkToggled(bool))
+	);
+	QObject::connect(
+		opt_widget, SIGNAL(alignmentChanged(Alignment const&)),
+		view, SLOT(alignmentChanged(Alignment const&))
 	);
 }
 

@@ -18,9 +18,12 @@
 
 #include "OptionsWidget.h.moc"
 #include "Settings.h"
+#include "Utils.h"
 #include "imageproc/Constants.h"
+#include <boost/foreach.hpp>
 #include <QPixmap>
 #include <QString>
+#include <assert.h>
 
 using namespace imageproc::constants;
 
@@ -44,6 +47,44 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	setupUi(this);
 	updateLinkDisplay(topBottomLink, m_topBottomLinked);
 	updateLinkDisplay(leftRightLink, m_leftRightLinked);
+	updateAlignmentButtons();
+	
+	Utils::mapSetValue(
+		m_alignmentByButton, alignTopLeftBtn,
+		Alignment(Alignment::TOP, Alignment::LEFT)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignTopBtn,
+		Alignment(Alignment::TOP, Alignment::HCENTER)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignTopRightBtn,
+		Alignment(Alignment::TOP, Alignment::RIGHT)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignLeftBtn,
+		Alignment(Alignment::VCENTER, Alignment::LEFT)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignCenterBtn,
+		Alignment(Alignment::VCENTER, Alignment::HCENTER)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignRightBtn,
+		Alignment(Alignment::VCENTER, Alignment::RIGHT)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignBottomLeftBtn,
+		Alignment(Alignment::BOTTOM, Alignment::LEFT)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignBottomBtn,
+		Alignment(Alignment::BOTTOM, Alignment::HCENTER)
+	);
+	Utils::mapSetValue(
+		m_alignmentByButton, alignBottomRightBtn,
+		Alignment(Alignment::BOTTOM, Alignment::RIGHT)
+	);
 	
 	connect(
 		unitsComboBox, SIGNAL(currentIndexChanged(int)),
@@ -51,6 +92,18 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	);
 	connect(topBottomLink, SIGNAL(clicked()), this, SLOT(topBottomLinkClicked()));
 	connect(leftRightLink, SIGNAL(clicked()), this, SLOT(leftRightLinkClicked()));
+	connect(
+		alignWithOthersCB, SIGNAL(toggled(bool)),
+		this, SLOT(alignWithOthersToggled())
+	);
+	
+	typedef AlignmentByButton::value_type KeyVal;
+	BOOST_FOREACH (KeyVal const& kv, m_alignmentByButton) {
+		connect(
+			kv.first, SIGNAL(clicked()),
+			this, SLOT(alignmentButtonClicked())
+		);
+	}
 }
 
 OptionsWidget::~OptionsWidget()
@@ -62,6 +115,30 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 {
 	m_marginsMM = m_ptrSettings->getPageMarginsMM(page_id);
 	updateMarginsDisplay();
+	marginsGroup->setEnabled(false);
+	alignmentGroup->setEnabled(false);
+}
+
+void
+OptionsWidget::postUpdateUI()
+{
+	marginsGroup->setEnabled(true);
+	alignmentGroup->setEnabled(true);
+}
+
+Alignment
+OptionsWidget::alignment() const
+{
+	if (alignWithOthersCB->isChecked()) {
+		typedef AlignmentByButton::value_type KeyVal;
+		BOOST_FOREACH (KeyVal const& kv, m_alignmentByButton) {
+			if (kv.first->isChecked()) {
+				return kv.second;
+			}
+		}
+	}
+	
+	return Alignment();
 }
 
 void
@@ -110,6 +187,25 @@ OptionsWidget::leftRightLinkClicked()
 }
 
 void
+OptionsWidget::alignWithOthersToggled()
+{
+	updateAlignmentButtons();
+	emit alignmentChanged(alignment());
+}
+
+void
+OptionsWidget::alignmentButtonClicked()
+{
+	QToolButton* const button = dynamic_cast<QToolButton*>(sender());
+	assert(button);
+	
+	AlignmentByButton::iterator const it(m_alignmentByButton.find(button));
+	assert(it != m_alignmentByButton.end());
+	
+	emit alignmentChanged(it->second);
+}
+
+void
 OptionsWidget::updateMarginsDisplay()
 {
 	topMarginSpinBox->setValue(m_marginsMM.top() * m_mmToUnit);
@@ -122,6 +218,22 @@ void
 OptionsWidget::updateLinkDisplay(QToolButton* button, bool const linked)
 {
 	button->setIcon(linked ? m_chainIcon : m_brokenChainIcon);
+}
+
+void
+OptionsWidget::updateAlignmentButtons()
+{
+	bool const enabled = alignWithOthersCB->isChecked();
+	
+	alignTopLeftBtn->setEnabled(enabled);
+	alignTopBtn->setEnabled(enabled);
+	alignTopRightBtn->setEnabled(enabled);
+	alignLeftBtn->setEnabled(enabled);
+	alignCenterBtn->setEnabled(enabled);
+	alignRightBtn->setEnabled(enabled);
+	alignBottomLeftBtn->setEnabled(enabled);
+	alignBottomBtn->setEnabled(enabled);
+	alignBottomRightBtn->setEnabled(enabled);
 }
 
 } // namespace page_layout
