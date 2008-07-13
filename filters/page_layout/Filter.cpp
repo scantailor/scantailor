@@ -22,7 +22,8 @@
 #include "Task.h"
 #include "PageId.h"
 #include "Settings.h"
-//#include "Params.h"
+#include "Margins.h"
+#include "Alignment.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
@@ -39,7 +40,7 @@ namespace page_layout
 Filter::Filter()
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
+	m_ptrOptionsWidget.reset(new OptionsWidget);
 }
 
 Filter::~Filter()
@@ -61,7 +62,9 @@ Filter::getView() const
 void
 Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
-	m_ptrOptionsWidget->preUpdateUI(page_id);
+	Margins const margins_mm(m_ptrSettings->getPageMarginsMM(page_id));
+	Alignment const alignment(m_ptrSettings->getPageAlignment(page_id));
+	m_ptrOptionsWidget->preUpdateUI(margins_mm, alignment);
 	ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 }
 

@@ -583,8 +583,12 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 void
 MainWindow::updateBatchProcessingActions()
 {
+#if 0
 	bool const ok = !isBelowSelectContent()
 		|| !m_ptrContentBoxAggregator->haveUndefinedItems();
+#else
+	bool const ok = true;
+#endif
 	actionStartBatchProcessing->setEnabled(ok && !m_batchProcessing);
 	actionStopBatchProcessing->setEnabled(ok && m_batchProcessing);
 }

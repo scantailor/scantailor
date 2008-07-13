@@ -26,6 +26,7 @@ namespace page_layout
 {
 
 Settings::Settings()
+:	m_defaultAlignment(Alignment::VCENTER, Alignment::HCENTER)
 {
 	m_defaultMarginsMM.setTop(10.0);
 	m_defaultMarginsMM.setBottom(10.0);
@@ -41,10 +42,12 @@ Margins
 Settings::getPageMarginsMM(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
-	PerPageMargins::const_iterator it(m_perPageMarginsMM.find(page_id));
+	
+	PerPageMargins::const_iterator const it(m_perPageMarginsMM.find(page_id));
 	if (it != m_perPageMarginsMM.end()) {
 		return it->second;
 	}
+	
 	return m_defaultMarginsMM;
 }
 
@@ -53,6 +56,27 @@ Settings::setPageMarginsMM(PageId const& page_id, Margins const& margins)
 {
 	QMutexLocker const locker(&m_mutex);
 	Utils::mapSetValue(m_perPageMarginsMM, page_id, margins);
+}
+
+Alignment
+Settings::getPageAlignment(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	PerPageAlignment::const_iterator const it(m_perPageAlignment.find(page_id));
+	
+	if (it != m_perPageAlignment.end()) {
+		return it->second;
+	}
+	
+	return m_defaultAlignment;
+}
+
+void
+Settings::setPageAlignment(PageId const& page_id, Alignment const& alignment)
+{
+	QMutexLocker const locker(&m_mutex);
+	Utils::mapSetValue(m_perPageAlignment, page_id, alignment);
 }
 
 void

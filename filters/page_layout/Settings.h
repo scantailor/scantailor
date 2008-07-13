@@ -22,6 +22,7 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "Margins.h"
+#include "Alignment.h"
 #include "Dependencies.h"
 #include "PageId.h"
 #include <QMutex>
@@ -41,7 +42,12 @@ public:
 	
 	Margins getPageMarginsMM(PageId const& page_id) const;
 	
+	// TODO: rename to hard margins
 	void setPageMarginsMM(PageId const& page_id, Margins const& margins);
+	
+	Alignment getPageAlignment(PageId const& page_id) const;
+	
+	void setPageAlignment(PageId const& page_id, Alignment const& alignment);
 	
 	void setContentSizeMM(PageId const& page_id,
 		QSizeF const& content_size_mm, Dependencies const& deps);
@@ -69,11 +75,14 @@ private:
 	
 	typedef std::map<PageId, Margins> PerPageMargins;
 	typedef std::map<PageId, ContentSizePlusDeps> PerPageContentSize;
+	typedef std::map<PageId, Alignment> PerPageAlignment;
 	
 	mutable QMutex m_mutex;
 	PerPageMargins m_perPageMarginsMM;
-	PerPageContentSize m_perPageContentSizeMM;
 	Margins m_defaultMarginsMM;
+	PerPageContentSize m_perPageContentSizeMM;
+	PerPageAlignment m_perPageAlignment;
+	Alignment m_defaultAlignment;
 };
 
 } // namespace page_layout

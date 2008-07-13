@@ -40,9 +40,24 @@ public:
 	
 	Vertical vertical() const { return m_vert; }
 	
+	void setVertical(Vertical vert) { m_vert = vert; }
+	
 	Horizontal horizontal() const { return m_hor; }
 	
+	void setHorizontal(Horizontal hor) { m_hor = hor; }
+	
 	bool isNull() const { return m_isNull; }
+	
+	void setNull(bool is_null) { m_isNull = is_null; }
+	
+	bool operator==(Alignment const& other) const {
+		return m_vert == other.m_vert && m_hor == other.m_hor
+				&& m_isNull == other.m_isNull;
+	}
+	
+	bool operator!=(Alignment const& other) const { 
+		return !(*this == other);
+	}
 private:
 	Vertical m_vert;
 	Horizontal m_hor;

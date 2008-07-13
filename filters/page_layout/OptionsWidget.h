@@ -24,9 +24,6 @@
 #include "IntrusivePtr.h"
 #include "Margins.h"
 #include "Alignment.h"
-//#include "AutoManualMode.h"
-//#include "Dependencies.h"
-#include "PageId.h"
 #include <QIcon>
 #include <memory>
 #include <map>
@@ -36,19 +33,17 @@ class QToolButton;
 namespace page_layout
 {
 
-class Settings;
-
 class OptionsWidget :
 	public FilterOptionsWidget,
 	public Ui::PageLayoutOptionsWidget
 {
 	Q_OBJECT
 public:
-	OptionsWidget(IntrusivePtr<Settings> const& settings);
+	OptionsWidget();
 	
 	virtual ~OptionsWidget();
 	
-	void preUpdateUI(PageId const& page_id);
+	void preUpdateUI(Margins const& margins_mm, Alignment const& alignment);
 	
 	void postUpdateUI();
 	
@@ -58,17 +53,23 @@ public:
 	
 	Margins const& marginsMM() const { return m_marginsMM; }
 	
-	Alignment alignment() const;
+	Alignment const& alignment() const { return m_alignment; }
 signals:
 	void leftRightLinkToggled(bool linked);
 	
 	void topBottomLinkToggled(bool linked);
 	
 	void alignmentChanged(Alignment const& alignment);
+	
+	void marginsSetLocally(Margins const& margins_mm);
 public slots:
 	void marginsSetExternally(Margins const& margins_mm);
 private slots:
 	void unitsChanged(int idx);
+	
+	void horMarginsChanged(double val);
+	
+	void vertMarginsChanged(double val);
 	
 	void topBottomLinkClicked();
 	
@@ -84,17 +85,16 @@ private:
 	
 	void updateLinkDisplay(QToolButton* button, bool linked);
 	
-	void updateAlignmentButtons();
+	void enableDisableAlignmentButtons();
 	
-	IntrusivePtr<Settings> m_ptrSettings;
-	//UiData m_uiData;
 	QIcon m_chainIcon;
 	QIcon m_brokenChainIcon;
-	PageId m_pageId;
 	AlignmentByButton m_alignmentByButton;
 	double m_mmToUnit;
 	double m_unitToMM;
 	Margins m_marginsMM;
+	Alignment m_alignment;
+	int m_ignoreMarginChanges;
 	bool m_leftRightLinked;
 	bool m_topBottomLinked;
 };

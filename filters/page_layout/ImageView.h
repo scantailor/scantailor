@@ -21,9 +21,11 @@
 
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
+#include "PhysicalTransformation.h"
 #include "Alignment.h"
 #include "IntrusivePtr.h"
 #include "PageId.h"
+#include <QTransform>
 #include <QSizeF>
 #include <QRectF>
 #include <QPointF>
@@ -48,8 +50,10 @@ public:
 	
 	virtual ~ImageView();
 signals:
-	void marginsSetManually(Margins const& margins_mm);
+	void marginsSetLocally(Margins const& margins_mm);
 public slots:
+	void marginsSetExternally(Margins const& margins_mm);
+	
 	void leftRightLinkToggled(bool linked);
 	
 	void topBottomLinkToggled(bool linked);
@@ -79,9 +83,9 @@ private:
 		QTransform widgetToOrig;
 		
 		/**
-		 * m_contentPlusMargins in widget coordinates.
+		 * m_middleRect in widget coordinates.
 		 */
-		QRectF outerWidgetRect;
+		QRectF middleWidgetRect;
 		
 		/**
 		 * Mouse pointer position in widget coordinates.
@@ -97,47 +101,84 @@ private:
 	
 	void resizeInnerRect(QPoint delta);
 	
-	void resizeOuterRect(QPoint delta);
+	void resizeMiddleRect(QPoint delta);
 	
-	void calcAndFitMarginBox(Margins const& margins_mm, FocalPointMode fp_mode);
+	void recalcBoxesAndFit(Margins const& margins_mm);
 	
 	void updatePresentationTransform(FitMode fit_mode);
 	
 	int cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const;
 	
-	void forceNonNegativeMargins(QRectF& content_plus_margins) const;
+	void forceNonNegativeHardMargins(QRectF& middle_rect) const;
 	
-	Margins calcMarginsMM() const;
+	Margins calcHardMarginsMM() const;
 	
-	Margins getAdditionalMarginsMM(QSizeF const& content_plus_margins_mm) const;
+	Margins calcSoftMarginsMM(QSizeF const& middle_rect_mm) const;
 	
-	void recalcAdditionalMarginsMM();
+	void recalcOuterRect();
 	
-	QSizeF origRectToSizeMM(QRectF const& rect);
+	QSizeF origRectToSizeMM(QRectF const& rect) const;
+	
+	static void extendPolyRectWithMargins(
+		QPolygonF& poly_rect, Margins const& margins);
+	
+	static QPointF getRightUnitVector(QPolygonF const& poly_rect);
+	
+	static QPointF getDownUnitVector(QPolygonF const& poly_rect);
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	
 	PageId const m_pageId;
 	
 	/**
-	 * Image transformation, as provided by the previous filter.
+	 * \brief Image transformation, as provided by the previous filter.
+	 *
 	 * We pass another transformation to ImageViewBase, which we call
-	 * "presentation transform" in order to be able to display margins that
-	 * may be outside the image area.
+	 * "presentation transformation" in order to be able to display margins
+	 * that may be outside the image area.  The presentation transformation
+	 * is accessible via physToVirt().
 	 */
 	ImageTransformation const m_origXform;
 	
 	/**
-	 * Content box in m_origXform coordinates.
+	 * Transformation between the original image coordinates and millimeters,
+	 * assuming that point (0, 0) in pixel coordinates corresponds to point
+	 * (0, 0) in millimeter coordinates.
 	 */
-	QRectF const m_contentRect;
+	PhysicalTransformation const m_physXform;
 	
 	/**
-	 * Content + margins box in m_origXform coordinates.
+	 * Transformation from m_origXform coordinates to millimeter coordinates.
 	 */
-	QRectF m_contentPlusMargins;
+	QTransform const m_origToMM;
 	
-	QRectF m_contentPlusAllMargins;
+	/**
+	 * Transformation from millimeter coordinates to m_origXform coordinates.
+	 */
+	QTransform const m_mmToOrig;
+	
+	/**
+	 * Content box in m_origXform coordinates.
+	 */
+	QRectF const m_innerRect;
+	
+	/**
+	 * \brief Content box + hard margins in m_origXform coordinates.
+	 *
+	 * Hard margins are margins that will be there no matter what.
+	 * Soft margins are those added to extend the page to match its
+	 * size with other pages.
+	 */
+	QRectF m_middleRect;
+	
+	/**
+	 * \brief Content box + hard + soft margins in m_origXform coordinates.
+	 *
+	 * Hard margins are margins that will be there no matter what.
+	 * Soft margins are those added to extend the page to match its
+	 * size with other pages.
+	 */
+	QRectF m_outerRect;
 	
 	QSizeF m_aggregatePageSizeMM;
 	
@@ -150,19 +191,19 @@ private:
 	
 	/**
 	 * A bitwise OR of *_EDGE values.  If non-zero, it means
-	 * we are currently resizing the inner edge of the margin zone.
-	 * \note Both m_innerResizingMask and m_outerResizingMask can't
+	 * we are currently dragging one or two edges of the inner rectangle.
+	 * \note Both m_innerResizingMask and m_middleResizingMask can't
 	 * be non-zero at the same time.
 	 */
 	int m_innerResizingMask;
 	
 	/**
 	 * A bitwise OR of *_EDGE values.  If non-zero, it means
-	 * we are currently resizing the outer edge of the margin zone.
+	 * we are currently dragging one or two edges of the middle rectangle.
 	 * \note Both m_innerResizingMask and m_outerResizingMask can't
 	 * be non-zero at the same time.
 	 */
-	int m_outerResizingMask;
+	int m_middleResizingMask;
 	
 	bool m_leftRightLinked;
 	

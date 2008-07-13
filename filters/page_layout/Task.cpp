@@ -158,8 +158,12 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 	
 	QObject::connect(
-		view, SIGNAL(marginsSetManually(Margins const&)),
+		view, SIGNAL(marginsSetLocally(Margins const&)),
 		opt_widget, SLOT(marginsSetExternally(Margins const&))
+	);
+	QObject::connect(
+		opt_widget, SIGNAL(marginsSetLocally(Margins const&)),
+		view, SLOT(marginsSetExternally(Margins const&))
 	);
 	QObject::connect(
 		opt_widget, SIGNAL(topBottomLinkToggled(bool)),
