@@ -104,7 +104,7 @@ PolygonUtils::roundPoint(QPointF const& p)
 double
 PolygonUtils::roundValue(double const val)
 {
-	double const multiplier = 1 << 16;
+	double const multiplier = 1 << 14;
 	double const r_multiplier = 1.0 / multiplier;
 	return floor(val * multiplier + 0.5) * r_multiplier;
 }
