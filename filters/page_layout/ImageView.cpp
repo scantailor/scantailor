@@ -36,6 +36,7 @@
 #include <QMouseEvent>
 #include <Qt>
 #include <algorithm>
+#include <assert.h>
 
 using namespace imageproc;
 
@@ -691,7 +692,8 @@ ImageView::extendPolyRectWithMargins(QPolygonF& poly_rect, Margins const& margin
 	poly_rect[3] += down_uv * margins.bottom();
 	poly_rect[3] -= right_uv * margins.left();
 	
-	if (poly_rect.size() == 4) {
+	if (poly_rect.size() > 4) {
+		assert(poly_rect.size() == 5);
 		// This polygon is closed.
 		poly_rect[4] = poly_rect[3];
 	}
