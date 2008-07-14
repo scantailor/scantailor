@@ -45,8 +45,7 @@ public:
 		PageId const& page_id,
 		QImage const& image,
 		ImageTransformation const& xform,
-		QRectF const& content_rect,
-		QSizeF const& aggregated_content_size_mm, bool batch);
+		QRectF const& content_rect, bool batch);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -58,20 +57,16 @@ private:
 	QImage m_image;
 	ImageTransformation m_xform;
 	QRectF m_contentRect;
-	QSizeF m_aggregatedContentSizeMM;
 	bool m_batchProcessing;
 };
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
-	PageId const& page_id,
-	QSizeF const& aggregated_content_size_mm,
-	bool batch, bool debug)
+	PageId const& page_id, bool batch, bool debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
-	m_aggregatedContentSizeMM(aggregated_content_size_mm),
 	m_batchProcessing(batch)
 {
 }
@@ -87,15 +82,14 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	Dependencies const deps(data.xform().transformBack().map(content_rect));
+	//Dependencies const deps(data.xform().transformBack().map(content_rect));
 	QSizeF const content_size_mm(calcContentSizeMM(data.xform(), content_rect));
-	m_ptrSettings->setContentSizeMM(m_pageId, content_size_mm, deps);
+	m_ptrSettings->setContentSizeMM(m_pageId, content_size_mm);
 	
 	return FilterResultPtr(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_pageId, data.image(),
-			data.xform(), content_rect,
-			m_aggregatedContentSizeMM, m_batchProcessing
+			data.xform(), content_rect, m_batchProcessing
 		)
 	);
 }
@@ -123,15 +117,13 @@ Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect,
-	QSizeF const& aggregated_content_size_mm, bool const batch)
+	QRectF const& content_rect, bool const batch)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_image(image),
 	m_xform(xform),
 	m_contentRect(content_rect),
-	m_aggregatedContentSizeMM(aggregated_content_size_mm),
 	m_batchProcessing(batch)
 {
 }

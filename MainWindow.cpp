@@ -84,7 +84,6 @@ public:
 	BackgroundTaskPtr createCompositeTask(
 		PageInfo const& page, int last_filter_idx,
 		ThumbnailPixmapCache& thumbnail_cache,
-		QSizeF const& aggregate_content_size_mm,
 		bool batch_processing, bool debug);
 	
 	IntrusivePtr<CompositeCacheDrivenTask>
@@ -617,7 +616,7 @@ MainWindow::loadImage(PageInfo const& page)
 	removeWidgetsFromLayout(m_pImageFrameLayout, false);
 	m_ptrTabbedDebugImages->clear();
 	m_imageWidgetCleanup.clear();
-	
+#if 0
 	if (isBelowSelectContent() && m_ptrContentBoxAggregator->haveUndefinedItems()) {
 		QString const err_text(
 			tr("You have to process all pages with the"
@@ -627,6 +626,7 @@ MainWindow::loadImage(PageInfo const& page)
 		setImageWidget(new ErrorWidget(err_text), TRANSFER_OWNERSHIP);
 		return;
 	}
+#endif
 	
 	m_ptrFilterListModel->getFilter(m_curFilter)->preUpdateUI(this, page.id());
 	
@@ -636,7 +636,6 @@ MainWindow::loadImage(PageInfo const& page)
 	}
 	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
 		page, m_curFilter, *m_ptrThumbnailCache,
-		m_ptrContentBoxAggregator->maxContentBoxMM(),
 		m_batchProcessing, m_debug
 	);
 	if (m_ptrCurTask) {
@@ -731,7 +730,6 @@ BackgroundTaskPtr
 MainWindow::FilterListModel::createCompositeTask(
 	PageInfo const& page, int const last_filter_idx,
 	ThumbnailPixmapCache& thumbnail_cache,
-	QSizeF const& aggregate_content_size_mm,
 	bool const batch_processing, bool const debug)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
@@ -743,8 +741,7 @@ MainWindow::FilterListModel::createCompositeTask(
 	switch (last_filter_idx) {
 	case 4:
 		page_layout_task = m_ptrPageLayoutFilter->createTask(
-			page.id(), aggregate_content_size_mm,
-			batch_processing, debug
+			page.id(), batch_processing, debug
 		);
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createTask(

@@ -62,7 +62,7 @@ Filter::getView() const
 void
 Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
-	Margins const margins_mm(m_ptrSettings->getPageMarginsMM(page_id));
+	Margins const margins_mm(m_ptrSettings->getHardMarginsMM(page_id));
 	Alignment const alignment(m_ptrSettings->getPageAlignment(page_id));
 	m_ptrOptionsWidget->preUpdateUI(margins_mm, alignment);
 	ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
@@ -150,13 +150,12 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 
 IntrusivePtr<Task>
 Filter::createTask(
-	PageId const& page_id,
-	QSizeF const& aggregate_content_size_mm, bool batch, bool debug)
+	PageId const& page_id, bool const batch, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
-			page_id, aggregate_content_size_mm, batch, debug
+			page_id, batch, debug
 		)
 	);
 }

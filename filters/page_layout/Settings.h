@@ -21,16 +21,16 @@
 
 #include "NonCopyable.h"
 #include "RefCountable.h"
-#include "Margins.h"
-#include "Alignment.h"
-#include "Dependencies.h"
-#include "PageId.h"
-#include <QMutex>
-#include <QSizeF>
-#include <map>
+#include <memory>
+
+class PageId;
+class Margins;
+class QSizeF;
 
 namespace page_layout
 {
+
+class Alignment;
 
 class Settings : public RefCountable
 {
@@ -40,49 +40,73 @@ public:
 	
 	virtual ~Settings();
 	
-	Margins getPageMarginsMM(PageId const& page_id) const;
+	/**
+	 * \brief Returns the hard margins for the specified page.
+	 *
+	 * Hard margins are margins that will be there no matter what.
+	 * Soft margins are those added to extend the page to match its
+	 * size with other pages.
+	 * \par
+	 * If no margins were assigned to the specified page, the default
+	 * margins are returned.
+	 */
+	Margins getHardMarginsMM(PageId const& page_id) const;
 	
-	// TODO: rename to hard margins
-	void setPageMarginsMM(PageId const& page_id, Margins const& margins);
+	/**
+	 * \brief Sets hard margins for the specified page.
+	 *
+	 * Hard margins are margins that will be there no matter what.
+	 * Soft margins are those added to extend the page to match its
+	 * size with other pages.
+	 */
+	void setHardMarginsMM(PageId const& page_id, Margins const& margins_mm);
 	
+	/**
+	 * \brief Returns the alignment for the specified page.
+	 *
+	 * Alignments affect the distribution of soft margins.
+	 * \par
+	 * If no alignment was specified, the default alignment is returned,
+	 * which is "center vertically and horizontally".
+	 */
 	Alignment getPageAlignment(PageId const& page_id) const;
 	
+	/**
+	 * \brief Sets alignment for the specified page.
+	 *
+	 * Alignments affect the distribution of soft margins.
+	 */
 	void setPageAlignment(PageId const& page_id, Alignment const& alignment);
 	
-	void setContentSizeMM(PageId const& page_id,
-		QSizeF const& content_size_mm, Dependencies const& deps);
+	/**
+	 * \brief Sets content size for a specified page.
+	 *
+	 * The content size comes from the "Select Content" filter.
+	 */
+	void setContentSizeMM(PageId const& page_id, QSizeF const& content_size_mm);
 	
-	QSizeF getAggregatePageSizeMM() const;
+	/**
+	 * \brief Returns the aggregate (max width + max height) hard page size.
+	 */
+	QSizeF getAggregateHardSizeMM() const;
 	
-	QSizeF getAggregatePageSizeMM(
-		PageId const& page_id, QSizeF const& content_plus_margins_size_mm);
+	/**
+	 * \brief Same as getAggregateHardSizeMM(), but assumes a specified
+	 *        size for a specified page.
+	 *
+	 * This function doesn't modify anything, it just pretents that
+	 * the size of a specified page has changed.
+	 */
+	QSizeF getAggregateHardSizeMM(
+		PageId const& page_id, QSizeF const& hard_size_mm) const;
 private:
+	class Impl;
 	class Item;
+	class ModifyMargins;
+	class ModifyAlignment;
+	class ModifyContentSize;
 	
-	class ContentSizePlusDeps
-	{
-	public:
-		ContentSizePlusDeps(QSizeF const& content_size_mm, Dependencies const& deps)
-		: m_contentSizeMM(content_size_mm), m_deps(deps) {}
-		
-		QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
-		
-		Dependencies const& dependencies() const { return m_deps; }
-	private:
-		QSizeF m_contentSizeMM;
-		Dependencies m_deps;
-	};
-	
-	typedef std::map<PageId, Margins> PerPageMargins;
-	typedef std::map<PageId, ContentSizePlusDeps> PerPageContentSize;
-	typedef std::map<PageId, Alignment> PerPageAlignment;
-	
-	mutable QMutex m_mutex;
-	PerPageMargins m_perPageMarginsMM;
-	Margins m_defaultMarginsMM;
-	PerPageContentSize m_perPageContentSizeMM;
-	PerPageAlignment m_perPageAlignment;
-	Alignment m_defaultAlignment;
+	std::auto_ptr<Impl> m_ptrImpl;
 };
 
 } // namespace page_layout

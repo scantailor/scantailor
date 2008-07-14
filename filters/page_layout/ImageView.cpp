@@ -55,7 +55,7 @@ ImageView::ImageView(
 	m_origToMM(m_origXform.transformBack() * m_physXform.pixelsToMM()),
 	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform()),
 	m_innerRect(content_rect),
-	m_aggregatePageSizeMM(settings->getAggregatePageSizeMM()),
+	m_aggregateHardSizeMM(settings->getAggregateHardSizeMM()),
 	m_alignment(opt_widget.alignment()),
 	m_innerResizingMask(0),
 	m_middleResizingMask(0),
@@ -74,7 +74,7 @@ ImageView::~ImageView()
 void
 ImageView::marginsSetExternally(Margins const& margins_mm)
 {
-	m_ptrSettings->setPageMarginsMM(m_pageId, margins_mm);
+	m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
 	recalcBoxesAndFit(margins_mm);
 }
 
@@ -92,7 +92,7 @@ ImageView::leftRightLinkToggled(bool const linked)
 			margins_mm.setRight(new_margin);
 			
 			recalcBoxesAndFit(margins_mm);
-			m_ptrSettings->setPageMarginsMM(m_pageId, margins_mm);
+			m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
 			emit marginsSetLocally(margins_mm);
 		}
 	}
@@ -112,7 +112,7 @@ ImageView::topBottomLinkToggled(bool const linked)
 			margins_mm.setBottom(new_margin);
 			
 			recalcBoxesAndFit(margins_mm);
-			m_ptrSettings->setPageMarginsMM(m_pageId, margins_mm);
+			m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
 			emit marginsSetLocally(margins_mm);
 		}
 	}
@@ -225,8 +225,8 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 		m_innerResizingMask = 0;
 		m_middleResizingMask = 0;
 		
-		m_ptrSettings->setPageMarginsMM(m_pageId, calcHardMarginsMM());
-		m_aggregatePageSizeMM = m_ptrSettings->getAggregatePageSizeMM();
+		m_ptrSettings->setHardMarginsMM(m_pageId, calcHardMarginsMM());
+		m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM();
 		
 		recalcOuterRect();
 		
@@ -292,7 +292,7 @@ ImageView::hideEvent(QHideEvent* const event)
 	ensureCursorShape(Qt::ArrowCursor);
 	if (old_resizing_mask) {
 		Margins const margins_mm(calcHardMarginsMM());
-		m_ptrSettings->setPageMarginsMM(m_pageId, margins_mm);
+		m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
 		emit marginsSetLocally(margins_mm);
 	}
 }
@@ -348,7 +348,7 @@ ImageView::resizeInnerRect(QPoint const delta)
 	fp = physToVirt().transformBack().map(fp);
 	setFocalPoint(fp);
 	
-	m_aggregatePageSizeMM = m_ptrSettings->getAggregatePageSizeMM(
+	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
 		m_pageId, origRectToSizeMM(m_middleRect)
 	);
 	
@@ -413,7 +413,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 		forceNonNegativeHardMargins(m_middleRect); // invalidates widget_rect
 	}
 	
-	m_aggregatePageSizeMM = m_ptrSettings->getAggregatePageSizeMM(
+	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
 		m_pageId, origRectToSizeMM(m_middleRect)
 	);
 	
@@ -426,7 +426,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 
 /**
  * Updates m_middleRect and m_outerRect based on \p margins_mm,
- * m_aggregatePageSizeMM and m_alignment.
+ * m_aggregateHardSizeMM and m_alignment.
  */
 void
 ImageView::recalcBoxesAndFit(Margins const& margins_mm)
@@ -601,7 +601,7 @@ ImageView::calcSoftMarginsMM(QSizeF const& middle_rect_mm) const
 	double left = 0.0;
 	double right = 0.0;
 	
-	double const delta_width = m_aggregatePageSizeMM.width()
+	double const delta_width = m_aggregateHardSizeMM.width()
 			- middle_rect_mm.width();
 	if (delta_width > 0.0) {
 		switch (m_alignment.horizontal()) {
@@ -617,7 +617,7 @@ ImageView::calcSoftMarginsMM(QSizeF const& middle_rect_mm) const
 		}
 	}
 	
-	double const delta_height = m_aggregatePageSizeMM.height()
+	double const delta_height = m_aggregateHardSizeMM.height()
 			- middle_rect_mm.height();
 	if (delta_height > 0.0) {
 		switch (m_alignment.vertical()) {
@@ -637,7 +637,7 @@ ImageView::calcSoftMarginsMM(QSizeF const& middle_rect_mm) const
 }
 
 /**
- * \brief Recalculates m_outerRect based on m_middleRect, m_aggregatePageSizeMM
+ * \brief Recalculates m_outerRect based on m_middleRect, m_aggregateHardSizeMM
  *        and m_alignment.
  */
 void

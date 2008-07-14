@@ -180,7 +180,10 @@ private:
 	 */
 	QRectF m_outerRect;
 	
-	QSizeF m_aggregatePageSizeMM;
+	/**
+	 * \brief Aggregate (max width + max height) hard page size.
+	 */
+	QSizeF m_aggregateHardSizeMM;
 	
 	Alignment m_alignment;
 	
