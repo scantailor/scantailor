@@ -92,6 +92,8 @@ public:
 	
 	void invalidateThumbnail(PageId const& page_id);
 	
+	void invalidateAllThumbnails();
+	
 	void setCurrentThumbnail(PageId const& page_id);
 	
 	void itemSelected(PageInfo const& page_info, CompositeItem* item);
@@ -243,6 +245,12 @@ ThumbnailSequence::invalidateThumbnail(PageId const& page_id)
 }
 
 void
+ThumbnailSequence::invalidateAllThumbnails()
+{
+	m_ptrImpl->invalidateAllThumbnails();
+}
+
+void
 ThumbnailSequence::setCurrentThumbnail(PageId const& page_id)
 {
 	m_ptrImpl->setCurrentThumbnail(page_id);
@@ -338,6 +346,48 @@ ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 }
 
 void
+ThumbnailSequence::Impl::invalidateAllThumbnails()
+{
+	ScopedIncDec<int> const scope_manager(m_syntheticSelectionScope);
+	
+	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
+	double offset = 0;
+	
+	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
+	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
+	for (; ord_it != ord_end; ++ord_it) {
+		std::auto_ptr<CompositeItem> composite(
+			getCompositeItem(ord_it->pageInfo)
+		);
+		
+		CompositeItem* const old_composite = ord_it->composite;
+		CompositeItem* const new_composite = composite.get();
+		bool const old_selected = old_composite->isSelected();
+		
+		new_composite->setPos(0.0, offset);
+		new_composite->updateSceneRect(m_sceneRect);
+		
+		offset += new_composite->boundingRect().height() + SPACING;
+		
+		m_graphicsScene.removeItem(old_composite);
+		if (m_pSelectedItem == old_composite) {
+			m_pSelectedItem = 0;
+		}
+		delete old_composite;
+		
+		ord_it->composite = new_composite;
+		m_graphicsScene.addItem(composite.release());
+		
+		if (old_selected) {
+			assert(!new_composite->isSelected()); // Because it was just created.
+			new_composite->setSelected(true); // This will cause a callback.
+		}
+	}
+	
+	commitSceneRect();
+}
+
+void
 ThumbnailSequence::Impl::setCurrentThumbnail(PageId const& page_id)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_id));
@@ -383,11 +433,11 @@ ThumbnailSequence::Impl::setThumbnail(
 {
 	ScopedIncDec<int> const scope_manager(m_syntheticSelectionScope);
 	
-	QGraphicsItem* const old_composite = id_it->composite;
+	CompositeItem* const old_composite = id_it->composite;
 	CompositeItem* const new_composite = composite.get();
 	QSizeF const old_size(old_composite->boundingRect().size());
 	QSizeF const new_size(new_composite->boundingRect().size());
-	bool old_selected = old_composite->isSelected();
+	bool const old_selected = old_composite->isSelected();
 	
 	new_composite->setPos(old_composite->pos());
 	composite->updateSceneRect(m_sceneRect);

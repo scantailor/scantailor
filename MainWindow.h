@@ -79,6 +79,8 @@ private slots:
 	
 	void invalidateThumbnailSlot(PageId const& page_id);
 	
+	void invalidateAllThumbnailsSlot();
+	
 	void filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result);
 	
 	void debugToggled(bool enabled);

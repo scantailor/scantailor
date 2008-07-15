@@ -53,6 +53,8 @@ public:
 	
 	void invalidateThumbnail(ImageId const& image_id);
 	
+	void invalidateAllThumbnails();
+	
 	void setCurrentThumbnail(PageId const& page_id);
 signals:
 	void pageSelected(

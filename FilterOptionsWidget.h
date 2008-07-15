@@ -33,6 +33,8 @@ signals:
 	
 	void invalidateThumbnail(PageId const& page_id);
 	
+	void invalidateAllThumbnails();
+	
 	void goToPage(PageId const& page_id);
 };
 

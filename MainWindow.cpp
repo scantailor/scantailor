@@ -305,6 +305,10 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 			this, SLOT(invalidateThumbnailSlot(PageId const&))
 		);
 		disconnect(
+			m_ptrOptionsWidget, SIGNAL(invalidateAllThumbnails()),
+			this, SLOT(invalidateAllThumbnailsSlot())
+		);
+		disconnect(
 			m_ptrOptionsWidget, SIGNAL(goToPage(PageId const&)),
 			this, SLOT(goToPage(PageId const&))
 		);
@@ -317,6 +321,10 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 	connect(
 		widget, SIGNAL(invalidateThumbnail(PageId const&)),
 		this, SLOT(invalidateThumbnailSlot(PageId const&))
+	);
+	connect(
+		widget, SIGNAL(invalidateAllThumbnails()),
+		this, SLOT(invalidateAllThumbnailsSlot())
 	);
 	connect(
 		widget, SIGNAL(goToPage(PageId const&)),
@@ -356,6 +364,12 @@ void
 MainWindow::invalidateThumbnail(PageId const& page_id)
 {
 	m_ptrThumbSequence->invalidateThumbnail(page_id);
+}
+
+void
+MainWindow::invalidateAllThumbnailsSlot()
+{
+	m_ptrThumbSequence->invalidateAllThumbnails();
 }
 
 void
