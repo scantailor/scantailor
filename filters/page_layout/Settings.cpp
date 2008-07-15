@@ -114,6 +114,10 @@ public:
 	
 	QSizeF getAggregateHardSizeMM(
 		PageId const& page_id, QSizeF const& hard_size_mm) const;
+	
+	PageId findWidestPage() const;
+	
+	PageId findTallestPage() const;
 private:
 	class DescWidthTag;
 	class DescHeightTag;
@@ -201,6 +205,18 @@ Settings::getAggregateHardSizeMM(
 	PageId const& page_id, QSizeF const& hard_size_mm) const
 {
 	return m_ptrImpl->getAggregateHardSizeMM(page_id, hard_size_mm);
+}
+
+PageId
+Settings::findWidestPage() const
+{
+	return m_ptrImpl->findWidestPage();
+}
+
+PageId
+Settings::findTallestPage() const
+{
+	return m_ptrImpl->findTallestPage();
 }
 
 
@@ -388,6 +404,30 @@ Settings::Impl::getAggregateHardSizeMM(
 	}
 	
 	return QSizeF(width, height);
+}
+
+PageId
+Settings::Impl::findWidestPage() const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	if (m_items.empty()) {
+		return PageId();
+	}
+	
+	return m_descWidthOrder.begin()->pageId;
+}
+
+PageId
+Settings::Impl::findTallestPage() const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	if (m_items.empty()) {
+		return PageId();
+	}
+	
+	return m_descHeightOrder.begin()->pageId;
 }
 
 } // namespace page_layout

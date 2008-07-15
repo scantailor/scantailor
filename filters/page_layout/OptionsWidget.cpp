@@ -17,6 +17,7 @@
 */
 
 #include "OptionsWidget.h.moc"
+#include "Settings.h"
 #include "Utils.h"
 #include "ScopedIncDec.h"
 #include "imageproc/Constants.h"
@@ -30,8 +31,9 @@ using namespace imageproc::constants;
 namespace page_layout
 {
 
-OptionsWidget::OptionsWidget()
-:	m_mmToUnit(1.0),
+OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+:	m_ptrSettings(settings),
+	m_mmToUnit(1.0),
 	m_unitToMM(1.0),
 	m_ignoreMarginChanges(0),
 	m_leftRightLinked(true),
@@ -117,6 +119,14 @@ OptionsWidget::OptionsWidget()
 	connect(
 		alignWithOthersCB, SIGNAL(toggled(bool)),
 		this, SLOT(alignWithOthersToggled())
+	);
+	connect(
+		widestPageLink, SIGNAL(linkActivated(QString const&)),
+		this, SLOT(goToWidestPage())
+	);
+	connect(
+		tallestPageLink, SIGNAL(linkActivated(QString const&)),
+		this, SLOT(goToTallestPage())
 	);
 	
 	typedef AlignmentByButton::value_type KeyVal;
@@ -269,6 +279,24 @@ OptionsWidget::alignmentButtonClicked()
 	
 	m_alignment = it->second;
 	emit alignmentChanged(m_alignment);
+}
+
+void
+OptionsWidget::goToWidestPage()
+{
+	PageId const page_id(m_ptrSettings->findWidestPage());
+	if (!page_id.isNull()) {
+		emit goToPage(page_id);
+	}
+}
+
+void
+OptionsWidget::goToTallestPage()
+{
+	PageId const page_id(m_ptrSettings->findTallestPage());
+	if (!page_id.isNull()) {
+		emit goToPage(page_id);
+	}
 }
 
 void

@@ -40,7 +40,7 @@ namespace page_layout
 Filter::Filter()
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget);
+	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
 }
 
 Filter::~Filter()

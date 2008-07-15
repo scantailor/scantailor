@@ -99,6 +99,26 @@ public:
 	 */
 	QSizeF getAggregateHardSizeMM(
 		PageId const& page_id, QSizeF const& hard_size_mm) const;
+	
+	/**
+	 * \brief Find the widest page and return its id.
+	 *
+	 * We only consider the hard page size, that is content size + hard
+	 * margins.
+	 * \return The page id of the widest page or a null PageId if no
+	 *         pages were defined.
+	 */
+	PageId findWidestPage() const;
+	
+	/**
+	 * \brief Find the tallest page and return its id.
+	 *
+	 * We only consider the hard page size, that is content size + hard
+	 * margins.
+	 * \return The page id of the tallest page or a null PageId if no
+	 *         pages were defined.
+	 */
+	PageId findTallestPage() const;
 private:
 	class Impl;
 	class Item;

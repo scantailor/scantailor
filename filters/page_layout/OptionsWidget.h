@@ -33,13 +33,15 @@ class QToolButton;
 namespace page_layout
 {
 
+class Settings;
+
 class OptionsWidget :
 	public FilterOptionsWidget,
 	public Ui::PageLayoutOptionsWidget
 {
 	Q_OBJECT
 public:
-	OptionsWidget();
+	OptionsWidget(IntrusivePtr<Settings> const& settings);
 	
 	virtual ~OptionsWidget();
 	
@@ -78,6 +80,10 @@ private slots:
 	void alignWithOthersToggled();
 	
 	void alignmentButtonClicked();
+	
+	void goToWidestPage();
+	
+	void goToTallestPage();
 private:
 	typedef std::map<QToolButton*, Alignment> AlignmentByButton;
 	
@@ -87,6 +93,7 @@ private:
 	
 	void enableDisableAlignmentButtons();
 	
+	IntrusivePtr<Settings> m_ptrSettings;
 	QIcon m_chainIcon;
 	QIcon m_brokenChainIcon;
 	AlignmentByButton m_alignmentByButton;
