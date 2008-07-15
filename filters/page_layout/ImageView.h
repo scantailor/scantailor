@@ -50,6 +50,10 @@ public:
 	
 	virtual ~ImageView();
 signals:
+	void invalidateThumbnail(PageId const& page_id);
+	
+	void invalidateAllThumbnails();
+	
 	void marginsSetLocally(Margins const& margins_mm);
 public slots:
 	void marginsSetExternally(Margins const& margins_mm);
@@ -74,6 +78,7 @@ protected:
 private:
 	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
 	enum FitMode { FIT, DONT_FIT };
+	enum AggregateSizeChanged { AGGREGATE_SIZE_UNCHANGED, AGGREGATE_SIZE_CHANGED };
 	
 	struct StateBeforeResizing
 	{
@@ -118,6 +123,10 @@ private:
 	void recalcOuterRect();
 	
 	QSizeF origRectToSizeMM(QRectF const& rect) const;
+	
+	AggregateSizeChanged commitHardMargins(Margins const& margins_mm);
+	
+	void invalidateThumbnails(AggregateSizeChanged agg_size_changed);
 	
 	static void extendPolyRectWithMargins(
 		QPolygonF& poly_rect, Margins const& margins);
@@ -182,8 +191,24 @@ private:
 	
 	/**
 	 * \brief Aggregate (max width + max height) hard page size.
+	 *
+	 * This one is for displaying purposes only.  It changes during
+	 * dragging, and it may differ from what
+	 * m_ptrSettings->getAggregateHardSizeMM() would return.
+	 *
+	 * \see m_committedAggregateHardSizeMM
 	 */
 	QSizeF m_aggregateHardSizeMM;
+	
+	/**
+	 * \brief Aggregate (max width + max height) hard page size.
+	 *
+	 * This one is supposed to be the cached version of what
+	 * m_ptrSettings->getAggregateHardSizeMM() would return.
+	 *
+	 * \see m_aggregateHardSizeMM
+	 */
+	QSizeF m_committedAggregateHardSizeMM;
 	
 	Alignment m_alignment;
 	

@@ -72,7 +72,7 @@ CacheDrivenTask::process(
 	}
 	
 	if (m_ptrNextTask) {
-		m_ptrNextTask->process(page_info, collector, xform);
+		m_ptrNextTask->process(page_info, collector, xform, params->contentRect());
 		return;
 	}
 	

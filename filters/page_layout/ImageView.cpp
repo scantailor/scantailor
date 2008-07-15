@@ -56,6 +56,7 @@ ImageView::ImageView(
 	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform()),
 	m_innerRect(content_rect),
 	m_aggregateHardSizeMM(settings->getAggregateHardSizeMM()),
+	m_committedAggregateHardSizeMM(m_aggregateHardSizeMM),
 	m_alignment(opt_widget.alignment()),
 	m_innerResizingMask(0),
 	m_middleResizingMask(0),
@@ -74,8 +75,11 @@ ImageView::~ImageView()
 void
 ImageView::marginsSetExternally(Margins const& margins_mm)
 {
-	m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
+	AggregateSizeChanged const changed = commitHardMargins(margins_mm);
+	
 	recalcBoxesAndFit(margins_mm);
+	
+	invalidateThumbnails(changed);
 }
 
 void
@@ -91,9 +95,13 @@ ImageView::leftRightLinkToggled(bool const linked)
 			margins_mm.setLeft(new_margin);
 			margins_mm.setRight(new_margin);
 			
+			AggregateSizeChanged const changed =
+					commitHardMargins(margins_mm);
+			
 			recalcBoxesAndFit(margins_mm);
-			m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
 			emit marginsSetLocally(margins_mm);
+			
+			invalidateThumbnails(changed);
 		}
 	}
 }
@@ -111,9 +119,13 @@ ImageView::topBottomLinkToggled(bool const linked)
 			margins_mm.setTop(new_margin);
 			margins_mm.setBottom(new_margin);
 			
+			AggregateSizeChanged const changed =
+					commitHardMargins(margins_mm);
+			
 			recalcBoxesAndFit(margins_mm);
-			m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
 			emit marginsSetLocally(margins_mm);
+			
+			invalidateThumbnails(changed);
 		}
 	}
 }
@@ -124,6 +136,7 @@ ImageView::alignmentChanged(Alignment const& alignment)
 	m_alignment = alignment;
 	m_ptrSettings->setPageAlignment(m_pageId, alignment);
 	recalcBoxesAndFit(calcHardMarginsMM());
+	emit invalidateThumbnail(m_pageId);
 }
 
 void
@@ -225,8 +238,9 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 		m_innerResizingMask = 0;
 		m_middleResizingMask = 0;
 		
-		m_ptrSettings->setHardMarginsMM(m_pageId, calcHardMarginsMM());
-		m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM();
+		AggregateSizeChanged const agg_size_changed(
+			commitHardMargins(calcHardMarginsMM())
+		);
 		
 		recalcOuterRect();
 		
@@ -235,6 +249,8 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 		} else {
 			updatePresentationTransform(DONT_FIT);
 		}
+		
+		invalidateThumbnails(agg_size_changed);
 	}
 }
 
@@ -292,8 +308,15 @@ ImageView::hideEvent(QHideEvent* const event)
 	ensureCursorShape(Qt::ArrowCursor);
 	if (old_resizing_mask) {
 		Margins const margins_mm(calcHardMarginsMM());
-		m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
+		
+		AggregateSizeChanged const agg_size_changed(
+			commitHardMargins(margins_mm)
+		);
+		
+		recalcBoxesAndFit(margins_mm);
 		emit marginsSetLocally(margins_mm);
+		
+		invalidateThumbnails(agg_size_changed);
 	}
 }
 
@@ -668,6 +691,32 @@ ImageView::origRectToSizeMM(QRectF const& rect) const
 	);
 	
 	return size_mm;
+}
+
+ImageView::AggregateSizeChanged
+ImageView::commitHardMargins(Margins const& margins_mm)
+{
+	m_ptrSettings->setHardMarginsMM(m_pageId, margins_mm);
+	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM();
+	
+	AggregateSizeChanged changed = AGGREGATE_SIZE_UNCHANGED;
+	if (m_committedAggregateHardSizeMM != m_aggregateHardSizeMM) {
+		 changed = AGGREGATE_SIZE_CHANGED;
+	}
+	
+	m_committedAggregateHardSizeMM = m_aggregateHardSizeMM;
+	
+	return changed;
+}
+
+void
+ImageView::invalidateThumbnails(AggregateSizeChanged const agg_size_changed)
+{
+	if (agg_size_changed == AGGREGATE_SIZE_CHANGED) {
+		emit invalidateAllThumbnails();
+	} else {
+		emit invalidateThumbnail(m_pageId);
+	}
 }
 
 void

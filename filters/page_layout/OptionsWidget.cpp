@@ -18,7 +18,7 @@
 
 #include "OptionsWidget.h.moc"
 #include "Settings.h"
-#include "Utils.h"
+#include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include "imageproc/Constants.h"
 #include <boost/foreach.hpp>

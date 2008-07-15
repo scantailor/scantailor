@@ -17,17 +17,24 @@
 */
 
 #include "CacheDrivenTask.h"
+#include "Settings.h"
+#include "Params.h"
+#include "Thumbnail.h"
 #include "IncompleteThumbnail.h"
 #include "ImageTransformation.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
+#include <QSizeF>
+#include <QRectF>
+#include <memory>
 
 namespace page_layout
 {
 
-CacheDrivenTask::CacheDrivenTask()
+CacheDrivenTask::CacheDrivenTask(IntrusivePtr<Settings> const& settings)
+:	m_ptrSettings(settings)
 {
 }
 
@@ -38,16 +45,36 @@ CacheDrivenTask::~CacheDrivenTask()
 void
 CacheDrivenTask::process(
 	PageInfo const& page_info, AbstractFilterDataCollector* collector,
-	ImageTransformation const& xform)
+	ImageTransformation const& xform, QRectF const& content_rect)
 {
+	std::auto_ptr<Params> const params(
+		m_ptrSettings->getPageParams(page_info.id())
+	);
+	
+	if (!params.get() || params->contentRect() != content_rect) {
+		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+			thumb_col->processThumbnail(
+				std::auto_ptr<QGraphicsItem>(
+					new IncompleteThumbnail(
+						thumb_col->thumbnailCache(),
+						thumb_col->maxLogicalThumbSize(),
+						page_info.imageId(), xform
+					)
+				)
+			);
+			
+		}
+		return;
+	}
 	
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 		thumb_col->processThumbnail(
 			std::auto_ptr<QGraphicsItem>(
-				new IncompleteThumbnail(
+				new Thumbnail(
 					thumb_col->thumbnailCache(),
 					thumb_col->maxLogicalThumbSize(),
-					page_info.imageId(), xform
+					page_info.imageId(), xform, *params,
+					m_ptrSettings->getAggregateHardSizeMM()
 				)
 			)
 		);

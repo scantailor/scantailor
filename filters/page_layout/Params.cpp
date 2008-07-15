@@ -16,38 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_CACHEDRIVENTASK_H_
-#define PAGE_LAYOUT_CACHEDRIVENTASK_H_
-
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
-
-class QRectF;
-class PageInfo;
-class AbstractFilterDataCollector;
-class ImageTransformation;
+#include "Params.h"
 
 namespace page_layout
 {
 
-class Settings;
-
-class CacheDrivenTask : public RefCountable
+Params::Params(
+	Margins const& hard_margins_mm, QRectF const& content_rect,
+	QSizeF const& content_size_mm, Alignment const& alignment)
+:	m_hardMarginsMM(hard_margins_mm),
+	m_contentRect(content_rect),
+	m_contentSizeMM(content_size_mm),
+	m_alignment(alignment)
 {
-	DECLARE_NON_COPYABLE(CacheDrivenTask)
-public:
-	CacheDrivenTask(IntrusivePtr<Settings> const& settings);
-	
-	virtual ~CacheDrivenTask();
-	
-	void process(
-		PageInfo const& page_info, AbstractFilterDataCollector* collector,
-		ImageTransformation const& xform, QRectF const& content_rect);
-private:
-	IntrusivePtr<Settings> m_ptrSettings;
-};
+}
 
 } // namespace page_layout
 
-#endif

@@ -163,7 +163,7 @@ Filter::createTask(
 IntrusivePtr<CacheDrivenTask>
 Filter::createCacheDrivenTask()
 {
-	return IntrusivePtr<CacheDrivenTask>(new CacheDrivenTask);
+	return IntrusivePtr<CacheDrivenTask>(new CacheDrivenTask(m_ptrSettings));
 }
 
 } // namespace page_layout

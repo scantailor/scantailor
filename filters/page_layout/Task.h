@@ -27,7 +27,6 @@
 
 class TaskStatus;
 class FilterData;
-class DebugImages;
 class ImageTransformation;
 class QRectF;
 
@@ -58,7 +57,6 @@ private:
 	
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
-	//std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;
 	bool m_batchProcessing;
 };

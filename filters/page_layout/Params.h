@@ -16,36 +16,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_CACHEDRIVENTASK_H_
-#define PAGE_LAYOUT_CACHEDRIVENTASK_H_
+#ifndef PAGE_LAYOUT_PARAMS_H_
+#define PAGE_LAYOUT_PARAMS_H_
 
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
-
-class QRectF;
-class PageInfo;
-class AbstractFilterDataCollector;
-class ImageTransformation;
+#include "Margins.h"
+#include "Alignment.h"
+#include <QRectF>
+#include <QSizeF>
 
 namespace page_layout
 {
 
-class Settings;
-
-class CacheDrivenTask : public RefCountable
+class Params
 {
-	DECLARE_NON_COPYABLE(CacheDrivenTask)
+	// Member-wise copying is OK.
 public:
-	CacheDrivenTask(IntrusivePtr<Settings> const& settings);
+	Params(Margins const& hard_margins_mm, QRectF const& content_rect,
+		QSizeF const& content_size_mm, Alignment const& alignment);
 	
-	virtual ~CacheDrivenTask();
+	Margins const& hardMarginsMM() const { return m_hardMarginsMM; }
 	
-	void process(
-		PageInfo const& page_info, AbstractFilterDataCollector* collector,
-		ImageTransformation const& xform, QRectF const& content_rect);
+	QRectF const& contentRect() const { return m_contentRect; }
+	
+	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
+	
+	Alignment const& alignment() const { return m_alignment; }
 private:
-	IntrusivePtr<Settings> m_ptrSettings;
+	Margins m_hardMarginsMM;
+	QRectF m_contentRect;
+	QSizeF m_contentSizeMM;
+	Alignment m_alignment;
 };
 
 } // namespace page_layout

@@ -26,10 +26,12 @@
 class PageId;
 class Margins;
 class QSizeF;
+class QRectF;
 
 namespace page_layout
 {
 
+class Params;
 class Alignment;
 
 class Settings : public RefCountable
@@ -39,6 +41,13 @@ public:
 	Settings();
 	
 	virtual ~Settings();
+	
+	/**
+	 * \brief Get all parameters at once.
+	 *
+	 * May return a null auto_ptr if the specified page is unknown to us.
+	 */
+	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
 	
 	/**
 	 * \brief Returns the hard margins for the specified page.
@@ -79,11 +88,13 @@ public:
 	void setPageAlignment(PageId const& page_id, Alignment const& alignment);
 	
 	/**
-	 * \brief Sets content size for a specified page.
+	 * \brief Sets content zone for the specified page.
 	 *
-	 * The content size comes from the "Select Content" filter.
+	 * The content zone comes from the "Select Content" filter.
 	 */
-	void setContentSizeMM(PageId const& page_id, QSizeF const& content_size_mm);
+	void setContentZone(
+		PageId const& page_id, QRectF const& content_rect,
+		QSizeF const& content_size_mm);
 	
 	/**
 	 * \brief Returns the aggregate (max width + max height) hard page size.

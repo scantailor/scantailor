@@ -84,7 +84,7 @@ Task::process(
 	
 	//Dependencies const deps(data.xform().transformBack().map(content_rect));
 	QSizeF const content_size_mm(calcContentSizeMM(data.xform(), content_rect));
-	m_ptrSettings->setContentSizeMM(m_pageId, content_size_mm);
+	m_ptrSettings->setContentZone(m_pageId, content_rect, content_size_mm);
 	
 	return FilterResultPtr(
 		new UiUpdater(
@@ -149,6 +149,14 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 	
+	QObject::connect(
+		view, SIGNAL(invalidateThumbnail(PageId const&)),
+		opt_widget, SIGNAL(invalidateThumbnail(PageId const&))
+	);
+	QObject::connect(
+		view, SIGNAL(invalidateAllThumbnails()),
+		opt_widget, SIGNAL(invalidateAllThumbnails())
+	);
 	QObject::connect(
 		view, SIGNAL(marginsSetLocally(Margins const&)),
 		opt_widget, SLOT(marginsSetExternally(Margins const&))

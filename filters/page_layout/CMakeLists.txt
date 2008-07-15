@@ -9,15 +9,16 @@ ADD_SUBDIRECTORY(ui)
 
 SET(
 	sources
+	Utils.cpp Utils.h
 	ImageView.cpp ImageView.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
 	Dependencies.cpp Dependencies.h
-#	Params.cpp Params.h
+	Params.cpp Params.h
 	Settings.cpp Settings.h
-#	Thumbnail.cpp Thumbnail.h
+	Thumbnail.cpp Thumbnail.h
 	Alignment.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

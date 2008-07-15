@@ -16,36 +16,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_CACHEDRIVENTASK_H_
-#define PAGE_LAYOUT_CACHEDRIVENTASK_H_
+#ifndef PAGE_LAYOUT_UTILS_H_
+#define PAGE_LAYOUT_UTILS_H_
 
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
-
-class QRectF;
-class PageInfo;
-class AbstractFilterDataCollector;
+class QPolygonF;
+class QPointF;
+class QSizeF;
+class Margins;
 class ImageTransformation;
 
 namespace page_layout
 {
 
-class Settings;
+class Alignment;
 
-class CacheDrivenTask : public RefCountable
+class Utils
 {
-	DECLARE_NON_COPYABLE(CacheDrivenTask)
 public:
-	CacheDrivenTask(IntrusivePtr<Settings> const& settings);
+	static void extendPolyRectWithMargins(
+		QPolygonF& poly_rect, Margins const& margins);
 	
-	virtual ~CacheDrivenTask();
+	static Margins calcSoftMarginsMM(
+		QSizeF const& hard_size_mm,
+		QSizeF const& aggregate_hard_size_mm,
+		Alignment const& alignment);
 	
-	void process(
-		PageInfo const& page_info, AbstractFilterDataCollector* collector,
-		ImageTransformation const& xform, QRectF const& content_rect);
+	static ImageTransformation calcPresentationTransform(
+		ImageTransformation const& orig_xform,
+		QPolygonF const& physical_crop_area);
 private:
-	IntrusivePtr<Settings> m_ptrSettings;
+	static QPointF getRightUnitVector(QPolygonF const& poly_rect);
+	
+	static QPointF getDownUnitVector(QPolygonF const& poly_rect);
 };
 
 } // namespace page_layout
