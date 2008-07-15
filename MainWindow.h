@@ -63,6 +63,8 @@ private slots:
 	
 	void prevPage();
 	
+	void goToPage(PageId const& page_id);
+	
 	void pageSelected(
 		PageInfo const& page_info, QRectF const& thumb_rect,
 		bool by_user, bool was_already_selected);

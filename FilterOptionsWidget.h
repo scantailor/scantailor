@@ -32,6 +32,8 @@ signals:
 	void reloadRequested();
 	
 	void invalidateThumbnail(PageId const& page_id);
+	
+	void goToPage(PageId const& page_id);
 };
 
 #endif

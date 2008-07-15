@@ -304,6 +304,10 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 			m_ptrOptionsWidget, SIGNAL(invalidateThumbnail(PageId const&)),
 			this, SLOT(invalidateThumbnailSlot(PageId const&))
 		);
+		disconnect(
+			m_ptrOptionsWidget, SIGNAL(goToPage(PageId const&)),
+			this, SLOT(goToPage(PageId const&))
+		);
 	}
 	
 	m_pOptionsFrameLayout->addWidget(widget);
@@ -313,6 +317,10 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 	connect(
 		widget, SIGNAL(invalidateThumbnail(PageId const&)),
 		this, SLOT(invalidateThumbnailSlot(PageId const&))
+	);
+	connect(
+		widget, SIGNAL(goToPage(PageId const&)),
+		this, SLOT(goToPage(PageId const&))
 	);
 }
 
@@ -372,6 +380,14 @@ MainWindow::prevPage()
 	PageInfo const prev_page(m_ptrPages->setPrevPage(m_frozenPages.view()));
 	m_ptrThumbSequence->setCurrentThumbnail(prev_page.id());
 	loadImage(prev_page);
+}
+
+void
+MainWindow::goToPage(PageId const& page_id)
+{
+	m_ptrPages->setCurPage(page_id);
+	m_ptrThumbSequence->setCurrentThumbnail(page_id);
+	loadImage();
 }
 
 void
