@@ -47,15 +47,7 @@ ThumbnailBase::ThumbnailBase(
 	m_imageXform(image_xform),
 	m_pixmapLoadPending(false)
 {
-	QSizeF const unscaled_size(m_imageXform.resultingRect().size());
-	QSizeF scaled_size(unscaled_size);
-	scaled_size.scale(max_size, Qt::KeepAspectRatio);
-	
-	m_boundingRect = QRectF(QPointF(0.0, 0.0), scaled_size);
-	
-	double const x_post_scale = m_boundingRect.width() / unscaled_size.width();
-	double const y_post_scale = m_boundingRect.height() / unscaled_size.height();
-	m_postScaleXform.scale(x_post_scale, y_post_scale);
+	setImageXform(m_imageXform);
 }
 
 ThumbnailBase::~ThumbnailBase()
@@ -174,6 +166,22 @@ ThumbnailBase::paint(QPainter* painter,
 	}
 	
 	paintOverImage(*painter, image_to_display, thumb_to_display);
+}
+
+void
+ThumbnailBase::setImageXform(ImageTransformation const& image_xform)
+{
+	m_imageXform = image_xform;
+	QSizeF const unscaled_size(image_xform.resultingRect().size());
+	QSizeF scaled_size(unscaled_size);
+	scaled_size.scale(m_maxSize, Qt::KeepAspectRatio);
+	
+	m_boundingRect = QRectF(QPointF(0.0, 0.0), scaled_size);
+	
+	double const x_post_scale = m_boundingRect.width() / unscaled_size.width();
+	double const y_post_scale = m_boundingRect.height() / unscaled_size.height();
+	m_postScaleXform.reset();
+	m_postScaleXform.scale(x_post_scale, y_post_scale);
 }
 
 void

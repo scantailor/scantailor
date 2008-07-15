@@ -66,6 +66,8 @@ protected:
 		QPainter& painter, QTransform const& image_to_display,
 		QTransform const& thumb_to_display) {}
 	
+	void setImageXform(ImageTransformation const& image_xform);
+	
 	ImageTransformation const& imageXform() const { return m_imageXform; }
 	
 	QTransform const& imageToThumb() const { return m_postScaleXform; }
