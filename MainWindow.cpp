@@ -31,6 +31,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailFactory.h"
 #include "ContentBoxAggregator.h"
+#include "PageParamsAggregator.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -91,6 +92,8 @@ public:
 	
 	int getSelectContentFilterIdx() const { return m_selectContentFilterIdx; }
 	
+	int getPageLayoutFilterIdx() const { return m_pageLayoutFilterIdx; }
+	
 	virtual int rowCount(QModelIndex const& parent) const;
 	
 	virtual QVariant data(QModelIndex const& index, int role) const;
@@ -102,6 +105,7 @@ private:
 	IntrusivePtr<page_layout::Filter> m_ptrPageLayoutFilter;
 	std::vector<FilterPtr> m_filters;
 	int m_selectContentFilterIdx;
+	int m_pageLayoutFilterIdx;
 };
 
 
@@ -182,12 +186,22 @@ MainWindow::construct()
 	
 	m_ptrThumbSequence->attachView(thumbView);
 	
-	IntrusivePtr<CompositeCacheDrivenTask> cb_task(
-		m_ptrFilterListModel->createCompositeCacheDrivenTask(
-			m_ptrFilterListModel->getSelectContentFilterIdx()
-		)
-	);
-	m_ptrContentBoxAggregator.reset(new ContentBoxAggregator(cb_task));
+	{
+		IntrusivePtr<CompositeCacheDrivenTask> const task(
+			m_ptrFilterListModel->createCompositeCacheDrivenTask(
+				m_ptrFilterListModel->getSelectContentFilterIdx()
+			)
+		);
+		m_ptrContentBoxAggregator.reset(new ContentBoxAggregator(task));
+	}
+	{
+		IntrusivePtr<CompositeCacheDrivenTask> const task(
+			m_ptrFilterListModel->createCompositeCacheDrivenTask(
+				m_ptrFilterListModel->getPageLayoutFilterIdx()
+			)
+		);
+		m_ptrPageParamsAggregator.reset(new PageParamsAggregator(task));
+	}
 	
 	addAction(actionNextPage);
 	addAction(actionPrevPage);
@@ -367,6 +381,18 @@ MainWindow::invalidateThumbnail(PageId const& page_id)
 }
 
 void
+MainWindow::invalidateAllThumbnails()
+{
+	m_ptrThumbSequence->invalidateAllThumbnails();
+}
+
+void
+MainWindow::invalidateThumbnailSlot(PageId const& page_id)
+{
+	invalidateThumbnail(page_id);
+}
+
+void
 MainWindow::invalidateAllThumbnailsSlot()
 {
 	m_ptrThumbSequence->invalidateAllThumbnails();
@@ -436,12 +462,22 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	m_curFilter = selected.front().top();
 	bool const now_below_select_content = isBelowSelectContent(m_curFilter);
 	
-	resetPageAndThumbSequences();
+	if (!was_below_select_content && now_below_select_content) {
+		// IMPORTANT: this needs to go before resetting thumbnails,
+		// because it may affect them.  The reason it may affect
+		// thumbnails is that besides collecting page parameters,
+		// this task propagates content rectangles from
+		// "Select Content" to "Page Layout" filters, which may
+		// change the aggregate page size.
+		m_ptrPageParamsAggregator->aggregate(*m_ptrPages);
+	}
 	
+	resetPageAndThumbSequences();
+	/*
 	if (!was_below_select_content && now_below_select_content) {
 		m_ptrContentBoxAggregator->aggregate(*m_ptrPages);
 	}
-	
+	*/
 	updateBatchProcessingActions();
 	
 	loadImage();
@@ -494,12 +530,6 @@ MainWindow::stopBatchProcessing()
 	updateBatchProcessingActions();
 	
 	loadImage();
-}
-
-void
-MainWindow::invalidateThumbnailSlot(PageId const& page_id)
-{
-	invalidateThumbnail(page_id);
 }
 
 void
@@ -730,6 +760,7 @@ MainWindow::FilterListModel::FilterListModel(
 	m_selectContentFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrSelectContentFilter);
 	
+	m_pageLayoutFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrPageLayoutFilter);
 }
 

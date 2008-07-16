@@ -18,10 +18,10 @@
 
 #include "Task.h"
 #include "Filter.h"
-#include "Dependencies.h"
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "Margins.h"
+#include "Utils.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
@@ -45,7 +45,9 @@ public:
 		PageId const& page_id,
 		QImage const& image,
 		ImageTransformation const& xform,
-		QRectF const& content_rect, bool batch);
+		QRectF const& content_rect,
+		Settings::AggregateSizeChanged const agg_size_changed,
+		bool batch);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -57,6 +59,7 @@ private:
 	QImage m_image;
 	ImageTransformation m_xform;
 	QRectF m_contentRect;
+	Settings::AggregateSizeChanged m_aggSizeChanged;
 	bool m_batchProcessing;
 };
 
@@ -83,30 +86,23 @@ Task::process(
 	status.throwIfCancelled();
 	
 	//Dependencies const deps(data.xform().transformBack().map(content_rect));
-	QSizeF const content_size_mm(calcContentSizeMM(data.xform(), content_rect));
-	m_ptrSettings->setContentZone(m_pageId, content_rect, content_size_mm);
+	QSizeF const content_size_mm(
+		Utils::calcRectSizeMM(data.xform(), content_rect)
+	);
+	
+	Settings::AggregateSizeChanged const agg_size_changed(
+		m_ptrSettings->setContentSizeMM(
+			m_pageId, content_size_mm
+		)
+	);
 	
 	return FilterResultPtr(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_pageId, data.image(),
-			data.xform(), content_rect, m_batchProcessing
+			data.xform(), content_rect, agg_size_changed,
+			m_batchProcessing
 		)
 	);
-}
-
-QSizeF
-Task::calcContentSizeMM(
-	ImageTransformation const& xform, QRectF const& content_rect)
-{
-	PhysicalTransformation const phys_xform(xform.origDpi());
-	QTransform const virt_to_mm(xform.transformBack() * phys_xform.pixelsToMM());
-	
-	QLineF const hor_line(content_rect.topLeft(), content_rect.topRight());
-	QLineF const ver_line(content_rect.topLeft(), content_rect.bottomLeft());
-	
-	double const width = virt_to_mm.map(hor_line).length();
-	double const height = virt_to_mm.map(ver_line).length();
-	return QSizeF(width, height);
 }
 
 
@@ -117,13 +113,16 @@ Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect, bool const batch)
+	QRectF const& content_rect,
+	Settings::AggregateSizeChanged const agg_size_changed,
+	bool const batch)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_image(image),
 	m_xform(xform),
 	m_contentRect(content_rect),
+	m_aggSizeChanged(agg_size_changed),
 	m_batchProcessing(batch)
 {
 }
@@ -137,7 +136,11 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI();
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
-	ui->invalidateThumbnail(m_pageId);
+	if (m_aggSizeChanged == Settings::AGGREGATE_SIZE_CHANGED) {
+		ui->invalidateAllThumbnails();
+	} else {
+		ui->invalidateThumbnail(m_pageId);
+	}
 	
 	if (m_batchProcessing) {
 		return;

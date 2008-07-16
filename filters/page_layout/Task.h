@@ -52,9 +52,6 @@ public:
 private:
 	class UiUpdater;
 	
-	static QSizeF calcContentSizeMM(
-		ImageTransformation const& xform, QRectF const& content_rect);
-	
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
 	PageId m_pageId;

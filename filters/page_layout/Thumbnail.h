@@ -25,6 +25,7 @@
 #include "PhysicalTransformation.h"
 #include <QTransform>
 #include <QSizeF>
+#include <QRectF>
 
 class ThumbnailPixmapCache;
 class ImageId;
@@ -37,7 +38,8 @@ class Thumbnail : public ThumbnailBase
 public:
 	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 		ImageId const& image_id, ImageTransformation const& xform,
-		Params const& params, QSizeF const& aggregate_hard_size_mm);
+		Params const& params, QRectF const& content_rect,
+		QSizeF const& aggregate_hard_size_mm);
 	
 	virtual void paintOverImage(
 		QPainter& painter,
@@ -47,7 +49,9 @@ private:
 	void recalcBoxesAndPresentationTransform();
 	
 	Params const m_params;
+	QRectF const m_contentRect; /**< In m_origXform coortinates. */
 	QSizeF const m_aggregateHardSizeMM;
+	
 	
 	/**
 	 * \brief Image transformation, as provided by the previous filter.

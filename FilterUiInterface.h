@@ -43,6 +43,8 @@ public:
 		DebugImages const* debug_images = 0) = 0;
 	
 	virtual void invalidateThumbnail(PageId const& page_id) = 0;
+	
+	virtual void invalidateAllThumbnails() = 0;
 };
 
 #endif

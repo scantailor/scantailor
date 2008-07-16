@@ -44,6 +44,7 @@ class WorkerThread;
 class ProjectReader;
 class DebugImages;
 class ContentBoxAggregator;
+class PageParamsAggregator;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -104,6 +105,8 @@ private:
 	
 	virtual void invalidateThumbnail(PageId const& page_id);
 	
+	virtual void invalidateAllThumbnails();
+	
 	std::auto_ptr<ThumbnailPixmapCache> createThumbnailCache();
 	
 	void construct();
@@ -142,6 +145,7 @@ private:
 	std::auto_ptr<QTabWidget> m_ptrTabbedDebugImages;
 	std::auto_ptr<FilterListModel> m_ptrFilterListModel;
 	std::auto_ptr<ContentBoxAggregator> m_ptrContentBoxAggregator;
+	std::auto_ptr<PageParamsAggregator> m_ptrPageParamsAggregator;
 	BackgroundTaskPtr m_ptrCurTask;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;

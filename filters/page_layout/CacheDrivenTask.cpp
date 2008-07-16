@@ -24,8 +24,10 @@
 #include "ImageTransformation.h"
 #include "PageInfo.h"
 #include "PageId.h"
+#include "Utils.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
+#include "filter_dc/PageLayoutParamsCollector.h"
 #include <QSizeF>
 #include <QRectF>
 #include <memory>
@@ -47,12 +49,34 @@ CacheDrivenTask::process(
 	PageInfo const& page_info, AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform, QRectF const& content_rect)
 {
-	std::auto_ptr<Params> const params(
-		m_ptrSettings->getPageParams(page_info.id())
-	);
+	if (PageLayoutParamsCollector* plc = dynamic_cast<PageLayoutParamsCollector*>(collector)) {
+		/*
+		Here we perform two tasks:
+		1. Propagating content rect from "Select Content" to "Page Layout".
+		2. Collecting page parameters.
+		Note that we can't combine the first task with thumbnail
+		generation, because updating content rect may change the
+		aggregate content size, which will require to re-generate
+		all thumbnails.
+		*/
+		QSizeF const content_size_mm(
+			Utils::calcRectSizeMM(xform, content_rect)
+		);
+		Params const params(
+			m_ptrSettings->updateContentSizeAndGetParams(
+				page_info.id(), content_size_mm
+			)
+		);
+		plc->processPageParams(params);
+	}
 	
-	if (!params.get() || params->contentRect() != content_rect) {
-		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+		
+		std::auto_ptr<Params> const params(
+			m_ptrSettings->getPageParams(page_info.id())
+		);
+		
+		if (!params.get()) {
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(
 					new IncompleteThumbnail(
@@ -62,22 +86,19 @@ CacheDrivenTask::process(
 					)
 				)
 			);
-			
-		}
-		return;
-	}
-	
-	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
-		thumb_col->processThumbnail(
-			std::auto_ptr<QGraphicsItem>(
-				new Thumbnail(
-					thumb_col->thumbnailCache(),
-					thumb_col->maxLogicalThumbSize(),
-					page_info.imageId(), xform, *params,
-					m_ptrSettings->getAggregateHardSizeMM()
+		} else {
+			thumb_col->processThumbnail(
+				std::auto_ptr<QGraphicsItem>(
+					new Thumbnail(
+						thumb_col->thumbnailCache(),
+						thumb_col->maxLogicalThumbSize(),
+						page_info.imageId(), xform,
+						*params, content_rect,
+						m_ptrSettings->getAggregateHardSizeMM()
+					)
 				)
-			)
-		);
+			);
+		}
 	}
 }
 

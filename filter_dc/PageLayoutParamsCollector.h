@@ -16,38 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_DEPENDENCIES_H_
-#define PAGE_LAYOUT_DEPENDENCIES_H_
+#ifndef PAGELAYOUTPARAMSCOLLECTOR_H_
+#define PAGELAYOUTPARAMSCOLLECTOR_H_
 
-#include <QPolygonF>
-
-class QDomDocument;
-class QDomElement;
-class QString;
+#include "AbstractFilterDataCollector.h"
 
 namespace page_layout
 {
+	class Params;
+}
 
-class Dependencies
+class PageLayoutParamsCollector : public AbstractFilterDataCollector
 {
 public:
-	// Member-wise copying is OK.
-	
-	Dependencies();
-	
-	Dependencies(QPolygonF const& physical_content_box);
-	
-	Dependencies(QDomElement const& deps_el);
-	
-	~Dependencies();
-	
-	bool matches(Dependencies const& other) const;
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-private:
-	QPolygonF m_physicalContentBox;
+	virtual void processPageParams(page_layout::Params const& params) = 0;
 };
-
-} // namespace page_layout
 
 #endif

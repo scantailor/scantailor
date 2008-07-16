@@ -128,13 +128,6 @@ private:
 	
 	void invalidateThumbnails(AggregateSizeChanged agg_size_changed);
 	
-	static void extendPolyRectWithMargins(
-		QPolygonF& poly_rect, Margins const& margins);
-	
-	static QPointF getRightUnitVector(QPolygonF const& poly_rect);
-	
-	static QPointF getDownUnitVector(QPolygonF const& poly_rect);
-	
 	IntrusivePtr<Settings> m_ptrSettings;
 	
 	PageId const m_pageId;

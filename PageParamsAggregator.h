@@ -16,34 +16,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_PARAMS_H_
-#define PAGE_LAYOUT_PARAMS_H_
+#ifndef PAGEPARAMSAGGREGATOR_H_
+#define PAGEPARAMSAGGREGATOR_H_
 
-#include "Margins.h"
-#include "Alignment.h"
+#include "IntrusivePtr.h"
 #include <QSizeF>
 
-namespace page_layout
-{
+class CompositeCacheDrivenTask;
+class PageSequence;
 
-class Params
+class PageParamsAggregator
 {
-	// Member-wise copying is OK.
 public:
-	Params(Margins const& hard_margins_mm,
-		QSizeF const& content_size_mm, Alignment const& alignment);
+	PageParamsAggregator(IntrusivePtr<CompositeCacheDrivenTask> const& task);
 	
-	Margins const& hardMarginsMM() const { return m_hardMarginsMM; }
+	~PageParamsAggregator();
 	
-	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
+	void aggregate(PageSequence const& pages);
 	
-	Alignment const& alignment() const { return m_alignment; }
+	bool haveUndefinedItems() const { return m_haveUndefinedItems; }
 private:
-	Margins m_hardMarginsMM;
-	QSizeF m_contentSizeMM;
-	Alignment m_alignment;
+	class Collector;
+	
+	IntrusivePtr<CompositeCacheDrivenTask> m_ptrTask;
+	bool m_haveUndefinedItems;
 };
-
-} // namespace page_layout
 
 #endif

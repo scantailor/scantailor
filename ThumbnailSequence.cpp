@@ -138,6 +138,7 @@ private:
 	CompositeItem* m_pSelectedItem;
 	IntrusivePtr<ThumbnailFactory> m_ptrFactory;
 	QGraphicsScene m_graphicsScene;
+public:
 	QRectF m_sceneRect;
 	int m_syntheticSelectionScope;
 };
@@ -353,6 +354,8 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
 	double offset = 0;
 	
+	CompositeItem* to_be_selected = 0;
+	
 	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
 	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
 	for (; ord_it != ord_end; ++ord_it) {
@@ -362,7 +365,9 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 		
 		CompositeItem* const old_composite = ord_it->composite;
 		CompositeItem* const new_composite = composite.get();
-		bool const old_selected = old_composite->isSelected();
+		if (old_composite->isSelected()) {
+			to_be_selected = new_composite;
+		}
 		
 		new_composite->setPos(0.0, offset);
 		new_composite->updateSceneRect(m_sceneRect);
@@ -377,14 +382,14 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 		
 		ord_it->composite = new_composite;
 		m_graphicsScene.addItem(composite.release());
-		
-		if (old_selected) {
-			assert(!new_composite->isSelected()); // Because it was just created.
-			new_composite->setSelected(true); // This will cause a callback.
-		}
 	}
 	
 	commitSceneRect();
+	
+	if (to_be_selected) {
+		assert(!to_be_selected->isSelected()); // Because it was just created.
+		to_be_selected->setSelected(true); // This will cause a callback.
+	}
 }
 
 void

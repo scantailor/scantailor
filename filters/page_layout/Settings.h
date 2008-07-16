@@ -26,7 +26,6 @@
 class PageId;
 class Margins;
 class QSizeF;
-class QRectF;
 
 namespace page_layout
 {
@@ -38,6 +37,8 @@ class Settings : public RefCountable
 {
 	DECLARE_NON_COPYABLE(Settings)
 public:
+	enum AggregateSizeChanged { AGGREGATE_SIZE_UNCHANGED, AGGREGATE_SIZE_CHANGED };
+	
 	Settings();
 	
 	virtual ~Settings();
@@ -48,6 +49,12 @@ public:
 	 * May return a null auto_ptr if the specified page is unknown to us.
 	 */
 	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
+	
+	/**
+	 * \brief Updates content size and returns all parameters at once.
+	 */
+	Params updateContentSizeAndGetParams(
+		PageId const& page_id, QSizeF const& content_size_mm);
 	
 	/**
 	 * \brief Returns the hard margins for the specified page.
@@ -88,13 +95,12 @@ public:
 	void setPageAlignment(PageId const& page_id, Alignment const& alignment);
 	
 	/**
-	 * \brief Sets content zone for the specified page.
+	 * \brief Sets content size in millimeters for the specified page.
 	 *
-	 * The content zone comes from the "Select Content" filter.
+	 * The content size comes from the "Select Content" filter.
 	 */
-	void setContentZone(
-		PageId const& page_id, QRectF const& content_rect,
-		QSizeF const& content_size_mm);
+	AggregateSizeChanged setContentSizeMM(
+		PageId const& page_id, QSizeF const& content_size_mm);
 	
 	/**
 	 * \brief Returns the aggregate (max width + max height) hard page size.

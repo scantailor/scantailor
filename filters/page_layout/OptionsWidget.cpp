@@ -158,6 +158,11 @@ OptionsWidget::preUpdateUI(Margins const& margins_mm, Alignment const& alignment
 	updateMarginsDisplay();
 	enableDisableAlignmentButtons();
 	
+	m_leftRightLinked = true;
+	m_topBottomLinked = true;
+	updateLinkDisplay(topBottomLink, m_topBottomLinked);
+	updateLinkDisplay(leftRightLink, m_leftRightLinked);
+	
 	marginsGroup->setEnabled(false);
 	alignmentGroup->setEnabled(false);
 }

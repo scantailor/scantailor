@@ -20,17 +20,48 @@
 #include "Margins.h"
 #include "Alignment.h"
 #include "ImageTransformation.h"
+#include "PhysicalTransformation.h"
 #include <QPolygonF>
 #include <QPointF>
 #include <QLineF>
 #include <QSizeF>
+#include <QRectF>
 #include <assert.h>
 
 namespace page_layout
 {
 
+QRectF
+Utils::adaptContentRect(
+	ImageTransformation const& xform, QRectF const& content_rect)
+{
+	if (!content_rect.isEmpty()) {
+		return content_rect;
+	}
+	
+	QPointF const center(xform.resultingRect().center());
+	QPointF const delta(0.01, 0.01);
+	return QRectF(center - delta, center + delta);
+}
+
+QSizeF
+Utils::calcRectSizeMM(
+	ImageTransformation const& xform, QRectF const& rect)
+{
+	PhysicalTransformation const phys_xform(xform.origDpi());
+	QTransform const virt_to_mm(xform.transformBack() * phys_xform.pixelsToMM());
+	
+	QLineF const hor_line(rect.topLeft(), rect.topRight());
+	QLineF const ver_line(rect.topLeft(), rect.bottomLeft());
+	
+	double const width = virt_to_mm.map(hor_line).length();
+	double const height = virt_to_mm.map(ver_line).length();
+	return QSizeF(width, height);
+}
+
 void
-Utils::extendPolyRectWithMargins(QPolygonF& poly_rect, Margins const& margins)
+Utils::extendPolyRectWithMargins(
+	QPolygonF& poly_rect, Margins const& margins)
 {
 	QPointF const down_uv(getDownUnitVector(poly_rect));
 	QPointF const right_uv(getRightUnitVector(poly_rect));

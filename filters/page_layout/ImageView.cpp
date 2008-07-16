@@ -21,6 +21,7 @@
 #include "Margins.h"
 #include "Settings.h"
 #include "ImageTransformation.h"
+#include "Utils.h"
 #include "imageproc/PolygonUtils.h"
 #include <QPointF>
 #include <QLineF>
@@ -54,7 +55,7 @@ ImageView::ImageView(
 	m_physXform(xform.origDpi()),
 	m_origToMM(m_origXform.transformBack() * m_physXform.pixelsToMM()),
 	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform()),
-	m_innerRect(content_rect),
+	m_innerRect(Utils::adaptContentRect(xform, content_rect)),
 	m_aggregateHardSizeMM(settings->getAggregateHardSizeMM()),
 	m_committedAggregateHardSizeMM(m_aggregateHardSizeMM),
 	m_alignment(opt_widget.alignment()),
@@ -455,7 +456,7 @@ void
 ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 {
 	QPolygonF poly_mm(m_origToMM.map(m_innerRect));
-	extendPolyRectWithMargins(poly_mm, margins_mm);
+	Utils::extendPolyRectWithMargins(poly_mm, margins_mm);
 
 	QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
 	
@@ -465,16 +466,17 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	);
 	Margins const soft_margins_mm(calcSoftMarginsMM(middle_rect_mm));
 	
-	extendPolyRectWithMargins(poly_mm, soft_margins_mm);
+	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 
 	QRectF const outer_rect(m_mmToOrig.map(poly_mm).boundingRect());
 	
-	ImageTransformation new_xform(m_origXform);
-	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
-	new_xform.setCropArea(
-		(m_physXform.mmToPixels() * new_xform.transform()).map(poly_mm)
+	ImageTransformation const new_xform(
+		Utils::calcPresentationTransform(
+			m_origXform, m_physXform.mmToPixels().map(poly_mm)
+		)
 	);
-	new_xform.setPostRotation(m_origXform.postRotation());
+	
+	// FIXME
 	
 	updateTransformAndFixFocalPoint(new_xform, CENTER_IF_FITS);
 	m_middleRect = middle_rect;
@@ -494,10 +496,9 @@ ImageView::updatePresentationTransform(FitMode const fit_mode)
 		m_origXform.transformBack().map(m_outerRect)
 	);
 	
-	ImageTransformation new_xform(m_origXform);
-	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
-	new_xform.setCropArea(new_xform.transform().map(poly_phys));
-	new_xform.setPostRotation(m_origXform.postRotation());
+	ImageTransformation const new_xform(
+		Utils::calcPresentationTransform(m_origXform, poly_phys)
+	);
 	
 	if (fit_mode == DONT_FIT) {
 		updateTransformPreservingScale(new_xform);
@@ -674,7 +675,7 @@ ImageView::recalcOuterRect()
 	);
 	Margins const soft_margins_mm(calcSoftMarginsMM(middle_rect_mm));
 	
-	extendPolyRectWithMargins(poly_mm, soft_margins_mm);
+	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 	
 	m_outerRect = m_mmToOrig.map(poly_mm).boundingRect();
 }
@@ -717,51 +718,6 @@ ImageView::invalidateThumbnails(AggregateSizeChanged const agg_size_changed)
 	} else {
 		emit invalidateThumbnail(m_pageId);
 	}
-}
-
-void
-ImageView::extendPolyRectWithMargins(QPolygonF& poly_rect, Margins const& margins)
-{
-	QPointF const down_uv(getDownUnitVector(poly_rect));
-	QPointF const right_uv(getRightUnitVector(poly_rect));
-	
-	// top-left
-	poly_rect[0] -= down_uv * margins.top();
-	poly_rect[0] -= right_uv * margins.left();
-	
-	// top-right
-	poly_rect[1] -= down_uv * margins.top();
-	poly_rect[1] += right_uv * margins.right();
-	
-	// bottom-right
-	poly_rect[2] += down_uv * margins.bottom();
-	poly_rect[2] += right_uv * margins.right();
-	
-	// bottom-left
-	poly_rect[3] += down_uv * margins.bottom();
-	poly_rect[3] -= right_uv * margins.left();
-	
-	if (poly_rect.size() > 4) {
-		assert(poly_rect.size() == 5);
-		// This polygon is closed.
-		poly_rect[4] = poly_rect[3];
-	}
-}
-
-QPointF
-ImageView::getRightUnitVector(QPolygonF const& poly_rect)
-{
-	QPointF const top_left(poly_rect[0]);
-	QPointF const top_right(poly_rect[1]);
-	return QLineF(top_left, top_right).unitVector().p2() - top_left;
-}
-
-QPointF
-ImageView::getDownUnitVector(QPolygonF const& poly_rect)
-{
-	QPointF const top_left(poly_rect[0]);
-	QPointF const bottom_left(poly_rect[3]);
-	return QLineF(top_left, bottom_left).unitVector().p2() - top_left;
 }
 
 } // namespace page_layout

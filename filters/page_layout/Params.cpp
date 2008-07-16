@@ -22,10 +22,9 @@ namespace page_layout
 {
 
 Params::Params(
-	Margins const& hard_margins_mm, QRectF const& content_rect,
+	Margins const& hard_margins_mm,
 	QSizeF const& content_size_mm, Alignment const& alignment)
 :	m_hardMarginsMM(hard_margins_mm),
-	m_contentRect(content_rect),
 	m_contentSizeMM(content_size_mm),
 	m_alignment(alignment)
 {

@@ -27,6 +27,7 @@
 #include <QPen>
 #include <QBrush>
 #include <QColor>
+#include <QDebug>
 
 namespace page_layout
 {
@@ -34,9 +35,11 @@ namespace page_layout
 Thumbnail::Thumbnail(
 	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 	ImageId const& image_id, ImageTransformation const& xform,
-	Params const& params, QSizeF const& aggregate_hard_size_mm)
+	Params const& params, QRectF const& content_rect,
+	QSizeF const& aggregate_hard_size_mm)
 :	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
 	m_params(params),
+	m_contentRect(Utils::adaptContentRect(xform, content_rect)),
 	m_aggregateHardSizeMM(aggregate_hard_size_mm),
 	m_origXform(xform),
 	m_physXform(xform.origDpi()),
@@ -52,6 +55,10 @@ Thumbnail::paintOverImage(
 	QTransform const& thumb_to_display)
 {
 #if 0
+	QTransform const orig_to_presentation(
+		m_origXform.transformBack() * imageXform().transform()
+	);
+	
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
 	QPen pen(QColor(0x00, 0x00, 0xff));
@@ -59,9 +66,11 @@ Thumbnail::paintOverImage(
 	pen.setCosmetic(true);
 	painter.setPen(pen);
 	
-	painter.setBrush(QColor(0x00, 0xff, 0x00, 50));
+	painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
 	
-	QRectF content_rect(imageToThumb().mapRect(m_params.contentRect()));
+	QRectF content_rect(
+		(orig_to_presentation * imageToThumb()).mapRect(m_contentRect)
+	);
 	
 	// Adjust to compensate for pen width.
 	content_rect.adjust(-1, -1, 1, 1);
@@ -70,17 +79,17 @@ Thumbnail::paintOverImage(
 	// For some reason, if we let Qt round the coordinates,
 	// the result is slightly different.
 	painter.drawRect(content_rect.toRect());
+	}
 #endif
 }
 
 void
 Thumbnail::recalcBoxesAndPresentationTransform()
 {
-	QPolygonF poly_mm(m_origToMM.map(m_params.contentRect()));
+	QPolygonF poly_mm(m_origToMM.map(m_contentRect));
 	Utils::extendPolyRectWithMargins(poly_mm, m_params.hardMarginsMM());
-
-	QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
 	
+	//QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
 	// TODO: rename middle_rect_mm to hard_size_mm everywhere
 	
 	QSizeF const hard_size_mm(
@@ -95,8 +104,8 @@ Thumbnail::recalcBoxesAndPresentationTransform()
 	);
 	
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
-
-	QRectF const outer_rect(m_mmToOrig.map(poly_mm).boundingRect());
+	
+	//QRectF const outer_rect(m_mmToOrig.map(poly_mm).boundingRect());
 	
 	ImageTransformation const presentation_xform(
 		Utils::calcPresentationTransform(
