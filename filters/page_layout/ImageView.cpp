@@ -141,6 +141,15 @@ ImageView::alignmentChanged(Alignment const& alignment)
 }
 
 void
+ImageView::aggregateHardSizeChanged()
+{
+	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM();
+	m_committedAggregateHardSizeMM = m_aggregateHardSizeMM;
+	recalcOuterRect();
+	updatePresentationTransform(FIT);
+}
+
+void
 ImageView::paintOverImage(QPainter& painter)
 {
 	// Pretend we are drawing in m_origXform coordinates.
@@ -475,8 +484,6 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 			m_origXform, m_physXform.mmToPixels().map(poly_mm)
 		)
 	);
-	
-	// FIXME
 	
 	updateTransformAndFixFocalPoint(new_xform, CENTER_IF_FITS);
 	m_middleRect = middle_rect;

@@ -180,6 +180,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		opt_widget, SIGNAL(alignmentChanged(Alignment const&)),
 		view, SLOT(alignmentChanged(Alignment const&))
 	);
+	QObject::connect(
+		opt_widget, SIGNAL(aggregateHardSizeChanged()),
+		view, SLOT(aggregateHardSizeChanged())
+	);
 }
 
 } // namespace page_layout

@@ -24,11 +24,13 @@
 #include "IntrusivePtr.h"
 #include "Margins.h"
 #include "Alignment.h"
+#include "Scope.h"
 #include <QIcon>
 #include <memory>
 #include <map>
 
 class QToolButton;
+class PageSequence;
 
 namespace page_layout
 {
@@ -41,7 +43,9 @@ class OptionsWidget :
 {
 	Q_OBJECT
 public:
-	OptionsWidget(IntrusivePtr<Settings> const& settings);
+	OptionsWidget(
+		IntrusivePtr<Settings> const& settings,
+		IntrusivePtr<PageSequence> const& page_sequence);
 	
 	virtual ~OptionsWidget();
 	
@@ -64,6 +68,8 @@ signals:
 	void alignmentChanged(Alignment const& alignment);
 	
 	void marginsSetLocally(Margins const& margins_mm);
+	
+	void aggregateHardSizeChanged();
 public slots:
 	void marginsSetExternally(Margins const& margins_mm);
 private slots:
@@ -84,6 +90,14 @@ private slots:
 	void goToWidestPage();
 	
 	void goToTallestPage();
+	
+	void showApplyMarginsDialog();
+	
+	void showApplyAlignmentDialog();
+	
+	void applyMargins(Scope scope);
+	
+	void applyAlignment(Scope scope);
 private:
 	typedef std::map<QToolButton*, Alignment> AlignmentByButton;
 	
@@ -94,6 +108,7 @@ private:
 	void enableDisableAlignmentButtons();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
+	IntrusivePtr<PageSequence> m_ptrPageSequence;
 	QIcon m_chainIcon;
 	QIcon m_brokenChainIcon;
 	AlignmentByButton m_alignmentByButton;

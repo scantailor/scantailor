@@ -751,7 +751,7 @@ MainWindow::FilterListModel::FilterListModel(
 	m_ptrPageSplitFilter(new page_split::Filter(page_sequence)),
 	m_ptrDeskewFilter(new deskew::Filter()),
 	m_ptrSelectContentFilter(new select_content::Filter()),
-	m_ptrPageLayoutFilter(new page_layout::Filter())
+	m_ptrPageLayoutFilter(new page_layout::Filter(page_sequence))
 {
 	m_filters.push_back(m_ptrFixOrientationFilter);
 	m_filters.push_back(m_ptrPageSplitFilter);

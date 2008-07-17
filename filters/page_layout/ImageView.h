@@ -63,6 +63,8 @@ public slots:
 	void topBottomLinkToggled(bool linked);
 	
 	void alignmentChanged(Alignment const& alignment);
+	
+	void aggregateHardSizeChanged();
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	

@@ -25,6 +25,7 @@
 #include "FilterResult.h"
 
 class PageId;
+class PageSequence;
 class QString;
 
 namespace page_layout
@@ -39,7 +40,7 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter();
+	Filter(IntrusivePtr<PageSequence> const& page_sequence);
 	
 	virtual ~Filter();
 	

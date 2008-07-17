@@ -18,8 +18,12 @@
 
 #include "OptionsWidget.h.moc"
 #include "Settings.h"
+#include "ApplyDialog.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
+#include "PageSequence.h"
+#include "PageInfo.h"
+#include "PageId.h"
 #include "imageproc/Constants.h"
 #include <boost/foreach.hpp>
 #include <QPixmap>
@@ -31,8 +35,11 @@ using namespace imageproc::constants;
 namespace page_layout
 {
 
-OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+OptionsWidget::OptionsWidget(
+	IntrusivePtr<Settings> const& settings,
+	IntrusivePtr<PageSequence> const& page_sequence)
 :	m_ptrSettings(settings),
+	m_ptrPageSequence(page_sequence),
 	m_mmToUnit(1.0),
 	m_unitToMM(1.0),
 	m_ignoreMarginChanges(0),
@@ -117,6 +124,10 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 		this, SLOT(leftRightLinkClicked())
 	);
 	connect(
+		applyMarginsBtn, SIGNAL(clicked()),
+		this, SLOT(showApplyMarginsDialog())
+	);
+	connect(
 		alignWithOthersCB, SIGNAL(toggled(bool)),
 		this, SLOT(alignWithOthersToggled())
 	);
@@ -127,6 +138,10 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	connect(
 		tallestPageLink, SIGNAL(linkActivated(QString const&)),
 		this, SLOT(goToTallestPage())
+	);
+	connect(
+		applyAlignmentBtn, SIGNAL(clicked()),
+		this, SLOT(showApplyAlignmentDialog())
 	);
 	
 	typedef AlignmentByButton::value_type KeyVal;
@@ -302,6 +317,73 @@ OptionsWidget::goToTallestPage()
 	if (!page_id.isNull()) {
 		emit goToPage(page_id);
 	}
+}
+
+void
+OptionsWidget::showApplyMarginsDialog()
+{
+	ApplyDialog* dialog = new ApplyDialog(this);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowTitle(tr("Apply Margins"));
+	connect(
+		dialog, SIGNAL(accepted(Scope)),
+		this, SLOT(applyMargins(Scope))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::showApplyAlignmentDialog()
+{
+	ApplyDialog* dialog = new ApplyDialog(this);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowTitle(tr("Apply Margins"));
+	connect(
+		dialog, SIGNAL(accepted(Scope)),
+		this, SLOT(applyAlignment(Scope))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::applyMargins(Scope const scope)
+{
+	if (scope == THIS_PAGE) {
+		return; // It's already applied to this page.
+	}
+	
+	PageSequenceSnapshot const snapshot(
+		m_ptrPageSequence->snapshot(PageSequence::PAGE_VIEW)
+	);
+	size_t const num_pages = snapshot.numPages();
+	for (size_t i = 0; i < num_pages; ++i) {
+		PageInfo const& page_info = snapshot.pageAt(i);
+		PageId const& page_id = page_info.id();
+		m_ptrSettings->setHardMarginsMM(page_id, m_marginsMM);
+	}
+	
+	emit aggregateHardSizeChanged();
+	emit invalidateAllThumbnails();
+}
+
+void
+OptionsWidget::applyAlignment(Scope const scope)
+{
+	if (scope == THIS_PAGE) {
+		return; // It's already applied to this page.
+	}
+	
+	PageSequenceSnapshot const snapshot(
+		m_ptrPageSequence->snapshot(PageSequence::PAGE_VIEW)
+	);
+	size_t const num_pages = snapshot.numPages();
+	for (size_t i = 0; i < num_pages; ++i) {
+		PageInfo const& page_info = snapshot.pageAt(i);
+		PageId const& page_id = page_info.id();
+		m_ptrSettings->setPageAlignment(page_id, m_alignment);
+	}
+	
+	emit invalidateAllThumbnails();
 }
 
 void
