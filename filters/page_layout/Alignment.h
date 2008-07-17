@@ -19,6 +19,10 @@
 #ifndef PAGE_LAYOUT_ALIGNMENT_H_
 #define PAGE_LAYOUT_ALIGNMENT_H_
 
+class QDomDocument;
+class QDomElement;
+class QString;
+
 namespace page_layout
 {
 
@@ -38,6 +42,8 @@ public:
 	Alignment(Vertical vert, Horizontal hor)
 	: m_vert(vert), m_hor(hor), m_isNull(false) {}
 	
+	Alignment(QDomElement const& el);
+	
 	Vertical vertical() const { return m_vert; }
 	
 	void setVertical(Vertical vert) { m_vert = vert; }
@@ -55,9 +61,11 @@ public:
 				&& m_isNull == other.m_isNull;
 	}
 	
-	bool operator!=(Alignment const& other) const { 
+	bool operator!=(Alignment const& other) const {
 		return !(*this == other);
 	}
+	
+	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
 	Vertical m_vert;
 	Horizontal m_hor;

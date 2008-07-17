@@ -44,11 +44,21 @@ public:
 	virtual ~Settings();
 	
 	/**
-	 * \brief Get all parameters at once.
+	 * \brief Removes all stored data.
+	 */
+	void clear();
+	
+	/**
+	 * \brief Get all page parameters at once.
 	 *
 	 * May return a null auto_ptr if the specified page is unknown to us.
 	 */
 	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
+	
+	/**
+	 * \brief Set all page parameters at once.
+	 */
+	void setPageParams(PageId const& page_id, Params const& params);
 	
 	/**
 	 * \brief Updates content size and returns all parameters at once.

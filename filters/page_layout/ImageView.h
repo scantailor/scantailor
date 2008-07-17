@@ -120,8 +120,6 @@ private:
 	
 	Margins calcHardMarginsMM() const;
 	
-	Margins calcSoftMarginsMM(QSizeF const& middle_rect_mm) const;
-	
 	void recalcOuterRect();
 	
 	QSizeF origRectToSizeMM(QRectF const& rect) const;

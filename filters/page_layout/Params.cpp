@@ -17,6 +17,11 @@
 */
 
 #include "Params.h"
+#include "XmlMarshaller.h"
+#include "XmlUnmarshaller.h"
+#include <QDomDocument>
+#include <QDomElement>
+#include <QString>
 
 namespace page_layout
 {
@@ -28,6 +33,33 @@ Params::Params(
 	m_contentSizeMM(content_size_mm),
 	m_alignment(alignment)
 {
+}
+
+Params::Params(QDomElement const& el)
+:	m_hardMarginsMM(
+		XmlUnmarshaller::margins(
+			el.namedItem("hardMarginsMM").toElement()
+		)
+	),
+	m_contentSizeMM(
+		XmlUnmarshaller::sizeF(
+			el.namedItem("contentSizeMM").toElement()
+		)
+	),
+	m_alignment(el.namedItem("alignment").toElement())
+{
+}
+
+QDomElement
+Params::toXml(QDomDocument& doc, QString const& name) const
+{
+	XmlMarshaller marshaller(doc);
+	
+	QDomElement el(doc.createElement(name));
+	el.appendChild(marshaller.margins(m_hardMarginsMM, "hardMarginsMM"));
+	el.appendChild(marshaller.sizeF(m_contentSizeMM, "contentSizeMM"));
+	el.appendChild(m_alignment.toXml(doc, "alignment"));
+	return el;
 }
 
 } // namespace page_layout

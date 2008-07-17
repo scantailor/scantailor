@@ -459,7 +459,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 
 /**
  * Updates m_middleRect and m_outerRect based on \p margins_mm,
- * m_aggregateHardSizeMM and m_alignment.
+ * m_aggregateHardSizeMM and m_alignment, updates the presentation transform.
  */
 void
 ImageView::recalcBoxesAndFit(Margins const& margins_mm)
@@ -469,11 +469,15 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 
 	QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
 	
-	QSizeF const middle_rect_mm(
+	QSizeF const hard_size_mm(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
 		QLineF(poly_mm[0], poly_mm[3]).length()
 	);
-	Margins const soft_margins_mm(calcSoftMarginsMM(middle_rect_mm));
+	Margins const soft_margins_mm(
+		Utils::calcSoftMarginsMM(
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment
+		)
+	);
 	
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 
@@ -617,57 +621,6 @@ ImageView::calcHardMarginsMM() const
 }
 
 /**
- * \brief Calculates margins for aligning this page to others.
- */
-Margins
-ImageView::calcSoftMarginsMM(QSizeF const& middle_rect_mm) const
-{
-	if (m_alignment.isNull()) {
-		// This means we are not aligning this page with others.
-		return Margins();
-	}
-	
-	double top = 0.0;
-	double bottom = 0.0;
-	double left = 0.0;
-	double right = 0.0;
-	
-	double const delta_width = m_aggregateHardSizeMM.width()
-			- middle_rect_mm.width();
-	if (delta_width > 0.0) {
-		switch (m_alignment.horizontal()) {
-			case Alignment::LEFT:
-				right = delta_width;
-				break;
-			case Alignment::HCENTER:
-				left = right = 0.5 * delta_width;
-				break;
-			case Alignment::RIGHT:
-				left = delta_width;
-				break;
-		}
-	}
-	
-	double const delta_height = m_aggregateHardSizeMM.height()
-			- middle_rect_mm.height();
-	if (delta_height > 0.0) {
-		switch (m_alignment.vertical()) {
-			case Alignment::TOP:
-				bottom = delta_height;
-				break;
-			case Alignment::VCENTER:
-				top = bottom = 0.5 * delta_height;
-				break;
-			case Alignment::BOTTOM:
-				top = delta_height;
-				break;
-		}
-	}
-	
-	return Margins(left, top, right, bottom);
-}
-
-/**
  * \brief Recalculates m_outerRect based on m_middleRect, m_aggregateHardSizeMM
  *        and m_alignment.
  */
@@ -676,11 +629,15 @@ ImageView::recalcOuterRect()
 {
 	QPolygonF poly_mm(m_origToMM.map(m_middleRect));
 	
-	QSizeF const middle_rect_mm(
+	QSizeF const hard_size_mm(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
 		QLineF(poly_mm[0], poly_mm[3]).length()
 	);
-	Margins const soft_margins_mm(calcSoftMarginsMM(middle_rect_mm));
+	Margins const soft_margins_mm(
+		Utils::calcSoftMarginsMM(
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment
+		)
+	);
 	
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 	

@@ -138,7 +138,6 @@ private:
 	CompositeItem* m_pSelectedItem;
 	IntrusivePtr<ThumbnailFactory> m_ptrFactory;
 	QGraphicsScene m_graphicsScene;
-public:
 	QRectF m_sceneRect;
 	int m_syntheticSelectionScope;
 };
@@ -383,7 +382,7 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 		ord_it->composite = new_composite;
 		m_graphicsScene.addItem(composite.release());
 	}
-	
+
 	commitSceneRect();
 	
 	if (to_be_selected) {

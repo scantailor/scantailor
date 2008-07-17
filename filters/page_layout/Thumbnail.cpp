@@ -90,7 +90,6 @@ Thumbnail::recalcBoxesAndPresentationTransform()
 	Utils::extendPolyRectWithMargins(poly_mm, m_params.hardMarginsMM());
 	
 	//QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
-	// TODO: rename middle_rect_mm to hard_size_mm everywhere
 	
 	QSizeF const hard_size_mm(
 		QLineF(poly_mm[0], poly_mm[1]).length(),

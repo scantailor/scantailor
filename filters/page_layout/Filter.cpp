@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "Margins.h"
 #include "Alignment.h"
+#include "Params.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
@@ -91,7 +92,6 @@ Filter::writePageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
 	PageId const& page_id, int numeric_id) const
 {
-#if 0
 	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(page_id));
 	if (!params.get()) {
 		return;
@@ -102,17 +102,15 @@ Filter::writePageSettings(
 	page_el.appendChild(params->toXml(doc, "params"));
 	
 	filter_el.appendChild(page_el);
-#endif
 }
 
 void
 Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 {
-#if 0
 	m_ptrSettings->clear();
 	
 	QDomElement const filter_el(
-		filters_el.namedItem("select-content").toElement()
+		filters_el.namedItem("page-layout").toElement()
 	);
 	
 	QString const page_tag_name("page");
@@ -145,7 +143,6 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 		Params const params(params_el);
 		m_ptrSettings->setPageParams(page_id, params);
 	}
-#endif
 }
 
 IntrusivePtr<Task>

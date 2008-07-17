@@ -24,8 +24,10 @@
 #include <QString>
 
 class QSize;
+class QSizeF;
 class Dpi;
 class OrthogonalRotation;
+class Margins;
 class QPointF;
 class QLineF;
 class QPolygonF;
@@ -38,6 +40,8 @@ public:
 	
 	QDomElement size(QSize const& size, QString const& name);
 	
+	QDomElement sizeF(QSizeF const& size, QString const& name);
+	
 	QDomElement dpi(Dpi const& dpi, QString const& name);
 	
 	QDomElement rotation(OrthogonalRotation const& rotation, QString const& name);
@@ -49,6 +53,8 @@ public:
 	QDomElement rectF(QRectF const& rect, QString const& name);
 	
 	QDomElement polygonF(QPolygonF const& poly, QString const& name);
+	
+	QDomElement margins(Margins const& margins, QString const& name);
 private:
 	QDomDocument m_doc;
 };

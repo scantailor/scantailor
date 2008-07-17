@@ -21,8 +21,10 @@
 
 class QDomElement;
 class QSize;
+class QSizeF;
 class Dpi;
 class OrthogonalRotation;
+class Margins;
 class QPointF;
 class QLineF;
 class QRectF;
@@ -33,9 +35,13 @@ class XmlUnmarshaller
 public:
 	static QSize size(QDomElement const& el);
 	
+	static QSizeF sizeF(QDomElement const& el);
+	
 	static Dpi dpi(QDomElement const& el);
 	
 	static OrthogonalRotation rotation(QDomElement const& el);
+	
+	static Margins margins(QDomElement const& el);
 	
 	static QPointF pointF(QDomElement const& el);
 	

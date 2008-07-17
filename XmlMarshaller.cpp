@@ -18,6 +18,7 @@
 
 #include "XmlMarshaller.h"
 #include "OrthogonalRotation.h"
+#include "Margins.h"
 #include "Dpi.h"
 #include <QPointF>
 #include <QLineF>
@@ -28,6 +29,20 @@
 
 QDomElement
 XmlMarshaller::size(QSize const& size, QString const& name)
+{
+	if (size.isNull()) {
+		return QDomElement();
+	}
+	
+	QDomElement el(m_doc.createElement(name));
+	el.setAttribute("width", size.width());
+	el.setAttribute("height", size.height());
+	return el;
+}
+
+
+QDomElement
+XmlMarshaller::sizeF(QSizeF const& size, QString const& name)
 {
 	if (size.isNull()) {
 		return QDomElement();
@@ -100,5 +115,16 @@ XmlMarshaller::polygonF(QPolygonF const& poly, QString const& name)
 		el.appendChild(pointF(*it, "point"));
 	}
 	
+	return el;
+}
+
+QDomElement
+XmlMarshaller::margins(Margins const& margins, QString const& name)
+{
+	QDomElement el(m_doc.createElement(name));
+	el.setAttribute("left", margins.left());
+	el.setAttribute("right", margins.right());
+	el.setAttribute("top", margins.top());
+	el.setAttribute("bottom", margins.bottom());
 	return el;
 }

@@ -101,7 +101,11 @@ public:
 	
 	~Impl();
 	
+	void clear();
+	
 	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
+	
+	void setPageParams(PageId const& page_id, Params const& params);
 	
 	Params updateContentSizeAndGetParams(
 		PageId const& page_id, QSizeF const& content_size_mm);
@@ -172,10 +176,22 @@ Settings::~Settings()
 {
 }
 
+void
+Settings::clear()
+{
+	return m_ptrImpl->clear();
+}
+
 std::auto_ptr<Params>
 Settings::getPageParams(PageId const& page_id) const
 {
 	return m_ptrImpl->getPageParams(page_id);
+}
+
+void
+Settings::setPageParams(PageId const& page_id, Params const& params)
+{
+	return m_ptrImpl->setPageParams(page_id, params);
 }
 
 Params
@@ -283,6 +299,13 @@ Settings::Impl::~Impl()
 {
 }
 
+void
+Settings::Impl::clear()
+{
+	QMutexLocker const locker(&m_mutex);
+	m_items.clear();
+}
+
 std::auto_ptr<Params>
 Settings::Impl::getPageParams(PageId const& page_id) const
 {
@@ -296,6 +319,24 @@ Settings::Impl::getPageParams(PageId const& page_id) const
 	return std::auto_ptr<Params>(
 		new Params(it->hardMarginsMM, it->contentSizeMM, it->alignment)
 	);
+}
+
+void
+Settings::Impl::setPageParams(PageId const& page_id, Params const& params)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	Item const new_item(
+		page_id, params.hardMarginsMM(),
+		params.contentSizeMM(), params.alignment()
+	);
+	
+	Container::iterator const it(m_items.lower_bound(page_id));
+	if (it == m_items.end() || page_id < it->pageId) {
+		m_items.insert(it, new_item);
+	} else {
+		m_items.replace(it, new_item);
+	}
 }
 
 Params
