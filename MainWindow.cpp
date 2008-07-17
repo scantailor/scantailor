@@ -529,7 +529,13 @@ MainWindow::stopBatchProcessing()
 	m_batchProcessing = false;
 	updateBatchProcessingActions();
 	
-	loadImage();
+	// The necessity to explicitly select a thumbnail comes from the fact
+	// that during batch processing we select not the thumbnail that is
+	// currently being processed, but the one that has been processed
+	// before that.
+	PageInfo const& page_info(m_ptrPages->curPage(m_frozenPages.view()));
+	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
+	loadImage(page_info);
 }
 
 void
@@ -565,7 +571,7 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		// During batch processing we prefer to select the thumbnail
 		// after it has been processed, not before.  Otherwise selected
 		// thumbnail will always be an unprocessed one, with the
-		// question mark or it.
+		// question mark on it.
 		m_ptrThumbSequence->setCurrentThumbnail(m_frozenPages.curPage().id());
 		
 		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
