@@ -182,7 +182,7 @@ BinaryImage closeBrick(
 	BWColor src_surroundings = WHITE);
 
 /**
- * \brief Performs a hit-miss transform.
+ * \brief Performs a hit-miss matching operation.
  *
  * \param src The input image.
  * \param src_surroundings The color that is assumed to be outside of the
@@ -191,13 +191,13 @@ BinaryImage closeBrick(
  * \param misses Offsets to miss positions relative to the origin point.
  * \return A binary image where black pixels indicate a successful pattern match.
  */
-BinaryImage hitMissTransform(
+BinaryImage hitMissMatch(
 	BinaryImage const& src, BWColor src_surroundings,
 	std::vector<QPoint> const& hits,
 	std::vector<QPoint> const& misses);
 
 /**
- * \brief A more user-friendly version of a hit-miss transform.
+ * \brief A more user-friendly version of a hit-miss match operation.
  *
  * \param src The input image.
  * \param src_surroundings The color that is assumed to be outside of the
@@ -217,11 +217,40 @@ BinaryImage hitMissTransform(
  *        to place a mark if the pattern matches.
  * \return A binary image where black pixels indicate a successful pattern match.
  */
-BinaryImage hitMissTransform(
+BinaryImage hitMissMatch(
 	BinaryImage const& src, BWColor src_surroundings,
 	char const* pattern,
 	int pattern_width, int pattern_height,
 	QPoint const& pattern_origin);
+
+/**
+ * \brief Does a hit-miss match and modifies user-specified pixels.
+ *
+ * \param src The input image.
+ * \param src_surroundings The color that is assumed to be outside of the
+ *        input image.
+ * \param pattern A string representing a pattern.  Example:
+ * \code
+ * char const* pattern =
+ * 	" - "
+ * 	"X+X"
+ * 	"XXX";
+ * \endcode
+ * Pattern characters have the following meaning:\n
+ * 'X': A black pixel.\n
+ * ' ': A white pixel.\n
+ * '-': A black pixel we want to turn into white.\n
+ * '+': A white pixel we want to turn into black.\n
+ * '?': Any pixel, we don't care which.\n
+ * \param pattern_width The width of the pattern.
+ * \param pattern_height The height of the pattern.
+ * \return The result of a match-and-replace operation.
+ */
+BinaryImage hitMissReplace(
+	BinaryImage const& src, BWColor src_surroundings,
+	char const* pattern,
+	int pattern_width,
+	int pattern_height);
 
 } // namespace imageproc
 

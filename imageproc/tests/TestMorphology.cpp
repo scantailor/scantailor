@@ -846,7 +846,7 @@ BOOST_AUTO_TEST_CASE(test_close_2x2_narrowing)
 	BOOST_CHECK(closeBrick(img, QSize(2, 2), dst_rect, BLACK) == control);
 }
 
-BOOST_AUTO_TEST_CASE(test_hmt_1)
+BOOST_AUTO_TEST_CASE(test_hmm_1)
 {
 	static int const inp[] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -881,11 +881,11 @@ BOOST_AUTO_TEST_CASE(test_hmt_1)
 	BinaryImage const img(makeBinaryImage(inp, 9, 9));
 	BinaryImage const control(makeBinaryImage(out, 9, 9));
 	
-	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
-	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, BLACK, pattern, 3, 3, origin) == control);
 }
 
-BOOST_AUTO_TEST_CASE(test_hmt_surroundings_1)
+BOOST_AUTO_TEST_CASE(test_hmm_surroundings_1)
 {
 	static int const inp[] = {
 		0, 0, 0, 0, 0, 1, 0, 1, 0,
@@ -933,11 +933,11 @@ BOOST_AUTO_TEST_CASE(test_hmt_surroundings_1)
 	BinaryImage const control_w(makeBinaryImage(out_white, 9, 9));
 	BinaryImage const control_b(makeBinaryImage(out_black, 9, 9));
 	
-	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control_w);
-	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control_b);
+	BOOST_CHECK(hitMissMatch(img, WHITE, pattern, 3, 3, origin) == control_w);
+	BOOST_CHECK(hitMissMatch(img, BLACK, pattern, 3, 3, origin) == control_b);
 }
 
-BOOST_AUTO_TEST_CASE(test_hmt_surroundings_2)
+BOOST_AUTO_TEST_CASE(test_hmm_surroundings_2)
 {
 	static int const inp[] = {
 		0, 0, 0, 0, 0, 1, 0, 1, 0,
@@ -972,11 +972,11 @@ BOOST_AUTO_TEST_CASE(test_hmt_surroundings_2)
 	BinaryImage const img(makeBinaryImage(inp, 9, 9));
 	BinaryImage const control(makeBinaryImage(out, 9, 9));
 	
-	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
-	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, BLACK, pattern, 3, 3, origin) == control);
 }
 
-BOOST_AUTO_TEST_CASE(test_hmt_cornercase_1)
+BOOST_AUTO_TEST_CASE(test_hmm_cornercase_1)
 {
 	static int const inp[] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1011,11 +1011,11 @@ BOOST_AUTO_TEST_CASE(test_hmt_cornercase_1)
 	BinaryImage const img(makeBinaryImage(inp, 9, 9));
 	BinaryImage const control(makeBinaryImage(out, 9, 9));
 	
-	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
-	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, BLACK, pattern, 3, 3, origin) == control);
 }
 
-BOOST_AUTO_TEST_CASE(test_hmt_cornercase_2)
+BOOST_AUTO_TEST_CASE(test_hmm_cornercase_2)
 {
 	static int const inp[] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1050,8 +1050,46 @@ BOOST_AUTO_TEST_CASE(test_hmt_cornercase_2)
 	BinaryImage const img(makeBinaryImage(inp, 9, 9));
 	BinaryImage const control(makeBinaryImage(out, 9, 9));
 	
-	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
-	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissMatch(img, BLACK, pattern, 3, 3, origin) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmr_1)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 1, 0,
+		0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 1, 1, 0, 1, 1, 0,
+		0, 0, 1, 0, 1, 1, 1, 1, 0,
+		0, 0, 1, 1, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 0, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0
+	};
+	
+	static int const out[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 1, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 1, 1, 1, 1, 1, 1, 0,
+		0, 0, 1, 0, 1, 1, 1, 1, 0,
+		0, 0, 1, 1, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 0, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0
+	};
+	
+	static char const pattern[] =
+		" - "
+		"X+X"
+		"XXX";
+	
+	BinaryImage const img(makeBinaryImage(inp, 9, 9));
+	BinaryImage const control(makeBinaryImage(out, 9, 9));
+	
+	BOOST_CHECK(hitMissReplace(img, WHITE, pattern, 3, 3) == control);
+	BOOST_CHECK(hitMissReplace(img, BLACK, pattern, 3, 3) == control);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

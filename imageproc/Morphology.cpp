@@ -26,10 +26,10 @@
 #include <boost/foreach.hpp>
 #include <vector>
 #include <stdexcept>
+#include <algorithm>
 #include <math.h>
 #include <assert.h>
-
-#include <QImage> // remove me
+#include <string.h>
 
 namespace imageproc
 {
@@ -579,7 +579,7 @@ BinaryImage closeBrick(
 	return closeBrick(src, brick, src.rect(), src_surroundings);
 }
 
-BinaryImage hitMissTransform(
+BinaryImage hitMissMatch(
 	BinaryImage const& src, BWColor const src_surroundings,
 	std::vector<QPoint> const& hits, std::vector<QPoint> const& misses)
 {
@@ -647,7 +647,7 @@ BinaryImage hitMissTransform(
 	return dst;
 }
 
-BinaryImage hitMissTransform(
+BinaryImage hitMissMatch(
 	BinaryImage const& src, BWColor const src_surroundings,
 	char const* const pattern,
 	int const pattern_width, int const pattern_height,
@@ -670,13 +670,120 @@ BinaryImage hitMissTransform(
 					break;
 				default:
 					throw std::invalid_argument(
-						"hitMissTransform: invalid character in pattern"
+						"hitMissMatch: invalid character in pattern"
 					);
 			}
 		}
 	}
 	
-	return hitMissTransform(src, src_surroundings, hits, misses);
+	return hitMissMatch(src, src_surroundings, hits, misses);
+}
+
+BinaryImage hitMissReplace(
+	BinaryImage const& src, BWColor src_surroundings,
+	char const* pattern, int pattern_width, int pattern_height)
+{
+	// It's better to have the origin at one of the replacement positions.
+	// Otherwise we may miss a partially outside-of-image match because
+	// the origin point was outside of the image as well.
+	int const pattern_len = pattern_width * pattern_height;
+	char const* const minus_pos = (char const*)memchr(pattern, '-', pattern_len);
+	char const* const plus_pos = (char const*)memchr(pattern, '+', pattern_len);
+	char const* origin_pos;
+	if (minus_pos && plus_pos) {
+		origin_pos = std::min(minus_pos, plus_pos);
+	} else if (minus_pos) {
+		origin_pos = minus_pos;
+	} else if (plus_pos) {
+		origin_pos = plus_pos;
+	} else {
+		// No replacements requested - just return the source image.
+		return src;
+	}
+	
+	QPoint const origin(
+		(origin_pos - pattern) % pattern_width,
+		(origin_pos - pattern) / pattern_width
+	);
+	
+	std::vector<QPoint> hits;
+	std::vector<QPoint> misses;
+	std::vector<QPoint> white_to_black;
+	std::vector<QPoint> black_to_white;
+	
+	char const* p = pattern;
+	for (int y = 0; y < pattern_height; ++y) {
+		for (int x = 0; x < pattern_width; ++x, ++p) {
+			switch (*p) {
+				case '-':
+					black_to_white.push_back(QPoint(x, y) - origin);
+					// fall through
+				case 'X':
+					hits.push_back(QPoint(x, y) - origin);
+					break;
+				case '+':
+					white_to_black.push_back(QPoint(x, y) - origin);
+					// fall through
+				case ' ':
+					misses.push_back(QPoint(x, y) - origin);
+					break;
+				case '?':
+					break;
+				default:
+					throw std::invalid_argument(
+						"hitMissReplace: invalid character in pattern"
+					);
+			}
+		}
+	}
+	
+	BinaryImage matches(hitMissMatch(src, src_surroundings, hits, misses));
+	BinaryImage or_img;
+	BinaryImage and_img;
+	
+	QRect const rect(src.rect());
+	
+	if (plus_pos) {
+		BinaryImage(src.size(), WHITE).swap(or_img);
+		
+		BOOST_FOREACH (QPoint const& offset, white_to_black) {
+			QRect src_rect(rect);
+			QRect dst_rect(rect.translated(offset));
+			adjustToFit(rect, dst_rect, src_rect);
+			
+			rasterOp<RopOr<RopSrc, RopDst> >(
+				or_img, dst_rect, matches, src_rect.topLeft()
+			);
+		}
+	}
+	
+	if (minus_pos) {
+		BinaryImage(src.size(), BLACK).swap(and_img);
+		
+		BOOST_FOREACH (QPoint const& offset, black_to_white) {
+			QRect src_rect(rect);
+			QRect dst_rect(rect.translated(offset));
+			adjustToFit(rect, dst_rect, src_rect);
+			
+			rasterOp<RopAnd<RopNot<RopSrc>, RopDst> >(
+				and_img, dst_rect, matches, src_rect.topLeft()
+			);
+		}
+	}
+	
+	matches.release();
+	
+	BinaryImage dst(src);
+	
+	if (plus_pos) {
+		rasterOp<RopOr<RopSrc, RopDst> >(dst, or_img);
+	}
+	
+	if (minus_pos) {
+		rasterOp<RopAnd<RopSrc, RopDst> >(dst, and_img);
+	}
+	
+	return dst;
 }
 
 } // namespace imageproc
