@@ -398,6 +398,10 @@ void rasterOp(BinaryImage& dst, QRect const& dr,
 {
 	using namespace detail;
 	
+	if (dr.isEmpty()) {
+		return;
+	}
+	
 	if (dst.isNull() || src.isNull()) {
 		throw std::invalid_argument("rasterOp: can't operate on null images");
 	}
