@@ -22,6 +22,7 @@
 #include "Utils.h"
 #include <QImage>
 #include <QSize>
+#include <QPoint>
 #include <boost/test/auto_unit_test.hpp>
 
 namespace imageproc
@@ -843,6 +844,214 @@ BOOST_AUTO_TEST_CASE(test_close_2x2_narrowing)
 	
 	BOOST_CHECK(closeBrick(img, QSize(2, 2), dst_rect, WHITE) == control);
 	BOOST_CHECK(closeBrick(img, QSize(2, 2), dst_rect, BLACK) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmt_1)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 0, 1, 0, 1, 0,
+		0, 1, 0, 1, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 1, 0, 0, 0, 0,
+		0, 0, 0, 1, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0
+	};
+	
+	static int const out[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 1, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 1, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static char const pattern[] =
+		"?X?"
+		"X X"
+		"?X?";
+	QPoint const origin(1, 1);
+	
+	BinaryImage const img(makeBinaryImage(inp, 9, 9));
+	BinaryImage const control(makeBinaryImage(out, 9, 9));
+	
+	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmt_surroundings_1)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 1, 0, 1, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 0, 1, 0, 0,
+		0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 0, 0, 1, 0, 0, 0, 0,
+		0, 0, 0, 1, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0,
+		0, 1, 0, 0, 0, 0, 0, 0, 0,
+		1, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static int const out_white[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static int const out_black[] = {
+		0, 0, 0, 0, 0, 0, 1, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static char const pattern[] =
+		"?X?"
+		"X X"
+		"?X?";
+	QPoint const origin(1, 1);
+	
+	BinaryImage const img(makeBinaryImage(inp, 9, 9));
+	BinaryImage const control_w(makeBinaryImage(out_white, 9, 9));
+	BinaryImage const control_b(makeBinaryImage(out_black, 9, 9));
+	
+	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control_w);
+	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control_b);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmt_surroundings_2)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 1, 0, 1, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 0, 0, 0, 0, 1, 0, 0,
+		0, 0, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 0, 0, 1, 0, 0, 0, 0,
+		0, 0, 0, 1, 0, 0, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 0, 0, 0,
+		0, 1, 0, 0, 0, 0, 0, 0, 0,
+		1, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static int const out[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static char const pattern[] =
+		"?X?"
+		"X X"
+		"?X?";
+	QPoint const origin(1, 0);
+	
+	BinaryImage const img(makeBinaryImage(inp, 9, 9));
+	BinaryImage const control(makeBinaryImage(out, 9, 9));
+	
+	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmt_cornercase_1)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 0, 1, 0, 1, 0,
+		0, 1, 0, 1, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 1, 0, 0, 0, 0,
+		0, 0, 0, 1, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		1, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 1, 0, 0, 0, 1, 1, 1, 0
+	};
+	
+	static int const out[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static char const pattern[] =
+		"?X?"
+		"X X"
+		"?X?";
+	QPoint const origin(10, 0);
+	
+	BinaryImage const img(makeBinaryImage(inp, 9, 9));
+	BinaryImage const control(makeBinaryImage(out, 9, 9));
+	
+	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_hmt_cornercase_2)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 0, 1, 0, 1, 0,
+		0, 1, 0, 1, 0, 1, 1, 1, 0,
+		0, 0, 1, 0, 1, 0, 0, 0, 0,
+		0, 0, 0, 1, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 1, 1, 1, 0,
+		1, 0, 0, 0, 0, 1, 1, 1, 0,
+		0, 1, 0, 0, 0, 1, 1, 1, 0
+	};
+	
+	static int const out[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static char const pattern[] =
+		"?X?"
+		"X X"
+		"?X?";
+	QPoint const origin(0, 9);
+	
+	BinaryImage const img(makeBinaryImage(inp, 9, 9));
+	BinaryImage const control(makeBinaryImage(out, 9, 9));
+	
+	BOOST_CHECK(hitMissTransform(img, WHITE, pattern, 3, 3, origin) == control);
+	BOOST_CHECK(hitMissTransform(img, BLACK, pattern, 3, 3, origin) == control);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

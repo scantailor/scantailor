@@ -20,6 +20,7 @@
 #define IMAGEPROC_MORPHOLOGY_H_
 
 #include "BWColor.h"
+#include <vector>
 
 class QSize;
 class QRect;
@@ -179,6 +180,48 @@ BinaryImage closeBrick(
 BinaryImage closeBrick(
 	BinaryImage const& src, QSize const& brick,
 	BWColor src_surroundings = WHITE);
+
+/**
+ * \brief Performs a hit-miss transform.
+ *
+ * \param src The input image.
+ * \param src_surroundings The color that is assumed to be outside of the
+ *        input image.
+ * \param hits Offsets to hit positions relative to the origin point.
+ * \param misses Offsets to miss positions relative to the origin point.
+ * \return A binary image where black pixels indicate a successful pattern match.
+ */
+BinaryImage hitMissTransform(
+	BinaryImage const& src, BWColor src_surroundings,
+	std::vector<QPoint> const& hits,
+	std::vector<QPoint> const& misses);
+
+/**
+ * \brief A more user-friendly version of a hit-miss transform.
+ *
+ * \param src The input image.
+ * \param src_surroundings The color that is assumed to be outside of the
+ *        input image.
+ * \param pattern A string representing a pattern.  Example:
+ * \code
+ * char const* pattern =
+ * 	"?X?"
+ * 	"X X"
+ * 	"?X?";
+ * \endcode
+ * Here X stads for a hit (black pixel) and [space] stands for a miss
+ * (white pixel).  Question marks indicate pixels that we are not interested in.
+ * \param pattern_width The width of the pattern.
+ * \param pattern_height The height of the pattern.
+ * \param pattern_origin A point usually within the pattern indicating where
+ *        to place a mark if the pattern matches.
+ * \return A binary image where black pixels indicate a successful pattern match.
+ */
+BinaryImage hitMissTransform(
+	BinaryImage const& src, BWColor src_surroundings,
+	char const* pattern,
+	int pattern_width, int pattern_height,
+	QPoint const& pattern_origin);
 
 } // namespace imageproc
 

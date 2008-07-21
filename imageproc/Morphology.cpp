@@ -22,10 +22,14 @@
 #include <QPoint>
 #include <QSize>
 #include <QRect>
+#include <QDebug>
+#include <boost/foreach.hpp>
 #include <vector>
 #include <stdexcept>
 #include <math.h>
 #include <assert.h>
+
+#include <QImage> // remove me
 
 namespace imageproc
 {
@@ -573,6 +577,106 @@ BinaryImage closeBrick(
 	BinaryImage const& src, QSize const& brick, BWColor const src_surroundings)
 {
 	return closeBrick(src, brick, src.rect(), src_surroundings);
+}
+
+BinaryImage hitMissTransform(
+	BinaryImage const& src, BWColor const src_surroundings,
+	std::vector<QPoint> const& hits, std::vector<QPoint> const& misses)
+{
+	if (src.isNull()) {
+		return BinaryImage();
+	}
+	
+	QRect const rect(src.rect()); // same as dst.rect()
+	BinaryImage dst(src.size());
+	
+	bool first = true;
+	
+	BOOST_FOREACH (QPoint const& hit, hits) {
+		QRect src_rect(rect);
+		QRect dst_rect(rect.translated(-hit));
+		adjustToFit(rect, dst_rect, src_rect);
+		
+		if (first) {
+			first = false;
+			rasterOp<RopSrc>(dst, dst_rect, src, src_rect.topLeft());
+			if (src_surroundings == BLACK) {
+				dst.fillExcept(dst_rect, BLACK);
+			}
+		} else {
+			rasterOp<RopAnd<RopSrc, RopDst> >(
+				dst, dst_rect, src, src_rect.topLeft()
+			);
+		}
+		
+		if (src_surroundings == WHITE) {
+			// No hits on white surroundings.
+			dst.fillExcept(dst_rect, WHITE);
+		}
+	}
+	
+	BOOST_FOREACH (QPoint const& miss, misses) {
+		QRect src_rect(rect);
+		QRect dst_rect(rect.translated(-miss));
+		adjustToFit(rect, dst_rect, src_rect);
+		
+		if (first) {
+			first = false;
+			rasterOp<RopNot<RopSrc> >(
+				dst, dst_rect, src, src_rect.topLeft()
+			);
+			if (src_surroundings == WHITE) {
+				dst.fillExcept(dst_rect, BLACK);
+			}
+		} else {
+			rasterOp<RopAnd<RopNot<RopSrc>, RopDst> >(
+				dst, dst_rect, src, src_rect.topLeft()
+			);
+		}
+		
+		if (src_surroundings == BLACK) {
+			// No misses on black surroundings.
+			dst.fillExcept(dst_rect, WHITE);
+		}
+	}
+	
+	if (first) {
+		dst.fill(WHITE); // No matches.
+	}
+	
+	return dst;
+}
+
+BinaryImage hitMissTransform(
+	BinaryImage const& src, BWColor const src_surroundings,
+	char const* const pattern,
+	int const pattern_width, int const pattern_height,
+	QPoint const& pattern_origin)
+{
+	std::vector<QPoint> hits;
+	std::vector<QPoint> misses;
+	
+	char const* p = pattern;
+	for (int y = 0; y < pattern_height; ++y) {
+		for (int x = 0; x < pattern_width; ++x, ++p) {
+			switch (*p) {
+				case 'X':
+					hits.push_back(QPoint(x, y) - pattern_origin);
+					break;
+				case ' ':
+					misses.push_back(QPoint(x, y) - pattern_origin);
+					break;
+				case '?':
+					break;
+				default:
+					throw std::invalid_argument(
+						"hitMissTransform: invalid character in pattern"
+					);
+			}
+		}
+	}
+	
+	return hitMissTransform(src, src_surroundings, hits, misses);
 }
 
 } // namespace imageproc
