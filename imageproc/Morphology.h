@@ -248,9 +248,33 @@ BinaryImage hitMissMatch(
  */
 BinaryImage hitMissReplace(
 	BinaryImage const& src, BWColor src_surroundings,
-	char const* pattern,
-	int pattern_width,
-	int pattern_height);
+	char const* pattern, int pattern_width, int pattern_height);
+
+/**
+ * \brief Does a hit-miss match and modifies user-specified pixels.
+ *
+ * \param[in,out] img The image to make replacements in.
+ * \param src_surroundings The color that is assumed to be outside of the
+ *        input image.
+ * \param pattern A string representing a pattern.  Example:
+ * \code
+ * char const* pattern =
+ * 	" - "
+ * 	"X+X"
+ * 	"XXX";
+ * \endcode
+ * Pattern characters have the following meaning:\n
+ * 'X': A black pixel.\n
+ * ' ': A white pixel.\n
+ * '-': A black pixel we want to turn into white.\n
+ * '+': A white pixel we want to turn into black.\n
+ * '?': Any pixel, we don't care which.\n
+ * \param pattern_width The width of the pattern.
+ * \param pattern_height The height of the pattern.
+ */
+void hitMissReplaceInPlace(
+	BinaryImage& img, BWColor src_surroundings,
+	char const* pattern, int pattern_width, int pattern_height);
 
 } // namespace imageproc
 

@@ -680,8 +680,25 @@ BinaryImage hitMissMatch(
 }
 
 BinaryImage hitMissReplace(
-	BinaryImage const& src, BWColor src_surroundings,
-	char const* pattern, int pattern_width, int pattern_height)
+	BinaryImage const& src, BWColor const src_surroundings,
+	char const* const pattern,
+	int const pattern_width, int const pattern_height)
+{
+	BinaryImage dst(src);
+	
+	hitMissReplaceInPlace(
+		dst, src_surroundings, pattern,
+		pattern_width, pattern_height
+	);
+	
+	return dst;
+}
+
+
+void hitMissReplaceInPlace(
+	BinaryImage& img, BWColor const src_surroundings,
+	char const* const pattern,
+	int const pattern_width, int const pattern_height)
 {
 	// It's better to have the origin at one of the replacement positions.
 	// Otherwise we may miss a partially outside-of-image match because
@@ -697,8 +714,8 @@ BinaryImage hitMissReplace(
 	} else if (plus_pos) {
 		origin_pos = plus_pos;
 	} else {
-		// No replacements requested - just return the source image.
-		return src;
+		// No replacements requested - nothing to do.
+		return;
 	}
 	
 	QPoint const origin(
@@ -737,53 +754,28 @@ BinaryImage hitMissReplace(
 		}
 	}
 	
-	BinaryImage matches(hitMissMatch(src, src_surroundings, hits, misses));
-	BinaryImage or_img;
-	BinaryImage and_img;
-	
-	QRect const rect(src.rect());
-	
-	if (plus_pos) {
-		BinaryImage(src.size(), WHITE).swap(or_img);
+	BinaryImage const matches(hitMissMatch(img, src_surroundings, hits, misses));
+	QRect const rect(img.rect());
 		
-		BOOST_FOREACH (QPoint const& offset, white_to_black) {
-			QRect src_rect(rect);
-			QRect dst_rect(rect.translated(offset));
-			adjustToFit(rect, dst_rect, src_rect);
-			
-			rasterOp<RopOr<RopSrc, RopDst> >(
-				or_img, dst_rect, matches, src_rect.topLeft()
-			);
-		}
-	}
-	
-	if (minus_pos) {
-		BinaryImage(src.size(), BLACK).swap(and_img);
+	BOOST_FOREACH (QPoint const& offset, white_to_black) {
+		QRect src_rect(rect);
+		QRect dst_rect(rect.translated(offset));
+		adjustToFit(rect, dst_rect, src_rect);
 		
-		BOOST_FOREACH (QPoint const& offset, black_to_white) {
-			QRect src_rect(rect);
-			QRect dst_rect(rect.translated(offset));
-			adjustToFit(rect, dst_rect, src_rect);
-			
-			rasterOp<RopAnd<RopNot<RopSrc>, RopDst> >(
-				and_img, dst_rect, matches, src_rect.topLeft()
-			);
-		}
+		rasterOp<RopOr<RopSrc, RopDst> >(
+			img, dst_rect, matches, src_rect.topLeft()
+		);
 	}
 	
-	matches.release();
-	
-	BinaryImage dst(src);
-	
-	if (plus_pos) {
-		rasterOp<RopOr<RopSrc, RopDst> >(dst, or_img);
+	BOOST_FOREACH (QPoint const& offset, black_to_white) {
+		QRect src_rect(rect);
+		QRect dst_rect(rect.translated(offset));
+		adjustToFit(rect, dst_rect, src_rect);
+		
+		rasterOp<RopSubtract<RopDst, RopSrc> >(
+			img, dst_rect, matches, src_rect.topLeft()
+		);
 	}
-	
-	if (minus_pos) {
-		rasterOp<RopAnd<RopSrc, RopDst> >(dst, and_img);
-	}
-	
-	return dst;
 }
 
 } // namespace imageproc
