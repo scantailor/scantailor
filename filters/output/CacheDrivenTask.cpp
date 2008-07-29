@@ -16,55 +16,44 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ImageView.h.moc"
+#include "CacheDrivenTask.h"
+#include "IncompleteThumbnail.h"
 #include "ImageTransformation.h"
+#include "PageInfo.h"
+#include "PageId.h"
+#include "filter_dc/AbstractFilterDataCollector.h"
+#include "filter_dc/ThumbnailCollector.h"
+#include <QPolygonF>
 
-namespace fix_orientation
+namespace output
 {
 
-ImageView::ImageView(QImage const& image, ImageTransformation const& xform)
-:	ImageViewBase(image, xform)
+CacheDrivenTask::CacheDrivenTask()
 {
 }
 
-ImageView::~ImageView()
+CacheDrivenTask::~CacheDrivenTask()
 {
 }
 
 void
-ImageView::setPreRotation(OrthogonalRotation const rotation)
+CacheDrivenTask::process(
+	PageInfo const& page_info, AbstractFilterDataCollector* collector,
+	ImageTransformation const& xform,
+	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
-	if (physToVirt().preRotation() == rotation) {
-		return;
+	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+		
+		thumb_col->processThumbnail(
+			std::auto_ptr<QGraphicsItem>(
+				new IncompleteThumbnail(
+					thumb_col->thumbnailCache(),
+					thumb_col->maxLogicalThumbSize(),
+					page_info.imageId(), xform
+				)
+			)
+		);
 	}
-	
-	ImageTransformation new_xform(physToVirt());
-	new_xform.setPreRotation(rotation);
-	updateTransform(new_xform); // should call update()
 }
 
-void
-ImageView::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
-}
-
-void
-ImageView::mousePressEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-} // namespace fix_orientation
+} // namespace output

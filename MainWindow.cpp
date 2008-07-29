@@ -47,6 +47,9 @@
 #include "filters/page_layout/Filter.h"
 #include "filters/page_layout/Task.h"
 #include "filters/page_layout/CacheDrivenTask.h"
+#include "filters/output/Filter.h"
+#include "filters/output/Task.h"
+#include "filters/output/CacheDrivenTask.h"
 #include "LoadFileTask.h"
 #include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
@@ -83,7 +86,8 @@ public:
 	int getFilterIndex(FilterPtr const& filter) const;
 	
 	BackgroundTaskPtr createCompositeTask(
-		PageInfo const& page, int last_filter_idx,
+		PageInfo const& page, int page_num,
+		QString const& out_dir, int last_filter_idx,
 		ThumbnailPixmapCache& thumbnail_cache,
 		bool batch_processing, bool debug);
 	
@@ -103,6 +107,7 @@ private:
 	IntrusivePtr<deskew::Filter> m_ptrDeskewFilter;
 	IntrusivePtr<select_content::Filter> m_ptrSelectContentFilter;
 	IntrusivePtr<page_layout::Filter> m_ptrPageLayoutFilter;
+	IntrusivePtr<output::Filter> m_ptrOutputFilter;
 	std::vector<FilterPtr> m_filters;
 	int m_selectContentFilterIdx;
 	int m_pageLayoutFilterIdx;
@@ -405,9 +410,12 @@ MainWindow::nextPage()
 		return;
 	}
 	
-	PageInfo const next_page(m_ptrPages->setNextPage(m_frozenPages.view()));
+	int page_num = 0;
+	PageInfo const next_page(
+		m_ptrPages->setNextPage(m_frozenPages.view(), &page_num)
+	);
 	m_ptrThumbSequence->setCurrentThumbnail(next_page.id());
-	loadImage(next_page);
+	loadImage(next_page, page_num);
 }
 
 void
@@ -417,9 +425,12 @@ MainWindow::prevPage()
 		return;
 	}
 	
-	PageInfo const prev_page(m_ptrPages->setPrevPage(m_frozenPages.view()));
+	int page_num = 0;
+	PageInfo const prev_page(
+		m_ptrPages->setPrevPage(m_frozenPages.view(), &page_num)
+	);
 	m_ptrThumbSequence->setCurrentThumbnail(prev_page.id());
-	loadImage(prev_page);
+	loadImage(prev_page, page_num);
 }
 
 void
@@ -442,7 +453,7 @@ MainWindow::pageSelected(
 		if (m_batchProcessing) {
 			stopBatchProcessing();
 		} else {
-			loadImage(page_info);
+			loadImage();
 		}
 	}
 }
@@ -507,7 +518,7 @@ MainWindow::startBatchProcessing()
 	PageInfo const page_info(m_frozenPages.pageAt(0));
 	m_ptrPages->setCurPage(page_info.id());
 	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
-	loadImage(page_info);
+	loadImage();
 }
 
 void
@@ -533,9 +544,10 @@ MainWindow::stopBatchProcessing()
 	// that during batch processing we select not the thumbnail that is
 	// currently being processed, but the one that has been processed
 	// before that.
-	PageInfo const& page_info(m_ptrPages->curPage(m_frozenPages.view()));
+	int page_num = 0;
+	PageInfo const page_info(m_ptrPages->curPage(m_frozenPages.view(), &page_num));
 	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
-	loadImage(page_info);
+	loadImage(page_info, page_num);
 }
 
 void
@@ -577,7 +589,11 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
 			stopBatchProcessing();
 		} else {
-			loadImage(m_ptrPages->setNextPage(m_frozenPages.view()));
+			int page_num = 0;
+			PageInfo const page_info(
+				m_ptrPages->setNextPage(m_frozenPages.view(), &page_num)
+			);
+			loadImage(page_info, page_num);
 		}
 	}
 }
@@ -673,11 +689,15 @@ MainWindow::isBelowSelectContent(int const filter_idx) const
 void
 MainWindow::loadImage()
 {
-	loadImage(m_ptrPages->curPage(m_frozenPages.view()));
+	int page_num = 0;
+	PageInfo const page_info(
+		m_ptrPages->curPage(m_frozenPages.view(), &page_num)
+	);
+	loadImage(page_info, page_num);
 }
 
 void
-MainWindow::loadImage(PageInfo const& page)
+MainWindow::loadImage(PageInfo const& page, int const page_num)
 {
 	removeWidgetsFromLayout(m_pImageFrameLayout, false);
 	m_ptrTabbedDebugImages->clear();
@@ -701,7 +721,7 @@ MainWindow::loadImage(PageInfo const& page)
 		m_ptrCurTask.reset();
 	}
 	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
-		page, m_curFilter, *m_ptrThumbnailCache,
+		page, page_num, m_outDir, m_curFilter, *m_ptrThumbnailCache,
 		m_batchProcessing, m_debug
 	);
 	if (m_ptrCurTask) {
@@ -757,7 +777,8 @@ MainWindow::FilterListModel::FilterListModel(
 	m_ptrPageSplitFilter(new page_split::Filter(page_sequence)),
 	m_ptrDeskewFilter(new deskew::Filter()),
 	m_ptrSelectContentFilter(new select_content::Filter()),
-	m_ptrPageLayoutFilter(new page_layout::Filter(page_sequence))
+	m_ptrPageLayoutFilter(new page_layout::Filter(page_sequence)),
+	m_ptrOutputFilter(new output::Filter())
 {
 	m_filters.push_back(m_ptrFixOrientationFilter);
 	m_filters.push_back(m_ptrPageSplitFilter);
@@ -768,6 +789,8 @@ MainWindow::FilterListModel::FilterListModel(
 	
 	m_pageLayoutFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrPageLayoutFilter);
+	
+	m_filters.push_back(m_ptrOutputFilter);
 }
 
 MainWindow::FilterListModel::~FilterListModel()
@@ -795,7 +818,8 @@ MainWindow::FilterListModel::getFilterIndex(FilterPtr const& filter) const
 
 BackgroundTaskPtr
 MainWindow::FilterListModel::createCompositeTask(
-	PageInfo const& page, int const last_filter_idx,
+	PageInfo const& page, int const page_num,
+	QString const& out_dir, int const last_filter_idx,
 	ThumbnailPixmapCache& thumbnail_cache,
 	bool const batch_processing, bool const debug)
 {
@@ -804,11 +828,16 @@ MainWindow::FilterListModel::createCompositeTask(
 	IntrusivePtr<deskew::Task> deskew_task;
 	IntrusivePtr<select_content::Task> select_content_task;
 	IntrusivePtr<page_layout::Task> page_layout_task;
+	IntrusivePtr<output::Task> output_task;
 	
 	switch (last_filter_idx) {
+	case 5:
+		output_task = m_ptrOutputFilter->createTask(
+			page.id(), page_num, out_dir, batch_processing, debug
+		);
 	case 4:
 		page_layout_task = m_ptrPageLayoutFilter->createTask(
-			page.id(), batch_processing, debug
+			page.id(), output_task, batch_processing, debug
 		);
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createTask(
@@ -842,10 +871,15 @@ MainWindow::FilterListModel::createCompositeCacheDrivenTask(int const last_filte
 	IntrusivePtr<deskew::CacheDrivenTask> deskew_task;
 	IntrusivePtr<select_content::CacheDrivenTask> select_content_task;
 	IntrusivePtr<page_layout::CacheDrivenTask> page_layout_task;
+	IntrusivePtr<output::CacheDrivenTask> output_task;
 	
 	switch (last_filter_idx) {
+	case 5:
+		output_task = m_ptrOutputFilter->createCacheDrivenTask();
 	case 4:
-		page_layout_task = m_ptrPageLayoutFilter->createCacheDrivenTask();
+		page_layout_task = m_ptrPageLayoutFilter->createCacheDrivenTask(
+			output_task
+		);
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createCacheDrivenTask(
 			page_layout_task

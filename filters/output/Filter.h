@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_FILTER_H_
-#define PAGE_LAYOUT_FILTER_H_
+#ifndef OUTPUT_FILTER_H_
+#define OUTPUT_FILTER_H_
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
@@ -25,16 +25,9 @@
 #include "FilterResult.h"
 
 class PageId;
-class PageSequence;
 class QString;
 
 namespace output
-{
-	class Task;
-	class CacheDrivenTask;
-}
-
-namespace page_layout
 {
 
 class OptionsWidget;
@@ -46,7 +39,7 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& page_sequence);
+	Filter();
 	
 	virtual ~Filter();
 	
@@ -63,12 +56,10 @@ public:
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
 	IntrusivePtr<Task> createTask(
-		PageId const& page_id,
-		IntrusivePtr<output::Task> const& next_task,
-		bool batch, bool debug);
+		PageId const& page_id, int page_num,
+		QString const& out_dir, bool batch, bool debug);
 	
-	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
-		IntrusivePtr<output::CacheDrivenTask> const& next_task);
+	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask();
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:
@@ -80,6 +71,6 @@ private:
 	std::auto_ptr<OptionsWidget> m_ptrOptionsWidget;
 };
 
-} // namespace page_layout
+} // namespace output
 
 #endif

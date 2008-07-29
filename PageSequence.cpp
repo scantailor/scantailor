@@ -219,11 +219,21 @@ PageSequence::curImage() const
 }
 
 PageInfo
-PageSequence::curPage(View const view) const
+PageSequence::curPage(View const view, int* page_num) const
 {
 	QMutexLocker locker(&m_mutex);
+	
 	assert((size_t)m_curImage <= m_images.size());
 	ImageDesc const& image = m_images[m_curImage];
+	
+	if (page_num) {
+		if (view == IMAGE_VIEW) {
+			*page_num = m_curImage;
+		} else {
+			*page_num = m_curLogicalPage;
+		}
+	}
+	
 	PageId const id(image.id, curSubPageLocked(image, view));
 	return PageInfo(
 		id, image.metadata,
@@ -232,7 +242,7 @@ PageSequence::curPage(View const view) const
 }
 
 PageInfo
-PageSequence::setPrevPage(View const view)
+PageSequence::setPrevPage(View const view, int* page_num)
 {
 	PageInfo info;
 	
@@ -240,7 +250,7 @@ PageSequence::setPrevPage(View const view)
 	
 	{
 		QMutexLocker locker(&m_mutex);
-		info = setPrevPageImpl(view, &was_modified);
+		info = setPrevPageImpl(view, page_num, was_modified);
 	}
 	
 	if (was_modified) {
@@ -251,7 +261,7 @@ PageSequence::setPrevPage(View const view)
 }
 
 PageInfo
-PageSequence::setNextPage(View const view)
+PageSequence::setNextPage(View const view, int* page_num)
 {
 	PageInfo info;
 	
@@ -259,7 +269,7 @@ PageSequence::setNextPage(View const view)
 	
 	{
 		QMutexLocker locker(&m_mutex);
-		info = setNextPageImpl(view, &was_modified);
+		info = setNextPageImpl(view, page_num, was_modified);
 	}
 	
 	if (was_modified) {
@@ -357,7 +367,7 @@ PageSequence::setCurPageImpl(PageId const& page_id, bool* modified)
 }
 
 PageInfo
-PageSequence::setPrevPageImpl(View const view, bool* modified)
+PageSequence::setPrevPageImpl(View const view, int* page_num, bool& modified)
 {
 	assert((size_t)m_curImage <= m_images.size());
 	
@@ -367,7 +377,7 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 		assert(image->numLogicalPages > 1);
 		--m_curLogicalPage;
 		--m_curSubPage;
-		*modified = true;
+		modified = true;
 	} else if (m_curImage > 0) {
 		// Move to the last sub-page of the previous image.
 		m_curLogicalPage -= m_curSubPage; // Move to sub-page 0
@@ -375,7 +385,15 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 		--m_curImage;
 		--image;
 		m_curSubPage = image->numLogicalPages - 1;
-		*modified = true;
+		modified = true;
+	}
+	
+	if (page_num) {
+		if (view == IMAGE_VIEW) {
+			*page_num = m_curImage;
+		} else {
+			*page_num = m_curLogicalPage;
+		}
 	}
 	
 	PageId const id(image->id, curSubPageLocked(*image, view));
@@ -386,7 +404,7 @@ PageSequence::setPrevPageImpl(View const view, bool* modified)
 }
 
 PageInfo
-PageSequence::setNextPageImpl(View const view, bool* modified)
+PageSequence::setNextPageImpl(View const view, int* page_num, bool& modified)
 {
 	assert((size_t)m_curImage <= m_images.size());
 	
@@ -395,7 +413,7 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 		// Move to the next sub-page within the same image.
 		++m_curLogicalPage;
 		++m_curSubPage;
-		*modified = true;
+		modified = true;
 	} else if (m_curImage < (int)m_images.size() - 1) {
 		// Move to the first sub-page of the next image.
 		m_curLogicalPage -= m_curSubPage; // Move to sub-page 0.
@@ -403,7 +421,15 @@ PageSequence::setNextPageImpl(View const view, bool* modified)
 		m_curSubPage = 0;
 		++m_curImage;
 		++image;
-		*modified = true;
+		modified = true;
+	}
+	
+	if (page_num) {
+		if (view == IMAGE_VIEW) {
+			*page_num = m_curImage;
+		} else {
+			*page_num = m_curLogicalPage;
+		}
 	}
 	
 	PageId const id(image->id, curSubPageLocked(*image, view));

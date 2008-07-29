@@ -16,25 +16,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_TASK_H_
-#define PAGE_LAYOUT_TASK_H_
+#ifndef OUTPUT_TASK_H_
+#define OUTPUT_TASK_H_
 
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "FilterResult.h"
 #include "PageId.h"
+#include <QString>
+#include <memory>
 
+class DebugImages;
 class TaskStatus;
 class FilterData;
 class ImageTransformation;
-class QRectF;
+class QPolygonF;
+class QSize;
+class Dpi;
 
-namespace output
+namespace imageproc
 {
-	class Task;
+	class BinaryImage;
 }
 
-namespace page_layout
+namespace output
 {
 
 class Filter;
@@ -45,25 +50,34 @@ class Task : public RefCountable
 	DECLARE_NON_COPYABLE(Task)
 public:
 	Task(IntrusivePtr<Filter> const& filter,
-		IntrusivePtr<output::Task> const& next_task,
 		IntrusivePtr<Settings> const& settings,
-		PageId const& page_id, bool batch, bool debug);
+		PageId const& page_id, int page_num,
+		QString const& out_dir, bool batch, bool debug);
 	
 	virtual ~Task();
 	
 	FilterResultPtr process(
 		TaskStatus const& status, FilterData const& data,
-		QRectF const& content_rect);
+		QPolygonF const& content_rect_phys,
+		QPolygonF const& page_rect_phys);
 private:
 	class UiUpdater;
 	
+	static void hitMissReplaceAllDirections(
+		imageproc::BinaryImage& img, char const* pattern,
+		int pattern_width, int pattern_height);
+	
+	static QSize calcLocalWindowSize(Dpi const& dpi);
+	
 	IntrusivePtr<Filter> m_ptrFilter;
-	IntrusivePtr<output::Task> m_ptrNextTask;
 	IntrusivePtr<Settings> m_ptrSettings;
+	std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;
+	QString m_outDir;
+	int m_pageNum;
 	bool m_batchProcessing;
 };
 
-} // namespace page_layout
+} // namespace output
 
 #endif

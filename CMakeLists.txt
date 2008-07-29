@@ -155,6 +155,7 @@ ADD_SUBDIRECTORY(filters/page_split)
 ADD_SUBDIRECTORY(filters/deskew)
 ADD_SUBDIRECTORY(filters/select_content)
 ADD_SUBDIRECTORY(filters/page_layout)
+ADD_SUBDIRECTORY(filters/output)
 
 SET(resource_sources)
 QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
@@ -230,8 +231,8 @@ QT4_AUTOMOC(${sources})
 ADD_EXECUTABLE(scantailor WIN32 ${sources} ${ui_sources} ${resource_sources})
 TARGET_LINK_LIBRARIES(
 	scantailor
-	fix_orientation page_split deskew select_content page_layout
-	imageproc boost_signals
+	fix_orientation page_split deskew select_content page_layout output
+	imageproc foundation boost_signals
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 

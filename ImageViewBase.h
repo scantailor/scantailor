@@ -147,6 +147,13 @@ protected:
 	void resetZoom();
 	
 	/**
+	 * \brief Replaces the current image with another one.
+	 *
+	 * The new image must have the same dimensions and the same DPI.
+	 */
+	void updateImage(QImage const& image);
+	
+	/**
 	 * \brief Updates physical-to-virtual and recalculates
 	 *        virtual-to-physical transformations.
 	 */

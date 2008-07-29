@@ -16,46 +16,48 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef OUTPUT_SETTINGS_H_
+#define OUTPUT_SETTINGS_H_
 
-namespace page_layout
+#include "RefCountable.h"
+#include "NonCopyable.h"
+#include "PageId.h"
+#include "Params.h"
+#include <QMutex>
+#include <map>
+
+namespace output
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
+class Settings : public RefCountable
 {
-	setupUi(this);
+	DECLARE_NON_COPYABLE(Settings)
+public:
+	Settings();
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
-
-ApplyDialog::~ApplyDialog()
-{
-}
-
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
+	virtual ~Settings();
 	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
+	void clear();
+	
+	Params getPageParams(PageId const& page_id) const;
+	
+	void setPageParams(PageId const& page_id, Params const& params);
+	
+	Dpi getDpi(PageId const& page_id) const;
+	
+	void setDpi(PageId const& page_id, Dpi const& dpi);
+	
+	void setDpiForAllPages(Dpi const& dpi);
+private:
+	typedef std::map<PageId, Params> PerPageParams;
+	
+	static Params initialDefaultParams();
+	
+	mutable QMutex m_mutex;
+	PerPageParams m_perPageParams;
+	Params m_defaultParams;
+};
 
-} // namespace page_layout
+} // namespace output
+
+#endif

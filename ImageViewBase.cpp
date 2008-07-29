@@ -270,6 +270,13 @@ ImageViewBase::resetZoom()
 }
 
 void
+ImageViewBase::updateImage(QImage const& image)
+{
+	m_pixmap = QPixmap::fromImage(image);
+	update();
+}
+
+void
 ImageViewBase::updateTransform(ImageTransformation const& phys_to_virt)
 {
 	m_physToVirt = phys_to_virt;

@@ -21,7 +21,6 @@
 
 #include "ui_OrientationApplyDialog.h"
 #include <QDialog>
-#include <QSize>
 
 namespace fix_orientation
 {

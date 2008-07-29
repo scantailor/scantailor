@@ -25,18 +25,23 @@
 #include "PageInfo.h"
 #include "PageId.h"
 #include "Utils.h"
+#include "filters/output/CacheDrivenTask.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
 #include "filter_dc/PageLayoutParamsCollector.h"
 #include <QSizeF>
 #include <QRectF>
+#include <QPolygonF>
 #include <memory>
 
 namespace page_layout
 {
 
-CacheDrivenTask::CacheDrivenTask(IntrusivePtr<Settings> const& settings)
-:	m_ptrSettings(settings)
+CacheDrivenTask::CacheDrivenTask(
+	IntrusivePtr<output::CacheDrivenTask> const& next_task,
+	IntrusivePtr<Settings> const& settings)
+:	m_ptrNextTask(next_task),
+	m_ptrSettings(settings)
 {
 }
 
@@ -70,13 +75,11 @@ CacheDrivenTask::process(
 		plc->processPageParams(params);
 	}
 	
-	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
-		
-		std::auto_ptr<Params> const params(
-			m_ptrSettings->getPageParams(page_info.id())
-		);
-		
-		if (!params.get()) {
+	std::auto_ptr<Params> const params(
+		m_ptrSettings->getPageParams(page_info.id())
+	);
+	if (!params.get()) {
+		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(
 					new IncompleteThumbnail(
@@ -86,19 +89,40 @@ CacheDrivenTask::process(
 					)
 				)
 			);
-		} else {
-			thumb_col->processThumbnail(
-				std::auto_ptr<QGraphicsItem>(
-					new Thumbnail(
-						thumb_col->thumbnailCache(),
-						thumb_col->maxLogicalThumbSize(),
-						page_info.imageId(), xform,
-						*params, content_rect,
-						m_ptrSettings->getAggregateHardSizeMM()
-					)
-				)
-			);
 		}
+		return;
+	}
+	
+	if (m_ptrNextTask) {
+		QPolygonF const content_rect_phys(
+			xform.transformBack().map(content_rect)
+		);
+		QPolygonF const page_rect_phys(
+			Utils::calcPageRectPhys(
+				xform, content_rect_phys, *params,
+				m_ptrSettings->getAggregateHardSizeMM()
+			)
+		);
+		m_ptrNextTask->process(
+			page_info, collector, xform,
+			content_rect_phys, page_rect_phys
+		);
+		return;
+	}
+	
+	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
+		
+		thumb_col->processThumbnail(
+			std::auto_ptr<QGraphicsItem>(
+				new Thumbnail(
+					thumb_col->thumbnailCache(),
+					thumb_col->maxLogicalThumbSize(),
+					page_info.imageId(), xform,
+					*params, content_rect,
+					m_ptrSettings->getAggregateHardSizeMM()
+				)
+			)
+		);
 	}
 }
 

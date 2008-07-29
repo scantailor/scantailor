@@ -22,7 +22,6 @@
 #include "ImageViewBase.h"
 #include "OrthogonalRotation.h"
 
-class QRect;
 class ImageTransformation;
 
 namespace fix_orientation

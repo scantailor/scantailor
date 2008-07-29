@@ -19,6 +19,8 @@
 #ifndef IMAGEPROC_BINARIZE_H_
 #define IMAGEPROC_BINARIZE_H_
 
+#include <QSize>
+
 class QImage;
 
 namespace imageproc
@@ -26,7 +28,30 @@ namespace imageproc
 
 class BinaryImage;
 
-BinaryImage binarizeWolf(QImage const& src, int window_size = 31);
+/**
+ * \brief Image binarization using Otsu's global thresholding method.
+ *
+ * N. Otsu (1979). "A threshold selection method from gray-level histograms".
+ * http://en.wikipedia.org/wiki/Otsu%27s_method
+ */
+BinaryImage binarizeOtsu(QImage const& src);
+
+/**
+ * \brief Image binarization using Sauvola's local thresholding method.
+ *
+ * Sauvola, J. and M. Pietikainen. 2000. "Adaptive document image binarization".
+ * http://www.mediateam.oulu.fi/publications/pdf/24.pdf
+ */
+BinaryImage binarizeSauvola(QImage const& src, QSize window_size);
+
+/**
+ * \brief Image binarization using Wolf's local thresholding method.
+ *
+ * C. Wolf, J.M. Jolion, F. Chassaing. "Text localization, enhancement and
+ * binarization in multimedia documents."
+ * http://liris.cnrs.fr/christian.wolf/papers/icpr2002v.pdf
+ */
+BinaryImage binarizeWolf(QImage const& src, QSize window_size);
 
 } // namespace imageproc
 

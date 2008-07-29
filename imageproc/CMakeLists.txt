@@ -10,6 +10,7 @@ SET(
 	ConnComp.h Connectivity.h
 	BitOps.cpp BitOps.h
 	SeedFill.cpp SeedFill.h
+	kFill.cpp kFill.h
 	ConnCompEraser.cpp ConnCompEraser.h
 	ConnCompEraserExt.cpp ConnCompEraser.h
 	Grayscale.cpp Grayscale.h

@@ -16,46 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef OUTPUT_SCOPE_H_
+#define OUTPUT_SCOPE_H_
 
-namespace page_layout
+namespace output
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
-{
-	setupUi(this);
-	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
+enum Scope { THIS_PAGE_ONLY, ALL_PAGES };
 
-ApplyDialog::~ApplyDialog()
-{
-}
+} // namespace output
 
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
-	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
-
-} // namespace page_layout
+#endif

@@ -19,6 +19,7 @@
 #include "Utils.h"
 #include "Margins.h"
 #include "Alignment.h"
+#include "Params.h"
 #include "ImageTransformation.h"
 #include "PhysicalTransformation.h"
 #include <QPolygonF>
@@ -137,6 +138,30 @@ Utils::calcSoftMarginsMM(
 	}
 	
 	return Margins(left, top, right, bottom);
+}
+
+QPolygonF
+Utils::calcPageRectPhys(
+	ImageTransformation const& xform, QPolygonF const& content_rect_phys,
+	Params const& params, QSizeF const& aggregate_hard_size_mm)
+{
+	PhysicalTransformation const phys_xform(xform.origDpi());
+	
+	QPolygonF poly_mm(phys_xform.pixelsToMM().map(content_rect_phys));
+	extendPolyRectWithMargins(poly_mm, params.hardMarginsMM());
+	
+	QSizeF const hard_size_mm(
+		QLineF(poly_mm[0], poly_mm[1]).length(),
+		QLineF(poly_mm[0], poly_mm[3]).length()
+	);
+	Margins const soft_margins_mm(
+		calcSoftMarginsMM(
+			hard_size_mm, aggregate_hard_size_mm, params.alignment()
+		)
+	);
+	
+	extendPolyRectWithMargins(poly_mm, soft_margins_mm);
+	return phys_xform.mmToPixels().map(poly_mm);
 }
 
 ImageTransformation

@@ -16,46 +16,42 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef OUTPUT_IMAGEVIEW_H_
+#define OUTPUT_IMAGEVIEW_H_
 
-namespace page_layout
+#include "ImageViewBase.h"
+#include <QColor>
+
+class ImageTransformation;
+
+namespace output
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
+class ImageView : public ImageViewBase
 {
-	setupUi(this);
+	Q_OBJECT
+public:
+	ImageView(QImage const& image);
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
-
-ApplyDialog::~ApplyDialog()
-{
-}
-
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
+	virtual ~ImageView();
+public slots:
+	void tonesChanged(QColor const& light, QColor const& dark);
+protected:
+	virtual void wheelEvent(QWheelEvent* event);
 	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
+	virtual void mousePressEvent(QMouseEvent* event);
+	
+	virtual void mouseReleaseEvent(QMouseEvent* event);
+	
+	virtual void mouseMoveEvent(QMouseEvent* event);
+public:
+	QImage m_bitonalImage;
+	int m_lightIdx;
+	int m_darkIdx;
+	QColor m_lightColor;
+	QColor m_darkColor;
+};
 
-} // namespace page_layout
+} // namespace output
+
+#endif

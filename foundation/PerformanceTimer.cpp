@@ -16,46 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#include "PerformanceTimer.h"
+#include <iostream>
 
-namespace page_layout
+void
+PerformanceTimer::print(char const* prefix)
 {
-
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
-{
-	setupUi(this);
+	std::cerr << prefix;
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
-
-ApplyDialog::~ApplyDialog()
-{
-}
-
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
+	clock_t const now = clock();
+	double const sec = double(now - m_start) / CLOCKS_PER_SEC;
+	if (sec > 10.0) {
+		std::cerr << (long)sec << " sec";
+	} else if (sec > 0.01) {
+		std::cerr << (long)(sec * 1000) << " msec";
+	} else {
+		std::cerr << (long)(sec * 1000000) << " usec";
+	}
 	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
+	std::cerr << std::endl;
 }
-
-} // namespace page_layout

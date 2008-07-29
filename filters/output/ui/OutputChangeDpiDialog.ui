@@ -1,80 +1,76 @@
 <ui version="4.0" >
- <class>PageSplitModeDialog</class>
- <widget class="QDialog" name="PageSplitModeDialog" >
-  <property name="windowModality" >
-   <enum>Qt::WindowModal</enum>
-  </property>
+ <class>OutputChangeDpiDialog</class>
+ <widget class="QDialog" name="OutputChangeDpiDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>225</width>
-    <height>297</height>
+    <width>255</width>
+    <height>233</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Split Pages</string>
+   <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <item>
-    <layout class="QHBoxLayout" >
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="layoutTypeLabel" >
-       <property name="pixmap" >
-        <pixmap resource="../../../resources/resources.qrc" >:/icons/layout_type_auto.png</pixmap>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>Mode</string>
+      <string>DPI</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QHBoxLayout" name="horizontalLayout" >
       <item>
-       <widget class="QRadioButton" name="modeAuto" >
-        <property name="text" >
-         <string>Auto</string>
+       <spacer name="horizontalSpacer" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="checked" >
-         <bool>true</bool>
+        <property name="sizeHint" stdset="0" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="xDpi" >
+        <property name="maximumSize" >
+         <size>
+          <width>45</width>
+          <height>16777215</height>
+         </size>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="modeManual" >
+       <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Manual</string>
+         <string>x</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="yDpi" >
+        <property name="maximumSize" >
+         <size>
+          <width>45</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2" >
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0" >
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -84,19 +80,19 @@
      <property name="title" >
       <string>Scope</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout" name="verticalLayout" >
       <item>
-       <widget class="QRadioButton" name="scopeThisPage" >
+       <widget class="QRadioButton" name="thisPageRB" >
         <property name="text" >
          <string>This page only</string>
         </property>
         <property name="checked" >
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="scopeAllPages" >
+       <widget class="QRadioButton" name="allPagesRB" >
         <property name="text" >
          <string>All pages</string>
         </property>
@@ -106,7 +102,7 @@
     </widget>
    </item>
    <item>
-    <spacer>
+    <spacer name="verticalSpacer" >
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
@@ -130,14 +126,12 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../resources/resources.qrc" />
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>PageSplitModeDialog</receiver>
+   <receiver>OutputChangeDpiDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >

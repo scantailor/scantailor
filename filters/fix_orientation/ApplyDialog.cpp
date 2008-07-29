@@ -118,6 +118,9 @@ ApplyDialog::onSubmit()
 	}
 	
 	emit accepted(Scope(from, to, m_curPage, step));
+	
+	// We assume the default connection from accepted() to accept()
+	// was removed.
 	accept();
 }
 

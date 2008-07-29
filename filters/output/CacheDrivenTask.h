@@ -16,46 +16,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef OUTPUT_CACHEDRIVENTASK_H_
+#define OUTPUT_CACHEDRIVENTASK_H_
 
-namespace page_layout
+#include "NonCopyable.h"
+#include "RefCountable.h"
+#include "IntrusivePtr.h"
+
+class QPolygonF;
+class PageInfo;
+class AbstractFilterDataCollector;
+class ImageTransformation;
+
+namespace output
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
+class Settings;
+
+class CacheDrivenTask : public RefCountable
 {
-	setupUi(this);
+	DECLARE_NON_COPYABLE(CacheDrivenTask)
+public:
+	CacheDrivenTask();
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
-
-ApplyDialog::~ApplyDialog()
-{
-}
-
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
+	virtual ~CacheDrivenTask();
 	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
+	void process(
+		PageInfo const& page_info, AbstractFilterDataCollector* collector,
+		ImageTransformation const& xform,
+		QPolygonF const& content_rect_phys,
+		QPolygonF const& page_rect_phys);
+};
 
-} // namespace page_layout
+} // namespace output
+
+#endif

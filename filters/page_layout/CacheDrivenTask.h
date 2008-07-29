@@ -28,6 +28,11 @@ class PageInfo;
 class AbstractFilterDataCollector;
 class ImageTransformation;
 
+namespace output
+{
+	class CacheDrivenTask;
+}
+
 namespace page_layout
 {
 
@@ -37,7 +42,8 @@ class CacheDrivenTask : public RefCountable
 {
 	DECLARE_NON_COPYABLE(CacheDrivenTask)
 public:
-	CacheDrivenTask(IntrusivePtr<Settings> const& settings);
+	CacheDrivenTask(IntrusivePtr<output::CacheDrivenTask> const& next_task,
+		IntrusivePtr<Settings> const& settings);
 	
 	virtual ~CacheDrivenTask();
 	
@@ -45,6 +51,7 @@ public:
 		PageInfo const& page_info, AbstractFilterDataCollector* collector,
 		ImageTransformation const& xform, QRectF const& content_rect);
 private:
+	IntrusivePtr<output::CacheDrivenTask> m_ptrNextTask;
 	IntrusivePtr<Settings> m_ptrSettings;
 };
 

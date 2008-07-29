@@ -83,6 +83,9 @@ SplitModeDialog::onSubmit()
 	}
 	
 	emit accepted(Rule(layout_type, scope));
+	
+	// We assume the default connection from accepted() to accept()
+	// was removed.
 	accept();
 }
 

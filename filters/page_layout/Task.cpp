@@ -21,6 +21,7 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "Margins.h"
+#include "Params.h"
 #include "Utils.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
@@ -28,9 +29,11 @@
 #include "ImageView.h"
 #include "ImageTransformation.h"
 #include "PhysicalTransformation.h"
+#include "filters/output/Task.h"
 #include <QSizeF>
 #include <QRectF>
 #include <QLineF>
+#include <QPolygonF>
 #include <QTransform>
 #include <QObject>
 
@@ -65,9 +68,11 @@ private:
 
 
 Task::Task(IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<output::Task> const& next_task,
 	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id, bool batch, bool debug)
 :	m_ptrFilter(filter),
+	m_ptrNextTask(next_task),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_batchProcessing(batch)
@@ -85,7 +90,6 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	//Dependencies const deps(data.xform().transformBack().map(content_rect));
 	QSizeF const content_size_mm(
 		Utils::calcRectSizeMM(data.xform(), content_rect)
 	);
@@ -96,13 +100,30 @@ Task::process(
 		)
 	);
 	
-	return FilterResultPtr(
-		new UiUpdater(
-			m_ptrFilter, m_ptrSettings, m_pageId, data.image(),
-			data.xform(), content_rect, agg_size_changed,
-			m_batchProcessing
-		)
+	QPolygonF const content_rect_phys(
+		data.xform().transformBack().map(content_rect)
 	);
+	
+	if (m_ptrNextTask) {
+		QPolygonF const page_rect_phys(
+			Utils::calcPageRectPhys(
+				data.xform(), content_rect_phys,
+				*m_ptrSettings->getPageParams(m_pageId), // FIXME
+				m_ptrSettings->getAggregateHardSizeMM()
+			)
+		);
+		return m_ptrNextTask->process(
+			status, data, content_rect_phys, page_rect_phys
+		);
+	} else {
+		return FilterResultPtr(
+			new UiUpdater(
+				m_ptrFilter, m_ptrSettings, m_pageId,
+				data.image(), data.xform(), content_rect,
+				agg_size_changed, m_batchProcessing
+			)
+		);
+	}
 }
 
 

@@ -71,11 +71,11 @@ public:
 	
 	ImageId curImage() const;
 	
-	PageInfo curPage(View view) const;
+	PageInfo curPage(View view, int* page_num = 0) const;
 	
-	PageInfo setPrevPage(View view);
+	PageInfo setPrevPage(View view, int* page_num = 0);
 	
-	PageInfo setNextPage(View view);
+	PageInfo setNextPage(View view, int* page_num = 0);
 signals:
 	void modified();
 private:
@@ -103,9 +103,9 @@ private:
 	
 	void setCurPageImpl(PageId const& page_id, bool* modified);
 	
-	PageInfo setPrevPageImpl(View view, bool* modified);
+	PageInfo setPrevPageImpl(View view, int* page_num, bool& modified);
 	
-	PageInfo setNextPageImpl(View view, bool* modified);
+	PageInfo setNextPageImpl(View view, int* page_num, bool& modified);
 	
 	PageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
 	

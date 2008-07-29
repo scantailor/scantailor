@@ -16,46 +16,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef OUTPUT_CHANGEDPIDIALOG_H_
+#define OUTPUT_CHANGEDPIDIALOG_H_
 
-namespace page_layout
+#include "ui_OutputChangeDpiDialog.h"
+#include "Scope.h"
+#include <QDialog>
+
+class Dpi;
+
+namespace output
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
+class ChangeDpiDialog : public QDialog, private Ui::OutputChangeDpiDialog
 {
-	setupUi(this);
+	Q_OBJECT
+public:
+	ChangeDpiDialog(QWidget* parent);
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
+	virtual ~ChangeDpiDialog();
+signals:
+	void accepted(Dpi const& dpi, Scope scope);
+private slots:
+	void onSubmit();
+};
 
-ApplyDialog::~ApplyDialog()
-{
-}
+} // namespace output
 
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
-	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
-
-} // namespace page_layout
+#endif

@@ -30,6 +30,7 @@ namespace page_layout
 {
 
 class Alignment;
+class Params;
 
 class Utils
 {
@@ -75,6 +76,20 @@ public:
 		QSizeF const& hard_size_mm,
 		QSizeF const& aggregate_hard_size_mm,
 		Alignment const& alignment);
+	
+	/**
+	 * \brief Calculates the page rect (content + hard margins + soft margins)
+	 *
+	 * \param xform Transformations applied to image.
+	 * \param content_rect Content rectangle in transformed coordinates.
+	 * \param params Margins, aligment and other parameters.
+	 * \param aggregate_hard_size_mm Maximum width and height across all pages.
+	 * \return Page rectangle (as a polygon) in physical image coordinates.
+	 */
+	static QPolygonF calcPageRectPhys(
+		ImageTransformation const& xform,
+		QPolygonF const& content_rect_phys,
+		Params const& params, QSizeF const& aggregate_hard_size_mm);
 	
 	/**
 	 * \brief Calculates the presentation transformation.

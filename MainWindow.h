@@ -123,7 +123,7 @@ private:
 	
 	void loadImage();
 	
-	void loadImage(PageInfo const& page);
+	void loadImage(PageInfo const& page, int page_num);
 	
 	void updateFrozenPages();
 	

@@ -120,6 +120,9 @@
             <property name="decimals" >
              <number>1</number>
             </property>
+            <property name="maximum" >
+             <double>999.000000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="2" column="0" >
@@ -133,6 +136,9 @@
            <widget class="QDoubleSpinBox" name="leftMarginSpinBox" >
             <property name="decimals" >
              <number>1</number>
+            </property>
+            <property name="maximum" >
+             <double>999.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -172,12 +178,18 @@
             <property name="decimals" >
              <number>1</number>
             </property>
+            <property name="maximum" >
+             <double>999.000000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="0" column="1" >
            <widget class="QDoubleSpinBox" name="topMarginSpinBox" >
             <property name="decimals" >
              <number>1</number>
+            </property>
+            <property name="maximum" >
+             <double>999.000000000000000</double>
             </property>
            </widget>
           </item>

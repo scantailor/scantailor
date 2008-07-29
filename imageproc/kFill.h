@@ -16,46 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef IMAGEPROC_KFILL_H_
+#define IMAGEPROC_KFILL_H_
 
-namespace page_layout
+namespace imageproc
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
-{
-	setupUi(this);
-	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
+class BinaryImage;
 
-ApplyDialog::~ApplyDialog()
-{
-}
+/**
+ * \brief Performs noise reduction on binary images.
+ *
+ * \param src The input image.
+ * \param k The window size.  Must be >= 3.
+ * \return The resulting image.
+ */
+BinaryImage kFill(BinaryImage src, int k);
 
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
+} // namespace imageproc
 
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
-	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
-
-} // namespace page_layout
+#endif

@@ -16,46 +16,59 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#include "ChangeDpiDialog.h.moc"
+#include "Dpi.h"
+#include <QIntValidator>
+#include <QMessageBox>
 
-namespace page_layout
+namespace output
 {
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
+ChangeDpiDialog::ChangeDpiDialog(QWidget* parent)
+:	QDialog(parent)
 {
 	setupUi(this);
 	
+	xDpi->setMaxLength(4);
+	yDpi->setMaxLength(4);
+	QIntValidator* xDpiValidator = new QIntValidator(xDpi);
+	xDpi->setValidator(xDpiValidator);
+	QIntValidator* yDpiValidator = new QIntValidator(yDpi);
+	yDpi->setValidator(yDpiValidator);
+	
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
 }
 
-ApplyDialog::~ApplyDialog()
+ChangeDpiDialog::~ChangeDpiDialog()
 {
 }
 
 void
-ApplyDialog::thisPageSelected()
+ChangeDpiDialog::onSubmit()
 {
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
+	if (xDpi->text().isEmpty()) {
+		QMessageBox::warning(
+			this, tr("Error"),
+			tr("Horizontal DPI is not set.")
+		);
+		return;
+	}
+	if (yDpi->text().isEmpty()) {
+		QMessageBox::warning(
+			this, tr("Error"),
+			tr("Vertical DPI is not set.")
+		);
+		return;
+	}
+	
+	Dpi const dpi(xDpi->text().toInt(), yDpi->text().toInt());
+	Scope const scope = allPagesRB->isChecked() ? ALL_PAGES : THIS_PAGE_ONLY;
+	
+	emit accepted(dpi, scope);
 	
 	// We assume the default connection from accepted() to accept()
 	// was removed.
 	accept();
 }
 
-} // namespace page_layout
+} // namespace output

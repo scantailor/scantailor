@@ -16,46 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyDialog.h.moc"
+#ifndef PERFORMANCETIMER_H_
+#define PERFORMANCETIMER_H_
 
-namespace page_layout
-{
+#include <time.h>
 
-ApplyDialog::ApplyDialog(QWidget* parent)
-:	QDialog(parent),
-	m_scope(THIS_PAGE)
+class PerformanceTimer
 {
-	setupUi(this);
+public:
+	PerformanceTimer() : m_start(clock()) {}
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPageRB, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(allPagesRB, SIGNAL(pressed()), this, SLOT(allPagesSelected()));
-}
+	void print(char const* prefix = "");
+private:
+	clock_t const m_start;
+};
 
-ApplyDialog::~ApplyDialog()
-{
-}
-
-void
-ApplyDialog::thisPageSelected()
-{
-	m_scope = THIS_PAGE;
-}
-
-void
-ApplyDialog::allPagesSelected()
-{
-	m_scope = ALL_PAGES;
-}
-
-void
-ApplyDialog::onSubmit()
-{
-	emit accepted(m_scope);
-	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
-	accept();
-}
-
-} // namespace page_layout
+#endif
