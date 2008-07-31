@@ -187,7 +187,7 @@ MainWindow::construct()
 	setupUi(this);
 	m_ptrTabbedDebugImages.reset(new QTabWidget);
 	actionStopBatchProcessing->setEnabled(false);
-	thumbView->setBackgroundBrush(palette().brush(QPalette::Window));
+	thumbView->setBackgroundBrush(palette().color(QPalette::Window));
 	
 	m_ptrThumbSequence->attachView(thumbView);
 	

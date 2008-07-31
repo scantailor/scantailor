@@ -146,9 +146,9 @@ ThumbnailBase::paint(QPainter* painter,
 		
 		QPalette const palette(QApplication::palette());
 		if (option->state & QStyle::State_Selected) {
-			brush = palette.highlight();
+			brush = palette.color(QPalette::Highlight);
 		} else {
-			brush = palette.window();
+			brush = palette.color(QPalette::Window);
 		}
 		
 		QPen pen(brush, 1.0);

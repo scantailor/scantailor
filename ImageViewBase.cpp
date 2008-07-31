@@ -116,7 +116,7 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	QPainterPath containing_path;
 	containing_path.addRect(rect());
 	
-	QBrush const brush(palette().brush(QPalette::Background));
+	QBrush const brush(palette().color(QPalette::Window));
 	QPen pen(brush, 1.0);
 	pen.setCosmetic(true);
 	
