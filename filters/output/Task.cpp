@@ -20,39 +20,20 @@
 #include "Filter.h"
 #include "OptionsWidget.h"
 #include "Settings.h"
-#include "Params.h"
+#include "ColorParams.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
 #include "Dpi.h"
-#include "Dpm.h"
 #include "ImageTransformation.h"
 #include "DebugImages.h"
-#include "PerformanceTimer.h"
-#include "imageproc/BinaryImage.h"
-#include "imageproc/BWColor.h"
-#include "imageproc/BinaryThreshold.h"
-#include "imageproc/Binarize.h"
-#include "imageproc/Constants.h"
-#include "imageproc/Transform.h"
-#include "imageproc/kFill.h"
-#include "imageproc/Morphology.h"
-#include "imageproc/SeedFill.h"
-#include "imageproc/PolygonRasterizer.h"
-#include <QRectF>
-#include <QPolygonF>
-#include <QPoint>
-#include <QSize>
-#include <QSizeF>
-#include <QTransform>
+#include "OutputGenerator.h"
 #include <QImage>
-#include <QColor>
+#include <QString>
 #include <QObject>
 #include <QFileInfo>
 #include <QDebug>
-#include <vector>
-#include <assert.h>
 
 using namespace imageproc;
 
@@ -105,148 +86,15 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	Params const params(m_ptrSettings->getPageParams(m_pageId));
+	ColorParams const params(m_ptrSettings->getColorParams(m_pageId));
+	Dpi const output_dpi(m_ptrSettings->getDpi(m_pageId));
 	
-	ImageTransformation xform(data.xform());
-	xform.preScaleToDpi(params.dpi());
-	
-	QRect const new_image_rect(
-		xform.transform().map(page_rect_phys).boundingRect().toRect()
+	OutputGenerator const generator(
+		output_dpi, params, data.xform(),
+		content_rect_phys, page_rect_phys
 	);
-	
-	QTransform const phys_to_new(
-		xform.transform() * QTransform().translate(
-			-new_image_rect.left(), -new_image_rect.top()
-		)
-	);
-	
-	QColor const white(200, 200, 200); // FIXME: this may hurt binarizeWolf()
-	QImage const gray_img(
-		transformToGray(
-			data.image(), xform.transform(),
-			new_image_rect, white
-		)
-	);
-	
-	if (DebugImages* dbg = m_ptrDbg.get()) {
-		dbg->add(gray_img, "gray_img");
-	}
-	
-	status.throwIfCancelled();
-	
-	BinaryImage bin_img;
-	switch (params.thresholdMode()) {
-		case Params::OTSU:
-			bin_img = binarizeOtsu(gray_img);
-			break;
-		case Params::SAUVOLA:
-			bin_img = binarizeSauvola(
-				gray_img, calcLocalWindowSize(params.dpi())
-			);
-			break;
-		case Params::WOLF:
-			bin_img = binarizeWolf(
-				gray_img, calcLocalWindowSize(params.dpi())
-			);
-			break;
-	}
-	assert(!bin_img.isNull());
-	
-	BinaryImage seed(openBrick(bin_img, QSize(3, 3)));
-	bin_img = seedFill(seed, bin_img, CONN4);
-	seed.release();
-	
-#if 0
-	PerformanceTimer kfill_timer;
-	bin_img = kFill(bin_img, 3);
-	kfill_timer.print("kfill: ");
-#endif
-	
-#if 1
-	PerformanceTimer hmt_timer;
-	
-	// When removing black noice, remove small ones first.
-	
-	{
-		char const pattern[] =
-			"XXX"
-			" - "
-			"   ";
-		hitMissReplaceAllDirections(bin_img, pattern, 3, 3);
-	}
-	
-	{
-		char const pattern[] =
-			"X ?"
-			"X  "
-			"X- "
-			"X- "
-			"X  "
-			"X ?";
-		hitMissReplaceAllDirections(bin_img, pattern, 3, 6);
-	}
-	
-	{
-		char const pattern[] =
-			"X ?"
-			"X ?"
-			"X  "
-			"X- "
-			"X- "
-			"X- "
-			"X  "
-			"X ?"
-			"X ?";
-		hitMissReplaceAllDirections(bin_img, pattern, 3, 9);
-	}
-	
-	{
-		char const pattern[] =
-			"XX?"
-			"XX?"
-			"XX "
-			"X+ "
-			"X+ "
-			"X+ "
-			"XX "
-			"XX?"
-			"XX?";
-		hitMissReplaceAllDirections(bin_img, pattern, 3, 9);
-	}
-	
-	{
-		char const pattern[] =
-			"XX?"
-			"XX "
-			"X+ "
-			"X+ "
-			"XX "
-			"XX?";
-		hitMissReplaceAllDirections(bin_img, pattern, 3, 6);
-	}
-	
-	{
-		char const pattern[] =
-			"   "
-			"X+X"
-			"XXX";
-		hitMissReplaceAllDirections(bin_img, pattern, 3, 3);
-	}
-	
-	hmt_timer.print("hit-miss operations: ");
-#endif
-	
-#if 0
-	PolygonRasterizer::fillExcept(
-		bin_img, WHITE, phys_to_new.map(content_rect_phys),
-		Qt::WindingFill
-	);
-#else
-	bin_img.fillExcept(
-		phys_to_new.map(content_rect_phys).boundingRect().toRect(),
-		WHITE
-	);
-#endif
+
+	QImage const q_img(generator.process(data.image(), status, m_ptrDbg.get()));
 	
 	QString const orig_fname(
 		QFileInfo(m_pageId.imageId().filePath()).fileName()
@@ -264,10 +112,6 @@ Task::process(
 		)
 	);
 	
-	QImage q_img(bin_img.toQImage());
-	Dpm const output_dpm(params.dpi());
-	q_img.setDotsPerMeterX(output_dpm.horizontal());
-	q_img.setDotsPerMeterY(output_dpm.vertical());
 	q_img.save(out_path);
 	
 	return FilterResultPtr(
@@ -276,77 +120,6 @@ Task::process(
 			q_img, m_batchProcessing
 		)
 	);
-}
-
-void
-Task::hitMissReplaceAllDirections(
-	imageproc::BinaryImage& img, char const* const pattern,
-	int const pattern_width, int const pattern_height)
-{
-	hitMissReplaceInPlace(img, WHITE, pattern, pattern_width, pattern_height);
-	
-	std::vector<char> pattern_data(pattern_width * pattern_height, ' ');
-	char* const new_pattern = &pattern_data[0];
-	
-	// Rotate 90 degrees clockwise.
-	char const* p = pattern;
-	int new_width = pattern_height;
-	int new_height = pattern_width;
-	for (int y = 0; y < pattern_height; ++y) {
-		for (int x = 0; x < pattern_width; ++x, ++p) {
-			int const new_x = pattern_height - 1 - y;
-			int const new_y = x;
-			new_pattern[new_y * new_width + new_x] = *p;
-		}
-	}
-	hitMissReplaceInPlace(img, WHITE, new_pattern, new_width, new_height);
-	
-	// Rotate upside down.
-	p = pattern;
-	new_width = pattern_width;
-	new_height = pattern_height;
-	for (int y = 0; y < pattern_height; ++y) {
-		for (int x = 0; x < pattern_width; ++x, ++p) {
-			int const new_x = pattern_width - 1 - x;
-			int const new_y = pattern_height - 1 - y;
-			new_pattern[new_y * new_width + new_x] = *p;
-		}
-	}
-	hitMissReplaceInPlace(img, WHITE, new_pattern, new_width, new_height);
-	
-	// Rotate 90 degrees counter-clockwise.
-	p = pattern;
-	new_width = pattern_height;
-	new_height = pattern_width;
-	for (int y = 0; y < pattern_height; ++y) {
-		for (int x = 0; x < pattern_width; ++x, ++p) {
-			int const new_x = y;
-			int const new_y = pattern_width - 1 - x;
-			new_pattern[new_y * new_width + new_x] = *p;
-		}
-	}
-	hitMissReplaceInPlace(img, WHITE, new_pattern, new_width, new_height);
-}
-
-QSize
-Task::calcLocalWindowSize(Dpi const& dpi)
-{
-	QSizeF const size_mm(15, 15);
-	QSizeF const size_inch(size_mm * constants::MM2INCH);
-	QSizeF const size_pixels_f(
-		dpi.horizontal() * size_inch.width(),
-		dpi.vertical() * size_inch.height()
-	);
-	QSize size_pixels(size_pixels_f.toSize());
-	
-	if (size_pixels.width() < 3) {
-		size_pixels.setWidth(3);
-	}
-	if (size_pixels.height() < 3) {
-		size_pixels.setHeight(3);
-	}
-	
-	return size_pixels;
 }
 
 

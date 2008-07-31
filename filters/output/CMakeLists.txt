@@ -9,13 +9,15 @@ ADD_SUBDIRECTORY(ui)
 
 SET(
 	sources
+	ApplyColorsDialog.cpp ApplyColorsDialog.h
 	ChangeDpiDialog.cpp ChangeDpiDialog.h
 	ImageView.cpp ImageView.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
-	Params.h
+	OutputGenerator.cpp OutputGenerator.h
+	ColorParams.h
 	Settings.cpp Settings.h
 #	Thumbnail.cpp Thumbnail.h
 	Scope.h

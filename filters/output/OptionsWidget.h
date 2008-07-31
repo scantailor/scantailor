@@ -23,7 +23,7 @@
 #include "FilterOptionsWidget.h"
 #include "IntrusivePtr.h"
 #include "PageId.h"
-#include "Params.h"
+#include "ColorParams.h"
 #include "Scope.h"
 #include <QColor>
 #include <QPixmap>
@@ -53,7 +53,11 @@ signals:
 private slots:
 	void changeDpiButtonClicked();
 	
+	void applyColorsButtonClicked();
+	
 	void dpiChanged(Dpi const& dpi, Scope scope);
+	
+	void applyColorsConfirmed(Scope scope);
 	
 	void colorModeChanged(int idx);
 	
@@ -67,11 +71,13 @@ private:
 	
 	void updateDpiDisplay(Dpi const& dpi);
 	
+	void updateColorsDisplay();
+	
 	IntrusivePtr<Settings> m_ptrSettings;
 	PageId m_pageId;
-	Params m_pageParams;
-	QColor m_lightColor;
-	QColor m_darkColor;
+	ColorParams m_colorParams;
+	//QColor m_lightColor; //
+	//QColor m_darkColor;  // TODO: maybe remove those. They are in m_colorParams
 	QPixmap m_lightColorPixmap;
 	QPixmap m_darkColorPixmap;
 };

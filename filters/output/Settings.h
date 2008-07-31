@@ -22,7 +22,8 @@
 #include "RefCountable.h"
 #include "NonCopyable.h"
 #include "PageId.h"
-#include "Params.h"
+#include "Dpi.h"
+#include "ColorParams.h"
 #include <QMutex>
 #include <map>
 
@@ -39,9 +40,11 @@ public:
 	
 	void clear();
 	
-	Params getPageParams(PageId const& page_id) const;
+	ColorParams getColorParams(PageId const& page_id) const;
 	
-	void setPageParams(PageId const& page_id, Params const& params);
+	void setColorParams(PageId const& page_id, ColorParams const& params);
+	
+	void setColorParamsForAllPages(ColorParams const& params);
 	
 	Dpi getDpi(PageId const& page_id) const;
 	
@@ -49,13 +52,14 @@ public:
 	
 	void setDpiForAllPages(Dpi const& dpi);
 private:
-	typedef std::map<PageId, Params> PerPageParams;
-	
-	static Params initialDefaultParams();
+	typedef std::map<PageId, Dpi> PerPageDpi;
+	typedef std::map<PageId, ColorParams> PerPageColorParams;
 	
 	mutable QMutex m_mutex;
-	PerPageParams m_perPageParams;
-	Params m_defaultParams;
+	PerPageDpi m_perPageDpi;
+	PerPageColorParams m_perPageColorParams;
+	Dpi m_defaultDpi;
+	ColorParams m_defaultColorParams;
 };
 
 } // namespace output

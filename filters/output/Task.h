@@ -24,6 +24,7 @@
 #include "FilterResult.h"
 #include "PageId.h"
 #include <QString>
+#include <QColor>
 #include <memory>
 
 class DebugImages;
@@ -32,6 +33,7 @@ class FilterData;
 class ImageTransformation;
 class QPolygonF;
 class QSize;
+class QImage;
 class Dpi;
 
 namespace imageproc
@@ -62,12 +64,6 @@ public:
 		QPolygonF const& page_rect_phys);
 private:
 	class UiUpdater;
-	
-	static void hitMissReplaceAllDirections(
-		imageproc::BinaryImage& img, char const* pattern,
-		int pattern_width, int pattern_height);
-	
-	static QSize calcLocalWindowSize(Dpi const& dpi);
 	
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;

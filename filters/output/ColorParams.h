@@ -16,47 +16,41 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_PARAMS_H_
-#define OUTPUT_PARAMS_H_
+#ifndef OUTPUT_COLORPARAMS_H_
+#define OUTPUT_COLORPARAMS_H_
 
-#include "Dpi.h"
 #include <QColor>
 
 namespace output
 {
 
-class Params
+class ColorParams
 {
 public:
 	enum ColorMode { BLACK_AND_WHITE, BITONAL, COLOR_GRAYSCALE };
 	enum ThresholdMode { OTSU, SAUVOLA, WOLF };
 	
-	Params(Dpi const& dpi)
-	: m_dpi(dpi), m_colorMode(BLACK_AND_WHITE), m_thresholdMode(OTSU) {}
-	
-	Dpi dpi() const { return m_dpi; }
-	
-	void setDpi(Dpi const& dpi) { m_dpi = dpi; }
+	ColorParams() : m_lightColor(0xFFFFFFFF), m_darkColor(0xFF000000),
+	m_colorMode(BLACK_AND_WHITE), m_thresholdMode(OTSU) {}
 	
 	ColorMode colorMode() const { return m_colorMode; }
 	
 	void setColorMode(ColorMode mode) { m_colorMode = mode; }
 	
-	QColor const& lightColor() const { return m_lightColor; }
+	QRgb lightColor() const { return m_lightColor; }
 	
-	void setLightColor(QColor const& color) { m_lightColor = color; }
+	void setLightColor(QRgb color) { m_lightColor = color; }
 	
-	QColor const& darkColor() const { return m_darkColor; }
+	QRgb darkColor() const { return m_darkColor; }
 	
-	void setDarkColor(QColor const& color) { m_darkColor = color; }
+	void setDarkColor(QRgb color) { m_darkColor = color; }
 	
 	ThresholdMode thresholdMode() const { return m_thresholdMode; }
 	
 	void setThresholdMode(ThresholdMode mode) { m_thresholdMode = mode; }
 private:
-	Dpi m_dpi;
-	QColor m_lightColor;
-	QColor m_darkColor;
+	QRgb m_lightColor;
+	QRgb m_darkColor;
 	ColorMode m_colorMode;
 	ThresholdMode m_thresholdMode;
 };
