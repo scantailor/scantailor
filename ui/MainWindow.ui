@@ -25,9 +25,9 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>26</y>
+     <y>27</y>
      <width>613</width>
-     <height>419</height>
+     <height>418</height>
     </rect>
    </property>
    <property name="sizePolicy" >
@@ -90,6 +90,9 @@
          <property name="frameShape" >
           <enum>QFrame::StyledPanel</enum>
          </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Sunken</enum>
+         </property>
         </widget>
        </widget>
       </item>
@@ -116,7 +119,7 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>26</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug" >
