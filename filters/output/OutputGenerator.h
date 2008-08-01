@@ -67,6 +67,8 @@ private:
 	static void colorizeBitonal(
 		QImage& img, QRgb light_color, QRgb dark_color);
 	
+	static unsigned char calcDominantBackgroundGrayLevel(QImage const& img);
+	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
 	QPolygonF m_pageRectPhys;

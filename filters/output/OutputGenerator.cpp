@@ -82,14 +82,12 @@ QImage
 OutputGenerator::processBitonalOrBW(QImage const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-	// TODO: calculate the dominant background color and use that.
-	QColor const white(200, 200, 200); // FIXME: this may hurt binarizeWolf()
-	QImage const gray_img(
-		transformToGray(input, m_toUncropped, m_cropRect, white)
+	QImage const transformed(
+		transformToGray(input, m_toUncropped, m_cropRect, Qt::white)
 	);
 	
 	if (dbg) {
-		dbg->add(gray_img, "gray_img");
+		dbg->add(transformed, "transformed");
 	}
 	
 	status.throwIfCancelled();
@@ -97,16 +95,11 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 	BinaryImage bin_img;
 	switch (m_colorParams.thresholdMode()) {
 		case ColorParams::OTSU:
-			bin_img = binarizeOtsu(gray_img);
+			bin_img = binarizeOtsu(transformed);
 			break;
 		case ColorParams::SAUVOLA:
 			bin_img = binarizeSauvola(
-				gray_img, calcLocalWindowSize(m_dpi)
-			);
-			break;
-		case ColorParams::WOLF:
-			bin_img = binarizeWolf(
-				gray_img, calcLocalWindowSize(m_dpi)
+				transformed, calcLocalWindowSize(m_dpi)
 			);
 			break;
 	}
@@ -213,8 +206,10 @@ QImage
 OutputGenerator::processColorOrGrayscale(QImage const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
+	unsigned char const dominant_gray = calcDominantBackgroundGrayLevel(input);
+	
 	QImage target(m_cropRect.size(), QImage::Format_RGB32);
-	target.fill(0xFFFFFFFF); // FIXME: calculate the dominant color instead.
+	target.fill(qRgb(dominant_gray, dominant_gray, dominant_gray));
 	
 	{
 		QPainter painter(&target);
@@ -317,6 +312,38 @@ OutputGenerator::colorizeBitonal(
 		img.setColor(0, light_color);
 		img.setColor(1, dark_color);
 	}
+}
+
+unsigned char
+OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
+{
+	QImage const gray(toGrayscale(img));
+	
+	BinaryImage mask(binarizeOtsu(gray));
+	mask.invert();
+	
+	GrayscaleHistogram const hist(gray, mask);
+	
+	int integral_hist[256];
+	integral_hist[0] = hist[0];
+	for (int i = 1; i < 256; ++i) {
+		integral_hist[i] = hist[i] + integral_hist[i - 1];
+	}
+	
+	int const num_colors = 256;
+	int const window_size = 10;
+	
+	int best_pos = 0;
+	int best_sum = integral_hist[window_size - 1];
+	for (int i = 1; i < num_colors - window_size; ++i) {
+		int const sum = integral_hist[i + window_size - 1] - integral_hist[i - 1];
+		if (sum > best_sum) {
+			best_sum = sum;
+			best_pos = i;
+		}
+	}
+	
+	return best_pos + window_size / 2;
 }
 
 } // namespace output
