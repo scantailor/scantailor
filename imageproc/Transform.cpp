@@ -26,6 +26,7 @@
 #include <QColor>
 #include <QTransform>
 #include <QtGlobal>
+#include <QDebug>
 #include <stdexcept>
 #include <algorithm>
 #include <stdint.h>
@@ -64,7 +65,12 @@ static QSizeF calcSrcUnitSize(QTransform const& xform)
 	double const width = src_poly.back().x() - src_poly.front().x();
 	std::sort(src_poly.begin(), src_poly.end(), YLess());
 	double const height = src_poly.back().y() - src_poly.front().y();
-	return QSizeF(width, height);
+	
+	// By limiting the minimum width and height of the source area
+	// corresponding to a destination pixel, we get interpolation
+	// when upscaling.
+	double const min = 0.9 * 32.0;
+	return QSizeF(std::max(min, width), std::max(min, height));
 }
 
 static QImage transformGrayToGray(
