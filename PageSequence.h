@@ -73,6 +73,8 @@ public:
 	
 	PageInfo curPage(View view, int* page_num = 0) const;
 	
+	PageInfo setFirstPage(View view);
+	
 	PageInfo setPrevPage(View view, int* page_num = 0);
 	
 	PageInfo setNextPage(View view, int* page_num = 0);

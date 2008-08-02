@@ -43,8 +43,7 @@ class QStackedLayout;
 class WorkerThread;
 class ProjectReader;
 class DebugImages;
-class ContentBoxAggregator;
-class PageParamsAggregator;
+class ContentBoxPropagator;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -111,7 +110,7 @@ private:
 	
 	void construct();
 	
-	void resetPageAndThumbSequences();
+	void resetThumbSequence();
 	
 	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
 	
@@ -121,11 +120,15 @@ private:
 	
 	bool isBelowSelectContent(int filter_idx) const;
 	
+	bool isOutputFilter() const;
+	
+	bool isOutputFilter(int filter_idx) const;
+	
+	PageSequence::View getCurrentView() const;
+	
 	void loadImage();
 	
 	void loadImage(PageInfo const& page, int page_num);
-	
-	void updateFrozenPages();
 	
 	void updateWindowTitle();
 	
@@ -133,7 +136,6 @@ private:
 	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<PageSequence> m_ptrPages;
-	PageSequenceSnapshot m_frozenPages;
 	QString m_outDir;
 	QString m_projectFile;
 	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
@@ -144,8 +146,7 @@ private:
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
 	std::auto_ptr<QTabWidget> m_ptrTabbedDebugImages;
 	std::auto_ptr<FilterListModel> m_ptrFilterListModel;
-	std::auto_ptr<ContentBoxAggregator> m_ptrContentBoxAggregator;
-	std::auto_ptr<PageParamsAggregator> m_ptrPageParamsAggregator;
+	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
 	BackgroundTaskPtr m_ptrCurTask;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;

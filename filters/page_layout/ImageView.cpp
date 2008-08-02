@@ -47,7 +47,7 @@ namespace page_layout
 ImageView::ImageView(
 	IntrusivePtr<Settings> const& settings, PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect, OptionsWidget const& opt_widget)
+	QRectF const& adapted_content_rect, OptionsWidget const& opt_widget)
 :	ImageViewBase(image, xform, Margins(5.0, 5.0, 5.0, 5.0)),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
@@ -55,7 +55,7 @@ ImageView::ImageView(
 	m_physXform(xform.origDpi()),
 	m_origToMM(m_origXform.transformBack() * m_physXform.pixelsToMM()),
 	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform()),
-	m_innerRect(Utils::adaptContentRect(xform, content_rect)),
+	m_innerRect(adapted_content_rect),
 	m_aggregateHardSizeMM(settings->getAggregateHardSizeMM()),
 	m_committedAggregateHardSizeMM(m_aggregateHardSizeMM),
 	m_alignment(opt_widget.alignment()),

@@ -186,8 +186,7 @@ SET(
 	ThumbnailSequence.cpp ThumbnailSequence.h
 	ThumbnailFactory.cpp ThumbnailFactory.h
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
-	ContentBoxAggregator.cpp ContentBoxAggregator.h
-	PageParamsAggregator.cpp PageParamsAggregator.h
+	ContentBoxPropagator.cpp ContentBoxPropagator.h
 	DebugImages.cpp DebugImages.h
 	ImageId.cpp ImageId.h
 	PageId.cpp PageId.h

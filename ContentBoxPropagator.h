@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGEPARAMSAGGREGATOR_H_
-#define PAGEPARAMSAGGREGATOR_H_
+#ifndef CONTENTBOXPROPAGATOR_H_
+#define CONTENTBOXPROPAGATOR_H_
 
 #include "IntrusivePtr.h"
 #include <QSizeF>
@@ -25,21 +25,35 @@
 class CompositeCacheDrivenTask;
 class PageSequence;
 
-class PageParamsAggregator
+namespace page_layout
+{
+	class Filter;
+}
+
+/**
+ * \brief Propagates content boxes from "Select Content" to "Page Layout" filter.
+ *
+ * This is necessary in the following case:\n
+ * You go back from Page Layout to one of the previous filters and make
+ * adjustments there to several pages.  Now you return to Page Layout and
+ * expect to see the results of all your adjustments (not just the current page)
+ * there.
+ */
+class ContentBoxPropagator
 {
 public:
-	PageParamsAggregator(IntrusivePtr<CompositeCacheDrivenTask> const& task);
+	ContentBoxPropagator(
+		IntrusivePtr<page_layout::Filter> const& page_layout_filter,
+		IntrusivePtr<CompositeCacheDrivenTask> const& task);
 	
-	~PageParamsAggregator();
+	~ContentBoxPropagator();
 	
-	void aggregate(PageSequence const& pages);
-	
-	bool haveUndefinedItems() const { return m_haveUndefinedItems; }
+	void propagate(PageSequence const& pages);
 private:
 	class Collector;
 	
+	IntrusivePtr<page_layout::Filter> m_ptrPageLayoutFilter;
 	IntrusivePtr<CompositeCacheDrivenTask> m_ptrTask;
-	bool m_haveUndefinedItems;
 };
 
 #endif

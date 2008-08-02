@@ -96,8 +96,8 @@ Task::process(
 
 	QImage const q_img(generator.process(data.image(), status, m_ptrDbg.get()));
 	
-	QString const orig_fname(
-		QFileInfo(m_pageId.imageId().filePath()).fileName()
+	QString const base_file_name(
+		QFileInfo(m_pageId.imageId().filePath()).completeBaseName()
 	);
 	QString const padded_number(
 		QString::fromAscii("%1").arg(
@@ -105,10 +105,9 @@ Task::process(
 		)
 	);
 	
-	// TODO: always output to PNG
 	QString const out_path(
-		QString::fromAscii("%1/%2_%3").arg(
-			m_outDir, padded_number, orig_fname
+		QString::fromAscii("%1/%2_%3.png").arg(
+			m_outDir, padded_number, base_file_name
 		)
 	);
 	

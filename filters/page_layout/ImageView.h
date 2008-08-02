@@ -46,7 +46,8 @@ public:
 	ImageView(
 		IntrusivePtr<Settings> const& settings, PageId const& page_id,
 		QImage const& image, ImageTransformation const& xform,
-		QRectF const& content_rect, OptionsWidget const& opt_widget);
+		QRectF const& adapted_content_rect,
+		OptionsWidget const& opt_widget);
 	
 	virtual ~ImageView();
 signals:

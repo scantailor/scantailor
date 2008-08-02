@@ -25,6 +25,7 @@
 
 class PageId;
 class Margins;
+class PageSequenceSnapshot;
 class QSizeF;
 
 namespace page_layout
@@ -47,6 +48,14 @@ public:
 	 * \brief Removes all stored data.
 	 */
 	void clear();
+	
+	/**
+	 * \brief Check that we have all the essential parameters for every
+	 *        page in the list.
+	 *
+	 * This check is used to allow of forbid going to the output stage.
+	 */
+	bool checkEverythingDefined(PageSequenceSnapshot const& pages) const;
 	
 	/**
 	 * \brief Get all page parameters at once.
@@ -111,6 +120,8 @@ public:
 	 */
 	AggregateSizeChanged setContentSizeMM(
 		PageId const& page_id, QSizeF const& content_size_mm);
+	
+	void invalidateContentSize(PageId const& page_id);
 	
 	/**
 	 * \brief Returns the aggregate (max width + max height) hard page size.

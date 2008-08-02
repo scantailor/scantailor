@@ -26,7 +26,9 @@
 
 class PageId;
 class PageSequence;
+class ImageTransformation;
 class QString;
+class QRectF;
 
 namespace output
 {
@@ -61,6 +63,14 @@ public:
 	
 	virtual void loadSettings(
 		ProjectReader const& reader, QDomElement const& filters_el);
+	
+	void setContentBox(
+		PageId const& page_id, ImageTransformation const& xform,
+		QRectF const& content_rect);
+	
+	void invalidateContentBox(PageId const& page_id);
+	
+	bool checkReadyForOutput(PageSequence const& pages);
 	
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,

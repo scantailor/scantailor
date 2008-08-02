@@ -25,11 +25,11 @@
 #include "PageId.h"
 #include "ColorParams.h"
 #include "Scope.h"
+#include "Dpi.h"
 #include <QColor>
 #include <QPixmap>
 
 class QIcon;
-class Dpi;
 
 namespace output
 {
@@ -69,15 +69,14 @@ private slots:
 private:
 	static QIcon createIcon(QPixmap const& pixmap);
 	
-	void updateDpiDisplay(Dpi const& dpi);
+	void updateDpiDisplay();
 	
 	void updateColorsDisplay();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	PageId m_pageId;
+	Dpi m_dpi;
 	ColorParams m_colorParams;
-	//QColor m_lightColor; //
-	//QColor m_darkColor;  // TODO: maybe remove those. They are in m_colorParams
 	QPixmap m_lightColorPixmap;
 	QPixmap m_darkColorPixmap;
 };

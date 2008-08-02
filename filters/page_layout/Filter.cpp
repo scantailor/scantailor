@@ -25,11 +25,15 @@
 #include "Margins.h"
 #include "Alignment.h"
 #include "Params.h"
+#include "PageSequence.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
+#include "Utils.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <QRectF>
+#include <QSizeF>
 #include <QString>
 #include <QObject>
 #include <QDomDocument>
@@ -143,6 +147,31 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 		Params const params(params_el);
 		m_ptrSettings->setPageParams(page_id, params);
 	}
+}
+
+void
+Filter::setContentBox(
+	PageId const& page_id, ImageTransformation const& xform,
+	QRectF const& content_rect)
+{
+	QSizeF const content_size_mm(Utils::calcRectSizeMM(xform, content_rect));
+	m_ptrSettings->setContentSizeMM(page_id, content_size_mm);
+}
+
+void
+Filter::invalidateContentBox(PageId const& page_id)
+{
+	m_ptrSettings->invalidateContentSize(page_id);
+}
+
+bool
+Filter::checkReadyForOutput(PageSequence const& pages)
+{
+	PageSequenceSnapshot const snapshot(
+		pages.snapshot(PageSequence::PAGE_VIEW)
+	);
+	
+	return m_ptrSettings->checkEverythingDefined(snapshot);
 }
 
 IntrusivePtr<Task>

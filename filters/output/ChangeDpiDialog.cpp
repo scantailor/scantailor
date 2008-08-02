@@ -24,10 +24,13 @@
 namespace output
 {
 
-ChangeDpiDialog::ChangeDpiDialog(QWidget* parent)
+ChangeDpiDialog::ChangeDpiDialog(QWidget* parent, Dpi const& dpi)
 :	QDialog(parent)
 {
 	setupUi(this);
+	
+	xDpi->setText(QString::number(dpi.horizontal()));
+	yDpi->setText(QString::number(dpi.vertical()));
 	
 	xDpi->setMaxLength(4);
 	yDpi->setMaxLength(4);
@@ -62,6 +65,22 @@ ChangeDpiDialog::onSubmit()
 	}
 	
 	Dpi const dpi(xDpi->text().toInt(), yDpi->text().toInt());
+	if (dpi.horizontal() < 72 || dpi.vertical() < 72) {
+		QMessageBox::warning(
+			this, tr("Error"),
+			tr("DPI is too low!")
+		);
+		return;
+	}
+	
+	if (dpi.horizontal() > 1200 || dpi.vertical() > 1200) {
+		QMessageBox::warning(
+			this, tr("Error"),
+			tr("DPI is too high!")
+		);
+		return;
+	}
+	
 	Scope const scope = allPagesRB->isChecked() ? ALL_PAGES : THIS_PAGE_ONLY;
 	
 	emit accepted(dpi, scope);

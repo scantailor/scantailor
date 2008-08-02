@@ -32,7 +32,7 @@ class ChangeDpiDialog : public QDialog, private Ui::OutputChangeDpiDialog
 {
 	Q_OBJECT
 public:
-	ChangeDpiDialog(QWidget* parent);
+	ChangeDpiDialog(QWidget* parent, Dpi const& dpi);
 	
 	virtual ~ChangeDpiDialog();
 signals:

@@ -36,8 +36,10 @@
 #include <QRectF>
 #include <QPointF>
 #include <QPainter>
+#include <QtGlobal>
 #include <QDebug>
 #include <vector>
+#include <algorithm>
 #include <assert.h>
 
 using namespace imageproc;
@@ -105,7 +107,7 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 	}
 	assert(!bin_img.isNull());
 	
-	BinaryImage seed(openBrick(bin_img, QSize(3, 3)));
+	BinaryImage seed(openBrick(bin_img, from300dpi(QSize(3, 3), m_dpi)));
 	bin_img = seedFill(seed, bin_img, CONN4);
 	seed.release();
 	
@@ -122,6 +124,8 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 		hitMissReplaceAllDirections(bin_img, pattern, 3, 3);
 	}
 	
+	status.throwIfCancelled();
+	
 	{
 		char const pattern[] =
 			"X ?"
@@ -132,6 +136,8 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 			"X ?";
 		hitMissReplaceAllDirections(bin_img, pattern, 3, 6);
 	}
+	
+	status.throwIfCancelled();
 	
 	{
 		char const pattern[] =
@@ -147,6 +153,8 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 		hitMissReplaceAllDirections(bin_img, pattern, 3, 9);
 	}
 	
+	status.throwIfCancelled();
+	
 	{
 		char const pattern[] =
 			"XX?"
@@ -161,6 +169,8 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 		hitMissReplaceAllDirections(bin_img, pattern, 3, 9);
 	}
 	
+	status.throwIfCancelled();
+	
 	{
 		char const pattern[] =
 			"XX?"
@@ -171,6 +181,8 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 			"XX?";
 		hitMissReplaceAllDirections(bin_img, pattern, 3, 6);
 	}
+	
+	status.throwIfCancelled();
 	
 	{
 		char const pattern[] =
@@ -183,9 +195,13 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 	//hmt_timer.print("hit-miss operations: ");
 #endif
 	
+	status.throwIfCancelled();
+	
 	bin_img.fillExcept(
 		m_contentRect.translated(-m_cropRect.topLeft()), WHITE
 	);
+	
+	status.throwIfCancelled();
 	
 	QImage q_img(bin_img.toQImage());
 	if (m_colorParams.colorMode() == ColorParams::BITONAL) {
@@ -194,6 +210,8 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 			m_colorParams.darkColor()
 		);
 	}
+	
+	status.throwIfCancelled();
 	
 	Dpm const output_dpm(m_dpi);
 	q_img.setDotsPerMeterX(output_dpm.horizontal());
@@ -211,6 +229,8 @@ OutputGenerator::processColorOrGrayscale(QImage const& input,
 	QImage target(m_cropRect.size(), QImage::Format_RGB32);
 	target.fill(qRgb(dominant_gray, dominant_gray, dominant_gray));
 	
+	status.throwIfCancelled();
+	
 	{
 		QPainter painter(&target);
 		painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -223,11 +243,23 @@ OutputGenerator::processColorOrGrayscale(QImage const& input,
 		painter.drawImage(QPointF(0.0, 0.0), input);
 	}
 	
+	status.throwIfCancelled();
+	
 	if (target.allGray()) {
 		return toGrayscale(target);
 	}
 	
 	return target;
+}
+
+QSize
+OutputGenerator::from300dpi(QSize const& size, Dpi const& target_dpi)
+{
+	double const hscale = target_dpi.horizontal() / 300.0;
+	double const vscale = target_dpi.vertical() / 300.0;
+	int const width = qRound(size.width() * hscale);
+	int const height = qRound(size.height() * vscale);
+	return QSize(std::max(1, width), std::max(1, height));
 }
 
 void
@@ -283,7 +315,7 @@ OutputGenerator::hitMissReplaceAllDirections(
 QSize
 OutputGenerator::calcLocalWindowSize(Dpi const& dpi)
 {
-	QSizeF const size_mm(15, 15);
+	QSizeF const size_mm(20, 20);
 	QSizeF const size_inch(size_mm * constants::MM2INCH);
 	QSizeF const size_pixels_f(
 		dpi.horizontal() * size_inch.width(),
@@ -343,7 +375,16 @@ OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 		}
 	}
 	
-	return best_pos + window_size / 2;
+	int half_sum = 0;
+	for (int i = best_pos; i < best_pos + window_size; ++i) {
+		half_sum += hist[i];
+		if (half_sum >= best_sum / 2) {
+			return i;
+		}
+	}
+	
+	assert(!"Unreachable");
+	return 0;
 }
 
 } // namespace output

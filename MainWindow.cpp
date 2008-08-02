@@ -30,8 +30,7 @@
 #include "ProjectReader.h"
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailFactory.h"
-#include "ContentBoxAggregator.h"
-#include "PageParamsAggregator.h"
+#include "ContentBoxPropagator.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -94,9 +93,15 @@ public:
 	IntrusivePtr<CompositeCacheDrivenTask>
 	createCompositeCacheDrivenTask(int last_filter_idx);
 	
+	IntrusivePtr<page_layout::Filter> const& getPageLayoutFilter() const {
+		return m_ptrPageLayoutFilter;
+	}
+	
 	int getSelectContentFilterIdx() const { return m_selectContentFilterIdx; }
 	
 	int getPageLayoutFilterIdx() const { return m_pageLayoutFilterIdx; }
+	
+	int getOutputFilterIdx() const { return m_outputFilterIdx; }
 	
 	virtual int rowCount(QModelIndex const& parent) const;
 	
@@ -111,13 +116,13 @@ private:
 	std::vector<FilterPtr> m_filters;
 	int m_selectContentFilterIdx;
 	int m_pageLayoutFilterIdx;
+	int m_outputFilterIdx;
 };
 
 
 MainWindow::MainWindow(
 	std::vector<ImageFileInfo> const& files, QString const& out_dir)
 :	m_ptrPages(new PageSequence(files, PageSequence::AUTO_PAGES)),
-	m_frozenPages(PageSequence::IMAGE_VIEW),
 	m_outDir(out_dir),
 	m_ptrThumbnailCache(createThumbnailCache()),
 	m_ptrWorkerThread(new WorkerThread),
@@ -135,7 +140,6 @@ MainWindow::MainWindow(
 MainWindow::MainWindow(
 	QString const& project_file, ProjectReader const& project_reader)
 :	m_ptrPages(project_reader.pages()),
-	m_frozenPages(PageSequence::IMAGE_VIEW),
 	m_outDir(project_reader.outputDirectory()),
 	m_projectFile(project_file),
 	m_ptrThumbnailCache(createThumbnailCache()),
@@ -191,22 +195,14 @@ MainWindow::construct()
 	
 	m_ptrThumbSequence->attachView(thumbView);
 	
-	{
-		IntrusivePtr<CompositeCacheDrivenTask> const task(
+	m_ptrContentBoxPropagator.reset(
+		new ContentBoxPropagator(
+			m_ptrFilterListModel->getPageLayoutFilter(),
 			m_ptrFilterListModel->createCompositeCacheDrivenTask(
 				m_ptrFilterListModel->getSelectContentFilterIdx()
 			)
-		);
-		m_ptrContentBoxAggregator.reset(new ContentBoxAggregator(task));
-	}
-	{
-		IntrusivePtr<CompositeCacheDrivenTask> const task(
-			m_ptrFilterListModel->createCompositeCacheDrivenTask(
-				m_ptrFilterListModel->getPageLayoutFilterIdx()
-			)
-		);
-		m_ptrPageParamsAggregator.reset(new PageParamsAggregator(task));
-	}
+		)
+	);
 	
 	addAction(actionNextPage);
 	addAction(actionPrevPage);
@@ -221,7 +217,7 @@ MainWindow::construct()
 		QItemSelectionModel::SelectCurrent
 	);
 	
-	resetPageAndThumbSequences();
+	resetThumbSequence();
 	
 	connect(
 		filterList->selectionModel(),
@@ -277,10 +273,8 @@ MainWindow::construct()
 }
 
 void
-MainWindow::resetPageAndThumbSequences()
+MainWindow::resetThumbSequence()
 {
-	updateFrozenPages();
-	
 	IntrusivePtr<CompositeCacheDrivenTask> const task(
 		m_ptrFilterListModel->createCompositeCacheDrivenTask(m_curFilter)
 	);
@@ -293,7 +287,7 @@ MainWindow::resetPageAndThumbSequences()
 		)
 	);
 	
-	m_ptrThumbSequence->reset(m_frozenPages);
+	m_ptrThumbSequence->reset(m_ptrPages->snapshot(getCurrentView()));
 }
 
 void
@@ -412,7 +406,7 @@ MainWindow::nextPage()
 	
 	int page_num = 0;
 	PageInfo const next_page(
-		m_ptrPages->setNextPage(m_frozenPages.view(), &page_num)
+		m_ptrPages->setNextPage(getCurrentView(), &page_num)
 	);
 	m_ptrThumbSequence->setCurrentThumbnail(next_page.id());
 	loadImage(next_page, page_num);
@@ -427,7 +421,7 @@ MainWindow::prevPage()
 	
 	int page_num = 0;
 	PageInfo const prev_page(
-		m_ptrPages->setPrevPage(m_frozenPages.view(), &page_num)
+		m_ptrPages->setPrevPage(getCurrentView(), &page_num)
 	);
 	m_ptrThumbSequence->setCurrentThumbnail(prev_page.id());
 	loadImage(prev_page, page_num);
@@ -475,20 +469,12 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	
 	if (!was_below_select_content && now_below_select_content) {
 		// IMPORTANT: this needs to go before resetting thumbnails,
-		// because it may affect them.  The reason it may affect
-		// thumbnails is that besides collecting page parameters,
-		// this task propagates content rectangles from
-		// "Select Content" to "Page Layout" filters, which may
-		// change the aggregate page size.
-		m_ptrPageParamsAggregator->aggregate(*m_ptrPages);
+		// because it may affect them.
+		m_ptrContentBoxPropagator->propagate(*m_ptrPages);
 	}
 	
-	resetPageAndThumbSequences();
-	/*
-	if (!was_below_select_content && now_below_select_content) {
-		m_ptrContentBoxAggregator->aggregate(*m_ptrPages);
-	}
-	*/
+	resetThumbSequence();
+	
 	updateBatchProcessingActions();
 	
 	loadImage();
@@ -515,8 +501,7 @@ MainWindow::startBatchProcessing()
 	
 	splitter->widget(0)->setVisible(false);
 	
-	PageInfo const page_info(m_frozenPages.pageAt(0));
-	m_ptrPages->setCurPage(page_info.id());
+	PageInfo const page_info(m_ptrPages->setFirstPage(getCurrentView()));
 	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
 	loadImage();
 }
@@ -545,7 +530,7 @@ MainWindow::stopBatchProcessing()
 	// currently being processed, but the one that has been processed
 	// before that.
 	int page_num = 0;
-	PageInfo const page_info(m_ptrPages->curPage(m_frozenPages.view(), &page_num));
+	PageInfo const page_info(m_ptrPages->curPage(getCurrentView(), &page_num));
 	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
 	loadImage(page_info, page_num);
 }
@@ -554,8 +539,6 @@ void
 MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result)
 {
 	if (task != m_ptrCurTask || task->isCancelled()) {
-		// The page sequence may still have changed.
-		updateFrozenPages();
 		return;
 	}
 	
@@ -576,7 +559,6 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		}
 	}
 	
-	updateFrozenPages(); // Must be done after m_curFilter is modified.
 	result->updateUI(this);
 	
 	if (m_batchProcessing) {
@@ -584,16 +566,18 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		// after it has been processed, not before.  Otherwise selected
 		// thumbnail will always be an unprocessed one, with the
 		// question mark on it.
-		m_ptrThumbSequence->setCurrentThumbnail(m_frozenPages.curPage().id());
+		PageInfo const cur_page(m_ptrPages->curPage(getCurrentView()));
+		m_ptrThumbSequence->setCurrentThumbnail(cur_page.id());
 		
-		if (m_frozenPages.curPageIdx() == m_frozenPages.numPages() - 1) {
+		int page_num = 0;
+		PageInfo const next_page(
+			m_ptrPages->setNextPage(getCurrentView(), &page_num)
+		);
+		
+		if (next_page.id() == cur_page.id()) {
 			stopBatchProcessing();
 		} else {
-			int page_num = 0;
-			PageInfo const page_info(
-				m_ptrPages->setNextPage(m_frozenPages.view(), &page_num)
-			);
-			loadImage(page_info, page_num);
+			loadImage(next_page, page_num);
 		}
 	}
 }
@@ -664,12 +648,10 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 void
 MainWindow::updateBatchProcessingActions()
 {
-#if 0
-	bool const ok = !isBelowSelectContent()
-		|| !m_ptrContentBoxAggregator->haveUndefinedItems();
-#else
-	bool const ok = true;
-#endif
+	bool const ok = !isOutputFilter() &&
+		!m_ptrFilterListModel->getPageLayoutFilter()
+		->checkReadyForOutput(*m_ptrPages);
+	
 	actionStartBatchProcessing->setEnabled(ok && !m_batchProcessing);
 	actionStopBatchProcessing->setEnabled(ok && m_batchProcessing);
 }
@@ -686,12 +668,30 @@ MainWindow::isBelowSelectContent(int const filter_idx) const
 	return (filter_idx > m_ptrFilterListModel->getSelectContentFilterIdx());
 }
 
+bool
+MainWindow::isOutputFilter() const
+{
+	return isOutputFilter(m_curFilter);
+}
+
+bool
+MainWindow::isOutputFilter(int const filter_idx) const
+{
+	return (filter_idx == m_ptrFilterListModel->getOutputFilterIdx());
+}
+
+PageSequence::View
+MainWindow::getCurrentView() const
+{
+	return m_ptrFilterListModel->getFilter(m_curFilter)->getView();
+}
+
 void
 MainWindow::loadImage()
 {
 	int page_num = 0;
 	PageInfo const page_info(
-		m_ptrPages->curPage(m_frozenPages.view(), &page_num)
+		m_ptrPages->curPage(getCurrentView(), &page_num)
 	);
 	loadImage(page_info, page_num);
 }
@@ -702,17 +702,18 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 	removeWidgetsFromLayout(m_pImageFrameLayout, false);
 	m_ptrTabbedDebugImages->clear();
 	m_imageWidgetCleanup.clear();
-#if 0
-	if (isBelowSelectContent() && m_ptrContentBoxAggregator->haveUndefinedItems()) {
+	
+	if (isOutputFilter() &&
+			!m_ptrFilterListModel->getPageLayoutFilter()
+			->checkReadyForOutput(*m_ptrPages)) {
 		QString const err_text(
-			tr("You have to process all pages with the"
-			" \"Select Content\" filter first.")
+			tr("You can't output pages yet.\nFirst you need to process"
+			" all of them with the \"Page Layout\" filter.")
 		);
 		setOptionsWidget(new FilterOptionsWidget, TRANSFER_OWNERSHIP);
 		setImageWidget(new ErrorWidget(err_text), TRANSFER_OWNERSHIP);
 		return;
 	}
-#endif
 	
 	m_ptrFilterListModel->getFilter(m_curFilter)->preUpdateUI(this, page.id());
 	
@@ -727,13 +728,6 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 	if (m_ptrCurTask) {
 		m_ptrWorkerThread->performTask(m_ptrCurTask);
 	}
-}
-
-void
-MainWindow::updateFrozenPages()
-{
-	FilterPtr const& filter = m_ptrFilterListModel->getFilter(m_curFilter);
-	m_frozenPages = m_ptrPages->snapshot(filter->getView());
 }
 
 void
@@ -790,6 +784,7 @@ MainWindow::FilterListModel::FilterListModel(
 	m_pageLayoutFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrPageLayoutFilter);
 	
+	m_outputFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrOutputFilter);
 }
 

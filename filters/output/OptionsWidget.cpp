@@ -20,7 +20,6 @@
 #include "ChangeDpiDialog.h"
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
-#include "Dpi.h"
 #include <QVariant>
 #include <QColorDialog>
 #include <QIcon>
@@ -44,11 +43,10 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	colorModeSelector->addItem(tr("Bitonal"), ColorParams::BITONAL);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	
-	// FIXME: by doing this, we put a fake entry into m_ptrSettings!
-	colorModeChanged(colorModeSelector->currentIndex());
-	
 	thresholdSelector->addItem(QString::fromAscii("Otsu"), ColorParams::OTSU);
 	thresholdSelector->addItem(QString::fromAscii("Sauvola"), ColorParams::SAUVOLA);
+	
+	updateColorsDisplay();
 	
 	connect(
 		changeDpiButton, SIGNAL(clicked()),
@@ -84,8 +82,9 @@ void
 OptionsWidget::preUpdateUI(PageId const& page_id)
 {
 	m_pageId = page_id;
+	m_dpi = m_ptrSettings->getDpi(page_id);
 	m_colorParams = m_ptrSettings->getColorParams(page_id);
-	updateDpiDisplay(m_ptrSettings->getDpi(page_id));
+	updateDpiDisplay();
 	updateColorsDisplay();
 	setEnabled(false);
 }
@@ -104,15 +103,10 @@ OptionsWidget::colorModeChanged(int const idx)
 	m_colorParams.setColorMode((ColorParams::ColorMode)mode);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	
+	updateColorsDisplay();
+	
 	switch (mode) {
 		case ColorParams::BLACK_AND_WHITE:
-			bitonalOptionsWidget->setVisible(true);
-			lightColorButton->setEnabled(false);
-			darkColorButton->setEnabled(false);
-			m_lightColorPixmap.fill(Qt::white);
-			m_darkColorPixmap.fill(Qt::black);
-			lightColorButton->setIcon(createIcon(m_lightColorPixmap));
-			darkColorButton->setIcon(createIcon(m_darkColorPixmap));
 			if (old_mode == ColorParams::BITONAL) {
 				emit tonesChanged(Qt::white, Qt::black);
 			} else {
@@ -120,13 +114,6 @@ OptionsWidget::colorModeChanged(int const idx)
 			}
 			break;
 		case ColorParams::BITONAL:
-			bitonalOptionsWidget->setVisible(true);
-			lightColorButton->setEnabled(true);
-			darkColorButton->setEnabled(true);
-			m_lightColorPixmap.fill(m_colorParams.lightColor());
-			m_darkColorPixmap.fill(m_colorParams.darkColor());
-			lightColorButton->setIcon(createIcon(m_lightColorPixmap));
-			darkColorButton->setIcon(createIcon(m_darkColorPixmap));
 			if (old_mode == ColorParams::BLACK_AND_WHITE) {
 				emit tonesChanged(
 					m_colorParams.lightColor(),
@@ -136,7 +123,6 @@ OptionsWidget::colorModeChanged(int const idx)
 			}
 			break;
 		case ColorParams::COLOR_GRAYSCALE:
-			bitonalOptionsWidget->setVisible(false);
 			emit reloadRequested();
 			break;
 	}
@@ -154,7 +140,7 @@ OptionsWidget::thresholdModeChanged(int const idx)
 void
 OptionsWidget::changeDpiButtonClicked()
 {
-	ChangeDpiDialog* dialog = new ChangeDpiDialog(this);
+	ChangeDpiDialog* dialog = new ChangeDpiDialog(this, m_dpi);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
 		dialog, SIGNAL(accepted(Dpi const&, Scope)),
@@ -178,7 +164,8 @@ OptionsWidget::applyColorsButtonClicked()
 void
 OptionsWidget::dpiChanged(Dpi const& dpi, Scope const scope)
 {
-	updateDpiDisplay(dpi);
+	m_dpi = dpi;
+	updateDpiDisplay();
 	
 	if (scope == THIS_PAGE_ONLY) {
 		m_ptrSettings->setDpi(m_pageId, dpi);
@@ -245,11 +232,11 @@ OptionsWidget::createIcon(QPixmap const& pixmap)
 }
 
 void
-OptionsWidget::updateDpiDisplay(Dpi const& dpi)
+OptionsWidget::updateDpiDisplay()
 {
 	dpiLabel->setText(
 		QString::fromAscii("%1 x %2")
-		.arg(dpi.horizontal()).arg(dpi.vertical())
+		.arg(m_dpi.horizontal()).arg(m_dpi.vertical())
 	);
 }
 

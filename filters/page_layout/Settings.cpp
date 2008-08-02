@@ -18,6 +18,7 @@
 
 #include "Settings.h"
 #include "PageId.h"
+#include "PageSequence.h"
 #include "Params.h"
 #include "Margins.h"
 #include "Alignment.h"
@@ -30,6 +31,7 @@
 #include <boost/multi_index/mem_fun.hpp>
 #include <algorithm>
 #include <functional> // for std::greater<>
+#include <stddef.h>
 
 using namespace ::boost;
 using namespace ::boost::multi_index;
@@ -103,6 +105,8 @@ public:
 	
 	void clear();
 	
+	bool checkEverythingDefined(PageSequenceSnapshot const& pages) const;
+	
 	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
 	
 	void setPageParams(PageId const& page_id, Params const& params);
@@ -120,6 +124,8 @@ public:
 	
 	AggregateSizeChanged setContentSizeMM(
 		PageId const& page_id, QSizeF const& content_size_mm);
+	
+	void invalidateContentSize(PageId const& page_id);
 	
 	QSizeF getAggregateHardSizeMM() const;
 	
@@ -159,7 +165,7 @@ private:
 	Container m_items;
 	DescWidthOrder& m_descWidthOrder;
 	DescHeightOrder& m_descHeightOrder;
-	QSizeF const m_zeroSize;
+	QSizeF const m_invalidSize;
 	Margins const m_defaultHardMarginsMM;
 	Alignment const m_defaultAlignment;
 };
@@ -180,6 +186,12 @@ void
 Settings::clear()
 {
 	return m_ptrImpl->clear();
+}
+
+bool
+Settings::checkEverythingDefined(PageSequenceSnapshot const& pages) const
+{
+	return m_ptrImpl->checkEverythingDefined(pages);
 }
 
 std::auto_ptr<Params>
@@ -230,6 +242,12 @@ Settings::setContentSizeMM(
 	PageId const& page_id, QSizeF const& content_size_mm)
 {
 	return m_ptrImpl->setContentSizeMM(page_id, content_size_mm);
+}
+
+void
+Settings::invalidateContentSize(PageId const& page_id)
+{
+	return m_ptrImpl->invalidateContentSize(page_id);
 }
 
 QSizeF
@@ -289,7 +307,7 @@ Settings::Impl::Impl()
 :	m_items(),
 	m_descWidthOrder(m_items.get<DescWidthTag>()),
 	m_descHeightOrder(m_items.get<DescHeightTag>()),
-	m_zeroSize(0.0, 0.0),
+	m_invalidSize(),
 	m_defaultHardMarginsMM(10.0, 5.0, 10.0, 5.0),
 	m_defaultAlignment(Alignment::VCENTER, Alignment::HCENTER)
 {
@@ -304,6 +322,23 @@ Settings::Impl::clear()
 {
 	QMutexLocker const locker(&m_mutex);
 	m_items.clear();
+}
+
+bool
+Settings::Impl::checkEverythingDefined(PageSequenceSnapshot const& pages) const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	size_t const num_pages = pages.numPages();
+	for (size_t i = 0; i < num_pages; ++i) {
+		PageInfo const& page_info = pages.pageAt(i);
+		Container::iterator const it(m_items.find(page_info.id()));
+		if (it == m_items.end() || !it->contentSizeMM.isValid()) {
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 std::auto_ptr<Params>
@@ -385,7 +420,7 @@ Settings::Impl::setHardMarginsMM(
 	Container::iterator const it(m_items.lower_bound(page_id));
 	if (it == m_items.end() || page_id < it->pageId) {
 		Item const item(
-			page_id, margins_mm, m_zeroSize, m_defaultAlignment
+			page_id, margins_mm, m_invalidSize, m_defaultAlignment
 		);
 		m_items.insert(it, item);
 	} else {
@@ -415,7 +450,7 @@ Settings::Impl::setPageAlignment(
 	Container::iterator const it(m_items.lower_bound(page_id));
 	if (it == m_items.end() || page_id < it->pageId) {
 		Item const item(
-			page_id, m_defaultHardMarginsMM, m_zeroSize, alignment
+			page_id, m_defaultHardMarginsMM, m_invalidSize, alignment
 		);
 		m_items.insert(it, item);
 	} else {
@@ -447,6 +482,17 @@ Settings::Impl::setContentSizeMM(
 		return AGGREGATE_SIZE_UNCHANGED;
 	} else {
 		return AGGREGATE_SIZE_CHANGED;
+	}
+}
+
+void
+Settings::Impl::invalidateContentSize(PageId const& page_id)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	Container::iterator const it(m_items.find(page_id));
+	if (it != m_items.end()) {
+		m_items.modify(it, ModifyContentSize(m_invalidSize));
 	}
 }
 

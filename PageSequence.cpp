@@ -242,6 +242,42 @@ PageSequence::curPage(View const view, int* page_num) const
 }
 
 PageInfo
+PageSequence::setFirstPage(View const view)
+{
+	PageInfo info;
+	bool was_modified = false;
+	
+	do {
+		QMutexLocker const locker(&m_mutex);
+		
+		if (m_images.empty()) {
+			break;
+		}
+		
+		if (m_curImage != 0 || m_curLogicalPage != 0 || m_curSubPage != 0) {
+			m_curImage = 0;
+			m_curLogicalPage = 0;
+			m_curSubPage = 0;
+			was_modified = true;
+		}
+		
+		ImageDesc const& image = m_images[0];
+		
+		PageId const id(image.id, curSubPageLocked(image, view));
+		info = PageInfo(
+			id, image.metadata,
+			image.multiPageFile, image.numLogicalPages
+		);
+	} while (false);
+	
+	if (was_modified) {
+		emit modified();
+	}
+	
+	return info;
+}
+
+PageInfo
 PageSequence::setPrevPage(View const view, int* page_num)
 {
 	PageInfo info;

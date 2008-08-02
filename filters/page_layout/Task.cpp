@@ -48,7 +48,7 @@ public:
 		PageId const& page_id,
 		QImage const& image,
 		ImageTransformation const& xform,
-		QRectF const& content_rect,
+		QRectF const& adapted_content_rect,
 		Settings::AggregateSizeChanged const agg_size_changed,
 		bool batch);
 	
@@ -61,7 +61,7 @@ private:
 	PageId m_pageId;
 	QImage m_image;
 	ImageTransformation m_xform;
-	QRectF m_contentRect;
+	QRectF m_adaptedContentRect;
 	Settings::AggregateSizeChanged m_aggSizeChanged;
 	bool m_batchProcessing;
 };
@@ -100,11 +100,14 @@ Task::process(
 		)
 	);
 	
-	QPolygonF const content_rect_phys(
-		data.xform().transformBack().map(content_rect)
+	QRectF const adapted_content_rect(
+		Utils::adaptContentRect(data.xform(), content_rect)
 	);
 	
 	if (m_ptrNextTask) {
+		QPolygonF const content_rect_phys(
+			data.xform().transformBack().map(adapted_content_rect)
+		);
 		QPolygonF const page_rect_phys(
 			Utils::calcPageRectPhys(
 				data.xform(), content_rect_phys,
@@ -119,7 +122,7 @@ Task::process(
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_pageId,
-				data.image(), data.xform(), content_rect,
+				data.image(), data.xform(), adapted_content_rect,
 				agg_size_changed, m_batchProcessing
 			)
 		);
@@ -134,7 +137,7 @@ Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Settings> const& settings,
 	PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect,
+	QRectF const& adapted_content_rect,
 	Settings::AggregateSizeChanged const agg_size_changed,
 	bool const batch)
 :	m_ptrFilter(filter),
@@ -142,7 +145,7 @@ Task::UiUpdater::UiUpdater(
 	m_pageId(page_id),
 	m_image(image),
 	m_xform(xform),
-	m_contentRect(content_rect),
+	m_adaptedContentRect(adapted_content_rect),
 	m_aggSizeChanged(agg_size_changed),
 	m_batchProcessing(batch)
 {
@@ -169,7 +172,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	ImageView* view = new ImageView(
 		m_ptrSettings, m_pageId, m_image, m_xform,
-		m_contentRect, *opt_widget
+		m_adaptedContentRect, *opt_widget
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 	

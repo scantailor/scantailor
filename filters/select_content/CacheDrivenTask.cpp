@@ -24,8 +24,8 @@
 #include "PageInfo.h"
 #include "PageId.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
-#include "filter_dc/ContentBoxCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
+#include "filter_dc/ContentBoxCollector.h"
 #include "filters/page_layout/CacheDrivenTask.h"
 
 namespace select_content
@@ -67,8 +67,8 @@ CacheDrivenTask::process(
 		return;
 	}
 	
-	if (ContentBoxCollector* cbox_col = dynamic_cast<ContentBoxCollector*>(collector)) {
-		cbox_col->processContentBox(xform, params->contentRect());
+	if (ContentBoxCollector* col = dynamic_cast<ContentBoxCollector*>(collector)) {
+		col->process(xform, params->contentRect());
 	}
 	
 	if (m_ptrNextTask) {

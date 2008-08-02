@@ -28,7 +28,6 @@
 #include "filters/output/CacheDrivenTask.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
-#include "filter_dc/PageLayoutParamsCollector.h"
 #include <QSizeF>
 #include <QRectF>
 #include <QPolygonF>
@@ -54,31 +53,10 @@ CacheDrivenTask::process(
 	PageInfo const& page_info, AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform, QRectF const& content_rect)
 {
-	if (PageLayoutParamsCollector* plc = dynamic_cast<PageLayoutParamsCollector*>(collector)) {
-		/*
-		Here we perform two tasks:
-		1. Propagating content rect from "Select Content" to "Page Layout".
-		2. Collecting page parameters.
-		Note that we can't combine the first task with thumbnail
-		generation, because updating content rect may change the
-		aggregate content size, which will require to re-generate
-		all thumbnails.
-		*/
-		QSizeF const content_size_mm(
-			Utils::calcRectSizeMM(xform, content_rect)
-		);
-		Params const params(
-			m_ptrSettings->updateContentSizeAndGetParams(
-				page_info.id(), content_size_mm
-			)
-		);
-		plc->processPageParams(params);
-	}
-	
 	std::auto_ptr<Params> const params(
 		m_ptrSettings->getPageParams(page_info.id())
 	);
-	if (!params.get()) {
+	if (!params.get() || !params->contentSizeMM().isValid()) {
 		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(
