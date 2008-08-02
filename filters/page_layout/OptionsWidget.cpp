@@ -172,7 +172,10 @@ OptionsWidget::preUpdateUI(Margins const& margins_mm, Alignment const& alignment
 	
 	updateMarginsDisplay();
 	
+	alignWithOthersCB->blockSignals(true);
 	alignWithOthersCB->setChecked(!alignment.isNull());
+	alignWithOthersCB->blockSignals(false);
+	
 	enableDisableAlignmentButtons();
 	
 	m_leftRightLinked = true;
