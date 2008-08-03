@@ -29,6 +29,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTemporaryFile>
+#include <QAbstractFileEngine>
 #include <QString>
 #include <QChar>
 #include <QImage>
@@ -91,6 +92,8 @@ public:
 		completion_handler = 0);
 	
 	void ensureThumbnailExists(ImageId const& image_id, QImage const& image);
+	
+	void recreateThumbnail(ImageId const& image_id, QImage const& image);
 protected:
 	virtual void run();
 	
@@ -135,6 +138,8 @@ private:
 	
 	static QImage makeThumbnail(
 		QImage const& image, QSize const& max_thumb_size);
+	
+	static bool renameFile(QString const& from, QString const& to);
 	
 	void postLoadResult(
 		LoadQueue::iterator const& lq_it, QImage const& image,
@@ -268,6 +273,13 @@ ThumbnailPixmapCache::ensureThumbnailExists(
 	ImageId const& image_id, QImage const& image)
 {
 	m_ptrImpl->ensureThumbnailExists(image_id, image);
+}
+
+void
+ThumbnailPixmapCache::recreateThumbnail(
+	ImageId const& image_id, QImage const& image)
+{
+	m_ptrImpl->recreateThumbnail(image_id, image);
 }
 
 
@@ -422,6 +434,10 @@ void
 ThumbnailPixmapCache::Impl::ensureThumbnailExists(
 	ImageId const& image_id, QImage const& image)
 {
+	if (m_shuttingDown) {
+		return;
+	}
+	
 	if (image.isNull()) {
 		return;
 	}
@@ -444,11 +460,73 @@ ThumbnailPixmapCache::Impl::ensureThumbnailExists(
 	temp_file.setAutoRemove(true);
 	if (temp_file.open()) {
 		if (thumbnail.save(&temp_file, "PNG")) {
-			temp_file.close();
-			if (temp_file.rename(thumb_file_path)) {
+			if (renameFile(temp_file.fileName(), thumb_file_path)) {
 				temp_file.setAutoRemove(false);
 			}
 		}
+	}
+}
+
+void
+ThumbnailPixmapCache::Impl::recreateThumbnail(
+	ImageId const& image_id, QImage const& image)
+{
+	if (m_shuttingDown) {
+		return;
+	}
+	
+	if (image.isNull()) {
+		return;
+	}
+	
+	QMutexLocker locker(&m_mutex);
+	QString const thumb_dir(m_thumbDir);
+	QSize const max_thumb_size(m_maxThumbSize);
+	locker.unlock();
+	
+	QString const thumb_file_path(getThumbFilePath(image_id, thumb_dir));
+	QImage const thumbnail(makeThumbnail(image, max_thumb_size));
+	bool thumb_written = false;
+	
+	// To avoid concurrently writing to the same file, we write
+	// to a temporary file and then replace the original.
+	QTemporaryFile temp_file(thumb_file_path);
+	temp_file.setAutoRemove(true);
+	if (temp_file.open()) {
+		if (thumbnail.save(&temp_file, "PNG")) {
+			if (renameFile(temp_file.fileName(), thumb_file_path)) {
+				thumb_written = true;
+				temp_file.setAutoRemove(false);
+			}
+		}
+	}
+	
+	if (!thumb_written) {
+		return;
+	}
+	
+	QMutexLocker const locker2(&m_mutex);
+	
+	ItemsByKey::iterator const k_it(m_itemsByKey.find(image_id));
+	if (k_it == m_itemsByKey.end()) {
+		return;
+	}
+	
+	switch (k_it->status) {
+		case Item::LOADED:
+		case Item::LOAD_FAILED:
+			m_itemsByKey.erase(image_id);
+			break;
+		case Item::QUEUED:
+			break;
+		case Item::IN_PROGRESS:
+			// We have a small race condition in this case.
+			// We don't know if the other thread has already loaded
+			// the thumbnail or not.  In case it did, again we
+			// don't know if it loaded the old or new version.
+			// Well, let's just pretend the thumnail was loaded
+			// (or failed to load) before we wrote the new version.
+			break;
 	}
 }
 
@@ -623,6 +701,15 @@ ThumbnailPixmapCache::Impl::makeThumbnail(
 	);
 }
 
+bool
+ThumbnailPixmapCache::Impl::renameFile(QString const& from, QString const& to)
+{
+	// We can't use QFile::rename(), because it doesn't overwrite existing files.
+	std::auto_ptr<QAbstractFileEngine> const engine(
+		QAbstractFileEngine::create(from)
+	);
+	return engine->rename(to);
+}
 
 void
 ThumbnailPixmapCache::Impl::postLoadResult(

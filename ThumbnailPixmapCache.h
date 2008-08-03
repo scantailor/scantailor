@@ -127,6 +127,16 @@ public:
 	 * \note This function may be called from any thread, even concurrently.
 	 */
 	void ensureThumbnailExists(ImageId const& image_id, QImage const& image);
+	
+	/**
+	 * \brief Re-create and replace the existing thumnail.
+	 *
+	 * \param image_id The identifier of the full size image and its thumbnail.
+	 * \param image The full-size image or a thumbnail.
+	 *
+	 * \note This function may be called from any thread, even concurrently.
+	 */
+	void recreateThumbnail(ImageId const& image_id, QImage const& image);
 private:
 	typedef boost::signal<void (ThumbnailLoadResult const&)> CompletionSignal;
 	
