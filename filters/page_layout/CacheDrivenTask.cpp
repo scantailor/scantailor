@@ -72,9 +72,13 @@ CacheDrivenTask::process(
 		return;
 	}
 	
+	QRectF const adapted_content_rect(
+		Utils::adaptContentRect(xform, content_rect)
+	);
+	
 	if (m_ptrNextTask) {
 		QPolygonF const content_rect_phys(
-			xform.transformBack().map(content_rect)
+			xform.transformBack().map(adapted_content_rect)
 		);
 		QPolygonF const page_rect_phys(
 			Utils::calcPageRectPhys(
@@ -97,7 +101,7 @@ CacheDrivenTask::process(
 					thumb_col->thumbnailCache(),
 					thumb_col->maxLogicalThumbSize(),
 					page_info.imageId(), xform,
-					*params, content_rect,
+					*params, adapted_content_rect,
 					m_ptrSettings->getAggregateHardSizeMM()
 				)
 			)

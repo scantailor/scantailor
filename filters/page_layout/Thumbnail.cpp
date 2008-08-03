@@ -35,11 +35,11 @@ namespace page_layout
 Thumbnail::Thumbnail(
 	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 	ImageId const& image_id, ImageTransformation const& xform,
-	Params const& params, QRectF const& content_rect,
+	Params const& params, QRectF const& adapted_content_rect,
 	QSizeF const& aggregate_hard_size_mm)
 :	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
 	m_params(params),
-	m_contentRect(Utils::adaptContentRect(xform, content_rect)),
+	m_adaptedContentRect(adapted_content_rect),
 	m_aggregateHardSizeMM(aggregate_hard_size_mm),
 	m_origXform(xform),
 	m_physXform(xform.origDpi()),
@@ -69,7 +69,7 @@ Thumbnail::paintOverImage(
 	painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
 	
 	QRectF content_rect(
-		(orig_to_presentation * imageToThumb()).mapRect(m_contentRect)
+		(orig_to_presentation * imageToThumb()).mapRect(m_adaptedContentRect)
 	);
 	
 	// Adjust to compensate for pen width.
@@ -86,7 +86,7 @@ Thumbnail::paintOverImage(
 void
 Thumbnail::recalcBoxesAndPresentationTransform()
 {
-	QPolygonF poly_mm(m_origToMM.map(m_contentRect));
+	QPolygonF poly_mm(m_origToMM.map(m_adaptedContentRect));
 	Utils::extendPolyRectWithMargins(poly_mm, m_params.hardMarginsMM());
 	
 	//QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());

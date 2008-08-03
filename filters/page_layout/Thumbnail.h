@@ -38,7 +38,7 @@ class Thumbnail : public ThumbnailBase
 public:
 	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 		ImageId const& image_id, ImageTransformation const& xform,
-		Params const& params, QRectF const& content_rect,
+		Params const& params, QRectF const& adapted_content_rect,
 		QSizeF const& aggregate_hard_size_mm);
 	
 	virtual void paintOverImage(
@@ -49,7 +49,7 @@ private:
 	void recalcBoxesAndPresentationTransform();
 	
 	Params const m_params;
-	QRectF const m_contentRect; /**< In m_origXform coortinates. */
+	QRectF const m_adaptedContentRect; /**< In m_origXform coortinates. */
 	QSizeF const m_aggregateHardSizeMM;
 	
 	
