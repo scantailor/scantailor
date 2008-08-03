@@ -41,6 +41,8 @@ ImageTransformation::preScaleToDpi(Dpi const& dpi)
 		return;
 	}
 	
+	m_preScaledDpi = dpi;
+	
 	double const xscale = (double)dpi.horizontal() / m_origDpi.horizontal();
 	double const yscale = (double)dpi.vertical() / m_origDpi.vertical();
 	

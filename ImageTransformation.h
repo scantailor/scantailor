@@ -76,6 +76,14 @@ public:
 	Dpi const& origDpi() const { return m_origDpi; }
 	
 	/**
+	 * \brief Get the target DPI for pre-scaling.
+	 *
+	 * Note that if the original DPI was assymetric, pre-scaling to
+	 * a symmetric DPI will be applied implicitly.
+	 */
+	Dpi const& preScaledDpi() const { return m_preScaledDpi; }
+	
+	/**
 	 * \brief Set the 2nd step transformation, resetting the following ones.
 	 *
 	 * \see \ref transformations Transformations.
@@ -182,6 +190,7 @@ private:
 	QPolygonF m_cropArea;
 	QPolygonF m_resultingCropArea;
 	Dpi m_origDpi;
+	Dpi m_preScaledDpi;
 	OrthogonalRotation m_preRotation;
 };
 
