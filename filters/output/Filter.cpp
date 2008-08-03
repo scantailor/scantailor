@@ -147,20 +147,22 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 IntrusivePtr<Task>
 Filter::createTask(
 	PageId const& page_id, int const page_num,
-	QString const& out_dir, bool const batch, bool const debug)
+	QString const& out_dir, ThumbnailPixmapCache& thumbnail_cache,
+	bool const batch, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
-			page_id, page_num, out_dir, batch, debug
+			thumbnail_cache, page_id, page_num, out_dir,
+			batch, debug
 		)
 	);
 }
 
 IntrusivePtr<CacheDrivenTask>
-Filter::createCacheDrivenTask()
+Filter::createCacheDrivenTask(QString const& out_dir)
 {
-	return IntrusivePtr<CacheDrivenTask>(new CacheDrivenTask);
+	return IntrusivePtr<CacheDrivenTask>(new CacheDrivenTask(out_dir));
 }
 
 } // namespace output

@@ -55,10 +55,11 @@ ThumbnailFactory::~ThumbnailFactory()
 }
 
 std::auto_ptr<QGraphicsItem>
-ThumbnailFactory::get(PageInfo const& page_info)
+ThumbnailFactory::get(
+	PageInfo const& page_info, int const page_num)
 {
 	Collector collector(m_rPixmapCache, m_maxSize);
-	m_ptrTask->process(page_info, &collector);
+	m_ptrTask->process(page_info, page_num, &collector);
 	return collector.retrieveThumbnail();
 }
 

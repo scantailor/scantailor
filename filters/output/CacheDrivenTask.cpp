@@ -17,18 +17,22 @@
 */
 
 #include "CacheDrivenTask.h"
+#include "Thumbnail.h"
 #include "IncompleteThumbnail.h"
 #include "ImageTransformation.h"
+#include "OrthogonalRotation.h"
 #include "PageInfo.h"
 #include "PageId.h"
+#include "ImageId.h"
+#include "Utils.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
-#include <QPolygonF>
 
 namespace output
 {
 
-CacheDrivenTask::CacheDrivenTask()
+CacheDrivenTask::CacheDrivenTask(QString const& out_dir)
+:	m_outDir(out_dir)
 {
 }
 
@@ -38,12 +42,13 @@ CacheDrivenTask::~CacheDrivenTask()
 
 void
 CacheDrivenTask::process(
-	PageInfo const& page_info, AbstractFilterDataCollector* collector,
+	PageInfo const& page_info, int const page_num,
+	AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform,
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
-		
+#if 0
 		thumb_col->processThumbnail(
 			std::auto_ptr<QGraphicsItem>(
 				new IncompleteThumbnail(
@@ -53,6 +58,25 @@ CacheDrivenTask::process(
 				)
 			)
 		);
+#else
+		QString const out_path(
+			Utils::outFilePath(page_info.id(), page_num, m_outDir)
+		);
+		
+		ImageTransformation out_xform(xform);
+		// This resets all transforms.
+		out_xform.setPreRotation(OrthogonalRotation());
+		
+		thumb_col->processThumbnail(
+			std::auto_ptr<QGraphicsItem>(
+				new Thumbnail(
+					thumb_col->thumbnailCache(),
+					thumb_col->maxLogicalThumbSize(),
+					ImageId(out_path), out_xform
+				)
+			)
+		);
+#endif
 	}
 }
 

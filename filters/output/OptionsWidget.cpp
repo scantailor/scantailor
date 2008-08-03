@@ -45,6 +45,7 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	
 	thresholdSelector->addItem(QString::fromAscii("Otsu"), ColorParams::OTSU);
 	thresholdSelector->addItem(QString::fromAscii("Sauvola"), ColorParams::SAUVOLA);
+	thresholdSelector->addItem(QString::fromAscii("Wolf"), ColorParams::WOLF);
 	
 	updateColorsDisplay();
 	

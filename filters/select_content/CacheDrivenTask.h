@@ -48,7 +48,8 @@ public:
 	virtual ~CacheDrivenTask();
 	
 	void process(
-		PageInfo const& page_info, AbstractFilterDataCollector* collector,
+		PageInfo const& page_info, int page_num,
+		AbstractFilterDataCollector* collector,
 		ImageTransformation const& xform);
 private:
 	IntrusivePtr<Settings> m_ptrSettings;

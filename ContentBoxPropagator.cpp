@@ -67,7 +67,7 @@ ContentBoxPropagator::propagate(PageSequence const& pages)
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page_info = snapshot.pageAt(i);
 		Collector collector;
-		m_ptrTask->process(page_info, &collector);
+		m_ptrTask->process(page_info, i, &collector);
 		if (collector.collected()) {
 			m_ptrPageLayoutFilter->setContentBox(
 				page_info.id(), collector.xform(),

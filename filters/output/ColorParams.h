@@ -28,7 +28,7 @@ class ColorParams
 {
 public:
 	enum ColorMode { BLACK_AND_WHITE, BITONAL, COLOR_GRAYSCALE };
-	enum ThresholdMode { OTSU, SAUVOLA };
+	enum ThresholdMode { OTSU, SAUVOLA, WOLF };
 	
 	ColorParams() : m_lightColor(0xFFFFFFFF), m_darkColor(0xFF000000),
 	m_colorMode(BLACK_AND_WHITE), m_thresholdMode(OTSU) {}

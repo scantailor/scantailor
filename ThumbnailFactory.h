@@ -40,7 +40,7 @@ public:
 	
 	virtual ~ThumbnailFactory();
 	
-	std::auto_ptr<QGraphicsItem> get(PageInfo const& page_info);
+	std::auto_ptr<QGraphicsItem> get(PageInfo const& page_info, int page_num);
 private:
 	class Collector;
 	

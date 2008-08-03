@@ -16,26 +16,35 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_THRESHOLDTYPE_H_
-#define OUTPUT_THRESHOLDTYPE_H_
+#include "Utils.h"
+#include "PageId.h"
+#include <QString>
+#include <QFileInfo>
 
 namespace output
 {
 
-class ThresholdType
+QString
+Utils::outFilePath(
+	PageId const& page_id, int const page_num, QString const& out_dir)
 {
-public:
-	enum Method { OTSU, SAUVOLA, WOLF };
+	QString const base_file_name(
+		QFileInfo(page_id.imageId().filePath()).completeBaseName()
+	);
 	
-	ThresholdType() : m_method(OTSU) {}
+	QString const padded_number(
+		QString::fromAscii("%1").arg(
+			QString::number(page_num + 1), 4, QChar('0')
+		)
+	);
 	
-	Method method() const { return m_method; }
+	QString const out_path(
+		QString::fromAscii("%1/%2_%3.png").arg(
+			out_dir, padded_number, base_file_name
+		)
+	);
 	
-	void setMethod(Method method) { m_method = method; }
-private:
-	Method m_method;
-};
+	return out_path;
+}
 
 } // namespace output
-
-#endif

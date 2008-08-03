@@ -30,7 +30,8 @@ public:
 	virtual ~CompositeCacheDrivenTask() {}
 	
 	virtual void process(
-		PageInfo const& page_info, AbstractFilterDataCollector* collector) = 0;
+		PageInfo const& page_info, int page_num,
+		AbstractFilterDataCollector* collector) = 0;
 };
 
 #endif

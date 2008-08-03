@@ -25,6 +25,7 @@
 #include "FilterResult.h"
 
 class PageId;
+class ThumbnailPixmapCache;
 class QString;
 
 namespace output
@@ -57,9 +58,12 @@ public:
 	
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id, int page_num,
-		QString const& out_dir, bool batch, bool debug);
+		QString const& out_dir,
+		ThumbnailPixmapCache& thumbnail_cache,
+		bool batch, bool debug);
 	
-	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask();
+	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
+		QString const& out_dir);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

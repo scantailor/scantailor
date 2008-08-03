@@ -104,6 +104,11 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 				transformed, calcLocalWindowSize(m_dpi)
 			);
 			break;
+		case ColorParams::WOLF:
+			bin_img = binarizeWolf(
+				transformed, calcLocalWindowSize(m_dpi)
+			);
+			break;
 	}
 	assert(!bin_img.isNull());
 	
@@ -315,7 +320,7 @@ OutputGenerator::hitMissReplaceAllDirections(
 QSize
 OutputGenerator::calcLocalWindowSize(Dpi const& dpi)
 {
-	QSizeF const size_mm(20, 20);
+	QSizeF const size_mm(15, 15);
 	QSizeF const size_inch(size_mm * constants::MM2INCH);
 	QSizeF const size_pixels_f(
 		dpi.horizontal() * size_inch.width(),

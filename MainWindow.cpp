@@ -91,7 +91,7 @@ public:
 		bool batch_processing, bool debug);
 	
 	IntrusivePtr<CompositeCacheDrivenTask>
-	createCompositeCacheDrivenTask(int last_filter_idx);
+	createCompositeCacheDrivenTask(QString const& out_dir, int last_filter_idx);
 	
 	IntrusivePtr<page_layout::Filter> const& getPageLayoutFilter() const {
 		return m_ptrPageLayoutFilter;
@@ -199,6 +199,7 @@ MainWindow::construct()
 		new ContentBoxPropagator(
 			m_ptrFilterListModel->getPageLayoutFilter(),
 			m_ptrFilterListModel->createCompositeCacheDrivenTask(
+				m_outDir,
 				m_ptrFilterListModel->getSelectContentFilterIdx()
 			)
 		)
@@ -276,7 +277,9 @@ void
 MainWindow::resetThumbSequence()
 {
 	IntrusivePtr<CompositeCacheDrivenTask> const task(
-		m_ptrFilterListModel->createCompositeCacheDrivenTask(m_curFilter)
+		m_ptrFilterListModel->createCompositeCacheDrivenTask(
+			m_outDir, m_curFilter
+		)
 	);
 	
 	m_ptrThumbSequence->setThumbnailFactory(
@@ -648,8 +651,8 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 void
 MainWindow::updateBatchProcessingActions()
 {
-	bool const ok = !isOutputFilter() &&
-		!m_ptrFilterListModel->getPageLayoutFilter()
+	bool const ok = !isOutputFilter() ||
+		m_ptrFilterListModel->getPageLayoutFilter()
 		->checkReadyForOutput(*m_ptrPages);
 	
 	actionStartBatchProcessing->setEnabled(ok && !m_batchProcessing);
@@ -828,7 +831,8 @@ MainWindow::FilterListModel::createCompositeTask(
 	switch (last_filter_idx) {
 	case 5:
 		output_task = m_ptrOutputFilter->createTask(
-			page.id(), page_num, out_dir, batch_processing, debug
+			page.id(), page_num, out_dir,
+			thumbnail_cache, batch_processing, debug
 		);
 	case 4:
 		page_layout_task = m_ptrPageLayoutFilter->createTask(
@@ -859,7 +863,8 @@ MainWindow::FilterListModel::createCompositeTask(
 }
 
 IntrusivePtr<CompositeCacheDrivenTask>
-MainWindow::FilterListModel::createCompositeCacheDrivenTask(int const last_filter_idx)
+MainWindow::FilterListModel::createCompositeCacheDrivenTask(
+	QString const& out_dir, int const last_filter_idx)
 {
 	IntrusivePtr<fix_orientation::CacheDrivenTask> fix_orientation_task;
 	IntrusivePtr<page_split::CacheDrivenTask> page_split_task;
@@ -870,7 +875,7 @@ MainWindow::FilterListModel::createCompositeCacheDrivenTask(int const last_filte
 	
 	switch (last_filter_idx) {
 	case 5:
-		output_task = m_ptrOutputFilter->createCacheDrivenTask();
+		output_task = m_ptrOutputFilter->createCacheDrivenTask(out_dir);
 	case 4:
 		page_layout_task = m_ptrPageLayoutFilter->createCacheDrivenTask(
 			output_task

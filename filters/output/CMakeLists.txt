@@ -17,10 +17,10 @@ SET(
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
 	OutputGenerator.cpp OutputGenerator.h
-	ColorParams.h
 	Settings.cpp Settings.h
-#	Thumbnail.cpp Thumbnail.h
-	Scope.h
+	Thumbnail.cpp Thumbnail.h
+	Utils.cpp Utils.h
+	ColorParams.h Scope.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

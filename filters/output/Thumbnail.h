@@ -16,47 +16,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_CACHEDRIVENTASK_H_
-#define PAGE_SPLIT_CACHEDRIVENTASK_H_
+#ifndef OUTPUT_THUMBNAIL_H_
+#define OUTPUT_THUMBNAIL_H_
 
-#include "NonCopyable.h"
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
+#include "ThumbnailBase.h"
 
-class QSizeF;
-class PageInfo;
-class AbstractFilterDataCollector;
+class ThumbnailPixmapCache;
 class ImageTransformation;
+class ImageId;
+class QSizeF;
 
-namespace deskew
-{
-	class CacheDrivenTask;
-}
-
-namespace page_split
+namespace output
 {
 
-class Settings;
-
-class CacheDrivenTask : public RefCountable
+class Thumbnail : public ThumbnailBase
 {
-	DECLARE_NON_COPYABLE(CacheDrivenTask)
 public:
-	CacheDrivenTask(
-		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<deskew::CacheDrivenTask> const& next_task);
-	
-	virtual ~CacheDrivenTask();
-	
-	void process(
-		PageInfo const& page_info, int page_num,
-		AbstractFilterDataCollector* collector,
-		ImageTransformation const& xform);
-private:
-	IntrusivePtr<deskew::CacheDrivenTask> m_ptrNextTask;
-	IntrusivePtr<Settings> m_ptrSettings;
+	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
+		ImageId const& image_id, ImageTransformation const& xform);
 };
 
-} // namespace page_split
+} // namespace output
 
 #endif

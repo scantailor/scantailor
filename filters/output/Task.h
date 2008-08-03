@@ -30,6 +30,7 @@
 class DebugImages;
 class TaskStatus;
 class FilterData;
+class ThumbnailPixmapCache;
 class ImageTransformation;
 class QPolygonF;
 class QSize;
@@ -53,6 +54,7 @@ class Task : public RefCountable
 public:
 	Task(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
+		ThumbnailPixmapCache& thumbnail_cache,
 		PageId const& page_id, int page_num,
 		QString const& out_dir, bool batch, bool debug);
 	
@@ -67,6 +69,7 @@ private:
 	
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
+	ThumbnailPixmapCache& m_rThumbnailCache;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;
 	QString m_outDir;

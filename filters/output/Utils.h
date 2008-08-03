@@ -16,44 +16,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_ORIENTATION_CACHEDRIVENTASK_H_
-#define FIX_ORIENTATION_CACHEDRIVENTASK_H_
+#ifndef OUTPUT_UTILS_H_
+#define OUTPUT_UTILS_H_
 
-#include "NonCopyable.h"
-#include "CompositeCacheDrivenTask.h"
-#include "IntrusivePtr.h"
+class PageId;
+class QString;
 
-class PageInfo;
-class AbstractFilterDataCollector;
-
-namespace page_split
-{
-	class CacheDrivenTask;
-}
-
-namespace fix_orientation
+namespace output
 {
 
-class Settings;
-
-class CacheDrivenTask : public CompositeCacheDrivenTask
+class Utils
 {
-	DECLARE_NON_COPYABLE(CacheDrivenTask)
 public:
-	CacheDrivenTask(
-		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<page_split::CacheDrivenTask> const& next_task);
-	
-	virtual ~CacheDrivenTask();
-	
-	virtual void process(
-		PageInfo const& page_info, int page_num,
-		AbstractFilterDataCollector* collector);
-private:
-	IntrusivePtr<page_split::CacheDrivenTask> m_ptrNextTask;
-	IntrusivePtr<Settings> m_ptrSettings;
+	static QString outFilePath(
+		PageId const& page_id, int page_num, QString const& out_dir);
 };
 
-} // namespace fix_orientation
+} // namespace output
 
 #endif

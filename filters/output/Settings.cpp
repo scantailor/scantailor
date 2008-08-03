@@ -17,7 +17,7 @@
 */
 
 #include "Settings.h"
-#include "Utils.h"
+#include "../../Utils.h"
 #include <boost/foreach.hpp>
 #include <QMutexLocker>
 

@@ -25,8 +25,11 @@
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
+#include "ImageId.h"
 #include "Dpi.h"
+#include "Utils.h"
 #include "ImageTransformation.h"
+#include "ThumbnailPixmapCache.h"
 #include "DebugImages.h"
 #include "OutputGenerator.h"
 #include <QImage>
@@ -61,10 +64,12 @@ private:
 
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
+	ThumbnailPixmapCache& thumbnail_cache,
 	PageId const& page_id, int const page_num,
 	QString const& out_dir, bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
+	m_rThumbnailCache(thumbnail_cache),
 	m_pageId(page_id),
 	m_outDir(out_dir),
 	m_pageNum(page_num),
@@ -96,22 +101,10 @@ Task::process(
 
 	QImage const q_img(generator.process(data.image(), status, m_ptrDbg.get()));
 	
-	QString const base_file_name(
-		QFileInfo(m_pageId.imageId().filePath()).completeBaseName()
-	);
-	QString const padded_number(
-		QString::fromAscii("%1").arg(
-			QString::number(m_pageNum + 1), 4, QChar('0')
-		)
-	);
-	
-	QString const out_path(
-		QString::fromAscii("%1/%2_%3.png").arg(
-			m_outDir, padded_number, base_file_name
-		)
-	);
-	
+	QString const out_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
 	q_img.save(out_path);
+	
+	m_rThumbnailCache.recreateThumbnail(ImageId(out_path), q_img);
 	
 	return FilterResultPtr(
 		new UiUpdater(
@@ -145,7 +138,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI();
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
-	// TODO: maybe invalidate thumbnail.
+	ui->invalidateThumbnail(m_pageId);
 	
 	if (m_batchProcessing) {
 		return;

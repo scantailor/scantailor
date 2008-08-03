@@ -44,14 +44,15 @@ CacheDrivenTask::~CacheDrivenTask()
 
 void
 CacheDrivenTask::process(
-	PageInfo const& page_info, AbstractFilterDataCollector* collector)
+	PageInfo const& page_info, int const page_num,
+	AbstractFilterDataCollector* collector)
 {
 	QRectF const initial_rect(QPointF(0.0, 0.0), page_info.metadata().size());
 	ImageTransformation xform(initial_rect, page_info.metadata().dpi());
 	xform.setPreRotation(m_ptrSettings->getRotationFor(page_info.imageId()));
 	
 	if (m_ptrNextTask) {
-		m_ptrNextTask->process(page_info, collector, xform);
+		m_ptrNextTask->process(page_info, page_num, collector, xform);
 		return;
 	}
 	

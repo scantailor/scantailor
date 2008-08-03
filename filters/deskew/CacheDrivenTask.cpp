@@ -44,7 +44,8 @@ CacheDrivenTask::~CacheDrivenTask()
 
 void
 CacheDrivenTask::process(
-	PageInfo const& page_info, AbstractFilterDataCollector* collector,
+	PageInfo const& page_info, int const page_num,
+	AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform, PageLayout const& layout)
 {
 	QRectF const rect(xform.rectBeforeCropping());
@@ -76,7 +77,7 @@ CacheDrivenTask::process(
 	new_xform.setPostRotation(params->deskewAngle());
 	
 	if (m_ptrNextTask) {
-		m_ptrNextTask->process(page_info, collector, new_xform);
+		m_ptrNextTask->process(page_info, page_num, collector, new_xform);
 		return;
 	}
 	

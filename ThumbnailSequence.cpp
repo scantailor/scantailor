@@ -66,14 +66,14 @@ using namespace ::boost::multi_index;
 class ThumbnailSequence::Item
 {
 public:
-	Item(PageInfo const& page_info, CompositeItem* comp_item, bool tag = false)
-	: pageInfo(page_info), composite(comp_item), tagged(tag) {}
+	Item(PageInfo const& page_info, int page_num, CompositeItem* comp_item)
+	: pageInfo(page_info), pageNum(page_num), composite(comp_item) {}
 	
 	PageId const& pageId() const { return pageInfo.id(); }
 	
 	PageInfo pageInfo;
+	int pageNum;
 	mutable CompositeItem* composite;
-	mutable bool tagged;
 };
 
 
@@ -121,11 +121,13 @@ private:
 	
 	void clear();
 	
-	std::auto_ptr<QGraphicsItem> getThumbnail(PageInfo const& page_info);
+	std::auto_ptr<QGraphicsItem> getThumbnail(
+		PageInfo const& page_info, int page_num);
 	
 	std::auto_ptr<LabelGroup> getLabelGroup(PageInfo const& page_info);
 	
-	std::auto_ptr<CompositeItem> getCompositeItem(PageInfo const& page_info);
+	std::auto_ptr<CompositeItem> getCompositeItem(
+		PageInfo const& page_info, int page_num);
 	
 	void commitSceneRect();
 	
@@ -314,7 +316,9 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page_info(pages.pageAt(i));
 		
-		std::auto_ptr<CompositeItem> composite(getCompositeItem(page_info));
+		std::auto_ptr<CompositeItem> composite(
+			getCompositeItem(page_info, i)
+		);
 		composite->setPos(0.0, offset);
 		composite->updateSceneRect(m_sceneRect);
 		
@@ -324,7 +328,7 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 			cur_item = composite.get();
 		}
 		
-		m_itemsInOrder.push_back(Item(page_info, composite.get()));
+		m_itemsInOrder.push_back(Item(page_info, i, composite.get()));
 		m_graphicsScene.addItem(composite.release());
 	}
 	
@@ -341,7 +345,10 @@ ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_id));
 	if (id_it != m_itemsById.end()) {
-		setThumbnail(id_it, getCompositeItem(id_it->pageInfo));
+		setThumbnail(
+			id_it,
+			getCompositeItem(id_it->pageInfo, id_it->pageNum)
+		);
 	}
 }
 
@@ -359,7 +366,7 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
 	for (; ord_it != ord_end; ++ord_it) {
 		std::auto_ptr<CompositeItem> composite(
-			getCompositeItem(ord_it->pageInfo)
+			getCompositeItem(ord_it->pageInfo, ord_it->pageNum)
 		);
 		
 		CompositeItem* const old_composite = ord_it->composite;
@@ -495,12 +502,13 @@ ThumbnailSequence::Impl::clear()
 }
 
 std::auto_ptr<QGraphicsItem>
-ThumbnailSequence::Impl::getThumbnail(PageInfo const& page_info)
+ThumbnailSequence::Impl::getThumbnail(
+	PageInfo const& page_info, int const page_num)
 {
 	std::auto_ptr<QGraphicsItem> thumb;
 	
 	if (m_ptrFactory.get()) {
-		thumb = m_ptrFactory->get(page_info);
+		thumb = m_ptrFactory->get(page_info, page_num);
 	}
 	
 	if (!thumb.get()) {
@@ -565,9 +573,10 @@ ThumbnailSequence::Impl::getLabelGroup(PageInfo const& page_info)
 }
 
 std::auto_ptr<ThumbnailSequence::CompositeItem>
-ThumbnailSequence::Impl::getCompositeItem(PageInfo const& page_info)
+ThumbnailSequence::Impl::getCompositeItem(
+	PageInfo const& page_info, int const page_num)
 {
-	std::auto_ptr<QGraphicsItem> thumb(getThumbnail(page_info));
+	std::auto_ptr<QGraphicsItem> thumb(getThumbnail(page_info, page_num));
 	std::auto_ptr<LabelGroup> label_group(getLabelGroup(page_info));
 	return std::auto_ptr<CompositeItem>(
 		new CompositeItem(*this, page_info, thumb, label_group)
