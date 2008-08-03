@@ -49,8 +49,7 @@ public:
 		QImage const& image,
 		ImageTransformation const& xform,
 		QRectF const& adapted_content_rect,
-		Settings::AggregateSizeChanged const agg_size_changed,
-		bool batch);
+		bool agg_size_changed, bool batch);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -62,7 +61,7 @@ private:
 	QImage m_image;
 	ImageTransformation m_xform;
 	QRectF m_adaptedContentRect;
-	Settings::AggregateSizeChanged m_aggSizeChanged;
+	bool m_aggSizeChanged;
 	bool m_batchProcessing;
 };
 
@@ -94,9 +93,12 @@ Task::process(
 		Utils::calcRectSizeMM(data.xform(), content_rect)
 	);
 	
-	Settings::AggregateSizeChanged const agg_size_changed(
-		m_ptrSettings->setContentSizeMM(
-			m_pageId, content_size_mm
+	QSizeF agg_hard_size_before;
+	QSizeF agg_hard_size_after;
+	Params const params(
+		m_ptrSettings->updateContentSizeAndGetParams(
+			m_pageId, content_size_mm,
+			&agg_hard_size_before, &agg_hard_size_after
 		)
 	);
 	
@@ -111,8 +113,7 @@ Task::process(
 		QPolygonF const page_rect_phys(
 			Utils::calcPageRectPhys(
 				data.xform(), content_rect_phys,
-				*m_ptrSettings->getPageParams(m_pageId), // FIXME
-				m_ptrSettings->getAggregateHardSizeMM()
+				params, agg_hard_size_after
 			)
 		);
 		return m_ptrNextTask->process(
@@ -123,7 +124,8 @@ Task::process(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_pageId,
 				data.image(), data.xform(), adapted_content_rect,
-				agg_size_changed, m_batchProcessing
+				agg_hard_size_before != agg_hard_size_after,
+				m_batchProcessing
 			)
 		);
 	}
@@ -138,8 +140,7 @@ Task::UiUpdater::UiUpdater(
 	PageId const& page_id,
 	QImage const& image, ImageTransformation const& xform,
 	QRectF const& adapted_content_rect,
-	Settings::AggregateSizeChanged const agg_size_changed,
-	bool const batch)
+	bool const agg_size_changed, bool const batch)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
@@ -160,7 +161,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI();
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
-	if (m_aggSizeChanged == Settings::AGGREGATE_SIZE_CHANGED) {
+	if (m_aggSizeChanged) {
 		ui->invalidateAllThumbnails();
 	} else {
 		ui->invalidateThumbnail(m_pageId);

@@ -54,8 +54,11 @@ public:
 	 *        page in the list.
 	 *
 	 * This check is used to allow of forbid going to the output stage.
+	 * \param pages The list of pages to check.
+	 * \param ignore The page to be ignored by the check.  Optional.
 	 */
-	bool checkEverythingDefined(PageSequenceSnapshot const& pages) const;
+	bool checkEverythingDefined(
+		PageSequenceSnapshot const& pages, PageId const* ignore = 0) const;
 	
 	/**
 	 * \brief Get all page parameters at once.
@@ -73,7 +76,9 @@ public:
 	 * \brief Updates content size and returns all parameters at once.
 	 */
 	Params updateContentSizeAndGetParams(
-		PageId const& page_id, QSizeF const& content_size_mm);
+		PageId const& page_id, QSizeF const& content_size_mm,
+		QSizeF* agg_hard_size_before = 0,
+		QSizeF* agg_hard_size_after = 0);
 	
 	/**
 	 * \brief Returns the hard margins for the specified page.

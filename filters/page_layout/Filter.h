@@ -70,7 +70,8 @@ public:
 	
 	void invalidateContentBox(PageId const& page_id);
 	
-	bool checkReadyForOutput(PageSequence const& pages);
+	bool checkReadyForOutput(
+		PageSequence const& pages, PageId const* ignore = 0);
 	
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,

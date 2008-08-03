@@ -165,13 +165,13 @@ Filter::invalidateContentBox(PageId const& page_id)
 }
 
 bool
-Filter::checkReadyForOutput(PageSequence const& pages)
+Filter::checkReadyForOutput(PageSequence const& pages, PageId const* ignore)
 {
 	PageSequenceSnapshot const snapshot(
 		pages.snapshot(PageSequence::PAGE_VIEW)
 	);
 	
-	return m_ptrSettings->checkEverythingDefined(snapshot);
+	return m_ptrSettings->checkEverythingDefined(snapshot, ignore);
 }
 
 IntrusivePtr<Task>

@@ -105,14 +105,16 @@ public:
 	
 	void clear();
 	
-	bool checkEverythingDefined(PageSequenceSnapshot const& pages) const;
+	bool checkEverythingDefined(
+		PageSequenceSnapshot const& pages, PageId const* ignore) const;
 	
 	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
 	
 	void setPageParams(PageId const& page_id, Params const& params);
 	
 	Params updateContentSizeAndGetParams(
-		PageId const& page_id, QSizeF const& content_size_mm);
+		PageId const& page_id, QSizeF const& content_size_mm,
+		QSizeF* agg_hard_size_before, QSizeF* agg_hard_size_after);
 	
 	Margins getHardMarginsMM(PageId const& page_id) const;
 	
@@ -189,9 +191,10 @@ Settings::clear()
 }
 
 bool
-Settings::checkEverythingDefined(PageSequenceSnapshot const& pages) const
+Settings::checkEverythingDefined(
+	PageSequenceSnapshot const& pages, PageId const* ignore) const
 {
-	return m_ptrImpl->checkEverythingDefined(pages);
+	return m_ptrImpl->checkEverythingDefined(pages, ignore);
 }
 
 std::auto_ptr<Params>
@@ -208,9 +211,13 @@ Settings::setPageParams(PageId const& page_id, Params const& params)
 
 Params
 Settings::updateContentSizeAndGetParams(
-	PageId const& page_id, QSizeF const& content_size_mm)
+	PageId const& page_id, QSizeF const& content_size_mm,
+	QSizeF* agg_hard_size_before, QSizeF* agg_hard_size_after)
 {
-	return m_ptrImpl->updateContentSizeAndGetParams(page_id, content_size_mm);
+	return m_ptrImpl->updateContentSizeAndGetParams(
+		page_id, content_size_mm,
+		agg_hard_size_before, agg_hard_size_after
+	);
 }
 
 Margins
@@ -325,13 +332,17 @@ Settings::Impl::clear()
 }
 
 bool
-Settings::Impl::checkEverythingDefined(PageSequenceSnapshot const& pages) const
+Settings::Impl::checkEverythingDefined(
+	PageSequenceSnapshot const& pages, PageId const* ignore) const
 {
 	QMutexLocker const locker(&m_mutex);
 	
 	size_t const num_pages = pages.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page_info = pages.pageAt(i);
+		if (ignore && *ignore == page_info.id()) {
+			continue;
+		}
 		Container::iterator const it(m_items.find(page_info.id()));
 		if (it == m_items.end() || !it->contentSizeMM.isValid()) {
 			return false;
@@ -376,9 +387,14 @@ Settings::Impl::setPageParams(PageId const& page_id, Params const& params)
 
 Params
 Settings::Impl::updateContentSizeAndGetParams(
-	PageId const& page_id, QSizeF const& content_size_mm)
+	PageId const& page_id, QSizeF const& content_size_mm,
+	QSizeF* agg_hard_size_before, QSizeF* agg_hard_size_after)
 {
 	QMutexLocker const locker(&m_mutex);
+	
+	if (agg_hard_size_before) {
+		*agg_hard_size_before = getAggregateHardSizeMMLocked();
+	}
 	
 	Container::iterator const it(m_items.lower_bound(page_id));
 	Container::iterator item_it(it);
@@ -390,6 +406,10 @@ Settings::Impl::updateContentSizeAndGetParams(
 		item_it = m_items.insert(it, item);
 	} else {
 		m_items.modify(it, ModifyContentSize(content_size_mm));
+	}
+	
+	if (agg_hard_size_after) {
+		*agg_hard_size_after = getAggregateHardSizeMMLocked();
 	}
 	
 	return Params(

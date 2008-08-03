@@ -705,7 +705,7 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 	
 	if (isOutputFilter() &&
 			!m_ptrFilterListModel->getPageLayoutFilter()
-			->checkReadyForOutput(*m_ptrPages)) {
+			->checkReadyForOutput(*m_ptrPages, &page.id())) {
 		QString const err_text(
 			tr("You can't output pages yet.\nFirst you need to process"
 			" all of them with the \"Page Layout\" filter.")
