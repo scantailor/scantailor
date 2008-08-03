@@ -20,7 +20,9 @@
 #define OUTPUT_UTILS_H_
 
 class PageId;
+class Dpi;
 class QString;
+class QTransform;
 
 namespace output
 {
@@ -30,6 +32,8 @@ class Utils
 public:
 	static QString outFilePath(
 		PageId const& page_id, int page_num, QString const& out_dir);
+	
+	static QTransform scaleFromToDpi(Dpi const& from, Dpi const& to);
 };
 
 } // namespace output

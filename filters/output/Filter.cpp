@@ -162,7 +162,9 @@ Filter::createTask(
 IntrusivePtr<CacheDrivenTask>
 Filter::createCacheDrivenTask(QString const& out_dir)
 {
-	return IntrusivePtr<CacheDrivenTask>(new CacheDrivenTask(out_dir));
+	return IntrusivePtr<CacheDrivenTask>(
+		new CacheDrivenTask(m_ptrSettings, out_dir)
+	);
 }
 
 } // namespace output

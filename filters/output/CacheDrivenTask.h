@@ -38,7 +38,9 @@ class CacheDrivenTask : public RefCountable
 {
 	DECLARE_NON_COPYABLE(CacheDrivenTask)
 public:
-	CacheDrivenTask(QString const& out_dir);
+	CacheDrivenTask(
+		IntrusivePtr<Settings> const& settings,
+		QString const& out_dir);
 	
 	virtual ~CacheDrivenTask();
 	
@@ -49,6 +51,7 @@ public:
 		QPolygonF const& content_rect_phys,
 		QPolygonF const& page_rect_phys);
 private:
+	IntrusivePtr<Settings> m_ptrSettings;
 	QString m_outDir;
 };
 

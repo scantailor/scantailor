@@ -18,7 +18,9 @@
 
 #include "Utils.h"
 #include "PageId.h"
+#include "Dpi.h"
 #include <QString>
+#include <QTransform>
 #include <QFileInfo>
 
 namespace output
@@ -45,6 +47,17 @@ Utils::outFilePath(
 	);
 	
 	return out_path;
+}
+
+QTransform
+Utils::scaleFromToDpi(Dpi const& from, Dpi const& to)
+{
+	QTransform xform;
+	xform.scale(
+		(double)to.horizontal() / from.horizontal(),
+		(double)to.vertical() / from.vertical()
+	);
+	return xform;
 }
 
 } // namespace output

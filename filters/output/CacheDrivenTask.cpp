@@ -17,22 +17,30 @@
 */
 
 #include "CacheDrivenTask.h"
+#include "Settings.h"
 #include "Thumbnail.h"
 #include "IncompleteThumbnail.h"
 #include "ImageTransformation.h"
-#include "OrthogonalRotation.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "ImageId.h"
+#include "Dpi.h"
 #include "Utils.h"
+#include "../page_layout/Utils.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
+#include <QFile>
+#include <QRect>
+#include <QRectF>
+#include <QTransform>
 
 namespace output
 {
 
-CacheDrivenTask::CacheDrivenTask(QString const& out_dir)
-:	m_outDir(out_dir)
+CacheDrivenTask::CacheDrivenTask(
+	IntrusivePtr<Settings> const& settings, QString const& out_dir)
+:	m_ptrSettings(settings),
+	m_outDir(out_dir)
 {
 }
 
@@ -48,35 +56,53 @@ CacheDrivenTask::process(
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
-#if 0
-		thumb_col->processThumbnail(
-			std::auto_ptr<QGraphicsItem>(
-				new IncompleteThumbnail(
-					thumb_col->thumbnailCache(),
-					thumb_col->maxLogicalThumbSize(),
-					page_info.imageId(), xform
-				)
-			)
-		);
-#else
+		
 		QString const out_path(
 			Utils::outFilePath(page_info.id(), page_num, m_outDir)
 		);
 		
-		ImageTransformation out_xform(xform);
-		// This resets all transforms.
-		out_xform.setPreRotation(OrthogonalRotation());
-		
-		thumb_col->processThumbnail(
-			std::auto_ptr<QGraphicsItem>(
-				new Thumbnail(
-					thumb_col->thumbnailCache(),
-					thumb_col->maxLogicalThumbSize(),
-					ImageId(out_path), out_xform
+		if (!QFile::exists(out_path)) {
+			ImageTransformation const new_xform(
+				page_layout::Utils::calcPresentationTransform(
+					xform, page_rect_phys
 				)
-			)
-		);
-#endif
+			);
+			
+			thumb_col->processThumbnail(
+				std::auto_ptr<QGraphicsItem>(
+					new IncompleteThumbnail(
+						thumb_col->thumbnailCache(),
+						thumb_col->maxLogicalThumbSize(),
+						page_info.imageId(), new_xform
+					)
+				)
+			);
+		} else {
+			Dpi const out_dpi(m_ptrSettings->getDpi(page_info.id()));
+			
+			QTransform tmp_xform(xform.transform());
+			tmp_xform *= Utils::scaleFromToDpi(
+				xform.preScaledDpi(), out_dpi
+			);
+			
+			QRect const crop_rect(
+				tmp_xform.map(page_rect_phys).boundingRect().toRect()
+			);
+			
+			ImageTransformation const out_xform(
+				crop_rect.translated(-crop_rect.topLeft()), out_dpi
+			);
+			
+			thumb_col->processThumbnail(
+				std::auto_ptr<QGraphicsItem>(
+					new Thumbnail(
+						thumb_col->thumbnailCache(),
+						thumb_col->maxLogicalThumbSize(),
+						ImageId(out_path), out_xform
+					)
+				)
+			);
+		}
 	}
 }
 

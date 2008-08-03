@@ -19,6 +19,7 @@
 #include "OutputGenerator.h"
 #include "ImageTransformation.h"
 #include "TaskStatus.h"
+#include "Utils.h"
 #include "DebugImages.h"
 #include "PerformanceTimer.h"
 #include "Dpm.h"
@@ -54,12 +55,10 @@ OutputGenerator::OutputGenerator(
 	QPolygonF const& page_rect_phys)
 :	m_dpi(dpi),
 	m_colorParams(color_params),
-	m_pageRectPhys(page_rect_phys)
+	m_pageRectPhys(page_rect_phys),
+	m_toUncropped(pre_xform.transform())
 {
-	ImageTransformation xform(pre_xform);
-	xform.preScaleToDpi(dpi);
-	
-	m_toUncropped = xform.transform();
+	m_toUncropped *= Utils::scaleFromToDpi(pre_xform.preScaledDpi(), m_dpi);
 	m_cropRect = m_toUncropped.map(page_rect_phys).boundingRect().toRect();
 	m_contentRect = m_toUncropped.map(content_rect_phys).boundingRect().toRect();
 }
