@@ -274,8 +274,17 @@ void
 MainWindow::closeEvent(QCloseEvent* const event)
 {
 	if (m_projectFile.isEmpty()) {
-		saveProjectAsTriggered();
-		event->accept();
+		switch (promptProjectSave()) {
+			case SAVE:
+				saveProjectTriggered();
+				// fall through
+			case DONT_SAVE:
+				event->accept();
+				break;
+			case CANCEL:
+				event->ignore();
+				break;
+		}
 		return;
 	}
 	
