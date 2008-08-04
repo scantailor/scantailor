@@ -19,6 +19,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ImageId.h"
 #include "ImageLoader.h"
+#include "Utils.h"
 #include "imageproc/Scale.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
@@ -138,8 +139,6 @@ private:
 	
 	static QImage makeThumbnail(
 		QImage const& image, QSize const& max_thumb_size);
-	
-	static bool renameFile(QString const& from, QString const& to);
 	
 	void postLoadResult(
 		LoadQueue::iterator const& lq_it, QImage const& image,
@@ -460,7 +459,7 @@ ThumbnailPixmapCache::Impl::ensureThumbnailExists(
 	temp_file.setAutoRemove(true);
 	if (temp_file.open()) {
 		if (thumbnail.save(&temp_file, "PNG")) {
-			if (renameFile(temp_file.fileName(), thumb_file_path)) {
+			if (Utils::renameFile(temp_file.fileName(), thumb_file_path)) {
 				temp_file.setAutoRemove(false);
 			}
 		}
@@ -494,7 +493,7 @@ ThumbnailPixmapCache::Impl::recreateThumbnail(
 	temp_file.setAutoRemove(true);
 	if (temp_file.open()) {
 		if (thumbnail.save(&temp_file, "PNG")) {
-			if (renameFile(temp_file.fileName(), thumb_file_path)) {
+			if (Utils::renameFile(temp_file.fileName(), thumb_file_path)) {
 				thumb_written = true;
 				temp_file.setAutoRemove(false);
 			}
@@ -699,16 +698,6 @@ ThumbnailPixmapCache::Impl::makeThumbnail(
 		to_size,
 		Qt::KeepAspectRatio, Qt::SmoothTransformation
 	);
-}
-
-bool
-ThumbnailPixmapCache::Impl::renameFile(QString const& from, QString const& to)
-{
-	// We can't use QFile::rename(), because it doesn't overwrite existing files.
-	std::auto_ptr<QAbstractFileEngine> const engine(
-		QAbstractFileEngine::create(from)
-	);
-	return engine->rename(to);
 }
 
 void

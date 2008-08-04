@@ -87,46 +87,21 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 	m_colorParams = m_ptrSettings->getColorParams(page_id);
 	updateDpiDisplay();
 	updateColorsDisplay();
-	setEnabled(false);
 }
 
 void
 OptionsWidget::postUpdateUI()
 {
-	setEnabled(true);
 }
 
 void
 OptionsWidget::colorModeChanged(int const idx)
 {
 	int const mode = colorModeSelector->itemData(idx).toInt();
-	ColorParams::ColorMode const old_mode = m_colorParams.colorMode();
 	m_colorParams.setColorMode((ColorParams::ColorMode)mode);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
-	
 	updateColorsDisplay();
-	
-	switch (mode) {
-		case ColorParams::BLACK_AND_WHITE:
-			if (old_mode == ColorParams::BITONAL) {
-				emit tonesChanged(Qt::white, Qt::black);
-			} else {
-				emit reloadRequested();
-			}
-			break;
-		case ColorParams::BITONAL:
-			if (old_mode == ColorParams::BLACK_AND_WHITE) {
-				emit tonesChanged(
-					m_colorParams.lightColor(),
-					m_colorParams.darkColor());
-			} else {
-				emit reloadRequested();
-			}
-			break;
-		case ColorParams::COLOR_GRAYSCALE:
-			emit reloadRequested();
-			break;
-	}
+	emit reloadRequested();
 }
 
 void
@@ -201,10 +176,11 @@ OptionsWidget::lightColorButtonClicked()
 	}
 	
 	m_colorParams.setLightColor(color.rgb());
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	m_lightColorPixmap.fill(m_colorParams.lightColor());
 	lightColorButton->setIcon(createIcon(m_lightColorPixmap));
 	
-	emit tonesChanged(m_colorParams.lightColor(), m_colorParams.darkColor());
+	emit reloadRequested();
 }
 
 void
@@ -217,10 +193,11 @@ OptionsWidget::darkColorButtonClicked()
 	}
 	
 	m_colorParams.setDarkColor(color.rgb());
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	m_darkColorPixmap.fill(m_colorParams.darkColor());
 	darkColorButton->setIcon(createIcon(m_darkColorPixmap));
 	
-	emit tonesChanged(m_colorParams.lightColor(), m_colorParams.darkColor());
+	emit reloadRequested();
 }
 
 QIcon

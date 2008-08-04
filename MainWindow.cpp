@@ -22,6 +22,7 @@
 #include "ThumbnailSequence.h"
 #include "PageInfo.h"
 #include "ImageId.h"
+#include "Utils.h"
 #include "FilterOptionsWidget.h"
 #include "ErrorWidget.h"
 #include "DebugImages.h"
@@ -54,12 +55,15 @@
 #include "ScopedIncDec.h"
 #include <boost/foreach.hpp>
 #include <QLineF>
+#include <QCloseEvent>
 #include <QStackedLayout>
 #include <QLayoutItem>
 #include <QAbstractListModel>
 #include <QFileInfo>
+#include <QFile>
 #include <QDir>
 #include <QString>
+#include <QByteArray>
 #include <QVariant>
 #include <QModelIndex>
 #include <QFileDialog>
@@ -129,7 +133,6 @@ MainWindow::MainWindow(
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_debug(false),
-	m_projectModified(true),
 	m_batchProcessing(false)
 {
 	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
@@ -147,7 +150,6 @@ MainWindow::MainWindow(
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_debug(false),
-	m_projectModified(false),
 	m_batchProcessing(false)
 {
 	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
@@ -264,13 +266,118 @@ MainWindow::construct()
 		this, SLOT(saveProjectAsTriggered())
 	);
 	
-	connect(
-		m_ptrPages.get(), SIGNAL(modified()),
-		this, SLOT(pageSequenceModified()), Qt::QueuedConnection
-	);
-	
 	updateWindowTitle();
 	loadImage();
+}
+
+void
+MainWindow::closeEvent(QCloseEvent* const event)
+{
+	if (m_projectFile.isEmpty()) {
+		saveProjectAsTriggered();
+		event->accept();
+		return;
+	}
+	
+	QFileInfo const project_file(m_projectFile);
+	QFileInfo const backup_file(
+		project_file.absoluteDir(),
+		QString::fromAscii("Backup.")+project_file.fileName()
+	);
+	QString const backup_file_path(backup_file.absoluteFilePath());
+	
+	ProjectWriter writer(m_outDir, m_ptrPages);
+	
+	if (!writer.write(backup_file_path, m_ptrFilterListModel->filters())) {
+		QFile::remove(backup_file_path);
+		switch (promptProjectSave()) {
+			case SAVE:
+				saveProjectTriggered();
+				// fall through
+			case DONT_SAVE:
+				event->accept();
+				return;
+			case CANCEL:
+				event->ignore();
+				return;
+		}
+	}
+	
+	if (compareFiles(m_projectFile, backup_file_path)) {
+		QFile::remove(backup_file_path);
+		event->accept();
+		return;
+	}
+	
+	switch (promptProjectSave()) {
+		case SAVE:
+			if (!Utils::renameFile(backup_file_path, m_projectFile)) {
+				event->ignore();
+				QMessageBox::warning(
+					this, tr("Error"),
+					tr("Error saving the project file!")
+				);
+				return;
+			}
+			// fall through
+		case DONT_SAVE:
+			event->accept();
+			return;
+		case CANCEL:
+			event->ignore();
+			return;
+	}
+	
+}
+
+MainWindow::SavePromptResult
+MainWindow::promptProjectSave()
+{
+	QMessageBox::StandardButton const res = QMessageBox::question(
+		 this, tr("Save Project"), tr("Save this project?"),
+		 QMessageBox::Save|QMessageBox::Discard|QMessageBox::Cancel,
+		 QMessageBox::Save
+	);
+	
+	switch (res) {
+		case QMessageBox::Save:
+			return SAVE;
+		case QMessageBox::Discard:
+			return DONT_SAVE;
+		default:
+			return CANCEL;
+	}
+}
+
+bool
+MainWindow::compareFiles(QString const& fpath1, QString const& fpath2)
+{
+	QFile file1(fpath1);
+	QFile file2(fpath2);
+	
+	if (!file1.open(QIODevice::ReadOnly)) {
+		return false;
+	}
+	if (!file2.open(QIODevice::ReadOnly)) {
+		return false;
+	}
+	
+	if (!file1.isSequential() && !file2.isSequential()) {
+		if (file1.size() != file2.size()) {
+			return false;
+		}
+	}
+	
+	int const chunk_size = 4096;
+	for (;;) {
+		QByteArray const chunk1(file1.read(chunk_size));
+		QByteArray const chunk2(file2.read(chunk_size));
+		if (chunk1.size() != chunk2.size()) {
+			return false;
+		} else if (chunk1.size() == 0) {
+			return true;
+		}
+	}
 }
 
 void
@@ -466,6 +573,11 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 		return;
 	}
 	
+	if (m_ptrCurTask) {
+		m_ptrCurTask->cancel();
+		m_ptrCurTask.reset();
+	}
+	
 	bool const was_below_select_content = isBelowSelectContent(m_curFilter);
 	m_curFilter = selected.front().top();
 	bool const now_below_select_content = isBelowSelectContent(m_curFilter);
@@ -600,7 +712,6 @@ MainWindow::saveProjectTriggered()
 	}
 	
 	if (saveProjectWithFeedback(m_projectFile)) {
-		m_projectModified = false;
 		updateWindowTitle();
 	}
 }
@@ -624,16 +735,8 @@ MainWindow::saveProjectAsTriggered()
 	
 	if (saveProjectWithFeedback(project_file)) {
 		m_projectFile = project_file;
-		m_projectModified = false;
 		updateWindowTitle();
 	}
-}
-
-void
-MainWindow::pageSequenceModified()
-{
-	m_projectModified = true;
-	updateWindowTitle();
 }
 
 void
@@ -742,10 +845,6 @@ MainWindow::updateWindowTitle()
 	} else {
 		project_name = QFileInfo(m_projectFile).baseName();
 	}
-	
-	// We don't include "[modified]" if m_projectModified is true,
-	// because very innocent things like moving to a next page will
-	// in fact mark the project as modified.
 	setWindowTitle(tr("%1 - Scan Tailor").arg(project_name));
 }
 

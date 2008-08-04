@@ -17,49 +17,17 @@
 */
 
 #include "ImageView.h.moc"
-#include "ImageTransformation.h"
-#include <QDebug>
-#include <assert.h>
 
 namespace output
 {
 
 ImageView::ImageView(QImage const& image)
-:	ImageViewBase(image),
-	m_lightIdx(0),
-	m_darkIdx(0),
-	m_lightColor(Qt::white),
-	m_darkColor(Qt::black)
+:	ImageViewBase(image)
 {
-	if (image.format() == QImage::Format_Mono
-			|| image.format() == QImage::Format_MonoLSB) {
-		m_bitonalImage = image;
-		if (qGray(image.color(0)) < qGray(image.color(1))) {
-			m_lightIdx = 1;
-		} else {
-			m_darkIdx = 1;
-		}
-	}
 }
 
 ImageView::~ImageView()
 {
-}
-
-void
-ImageView::tonesChanged(QColor const& light, QColor const& dark)
-{
-	assert(!m_bitonalImage.isNull());
-	
-	if (light == m_lightColor && dark == m_darkColor) {
-		return;
-	}
-	
-	m_lightColor = light;
-	m_darkColor = dark;
-	m_bitonalImage.setColor(m_lightIdx, light.rgb());
-	m_bitonalImage.setColor(m_darkIdx, dark.rgb());
-	updateImage(m_bitonalImage);
 }
 
 void

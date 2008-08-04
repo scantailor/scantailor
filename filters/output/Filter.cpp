@@ -22,6 +22,7 @@
 #include "Task.h"
 #include "PageId.h"
 #include "Settings.h"
+#include "Params.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
@@ -87,28 +88,22 @@ Filter::writePageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
 	PageId const& page_id, int numeric_id) const
 {
-#if 0
-	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(page_id));
-	if (!params.get()) {
-		return;
-	}
+	Params const params(m_ptrSettings->getParams(page_id));
 	
 	QDomElement page_el(doc.createElement("page"));
 	page_el.setAttribute("id", numeric_id);
-	page_el.appendChild(params->toXml(doc, "params"));
+	page_el.appendChild(params.toXml(doc, "params"));
 	
 	filter_el.appendChild(page_el);
-#endif
 }
 
 void
 Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 {
-#if 0
 	m_ptrSettings->clear();
 	
 	QDomElement const filter_el(
-		filters_el.namedItem("page-layout").toElement()
+		filters_el.namedItem("output").toElement()
 	);
 	
 	QString const page_tag_name("page");
@@ -139,9 +134,8 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 		}
 		
 		Params const params(params_el);
-		m_ptrSettings->setPageParams(page_id, params);
+		m_ptrSettings->setParams(page_id, params);
 	}
-#endif
 }
 
 IntrusivePtr<Task>

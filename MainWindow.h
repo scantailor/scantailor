@@ -58,6 +58,8 @@ public:
 	MainWindow(QString const& project_file, ProjectReader const& project_reader);
 	
 	virtual ~MainWindow();
+protected:
+	virtual void closeEvent(QCloseEvent* event);
 private slots:
 	void nextPage();
 	
@@ -88,10 +90,10 @@ private slots:
 	void saveProjectTriggered();
 	
 	void saveProjectAsTriggered();
-	
-	void pageSequenceModified();
 private:
 	class FilterListModel;
+	
+	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
 	
@@ -109,6 +111,10 @@ private:
 	std::auto_ptr<ThumbnailPixmapCache> createThumbnailCache();
 	
 	void construct();
+	
+	SavePromptResult promptProjectSave();
+	
+	static bool compareFiles(QString const& fpath1, QString const& fpath2);
 	
 	void resetThumbSequence();
 	
@@ -153,7 +159,6 @@ private:
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
 	bool m_debug;
-	bool m_projectModified;
 	bool m_batchProcessing;
 };
 

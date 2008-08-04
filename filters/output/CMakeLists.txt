@@ -20,6 +20,7 @@ SET(
 	Settings.cpp Settings.h
 	Thumbnail.cpp Thumbnail.h
 	Utils.cpp Utils.h
+	Params.cpp Params.h
 	ColorParams.h Scope.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

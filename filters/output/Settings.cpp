@@ -17,6 +17,7 @@
 */
 
 #include "Settings.h"
+#include "Params.h"
 #include "../../Utils.h"
 #include <boost/foreach.hpp>
 #include <QMutexLocker>
@@ -44,11 +45,33 @@ Settings::clear()
 	m_perPageColorParams.clear();
 }
 
+Params
+Settings::getParams(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	return Params(getDpiLocked(page_id), getColorParamsLocked(page_id));
+}
+
+void
+Settings::setParams(PageId const& page_id, Params const& params)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	setDpiLocked(page_id, params.dpi());
+	setColorParamsLocked(page_id, params.colorParams());
+}
+
 ColorParams
 Settings::getColorParams(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
-	
+	return getColorParamsLocked(page_id);
+}
+
+ColorParams
+Settings::getColorParamsLocked(PageId const& page_id) const
+{
 	PerPageColorParams::const_iterator const it(m_perPageColorParams.find(page_id));
 	if (it != m_perPageColorParams.end()) {
 		return it->second;
@@ -61,6 +84,12 @@ void
 Settings::setColorParams(PageId const& page_id, ColorParams const& params)
 {
 	QMutexLocker const locker(&m_mutex);
+	setColorParamsLocked(page_id, params);
+}
+
+void
+Settings::setColorParamsLocked(PageId const& page_id, ColorParams const& params)
+{
 	Utils::mapSetValue(m_perPageColorParams, page_id, params);
 }
 
@@ -77,7 +106,12 @@ Dpi
 Settings::getDpi(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
-	
+	return getDpiLocked(page_id);
+}
+
+Dpi
+Settings::getDpiLocked(PageId const& page_id) const
+{
 	PerPageDpi::const_iterator const it(m_perPageDpi.find(page_id));
 	if (it != m_perPageDpi.end()) {
 		return it->second;
@@ -90,6 +124,12 @@ void
 Settings::setDpi(PageId const& page_id, Dpi const& dpi)
 {
 	QMutexLocker const locker(&m_mutex);
+	setDpiLocked(page_id, dpi);
+}
+
+void
+Settings::setDpiLocked(PageId const& page_id, Dpi const& dpi)
+{
 	Utils::mapSetValue(m_perPageDpi, page_id, dpi);
 }
 

@@ -30,6 +30,8 @@
 namespace output
 {
 
+class Params;
+
 class Settings : public RefCountable
 {
 	DECLARE_NON_COPYABLE(Settings)
@@ -39,6 +41,10 @@ public:
 	virtual ~Settings();
 	
 	void clear();
+	
+	Params getParams(PageId const& page_id) const;
+	
+	void setParams(PageId const& page_id, Params const& params);
 	
 	ColorParams getColorParams(PageId const& page_id) const;
 	
@@ -54,6 +60,15 @@ public:
 private:
 	typedef std::map<PageId, Dpi> PerPageDpi;
 	typedef std::map<PageId, ColorParams> PerPageColorParams;
+	
+	Dpi getDpiLocked(PageId const& page_id) const;
+	
+	void setDpiLocked(PageId const& page_id, Dpi const& dpi);
+	
+	ColorParams getColorParamsLocked(PageId const& page_id) const;
+	
+	void setColorParamsLocked(
+		PageId const& page_id, ColorParams const& params);
 	
 	mutable QMutex m_mutex;
 	PerPageDpi m_perPageDpi;

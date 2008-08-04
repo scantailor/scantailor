@@ -17,6 +17,7 @@
 */
 
 #include "Params.h"
+#include "../../Utils.h"
 #include <QDomDocument>
 #include <QDomElement>
 
@@ -47,7 +48,7 @@ Params::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("mode", m_mode == MODE_AUTO ? "auto" : "manual");
-	el.setAttribute("angle", m_deskewAngleDeg);
+	el.setAttribute("angle", Utils::doubleToString(m_deskewAngleDeg));
 	el.appendChild(m_deps.toXml(doc, "dependencies"));
 	return el;
 }

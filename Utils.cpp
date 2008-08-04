@@ -16,34 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_IMAGEVIEW_H_
-#define OUTPUT_IMAGEVIEW_H_
+#include "Utils.h"
+#include <QString>
+#include <QAbstractFileEngine>
+#include <memory>
 
-#include "ImageViewBase.h"
-#include <QColor>
-
-class ImageTransformation;
-
-namespace output
+bool
+Utils::renameFile(QString const& from, QString const& to)
 {
-
-class ImageView : public ImageViewBase
-{
-	Q_OBJECT
-public:
-	ImageView(QImage const& image);
-	
-	virtual ~ImageView();
-protected:
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
-};
-
-} // namespace output
-
-#endif
+	// We can't use QFile::rename(), because it doesn't overwrite existing files.
+	std::auto_ptr<QAbstractFileEngine> const engine(
+		QAbstractFileEngine::create(from)
+	);
+	return engine->rename(to);
+}

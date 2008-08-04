@@ -48,8 +48,6 @@ public:
 	void preUpdateUI(PageId const& page_id);
 	
 	void postUpdateUI();
-signals:
-	void tonesChanged(QColor const& light, QColor const& dark);
 private slots:
 	void changeDpiButtonClicked();
 	

@@ -26,6 +26,21 @@ class Utils
 public:
 	template<typename M, typename K, typename V>
 	static void mapSetValue(M& map, K const& key, V const& val);
+	
+	/**
+	 * Unlike QFile::rename(), this one overwrites existing files.
+	 */
+	static bool renameFile(QString const& from, QString const& to);
+	
+	/**
+	 * \brief A high precision, locale independent number to string conversion.
+	 *
+	 * This function is intended to be used instead of
+	 * QDomElement::setAttribute(double), which is locale dependent.
+	 */
+	static QString doubleToString(double val) {
+		return QString::number(val, 'g', 16);
+	}
 };
 
 template<typename M, typename K, typename V>

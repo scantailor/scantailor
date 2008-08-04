@@ -146,11 +146,6 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	ImageView* view = new ImageView(m_image);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
-	
-	QObject::connect(
-		opt_widget, SIGNAL(tonesChanged(QColor const&, QColor const&)),
-		view, SLOT(tonesChanged(QColor const&, QColor const&))
-	);
 }
 
 } // namespace output

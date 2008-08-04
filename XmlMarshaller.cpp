@@ -20,6 +20,7 @@
 #include "OrthogonalRotation.h"
 #include "Margins.h"
 #include "Dpi.h"
+#include "Utils.h"
 #include <QPointF>
 #include <QLineF>
 #include <QRectF>
@@ -49,8 +50,8 @@ XmlMarshaller::sizeF(QSizeF const& size, QString const& name)
 	}
 	
 	QDomElement el(m_doc.createElement(name));
-	el.setAttribute("width", size.width());
-	el.setAttribute("height", size.height());
+	el.setAttribute("width", Utils::doubleToString(size.width()));
+	el.setAttribute("height", Utils::doubleToString(size.height()));
 	return el;
 }
 
@@ -79,8 +80,8 @@ QDomElement
 XmlMarshaller::pointF(QPointF const& p, QString const& name)
 {
 	QDomElement el(m_doc.createElement(name));
-	el.setAttribute("x", p.x());
-	el.setAttribute("y", p.y());
+	el.setAttribute("x", Utils::doubleToString(p.x()));
+	el.setAttribute("y", Utils::doubleToString(p.y()));
 	return el;
 }
 
@@ -97,10 +98,10 @@ QDomElement
 XmlMarshaller::rectF(QRectF const& rect, QString const& name)
 {
 	QDomElement el(m_doc.createElement(name));
-	el.setAttribute("x", rect.x());
-	el.setAttribute("y", rect.y());
-	el.setAttribute("width", rect.width());
-	el.setAttribute("height", rect.height());
+	el.setAttribute("x", Utils::doubleToString(rect.x()));
+	el.setAttribute("y", Utils::doubleToString(rect.y()));
+	el.setAttribute("width", Utils::doubleToString(rect.width()));
+	el.setAttribute("height", Utils::doubleToString(rect.height()));
 	return el;
 }
 
@@ -122,9 +123,9 @@ QDomElement
 XmlMarshaller::margins(Margins const& margins, QString const& name)
 {
 	QDomElement el(m_doc.createElement(name));
-	el.setAttribute("left", margins.left());
-	el.setAttribute("right", margins.right());
-	el.setAttribute("top", margins.top());
-	el.setAttribute("bottom", margins.bottom());
+	el.setAttribute("left", Utils::doubleToString(margins.left()));
+	el.setAttribute("right", Utils::doubleToString(margins.right()));
+	el.setAttribute("top", Utils::doubleToString(margins.top()));
+	el.setAttribute("bottom", Utils::doubleToString(margins.bottom()));
 	return el;
 }
