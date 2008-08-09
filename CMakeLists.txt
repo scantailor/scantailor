@@ -4,6 +4,9 @@ PROJECT("Scan Tailor")
 
 ENABLE_TESTING()
 
+FILE(READ "${PROJECT_SOURCE_DIR}/VERSION" VERSION)
+STRING(REGEX MATCH "[-.0-9A-Za-z]+" VERSION "${VERSION}")
+
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(cmake/FindPthreads.cmake)
@@ -145,6 +148,7 @@ ADD_SUBDIRECTORY(imageproc)
 ADD_SUBDIRECTORY(tests)
 
 FILE(GLOB ui_files "ui/*.ui")
+SOURCE_GROUP("Ui Files" FILES ${ui_files})
 QT4_WRAP_UI(ui_sources ${ui_files})
 SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
 ADD_SUBDIRECTORY(ui)
@@ -237,3 +241,17 @@ TARGET_LINK_LIBRARIES(
 
 ADD_TEST(ImageProcTests imageproc/tests/imageproc_tests --log_level=message)
 ADD_TEST(ScanTaylorTests tests/tests --log_level=message)
+
+# Packaging
+SET(CPACK_CMAKE_GENERATOR "")
+SET(CPACK_SOURCE_GENERATOR "TGZ")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "scantailor-${VERSION}")
+SET(
+	CPACK_SOURCE_IGNORE_FILES
+	"/\\\\.svn/"
+	"~$"
+	"TODO.txt"
+	"/doxygen/"
+	"${CMAKE_BINARY_DIR}"
+)
+INCLUDE(CPack)
