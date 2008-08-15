@@ -101,7 +101,7 @@ BinaryImage binarizeSauvola(QImage const& src, QSize const window_size)
 			double const variance = sqmean - mean * mean;
 			double const deviation = sqrt(fabs(variance));
 			
-			double const k = 0.5;
+			double const k = 0.34;
 			double const threshold = mean * (1.0 + k * (deviation / 128.0 - 1.0));
 			
 			uint32_t const msb = uint32_t(1) << 31;
