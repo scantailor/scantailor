@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QDir>
 #include <QString>
+#include <QSettings>
 #include <QDomDocument>
 
 ProjectOpeningContext::ProjectOpeningContext()
@@ -44,10 +45,13 @@ ProjectOpeningContext::openProject()
 void
 ProjectOpeningContext::openProjectImpl()
 {
+	QSettings settings;
+	QString const project_dir(settings.value("project/lastDir").toString());
+	
 	QString const project_file(
 		QFileDialog::getOpenFileName(
 			0, tr("Open Project"),
-			QDir::home().absolutePath(),
+			project_dir,
 			tr("Scan Tailor Projects")+" (*.ScanTailor)"
 		)
 	);

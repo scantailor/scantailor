@@ -69,6 +69,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPalette>
+#include <QSettings>
 #include <QDebug>
 #include <algorithm>
 #include <stddef.h>
@@ -729,13 +730,17 @@ MainWindow::saveProjectTriggered()
 void
 MainWindow::saveProjectAsTriggered()
 {
-	QDir dir(m_outDir);
+	QString project_dir;
 	if (!m_projectFile.isEmpty()) {
-		dir = QFileInfo(m_projectFile).absoluteDir();
+		project_dir = QFileInfo(m_projectFile).absolutePath();
+	} else {
+		QSettings settings;
+		project_dir = settings.value("project/lastDir").toString();
 	}
+	
 	QString project_file(
 		QFileDialog::getSaveFileName(
-			this, QString(), dir.absolutePath(),
+			this, QString(), project_dir,
 			tr("Scan Tailor Projects")+" (*.ScanTailor)"
 		)
 	);
@@ -746,6 +751,12 @@ MainWindow::saveProjectAsTriggered()
 	if (saveProjectWithFeedback(project_file)) {
 		m_projectFile = project_file;
 		updateWindowTitle();
+		
+		QSettings settings;
+		settings.setValue(
+			"project/lastDir",
+			QFileInfo(m_projectFile).absolutePath()
+		);
 	}
 }
 

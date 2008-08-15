@@ -23,6 +23,7 @@
 #include "JpegMetadataLoader.h"
 #include <QMetaType>
 #include <QtPlugin>
+#include <QString>
 
 #ifdef Q_WS_WIN
 // Import static plugins
@@ -32,6 +33,11 @@ Q_IMPORT_PLUGIN(qjpeg)
 int main(int argc, char** argv)
 {
 	Application app(argc, argv);
+	
+	// This information is used by QSettings.
+	app.setApplicationName("Scan Tailor");
+	app.setOrganizationName("Scan Tailor");
+	app.setOrganizationDomain("scantailor.sourceforge.net");
 	
 	PngMetadataLoader::registerMyself();
 	TiffMetadataLoader::registerMyself();
