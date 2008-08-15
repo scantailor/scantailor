@@ -330,6 +330,7 @@ MainWindow::closeEvent(QCloseEvent* const event)
 			}
 			// fall through
 		case DONT_SAVE:
+			QFile::remove(backup_file_path);
 			event->accept();
 			return;
 		case CANCEL:
