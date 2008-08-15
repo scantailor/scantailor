@@ -209,7 +209,8 @@ ProjectFilesDialog::ProjectFilesDialog(QWidget* parent)
 	m_ptrInProjectFiles(new FileList),
 	m_ptrInProjectFilesSorted(new SortedFileList(*m_ptrInProjectFiles)),
 	m_loadTimerId(0),
-	m_metadataLoadFailed(false)
+	m_metadataLoadFailed(false),
+	m_autoCreateOutDir(false)
 {
 	m_supportedExtensions.insert("png");
 	m_supportedExtensions.insert("jpg");
@@ -223,6 +224,7 @@ ProjectFilesDialog::ProjectFilesDialog(QWidget* parent)
 	
 	connect(inpDirBrowseBtn, SIGNAL(clicked()), this, SLOT(inpDirBrowse()));
 	connect(outDirBrowseBtn, SIGNAL(clicked()), this, SLOT(outDirBrowse()));
+	connect(outDirLine, SIGNAL(textChanged(QString const&)), this, SLOT(outDirChanged()));
 	connect(addToProjectBtn, SIGNAL(clicked()), this, SLOT(addToProject()));
 	connect(removeFromProjectBtn, SIGNAL(clicked()), this, SLOT(removeFromProject()));
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onOK()));
@@ -312,6 +314,12 @@ ProjectFilesDialog::outDirBrowse()
 	}
 }
 
+void
+ProjectFilesDialog::outDirChanged()
+{
+	m_autoCreateOutDir = false;
+}
+
 namespace
 {
 
@@ -343,6 +351,10 @@ ProjectFilesDialog::setInputDir(QString const& dir)
 	using namespace boost::lambda;
 	
 	inpDirLine->setText(dir);
+	if (outDirLine->text().isEmpty()) {
+		outDirLine->setText(QDir::cleanPath(dir + QDir::separator() + "out"));
+		m_autoCreateOutDir = true;
+	}
 	
 	QFileInfoList files(QDir(dir).entryInfoList(QDir::Files));
 	
@@ -449,6 +461,13 @@ ProjectFilesDialog::removeFromProject()
 void
 ProjectFilesDialog::onOK()
 {
+	if (m_ptrInProjectFiles->count() == 0) {
+		QMessageBox::warning(
+			this, tr("Error"), tr("No files in project!")
+		);
+		return;
+	}
+	
 	QDir const inp_dir(inpDirLine->text());
 	if (!inp_dir.isAbsolute() || !inp_dir.exists()) {
 		QMessageBox::warning(
@@ -459,14 +478,6 @@ ProjectFilesDialog::onOK()
 	}
 	
 	QDir const out_dir(outDirLine->text());
-	if (!out_dir.isAbsolute() || !out_dir.exists()) {
-		QMessageBox::warning(
-			this, tr("Error"),
-			tr("Output directory is not set or doesn't exist.")
-		);
-		return;
-	}
-	
 	if (inp_dir == out_dir) {
 		QMessageBox::warning(
 			this, tr("Error"),
@@ -475,9 +486,33 @@ ProjectFilesDialog::onOK()
 		return;
 	}
 	
-	if (m_ptrInProjectFiles->count() == 0) {
+	if (out_dir.isAbsolute() && !out_dir.exists()) {
+		// Maybe create it.
+		bool create = m_autoCreateOutDir;
+		if (!m_autoCreateOutDir) {
+			create = QMessageBox::question(
+				this, tr("Create Directory?"),
+				tr("Output directory doesn't exist.  Create it?"),
+				QMessageBox::Yes|QMessageBox::No
+			) == QMessageBox::Yes;
+			if (!create) {
+				return;
+			}
+		}
+		if (create) {
+			if (!out_dir.mkpath(out_dir.path())) {
+				QMessageBox::warning(
+					this, tr("Error"),
+					tr("Unable to create output directory.")
+				);
+				return;
+			}
+		}
+	}
+	if (!out_dir.isAbsolute() || !out_dir.exists()) {
 		QMessageBox::warning(
-			this, tr("Error"), tr("No files in project!")
+			this, tr("Error"),
+			tr("Output directory is not set or doesn't exist.")
 		);
 		return;
 	}
