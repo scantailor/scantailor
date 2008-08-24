@@ -19,9 +19,11 @@
 #include "Morphology.h"
 #include "BinaryImage.h"
 #include "RasterOp.h"
+#include "Grayscale.h"
 #include <QPoint>
 #include <QSize>
 #include <QRect>
+#include <QImage>
 #include <QDebug>
 #include <boost/foreach.hpp>
 #include <vector>
@@ -54,6 +56,14 @@ Brick::Brick(QSize const& size, QPoint const& origin)
 	m_maxY = (size.height() - 1) - y_origin;
 }
 
+Brick::Brick(int min_x, int min_y, int max_x, int max_y)
+:	m_minX(min_x),
+	m_maxX(max_x),
+	m_minY(min_y),
+	m_maxY(max_y)
+{
+}
+
 void
 Brick::flip()
 {
@@ -63,6 +73,14 @@ Brick::flip()
 	int const new_min_y = -m_maxY;
 	m_maxY = -m_minY;
 	m_minY = new_min_y;
+}
+
+Brick
+Brick::flipped() const
+{
+	Brick brick(*this);
+	brick.flip();
+	return brick;
 }
 
 namespace
@@ -127,6 +145,10 @@ public:
 	
 	QRect mapTo(QRect const& rect, CoordinateSystem const& target_cs) const {
 		return rect.translated(m_origin).translated(-target_cs.origin());
+	}
+	
+	QPoint offsetTo(CoordinateSystem const& target_cs) const {
+		return m_origin - target_cs.origin();
 	}
 private:
 	QPoint m_origin;
@@ -426,6 +448,362 @@ void dilateOrErodeBrick(
 	}
 }
 
+class Darker
+{
+public:
+	static uint8_t select(uint8_t v1, uint8_t v2) {
+		return std::min(v1, v2);
+	}
+};
+
+class Lighter
+{
+public:
+	static uint8_t select(uint8_t v1, uint8_t v2) {
+		return std::max(v1, v2);
+	}
+};
+
+template<typename MinOrMax>
+void fillExtremumArrayLeftHalf(
+	uint8_t* dst, uint8_t const* const src_center, int const src_delta,
+	int const src_first_offset, int const src_center_offset)
+{
+	uint8_t const* src = src_center;
+	uint8_t extremum = *src;
+	*dst = extremum;
+	
+	for (int i = src_center_offset - 1; i >= src_first_offset; --i) {
+		src -= src_delta;
+		--dst;
+		extremum = MinOrMax::select(extremum, *src);
+		*dst = extremum;
+	}
+}
+
+template<typename MinOrMax>
+void fillExtremumArrayRightHalf(
+	uint8_t* dst, uint8_t const* const src_center, int const src_delta,
+	int const src_center_offset, int const src_last_offset)
+{
+	uint8_t const* src = src_center;
+	uint8_t extremum = *src;
+	*dst = extremum;
+	
+	for (int i = src_center_offset + 1; i <= src_last_offset; ++i) {
+		src += src_delta;
+		++dst;
+		extremum = MinOrMax::select(extremum, *src);
+		*dst = extremum;
+	}
+}
+
+template<typename MinOrMax>
+void spreadGrayHorizontal(
+	QImage& dst, QImage const& src,
+	int const dy, int const dx1, int const dx2)
+{
+	int const src_bpl = src.bytesPerLine();
+	int const dst_bpl = dst.bytesPerLine();
+	uint8_t const* src_line = src.bits() + dy * src_bpl;
+	uint8_t* dst_line = dst.bits();
+	
+	int const dst_width = dst.width();
+	int const dst_height = dst.height();
+	
+	int const se_len = dx2 - dx1 + 1;
+	
+	std::vector<uint8_t> min_max_array(se_len * 2 - 1, 0);
+	uint8_t* const array_center = &min_max_array[se_len - 1];
+	
+	for (int y = 0; y < dst_height; ++y) {
+		for (int dst_segment_first = 0; dst_segment_first < dst_width;
+				dst_segment_first += se_len) {
+			int const dst_segment_last = std::min(
+				dst_segment_first + se_len, dst_width
+			) - 1; // inclusive
+			int const src_segment_first = dst_segment_first + dx1;
+			int const src_segment_last = dst_segment_last + dx2;
+			int const src_segment_center =
+				(src_segment_first + src_segment_last) >> 1;
+			
+			fillExtremumArrayLeftHalf<MinOrMax>(
+				array_center, src_line + src_segment_center, 1,
+				src_segment_first, src_segment_center
+			);
+			
+			fillExtremumArrayRightHalf<MinOrMax>(
+				array_center, src_line + src_segment_center, 1,
+				src_segment_center, src_segment_last
+			);
+			
+			for (int x = dst_segment_first; x <= dst_segment_last; ++x) {
+				int const src_first = x + dx1;
+				int const src_last = x + dx2; // inclusive
+				assert(src_segment_center >= src_first);
+				assert(src_segment_center <= src_last);
+				uint8_t v1 = array_center[src_first - src_segment_center];
+				uint8_t v2 = array_center[src_last - src_segment_center];
+				dst_line[x] = MinOrMax::select(v1, v2);
+			}
+		}
+		
+		src_line += src_bpl;
+		dst_line += dst_bpl;
+	}
+}
+
+/**
+ * \brief Perform a grayscale horizontal dilation or erosion.
+ *
+ * \param dst The destination image.
+ * \param src The source image.
+ */
+template<typename MinOrMax>
+void spreadGrayHorizontal(
+	QImage& dst, CoordinateSystem const& dst_cs,
+	QImage const& src, CoordinateSystem const& src_cs,
+	int const dy, int const dx1, int const dx2)
+{
+	// src_point = dst_point + dst_to_src;
+	QPoint const dst_to_src(dst_cs.offsetTo(src_cs));
+	
+	spreadGrayHorizontal<MinOrMax>(
+		dst, src, dy + dst_to_src.y(),
+		dx1 + dst_to_src.x(), dx2 + dst_to_src.x()
+	);
+}
+
+template<typename MinOrMax>
+void spreadGrayVertical(
+	QImage& dst, QImage const& src,
+	int const dx, int const dy1, int const dy2)
+{
+	int const src_bpl = src.bytesPerLine();
+	int const dst_bpl = dst.bytesPerLine();
+	uint8_t const* const src_data = src.bits() + dx;
+	uint8_t* const dst_data = dst.bits();
+	
+	int const dst_width = dst.width();
+	int const dst_height = dst.height();
+	
+	int const se_len = dy2 - dy1 + 1;
+	
+	std::vector<uint8_t> min_max_array(se_len * 2 - 1, 0);
+	uint8_t* const array_center = &min_max_array[se_len - 1];
+	
+	for (int x = 0; x < dst_width; ++x) {
+		for (int dst_segment_first = 0; dst_segment_first < dst_height;
+				dst_segment_first += se_len) {
+			int const dst_segment_last = std::min(
+				dst_segment_first + se_len, dst_height
+			) - 1; // inclusive
+			int const src_segment_first = dst_segment_first + dy1;
+			int const src_segment_last = dst_segment_last + dy2;
+			int const src_segment_center =
+				(src_segment_first + src_segment_last) >> 1;
+			
+			fillExtremumArrayLeftHalf<MinOrMax>(
+				array_center, src_data + x + src_segment_center * src_bpl,
+				src_bpl, src_segment_first, src_segment_center
+			);
+			
+			fillExtremumArrayRightHalf<MinOrMax>(
+				array_center, src_data + x + src_segment_center * src_bpl,
+				src_bpl, src_segment_center, src_segment_last
+			);
+			
+			uint8_t* dst = dst_data + x + dst_segment_first * dst_bpl;
+			for (int y = dst_segment_first; y <= dst_segment_last; ++y) {
+				int const src_first = y + dy1;
+				int const src_last = y + dy2; // inclusive
+				assert(src_segment_center >= src_first);
+				assert(src_segment_center <= src_last);
+				uint8_t v1 = array_center[src_first - src_segment_center];
+				uint8_t v2 = array_center[src_last - src_segment_center];
+				*dst = MinOrMax::select(v1, v2);
+				dst += dst_bpl;
+			}
+		}
+	}
+}
+
+template<typename MinOrMax>
+void spreadGrayVertical(
+	QImage& dst, CoordinateSystem const& dst_cs,
+	QImage const& src, CoordinateSystem const& src_cs,
+	int const dx, int const dy1, int const dy2)
+{
+	// src_point = dst_point + dst_to_src;
+	QPoint const dst_to_src(dst_cs.offsetTo(src_cs));
+	
+	spreadGrayVertical<MinOrMax>(
+		dst, src, dx + dst_to_src.x(),
+		dy1 + dst_to_src.y(), dy2 + dst_to_src.y()
+	);
+}
+
+QImage extendGrayImage(
+	QImage const& src, QRect const& dst_area, uint8_t const background)
+{
+	QImage dst(dst_area.size(), QImage::Format_Indexed8);
+	dst.setColorTable(createGrayscalePalette());
+	
+	CoordinateSystem const dst_cs(dst_area.topLeft());
+	QRect const src_rect_in_dst_cs(dst_cs.fromGlobal(src.rect()));
+	QRect const bound_src_rect_in_dst_cs(src_rect_in_dst_cs.intersected(dst.rect()));
+	
+	if (bound_src_rect_in_dst_cs.isEmpty()) {
+		dst.fill(background);
+		return dst;
+	}
+	
+	uint8_t const* src_line = src.bits();
+	uint8_t* dst_line = dst.bits();
+	int const src_bpl = src.bytesPerLine();
+	int const dst_bpl = dst.bytesPerLine();
+	
+	int y = 0;
+	for (; y < bound_src_rect_in_dst_cs.top(); ++y, dst_line += dst_bpl) {
+		memset(dst_line, background, dst_bpl);
+	}
+	
+	int const front_span_len = bound_src_rect_in_dst_cs.left();
+	int const data_span_len = bound_src_rect_in_dst_cs.width();
+	int const back_span_offset = front_span_len + data_span_len;
+	int const back_span_len = dst_area.width() - back_span_offset;
+	
+	QPoint const src_offset(
+		bound_src_rect_in_dst_cs.topLeft() - src_rect_in_dst_cs.topLeft()
+	);
+	
+	src_line += src_offset.x() + src_offset.y() * src_bpl;
+	for (; y <= bound_src_rect_in_dst_cs.bottom(); ++y) {
+		memset(dst_line, background, front_span_len);
+		memcpy(dst_line + front_span_len, src_line, data_span_len);
+		memset(dst_line + back_span_offset, background, back_span_len);
+		
+		src_line += src_bpl;
+		dst_line += dst_bpl;
+	}
+	
+	int const height = dst_area.height();
+	for (; y < height; ++y, dst_line += dst_bpl) {
+		memset(dst_line, background, dst_bpl);
+	}
+	
+	return dst;
+}
+
+template<typename MinOrMax>
+QImage dilateOrErodeGray(
+	QImage const& src, Brick const& brick,
+	QRect const& dst_area, unsigned char const src_surroundings)
+{
+	assert(!src.isNull());
+	assert(!brick.isEmpty());
+	assert(!dst_area.isEmpty());
+	
+	QImage dst(dst_area.size(), QImage::Format_Indexed8);
+	dst.setColorTable(createGrayscalePalette());
+	
+	if (!extendByBrick(src.rect(), brick).intersects(dst_area)) {
+		dst.fill(src_surroundings);
+		return dst;
+	}
+	CoordinateSystem const dst_cs(dst_area.topLeft());
+	
+	// Each pixel will be a minumum or maximum of a group of pixels
+	// in its neighborhood.  The neighborhood is defined by collect_area.
+	Brick const collect_area(brick.flipped());
+	
+	if (collect_area.minY() != collect_area.maxY()
+			&& collect_area.minX() != collect_area.maxX()) {
+		// We are going to make two operations:
+		// src -> tmp, then tmp -> dst
+		// Those operations will use the following collect areas:
+		Brick const collect_area1(
+			collect_area.minX(), collect_area.minY(),
+			collect_area.maxX(), collect_area.minY()
+		);
+		Brick const collect_area2(
+			0, 0, 0, collect_area.maxY() - collect_area.minY()
+		);
+		
+		QRect const tmp_rect(extendByBrick(dst_area, collect_area2));
+		CoordinateSystem tmp_cs(tmp_rect.topLeft());
+		
+		QImage tmp(tmp_rect.size(), QImage::Format_Indexed8);
+		tmp.setColorTable(createGrayscalePalette());
+		
+		// First operation.  The scope is there to destroy the
+		// effective_src image when it's no longer necessary.
+		{
+			QRect const effective_src_rect(
+				extendByBrick(tmp_rect, collect_area1)
+			);
+			QImage effective_src;
+			CoordinateSystem effective_src_cs;
+			if (src.rect().contains(effective_src_rect)) {
+				effective_src = src;
+			} else {
+				effective_src = extendGrayImage(
+					src, effective_src_rect, src_surroundings
+				);
+				effective_src_cs = CoordinateSystem(
+					effective_src_rect.topLeft()
+				);
+			}
+			
+			spreadGrayHorizontal<MinOrMax>(
+				tmp, tmp_cs, effective_src, effective_src_cs,
+				collect_area1.minY(),
+				collect_area1.minX(), collect_area1.maxX()
+			);
+		}
+		
+		// Second operation.
+		spreadGrayVertical<MinOrMax>(
+			dst, dst_cs, tmp, tmp_cs,
+			collect_area2.minX(),
+			collect_area2.minY(), collect_area2.maxY()
+		);
+	} else {
+		QRect const effective_src_rect(
+			extendByBrick(dst_area, collect_area)
+		);
+		QImage effective_src;
+		CoordinateSystem effective_src_cs;
+		if (src.rect().contains(effective_src_rect)) {
+			effective_src = src;
+		} else {
+			effective_src = extendGrayImage(
+				src, effective_src_rect, src_surroundings
+			);
+			effective_src_cs = CoordinateSystem(
+				effective_src_rect.topLeft()
+			);
+		}
+		
+		if (collect_area.minY() == collect_area.maxY()) {
+			spreadGrayHorizontal<MinOrMax>(
+				dst, dst_cs, effective_src, effective_src_cs,
+				collect_area.minY(),
+				collect_area.minX(), collect_area.maxX()
+			);
+		} else {
+			assert(collect_area.minX() == collect_area.maxX());
+			spreadGrayVertical<MinOrMax>(
+				dst, dst_cs, effective_src, effective_src_cs,
+				collect_area.minX(),
+				collect_area.minY(), collect_area.maxY()
+			);
+		}
+	}
+	
+	return dst;
+}
+
 } // anonymous namespace
 
 
@@ -450,10 +828,36 @@ BinaryImage dilateBrick(
 	return dst;
 }
 
+QImage dilateGray(
+	QImage const& src, Brick const& brick,
+	QRect const& dst_area, unsigned char const src_surroundings)
+{
+	if (src.isNull()) {
+		throw std::invalid_argument("dilateGray: src image is null");
+	}
+	if (brick.isEmpty()) {
+		throw std::invalid_argument("dilateGray: brick is empty");
+	}
+	if (dst_area.isEmpty()) {
+		throw std::invalid_argument("dilateGray: dst_area is empty");
+	}
+	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
+		throw std::invalid_argument("dilateGray: src image is not grayscale");
+	}
+	
+	return dilateOrErodeGray<Darker>(src, brick, dst_area, src_surroundings);
+}
+
 BinaryImage dilateBrick(
 	BinaryImage const& src, Brick const& brick, BWColor const src_surroundings)
 {
 	return dilateBrick(src, brick, src.rect(), src_surroundings);
+}
+
+QImage dilateGray(
+	QImage const& src, Brick const& brick, unsigned char const src_surroundings)
+{
+	return dilateGray(src, brick, src.rect(), src_surroundings);
 }
 
 BinaryImage erodeBrick(
@@ -479,10 +883,36 @@ BinaryImage erodeBrick(
 	return dst;
 }
 
+QImage erodeGray(
+	QImage const& src, Brick const& brick,
+	QRect const& dst_area, unsigned char const src_surroundings)
+{
+	if (src.isNull()) {
+		throw std::invalid_argument("erodeGray: src image is null");
+	}
+	if (brick.isEmpty()) {
+		throw std::invalid_argument("erodeGray: brick is empty");
+	}
+	if (dst_area.isEmpty()) {
+		throw std::invalid_argument("erodeGray: dst_area is empty");
+	}
+	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
+		throw std::invalid_argument("erodeGray: src image is not grayscale");
+	}
+	
+	return dilateOrErodeGray<Lighter>(src, brick, dst_area, src_surroundings);
+}
+
 BinaryImage erodeBrick(
 	BinaryImage const& src, Brick const& brick, BWColor const src_surroundings)
 {
 	return erodeBrick(src, brick, src.rect(), src_surroundings);
+}
+
+QImage erodeGray(
+	QImage const& src, Brick const& brick, unsigned char const src_surroundings)
+{
+	return erodeGray(src, brick, src.rect(), src_surroundings);
 }
 
 BinaryImage openBrick(

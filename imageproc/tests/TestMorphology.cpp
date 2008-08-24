@@ -53,6 +53,24 @@ BOOST_AUTO_TEST_CASE(test_dilate_1x1)
 	BOOST_CHECK(dilateBrick(img, QSize(1, 1), img.rect()) == img);
 }
 
+BOOST_AUTO_TEST_CASE(test_dilate_1x1_gray)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 2,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 7, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 6, 5, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 3, 0,
+		0, 0, 0, 4, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	BOOST_CHECK(dilateGray(img, QSize(1, 1), img.rect()) == img);
+}
+
 BOOST_AUTO_TEST_CASE(test_dilate_1x1_shift_black)
 {
 	static int const inp[] = {
@@ -85,6 +103,130 @@ BOOST_AUTO_TEST_CASE(test_dilate_1x1_shift_black)
 	BOOST_CHECK(dilateBrick(img, QSize(1, 1), img.rect().translated(2, 2), BLACK) == control);
 }
 
+BOOST_AUTO_TEST_CASE(test_dilate_1x1_shift_gray)
+{
+	static int const inp[] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 2,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 7, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 6, 5, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 3, 0,
+		0, 0, 0, 4, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	
+	static int const out[] = {
+		0, 0, 0, 0, 0, 0, 0, 5, 5,
+		0, 0, 0, 0, 0, 0, 0, 5, 5,
+		6, 5, 0, 0, 0, 0, 0, 5, 5,
+		0, 0, 0, 0, 0, 3, 0, 5, 5,
+		0, 4, 0, 0, 0, 0, 0, 5, 5,
+		0, 0, 0, 0, 0, 0, 0, 5, 5,
+		0, 0, 0, 0, 0, 0, 0, 5, 5,
+		5, 5, 5, 5, 5, 5, 5, 5, 5,
+		5, 5, 5, 5, 5, 5, 5, 5, 5
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 9, 9));	
+	BOOST_CHECK(dilateGray(img, QSize(1, 1), img.rect().translated(2, 2), 5) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_dilate_3x1_gray)
+{
+	static int const inp[] = {
+		9, 4, 2, 3, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 3, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 2, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 5, 2, 9,
+		9, 9, 9, 9, 9, 9, 2, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	static int const out[] = {
+		4, 2, 2, 2, 3, 9, 9, 1, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		3, 3, 3, 3, 3, 9, 9, 9, 9,
+		9, 9, 2, 2, 2, 2, 9, 9, 9,
+		9, 9, 9, 9, 9, 5, 2, 2, 2,
+		9, 9, 9, 9, 9, 2, 2, 2, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 9, 9));
+	BOOST_CHECK(dilateGray(img, QSize(3, 1), img.rect()) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_dilate_1x3_gray)
+{
+	static int const inp[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 2, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	static int const out[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 2, 9, 9, 9, 9, 9, 9, 1,
+		9, 2, 9, 9, 9, 9, 9, 9, 9,
+		9, 2, 9, 2, 9, 9, 9, 9, 9,
+		9, 3, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 9, 9));
+	BOOST_CHECK(dilateGray(img, QSize(1, 3), img.rect()) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_dilate_1x20_gray)
+{
+	static int const inp[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 2, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	static int const out[] = {
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1,
+		9, 2, 9, 2, 9, 9, 5, 2, 1
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 9, 9));
+	BOOST_CHECK(dilateGray(img, QSize(1, 20), img.rect()) == control);
+}
+
 BOOST_AUTO_TEST_CASE(test_dilate_3x3_white)
 {
 	static int const inp[] = {
@@ -115,6 +257,67 @@ BOOST_AUTO_TEST_CASE(test_dilate_3x3_white)
 	BinaryImage const control(makeBinaryImage(out, 9, 9));
 	
 	BOOST_CHECK(dilateBrick(img, QSize(3, 3), img.rect(), WHITE) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_dilate_3x3_gray)
+{
+	static int const inp[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 2, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	static int const out[] = {
+		4, 4, 4, 9, 9, 9, 9, 1, 1,
+		2, 2, 2, 9, 9, 9, 9, 1, 1,
+		2, 2, 2, 9, 9, 9, 9, 9, 9,
+		2, 2, 2, 2, 2, 9, 9, 9, 9,
+		3, 3, 2, 2, 2, 5, 2, 2, 2,
+		9, 9, 2, 2, 2, 5, 2, 2, 2,
+		9, 9, 2, 2, 2, 5, 2, 2, 2,
+		9, 9, 2, 2, 2, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 9, 9));
+	BOOST_CHECK(dilateGray(img, QSize(3, 3), img.rect()) == control);
+}
+
+BOOST_AUTO_TEST_CASE(test_dilate_3x3_gray_shrinked)
+{
+	static int const inp[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 2, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9
+	};
+	
+	static int const out[] = {
+		2, 2, 9, 9, 9, 9, 1,
+		2, 2, 9, 9, 9, 9, 9,
+		2, 2, 2, 2, 9, 9, 9,
+		3, 2, 2, 2, 5, 2, 2,
+		9, 2, 2, 2, 5, 2, 2,
+		9, 2, 2, 2, 5, 2, 2,
+		9, 2, 2, 2, 9, 9, 9
+	};
+	
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 7, 7));
+	QRect const dst_area(img.rect().adjusted(1, 1, -1, -1));
+	BOOST_CHECK(dilateGray(img, QSize(3, 3), dst_area) == control);
 }
 
 BOOST_AUTO_TEST_CASE(test_dilate_5x5_white)

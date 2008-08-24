@@ -25,6 +25,7 @@
 class QSize;
 class QRect;
 class QPoint;
+class QImage;
 
 namespace imageproc
 {
@@ -50,6 +51,14 @@ public:
 	 * \note Origin doesn't have to be inside the brick.
 	 */
 	Brick(QSize const& size, QPoint const& origin);
+	
+	/**
+	 * \brief Constructs a brick by specifying its bounds.
+	 *
+	 * Note that all bounds are inclusive.  The order of the arguments
+	 * is the same as for QRect::adjust().
+	 */
+	Brick(int min_x, int min_y, int max_x, int max_y);
 	
 	/**
 	 * \brief Get the minimum (inclusive) X offset from the origin.
@@ -81,6 +90,11 @@ public:
 	 * \brief Flips the brick both horizontally and vertically around the origin.
 	 */
 	void flip();
+	
+	/**
+	 * \brief Returns a brick flipped both horizontally and vertically around the origin.
+	 */
+	Brick flipped() const;
 private:
 	int m_minX;
 	int m_maxX;
@@ -112,6 +126,28 @@ BinaryImage dilateBrick(
 	BWColor src_surroundings = WHITE);
 
 /**
+ * \brief Spreads darker pixels over the brick's area.
+ *
+ * \param src The source image.  Must be grayscale.
+ * \param brick The area to spread darker pixels into.
+ * \param dst_area The area in source image coordinates that
+ *        will be returned as a destination image. It doesn't have
+ *        to fit into the source image area.
+ * \param src_surroundings The color of pixels that are assumed to
+ *        surround the source image.
+ */
+QImage dilateGray(
+	QImage const& src, Brick const& brick,
+	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+
+/**
+ * \brief Same as above, but assumes dst_rect == src.rect()
+ */
+QImage dilateGray(
+	QImage const& src, Brick const& brick,
+	unsigned char src_surroundings = 0xff);
+
+/**
  * \brief Turn every white pixel into a brick of white pixels.
  *
  * \param src The source image.
@@ -132,6 +168,28 @@ BinaryImage erodeBrick(
 BinaryImage erodeBrick(
 	BinaryImage const& src, Brick const& brick,
 	BWColor src_surroundings = WHITE);
+
+/**
+ * \brief Spreads lighter pixels over the brick's area.
+ *
+ * \param src The source image.  Must be grayscale.
+ * \param brick The area to spread lighter pixels into.
+ * \param dst_area The area in source image coordinates that
+ *        will be returned as a destination image. It doesn't have
+ *        to fit into the source image area.
+ * \param src_surroundings The color of pixels that are assumed to
+ *        surround the source image.
+ */
+QImage erodeGray(
+	QImage const& src, Brick const& brick,
+	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+
+/**
+ * \brief Same as above, but assumes dst_rect == src.rect()
+ */
+QImage erodeGray(
+	QImage const& src, Brick const& brick,
+	unsigned char src_surroundings = 0xff);
 
 /**
  * \brief Turn the black areas where the brick doesn't fit, into white.
