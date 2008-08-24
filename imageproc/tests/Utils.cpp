@@ -18,8 +18,10 @@
 
 #include "Utils.h"
 #include "BinaryImage.h"
+#include "Grayscale.h"
 #include <QImage>
 #include <QRect>
+#include <iostream>
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -82,6 +84,42 @@ QImage makeMonoQImage(int const* data, int const width, int const height)
 		}
 	}
 	return img;
+}
+
+QImage makeGrayImage(int const* data, int const width, int const height)
+{
+	QImage img(width, height, QImage::Format_Indexed8);
+	img.setColorTable(createGrayscalePalette());
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			img.setPixel(x, y, data[y * width + x]);
+		}
+	}
+	return img;
+}
+
+void dumpGrayImage(QImage const& img)
+{
+	if (img.isNull()) {
+		std::cout << "NULL image" << std::endl;
+		return;
+	}
+	if (img.format() != QImage::Format_Indexed8) {
+		std::cout << "Not grayscale image" << std::endl;
+	}
+	
+	int const width = img.width();
+	int const height = img.height();
+	
+	std::cout << "{\n";
+	for (int y = 0; y < height; ++y) {
+		std::cout << "\t";
+		for (int x = 0; x < width; ++x) {
+			std::cout << img.pixelIndex(x, y) << ", ";
+		}
+		std::cout << "\n";
+	}
+	std::cout << "}" << std::endl;
 }
 
 bool surroundingsIntact(QImage const& img1, QImage const& img2, QRect const& rect)

@@ -41,6 +41,10 @@ BinaryImage makeBinaryImage(int const* data, int width, int height);
 
 QImage makeMonoQImage(int const* data, int width, int height);
 
+QImage makeGrayImage(int const* data, int width, int height);
+
+void dumpGrayImage(QImage const& img);
+
 bool surroundingsIntact(QImage const& img1, QImage const& img2, QRect const& rect);
 
 } // namespace utils
