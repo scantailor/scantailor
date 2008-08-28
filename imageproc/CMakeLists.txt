@@ -28,6 +28,7 @@ SET(
 	Binarize.cpp Binarize.h
 	PolygonUtils.cpp PolygonUtils.h
 	PolygonRasterizer.cpp PolygonRasterizer.h
+	HoughLineDetector.cpp HoughLineDetector.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})
