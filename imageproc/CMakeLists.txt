@@ -29,6 +29,7 @@ SET(
 	PolygonUtils.cpp PolygonUtils.h
 	PolygonRasterizer.cpp PolygonRasterizer.h
 	HoughLineDetector.cpp HoughLineDetector.h
+	GaussBlur.cpp GaussBlur.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})
