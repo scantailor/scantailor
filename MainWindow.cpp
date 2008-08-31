@@ -939,7 +939,7 @@ MainWindow::FilterListModel::createCompositeTask(
 	PageInfo const& page, int const page_num,
 	QString const& out_dir, int const last_filter_idx,
 	ThumbnailPixmapCache& thumbnail_cache,
-	bool const batch_processing, bool const debug)
+	bool const batch_processing, bool debug)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
 	IntrusivePtr<page_split::Task> page_split_task;
@@ -948,32 +948,42 @@ MainWindow::FilterListModel::createCompositeTask(
 	IntrusivePtr<page_layout::Task> page_layout_task;
 	IntrusivePtr<output::Task> output_task;
 	
+	if (batch_processing) {
+		debug = false;
+	}
+	
 	switch (last_filter_idx) {
 	case 5:
 		output_task = m_ptrOutputFilter->createTask(
 			page.id(), page_num, out_dir,
 			thumbnail_cache, batch_processing, debug
 		);
+		debug = false;
 	case 4:
 		page_layout_task = m_ptrPageLayoutFilter->createTask(
 			page.id(), output_task, batch_processing, debug
 		);
+		debug = false;
 	case 3:
 		select_content_task = m_ptrSelectContentFilter->createTask(
 			page.id(), page_layout_task, batch_processing, debug
 		);
+		debug = false;
 	case 2:
 		deskew_task = m_ptrDeskewFilter->createTask(
 			page.id(), select_content_task, batch_processing, debug
 		);
+		debug = false;
 	case 1:
 		page_split_task = m_ptrPageSplitFilter->createTask(
 			page.id(), deskew_task, batch_processing, debug
 		);
+		debug = false;
 	case 0:
 		fix_orientation_task = m_ptrFixOrientationFilter->createTask(
 			page.id(), page_split_task, batch_processing
 		);
+		debug = false;
 	}
 	assert(fix_orientation_task);
 	
