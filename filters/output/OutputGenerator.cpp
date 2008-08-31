@@ -24,6 +24,7 @@
 #include "PerformanceTimer.h"
 #include "Dpm.h"
 #include "imageproc/BinaryImage.h"
+#include "imageproc/BinaryThreshold.h"
 #include "imageproc/Binarize.h"
 #include "imageproc/BWColor.h"
 #include "imageproc/Transform.h"
@@ -32,6 +33,7 @@
 #include "imageproc/SeedFill.h"
 #include "imageproc/Constants.h"
 #include "imageproc/Grayscale.h"
+#include "imageproc/GaussBlur.h"
 #include <QImage>
 #include <QSize>
 #include <QRectF>
@@ -72,6 +74,7 @@ OutputGenerator::process(QImage const& input,
 		case ColorParams::BITONAL:
 			return processBitonalOrBW(input, status, dbg);
 		case ColorParams::COLOR_GRAYSCALE:
+			//return processAutoHalftone(input, status, dbg);
 			return processColorOrGrayscale(input, status, dbg);
 	}
 	
@@ -254,6 +257,79 @@ OutputGenerator::processColorOrGrayscale(QImage const& input,
 	}
 	
 	return target;
+}
+
+QImage
+OutputGenerator::processAutoHalftone(QImage const& input,
+	TaskStatus const& status, DebugImages* const dbg) const
+{
+#if 0
+	h = fspecial('gaussian', [5, 5], 1.7);
+	blurred = imfilter(A, h,'replicate');
+	level = graythresh(A);
+	im= im2bw(A, level);
+	se = strel('disk',2);
+	w_d=imdilate(A, se);
+	b=imcomplement(A);
+	b_d=imdilate(b, se);
+	g=uint8(double(b_d).*double(w_d)/255); % OR
+	se2 = strel('disk',15);
+	marker=imerode(g, se2);
+	p=imreconstruct(marker, g);
+	g_a = imfill(p,'holes');
+	level = graythresh(g_a);% replace to other thresholding algoritm, error if not pictures in image
+	g_ab= im2bw(g_a,level);
+	final_image=uint8((double(blurred).*double(g_ab)+255*double(im).*double(1-g_ab)));
+	imwrite(final_image, 'final_image.tif')
+#endif
+	QImage const gray_input(toGrayscale(input));
+	
+	QImage const blurred(gaussBlurGray(gray_input, 4.5));
+	if (dbg) {
+		dbg->add(blurred, "blurred");
+	}
+	BinaryImage const im(binarizeOtsu(blurred));
+	if (dbg) {
+		dbg->add(im, "blurred_binarized");
+	}
+	QImage const dilated(dilateGray(gray_input, QSize(4, 4)));
+	if (dbg) {
+		dbg->add(dilated, "input_dilated");
+	}
+	QImage const eroded(erodeGray(gray_input, QSize(4, 4)));
+	if (dbg) {
+		dbg->add(eroded, "input_eroded");
+	}
+	
+	QImage gray(gray_input.size(), QImage::Format_Indexed8);
+	gray.setColorTable(createGrayscalePalette());
+	for (int y = 0; y < gray.height(); ++y) {
+		for (int x = 0; x < gray.width(); ++x) {
+			unsigned const e = eroded.pixelIndex(x, y);
+			unsigned const d = dilated.pixelIndex(x, y);
+			gray.setPixel(x, y, (255 - e) * d / 255);
+		}
+	}
+	if (dbg) {
+		dbg->add(gray, "gray");
+	}
+	
+	QImage const marker(dilateGray(gray, QSize(30, 30)));
+	if (dbg) {
+		dbg->add(marker, "marker");
+	}
+	
+	QImage const p(seedFillGray(marker, gray, CONN4));
+	if (dbg) {
+		dbg->add(p, "p");
+	}
+	
+	BinaryImage const gray_binarized(binarizeOtsu(p));
+	if (dbg) {
+		dbg->add(gray_binarized, "gray_binarized");
+	}
+	
+	return input;
 }
 
 QSize

@@ -58,6 +58,9 @@ private:
 	QImage processColorOrGrayscale(QImage const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
+	QImage processAutoHalftone(QImage const& input,
+		TaskStatus const& status, DebugImages* dbg = 0) const;
+	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
 	
 	static void hitMissReplaceAllDirections(
