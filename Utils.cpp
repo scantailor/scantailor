@@ -18,15 +18,27 @@
 
 #include "Utils.h"
 #include <QString>
-#include <QAbstractFileEngine>
-#include <memory>
+#include <QByteArray>
+#include <QFile>
+
+#ifdef Q_WS_WIN
+#include <windows.h>
+#else
+#include <stdio.h>
+#endif
 
 bool
 Utils::renameFile(QString const& from, QString const& to)
 {
-	// We can't use QFile::rename(), because it doesn't overwrite existing files.
-	std::auto_ptr<QAbstractFileEngine> const engine(
-		QAbstractFileEngine::create(from)
-	);
-	return engine->rename(to);
+#ifdef Q_WS_WIN
+	return MoveFileExW(
+		(WCHAR*)from.utf16(), (WCHAR*)to.utf16(),
+		MOVEFILE_REPLACE_EXISTING
+	) != 0;
+#else
+	return rename(
+		QFile::encodeName(from).data(),
+		QFile::encodeName(to).data()
+	) == 0;
+#endif
 }
