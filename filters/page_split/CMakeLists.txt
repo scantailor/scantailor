@@ -16,6 +16,7 @@ SET(
 	Params.cpp Params.h
 	Dependencies.cpp Dependencies.h
 	PageSplitFinder.cpp PageSplitFinder.h
+	VertLineFinder.cpp VertLineFinder.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
 	SplitModeDialog.cpp SplitModeDialog.h

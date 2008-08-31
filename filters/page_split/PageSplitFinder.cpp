@@ -19,10 +19,14 @@
 #include "PageSplitFinder.h"
 #include "PageLayout.h"
 #include "OrthogonalRotation.h"
+#include "VertLineFinder.h"
 #include "ContentSpanFinder.h"
 #include "DebugImages.h"
+#include "Dpi.h"
 #include "Dpm.h"
+#include "ImageTransformation.h"
 #include "foundation/Span.h"
+#include "imageproc/Binarize.h"
 #include "imageproc/BinaryThreshold.h"
 #include "imageproc/BWColor.h"
 #include "imageproc/Morphology.h"
@@ -30,6 +34,8 @@
 #include "imageproc/SeedFill.h"
 #include "imageproc/ReduceThreshold.h"
 #include "imageproc/ConnComp.h"
+#include "imageproc/ConnCompEraserExt.h"
+#include "imageproc/Connectivity.h"
 #include "imageproc/SkewFinder.h"
 #include "imageproc/Constants.h"
 #include "imageproc/RasterOp.h"
@@ -37,6 +43,8 @@
 #include "imageproc/OrthogonalRotation.h"
 #include "imageproc/Scale.h"
 #include "imageproc/SlicedHistogram.h"
+#include "imageproc/Transform.h"
+#include "imageproc/Grayscale.h"
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -47,25 +55,155 @@
 #include <QPoint>
 #include <QPainter>
 #include <QColor>
+#include <QPen>
+#include <QBrush>
 #include <QTransform>
 #include <QtGlobal>
+#include <QDebug>
 #include <vector>
 #include <utility>
 #include <algorithm>
 #include <limits>
 #include <math.h>
+#include <stdint.h>
 #include <assert.h>
-
-#include <QDebug>
 
 namespace page_split
 {
 
 using namespace imageproc;
 
+namespace
+{
+
+struct CenterComparator
+{
+	bool operator()(QLineF const& line1, QLineF const& line2) const {
+		double const line1_x_center = 0.5 * (line1.p1().x() + line1.p2().x());
+		double const line2_x_center = 0.5 * (line2.p1().x() + line2.p2().x());
+		return line1_x_center < line2_x_center;
+	}
+};
+
+unsigned sumGrayLevels(QImage const& image, QRect const& rect)
+{
+	unsigned char const* image_line = image.bits();
+	int const image_bpl = image.bytesPerLine();
+	int const w = rect.width();
+	int const h = rect.height();
+	
+	unsigned sum = 0;
+	image_line += rect.left() + rect.top() * image_bpl;
+	for (int y = 0; y < h; ++y, image_line += image_bpl) {
+		for (int x = 0; x < w; ++x) {
+			sum += image_line[x];
+		}
+	}
+	
+	return sum;
+}
+
+PageLayout selectSinglePageSplitLine(
+	std::vector<QLineF> const& ltr_lines, QSize const& image_size,
+	QImage const& hor_shadows, DebugImages* dbg)
+{
+	if (dbg) {
+		dbg->add(hor_shadows, "hor_shadows");
+	}
+	
+	if (ltr_lines.empty()) {
+		return PageLayout();
+	}
+	
+	if (ltr_lines.size() == 1) {
+		QLineF const& line = ltr_lines.front();
+		double const x_center = 0.5 * (line.p1().x() + line.p2().x());
+		if (x_center < 0.5 * image_size.width()) {
+			return PageLayout(line, false, true);
+		} else {
+			return PageLayout(line, true, false);
+		}
+	}
+	
+	QRect left_area(hor_shadows.rect());
+	left_area.setWidth(std::min(20, hor_shadows.width()));
+	QRect right_area(left_area);
+	right_area.moveRight(hor_shadows.rect().right());
+#if 0
+	unsigned const left_sum = sumGrayLevels(hor_shadows, left_area);
+	unsigned const right_sum = sumGrayLevels(hor_shadows, right_area);
+#else
+	BinaryImage const hor_shadows_bin(binarizeOtsu(hor_shadows));
+	if (dbg) {
+		dbg->add(hor_shadows_bin, "hor_shadows_bin");
+	}
+	unsigned const left_sum = hor_shadows_bin.countWhitePixels(left_area);
+	unsigned const right_sum = hor_shadows_bin.countWhitePixels(right_area);
+#endif
+	if (left_sum < right_sum) {
+		// Probably the horizontal shadow from a page touches the left
+		// border, which means that the left page was cut off.
+		return PageLayout(ltr_lines.front(), false, true);
+	} else {
+		return PageLayout(ltr_lines.back(), true, false);
+	}
+}
+
+PageLayout selectTwoPageSplitLine(
+	std::vector<QLineF> const& ltr_lines, QSize const& image_size)
+{
+	int const width = image_size.width();
+	int const height = image_size.height();
+	
+	if (ltr_lines.empty()) {
+		return PageLayout();
+	} else if (ltr_lines.size() == 1) {
+		return PageLayout(ltr_lines.front(), true, true);
+	}
+	
+	// Find the line closest to the center.
+	double const global_center = 0.5 * width;
+	double min_distance = std::numeric_limits<double>::max();
+	QLineF const* best_line = 0;
+	BOOST_FOREACH (QLineF const& line, ltr_lines) {
+		double const line_center = 0.5 * (line.p1().x() + line.p2().x());
+		double const distance = fabs(line_center - global_center);
+		if (distance < min_distance) {
+			min_distance = distance;
+			best_line = &line;
+		}
+	}
+	
+	return PageLayout(*best_line, true, true);
+}
+
+} // anonymous namespace
+
+
 PageLayout
 PageSplitFinder::findSplitLine(
-	QImage const& input, OrthogonalRotation const pre_rotation,
+	QImage const& input, ImageTransformation const& pre_xform,
+	BinaryThreshold const bw_threshold,
+	bool const single_page, DebugImages* dbg)
+{
+	PageLayout layout(
+		splitPagesByFindingVerticalLines(
+			input, pre_xform, bw_threshold, single_page, dbg
+		)
+	);
+	
+	if (layout.isNull()) {
+		layout = splitPagesByFindingVerticalWhitespace(
+			input, pre_xform, bw_threshold, single_page, dbg
+		);
+	}
+	
+	return layout;
+}
+
+PageLayout
+PageSplitFinder::splitPagesByFindingVerticalWhitespace(
+	QImage const& input, ImageTransformation const& pre_xform,
 	BinaryThreshold const bw_threshold,
 	bool const single_page, DebugImages* dbg)
 {
@@ -73,7 +211,7 @@ PageSplitFinder::findSplitLine(
 	
 	// Convert to B/W and rotate.
 	BinaryImage img(to300DpiBinary(input, xform, bw_threshold));
-	img = orthogonalRotation(img, pre_rotation.toDegrees());
+	img = orthogonalRotation(img, pre_xform.preRotation().toDegrees());
 	if (dbg) {
 		dbg->add(img, "bw300");
 	}
@@ -122,10 +260,43 @@ PageSplitFinder::findSplitLine(
 		}
 	}
 	
-	PageLayout const split(findSplitLineDeskewed(
-		img, single_page, left_cutoff, right_cutoff, dbg
-	));
-	return split.transformed(xform.inverted());
+	PageLayout const layout(
+		findSplitLineDeskewed(
+			img, single_page, left_cutoff, right_cutoff, dbg
+		)
+	);
+	return layout.transformed(xform.inverted());
+}
+
+PageLayout
+PageSplitFinder::splitPagesByFindingVerticalLines(
+	QImage const& input, ImageTransformation const& pre_xform,
+	imageproc::BinaryThreshold bw_threshold,
+	bool const single_page, DebugImages* dbg)
+{
+	QImage hor_shadows;
+	
+	int const max_lines = 8;
+	std::vector<QLineF> lines(
+		VertLineFinder::findLines(
+			input, pre_xform, max_lines, dbg,
+			single_page ? &hor_shadows : 0
+		)
+	);
+	
+	if (lines.empty()) {
+		return PageLayout();
+	}
+	
+	std::sort(lines.begin(), lines.end(), CenterComparator());
+	
+	if (single_page) {
+		return selectSinglePageSplitLine(
+			lines, input.size(), hor_shadows, dbg
+		);
+	} else {
+		return selectTwoPageSplitLine(lines, input.size());
+	}
 }
 
 imageproc::BinaryImage
@@ -167,6 +338,7 @@ PageSplitFinder::removeGarbageAnd2xDownscale(
 	non_garbage_seed2.release();
 	reduced = seedFill(non_garbage_seed, reduced, CONN8);
 	non_garbage_seed.release();
+	
 	if (dbg) {
 		dbg->add(reduced, "garbage_removed");
 	}
@@ -190,7 +362,6 @@ PageSplitFinder::removeGarbageAnd2xDownscale(
 	}
 	
 	rasterOp<RopSubtract<RopDst, RopSrc> >(reduced, shadows_dilated);
-	
 	return reduced;
 }
 
@@ -225,12 +396,32 @@ PageSplitFinder::findSplitLineDeskewed(
 	int const width = input.width();
 	int const height = input.height();
 	
+	BinaryImage cc_img(input.size(), WHITE);
+
+	{
+		ConnCompEraser cc_eraser(input, CONN8);
+		ConnComp cc;
+		while (!(cc = cc_eraser.nextConnComp()).isNull()) {
+			if (cc.width() < 5 || cc.height() < 5) {
+				continue;
+			}
+			if ((double)cc.height() / cc.width() > 6) {
+				continue;
+			}
+			cc_img.fill(cc.rect(), BLACK);
+		}
+	}
+	
+	if (dbg) {
+		dbg->add(cc_img, "cc_img");
+	}
+	
 	ContentSpanFinder span_finder;
 	span_finder.setMinContentWidth(2);
 	span_finder.setMinWhitespaceWidth(8);
 	
 	std::deque<Span> spans;
-	SlicedHistogram hist(input, SlicedHistogram::COLS);
+	SlicedHistogram hist(cc_img, SlicedHistogram::COLS);
 	span_finder.find(hist, bind(&std::deque<Span>::push_back, var(spans), _1));
 	
 	if (dbg) {

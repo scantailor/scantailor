@@ -27,7 +27,7 @@ class QRect;
 class QPoint;
 class QImage;
 class QTransform;
-class OrthogonalRotation;
+class ImageTransformation;
 class DebugImages;
 class Span;
 class PageLayout;
@@ -36,6 +36,7 @@ namespace imageproc
 {
 	class BinaryImage;
 	class BinaryThreshold;
+	class SlicedHistogram;
 }
 
 namespace page_split
@@ -45,10 +46,20 @@ class PageSplitFinder
 {
 public:
 	static PageLayout findSplitLine(
-		QImage const& input, OrthogonalRotation pre_rotation,
+		QImage const& input, ImageTransformation const& pre_xform,
 		imageproc::BinaryThreshold bw_threshold,
 		bool single_page, DebugImages* dbg = 0);
 private:
+	static PageLayout splitPagesByFindingVerticalLines(
+		QImage const& input, ImageTransformation const& pre_xform,
+		imageproc::BinaryThreshold bw_threshold,
+		bool single_page, DebugImages* dbg);
+	
+	static PageLayout splitPagesByFindingVerticalWhitespace(
+		QImage const& input, ImageTransformation const& pre_xform,
+		imageproc::BinaryThreshold const bw_threshold,
+		bool const single_page, DebugImages* dbg);
+	
 	static imageproc::BinaryImage to300DpiBinary(
 		QImage const& img, QTransform& xform,
 		imageproc::BinaryThreshold threshold);

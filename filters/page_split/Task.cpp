@@ -129,8 +129,11 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	}
 	
 	if (layout.isNull()) {
+		ImageTransformation new_xform(data.xform());
+		new_xform.setPreRotation(pre_rotation);
+		
 		layout = PageSplitFinder::findSplitLine(
-			data.image(), pre_rotation, data.bwThreshold(),
+			data.image(), new_xform, data.bwThreshold(),
 			single_page, m_ptrDbg.get()
 		);
 		
