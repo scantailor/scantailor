@@ -30,6 +30,7 @@ SET(
 	PolygonRasterizer.cpp PolygonRasterizer.h
 	HoughLineDetector.cpp HoughLineDetector.h
 	GaussBlur.cpp GaussBlur.h
+	MorphGradientDetect.cpp MorphGradientDetect.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})
