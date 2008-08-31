@@ -553,12 +553,6 @@ void spreadGrayHorizontal(
 	}
 }
 
-/**
- * \brief Perform a grayscale horizontal dilation or erosion.
- *
- * \param dst The destination image.
- * \param src The source image.
- */
 template<typename MinOrMax>
 void spreadGrayHorizontal(
 	QImage& dst, CoordinateSystem const& dst_cs,
@@ -962,6 +956,46 @@ BinaryImage openBrick(
 	return openBrick(src, brick, src.rect(), src_surroundings);
 }
 
+QImage openGray(
+	QImage const& src, QSize const& brick,
+	QRect const& dst_area, unsigned char const src_surroundings)
+{
+	if (src.isNull()) {
+		throw std::invalid_argument("openGray: src image is null");
+	}
+	if (brick.isEmpty()) {
+		throw std::invalid_argument("openGray: brick is empty");
+	}
+	if (dst_area.isEmpty()) {
+		throw std::invalid_argument("openGray: dst_area is empty");
+	}
+	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
+		throw std::invalid_argument("openGray: src image is not grayscale");
+	}
+	
+	Brick const brick1(brick);
+	Brick const brick2(brick1.flipped());
+	
+	// We are going to make two operations:
+	// tmp = erodeGray(src, brick1), then dst = dilateGray(tmp, brick2)
+	QRect const tmp_rect(extendByBrick(dst_area, brick2));
+	CoordinateSystem tmp_cs(tmp_rect.topLeft());
+	
+	QImage const tmp(
+		dilateOrErodeGray<Lighter>(src, brick1, tmp_rect, src_surroundings)
+	);
+	return dilateOrErodeGray<Darker>(
+		tmp, brick2, tmp_cs.fromGlobal(dst_area), src_surroundings
+	);
+}
+
+QImage openGray(
+	QImage const& src, QSize const& brick,
+	unsigned char const src_surroundings)
+{
+	return openGray(src, brick, src.rect(), src_surroundings);
+}
+
 BinaryImage closeBrick(
 	BinaryImage const& src, QSize const& brick,
 	QRect const& dst_area, BWColor const src_surroundings)
@@ -1007,6 +1041,46 @@ BinaryImage closeBrick(
 	BinaryImage const& src, QSize const& brick, BWColor const src_surroundings)
 {
 	return closeBrick(src, brick, src.rect(), src_surroundings);
+}
+
+QImage closeGray(
+	QImage const& src, QSize const& brick,
+	QRect const& dst_area, unsigned char const src_surroundings)
+{
+	if (src.isNull()) {
+		throw std::invalid_argument("closeGray: src image is null");
+	}
+	if (brick.isEmpty()) {
+		throw std::invalid_argument("closeGray: brick is empty");
+	}
+	if (dst_area.isEmpty()) {
+		throw std::invalid_argument("closeGray: dst_area is empty");
+	}
+	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
+		throw std::invalid_argument("closeGray: src image is not grayscale");
+	}
+	
+	Brick const brick1(brick);
+	Brick const brick2(brick1.flipped());
+	
+	// We are going to make two operations:
+	// tmp = dilateGray(src, brick1), then dst = erodeGray(tmp, brick2)
+	QRect const tmp_rect(extendByBrick(dst_area, brick2));
+	CoordinateSystem tmp_cs(tmp_rect.topLeft());
+	
+	QImage const tmp(
+		dilateOrErodeGray<Darker>(src, brick1, tmp_rect, src_surroundings)
+	);
+	return dilateOrErodeGray<Lighter>(
+		tmp, brick2, tmp_cs.fromGlobal(dst_area), src_surroundings
+	);
+}
+
+QImage closeGray(
+	QImage const& src, QSize const& brick,
+	unsigned char const src_surroundings)
+{
+	return closeGray(src, brick, src.rect(), src_surroundings);
 }
 
 BinaryImage hitMissMatch(

@@ -216,6 +216,28 @@ BinaryImage openBrick(
 	BWColor src_surroundings = WHITE);
 
 /**
+ * \brief Remove dark areas smaller than the structuring element.
+ *
+ * \param src The source image.
+ * \param brick The structuring element.
+ * \param dst_area The area in source image coordinates that
+ *        will be returned as a destination image. It doesn't have
+ *        to fit into the source image area.
+ * \param src_surroundings The color of pixels that are assumed to
+ *        surround the source image.
+ */
+QImage openGray(
+	QImage const& src, QSize const& brick,
+	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+
+/**
+ * \brief Same as above, but assumes dst_rect == src.rect()
+ */
+QImage openGray(
+	QImage const& src, QSize const& brick,
+	unsigned char src_surroundings = 0xff);
+
+/**
  * \brief Turn the white areas where the brick doesn't fit, into black.
  *
  * \param src The source image.
@@ -238,6 +260,28 @@ BinaryImage closeBrick(
 BinaryImage closeBrick(
 	BinaryImage const& src, QSize const& brick,
 	BWColor src_surroundings = WHITE);
+
+/**
+ * \brief Remove light areas smaller than the structuring element.
+ *
+ * \param src The source image.
+ * \param brick The structuring element.
+ * \param dst_area The area in source image coordinates that
+ *        will be returned as a destination image. It doesn't have
+ *        to fit into the source image area.
+ * \param src_surroundings The color of pixels that are assumed to
+ *        surround the source image.
+ */
+QImage closeGray(
+	QImage const& src, QSize const& brick,
+	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+
+/**
+ * \brief Same as above, but assumes dst_rect == src.rect()
+ */
+QImage closeGray(
+	QImage const& src, QSize const& brick,
+	unsigned char src_surroundings = 0xff);
 
 /**
  * \brief Performs a hit-miss matching operation.
