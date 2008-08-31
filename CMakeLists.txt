@@ -238,6 +238,7 @@ TARGET_LINK_LIBRARIES(
 	imageproc foundation boost_signals
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
+INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
 
 ADD_TEST(ImageProcTests imageproc/tests/imageproc_tests --log_level=message)
 ADD_TEST(ScanTaylorTests tests/tests --log_level=message)
@@ -250,6 +251,7 @@ SET(
 	CPACK_SOURCE_IGNORE_FILES
 	"/\\\\.svn/"
 	"~$"
+	"\\\\.pcs$"
 	"TODO.txt"
 	"/doxygen/"
 	"${CMAKE_BINARY_DIR}"
