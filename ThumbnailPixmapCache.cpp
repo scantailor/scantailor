@@ -19,7 +19,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ImageId.h"
 #include "ImageLoader.h"
-#include "Utils.h"
+#include "AtomicFileOverwriter.h"
 #include "imageproc/Scale.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
@@ -29,8 +29,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QFile>
-#include <QTemporaryFile>
-#include <QAbstractFileEngine>
 #include <QString>
 #include <QChar>
 #include <QImage>
@@ -453,16 +451,10 @@ ThumbnailPixmapCache::Impl::ensureThumbnailExists(
 	
 	QImage const thumbnail(makeThumbnail(image, max_thumb_size));
 	
-	// To avoid concurrently writing to the same file, we write
-	// to a temporary file and then replace the original.
-	QTemporaryFile temp_file(thumb_file_path);
-	temp_file.setAutoRemove(true);
-	if (temp_file.open()) {
-		if (thumbnail.save(&temp_file, "PNG")) {
-			if (Utils::renameFile(temp_file.fileName(), thumb_file_path)) {
-				temp_file.setAutoRemove(false);
-			}
-		}
+	AtomicFileOverwriter overwriter;
+	QIODevice* iodev = overwriter.startWriting(thumb_file_path);
+	if (thumbnail.save(iodev, "PNG")) {
+		overwriter.commit();
 	}
 }
 
@@ -487,17 +479,13 @@ ThumbnailPixmapCache::Impl::recreateThumbnail(
 	QImage const thumbnail(makeThumbnail(image, max_thumb_size));
 	bool thumb_written = false;
 	
-	// To avoid concurrently writing to the same file, we write
-	// to a temporary file and then replace the original.
-	QTemporaryFile temp_file(thumb_file_path);
-	temp_file.setAutoRemove(true);
-	if (temp_file.open()) {
-		if (thumbnail.save(&temp_file, "PNG")) {
-			if (Utils::renameFile(temp_file.fileName(), thumb_file_path)) {
-				thumb_written = true;
-				temp_file.setAutoRemove(false);
-			}
-		}
+	// Note that we may be called from multiple threads at the same time.
+	AtomicFileOverwriter overwriter;
+	QIODevice* iodev = overwriter.startWriting(thumb_file_path);
+	if (thumbnail.save(iodev, "PNG")) {
+		thumb_written = overwriter.commit();
+	} else {
+		overwriter.abort();
 	}
 	
 	if (!thumb_written) {
