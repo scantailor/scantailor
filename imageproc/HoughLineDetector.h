@@ -24,6 +24,7 @@
 
 class QSize;
 class QLineF;
+class QImage;
 
 namespace imageproc
 {
@@ -56,6 +57,10 @@ public:
 	 * The weight of a point is an argument to HoughLineDetector::put().
 	 */
 	unsigned quality() const { return m_quality; }
+	
+	QPointF pointAtY(double y) const;
+	
+	QPointF pointAtX(double x) const;
 	
 	/**
 	 * \brief Returns an arbitrary line segment of length 1.
@@ -97,6 +102,8 @@ public:
 	 */
 	void process(int x, int y, unsigned weight = 1);
 	
+	QImage visualizeHoughSpace(unsigned lower_bound) const;
+	
 	/**
 	 * \brief Returns the lines found among the input points.
 	 *
@@ -121,7 +128,7 @@ private:
 		std::vector<unsigned>& hist,
 		int width, int height, BinaryImage const& mask);
 	
-	static void max3x3(
+	static void max5x5(
 		std::vector<unsigned> const& src,
 		std::vector<unsigned>& dst, int width, int height);
 	
@@ -133,11 +140,6 @@ private:
 		std::vector<unsigned> const& src,
 		std::vector<unsigned>& dst, int width, int height);
 	
-	static void maxPrevCurNext(
-		std::vector<unsigned> const& src,
-		std::vector<unsigned>& dst, int width, int height,
-		int next_offset);
-	
 	static BinaryImage buildEqualMap(
 		std::vector<unsigned> const& src1,
 		std::vector<unsigned> const& src2,
@@ -148,9 +150,6 @@ private:
 	 *
 	 * Rows correspond to line angles while columns correspond to
 	 * line distances from the origin.
-	 *
-	 * \note An extra line of empty bins is added from each side
-	 * of the histogram to simplify its processing.
 	 */
 	std::vector<unsigned> m_histogram;
 	
@@ -175,12 +174,12 @@ private:
 	double m_distanceBias;
 	
 	/**
-	 * The width of m_histogram, including the 2 padding columns.
+	 * The width of m_histogram.
 	 */
 	int m_histWidth;
 	
 	/**
-	 * The height of m_histogram, including the 2 padding rows.
+	 * The height of m_histogram.
 	 */
 	int m_histHeight;
 };
