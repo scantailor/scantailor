@@ -30,7 +30,7 @@ public:
 	/**
 	 * Unlike QFile::rename(), this one overwrites existing files.
 	 */
-	static bool renameFile(QString const& from, QString const& to);
+	static bool overwritingRename(QString const& from, QString const& to);
 	
 	/**
 	 * \brief A high precision, locale independent number to string conversion.

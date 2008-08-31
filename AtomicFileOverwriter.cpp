@@ -60,7 +60,7 @@ AtomicFileOverwriter::commit()
 	// 2. QTemporaryFile::close() doesn't really close it.
 	m_ptrTempFile.reset();
 	
-	if (!Utils::renameFile(temp_file_path, target_path)) {
+	if (!Utils::overwritingRename(temp_file_path, target_path)) {
 		QFile::remove(temp_file_path);
 		return false;
 	}

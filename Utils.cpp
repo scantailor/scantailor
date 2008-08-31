@@ -28,7 +28,7 @@
 #endif
 
 bool
-Utils::renameFile(QString const& from, QString const& to)
+Utils::overwritingRename(QString const& from, QString const& to)
 {
 #ifdef Q_WS_WIN
 	return MoveFileExW(

@@ -321,7 +321,7 @@ MainWindow::closeEvent(QCloseEvent* const event)
 	
 	switch (promptProjectSave()) {
 		case SAVE:
-			if (!Utils::renameFile(backup_file_path, m_projectFile)) {
+			if (!Utils::overwritingRename(backup_file_path, m_projectFile)) {
 				event->ignore();
 				QMessageBox::warning(
 					this, tr("Error"),
