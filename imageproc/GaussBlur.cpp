@@ -37,7 +37,7 @@ static void transfer_pixels(
 	unsigned char* dest, int const dest_step, int const count)
 {
 	for (int i = 0; i < count; ++i) {
-		int sum = floor(*src1 + *src2 + 0.5);
+		int sum = (int)floor(*src1 + *src2 + 0.5);
 		if (sum > 255) {
 			sum = 255;
 		} else if (sum < 0) {
