@@ -39,6 +39,7 @@
 #include "imageproc/Grayscale.h"
 #include "imageproc/SlicedHistogram.h"
 #include "imageproc/DentFinder.h"
+#include "imageproc/IntegralImage.h"
 #include "imageproc/PolygonRasterizer.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -50,6 +51,7 @@
 #include <QPainter>
 #include <QTransform>
 #include <Qt>
+#include <QDebug>
 #include <deque>
 #include <algorithm>
 
@@ -84,7 +86,7 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	//BinaryImage bw150(binarizeWolf(gray150));
+	//BinaryImage bw150(binarizeWolf(gray150, QSize(91, 91)));
 	BinaryImage bw150(gray150, data.bwThreshold());
 	if (dbg) {
 		dbg->add(bw150, "bw150");
@@ -159,6 +161,44 @@ ContentBoxFinder::findContentBox(
 	);
 	if (dbg) {
 		dbg->add(content, "page_mask_applied");
+	}
+	
+	status.throwIfCancelled();
+	
+	BinaryImage large_seed(openBrick(content, QSize(2, 2)));
+	content = seedFill(large_seed, content, CONN8);
+	large_seed.release();
+	if (dbg) {
+		dbg->add(content, "small_garbage_removed");
+	}
+	
+	IntegralImage<unsigned> integral_img(content.width(), content.height());
+	for (int y = 0; y < content.height(); ++y) {
+		integral_img.beginRow();
+		uint32_t const* line = content.data() + content.wordsPerLine() * y;
+		for (int x = 0; x < content.width(); ++x) {
+			unsigned const bit = (line[x >> 5] >> (31 - (x & 31))) & 1;
+			integral_img.push(bit);
+		}
+	}
+	
+	QSize const window(50, 50);
+	for (int y = 0; y < content.height(); ++y) {
+		uint32_t const msb = uint32_t(1) << 31;
+		uint32_t* line = content.data() + content.wordsPerLine() * y;
+		for (int x = 0; x < content.width(); ++x) {
+			QRect rect(QPoint(0, 0), window);
+			rect.moveCenter(QPoint(x, y));
+			rect &= content.rect();
+			unsigned const sum = integral_img.sum(rect);
+			uint32_t* word = &line[x >> 5];
+			if (sum < window.width() * window.height() * 0.02) {
+				*word &= ~(msb >> (x & 31));
+			}
+		}
+	}
+	if (dbg) {
+		dbg->add(content, "remote_removed");
 	}
 	
 	status.throwIfCancelled();
