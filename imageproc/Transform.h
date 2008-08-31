@@ -19,6 +19,8 @@
 #ifndef IMAGEPROC_TRANSFORM_H_
 #define IMAGEPROC_TRANSFORM_H_
 
+#include <QSizeF>
+
 class QImage;
 class QRect;
 class QTransform;
@@ -27,9 +29,23 @@ class QColor;
 namespace imageproc
 {
 
+/**
+ * \brief Apply an affine transformation to the image.
+ *
+ * \param src The source image.
+ * \param xform The transformation from source to destination.
+ *        Only affine transformations are supported.
+ * \param dst_rect The are in source image coordinates to return
+ *        as a destination image.
+ * \param background_color Used to fill areas not represented in the source image.
+ * \param min_mapping_area Defines the minimum rectangle in the source image
+ *        that maps to a destination pixel.  This can be used to control
+ *        smoothing.
+ */
 QImage transformToGray(
 	QImage const& src, QTransform const& xform,
-	QRect const& dst_rect, QColor const& background_color);
+	QRect const& dst_rect, QColor const& background_color,
+	QSizeF const& min_mapping_area = QSizeF(0.9, 0.9));
 
 } // namespace imageproc
 

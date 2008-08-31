@@ -50,7 +50,7 @@ struct YLess
 	}
 };
 
-static QSizeF calcSrcUnitSize(QTransform const& xform)
+static QSizeF calcSrcUnitSize(QTransform const& xform, QSizeF const& min)
 {
 	// Imagine a rectangle of (0, 0, 1, 1), except we take
 	// centers of its edges instead of its vertices.
@@ -66,16 +66,17 @@ static QSizeF calcSrcUnitSize(QTransform const& xform)
 	std::sort(src_poly.begin(), src_poly.end(), YLess());
 	double const height = src_poly.back().y() - src_poly.front().y();
 	
-	// By limiting the minimum width and height of the source area
-	// corresponding to a destination pixel, we get interpolation
-	// when upscaling.
-	double const min = 0.9 * 32.0;
-	return QSizeF(std::max(min, width), std::max(min, height));
+	QSizeF const min32(min * 32.0);
+	return QSizeF(
+		std::max(min32.width(), width),
+		std::max(min32.height(), height)
+	);
 }
 
 static QImage transformGrayToGray(
 	QImage const& src, QTransform const& xform,
-	QRect const& dst_rect, QColor const background_color)
+	QRect const& dst_rect, QColor const background_color,
+	QSizeF const& min_mapping_area)
 {
 	int const sw = src.width();
 	int const sh = src.height();
@@ -98,7 +99,7 @@ static QImage transformGrayToGray(
 	// sx32 = dx*inv_xform.m11() + dy*inv_xform.m21() + inv_xform.dx();
 	// sy32 = dy*inv_xform.m22() + dx*inv_xform.m12() + inv_xform.dy();
 	
-	QSizeF const src32_unit_size(calcSrcUnitSize(inv_xform));
+	QSizeF const src32_unit_size(calcSrcUnitSize(inv_xform, min_mapping_area));
 	int const src32_unit_w = std::max<int>(1, qRound(src32_unit_size.width()));
 	int const src32_unit_h = std::max<int>(1, qRound(src32_unit_size.height()));
 	
@@ -299,7 +300,8 @@ static QImage transformGrayToGray(
 
 QImage transformToGray(
 	QImage const& src, QTransform const& xform,
-	QRect const& dst_rect, QColor const& background_color)
+	QRect const& dst_rect, QColor const& background_color,
+	QSizeF const& min_mapping_area)
 {
 	if (src.isNull()) {
 		return src;
@@ -313,7 +315,10 @@ QImage transformToGray(
 		throw std::invalid_argument("transformToGray: dst_rect is invalid");
 	}
 	
-	return transformGrayToGray(toGrayscale(src), xform, dst_rect, background_color);
+	return transformGrayToGray(
+		toGrayscale(src), xform, dst_rect,
+		background_color, min_mapping_area
+	);
 }
 
 } // namespace imageproc
