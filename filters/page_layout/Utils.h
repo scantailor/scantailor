@@ -81,7 +81,7 @@ public:
 	 * \brief Calculates the page rect (content + hard margins + soft margins)
 	 *
 	 * \param xform Transformations applied to image.
-	 * \param content_rect Content rectangle in transformed coordinates.
+	 * \param content_rect_phys Content rectangle in transformed coordinates.
 	 * \param params Margins, aligment and other parameters.
 	 * \param aggregate_hard_size_mm Maximum width and height across all pages.
 	 * \return Page rectangle (as a polygon) in physical image coordinates.
