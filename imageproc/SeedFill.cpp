@@ -18,7 +18,10 @@
 
 #include "SeedFill.h"
 #include <QSize>
+#include <QImage>
 #include <stdexcept>
+#include <algorithm>
+#include <stdint.h>
 
 namespace imageproc
 {
@@ -51,36 +54,38 @@ void seedFill4Iteration(BinaryImage& seed, BinaryImage const& mask)
 	
 	uint32_t* seed_line = seed.data();
 	uint32_t const* mask_line = mask.data();
+	uint32_t const* prev_line = seed_line;
 	
-	// Top from bottom.
-	for (int y = 0; y < h; ++y, seed_line += seed_wpl, mask_line += mask_wpl) {
-		uint32_t const* north_line = (y == 0) ? seed_line : seed_line - seed_wpl;
-		uint32_t west_word = 0;
+	// Top to bottom.
+	for (int y = 0; y < h; ++y) {
+		uint32_t prev_word = 0;
 		
-		// Make sure offscreen bits area 0.
+		// Make sure offscreen bits are 0.
 		seed_line[content_wpl - 1] &= last_word_mask;
 		
 		// Left to right.
 		for (int i = 0; i < content_wpl; ++i) {
 			uint32_t const mask = mask_line[i];
-			uint32_t word = west_word << 31;
-			word |= seed_line[i] | north_line[i];
+			uint32_t word = prev_word << 31;
+			word |= seed_line[i] | prev_line[i];
 			word &= mask;
 			word = fillWordHorizontally(word, mask);
 			seed_line[i] = word;
-			west_word = word;
+			prev_word = word;
 		}
 		
-		// Note that we might have set some offscreen bits to 1.
+		prev_line = seed_line;
+		seed_line += seed_wpl;
+		mask_line += mask_wpl;
 	}
 	
-	// Bottom from top.
+	seed_line -= seed_wpl;
+	mask_line -= mask_wpl;
+	prev_line = seed_line;
+	
+	// Bottom to top.
 	for (int y = h - 1; y >= 0; --y) {
-		seed_line -= seed_wpl;
-		mask_line -= mask_wpl;
-		
-		uint32_t const* south_line = (y == h - 1) ? seed_line : seed_line + seed_wpl;
-		uint32_t east_word = 0;
+		uint32_t prev_word = 0;
 		
 		// Make sure offscreen bits area 0.
 		seed_line[content_wpl - 1] &= last_word_mask;
@@ -88,15 +93,17 @@ void seedFill4Iteration(BinaryImage& seed, BinaryImage const& mask)
 		// Right to left.
 		for (int i = content_wpl - 1; i >= 0; --i) {
 			uint32_t const mask = mask_line[i];
-			uint32_t word = east_word >> 31;
-			word |= seed_line[i] | south_line[i];
+			uint32_t word = prev_word >> 31;
+			word |= seed_line[i] | prev_line[i];
 			word &= mask;
 			word = fillWordHorizontally(word, mask);
 			seed_line[i] = word;
-			east_word = word;
+			prev_word = word;
 		}
 		
-		// Note that we might have set some offscreen bits to 1.
+		prev_line = seed_line;
+		seed_line -= seed_wpl;
+		mask_line -= mask_wpl;
 	}
 }
 
@@ -112,11 +119,11 @@ void seedFill8Iteration(BinaryImage& seed, BinaryImage const& mask)
 	
 	uint32_t* seed_line = seed.data();
 	uint32_t const* mask_line = mask.data();
+	uint32_t const* prev_line = seed_line;
 	
 	// Top to bottom.
-	for (int y = 0; y < h; ++y, seed_line += seed_wpl, mask_line += mask_wpl) {
-		uint32_t const* north_line = (y == 0) ? seed_line : seed_line - seed_wpl;
-		uint32_t west_word = 0;
+	for (int y = 0; y < h; ++y) {
+		uint32_t prev_word = 0;
 		
 		// Make sure offscreen bits area 0.
 		seed_line[content_wpl - 1] &= last_word_mask;
@@ -124,25 +131,27 @@ void seedFill8Iteration(BinaryImage& seed, BinaryImage const& mask)
 		// Left to right.
 		for (int i = 0; i < content_wpl; ++i) {
 			uint32_t const mask = mask_line[i];
-			uint32_t word = north_line[i];
+			uint32_t word = prev_line[i];
 			word |= (word << 1) | (word >> 1);
-			word |= seed_line[i] | (west_word << 31);
+			word |= seed_line[i] | (prev_word << 31);
 			word &= mask;
 			word = fillWordHorizontally(word, mask);
 			seed_line[i] = word;
-			west_word = word;
+			prev_word = word;
 		}
 		
-		// Note that we might have set some offscreen bits to 1.
+		prev_line = seed_line;
+		seed_line += seed_wpl;
+		mask_line += mask_wpl;
 	}
+	
+	seed_line -= seed_wpl;
+	mask_line -= mask_wpl;
+	prev_line = seed_line;
 	
 	// Bottom to top.
 	for (int y = h - 1; y >= 0; --y) {
-		seed_line -= seed_wpl;
-		mask_line -= mask_wpl;
-		
-		uint32_t const* south_line = (y == h - 1) ? seed_line : seed_line + seed_wpl;
-		uint32_t east_word = 0;
+		uint32_t prev_word = 0;
 		
 		// Make sure offscreen bits area 0.
 		seed_line[content_wpl - 1] &= last_word_mask;
@@ -150,16 +159,178 @@ void seedFill8Iteration(BinaryImage& seed, BinaryImage const& mask)
 		// Right to left.
 		for (int i = content_wpl - 1; i >= 0; --i) {
 			uint32_t const mask = mask_line[i];
-			uint32_t word = south_line[i];
+			uint32_t word = prev_line[i];
 			word |= (word << 1) | (word >> 1);
-			word |= seed_line[i] | (east_word >> 31);
+			word |= seed_line[i] | (prev_word >> 31);
 			word &= mask;
 			word = fillWordHorizontally(word, mask);
 			seed_line[i] = word;
-			east_word = word;
+			prev_word = word;
 		}
 		
-		// Note that we might have set some offscreen bits to 1.
+		prev_line = seed_line;
+		seed_line -= seed_wpl;
+		mask_line -= mask_wpl;
+	}
+}
+
+void seedFillGray4Iteration(QImage& seed, QImage const& mask)
+{
+	int const w = seed.width();
+	int const h = seed.height();
+	
+	int const seed_bpl = seed.bytesPerLine();
+	int const mask_bpl = mask.bytesPerLine();
+	
+	uint8_t* seed_line = seed.bits();
+	uint8_t const* mask_line = mask.bits();
+	uint8_t const* prev_line = seed_line;
+	
+	// Top to bottom.
+	for (int y = 0; y < h; ++y) {
+		uint8_t prev_pixel = 0xff;
+		
+		// Left to right.
+		for (int x = 0; x < w; ++x) {
+			uint8_t const pixel = std::max(
+				mask_line[x],
+				std::min(
+					prev_pixel,
+					std::min(seed_line[x], prev_line[x])
+				)
+			);
+			seed_line[x] = pixel;
+			prev_pixel = pixel;
+		}
+		
+		prev_line = seed_line;
+		seed_line += seed_bpl;
+		mask_line += mask_bpl;
+	}
+	
+	seed_line -= seed_bpl;
+	mask_line -= mask_bpl;
+	prev_line = seed_line;
+	
+	// Bottom to top.
+	for (int y = h - 1; y >= 0; --y) {
+		uint8_t prev_pixel = 0xff;
+		
+		// Right to left.
+		for (int x = w - 1; x >= 0; --x) {
+			uint8_t const pixel = std::max(
+				mask_line[x],
+				std::min(
+					prev_pixel,
+					std::min(seed_line[x], prev_line[x])
+				)
+			);
+			seed_line[x] = pixel;
+			prev_pixel = pixel;
+		}
+		
+		prev_line = seed_line;
+		seed_line -= seed_bpl;
+		mask_line -= mask_bpl;
+	}
+}
+
+void seedFillGray8Iteration(QImage& seed, QImage const& mask)
+{
+	int const w = seed.width();
+	int const h = seed.height();
+	
+	int const seed_bpl = seed.bytesPerLine();
+	int const mask_bpl = mask.bytesPerLine();
+	
+	uint8_t* seed_line = seed.bits();
+	uint8_t const* mask_line = mask.bits();
+	uint8_t const* prev_line = seed_line;
+	
+	// Top to bottom.
+	for (int y = 0; y < h; ++y) {
+		int x = 0;
+		
+		// Leftmost pixel.
+		seed_line[x] = std::max(
+			mask_line[x],
+			std::min(
+				seed_line[x],
+				std::min(prev_line[x], prev_line[x + 1])
+			)
+		);
+		
+		// Left to right.
+		for (; x < w - 1; ++x) {
+			seed_line[x] = std::max(
+				mask_line[x],
+				std::min(
+					std::min(
+						std::min(seed_line[x], seed_line[x - 1]),
+						std::min(prev_line[x], prev_line[x - 1])
+					),
+					prev_line[x + 1]
+				)
+			);
+		}
+		
+		// Rightmost pixel.
+		seed_line[x] = std::max(
+			mask_line[x],
+			std::min(
+				std::min(seed_line[x], seed_line[x - 1]),
+				std::min(prev_line[x], prev_line[x - 1])
+			)
+		);
+		
+		prev_line = seed_line;
+		seed_line += seed_bpl;
+		mask_line += mask_bpl;
+	}
+	
+	seed_line -= seed_bpl;
+	mask_line -= mask_bpl;
+	prev_line = seed_line;
+	
+	// Bottom to top.
+	for (int y = h - 1; y >= 0; --y) {
+		int x = w - 1;
+		
+		// Rightmost pixel.
+		seed_line[x] = std::max(
+			mask_line[x],
+			std::min(
+				seed_line[x],
+				std::min(prev_line[x], prev_line[x - 1])
+			)
+		);
+		
+		// Right to left.
+		for (; x > 0; --x) {
+			seed_line[x] = std::max(
+				mask_line[x],
+				std::min(
+					std::min(
+						std::min(seed_line[x], seed_line[x + 1]),
+						std::min(prev_line[x], prev_line[x + 1])
+					),
+					prev_line[x - 1]
+				)
+			);
+		}
+		
+		// Leftmost pixel.
+		seed_line[x] = std::max(
+			mask_line[x],
+			std::min(
+				std::min(seed_line[x], seed_line[x + 1]),
+				std::min(prev_line[x], prev_line[x + 1])
+			)
+		);
+		
+		prev_line = seed_line;
+		seed_line -= seed_bpl;
+		mask_line -= mask_bpl;
 	}
 }
 
@@ -182,6 +353,34 @@ BinaryImage seedFill(
 			seedFill4Iteration(img, mask);
 		} else {
 			seedFill8Iteration(img, mask);
+		}
+	} while (img != prev);
+	
+	return img;
+}
+
+QImage seedFillGray(
+	QImage const& seed, QImage const& mask, Connectivity const connectivity)
+{
+	if (seed.size() != mask.size()) {
+		throw std::invalid_argument("seedFillGray: seed and mask have different sizes");
+	}
+	if (seed.format() != QImage::Format_Indexed8 || !seed.isGrayscale()) {
+		throw std::invalid_argument("seedFillGray: seed is not grayscale");
+	}
+	if (mask.format() != QImage::Format_Indexed8 || !mask.isGrayscale()) {
+		throw std::invalid_argument("seedFillGray: mask is not grayscale");
+	}
+	
+	QImage prev;
+	QImage img(seed);
+	
+	do {
+		prev = img;
+		if (connectivity == CONN4) {
+			seedFillGray4Iteration(img, mask);
+		} else {
+			seedFillGray4Iteration(img, mask);
 		}
 	} while (img != prev);
 	

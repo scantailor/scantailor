@@ -22,12 +22,24 @@
 #include "BinaryImage.h"
 #include "Connectivity.h"
 
+class QImage;
+
 namespace imageproc
 {
 
 BinaryImage seedFill(
 	BinaryImage const& seed, BinaryImage const& mask,
 	Connectivity connectivity);
+
+/**
+ * \brief Spread darker colors from seed as long as mask allows it.
+ *
+ * The result of this operation is an image where some areas are lighter
+ * than in \p mask, because there were no dark path from them to dark
+ * areas in \p seed.
+ */
+QImage seedFillGray(
+	QImage const& seed, QImage const& mask, Connectivity connectivity);
 
 } // namespace imageproc
 
