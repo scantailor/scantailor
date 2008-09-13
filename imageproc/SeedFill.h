@@ -27,6 +27,19 @@ class QImage;
 namespace imageproc
 {
 
+/**
+ * \brief Spread black pixels from seed as long as mask allows it.
+ *
+ * This operation retains black connected componets from \p mask that are
+ * tagged by at least one black pixel in \p seed.  The rest do not appear
+ * in the result.
+ * \par
+ * \p seed is allowed to contain black pixels that are not in \p mask.
+ * They will be ignored and will not appear in the resulting image.
+ * \par
+ * The underlying code implements Luc Vincent's iterative seed-fill
+ * algorithm: http://www.vincent-net.com/luc/papers/93ieeeip_recons.pdf
+ */
 BinaryImage seedFill(
 	BinaryImage const& seed, BinaryImage const& mask,
 	Connectivity connectivity);
@@ -35,10 +48,31 @@ BinaryImage seedFill(
  * \brief Spread darker colors from seed as long as mask allows it.
  *
  * The result of this operation is an image where some areas are lighter
- * than in \p mask, because there were no dark path from them to dark
+ * than in \p mask, because there were no dark paths linking them to dark
  * areas in \p seed.
+ * \par
+ * \p seed is allowed to contain pixels darker than the corresponding pixels
+ * in \p mask.  Such pixels will be made equal to their mask values.
+ * \par
+ * The underlying code implements Luc Vincent's hybrid seed-fill algorithm:
+ * http://www.vincent-net.com/luc/papers/93ieeeip_recons.pdf
  */
 QImage seedFillGray(
+	QImage const& seed, QImage const& mask, Connectivity connectivity);
+
+/**
+ * \brief A faster, in-place version of seedFillGray().
+ */
+void seedFillGrayInPlace(
+	QImage& seed, QImage const& mask, Connectivity connectivity);
+
+/**
+ * \brief A slower but more simple implementation of seedFillGray().
+ *
+ * This function should not be used for anything but testing the correctness
+ * of the fast and complex implementation that is seedFillGray().
+ */
+QImage seedFillGraySlow(
 	QImage const& seed, QImage const& mask, Connectivity connectivity);
 
 } // namespace imageproc

@@ -17,6 +17,7 @@ SET(
 	TestBinarize.cpp
 	TestPolygonRasterizer.cpp
 	TestKFill.cpp
+	TestSeedFill.cpp
 	Utils.cpp Utils.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
