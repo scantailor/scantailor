@@ -67,6 +67,19 @@ randomMonoQImage(int const width, int const height)
 	return image;
 }
 
+QImage
+randomGrayImage(int width, int height)
+{
+	QImage img(width, height, QImage::Format_Indexed8);
+	img.setColorTable(createGrayscalePalette());
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			img.setPixel(x, y, rand() % 10);
+		}
+	}
+	return img;
+}
+
 BinaryImage makeBinaryImage(int const* data, int const width, int const height)
 {
 	return BinaryImage(makeMonoQImage(data, width, height));
@@ -98,8 +111,39 @@ QImage makeGrayImage(int const* data, int const width, int const height)
 	return img;
 }
 
-void dumpGrayImage(QImage const& img)
+void dumpBinaryImage(BinaryImage const& img, char const* name)
 {
+	if (name) {
+		std::cout << name << " = ";
+	}
+	
+	if (img.isNull()) {
+		std::cout << "NULL image" << std::endl;
+		return;
+	}
+	
+	int const width = img.width();
+	int const height = img.height();
+	uint32_t const* line = img.data();
+	int const wpl = img.wordsPerLine();
+	
+	std::cout << "{\n";
+	for (int y = 0; y < height; ++y, line += wpl) {
+		std::cout << "\t";
+		for (int x = 0; x < width; ++x) {
+			std::cout << ((line[x >> 5] >> (31 - (x & 31))) & 1) << ", ";
+		}
+		std::cout << "\n";
+	}
+	std::cout << "}" << std::endl;
+}
+
+void dumpGrayImage(QImage const& img, char const* name)
+{
+	if (name) {
+		std::cout << name << " = ";
+	}
+	
 	if (img.isNull()) {
 		std::cout << "NULL image" << std::endl;
 		return;
