@@ -129,6 +129,14 @@ ADD_CUSTOM_COMMAND(
 	"${png_location}" "${PNG_DIR}/"
 )
 
+# For some reason, Qt (as of 4.4.2) links with -lpng.lib, not just -lpng
+# So, we copy libpng.a to libpng.lib.a
+ADD_CUSTOM_COMMAND(
+	TARGET png POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+	"${png_location}" "${PNG_DIR}/libpng.lib.a"
+)
+
 
 #=================================== TIFF ===================================#
 
@@ -197,23 +205,26 @@ TO_NATIVE_PATH("${ZLIB_DIR}" ZLIB_INCLUDE_DIR)
 TO_NATIVE_PATH("${PNG_DIR}" PNG_INCLUDE_DIR)
 TO_NATIVE_PATH("${QT_DIR}" QT_DIR_NATIVE)
 
-# Note #1: We build with -no-zlib because of a bug in Qt that prevents building
-# with -system-zlib on Windows.  This bug is known (ID: #186774) and scheduled
-# to be fixed in Qt 4.4.1
+# Note #1: -system-zlib is broken on Windows (bug: #186774).  So, we build with
+# internal zlib, while libpng is linked with an external zlib.  This works only
+# because both zlib's have the same ABI.
 # Note #2: We build with -no-libtiff because we have our own TIFF loading code.
 # Qt's TIFF loader doesn't support multipage TIFFs or TIFFs with JPEG encoding.
 SET(build_qt_fname "${CMAKE_CURRENT_BINARY_DIR}/build-qt.bat")
 FILE(
 	WRITE "${build_qt_fname}"
 	"cd \"${QT_DIR_NATIVE}\"\n"
-	"configure -release -static -fast -no-zlib -no-gif -system-libpng"
+	"configure -release -static -fast -no-gif -system-libpng"
 	" -no-libmng -no-libtiff -system-libjpeg -no-sse -no-sse2"
 	" -no-openssl -no-qt3support -no-style-plastique -no-style-cleanlooks"
-	" -no-style-motif -no-style-cde -no-phonon -no-webkit"
+	" -no-style-motif -no-style-cde -no-phonon -no-webkit -no-sql-sqlite"
 	" -I \"${JPEG_INCLUDE_DIR}\" -I \"${ZLIB_INCLUDE_DIR}\""
-	" -I \"${PNG_INCLUDE_DIR}\""
+	" -I \"${PNG_INCLUDE_DIR}\" -L \"${JPEG_DIR}\" -L \"${ZLIB_DIR}\""
+	" -L \"${PNG_DIR}\""
 	"\n"
 	"mingw32-make"
 )
 
 ADD_CUSTOM_TARGET(Qt ALL "${build_qt_fname}")
+
+ADD_DEPENDENCIES(Qt zlib jpeg png tiff)
