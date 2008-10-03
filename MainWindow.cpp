@@ -192,11 +192,11 @@ MainWindow::construct()
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
+	
 	m_ptrTabbedDebugImages.reset(new QTabWidget);
 	actionStopBatchProcessing->setEnabled(false);
-	thumbView->setBackgroundBrush(palette().color(QPalette::Window));
 	
-	m_ptrThumbSequence->attachView(thumbView);
+	setupThumbView();
 	
 	m_ptrContentBoxPropagator.reset(
 		new ContentBoxPropagator(
@@ -269,6 +269,24 @@ MainWindow::construct()
 	
 	updateWindowTitle();
 	loadImage();
+}
+
+void
+MainWindow::setupThumbView()
+{
+	QSize const outer_before(thumbView->size());
+	QSize const inner_before(thumbView->viewport()->size());
+	
+	QSize const inner_after(m_maxLogicalThumbSize.toSize());
+	QSize const outer_after(
+		inner_after.width() + outer_before.width() - inner_before.width(),
+		inner_after.height() + outer_before.height() - inner_before.height()
+	);
+	
+	thumbView->setMinimumSize(outer_after);
+	
+	thumbView->setBackgroundBrush(palette().color(QPalette::Window));
+	m_ptrThumbSequence->attachView(thumbView);
 }
 
 void

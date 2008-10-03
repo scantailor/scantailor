@@ -112,6 +112,8 @@ private:
 	
 	void construct();
 	
+	void setupThumbView();
+	
 	SavePromptResult promptProjectSave();
 	
 	static bool compareFiles(QString const& fpath1, QString const& fpath2);
