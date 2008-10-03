@@ -80,7 +80,7 @@ VertLineFinder::findLines(
 		preprocessed = QImage();
 	}
 	
-	grayRasterOp<GRopSubtract<GRopDst, GRopSrc> >(h_gradient, v_gradient);
+	grayRasterOp<GRopClippedSubtract<GRopDst, GRopSrc> >(h_gradient, v_gradient);
 	v_gradient = QImage();
 	if (dbg) {
 		dbg->add(h_gradient, "vert_raster_lines");
@@ -213,7 +213,7 @@ VertLineFinder::removeDarkVertBorders(QImage const& src)
 	QImage dst(src);
 	
 	selectVertBorders(dst);
-	grayRasterOp<GRopInvert<GRopSubtract<GRopDst, GRopSrc> > >(dst, src);
+	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
 	
 	return dst;
 }
@@ -224,7 +224,7 @@ VertLineFinder::removeDarkHorBorders(QImage const& src)
 	QImage dst(src);
 	
 	selectHorBorders(dst);
-	grayRasterOp<GRopInvert<GRopSubtract<GRopDst, GRopSrc> > >(dst, src);
+	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
 	
 	return dst;
 }

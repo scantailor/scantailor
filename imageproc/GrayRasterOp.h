@@ -82,11 +82,15 @@ public:
 };
 
 /**
- * \brief Raster operation that performs subtracts gray levels of Rhs from Lhs.
+ * \brief Raster operation that subtracts gray levels of Rhs from Lhs.
+ *
+ * The "Clipped" part of the name indicates that negative subtraction results
+ * are turned into zero.
+ *
  * \see grayRasterOp()
  */
 template<typename Lhs, typename Rhs>
-class GRopSubtract
+class GRopClippedSubtract
 {
 public:
 	static uint8_t transform(uint8_t src, uint8_t dst) {
@@ -96,6 +100,92 @@ public:
 	}
 };
 
+/**
+ * \brief Raster operation that subtracts gray levels of Rhs from Lhs.
+ *
+ * The "Unclipped" part of the name indicates that underflows aren't handled.
+ * Negative results will appear as 256 - |negative_result|.
+ *
+ * \see grayRasterOp()
+ */
+template<typename Lhs, typename Rhs>
+class GRopUnclippedSubtract
+{
+public:
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		uint8_t const lhs = Lhs::transform(src, dst);
+		uint8_t const rhs = Rhs::transform(src, dst);
+		return lhs - rhs;
+	}
+};
+
+/**
+ * \brief Raster operation that sums Rhs and Lhs gray levels.
+ *
+ * The "Clipped" part of the name indicates that overflow are clipped at 255.
+ *
+ * \see grayRasterOp()
+ */
+template<typename Lhs, typename Rhs>
+class GRopClippedAdd
+{
+public:
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		unsigned const lhs = Lhs::transform(src, dst);
+		unsigned const rhs = Rhs::transform(src, dst);
+		unsigned const sum = lhs + rhs;
+		return sum < 256 ? static_cast<uint8_t>(sum) : uint8_t(255);
+	}
+};
+
+/**
+ * \brief Raster operation that sums Rhs and Lhs gray levels.
+ *
+ * The "Unclipped" part of the name indicates that overflows aren't handled.
+ * Results exceeding 255 will appear as result - 256.
+ *
+ * \see grayRasterOp()
+ */
+template<typename Lhs, typename Rhs>
+class GRopUnclippedAdd
+{
+public:
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		uint8_t const lhs = Lhs::transform(src, dst);
+		uint8_t const rhs = Rhs::transform(src, dst);
+		return lhs + rhs;
+	}
+};
+
+/**
+ * \brief Raster operation that takes the darkest of its arguments.
+ * \see grayRasterOp()
+ */
+template<typename Lhs, typename Rhs>
+class GRopDarkest
+{
+public:
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		uint8_t const lhs = Lhs::transform(src, dst);
+		uint8_t const rhs = Rhs::transform(src, dst);
+		return lhs < rhs ? lhs : rhs;
+	}
+};
+
+/**
+ * \brief Raster operation that takes the lightest of its arguments.
+ * \see grayRasterOp()
+ */
+template<typename Lhs, typename Rhs>
+class GRopLightest
+{
+public:
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		uint8_t const lhs = Lhs::transform(src, dst);
+		uint8_t const rhs = Rhs::transform(src, dst);
+		return lhs > rhs ? lhs : rhs;
+	}
+};
 
 template<typename GRop>
 void grayRasterOp(QImage& dst, QImage const& src)
