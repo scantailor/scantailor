@@ -21,6 +21,7 @@
 #include "BitOps.h"
 #include <QImage>
 #include <QColor>
+#include <QtGlobal>
 #include <stdexcept>
 #include <string.h>
 #include <stdint.h>
@@ -157,6 +158,74 @@ QImage toGrayscale(QImage const& src)
 	default:
 		return anyToGrayscale(src);
 	}
+}
+
+QImage stretchGrayRange(
+	QImage const& src,
+	double const black_clip_fraction, double const white_clip_fraction)
+{
+	if (src.isNull()) {
+		return QImage();
+	}
+	
+	QImage dst(toGrayscale(src));
+	
+	int const width = dst.width();
+	int const height = dst.height();
+	
+	int const num_pixels = width * height;
+	int black_clip_pixels = qRound(black_clip_fraction * num_pixels);
+	int white_clip_pixels = qRound(white_clip_fraction * num_pixels);
+	
+	GrayscaleHistogram const hist(dst);
+	
+	int min = 0;
+	for (; min <= 255; ++min) {
+		if (black_clip_pixels < hist[min]) {
+			break;
+		}
+		black_clip_pixels -= hist[min];
+	}
+	
+	int max = 255;
+	for (; max >= 0; --max) {
+		if (white_clip_pixels < hist[max]) {
+			break;
+		}
+		white_clip_pixels -= hist[max];
+	}
+	
+	uint8_t gray_mapping[256];
+	
+	if (min >= max) {
+		int const avg = (min + max) / 2;
+		for (int i = 0; i <= avg; ++i) {
+			gray_mapping[i] = 0;
+		}
+		for (int i = avg + 1; i < 256; ++i) {
+			gray_mapping[i] = 255;
+		}
+	} else {
+		int const src_range = max - min;
+		for (int i = 0; i < 256; ++i) {
+			int const src_level = qBound(min, i, max);
+			int const nom = 255 * (src_level - min);
+			int const denom = max - min;
+			int const dst_level = (nom + denom / 2) / denom;
+			gray_mapping[i] = static_cast<uint8_t>(dst_level);
+		}
+	}
+	
+	uint8_t* line = dst.bits();
+	int const bpl = dst.bytesPerLine();
+	
+	for (int y = 0; y < height; ++y, line += bpl) {
+		for (int x = 0; x < width; ++x) {
+			line[x] = gray_mapping[line[x]];
+		}
+	}
+	
+	return dst;
 }
 
 GrayscaleHistogram::GrayscaleHistogram(QImage const& img)

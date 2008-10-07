@@ -55,9 +55,33 @@ private:
 	int m_pixels[256];
 };
 
+/**
+ * \brief Create a 256-element grayscale palette.
+ */
 QVector<QRgb> createGrayscalePalette();
 
+/**
+ * \brief Convert an image from any format to grayscale.
+ *
+ * \param src The source image in any format.
+ * \return A grayscale image with proper palette.  Null will be returned
+ *         if \p src was null.
+ */
 QImage toGrayscale(QImage const& src);
+
+/**
+ * \brief Stetch the distribution of gray levels to cover the whole range.
+ *
+ * \param src The source image.  It doesn't have to be grayscale.
+ * \param black_clip_fraction The fraction of pixels that are allowed
+ *        to go negative.  Such pixels will be clipped to 0 (black).
+ * \param white_clip_fraction The fraction of pixels that are allowed
+ *        to exceed the maximum brightness level.  Such pixels will be clipped
+ *        to 255 (white).
+ * \return A grayscale image, or a null image, if \p src was null.
+ */
+QImage stretchGrayRange(QImage const& src, double black_clip_fraction = 0.0,
+	double white_clip_fraction = 0.0);
 
 } // namespace imageproc
 
