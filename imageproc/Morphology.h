@@ -182,14 +182,14 @@ BinaryImage erodeBrick(
  */
 QImage erodeGray(
 	QImage const& src, Brick const& brick,
-	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+	QRect const& dst_area, unsigned char src_surroundings = 0x00);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
 QImage erodeGray(
 	QImage const& src, Brick const& brick,
-	unsigned char src_surroundings = 0xff);
+	unsigned char src_surroundings = 0x00);
 
 /**
  * \brief Turn the black areas where the brick doesn't fit, into white.
@@ -228,14 +228,14 @@ BinaryImage openBrick(
  */
 QImage openGray(
 	QImage const& src, QSize const& brick,
-	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+	QRect const& dst_area, unsigned char src_surroundings);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
 QImage openGray(
 	QImage const& src, QSize const& brick,
-	unsigned char src_surroundings = 0xff);
+	unsigned char src_surroundings);
 
 /**
  * \brief Turn the white areas where the brick doesn't fit, into black.
@@ -274,14 +274,14 @@ BinaryImage closeBrick(
  */
 QImage closeGray(
 	QImage const& src, QSize const& brick,
-	QRect const& dst_area, unsigned char src_surroundings = 0xff);
+	QRect const& dst_area, unsigned char src_surroundings);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
 QImage closeGray(
 	QImage const& src, QSize const& brick,
-	unsigned char src_surroundings = 0xff);
+	unsigned char src_surroundings);
 
 /**
  * \brief Performs a hit-miss matching operation.

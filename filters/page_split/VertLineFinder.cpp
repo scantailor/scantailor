@@ -86,7 +86,7 @@ VertLineFinder::findLines(
 		dbg->add(h_gradient, "vert_raster_lines");
 	}
 	
-	QImage const raster_lines(closeGray(h_gradient, QSize(1, 19)));
+	QImage const raster_lines(closeGray(h_gradient, QSize(1, 19), 0x00));
 	h_gradient = QImage();
 	if (dbg) {
 		dbg->add(raster_lines, "short_segments_removed");
@@ -202,9 +202,9 @@ VertLineFinder::findLines(
 QImage
 VertLineFinder::detectHorShadows(QImage const& src)
 {
-	QImage long_hor_lines(openGray(src, QSize(100, 1)));
+	QImage long_hor_lines(openGray(src, QSize(100, 1), 0xff));
 	long_hor_lines = removeDarkHorBorders(long_hor_lines);
-	return openGray(long_hor_lines, QSize(100, 1));
+	return openGray(long_hor_lines, QSize(100, 1), 0xff);
 }
 
 QImage
