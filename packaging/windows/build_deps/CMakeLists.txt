@@ -1,3 +1,5 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7)
+
 PROJECT(deps)
 
 INCLUDE(../../../cmake/SetDefaultBuildType.cmake)
@@ -13,6 +15,7 @@ FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
+FILE(GLOB qt_dirs2 "C:/Qt/4.*.*")
 
 FIND_PATH(
 	JPEG_DIR jpeglib.h PATHS ${jpeg_dirs}
@@ -31,7 +34,7 @@ FIND_PATH(
 	DOC "Path to top-level tiff source directory."
 )
 FIND_PATH(
-	QT_DIR projects.pro PATHS ${qt_dirs}
+	QT_DIR projects.pro PATHS ${qt_dirs} ${qt_dirs2}
 	DOC "Path to top-level Qt source directory."
 )
 
@@ -144,11 +147,6 @@ INCLUDE_DIRECTORIES(${JPEG_DIR}) # ZLIB_DIR already included above
 
 SET(
 	tiff_definitions
-	-DTIF_PLATFORM_CONSOLE -DCCITT_SUPPORT -DPACKBITS_SUPPORT
-	-DLZW_SUPPORT -DTHUNDER_SUPPORT -DNEXT_SUPPORT -DLOGLUV_SUPPORT
-	-DJPEG_SUPPORT -DOJPEG_SUPPORT -DZIP_SUPPORT -DPIXARLOG_SUPPORT
-	-DSTRIPCHOP_DEFAULT=TIFF_STRIPCHOP -DSTRIP_SIZE_DEFAULT=8192
-	-DDEFAULT_EXTRASAMPLE_AS_ALPHA -DCHECK_JPEG_YCBCR_SUBSAMPLING
 	-DAVOID_WIN32_FILEIO -DLIBTIFF_STATIC
 )
 
@@ -183,15 +181,16 @@ ADD_CUSTOM_COMMAND(
 
 #=================================== Qt ===================================#
 
-# Patch projects.pro to exclude unnecessary components"
-IF(NOT EXISTS "${QT_DIR}/projects.pro.orig")
-	FILE(READ "${QT_DIR}/projects.pro" projects_pro_orig)
-	SET(projects_pro "QT_BUILD_PARTS = libs tools\n${projects_pro_orig}")
-	FILE(WRITE "${QT_DIR}/projects.pro" "${projects_pro}")
-	FILE(WRITE "${QT_DIR}/projects.pro.orig" "${projects_pro_orig}")
-	SET(projects_pro "")
-	SET(projects_pro_orig "")
-ENDIF(NOT EXISTS "${QT_DIR}/projects.pro.orig")
+# Backward compatibility.  We used to patch projects.pro, now we patch
+# .qmake.cache instead.
+IF(EXISTS "${QT_DIR}/projects.pro.orig")
+	CONFIGURE_FILE(
+		"${QT_DIR}/projects.pro.orig"
+		"${QT_DIR}/projects.pro" COPYONLY
+	)
+	FILE(REMOVE "${QT_DIR}/projects.pro.orig")
+ENDIF(EXISTS "${QT_DIR}/projects.pro.orig")
+
 
 # FILE(TO_NATIVE_PATH ...) is broken on MinGW.
 MACRO(TO_NATIVE_PATH PATH OUT)
@@ -203,6 +202,16 @@ TO_NATIVE_PATH("${JPEG_DIR}" JPEG_INCLUDE_DIR)
 TO_NATIVE_PATH("${ZLIB_DIR}" ZLIB_INCLUDE_DIR)
 TO_NATIVE_PATH("${PNG_DIR}" PNG_INCLUDE_DIR)
 TO_NATIVE_PATH("${QT_DIR}" QT_DIR_NATIVE)
+
+
+SET(qt_build_parts "libs tools")
+IF(EXISTS "${QT_DIR}/bin/designer.exe")
+	# Using a binary build
+	SET(qt_build_parts "libs")
+ENDIF(EXISTS "${QT_DIR}/bin/designer.exe")
+
+CONFIGURE_FILE("patch_qmake_cache.cmake.in" "${CMAKE_BINARY_DIR}/patch_qmake_cache.cmake" @ONLY) 
+
 
 # Note #1: -system-zlib is broken on Windows (bug: #186774).  So, we build with
 # internal zlib, while libpng is linked with an external zlib.  This works only
@@ -222,6 +231,7 @@ FILE(
 	" -L \"${PNG_DIR}\""
 	"\n"
 	"IF %ERRORLEVEL% NEQ 0 GOTO exit\n"
+	"\"${CMAKE_COMMAND}\" -P \"${CMAKE_BINARY_DIR}\\patch_qmake_cache.cmake\"\n"
 	"mingw32-make\n"
 	":exit\n"
 )

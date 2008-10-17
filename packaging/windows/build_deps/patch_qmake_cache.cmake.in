@@ -1,0 +1,12 @@
+FILE(READ "@QT_DIR@/.qmake.cache" qmake_cache)
+
+
+# Replace QT_BUILD_PARTS = ... with the value of qt_build_parts variable.
+STRING(
+	REGEX REPLACE "(QT_BUILD_PARTS *= *)[^\n]*"
+	"\\1@qt_build_parts@" qmake_cache "${qmake_cache}"
+)
+
+# This file is hidden, so it's impossible to write to it, unless we delete if first.
+FILE(REMOVE "@QT_DIR@/.qmake.cache")
+FILE(WRITE "@QT_DIR@/.qmake.cache" "${qmake_cache}")
