@@ -59,7 +59,7 @@ static void find_iir_constants(
 	 *  using a 4th order approximation of the gaussian operator
 	 */
 	
-	const double div = sqrt (2.0 * constants::PI) * std_dev;
+	const double div = sqrt(2.0 * constants::PI) * std_dev;
 	const double x0 = -1.783 / std_dev;
 	const double x1 = -1.723 / std_dev;
 	const double x2 = 0.6318 / std_dev;
@@ -215,7 +215,7 @@ QImage gaussBlurGray(QImage const& src, double radius)
 	}
 	radius += 1.0; // Include the center pixel.
 	
-	double const std_dev = sqrt(-(radius * radius) / (2 * log(1.0 / 255.0)));
+	double const std_dev = sqrt((radius * radius) / (-2.0 * log(1.0 / 255.0)));
 	
 	return gaussBlurGrayToGray(toGrayscale(src), std_dev);
 }
