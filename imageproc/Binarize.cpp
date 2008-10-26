@@ -40,6 +40,18 @@ BinaryImage binarizeOtsu(QImage const& src)
 	return BinaryImage(src, BinaryThreshold::otsuThreshold(src));
 }
 
+BinaryImage binarizeMokji(
+	QImage const& src, unsigned const max_edge_width,
+	unsigned const min_edge_magnitude)
+{
+	BinaryThreshold const threshold(
+		BinaryThreshold::mokjiThreshold(
+			src, max_edge_width, min_edge_magnitude
+		)
+	);
+	return BinaryImage(src, threshold);
+}
+
 BinaryImage binarizeSauvola(QImage const& src, QSize const window_size)
 {
 	if (window_size.isEmpty()) {

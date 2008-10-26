@@ -37,6 +37,23 @@ class BinaryImage;
 BinaryImage binarizeOtsu(QImage const& src);
 
 /**
+ * \brief Image binarization using Mokji's global thresholding method.
+ *
+ * M. M. Mokji, S. A. R. Abu-Bakar: Adaptive Thresholding Based on
+ * Co-occurrence Matrix Edge Information. Asia International Conference on
+ * Modelling and Simulation 2007: 444-450
+ * http://www.academypublisher.com/jcp/vol02/no08/jcp02084452.pdf
+ *
+ * \param src The source image.  May be in any format.
+ * \param max_edge_width The maximum gradient length to consider.
+ * \param max_edge_magnitude The minimum color difference in a gradient.
+ * \return A black and white image.
+ */
+BinaryImage binarizeMokji(
+	QImage const& src, unsigned max_edge_width = 3,
+	unsigned min_edge_magnitude = 20);
+
+/**
  * \brief Image binarization using Sauvola's local thresholding method.
  *
  * Sauvola, J. and M. Pietikainen. 2000. "Adaptive document image binarization".
