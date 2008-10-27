@@ -58,7 +58,7 @@ private:
 	QImage processColorOrGrayscale(QImage const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
-	QImage processAutoHalftone(QImage const& input,
+	QImage processMixed(QImage const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
@@ -73,6 +73,8 @@ private:
 		QImage& img, QRgb light_color, QRgb dark_color);
 	
 	static unsigned char calcDominantBackgroundGrayLevel(QImage const& img);
+	
+	static QImage normalizeIllumination(QImage const& gray_input, DebugImages* dbg);
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;

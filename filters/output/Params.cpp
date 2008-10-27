@@ -105,6 +105,8 @@ Params::parseColorMode(QString const& str)
 		return ColorParams::BITONAL;
 	} else if (str == "colorOrGray") {
 		return ColorParams::COLOR_GRAYSCALE;
+	} else if (str == "mixed") {
+		return ColorParams::MIXED;
 	} else {
 		return ColorParams::BLACK_AND_WHITE;
 	}
@@ -124,6 +126,9 @@ Params::formatColorMode(ColorParams::ColorMode const mode)
 		case ColorParams::COLOR_GRAYSCALE:
 			str = "colorOrGray";
 			break;
+		case ColorParams::MIXED:
+			str = "mixed";
+			break;
 	}
 	return QString::fromAscii(str);
 }
@@ -131,7 +136,9 @@ Params::formatColorMode(ColorParams::ColorMode const mode)
 ColorParams::ThresholdMode
 Params::parseThresholdMode(QString const& str)
 {
-	if (str == "otsu") {
+	if (str == "mokji") {
+		return ColorParams::MOKJI;
+	} else if (str == "otsu") {
 		return ColorParams::OTSU;
 	} else if (str == "sauvola") {
 		return ColorParams::SAUVOLA;
@@ -147,6 +154,9 @@ Params::formatThresholdMode(ColorParams::ThresholdMode const mode)
 {
 	char const* str = "";
 	switch (mode) {
+		case ColorParams::MOKJI:
+			str = "mokji";
+			break;
 		case ColorParams::OTSU:
 			str = "otsu";
 			break;

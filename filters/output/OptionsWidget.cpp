@@ -42,7 +42,9 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
 	colorModeSelector->addItem(tr("Bitonal"), ColorParams::BITONAL);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
+	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
 	
+	thresholdSelector->addItem(QString::fromAscii("Mokji"), ColorParams::MOKJI);
 	thresholdSelector->addItem(QString::fromAscii("Otsu"), ColorParams::OTSU);
 	thresholdSelector->addItem(QString::fromAscii("Sauvola"), ColorParams::SAUVOLA);
 	thresholdSelector->addItem(QString::fromAscii("Wolf"), ColorParams::WOLF);

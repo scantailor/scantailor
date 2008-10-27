@@ -33,7 +33,7 @@
 #include "imageproc/SeedFill.h"
 #include "imageproc/Constants.h"
 #include "imageproc/Grayscale.h"
-#include "imageproc/GaussBlur.h"
+#include "imageproc/GrayRasterOp.h"
 #include <QImage>
 #include <QSize>
 #include <QRectF>
@@ -44,6 +44,7 @@
 #include <vector>
 #include <algorithm>
 #include <assert.h>
+#include <string.h>
 
 using namespace imageproc;
 
@@ -74,8 +75,10 @@ OutputGenerator::process(QImage const& input,
 		case ColorParams::BITONAL:
 			return processBitonalOrBW(input, status, dbg);
 		case ColorParams::COLOR_GRAYSCALE:
-			//return processAutoHalftone(input, status, dbg);
 			return processColorOrGrayscale(input, status, dbg);
+		case ColorParams::MIXED:
+			return processMixed(input, status, dbg);
+			
 	}
 	
 	assert(!"Unreachable");
@@ -86,10 +89,17 @@ QImage
 OutputGenerator::processBitonalOrBW(QImage const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-	QImage const transformed(
-		transformToGray(input, m_toUncropped, m_cropRect, Qt::white)
-	);
+	QImage normalized(normalizeIllumination(toGrayscale(input), dbg));
+	if (dbg) {
+		dbg->add(normalized, "normalized");
+	}
 	
+	status.throwIfCancelled();
+	
+	QImage transformed(
+		transformToGray(normalized, m_toUncropped, m_cropRect, Qt::white)
+	);
+	normalized = QImage();
 	if (dbg) {
 		dbg->add(transformed, "transformed");
 	}
@@ -98,6 +108,9 @@ OutputGenerator::processBitonalOrBW(QImage const& input,
 	
 	BinaryImage bin_img;
 	switch (m_colorParams.thresholdMode()) {
+		case ColorParams::MOKJI:
+			bin_img = binarizeMokji(transformed);
+			break;
 		case ColorParams::OTSU:
 			bin_img = binarizeOtsu(transformed);
 			break;
@@ -231,7 +244,18 @@ QImage
 OutputGenerator::processColorOrGrayscale(QImage const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-	unsigned char const dominant_gray = calcDominantBackgroundGrayLevel(input);
+	if (input.allGray()) {
+		QImage const gray_input(toGrayscale(input));
+		uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(gray_input);
+		
+		status.throwIfCancelled();
+		
+		return transformToGray(
+			gray_input, m_toUncropped, m_cropRect, dominant_gray
+		);
+	}
+	
+	uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(input);
 	
 	QImage target(m_cropRect.size(), QImage::Format_RGB32);
 	target.fill(qRgb(dominant_gray, dominant_gray, dominant_gray));
@@ -252,84 +276,151 @@ OutputGenerator::processColorOrGrayscale(QImage const& input,
 	
 	status.throwIfCancelled();
 	
-	if (target.allGray()) {
-		return toGrayscale(target);
-	}
-	
 	return target;
 }
 
+static QImage getBorderImage(QSize const& size)
+{
+	QImage image(size, QImage::Format_Indexed8);
+	image.setColorTable(createGrayscalePalette());
+	image.fill(0xff); // white
+	
+	int const width = size.width();
+	int const height = size.height();
+	
+	unsigned char* line = image.bits();
+	int const bpl = image.bytesPerLine();
+	
+	memset(line, 0, width);
+	
+	for (int y = 0; y < height; ++y, line += bpl) {
+		line[0] = 0x00;
+		line[width - 1] = 0x00;
+	}
+	
+	memset(line - bpl, 0, width);
+	
+	return image;
+}
+
+namespace
+{
+
+class CombineInverted
+{
+public:
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		unsigned const dilated = dst;
+		unsigned const eroded = src;
+		unsigned const res = 255 - (255 - dilated) * eroded / 255;
+		return static_cast<uint8_t>(res);
+	}
+};
+
+} // anonymous namespace
+
 QImage
-OutputGenerator::processAutoHalftone(QImage const& input,
+OutputGenerator::processMixed(QImage const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-#if 0
-	h = fspecial('gaussian', [5, 5], 1.7);
-	blurred = imfilter(A, h,'replicate');
-	level = graythresh(A);
-	im= im2bw(A, level);
-	se = strel('disk',2);
-	w_d=imdilate(A, se);
-	b=imcomplement(A);
-	b_d=imdilate(b, se);
-	g=uint8(double(b_d).*double(w_d)/255); % OR
-	se2 = strel('disk',15);
-	marker=imerode(g, se2);
-	p=imreconstruct(marker, g);
-	g_a = imfill(p,'holes');
-	level = graythresh(g_a);% replace to other thresholding algoritm, error if not pictures in image
-	g_ab= im2bw(g_a,level);
-	final_image=uint8((double(blurred).*double(g_ab)+255*double(im).*double(1-g_ab)));
-	imwrite(final_image, 'final_image.tif')
-#endif
-	QImage const gray_input(toGrayscale(input));
+	QImage transformed_input(processColorOrGrayscale(input, status, dbg));
 	
-	QImage const blurred(gaussBlurGray(gray_input, 4.5));
+	// TODO: Ideally we should only consider pixels inside m_contentRect
+	QImage gray_input(stretchGrayRange(transformed_input, 0.01, 0.01));
+	
+	transformed_input = QImage();
+	
+	QImage eroded(erodeGray(gray_input, QSize(3, 3), 0x00));
 	if (dbg) {
-		dbg->add(blurred, "blurred");
-	}
-	BinaryImage const im(binarizeOtsu(blurred));
-	if (dbg) {
-		dbg->add(im, "blurred_binarized");
-	}
-	QImage const dilated(dilateGray(gray_input, QSize(4, 4)));
-	if (dbg) {
-		dbg->add(dilated, "input_dilated");
-	}
-	QImage const eroded(erodeGray(gray_input, QSize(4, 4)));
-	if (dbg) {
-		dbg->add(eroded, "input_eroded");
+		dbg->add(eroded, "eroded");
 	}
 	
-	QImage gray(gray_input.size(), QImage::Format_Indexed8);
-	gray.setColorTable(createGrayscalePalette());
-	for (int y = 0; y < gray.height(); ++y) {
-		for (int x = 0; x < gray.width(); ++x) {
-			unsigned const e = eroded.pixelIndex(x, y);
-			unsigned const d = dilated.pixelIndex(x, y);
-			gray.setPixel(x, y, (255 - e) * d / 255);
-		}
-	}
+	QImage dilated(dilateGray(gray_input, QSize(3, 3), 0xff));
 	if (dbg) {
-		dbg->add(gray, "gray");
+		dbg->add(dilated, "dilated");
 	}
 	
-	QImage const marker(dilateGray(gray, QSize(30, 30)));
+	grayRasterOp<CombineInverted>(dilated, eroded);
+	QImage gray_gradient(dilated);
+	dilated = QImage();
+	eroded = QImage();
+	if (dbg) {
+		dbg->add(gray_gradient, "gray_gradient");
+	}
+
+	QImage marker(erodeGray(gray_gradient, QSize(35, 35), 0x00));
 	if (dbg) {
 		dbg->add(marker, "marker");
 	}
 	
-	QImage const p(seedFillGray(marker, gray, CONN4));
+	seedFillGrayInPlace(marker, gray_gradient, CONN8);
+	QImage reconstructed(marker);
+	marker = QImage();
 	if (dbg) {
-		dbg->add(p, "p");
+		dbg->add(reconstructed, "reconstructed");
 	}
 	
-	BinaryImage const gray_binarized(binarizeOtsu(p));
+	grayRasterOp<GRopInvert<GRopSrc> >(reconstructed, reconstructed);
+	
+	QImage holes_filled(getBorderImage(reconstructed.size()));
+	seedFillGrayInPlace(holes_filled, reconstructed, CONN8);
 	if (dbg) {
-		dbg->add(gray_binarized, "gray_binarized");
+		dbg->add(holes_filled, "holes_filled");
+	}
+
+	// Black areas in bw_mask indicate areas to be binarized.
+	BinaryImage bw_mask(binarizeMokji(holes_filled, 3, 32));
+	holes_filled = QImage();
+	if (dbg) {
+		dbg->add(bw_mask, "bw_mask");
 	}
 	
-	return input;
+	QImage normalized(normalizeIllumination(gray_input, dbg));
+	if (dbg) {
+		dbg->add(normalized, "normalized");
+	}
+	
+	GrayscaleHistogram const hist(normalized, bw_mask);
+	BinaryThreshold const bw_thresh(BinaryThreshold::otsuThreshold(hist));
+	BinaryImage const bw_content(normalized, bw_thresh);
+	if (dbg) {
+		dbg->add(bw_content, "bw_content");
+	}
+	
+	// TODO: Support color mode.
+	QImage dst(gray_input);
+	gray_input = QImage();
+	if (dbg) {
+		dbg->add(dst, "blurred");
+	}
+	
+	uint8_t* dst_line = dst.bits();
+	int const dst_bpl = dst.bytesPerLine();
+	uint32_t const* bw_content_line = bw_content.data();
+	int const bw_content_wpl = bw_content.wordsPerLine();
+	uint32_t const* bw_mask_line = bw_mask.data();
+	int const bw_mask_wpl = bw_mask.wordsPerLine();
+	int const width = dst.width();
+	int const height = dst.height();
+	uint32_t const msb = uint32_t(1) << 31;
+	
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
+				uint32_t const bit = (
+					bw_content_line[x >> 5] >> (31 - (x & 31))
+				) & uint32_t(1);
+				
+				// 1 becomes 0 (black), 0 becomes 0xff (white)
+				dst_line[x] = static_cast<uint8_t>(bit - 1);
+			}
+		}
+		dst_line += dst_bpl;
+		bw_content_line += bw_content_wpl;
+		bw_mask_line += bw_mask_wpl;
+	}
+	
+	return dst;
 }
 
 QSize
@@ -395,7 +486,7 @@ OutputGenerator::hitMissReplaceAllDirections(
 QSize
 OutputGenerator::calcLocalWindowSize(Dpi const& dpi)
 {
-	QSizeF const size_mm(15, 15);
+	QSizeF const size_mm(3, 30);
 	QSizeF const size_inch(size_mm * constants::MM2INCH);
 	QSizeF const size_pixels_f(
 		dpi.horizontal() * size_inch.width(),
@@ -409,6 +500,8 @@ OutputGenerator::calcLocalWindowSize(Dpi const& dpi)
 	if (size_pixels.height() < 3) {
 		size_pixels.setHeight(3);
 	}
+	
+	qDebug() << "size_pixels: " << size_pixels;
 	
 	return size_pixels;
 }
@@ -465,6 +558,38 @@ OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 	
 	assert(!"Unreachable");
 	return 0;
+}
+
+namespace
+{
+
+struct RaiseAboveBackground
+{
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		// src: orig
+		// dst: background (dst >= src)
+		if (dst - src < 1) {
+			return 0xff;
+		}
+		unsigned const orig = src;
+		unsigned const background = dst;
+		return static_cast<uint8_t>((orig * 255 + background / 2) / background);
+	}
+};
+
+} // anonymous namespace
+
+QImage
+OutputGenerator::normalizeIllumination(QImage const& gray_input, DebugImages* dbg)
+{
+	QImage background(getBorderImage(gray_input.size()));
+	seedFillGrayInPlace(background, gray_input, CONN8);
+	if (dbg) {
+		dbg->add(background, "background");
+	}
+	
+	grayRasterOp<RaiseAboveBackground>(background, gray_input);
+	return background;
 }
 
 } // namespace output
