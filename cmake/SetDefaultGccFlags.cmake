@@ -31,7 +31,7 @@ MACRO(ST_SET_DEFAULT_GCC_FLAGS)
 				CACHE STRING "Common C flags for all build configurations." FORCE
 			)
 			SET(
-				CMAKE_C_FLAGS "${CMAKE_C_FLAGS}"
+				CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}"
 				CACHE STRING "Common C++ flags for all build configurations." FORCE
 			)
 			SET(
