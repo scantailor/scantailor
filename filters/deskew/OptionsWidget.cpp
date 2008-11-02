@@ -94,6 +94,7 @@ OptionsWidget::spinBoxValueChanged(double const value)
 	m_uiData.setEffectiveDeskewAngle(degrees);
 	m_uiData.setMode(MODE_MANUAL);
 	updateModeIndication(MODE_MANUAL);
+	commitCurrentParams();
 	
 	emit manualDeskewAngleSet(degrees);
 	emit invalidateThumbnail(m_pageId);
