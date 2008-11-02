@@ -23,6 +23,7 @@
 #include "RefCountable.h"
 #include "FilterResult.h"
 #include "PageId.h"
+#include <memory>
 
 class TaskStatus;
 class FilterData;

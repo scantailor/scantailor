@@ -23,6 +23,7 @@
 #include "AbstractFilter.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
+#include <memory>
 
 class PageId;
 class PageSequence;

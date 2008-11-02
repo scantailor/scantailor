@@ -24,6 +24,7 @@
 #include "FilterResult.h"
 #include "IntrusivePtr.h"
 #include "ImageId.h"
+#include <memory>
 
 class TaskStatus;
 class PageSequence;

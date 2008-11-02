@@ -24,6 +24,7 @@
 #include <QString>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <algorithm>
 #include <assert.h>
 
 ProjectCreationContext::ProjectCreationContext()
