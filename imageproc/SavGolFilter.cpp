@@ -413,6 +413,9 @@ QImage savGolFilterGrayToGray(
 QImage savGolFilter(
 	QImage const& src, QSize const& window_size, int const order)
 {
+	if (order < 1) {
+		throw std::invalid_argument("savGolFilter: invalid polynomial order");
+	}
 	if (window_size.isEmpty()) {
 		throw std::invalid_argument("savGolFilter: invalid window size");
 	}
