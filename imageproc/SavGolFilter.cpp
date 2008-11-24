@@ -148,7 +148,7 @@ SavGolKernel::SavGolKernel(int const order, QSize const& size, QPoint const& ori
 
 /**
  * Perform a QR factorization of m_equations by Givens rotations.
- * We store R in place of m_equations, and we don't store R anywhere,
+ * We store R in place of m_equations, and we don't store Q anywhere,
  * but we do store the rotations in the order they were performed.
  */
 void
