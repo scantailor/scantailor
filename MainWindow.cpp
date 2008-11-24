@@ -486,7 +486,8 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 
 void
 MainWindow::setImageWidget(
-	QWidget* widget, Ownership const ownership, DebugImages const* debug_images)
+	QWidget* widget, Ownership const ownership,
+	DebugImages* debug_images)
 {
 	removeWidgetsFromLayout(m_pImageFrameLayout, false);
 	
@@ -503,10 +504,11 @@ MainWindow::setImageWidget(
 		m_pImageFrameLayout->addWidget(widget);
 	} else {
 		m_ptrTabbedDebugImages->addTab(widget, "Main");
-		BOOST_FOREACH (DebugImages::Item const& item, debug_images->items()) {
+		BOOST_FOREACH (DebugImages::Item& item, debug_images->items()) {
 			QWidget* widget = new BasicImageView(item.image());
 			m_imageWidgetCleanup.add(widget);
 			m_ptrTabbedDebugImages->addTab(widget, item.label());
+			item.image() = QImage(); // Save memory.
 		}
 		m_pImageFrameLayout->addWidget(m_ptrTabbedDebugImages.get());
 	}

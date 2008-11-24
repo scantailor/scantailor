@@ -40,7 +40,7 @@ public:
 	
 	virtual void setImageWidget(
 		QWidget* widget, Ownership ownership,
-		DebugImages const* debug_images = 0) = 0;
+		DebugImages* debug_images = 0) = 0;
 	
 	virtual void invalidateThumbnail(PageId const& page_id) = 0;
 	

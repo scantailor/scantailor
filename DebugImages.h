@@ -39,6 +39,8 @@ public:
 	public:
 		Item(QImage const& image, QString const& label);
 		
+		QImage& image() { return m_image; }
+		
 		QImage const& image() const { return m_image; }
 		
 		QString const& label() const { return m_label; }
@@ -50,6 +52,8 @@ public:
 	void add(QImage const& image, QString const& label);
 	
 	void add(imageproc::BinaryImage const& image, QString const& label);
+	
+	std::list<Item>& items() { return m_items; }
 	
 	std::list<Item> const& items() const { return m_items; }
 private:
