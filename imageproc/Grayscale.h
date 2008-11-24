@@ -23,6 +23,7 @@
 #include <QColor>
 
 class QImage;
+class QSize;
 
 namespace imageproc
 {
@@ -82,6 +83,18 @@ QImage toGrayscale(QImage const& src);
  */
 QImage stretchGrayRange(QImage const& src, double black_clip_fraction = 0.0,
 	double white_clip_fraction = 0.0);
+
+/**
+ * \brief Create a grayscale image consisting of a 1 pixel frame and an inner area.
+ *
+ * \param size The size of the image including the frame.
+ * \param inner_color The gray level of the inner area.  Defaults to white.
+ * \param frame_color The gray level of the frame area.  Defaults to black.
+ * \return The resulting image.
+ */
+QImage createFramedImage(
+	QSize const& size, unsigned char inner_color = 0xff,
+	unsigned char border_color = 0x00);
 
 } // namespace imageproc
 

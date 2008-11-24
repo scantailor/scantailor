@@ -206,12 +206,11 @@ QImage stretchGrayRange(
 			gray_mapping[i] = 255;
 		}
 	} else {
-		int const src_range = max - min;
 		for (int i = 0; i < 256; ++i) {
 			int const src_level = qBound(min, i, max);
-			int const nom = 255 * (src_level - min);
+			int const num = 255 * (src_level - min);
 			int const denom = max - min;
-			int const dst_level = (nom + denom / 2) / denom;
+			int const dst_level = (num + denom / 2) / denom;
 			gray_mapping[i] = static_cast<uint8_t>(dst_level);
 		}
 	}
@@ -226,6 +225,31 @@ QImage stretchGrayRange(
 	}
 	
 	return dst;
+}
+
+QImage createFramedImage(QSize const& size,
+	unsigned char const inner_color, unsigned char const border_color)
+{
+	QImage image(size, QImage::Format_Indexed8);
+	image.setColorTable(createGrayscalePalette());
+	image.fill(inner_color);
+	
+	int const width = size.width();
+	int const height = size.height();
+	
+	unsigned char* line = image.bits();
+	int const bpl = image.bytesPerLine();
+	
+	memset(line, border_color, width);
+	
+	for (int y = 0; y < height; ++y, line += bpl) {
+		line[0] = border_color;
+		line[width - 1] = border_color;
+	}
+	
+	memset(line - bpl, border_color, width);
+	
+	return image;
 }
 
 GrayscaleHistogram::GrayscaleHistogram(QImage const& img)
