@@ -258,6 +258,7 @@ QImage savGolFilterGrayToGray(
 	int const width = src.width();
 	int const height = src.height();
 	
+	// Kernel width and height.
 	int const kw = window_size.width();
 	int const kh = window_size.height();
 	
@@ -265,9 +266,34 @@ QImage savGolFilterGrayToGray(
 		return src;
 	}
 	
-	int const k_top = kh / 2;
+	/*
+	 * Consider a 5x5 kernel:
+	 * |x|x|T|x|x|
+	 * |x|x|T|x|x|
+	 * |L|L|C|R|R|
+	 * |x|x|B|x|x|
+	 * |x|x|B|x|x|
+	 */
+	
+	// Co-ordinates of the central point (C) of the kernel.
+	QPoint const k_center(kw / 2, kh / 2);
+	
+	// Origin is the current hot spot of the kernel.
+	// Normally it's at k_center, but sometimes we move
+	// it to other locations to avoid parts of the kernel
+	// from going outside of the image area.
+	QPoint k_origin;
+	
+	// Length of the top segment (T) of the kernel.
+	int const k_top = k_center.y();
+	
+	// Length of the bottom segment (B) of the kernel.
 	int const k_bottom = kh - k_top - 1;
-	int const k_left = kw / 2;
+	
+	// Length of the left segment (L) of the kernel.
+	int const k_left = k_center.x();
+	
+	// Length of the right segment (R) of the kernel.
 	int const k_right = kw - k_left - 1;
 	
 	uint8_t const* const src_data = src.bits();
@@ -278,49 +304,49 @@ QImage savGolFilterGrayToGray(
 	
 	uint8_t* const dst_data = dst.bits();
 	int const dst_bpl = dst.bytesPerLine();
-
+	
 	// Top-left corner.
-	QPoint origin(0, 0);
+	uint8_t const* src_line = src_data;
 	uint8_t* dst_line = dst_data;
-	SavGolKernel kernel(order, window_size, origin);
+	SavGolKernel kernel(order, window_size, QPoint(0, 0));
 	for (int y = 0; y < k_top; ++y, dst_line += dst_bpl) {
-		origin.setY(y);
+		k_origin.setY(y);
 		for (int x = 0; x < k_left; ++x) {
-			origin.setX(x);
-			kernel.recalcForOrigin(origin);
-			kernel.convolve(dst_line + x, src_data, src_bpl);
+			k_origin.setX(x);
+			kernel.recalcForOrigin(k_origin);
+			kernel.convolve(dst_line + x, src_line, src_bpl);
 		}
 	}
 	
 	// Top area between two corners.
-	origin.setX(kw / 2);
+	k_origin.setX(k_center.x());
+	src_line = src_data - k_left;
 	dst_line = dst_data;
 	for (int y = 0; y < k_top; ++y, dst_line += dst_bpl) {
-		origin.setY(y);
-		kernel.recalcForOrigin(origin);
+		k_origin.setY(y);
+		kernel.recalcForOrigin(k_origin);
 		for (int x = k_left; x < width - k_right; ++x) {
-			kernel.convolve(dst_line + x, src_data - k_left + x, src_bpl);
+			kernel.convolve(dst_line + x, src_line + x, src_bpl);
 		}
 	}
 	
 	// Top-right corner.
-	origin.setY(0);
+	k_origin.setY(0);
+	src_line = src_data + width - kw;
 	dst_line = dst_data;
 	for (int y = 0; y < k_top; ++y, dst_line += dst_bpl) {
-		origin.setX(kw - 1);
+		k_origin.setX(k_center.x() + 1);
 		for (int x = width - k_right; x < width; ++x) {
-			kernel.recalcForOrigin(origin);
-			kernel.convolve(dst_line + x, src_data + width - kw, src_bpl);
-			origin.rx() -= 1;
+			kernel.recalcForOrigin(k_origin);
+			kernel.convolve(dst_line + x, src_line, src_bpl);
+			k_origin.rx() += 1;
 		}
-		origin.ry() += 1;
+		k_origin.ry() += 1;
 	}
 	
 	// Central area.
-	origin.setX(kw / 2);
-	origin.setY(kh / 2);
-	kernel.recalcForOrigin(origin);
-	uint8_t const* src_line = src_data - k_left;	
+	kernel.recalcForOrigin(k_center);
+	src_line = src_data - k_left;
 	dst_line = dst_data + dst_bpl * k_top;
 	for (int y = k_top; y < height - k_bottom; ++y) {
 		for (int x = k_left; x < width - k_right; ++x) {
@@ -331,77 +357,75 @@ QImage savGolFilterGrayToGray(
 	}
 
 	// Left area between two corners.
-	origin.setX(0);
-	origin.setY(kh / 2);
+	k_origin.setX(0);
+	k_origin.setY(k_center.y() + 1);
 	for (int x = 0; x < k_left; ++x) {
 		src_line = src_data;
 		dst_line = dst_data + dst_bpl * k_top;
 		
-		kernel.recalcForOrigin(origin);
+		kernel.recalcForOrigin(k_origin);
 		for (int y = k_top; y < height - k_bottom; ++y) {
 			kernel.convolve(dst_line + x, src_line, src_bpl);
 			src_line += src_bpl;
 			dst_line += dst_bpl;
 		}
-		origin.rx() += 1;
+		k_origin.rx() += 1;
 	}
 	
 	// Right area between two corners.
-	origin.setX(kw / 2 + 1);
-	origin.setY(kh / 2);
+	k_origin.setX(k_center.x() + 1);
+	k_origin.setY(k_center.y());
 	for (int x = width - k_right; x < width; ++x) {
 		src_line = src_data + width - kw;
 		dst_line = dst_data + dst_bpl * k_top;
 		
-		kernel.recalcForOrigin(origin);
+		kernel.recalcForOrigin(k_origin);
 		for (int y = k_top; y < height - k_bottom; ++y) {
 			kernel.convolve(dst_line + x, src_line, src_bpl);
 			src_line += src_bpl;
 			dst_line += dst_bpl;
 		}
-		origin.rx() += 1;
+		k_origin.rx() += 1;
 	}
 	
 	// Bottom-left corner.
-	origin.setY(kh / 2 + 1);
+	k_origin.setY(k_center.y() + 1);
 	src_line = src_data + src_bpl * (height - kh);
 	dst_line = dst_data + dst_bpl * (height - k_bottom);
 	for (int y = height - k_bottom; y < height; ++y, dst_line += dst_bpl) {
-		origin.setX(0);
 		for (int x = 0; x < k_left; ++x) {
-			origin.setX(x);
-			kernel.recalcForOrigin(origin);
+			k_origin.setX(x);
+			kernel.recalcForOrigin(k_origin);
 			kernel.convolve(dst_line + x, src_line, src_bpl);
-			origin.rx() += 1;
 		}
-		origin.ry() += 1;
+		k_origin.ry() += 1;
 	}
 	
 	// Bottom area between two corners.
-	origin.setX(kw / 2);
-	origin.setY(kh / 2 + 1);
-	src_line = src_data + src_bpl * (height - kh) - origin.x();
+	k_origin.setX(k_center.x());
+	k_origin.setY(k_center.y() + 1);
+	src_line = src_data + src_bpl * (height - kh) - k_left;
 	dst_line = dst_data + dst_bpl * (height - k_bottom);
 	for (int y = height - k_bottom; y < height; ++y, dst_line += dst_bpl) {
-		kernel.recalcForOrigin(origin);
+		kernel.recalcForOrigin(k_origin);
 		for (int x = k_left; x < width - k_right; ++x) {
 			kernel.convolve(dst_line + x, src_line + x, src_bpl);
 		}
-		origin.ry() += 1;
+		k_origin.ry() += 1;
 	}
 	
 	// Bottom-right corner.
-	origin.setY(kh / 2 + 1);
+	k_origin.setY(k_center.y() + 1);
 	src_line = src_data + src_bpl * (height - kh) + (width - kw);
 	dst_line = dst_data + dst_bpl * (height - k_bottom);
 	for (int y = height - k_bottom; y < height; ++y, dst_line += dst_bpl) {
-		origin.setX(kw / 2 + 1);
+		k_origin.setX(k_center.x() + 1);
 		for (int x = width - k_right; x < width; ++x) {
-			kernel.recalcForOrigin(origin);
+			kernel.recalcForOrigin(k_origin);
 			kernel.convolve(dst_line + x, src_line, src_bpl);
-			origin.rx() += 1;
+			k_origin.rx() += 1;
 		}
-		origin.ry() += 1;
+		k_origin.ry() += 1;
 	}
 	
 	return dst;
