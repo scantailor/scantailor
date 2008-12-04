@@ -482,9 +482,9 @@ BinaryImage::contentBoundingBox(BWColor const content_color) const
 	int const h = m_height;
 	int const wpl = m_wpl;
 	int const last_word_idx = (w - 1) >> 5;
-	int const last_word_length = w - (last_word_idx << 5);
-	int const last_word_unused_len = 32 - last_word_length;
-	uint32_t const last_word_mask = ~uint32_t(0) << last_word_unused_len;
+	int const last_word_bits = w - (last_word_idx << 5);
+	int const last_word_unused_bits = 32 - last_word_bits;
+	uint32_t const last_word_mask = ~uint32_t(0) << last_word_unused_bits;
 	uint32_t const modifier = (content_color == WHITE) ? ~uint32_t(0) : 0;
 	uint32_t const* const data = this->data();
 	
@@ -524,18 +524,18 @@ BinaryImage::contentBoundingBox(BWColor const content_color) const
 		}
 		if (right != 0) {
 			uint32_t const word =
-				(line[last_word_idx] ^ modifier) >> last_word_unused_len;
+				(line[last_word_idx] ^ modifier) >> last_word_unused_bits;
 			if (word) {
 				int const offset = countLeastSignificantZeroes(word);
 				if (offset < right) {
 					right = offset;
 				}
-			} else if (right > last_word_length) {
-				right -= last_word_length;
+			} else if (right > last_word_bits) {
+				right -= last_word_bits;
 				right = rightmostBitOffset(
 					line + last_word_idx, right, modifier
 				);
-				right += last_word_length;
+				right += last_word_bits;
 			}
 		}
 	}
@@ -617,11 +617,11 @@ BinaryImage::fillRectImpl(uint32_t* const data, QRect const& rect, BWColor const
 		return;
 	}
 	
-	uint32_t const first_word_idx = rect.left() / 32;
+	uint32_t const first_word_idx = rect.left() >> 5;
 	// Note: rect.right() == rect.left() + rect.width() - 1
-	uint32_t const last_word_idx = rect.right() / 32;
-	uint32_t const first_word_mask = ~uint32_t(0) >> (rect.left() % 32);
-	uint32_t const last_word_mask = ~uint32_t(0) << (31 - rect.right() % 32);
+	uint32_t const last_word_idx = rect.right() >> 5;
+	uint32_t const first_word_mask = ~uint32_t(0) >> (rect.left() & 31);
+	uint32_t const last_word_mask = ~uint32_t(0) << (31 - (rect.right() & 31));
 	uint32_t* line = data + rect.top() * m_wpl;
 	
 	if (first_word_idx == last_word_idx) {
@@ -720,10 +720,11 @@ BinaryImage::fromMono(QImage const& image, QRect const& rect)
 			dst_line += dst_wpl;
 		}
 	} else {
+		int const last_word_idx = (width - 1) >> 5;
 		for (int i = height; i > 0; --i) {
 			int j = 0;
 			uint32_t next_word = ntohl(src_line[j]);
-			for (; j < dst_wpl - 1; ++j) {
+			for (; j < last_word_idx; ++j) {
 				uint32_t const this_word = next_word;
 				next_word = ntohl(src_line[j + 1]);
 				uint32_t const dst_word = (this_word << word1_unused_bits)
@@ -773,7 +774,9 @@ BinaryImage::fromIndexed8(
 	BinaryImage dst(width, height);
 	int const dst_wpl = dst.wordsPerLine();
 	uint32_t* dst_line = dst.data();
-	int const dst_last_word = dst_wpl - 1;
+	int const last_word_idx = (width - 1) >> 5;
+	int const last_word_bits = width - (last_word_idx << 5);
+	int const last_word_unused_bits = 32 - last_word_bits;
 	
 	int const num_colors = image.numColors();
 	assert(num_colors <= 256);
@@ -787,7 +790,7 @@ BinaryImage::fromIndexed8(
 	}
 	
 	for (int i = height; i > 0; --i) {
-		for (int j = 0; j < dst_last_word; ++j) {
+		for (int j = 0; j < last_word_idx; ++j) {
 			uint8_t const* const src_pos = &src_line[j << 5];
 			uint32_t word = 0;
 			for (int bit = 0; bit < 32; ++bit) {
@@ -800,17 +803,16 @@ BinaryImage::fromIndexed8(
 		}
 		
 		// Handle the last word.
-		uint8_t const* const src_pos = &src_line[dst_last_word << 5];
+		uint8_t const* const src_pos = &src_line[last_word_idx << 5];
 		uint32_t word = 0;
-		int const bit_limit = width % 32;
-		for (int bit = 0; bit < bit_limit; ++bit) {
+		for (int bit = 0; bit < last_word_bits; ++bit) {
 			word <<= 1;
 			if (color_to_gray[src_pos[bit]] < threshold) {
 				word |= uint32_t(1);
 			}
 		}
-		word <<= 32 - bit_limit;
-		dst_line[dst_last_word] = word;
+		word <<= last_word_unused_bits;
+		dst_line[last_word_idx] = word;
 		
 		dst_line += dst_wpl;
 		src_line += src_bpl;
@@ -842,11 +844,13 @@ BinaryImage::fromRgb32(
 	BinaryImage dst(width, height);
 	int const dst_wpl = dst.wordsPerLine();
 	uint32_t* dst_line = dst.data();
-	int const dst_last_word = dst_wpl - 1;
+	int const last_word_idx = (width - 1) >> 5;
+	int const last_word_bits = width - (last_word_idx << 5);
+	int const last_word_unused_bits = 32 - last_word_bits;
 	
 	for (int i = height; i > 0; --i) {
-		for (int j = 0; j < dst_last_word; ++j) {
-			QRgb const* const src_pos = &src_line[j * 32];
+		for (int j = 0; j < last_word_idx; ++j) {
+			QRgb const* const src_pos = &src_line[j << 5];
 			uint32_t word = 0;
 			for (int bit = 0; bit < 32; ++bit) {
 				word <<= 1;
@@ -856,15 +860,14 @@ BinaryImage::fromRgb32(
 		}
 		
 		// Handle the last word.
-		QRgb const* const src_pos = &src_line[dst_last_word * 32];
+		QRgb const* const src_pos = &src_line[last_word_idx << 5];
 		uint32_t word = 0;
-		int const bit_limit = width % 32;
-		for (int bit = 0; bit < bit_limit; ++bit) {
+		for (int bit = 0; bit < last_word_bits; ++bit) {
 			word <<= 1;
 			word |= thresholdRgb32(src_pos[bit], threshold);
 		}
-		word <<= 32 - bit_limit;
-		dst_line[dst_last_word] = word;
+		word <<= last_word_unused_bits;
+		dst_line[last_word_idx] = word;
 		
 		dst_line += dst_wpl;
 		src_line += src_wpl;
@@ -904,11 +907,13 @@ BinaryImage::fromArgb32Premultiplied(
 	BinaryImage dst(width, height);
 	int const dst_wpl = dst.wordsPerLine();
 	uint32_t* dst_line = dst.data();
-	int const dst_last_word = dst_wpl - 1;
+	int const last_word_idx = (width - 1) >> 5;
+	int const last_word_bits = width - (last_word_idx << 5);
+	int const last_word_unused_bits = 32 - last_word_bits;
 	
 	for (int i = height; i > 0; --i) {
-		for (int j = 0; j < dst_last_word; ++j) {
-			QRgb const* const src_pos = &src_line[j * 32];
+		for (int j = 0; j < last_word_idx; ++j) {
+			QRgb const* const src_pos = &src_line[j << 5];
 			uint32_t word = 0;
 			for (int bit = 0; bit < 32; ++bit) {
 				word <<= 1;
@@ -918,15 +923,14 @@ BinaryImage::fromArgb32Premultiplied(
 		}
 		
 		// Handle the last word.
-		QRgb const* const src_pos = &src_line[dst_last_word * 32];
+		QRgb const* const src_pos = &src_line[last_word_idx << 5];
 		uint32_t word = 0;
-		int const bit_limit = width % 32;
-		for (int bit = 0; bit < bit_limit; ++bit) {
+		for (int bit = 0; bit < last_word_bits; ++bit) {
 			word <<= 1;
 			word |= thresholdArgbPM(src_pos[bit], threshold);
 		}
-		word <<= 32 - bit_limit;
-		dst_line[dst_last_word] = word;
+		word <<= last_word_unused_bits;
+		dst_line[last_word_idx] = word;
 		
 		dst_line += dst_wpl;
 		src_line += src_wpl;
@@ -974,11 +978,12 @@ BinaryImage::fromRgb16(
 	BinaryImage dst(width, height);
 	int const dst_wpl = dst.wordsPerLine();
 	uint32_t* dst_line = dst.data();
-	int const dst_last_word = dst_wpl - 1;
+	int const last_word_idx = (width - 1) >> 5;
+	int const last_word_bits = width - (last_word_idx << 5);
 	
 	for (int i = height; i > 0; --i) {
-		for (int j = 0; j < dst_last_word; ++j) {
-			uint16_t const* const src_pos = &src_line[j * 32];
+		for (int j = 0; j < last_word_idx; ++j) {
+			uint16_t const* const src_pos = &src_line[j << 5];
 			uint32_t word = 0;
 			for (int bit = 0; bit < 32; ++bit) {
 				word <<= 1;
@@ -988,15 +993,14 @@ BinaryImage::fromRgb16(
 		}
 		
 		// Handle the last word.
-		uint16_t const* const src_pos = &src_line[dst_last_word * 32];
+		uint16_t const* const src_pos = &src_line[last_word_idx << 5];
 		uint32_t word = 0;
-		int const bit_limit = width % 32;
-		for (int bit = 0; bit < bit_limit; ++bit) {
+		for (int bit = 0; bit < last_word_bits; ++bit) {
 			word <<= 1;
 			word |= thresholdRgb16(src_pos[bit], threshold);
 		}
-		word <<= 32 - bit_limit;
-		dst_line[dst_last_word] = word;
+		word <<= 32 - last_word_bits;
+		dst_line[last_word_idx] = word;
 		
 		dst_line += dst_wpl;
 		src_line += src_wpl;
