@@ -36,10 +36,18 @@ namespace imageproc
 namespace
 {
 
+int calcNumTerms(int const hor_degree, int const vert_degree)
+{
+	return (hor_degree + 1) * (vert_degree + 1);
+}
+
+
 class SavGolKernel
 {
 public:
-	SavGolKernel(int order, QSize const& size, QPoint const& origin);
+	SavGolKernel(
+		QSize const& size, QPoint const& origin,
+		int hor_degree, int vert_degree);
 	
 	void recalcForOrigin(QPoint const& origin);
 	
@@ -87,9 +95,14 @@ private:
 	std::vector<double> m_kernel;
 	
 	/**
-	 * The order of the polynomial.
+	 * The degree of the polynomial in horizontal direction.
 	 */
-	int m_order;
+	int m_horDegree;
+	
+	/**
+	 * The degree of the polynomial in vertical direction.
+	 */
+	int m_vertDegree;
 	
 	/**
 	 * The width of the convolution kernel.
@@ -102,9 +115,9 @@ private:
 	int m_height;
 	
 	/**
-	 * The number of polynomial coefficients.  This is equal to (order + 1)^2.
+	 * The number of terms in the polynomial.
 	 */
-	int m_numVars;
+	int m_numTerms;
 	
 	/**
 	 * The number of data points.  This corresponds to the number of items
@@ -113,31 +126,36 @@ private:
 	int m_numDataPoints;
 };
 
-SavGolKernel::SavGolKernel(int const order, QSize const& size, QPoint const& origin)
-:	m_order(order),
+SavGolKernel::SavGolKernel(
+	QSize const& size, QPoint const& origin,
+	int const hor_degree, int const vert_degree)
+:	m_horDegree(hor_degree),
+	m_vertDegree(vert_degree),
 	m_width(size.width()),
 	m_height(size.height()),
-	m_numVars((order + 1) * (order + 1)),
+	m_numTerms(calcNumTerms(hor_degree, vert_degree)),
 	m_numDataPoints(size.width() * size.height())
 {
-	assert(order > 0);
-	assert(m_numVars <= m_numDataPoints);
+	assert(hor_degree >= 0 && vert_degree >= 0);
+	assert(m_numTerms <= m_numDataPoints);
 	
 	// Allocate memory.
 	m_dataPoints.resize(m_numDataPoints, 0.0);
-	m_coeffs.resize(m_numVars);
+	m_coeffs.resize(m_numTerms);
 	m_kernel.resize(m_numDataPoints);
 	
 	// Prepare equations.
-	m_equations.reserve(m_numVars * m_numDataPoints);
+	m_equations.reserve(m_numTerms * m_numDataPoints);
 	for (int y = 1; y <= m_height; ++y) {
 		for (int x = 1; x <= m_width; ++x) {
 			double pow1 = 1.0;
-			for (int i = 0; i <= order; ++i, pow1 *= y) {
+			for (int i = 0; i <= m_vertDegree; ++i) {
 				double pow2 = pow1;
-				for (int j = 0; j <= order; ++j, pow2 *= x) {
+				for (int j = 0; j <= m_horDegree; ++j) {
 					m_equations.push_back(pow2);
+					pow2 *= x;
 				}
+				pow1 *= y;
 			}
 		}
 	}
@@ -156,14 +174,14 @@ SavGolKernel::QR()
 {
 	m_rotations.clear();
 	m_rotations.reserve(
-		(m_numVars * (m_numVars - 1) / 2
-		+ (m_numDataPoints - m_numVars) * m_numVars)
+		m_numTerms * (m_numTerms - 1) / 2
+		+ (m_numDataPoints - m_numTerms) * m_numTerms
 	);
 	
-	int jj = 0; // j * m_numVars + j
-	for (int j = 0; j < m_numVars; ++j, jj += m_numVars + 1) {
-		int ij = jj + m_numVars; // i * m_numVars + j
-		for (int i = j + 1; i < m_numDataPoints; ++i, ij += m_numVars) {
+	int jj = 0; // j * m_numTerms + j
+	for (int j = 0; j < m_numTerms; ++j, jj += m_numTerms + 1) {
+		int ij = jj + m_numTerms; // i * m_numTerms + j
+		for (int i = j + 1; i < m_numDataPoints; ++i, ij += m_numTerms) {
 			double const a = m_equations[jj];
 			double const b = m_equations[ij];
 			double const radius = sqrt(a*a + b*b);
@@ -174,9 +192,9 @@ SavGolKernel::QR()
 			m_equations[jj] = radius;
 			m_equations[ij] = 0.0;
 			
-			int ik = ij + 1; // i * m_numVars + k
-			int jk = jj + 1; // j * m_numVars + k
-			for (int k = j + 1; k < m_numVars; ++k, ++ik, ++jk) {
+			int ik = ij + 1; // i * m_numTerms + k
+			int jk = jj + 1; // j * m_numTerms + k
+			for (int k = j + 1; k < m_numTerms; ++k, ++ik, ++jk) {
 				double const temp = cos * m_equations[jk] + sin * m_equations[ik];
 				m_equations[ik] = cos * m_equations[ik] - sin * m_equations[jk];
 				m_equations[jk] = temp;
@@ -194,7 +212,7 @@ SavGolKernel::recalcForOrigin(QPoint const& origin)
 	// Rotate data points.
 	double* const dp = &m_dataPoints[0];
 	std::vector<Rotation>::const_iterator rot(m_rotations.begin());
-	for (int j = 0; j < m_numVars; ++j) {
+	for (int j = 0; j < m_numTerms; ++j) {
 		for (int i = j + 1; i < m_numDataPoints; ++i, ++rot) {
 			double const temp = rot->cos * dp[j] + rot->sin * dp[i];
 			dp[i] = rot->cos * dp[i] - rot->sin * dp[j];
@@ -202,12 +220,12 @@ SavGolKernel::recalcForOrigin(QPoint const& origin)
 		}
 	}
 	
-	// Solve R*x = d, by back-substitution.
-	int ii = m_numVars * m_numVars - 1; // i * m_numVars + i
-	for (int i = m_numVars - 1; i >= 0; --i, ii -= m_numVars + 1) {
+	// Solve R*x = d by back-substitution.
+	int ii = m_numTerms * m_numTerms - 1; // i * m_numTerms + i
+	for (int i = m_numTerms - 1; i >= 0; --i, ii -= m_numTerms + 1) {
 		double sum = dp[i];
 		int ik = ii + 1;
-		for (int k = i + 1; k < m_numVars; ++k, ++ik) {
+		for (int k = i + 1; k < m_numTerms; ++k, ++ik) {
 			sum -= m_equations[ik] * m_coeffs[k];
 		}
 		
@@ -221,12 +239,14 @@ SavGolKernel::recalcForOrigin(QPoint const& origin)
 			double sum = 0.0;
 			double pow1 = 1.0;
 			int ci = 0;
-			for (int i = 0; i <= m_order; ++i, pow1 *= y) {
+			for (int i = 0; i <= m_vertDegree; ++i) {
 				double pow2 = pow1;
-				for (int j = 0; j <= m_order; ++j, pow2 *= x) {
+				for (int j = 0; j <= m_horDegree; ++j) {
 					sum += pow2 * m_coeffs[ci];
 					++ci;
+					pow2 *= x;
 				}
+				pow1 *= y;
 			}
 			m_kernel[ki] = sum;
 			++ki;
@@ -253,7 +273,8 @@ SavGolKernel::convolve(uint8_t* dst, uint8_t const* src_top_left, int src_bpl) c
 }
 
 QImage savGolFilterGrayToGray(
-	QImage const& src, QSize const& window_size, int const order)
+	QImage const& src, QSize const& window_size,
+	int const hor_degree, int const vert_degree)
 {
 	int const width = src.width();
 	int const height = src.height();
@@ -308,7 +329,7 @@ QImage savGolFilterGrayToGray(
 	// Top-left corner.
 	uint8_t const* src_line = src_data;
 	uint8_t* dst_line = dst_data;
-	SavGolKernel kernel(order, window_size, QPoint(0, 0));
+	SavGolKernel kernel(window_size, QPoint(0, 0), hor_degree, vert_degree);
 	for (int y = 0; y < k_top; ++y, dst_line += dst_bpl) {
 		k_origin.setY(y);
 		for (int x = 0; x < k_left; ++x) {
@@ -435,21 +456,25 @@ QImage savGolFilterGrayToGray(
 
 
 QImage savGolFilter(
-	QImage const& src, QSize const& window_size, int const order)
+	QImage const& src, QSize const& window_size,
+	int const hor_degree, int const vert_degree)
 {
-	if (order < 1) {
-		throw std::invalid_argument("savGolFilter: invalid polynomial order");
+	if (hor_degree < 0 || vert_degree < 0) {
+		throw std::invalid_argument("savGolFilter: invalid polynomial degree");
 	}
 	if (window_size.isEmpty()) {
 		throw std::invalid_argument("savGolFilter: invalid window size");
 	}
-	if ((order + 1) * (order + 1) >
-			window_size.width() * window_size.height()) {
+	
+	if (calcNumTerms(hor_degree, vert_degree)
+			> window_size.width() * window_size.height()) {
 		throw std::invalid_argument(
 			"savGolFilter: order is too big for that window");
 	}
 	
-	return savGolFilterGrayToGray(toGrayscale(src), window_size, order);
+	return savGolFilterGrayToGray(
+		toGrayscale(src), window_size, hor_degree, vert_degree
+	);
 }
 
 } // namespace imageproc
