@@ -85,24 +85,6 @@ struct CenterComparator
 	}
 };
 
-unsigned sumGrayLevels(QImage const& image, QRect const& rect)
-{
-	unsigned char const* image_line = image.bits();
-	int const image_bpl = image.bytesPerLine();
-	int const w = rect.width();
-	int const h = rect.height();
-	
-	unsigned sum = 0;
-	image_line += rect.left() + rect.top() * image_bpl;
-	for (int y = 0; y < h; ++y, image_line += image_bpl) {
-		for (int x = 0; x < w; ++x) {
-			sum += image_line[x];
-		}
-	}
-	
-	return sum;
-}
-
 PageLayout selectSinglePageSplitLine(
 	std::vector<QLineF> const& ltr_lines, QSize const& image_size,
 	QImage const& hor_shadows, DebugImages* dbg)
@@ -112,6 +94,26 @@ PageLayout selectSinglePageSplitLine(
 	}
 	
 	if (ltr_lines.empty()) {
+		return PageLayout();
+	}
+	
+	QRect left_area(hor_shadows.rect());
+	left_area.setWidth(std::min(20, hor_shadows.width()));
+	QRect right_area(left_area);
+	right_area.moveRight(hor_shadows.rect().right());
+	
+	BinaryImage const hor_shadows_bin(binarizeOtsu(hor_shadows));
+	if (dbg) {
+		dbg->add(hor_shadows_bin, "hor_shadows_bin");
+	}
+	unsigned const left_sum = hor_shadows_bin.countBlackPixels(left_area);
+	unsigned const right_sum = hor_shadows_bin.countBlackPixels(right_area);
+	
+	if (left_sum == 0 && right_sum == 0) {
+		// Looks like this scan doesn't have a horizontal shadow that
+		// touches the left or the right edge.  This probably means it
+		// doesn't have a split line there as well, and those that
+		// we found are false positives.
 		return PageLayout();
 	}
 	
@@ -125,22 +127,7 @@ PageLayout selectSinglePageSplitLine(
 		}
 	}
 	
-	QRect left_area(hor_shadows.rect());
-	left_area.setWidth(std::min(20, hor_shadows.width()));
-	QRect right_area(left_area);
-	right_area.moveRight(hor_shadows.rect().right());
-#if 0
-	unsigned const left_sum = sumGrayLevels(hor_shadows, left_area);
-	unsigned const right_sum = sumGrayLevels(hor_shadows, right_area);
-#else
-	BinaryImage const hor_shadows_bin(binarizeOtsu(hor_shadows));
-	if (dbg) {
-		dbg->add(hor_shadows_bin, "hor_shadows_bin");
-	}
-	unsigned const left_sum = hor_shadows_bin.countWhitePixels(left_area);
-	unsigned const right_sum = hor_shadows_bin.countWhitePixels(right_area);
-#endif
-	if (left_sum < right_sum) {
+	if (left_sum > right_sum) {
 		// Probably the horizontal shadow from a page touches the left
 		// border, which means that the left page was cut off.
 		return PageLayout(ltr_lines.front(), false, true);
@@ -153,7 +140,6 @@ PageLayout selectTwoPageSplitLine(
 	std::vector<QLineF> const& ltr_lines, QSize const& image_size)
 {
 	int const width = image_size.width();
-	int const height = image_size.height();
 	
 	if (ltr_lines.empty()) {
 		return PageLayout();
