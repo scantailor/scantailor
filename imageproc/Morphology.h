@@ -160,14 +160,14 @@ QImage dilateGray(
  */
 BinaryImage erodeBrick(
 	BinaryImage const& src, Brick const& brick,
-	QRect const& dst_area, BWColor src_surroundings = WHITE);
+	QRect const& dst_area, BWColor src_surroundings = BLACK);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
 BinaryImage erodeBrick(
 	BinaryImage const& src, Brick const& brick,
-	BWColor src_surroundings = WHITE);
+	BWColor src_surroundings = BLACK);
 
 /**
  * \brief Spreads lighter pixels over the brick's area.
