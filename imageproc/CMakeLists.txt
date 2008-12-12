@@ -31,6 +31,12 @@ SET(
 	HoughLineDetector.cpp HoughLineDetector.h
 	GaussBlur.cpp GaussBlur.h
 	MorphGradientDetect.cpp MorphGradientDetect.h
+	LeastSquaresFit.cpp LeastSquaresFit.h
+	PolynomialLine.cpp PolynomialSurface.h
+	PolynomialSurface.cpp PolynomialSurface.h
+	SavGolFilter.cpp SavGolFilter.h
+	DrawOver.cpp DrawOver.h
+	AdjustBrightness.cpp AdjustBrightness.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

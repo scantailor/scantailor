@@ -219,6 +219,7 @@ SET(
 	XmlMarshaller.cpp XmlMarshaller.h
 	XmlUnmarshaller.cpp XmlUnmarshaller.h
 	AtomicFileOverwriter.cpp AtomicFileOverwriter.h
+	EstimateBackground.cpp EstimateBackground.h
 	Utils.cpp Utils.h
 	AutoManualMode.h
 	AbstractCommand.h
