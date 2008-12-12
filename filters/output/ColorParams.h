@@ -28,10 +28,10 @@ class ColorParams
 {
 public:
 	enum ColorMode { BLACK_AND_WHITE, BITONAL, COLOR_GRAYSCALE, MIXED };
-	enum ThresholdMode { MOKJI, OTSU, SAUVOLA, WOLF };
+	enum ThresholdMode { OTSU, MOKJI, SAUVOLA, WOLF };
 	
 	ColorParams() : m_lightColor(0xFFFFFFFF), m_darkColor(0xFF000000),
-	m_colorMode(BLACK_AND_WHITE), m_thresholdMode(MOKJI) {}
+	m_colorMode(BLACK_AND_WHITE), m_thresholdMode(OTSU) {}
 	
 	ColorMode colorMode() const { return m_colorMode; }
 	
