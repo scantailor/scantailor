@@ -44,8 +44,8 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
 	
-	thresholdSelector->addItem(QString::fromAscii("Mokji"), ColorParams::MOKJI);
 	thresholdSelector->addItem(QString::fromAscii("Otsu"), ColorParams::OTSU);
+	thresholdSelector->addItem(QString::fromAscii("Mokji"), ColorParams::MOKJI);
 	thresholdSelector->addItem(QString::fromAscii("Sauvola"), ColorParams::SAUVOLA);
 	thresholdSelector->addItem(QString::fromAscii("Wolf"), ColorParams::WOLF);
 	
@@ -230,18 +230,23 @@ OptionsWidget::updateColorsDisplay()
 	int const color_mode_idx = colorModeSelector->findData(color_mode);
 	colorModeSelector->setCurrentIndex(color_mode_idx);
 	
-	bitonalOptionsWidget->setVisible(color_mode != ColorParams::COLOR_GRAYSCALE);
+	bool const show_bitonal_options = (
+		color_mode == ColorParams::BLACK_AND_WHITE
+		|| color_mode == ColorParams::BITONAL
+	);
+	
+	bitonalOptionsWidget->setVisible(show_bitonal_options);
 	lightColorButton->setEnabled(color_mode == ColorParams::BITONAL);
 	darkColorButton->setEnabled(color_mode == ColorParams::BITONAL);
 	
-	if (color_mode == ColorParams::BLACK_AND_WHITE) {
-		m_lightColorPixmap.fill(Qt::white);
-		m_darkColorPixmap.fill(Qt::black);
-	} else if (color_mode == ColorParams::BITONAL) {
-		m_lightColorPixmap.fill(m_colorParams.lightColor());
-		m_darkColorPixmap.fill(m_colorParams.darkColor());
-	}
-	if (color_mode != ColorParams::COLOR_GRAYSCALE) {
+	if (show_bitonal_options) {
+		if (color_mode == ColorParams::BLACK_AND_WHITE) {
+			m_lightColorPixmap.fill(Qt::white);
+			m_darkColorPixmap.fill(Qt::black);
+		} else if (color_mode == ColorParams::BITONAL) {
+			m_lightColorPixmap.fill(m_colorParams.lightColor());
+			m_darkColorPixmap.fill(m_colorParams.darkColor());
+		}
 		lightColorButton->setIcon(createIcon(m_lightColorPixmap));
 		darkColorButton->setIcon(createIcon(m_darkColorPixmap));
 	}
