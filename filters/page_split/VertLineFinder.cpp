@@ -70,8 +70,8 @@ VertLineFinder::findLines(
 		dbg->add(preprocessed, "preprocessed");
 	}
 	
-	QImage h_gradient(morphGradientDetect(preprocessed, QSize(11, 1)));
-	QImage v_gradient(morphGradientDetect(preprocessed, QSize(1, 11)));
+	QImage h_gradient(morphGradientDetectDarkSide(preprocessed, QSize(11, 1)));
+	QImage v_gradient(morphGradientDetectDarkSide(preprocessed, QSize(1, 11)));
 	if (dbg) {
 		dbg->add(h_gradient, "h_gradient");
 		dbg->add(v_gradient, "v_gradient");
