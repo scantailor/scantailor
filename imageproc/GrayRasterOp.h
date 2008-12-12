@@ -42,7 +42,7 @@ namespace imageproc
  * GRopSubtract\<GRopSrc, GRopDst\>.
  */
 template<typename GRop>
-void grayRasterOp(QImage const& dst, QImage const& src);
+void grayRasterOp(QImage& dst, QImage const& src);
 
 /**
  * \brief Raster operation that takes source pixels as they are.
