@@ -17,12 +17,14 @@
 */
 
 #include "PolynomialSurface.h"
+#include "LeastSquaresFit.h"
 #include "BinaryImage.h"
 #include "Grayscale.h"
 #include "BitOps.h"
 #include <QImage>
 #include <QDebug>
 #include <stdexcept>
+#include <algorithm>
 #include <math.h>
 #include <stdint.h>
 #include <assert.h>
@@ -31,18 +33,17 @@ namespace imageproc
 {
 
 PolynomialSurface::PolynomialSurface(
-	int const hor_order, int const vert_order, QImage const& src)
-:	m_size(src.size()),
-	m_horOrder(hor_order),
-	m_vertOrder(vert_order)
+	int const hor_degree, int const vert_degree, QImage const& src)
+:	m_horDegree(hor_degree),
+	m_vertDegree(vert_degree)
 {
-	// Note: m_horOrder and m_vertOrder may still change!
+	// Note: m_horDegree and m_vertDegree may still change!
 	
-	if (hor_order < 0) {
-		throw std::invalid_argument("PolynomialSurface: horizontal order is invalid");
+	if (hor_degree < 0) {
+		throw std::invalid_argument("PolynomialSurface: horizontal degree is invalid");
 	}
-	if (vert_order < 0) {
-		throw std::invalid_argument("PolynomialSurface: vertical order is invalid");
+	if (vert_degree < 0) {
+		throw std::invalid_argument("PolynomialSurface: vertical degree is invalid");
 	}
 	
 	if (src.format() != QImage::Format_Indexed8
@@ -51,35 +52,43 @@ PolynomialSurface::PolynomialSurface(
 	}
 	
 	int const num_data_points = src.width() * src.height();
-	maybeReduceOrders(num_data_points);
+	if (num_data_points == 0) {
+		m_horDegree = 0;
+		m_vertDegree = 0;
+		m_coeffs.push_back(0.0);
+		return;
+	}
 	
-	QSize const mat_size(
-		(m_horOrder + 1) * (m_vertOrder + 1), num_data_points
-	);
-	std::vector<double> M;
-	std::vector<double> V;
-	M.reserve(mat_size.width() * mat_size.height());
-	V.reserve(mat_size.height());
-	prepareMatrixAndVector(src, M, V);
+	maybeReduceDegrees(num_data_points);
 	
-	m_coeffs.resize(mat_size.width());
-	leastSquaresFit(mat_size, M, m_coeffs, V);
+	int const num_terms = calcNumTerms();
+	QSize const dimensions(num_terms, num_data_points);
+	std::vector<double> equations;
+	std::vector<double> data_points;
+	equations.reserve(dimensions.width() * dimensions.height());
+	data_points.reserve(dimensions.height());
+	m_coeffs.resize(dimensions.width());
+	
+	prepareEquationsAndDataPoints(src, equations, data_points);
+	assert(equations.size() == dimensions.width() * dimensions.height());
+	assert(data_points.size() == num_terms);
+	
+	leastSquaresFit(dimensions, &equations[0], &m_coeffs[0], &data_points[0]);
 }
 
 PolynomialSurface::PolynomialSurface(
-	int const hor_order, int const vert_order,
+	int const hor_degree, int const vert_degree,
 	QImage const& src, BinaryImage const& mask)
-:	m_size(src.size()),
-	m_horOrder(hor_order),
-	m_vertOrder(vert_order)
+:	m_horDegree(hor_degree),
+	m_vertDegree(vert_degree)
 {
-	// Note: m_horOrder and m_vertOrder may still change!
+	// Note: m_horDegree and m_vertDegree may still change!
 	
-	if (hor_order < 0) {
-		throw std::invalid_argument("PolynomialSurface: horizontal order is invalid");
+	if (hor_degree < 0) {
+		throw std::invalid_argument("PolynomialSurface: horizontal degree is invalid");
 	}
-	if (vert_order < 0) {
-		throw std::invalid_argument("PolynomialSurface: vertical order is invalid");
+	if (vert_degree < 0) {
+		throw std::invalid_argument("PolynomialSurface: vertical degree is invalid");
 	}
 	
 	if (src.format() != QImage::Format_Indexed8
@@ -92,26 +101,29 @@ PolynomialSurface::PolynomialSurface(
 	}
 	
 	int const num_data_points = mask.countBlackPixels();
-	maybeReduceOrders(num_data_points);
+	if (num_data_points == 0) {
+		m_horDegree = 0;
+		m_vertDegree = 0;
+		m_coeffs.push_back(0.0);
+		return;
+	}
 	
-	QSize const mat_size(
-		(m_horOrder + 1) * (m_vertOrder + 1), num_data_points
-	);
+	maybeReduceDegrees(num_data_points);
 	
-	std::vector<double> M;
-	std::vector<double> V;
-	M.reserve(mat_size.width() * mat_size.height());
-	V.reserve(mat_size.height());
-	prepareMatrixAndVector(src, mask, M, V);
+	int const num_terms = calcNumTerms();
+	QSize const dimensions(num_terms, num_data_points);
 	
-	m_coeffs.resize(mat_size.width());
-	leastSquaresFit(mat_size, M, m_coeffs, V);
-}
-
-QImage
-PolynomialSurface::render() const
-{
-	return render(m_size);
+	std::vector<double> equations;
+	std::vector<double> data_points;
+	equations.reserve(dimensions.width() * dimensions.height());
+	data_points.reserve(dimensions.height());
+	m_coeffs.resize(dimensions.width());
+	
+	prepareEquationsAndDataPoints(src, mask, equations, data_points);
+	assert(equations.size() == dimensions.width() * dimensions.height());
+	assert(data_points.size() == num_terms);
+	
+	leastSquaresFit(dimensions, &equations[0], &m_coeffs[0], &data_points[0]);
 }
 
 QImage
@@ -128,19 +140,11 @@ PolynomialSurface::render(QSize const& size) const
 	unsigned char* line = image.bits();
 	int const bpl = image.bytesPerLine();
 	
-	double xscale = m_size.width() - 1;
-	if (width == 1) {
-		xscale *= 0.5;
-	} else {
-		xscale /= width - 1;
-	}
 	
-	double yscale = m_size.height() - 1;
-	if (height == 1) {
-		yscale *= 0.5;
-	} else {
-		yscale /= height - 1;
-	}
+	// Pretend that both x and y positions of pixels
+	// lie in range of [1, 2].
+	double const xscale = calcScale(width);
+	double const yscale = calcScale(height);
 	
 	for (int y = 0; y < height; ++y, line += bpl) {
 		double const y_adjusted = 1.0 + y * yscale;
@@ -149,9 +153,9 @@ PolynomialSurface::render(QSize const& size) const
 			int pos = 0;
 			double sum = 0.5; // for rounding purposes
 			double pow1 = 1.0;
-			for (int i = 0; i <= m_vertOrder; ++i) {
+			for (int i = 0; i <= m_vertDegree; ++i) {
 				double pow2 = pow1;
-				for (int j = 0; j <= m_horOrder; ++j, ++pos) {
+				for (int j = 0; j <= m_horDegree; ++j, ++pos) {
 					sum += m_coeffs[pos] * pow2;
 					pow2 *= x_adjusted;
 				}
@@ -166,55 +170,86 @@ PolynomialSurface::render(QSize const& size) const
 }
 
 void
-PolynomialSurface::maybeReduceOrders(int const num_data_points)
+PolynomialSurface::maybeReduceDegrees(int const num_data_points)
 {
-	while (num_data_points  < (m_horOrder + 1) * (m_vertOrder + 1)) {
-		// Order 0 is actually legal, the cycle will stop eventually.
-		if (m_horOrder > m_vertOrder) {
-			--m_horOrder;
+	assert(num_data_points > 0);
+	
+	while (num_data_points < calcNumTerms()) {
+		if (m_horDegree > m_vertDegree) {
+			--m_horDegree;
 		} else {
-			--m_vertOrder;
+			--m_vertDegree;
 		}
 	}
 }
 
-void
-PolynomialSurface::prepareMatrixAndVector(
-	QImage const& image,
-	std::vector<double>& M, std::vector<double>& V) const
+int
+PolynomialSurface::calcNumTerms() const
 {
-	int const width = m_size.width();
-	int const height = m_size.height();
+	return (m_horDegree + 1) * (m_vertDegree + 1);
+}
+
+double
+PolynomialSurface::calcScale(int const dimension)
+{
+	if (dimension <= 1) {
+		return 0.0;
+	} else {
+		return 1.0 / (dimension - 1);
+	}
+}
+
+void
+PolynomialSurface::prepareEquationsAndDataPoints(
+	QImage const& image,
+	std::vector<double>& equations,
+	std::vector<double>& data_points) const
+{
+	int const width = image.width();
+	int const height = image.height();
 	
-	// -1 is added to compensate for x starting at 1 instead of 0.
-	uint8_t const* line = image.bits() - 1;
+	uint8_t const* line = image.bits();
 	int const bpl = image.bytesPerLine();
 	
-	for (int y = 1; y <= height; ++y, line += bpl) {
-		for (int x = 1; x <= width; ++x) {
-			V.push_back(line[x]);
+	// Pretend that both x and y positions of pixels
+	// lie in range of [1, 2].
+	double const xscale = calcScale(width);
+	double const yscale = calcScale(height);
+	
+	for (int y = 0; y < height; ++y, line += bpl) {
+		double const y_adjusted = 1.0 + yscale * y;
+		
+		for (int x = 0; x < width; ++x) {
+			double const x_adjusted = 1.0 + xscale * x;
+			
+			data_points.push_back(line[x]);
 			
 			double pow1 = 1.0;
-			for (int i = 0; i <= m_vertOrder; ++i, pow1 *= y) {
+			for (int i = 0; i <= m_vertDegree; ++i) {
 				double pow2 = pow1;
-				for (int j = 0; j <= m_horOrder; ++j, pow2 *= x) {
-					M.push_back(pow2);
+				for (int j = 0; j <= m_horDegree; ++j) {
+					equations.push_back(pow2);
+					pow2 *= x_adjusted;
 				}
+				pow1 *= y_adjusted;
 			}
 		}
 	}
 }
 
 void
-PolynomialSurface::prepareMatrixAndVector(
+PolynomialSurface::prepareEquationsAndDataPoints(
 	QImage const& image, BinaryImage const& mask,
-	std::vector<double>& M, std::vector<double>& V) const
+	std::vector<double>& equations,
+	std::vector<double>& data_points) const
 {
 	int const width = image.width();
 	int const height = image.height();
 	
-	// -1 is added to compensate for x starting at 1 instead of 0.
-	uint8_t const* image_line = image.bits() - 1;
+	double const xscale = calcScale(width);
+	double const yscale = calcScale(height);
+	
+	uint8_t const* image_line = image.bits();
 	int const image_bpl = image.bytesPerLine();
 	
 	uint32_t const* mask_line = mask.data();
@@ -222,17 +257,22 @@ PolynomialSurface::prepareMatrixAndVector(
 	int const last_word_idx = (width - 1) >> 5;
 	int const last_word_mask = ~uint32_t(0) << (31 - ((width - 1) & 31));
 	
-	for (int y = 1; y <= height; ++y) {
+	for (int y = 0; y < height; ++y) {
+		double const y_adjusted = 1.0 + y * yscale;
 		int idx = 0;
 		
 		// Full words.
 		for (; idx < last_word_idx; ++idx) {
-			processMaskWord(image_line, mask_line[idx], idx, y, M, V);
+			processMaskWord(
+				image_line, mask_line[idx], idx, y,
+				y_adjusted, xscale, equations, data_points
+			);
 		}
 		
 		// Last word.
 		processMaskWord(
-			image_line, mask_line[idx] & last_word_mask, idx, y, M, V
+			image_line, mask_line[idx] & last_word_mask,
+			idx, y, y_adjusted, xscale, equations, data_points
 		);
 		
 		image_line += image_bpl;
@@ -242,12 +282,14 @@ PolynomialSurface::prepareMatrixAndVector(
 
 void
 PolynomialSurface::processMaskWord(
-	uint8_t const* image_line,
-	uint32_t word, int word_idx, int y,
-	std::vector<double>& M, std::vector<double>& V) const
+	uint8_t const* const image_line,
+	uint32_t word, int const word_idx, int const y,
+	double const y_adjusted, double const xscale,
+	std::vector<double>& equations,
+	std::vector<double>& data_points) const
 {
 	uint32_t const msb = uint32_t(1) << 31;
-	int const xbase = 1 + (word_idx << 5);
+	int const xbase = word_idx << 5;
 	
 	int x = xbase;
 	uint32_t mask = msb;
@@ -261,78 +303,20 @@ PolynomialSurface::processMaskWord(
 			assert(word & mask);
 		}
 		
-		// Note that image_line is biased to compensate the
-		// fact that x goes from 1 instead of 0.
-		V.push_back(image_line[x]);
+		data_points.push_back(image_line[x]);
 		
+		double const x_adjusted = 1.0 + xscale * x;
 		double pow1 = 1.0;
-		for (int i = 0; i <= m_vertOrder; ++i, pow1 *= y) {
+		for (int i = 0; i <= m_vertDegree; ++i) {
 			double pow2 = pow1;
-			for (int j = 0; j <= m_horOrder; ++j, pow2 *= x) {
-				M.push_back(pow2);
-			}
-		}
-	}
-}
-
-/**
- * \brief Solves C*x = d
- *
- * The result is written into vector x, while C and d are modified.
- */
-void
-PolynomialSurface::leastSquaresFit(
-	QSize const& C_size, std::vector<double>& C,
-	std::vector<double>& x, std::vector<double>& d)
-{
-	int const height = C_size.height();
-	int const width = C_size.width();
-	
-	assert(height >= width);
-
-	// Calculate a QR decomposition of C using Givens rotations.
-	// We store R in place of C, while Q is not stored at all.
-	// Instead, we rotate the d vector on the fly.
-	int jj = 0; // j * width + j
-	for (int j = 0; j < width; ++j, jj += width + 1) {
-		int ij = jj + width; // i * width + j
-		for (int i = j + 1; i < height; ++i, ij += width) {
-			double const a = C[jj];
-			double const b = C[ij];
-			double const radius = sqrt(a*a + b*b);
-			double const cos = a / radius;
-			double const sin = b / radius;
 			
-			C[jj] = radius;
-			C[ij] = 0.0;
-			
-			int ik = ij + 1; // i * width + k
-			int jk = jj + 1; // j * width + k
-			for (int k = j + 1; k < width; ++k, ++ik, ++jk) {
-				double const temp = cos * C[jk] + sin * C[ik];
-				C[ik] = cos * C[ik] - sin * C[jk];
-				C[jk] = temp;
+			for (int j = 0; j <= m_horDegree; ++j) {
+				equations.push_back(pow2);
+				pow2 *= x_adjusted;
 			}
 			
-			// Rotate d.
-			double const temp = cos * d[j] + sin * d[i];
-			d[i] = cos * d[i] - sin * d[j];
-			d[j] = temp;
+			pow1 *= y_adjusted;
 		}
-	}
-	
-	// Solve R*x = d by back-substitution.
-	int ii = width * width - 1; // i * width + i
-	for (int i = width - 1; i >= 0; --i, ii -= width + 1) {
-		double sum = d[i];
-		
-		int ik = ii + 1;
-		for (int k = i + 1; k < width; ++k, ++ik) {
-			sum -= C[ik] * x[k];
-		}
-		
-		assert(C[ii] != 0.0);
-		x[i] = sum / C[ii];
 	}
 }
 

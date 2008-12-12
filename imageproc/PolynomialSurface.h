@@ -40,27 +40,31 @@ public:
 	/**
 	 * \brief Calculate a polynomial that approximates the given image.
 	 *
-	 * \param hor_order The order of the polynomial in horizontal direction.
-	 *        Recommended value: 3 or 4.
-	 * \param vert_order The order of the polynomial in vertical direction.
-	 *        Recommended value: 3 or 4.
+	 * \param hor_degree The degree of the polynomial in horizontal direction.
+	 *        Must not be negative.  A value of 3 or 4 should be enough
+	 *        to approximate page background.
+	 * \param vert_degree The degree of the polynomial in vertical direction.
+	 *        Must not be negative.  A value of 3 or 4 should be enough
+	 *        to approximate page background.
 	 * \param src The image to approximate.  Must be grayscale and not null.
 	 *
 	 * \note Building a polynomial surface for full size 300 DPI scans
 	 *       takes forever, so pass a downscaled version here. 300x300
 	 *       pixels will be fine.  Once built, the polynomial surface
-	 *       may then rendered in the original size, if necessary.
+	 *       may then be rendered in the original size, if necessary.
 	 */
 	PolynomialSurface(
-		int hor_order, int vert_order, QImage const& src);
+		int hor_degree, int vert_degree, QImage const& src);
 	
 	/**
 	 * \brief Calculate a polynomial that approximates portions of the given image.
 	 *
-	 * \param hor_order The order of the polynomial in horizontal direction.
-	 *        Recommended value: 3 or 4.
-	 * \param vert_order The order of the polynomial in vertical direction.
-	 *        Recommended value: 3 or 4.
+	* \param hor_degree The degree of the polynomial in horizontal direction.
+	 *        Must not be negative.  A value of 5 should be enough
+	 *        to approximate page background.
+	 * \param vert_degree The degree of the polynomial in vertical direction.
+	 *        Must not be negative.  A value of 5 should be enough
+	 *        to approximate page background.
 	 * \param src The image to approximate.  Must be grayscale and not null.
 	 * \param mask Specifies which areas of \p src to consider.
 	 *        A pixel in \p src is considered if the corresponding pixel
@@ -72,49 +76,42 @@ public:
 	 *       may then rendered in the original size, if necessary.
 	 */
 	PolynomialSurface(
-		int hor_order, int vert_order,
+		int hor_degree, int vert_degree,
 		QImage const& src, BinaryImage const& mask);
 	
 	/**
-	 * \brief Returns the dimentions of the polynomial surface.
-	 */
-	QSize size() const { return m_size; }
-	
-	/**
-	 * \brief Renders the polynomial surface as a grayscale image.
-	 */
-	QImage render() const;
-	
-	/**
-	 * \brief Renders the polynomial surface as a grayscale image.
+	 * \brief Visualizes the polynomial surface as a grayscale image.
 	 *
 	 * The surface will be stretched / shrinked to fit the new size.
 	 */
 	QImage render(QSize const& size) const;
 private:
-	void maybeReduceOrders(int num_data_points);
+	void maybeReduceDegrees(int num_data_points);
 	
-	void prepareMatrixAndVector(
+	int calcNumTerms() const;
+	
+	static double calcScale(int dimension);
+	
+	void prepareEquationsAndDataPoints(
 		QImage const& image,
-		std::vector<double>& M, std::vector<double>& V) const;
+		std::vector<double>& equations,
+		std::vector<double>& data_points) const;
 	
-	void prepareMatrixAndVector(
+	void prepareEquationsAndDataPoints(
 		QImage const& image, BinaryImage const& mask,
-		std::vector<double>& M, std::vector<double>& V) const;
+		std::vector<double>& equations,
+		std::vector<double>& data_points) const;
 	
 	void processMaskWord(
 		uint8_t const* image_line, uint32_t word,
-		int y, int mask_word_idx,
-		std::vector<double>& M, std::vector<double>& V) const;
-	
-	static void leastSquaresFit(
-		QSize const& C_size, std::vector<double>& C,
-		std::vector<double>& x, std::vector<double>& d);
+		int mask_word_idx, int y,
+		double y_adjusted, double xscale,
+		std::vector<double>& equations,
+		std::vector<double>& data_points) const;
 	
 	std::vector<double> m_coeffs;
-	QSize m_size;
-	int m_horOrder;
-	int m_vertOrder;
+	int m_horDegree;
+	int m_vertDegree;
 };
 
 }
