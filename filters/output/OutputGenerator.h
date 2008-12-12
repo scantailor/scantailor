@@ -27,8 +27,8 @@
 #include <QPolygonF>
 
 class TaskStatus;
-class ImageTransformation;
 class DebugImages;
+class ImageTransformation;
 class QSize;
 class QImage;
 
@@ -52,16 +52,25 @@ public:
 	QImage process(QImage const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 private:
-	QImage processBitonalOrBW(QImage const& input,
-		TaskStatus const& status, DebugImages* dbg = 0) const;
-	
 	QImage processColorOrGrayscale(QImage const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
-	QImage processMixed(QImage const& input,
+	QImage processMixedOrBitonal(QImage const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
+	
+	static QSize to300dpi(QSize const& size, Dpi const& source_dpi);
+	
+	static QImage detectPictures(
+		QImage const& input_300dpi, TaskStatus const& status,
+		DebugImages* dbg = 0);
+	
+	imageproc::BinaryImage binarize(
+		QImage const& image, Dpi const& image_dpi) const;
+	
+	static void morphologicalSmoothInPlace(
+		imageproc::BinaryImage& img, TaskStatus const& status);
 	
 	static void hitMissReplaceAllDirections(
 		imageproc::BinaryImage& img, char const* pattern,
@@ -76,25 +85,45 @@ private:
 	
 	static QImage normalizeIllumination(QImage const& gray_input, DebugImages* dbg);
 	
+	QImage transformAndNormalizeIllumination(
+		QImage const& gray_input, DebugImages* dbg,
+		QImage const* morph_background = 0) const;
+	
+	QImage transformAndNormalizeIllumination2(
+		QImage const& gray_input, DebugImages* dbg,
+		QImage const* morph_background = 0) const;
+	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
 	QPolygonF m_pageRectPhys;
 	
 	/**
 	 * Transformation from the input image coordinates to coordinates
-	 * of the output image before it's cropped.
+	 * of the output image before it's cropped.  This transformation
+	 * includes all transformations from the ImageTransformation
+	 * passed to a constructor, plus scaling to produce the
+	 * desired output DPI.
 	 */
 	QTransform m_toUncropped;
 	
 	/**
-	 * The cropping rectangle in uncropped coordinates.
+	 * The content rectangle in m_toUncropped coordinates.
+	 */
+	QRect m_contentRect;
+	
+	/**
+	 * The cropping rectangle in m_toUncropped coordinates.
+	 * The cropping rectangle is the content rect plus margins.
 	 */
 	QRect m_cropRect;
 	
 	/**
-	 * The content rectangle in uncropped coordinates.
+	 * The bounding rectangle of a polygon that represents
+	 * the page boundaries.  The polygon is usually formed
+	 * by image edges and a split line.  This rectangle is
+	 * in m_toUncropped coordinates.
 	 */
-	QRect m_contentRect;
+	QRect m_fullPageRect;
 };
 
 } // namespace output
