@@ -19,42 +19,27 @@
 #include "MorphGradientDetect.h"
 #include "Morphology.h"
 #include "Grayscale.h"
+#include "GrayRasterOp.h"
 #include <QImage>
 #include <QSize>
 
 namespace imageproc
 {
 
-QImage morphGradientDetect(QImage const& image, QSize const& window)
+QImage morphGradientDetectDarkSide(QImage const& image, QSize const& area)
 {
 	QImage const gray(toGrayscale(image));
-	QImage const eroded(erodeGray(gray, window, 0x00));
-	
-	QImage gradient(image.size(), QImage::Format_Indexed8);
-	gradient.setColorTable(createGrayscalePalette());
-	
-	uint8_t const* orig_line = gray.bits();
-	int const orig_bpl = gray.bytesPerLine();
-	
-	uint8_t const* lighter_line = eroded.bits();
-	int const lighter_bpl = eroded.bytesPerLine();
-	
-	uint8_t* gradient_line = gradient.bits();
-	int const gradient_bpl = gradient.bytesPerLine();
-	
-	int const width = image.width();
-	int const height = image.height();
-	
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			gradient_line[x] = lighter_line[x] - orig_line[x];
-		}
-		orig_line += orig_bpl;
-		lighter_line += lighter_bpl;
-		gradient_line += gradient_bpl;
-	}
-	
-	return gradient;
+	QImage lighter(erodeGray(gray, area, 0x00));
+	grayRasterOp<GRopUnclippedSubtract<GRopDst, GRopSrc> >(lighter, gray);
+	return lighter;
+}
+
+QImage morphGradientDetectLightSide(QImage const& image, QSize const& area)
+{
+	QImage const gray(toGrayscale(image));
+	QImage darker(dilateGray(gray, area, 0xff));
+	grayRasterOp<GRopUnclippedSubtract<GRopSrc, GRopDst> >(darker, gray);
+	return darker;
 }
 
 } // namespace imageproc
