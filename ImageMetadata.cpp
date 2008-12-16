@@ -16,38 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEMETADATA_H_
-#define IMAGEMETADATA_H_
+#include "ImageMetadata.h"
 
-#include <QSize>
-#include "Dpi.h"
-
-class ImageMetadata
+bool
+ImageMetadata::operator==(ImageMetadata const& other) const
 {
-	// Member-wise copying is OK.
-public:
-	ImageMetadata() {}
-	
-	ImageMetadata(QSize size, Dpi dpi) : m_size(size), m_dpi(dpi) {}
-	
-	QSize const& size() const { return m_size; }
-	
-	void setSize(QSize const& size) { m_size = size; }
-	
-	Dpi const& dpi() const { return m_dpi; }
-	
-	void setDpi(Dpi const& dpi) { m_dpi = dpi; }
-	
-	bool isUndefinedDpi() const { return m_dpi.isNull(); }
-	
-	bool operator==(ImageMetadata const& other) const;
-	
-	bool operator!=(ImageMetadata const& other) const {
-		return !(*this == other);
+	if (m_size != other.m_size) {
+		return false;
+	} else if (m_dpi.isNull() && other.m_dpi.isNull()) {
+		return true;
+	} else {
+		return m_dpi == other.m_dpi;
 	}
-private:
-	QSize m_size;
-	Dpi m_dpi;
-};
-
-#endif
+}

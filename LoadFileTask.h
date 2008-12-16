@@ -28,6 +28,7 @@
 
 class ThumbnailPixmapCache;
 class PageInfo;
+class PageSequence;
 class QImage;
 
 namespace fix_orientation
@@ -40,6 +41,7 @@ class LoadFileTask : public BackgroundTask
 	DECLARE_NON_COPYABLE(LoadFileTask)
 public:
 	LoadFileTask(PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
+		IntrusivePtr<PageSequence> const& page_sequence,
 		IntrusivePtr<fix_orientation::Task> const& next_task);
 	
 	virtual ~LoadFileTask();
@@ -48,11 +50,14 @@ public:
 private:
 	class ErrorResult;
 	
+	void updateImageSizeIfChanged(QImage const& image);
+	
 	void addMissingMetadata(QImage& image) const;
 	
 	ThumbnailPixmapCache& m_rThumbnailCache;
 	ImageId m_imageId;
 	ImageMetadata m_imageMetadata;
+	IntrusivePtr<PageSequence> const m_ptrPageSequence;
 	IntrusivePtr<fix_orientation::Task> const m_ptrNextTask;
 };
 

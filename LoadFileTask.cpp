@@ -25,6 +25,7 @@
 #include "AbstractFilter.h"
 #include "FilterOptionsWidget.h"
 #include "ThumbnailPixmapCache.h"
+#include "PageSequence.h"
 #include "PageInfo.h"
 #include "Dpi.h"
 #include "Dpm.h"
@@ -54,10 +55,12 @@ private:
 
 LoadFileTask::LoadFileTask(
 	PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
+	IntrusivePtr<PageSequence> const& page_sequence,
 	IntrusivePtr<fix_orientation::Task> const& next_task)
 :	m_rThumbnailCache(thumbnail_cache),
 	m_imageId(page.imageId()),
 	m_imageMetadata(page.metadata()),
+	m_ptrPageSequence(page_sequence),
 	m_ptrNextTask(next_task)
 {
 	assert(m_ptrNextTask);
@@ -78,12 +81,30 @@ LoadFileTask::operator()()
 		if (image.isNull()) {
 			return FilterResultPtr(new ErrorResult(m_imageId.filePath()));
 		} else {
+			updateImageSizeIfChanged(image);
 			addMissingMetadata(image);
 			m_rThumbnailCache.ensureThumbnailExists(m_imageId, image);
 			return m_ptrNextTask->process(*this, FilterData(image));
 		}
 	} catch (CancelledException const&) {
 		return FilterResultPtr();
+	}
+}
+
+void
+LoadFileTask::updateImageSizeIfChanged(QImage const& image)
+{
+	// The user might just replace a file with another one.
+	// In that case, we update its size that we store.
+	// Note that we don't do the same about DPI, because
+	// a DPI mismatch between the image and the stored value
+	// may indicate that the DPI was overridden.
+	// TODO: do something about DPIs when we have the ability
+	// to change DPIs at any point in time (not just when
+	// creating a project).
+	if (image.size() != m_imageMetadata.size()) {
+		m_imageMetadata.setSize(image.size());
+		m_ptrPageSequence->updateImageMetadata(m_imageId, m_imageMetadata);
 	}
 }
 

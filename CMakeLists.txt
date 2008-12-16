@@ -175,7 +175,7 @@ SET(
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
 	ImageInfo.cpp ImageInfo.h
 	ImageFileInfo.cpp ImageFileInfo.h
-	ImageMetadata.h
+	ImageMetadata.cpp ImageMetadata.h
 	PageLayout.cpp PageLayout.h
 	FixDpiDialog.cpp FixDpiDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h

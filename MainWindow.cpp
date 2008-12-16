@@ -93,6 +93,7 @@ public:
 		PageInfo const& page, int page_num,
 		QString const& out_dir, int last_filter_idx,
 		ThumbnailPixmapCache& thumbnail_cache,
+		IntrusivePtr<PageSequence> const& page_sequence,
 		bool batch_processing, bool debug);
 	
 	IntrusivePtr<CompositeCacheDrivenTask>
@@ -869,7 +870,8 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 		m_ptrCurTask.reset();
 	}
 	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
-		page, page_num, m_outDir, m_curFilter, *m_ptrThumbnailCache,
+		page, page_num, m_outDir, m_curFilter,
+		*m_ptrThumbnailCache, m_ptrPages,
 		m_batchProcessing, m_debug
 	);
 	if (m_ptrCurTask) {
@@ -959,6 +961,7 @@ MainWindow::FilterListModel::createCompositeTask(
 	PageInfo const& page, int const page_num,
 	QString const& out_dir, int const last_filter_idx,
 	ThumbnailPixmapCache& thumbnail_cache,
+	IntrusivePtr<PageSequence> const& page_sequence,
 	bool const batch_processing, bool debug)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
@@ -1008,7 +1011,10 @@ MainWindow::FilterListModel::createCompositeTask(
 	assert(fix_orientation_task);
 	
 	return BackgroundTaskPtr(
-		new LoadFileTask(page, thumbnail_cache, fix_orientation_task)
+		new LoadFileTask(
+			page, thumbnail_cache,
+			page_sequence, fix_orientation_task
+		)
 	);
 }
 

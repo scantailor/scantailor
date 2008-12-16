@@ -166,6 +166,22 @@ PageSequence::autoSetLogicalPagesInImage(
 	}
 }
 
+void
+PageSequence::updateImageMetadata(
+	ImageId const& image_id, ImageMetadata const& metadata)
+{
+	bool was_modified = false;
+	
+	{
+		QMutexLocker locker(&m_mutex);
+		updateImageMetadataImpl(image_id, metadata, &was_modified);
+	}
+	
+	if (was_modified) {
+		emit modified();
+	}
+}
+
 int
 PageSequence::adviseNumberOfLogicalPages(
 	ImageMetadata const& metadata, OrthogonalRotation const rotation)
@@ -215,7 +231,7 @@ PageSequence::curImage() const
 	QMutexLocker locker(&m_mutex);
 	assert((size_t)m_curImage <= m_images.size());
 	ImageDesc const& image = m_images[m_curImage];
-	return m_images[m_curImage].id;
+	return image.id;
 }
 
 PageInfo
@@ -373,6 +389,24 @@ PageSequence::autoSetLogicalPagesInImageImpl(
 			break;
 		}
 		logical_pages_seen += image.numLogicalPages;
+	}
+}
+
+void
+PageSequence::updateImageMetadataImpl(
+	ImageId const& image_id,
+	ImageMetadata const& metadata, bool* modified)
+{
+	int const num_images = m_images.size();
+	for (int i = 0; i < num_images; ++i) {
+		ImageDesc& image = m_images[i];
+		if (image.id == image_id) {
+			if (image.metadata != metadata) {
+				image.metadata = metadata;
+				*modified = true;
+			}
+			break;
+		}
 	}
 }
 

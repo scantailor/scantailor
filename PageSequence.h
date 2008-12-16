@@ -60,6 +60,9 @@ public:
 	void autoSetLogicalPagesInImage(
 		ImageId const& image_id, OrthogonalRotation rotation);
 	
+	void updateImageMetadata(
+		ImageId const& image_id, ImageMetadata const& metadata);
+	
 	static int adviseNumberOfLogicalPages(
 		ImageMetadata const& metadata, OrthogonalRotation rotation);
 	
@@ -102,6 +105,10 @@ private:
 	
 	void autoSetLogicalPagesInImageImpl(
 		ImageId const& image_id, OrthogonalRotation rotation, bool* modified);
+	
+	void updateImageMetadataImpl(
+		ImageId const& image_id,
+		ImageMetadata const& metadata, bool* modified);
 	
 	void setCurPageImpl(PageId const& page_id, bool* modified);
 	
