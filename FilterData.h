@@ -30,14 +30,17 @@ public:
 	FilterData(QImage const& image);
 	
 	FilterData(FilterData const& other, ImageTransformation const& xform);
-	
-	QImage const& image() const { return m_image; }
-	
+		
 	imageproc::BinaryThreshold bwThreshold() const { return m_bwThreshold; }
 	
 	ImageTransformation const& xform() const { return m_xform; }
+
+	QImage const& origImage() const {return m_origImage;}
+
+	QImage const& grayImage() const {return m_grayImage;}
 private:
-	QImage m_image;
+	QImage m_origImage;
+	QImage m_grayImage;
 	ImageTransformation m_xform;
 	imageproc::BinaryThreshold m_bwThreshold;
 };

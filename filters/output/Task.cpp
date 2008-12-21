@@ -99,8 +99,7 @@ Task::process(
 		content_rect_phys, page_rect_phys
 	);
 
-	QImage const q_img(generator.process(data.image(), status, m_ptrDbg.get()));
-	
+	QImage const q_img(generator.process(data, status, m_ptrDbg.get()));
 	QString const out_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
 	q_img.save(out_path);
 	

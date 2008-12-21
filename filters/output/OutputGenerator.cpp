@@ -18,6 +18,7 @@
 
 #include "OutputGenerator.h"
 #include "ImageTransformation.h"
+#include "FilterData.h"
 #include "TaskStatus.h"
 #include "Utils.h"
 #include "DebugImages.h"
@@ -89,7 +90,7 @@ OutputGenerator::OutputGenerator(
 }
 
 QImage
-OutputGenerator::process(QImage const& input,
+OutputGenerator::process(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
 	QImage image;
@@ -114,22 +115,18 @@ OutputGenerator::process(QImage const& input,
 }
 
 QImage
-OutputGenerator::processColorOrGrayscale(QImage const& input,
+OutputGenerator::processColorOrGrayscale(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-	if (input.allGray()) {
-		QImage const gray_input(toGrayscale(input));
-		uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(gray_input);
-		
+	uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(input.grayImage());
+	
+	if (input.origImage().allGray()) {
 		status.throwIfCancelled();
-		
 		return transformToGray(
-			gray_input, m_toUncropped, m_cropRect,
+			input.grayImage(), m_toUncropped, m_cropRect,
 			qRgb(dominant_gray, dominant_gray, dominant_gray)
 		);
 	}
-	
-	uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(input);
 	
 	QImage target(m_cropRect.size(), QImage::Format_RGB32);
 	target.fill(qRgb(dominant_gray, dominant_gray, dominant_gray));
@@ -145,7 +142,7 @@ OutputGenerator::processColorOrGrayscale(QImage const& input,
 		target_xform *= QTransform().translate(-m_cropRect.left(), -m_cropRect.top());
 		painter.setTransform(target_xform);
 		
-		painter.drawImage(QPointF(0.0, 0.0), input);
+		painter.drawImage(QPointF(0.0, 0.0), input.origImage());
 	}
 	
 	status.throwIfCancelled();
@@ -183,7 +180,7 @@ struct CombineInverted
 } // anonymous namespace
 
 QImage
-OutputGenerator::processMixedOrBitonal(QImage const& input,
+OutputGenerator::processMixedOrBitonal(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
 	// The whole image minus the part cut off by the split line.
@@ -218,7 +215,7 @@ OutputGenerator::processMixedOrBitonal(QImage const& input,
 	
 	QImage to_be_normalized(
 		transformToGray(
-			input, m_toUncropped,
+			input.grayImage(), m_toUncropped,
 			normalize_illumination_rect,
 			Qt::black // <-- Important!
 		)
@@ -390,7 +387,7 @@ OutputGenerator::processMixedOrBitonal(QImage const& input,
 	
 	status.throwIfCancelled();
 	
-	if (!input.allGray()) {
+	if (!input.origImage().allGray()) {
 		bw_mask.invert();
 		QImage bw_content_argb(bw_content.toQImage());
 		bw_content.release();
@@ -423,7 +420,7 @@ OutputGenerator::processMixedOrBitonal(QImage const& input,
 			);
 			
 			painter.setTransform(target_xform);
-			painter.drawImage(QPointF(0.0, 0.0), input);
+			painter.drawImage(QPointF(0.0, 0.0), input.origImage());
 		}
 		
 		status.throwIfCancelled();
@@ -855,4 +852,3 @@ OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 }
 
 } // namespace output
-

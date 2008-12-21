@@ -137,7 +137,7 @@ Task::process(
 			new_xform.transformBack().mapRect(new_xform.resultingRect())
 		);
 		QRect const bounded_image_area(
-			image_area.toRect().intersected(data.image().rect())
+			image_area.toRect().intersected(data.origImage().rect())
 		);
 		
 		status.throwIfCancelled();
@@ -146,7 +146,7 @@ Task::process(
 			BinaryImage rotated_image(
 				orthogonalRotation(
 					BinaryImage(
-						data.image(), bounded_image_area,
+						data.grayImage(), bounded_image_area,
 						data.bwThreshold()
 					),
 					data.xform().preRotation().toDegrees()
@@ -156,7 +156,7 @@ Task::process(
 				m_ptrDbg->add(rotated_image, "bw_rotated");
 			}
 			
-			QSize const unrotated_dpm(Dpm(data.image()).toSize());
+			QSize const unrotated_dpm(Dpm(data.origImage()).toSize());
 			Dpm const rotated_dpm(
 				data.xform().preRotation().rotate(unrotated_dpm)
 			);
@@ -196,7 +196,7 @@ Task::process(
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, m_ptrDbg, data.image(),
+				m_ptrFilter, m_ptrDbg, data.origImage(),
 				m_pageId, new_xform, ui_data, m_batchProcessing
 			)
 		);

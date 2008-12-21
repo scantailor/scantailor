@@ -121,7 +121,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, m_pageId, m_ptrDbg, data.image(),
+				m_ptrFilter, m_pageId, m_ptrDbg, data.origImage(),
 				data.xform(), ui_data, m_batchProcessing
 			)
 		);

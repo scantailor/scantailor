@@ -86,7 +86,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, data.image(), m_imageId, xform,
+				m_ptrFilter, data.origImage(), m_imageId, xform,
 				m_batchProcessing
 			)
 		);

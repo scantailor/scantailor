@@ -29,6 +29,7 @@
 class TaskStatus;
 class DebugImages;
 class ImageTransformation;
+class FilterData;
 class QSize;
 class QImage;
 
@@ -49,13 +50,13 @@ public:
 		QPolygonF const& content_rect_phys,
 		QPolygonF const& page_rect_phys);
 	
-	QImage process(QImage const& input,
+	QImage process(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 private:
-	QImage processColorOrGrayscale(QImage const& input,
+	QImage processColorOrGrayscale(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
-	QImage processMixedOrBitonal(QImage const& input,
+	QImage processMixedOrBitonal(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);

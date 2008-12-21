@@ -73,7 +73,7 @@ ContentBoxFinder::findContentBox(
 	QColor const black(0x00, 0x00, 0x00);
 	QImage const gray150(
 		transformToGray(
-			data.image(), xform_150dpi.transform(),
+			data.grayImage(), xform_150dpi.transform(),
 			xform_150dpi.resultingRect().toRect(), black
 		)
 	);

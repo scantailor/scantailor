@@ -123,7 +123,7 @@ Task::process(
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_pageId,
-				data.image(), data.xform(), adapted_content_rect,
+				data.origImage(), data.xform(), adapted_content_rect,
 				agg_hard_size_before != agg_hard_size_after,
 				m_batchProcessing
 			)

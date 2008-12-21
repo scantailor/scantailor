@@ -101,7 +101,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	status.throwIfCancelled();
 	
 	OrthogonalRotation const pre_rotation(data.xform().preRotation());
-	Dependencies const deps(data.image().size(), pre_rotation);
+	Dependencies const deps(data.origImage().size(), pre_rotation);
 	
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
@@ -115,7 +115,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 			PageLayout const layout(
 				PageLayoutEstimator::estimatePageLayout(
 					record.rule().layoutType(),
-					data.image(), data.xform(),
+					data.grayImage(), data.xform(),
 					data.bwThreshold(), m_ptrDbg.get()
 				)
 			);
@@ -161,7 +161,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, m_ptrDbg, data.image(), m_imageId,
+				m_ptrFilter, m_ptrDbg, data.origImage(), m_imageId,
 				data.xform(), ui_data, m_batchProcessing
 			)
 		);
