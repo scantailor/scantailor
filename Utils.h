@@ -25,7 +25,8 @@ class Utils
 {
 public:
 	template<typename M, typename K, typename V>
-	static void mapSetValue(M& map, K const& key, V const& val);
+	static typename M::iterator mapSetValue(
+		M& map, K const& key, V const& val);
 	
 	/**
 	 * Unlike QFile::rename(), this one overwrites existing files.
@@ -44,14 +45,15 @@ public:
 };
 
 template<typename M, typename K, typename V>
-void
+typename M::iterator
 Utils::mapSetValue(M& map, K const& key, V const& val)
 {
 	typename M::iterator const it(map.lower_bound(key));
 	if (it == map.end() || map.key_comp()(key, it->first)) {
-		map.insert(it, typename M::value_type(key, val));
+		return map.insert(it, typename M::value_type(key, val));
 	} else {
 		it->second = val;
+		return it;
 	}
 }
 
