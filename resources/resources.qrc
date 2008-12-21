@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/single_page_uncut_selected.png</file>
+    <file>icons/right_page_plus_offcut_selected.png</file>
+    <file>icons/two_pages_selected.png</file>
+    <file>icons/left_page_plus_offcut_selected.png</file>
     <file>icons/stock-center-24.png</file>
     <file>icons/stock-gravity-east-24.png</file>
     <file>icons/stock-gravity-north-24.png</file>
@@ -23,7 +27,9 @@
     <file>icons/layout_type_auto.png</file>
     <file>icons/object-rotate-left.png</file>
     <file>icons/object-rotate-right.png</file>
-    <file>icons/single_page.png</file>
     <file>icons/two_pages.png</file>
+    <file>icons/single_page_uncut.png</file>
+    <file>icons/left_page_plus_offcut.png</file>
+    <file>icons/right_page_plus_offcut.png</file>
   </qresource>
 </RCC>

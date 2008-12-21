@@ -92,13 +92,18 @@ Filter::saveSettings(
 }
 
 void
-Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
+Filter::loadSettings(
+	ProjectReader const& reader, QDomElement const& filters_el)
 {
 	m_ptrSettings->clear();
 	
 	QDomElement const filter_el(filters_el.namedItem("page-split").toElement());
-	QString const default_layout_type(filter_el.attribute("defaultLayoutType"));
-	m_ptrSettings->applyToAllPages(Rule::layoutTypeFromString(default_layout_type));
+	QString const default_layout_type(
+		filter_el.attribute("defaultLayoutType")
+	);
+	m_ptrSettings->setLayoutTypeForAllPages(
+		Rule::layoutTypeFromString(default_layout_type)
+	);
 	
 	QString const image_tag_name("image");
 	QDomNode node(filter_el.firstChild());
@@ -122,17 +127,21 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		
+		Settings::UpdateAction update;
+		
 		QString const layout_type(el.attribute("layoutType"));
 		if (!layout_type.isEmpty()) {
-			m_ptrSettings->applyToPage(
-				image_id, Rule::layoutTypeFromString(layout_type)
+			update.setLayoutType(
+				Rule::layoutTypeFromString(layout_type)
 			);
 		}
 		
 		QDomElement params_el(el.namedItem("params").toElement());
 		if (!params_el.isNull()) {
-			m_ptrSettings->setPageParams(image_id, Params(params_el));
+			update.setParams(Params(params_el));
 		}
+		
+		m_ptrSettings->updatePage(image_id, update);
 	}
 }
 
@@ -141,23 +150,20 @@ Filter::writeImageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
 	ImageId const& image_id, int const numeric_id) const
 {
-	Rule const rule(m_ptrSettings->getRuleFor(image_id));
+	Settings::Record const record(m_ptrSettings->getPageRecord(image_id));
 	
 	QDomElement image_el(doc.createElement("image"));
 	image_el.setAttribute("id", numeric_id);
-	if (rule.scope() != Rule::ALL_PAGES) {
-		// If scope is ALL_PAGES, this layout type is the default one.
-		// We've already written it as "defaultLayoutType".
-		image_el.setAttribute("layoutType", rule.layoutTypeAsString());
+	if (Rule::LayoutType const* layout_type = record.layoutType()) {
+		image_el.setAttribute(
+			"layoutType", Rule::layoutTypeToString(*layout_type)
+		);
 	}
 	
-	std::auto_ptr<Params> const params(m_ptrSettings->getPageParams(image_id));
-	if (!params.get() && rule.layoutType() == Rule::AUTO_DETECT) {
-		return;
+	if (Params const* params = record.params()) {
+		image_el.appendChild(params->toXml(doc, "params"));
+		filter_el.appendChild(image_el);
 	}
-	
-	image_el.appendChild(params->toXml(doc, "params"));
-	filter_el.appendChild(image_el);
 }
 
 IntrusivePtr<Task>

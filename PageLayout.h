@@ -32,32 +32,49 @@ class QDomDocument;
 class PageLayout
 {
 public:
+	enum Type {
+		SINGLE_PAGE_UNCUT,
+		LEFT_PAGE_PLUS_OFFCUT,
+		RIGHT_PAGE_PLUS_OFFCUT,
+		TWO_PAGES
+	};
+	
 	/**
-	 * \brief Construct a null page layout.
+	 * \brief Constructs a SINGLE_PAGE_UNCUT layout with a null split line.
 	 */
 	PageLayout();
 	
 	/**
 	 * \brief Construct a page layout.
 	 *
-	 * \param split_line The line that splits pages. Endpoints don't matter.
-	 *        They only define the line, not a line segment. The split line
-	 *        may be null.  In this case \p left_page_valid  and
-	 *        \p right_page_valid must be false.
+	 * \param type The layout type.  The type must be consistent with
+	 *        \p left_page_valid and \p right_page_valid.
+	 * \param split_line The line that splits pages or cuts off garbage.
+	 *        Endpoints don't matter - they only define a line, not a line
+	 *        segment. The split line may not be null.
 	 * \param left_page_valid True if there is a page to the left of
 	 *        \p split_line.
 	 * \param right_page_valid True if there is a page to the right of
 	 *        \p split_line.
+	 *
+	 * At least one of the pages must be valid.  Use 
 	 */
-	PageLayout(QLineF const& split_line,
-		bool left_page_valid, bool right_page_valid);
+	PageLayout(Type type, QLineF const& split_line);
 	
 	/**
 	 * \brief Construct a page layout based on XML data.
 	 */
 	PageLayout(QDomElement const& layout_el);
 	
-	bool isNull() const { return m_splitLine.isNull(); }
+	static PageLayout singlePageUncut();
+	
+	static PageLayout leftPagePlusOffcut(QLineF const& split_line);
+	
+	static PageLayout rightPagePlusOffcut(QLineF const& split_line);
+	
+	static PageLayout twoPages(QLineF const& split_line);
+	
+	Type type() const { return m_type; }
 	
 	/**
 	 * \brief Get a split line with arbitrary end points.
@@ -68,10 +85,9 @@ public:
 	 */
 	QLineF const& splitLine() const { return m_splitLine; }
 	
-	bool leftPageValid() const { return m_leftPageValid; }
-	
-	bool rightPageValid() const { return m_rightPageValid; }
-	
+	/**
+	 * \brief Get the number of pages (1 or 2) for this layout.
+	 */
 	int numSubPages() const;
 	
 	/**
@@ -82,14 +98,20 @@ public:
 	QLineF inscribedSplitLine(QRectF const& rect) const;
 	
 	/**
-	 * \brief Get the left page outline, even if the left page is invalid.
+	 * \brief For single page layouts, return the outline of that page,
+	 *        otherwise return QPolygonF().
 	 */
-	QPolygonF leftPage(QRectF const& rect) const;
+	QPolygonF singlePageOutline(QRectF const& rect) const;
 	
 	/**
-	 * \brief Get the right page outline, even if the right page is invalid.
+	 * \brief Get the outline of the left page, if it exists.
 	 */
-	QPolygonF rightPage(QRectF const& rect) const;
+	QPolygonF leftPageOutline(QRectF const& rect) const;
+	
+	/**
+	 * \brief Get the outline of the right page, if it exists.
+	 */
+	QPolygonF rightPageOutline(QRectF const& rect) const;
 	
 	QPolygonF pageOutline(QRectF const& rect, PageId::SubPage page) const;
 	
@@ -107,9 +129,12 @@ private:
 	
 	static QLineF clipTopBottom(QLineF const& line, double y_top, double y_bottom);
 	
+	static Type typeFromString(QString const& str);
+	
+	static QString typeToString(Type type);
+	
 	QLineF m_splitLine;
-	bool m_leftPageValid;
-	bool m_rightPageValid;
+	Type m_type;
 };
 
 #endif

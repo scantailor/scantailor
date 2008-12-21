@@ -36,7 +36,7 @@ public:
 	// Member-wise copying is OK.
 	
 	Params(PageLayout const& layout,
-		Dependencies const& deps, AutoManualMode mode);
+		Dependencies const& deps, AutoManualMode split_line_mode);
 	
 	Params(QDomElement const& el);
 	
@@ -46,13 +46,13 @@ public:
 	
 	Dependencies const& dependencies() const { return m_deps; }
 	
-	AutoManualMode mode() const { return m_mode; }
+	AutoManualMode splitLineMode() const { return m_splitLineMode; }
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
 	PageLayout m_layout;
 	Dependencies m_deps;
-	AutoManualMode m_mode;
+	AutoManualMode m_splitLineMode;
 };
 
 } // namespace page_split

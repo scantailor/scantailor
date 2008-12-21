@@ -34,8 +34,12 @@ Rule::layoutTypeToString(LayoutType const layout_type)
 	switch (layout_type) {
 		case AUTO_DETECT:
 			return "auto-detect";
-		case SINGLE_PAGE:
-			return "single-page";
+		case SINGLE_PAGE_UNCUT:
+			return "single-uncut";
+		case LEFT_PAGE_PLUS_OFFCUT:
+			return "left-page";
+		case RIGHT_PAGE_PLUS_OFFCUT:
+			return "right-page";
 		case TWO_PAGES:
 			return "two-pages";
 	}
@@ -46,8 +50,12 @@ Rule::layoutTypeToString(LayoutType const layout_type)
 Rule::LayoutType
 Rule::layoutTypeFromString(QString const& layout_type)
 {
-	if (layout_type == "single-page") {
-		return SINGLE_PAGE;
+	if (layout_type == "single-uncut") {
+		return SINGLE_PAGE_UNCUT;
+	} else if (layout_type == "left-page") {
+		return LEFT_PAGE_PLUS_OFFCUT;
+	} else if (layout_type == "right-page") {
+		return RIGHT_PAGE_PLUS_OFFCUT;
 	} else if (layout_type == "two-pages") {
 		return TWO_PAGES;
 	} else {

@@ -22,10 +22,9 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "Rule.h"
-#include "LayoutTypeResolver.h"
 #include "PageInfo.h"
 #include "PageId.h"
-#include "PageSplitFinder.h"
+#include "PageLayoutEstimator.h"
 #include "PageLayout.h"
 #include "Dependencies.h"
 #include "Params.h"
@@ -33,7 +32,6 @@
 #include "ImageMetadata.h"
 #include "Dpm.h"
 #include "Dpi.h"
-#include "AutoDetectedLayout.h"
 #include "OrthogonalRotation.h"
 #include "ImageTransformation.h"
 #include "filters/deskew/Task.h"
@@ -42,6 +40,7 @@
 #include "DebugImages.h"
 #include <QImage>
 #include <QObject>
+#include <QDebug>
 #include <memory>
 
 namespace page_split
@@ -102,51 +101,60 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	status.throwIfCancelled();
 	
 	OrthogonalRotation const pre_rotation(data.xform().preRotation());
+	Dependencies const deps(data.image().size(), pre_rotation);
+	
 	OptionsWidget::UiData ui_data;
-	
-	Rule const rule(m_ptrSettings->getRuleFor(m_imageId));
-	LayoutTypeResolver const resolver(rule.layoutType());
-	ImageMetadata const metadata(data.image().size(), Dpm(data.image()));
-	int const num_logical_pages = resolver.numLogicalPages(metadata, pre_rotation);
-	bool const single_page = (num_logical_pages == 1);
-	
-	if (rule.layoutType() == Rule::AUTO_DETECT) {
-		ui_data.setAutoDetectedLayout(single_page ? SINGLE_PAGE : TWO_PAGES);
-	}
-	
-	Dependencies const deps(data.image().size(), pre_rotation, single_page);
-	PageLayout layout;
-	AutoManualMode mode = MODE_AUTO;
-	
 	ui_data.setDependencies(deps);
 	
-	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_imageId));
-	if (params.get()) {
-		mode = params->mode();
-		if (deps.matches(params->dependencies())) {
-			layout = params->pageLayout();
+	Settings::Record record(m_ptrSettings->getPageRecord(m_imageId));
+	
+	for (;;) {
+		Params const* const params = record.params();
+		
+		if (!params || !params->dependencies().matches(deps)) {
+			PageLayout const layout(
+				PageLayoutEstimator::estimatePageLayout(
+					record.rule().layoutType(),
+					data.image(), data.xform(),
+					data.bwThreshold(), m_ptrDbg.get()
+				)
+			);
+			
+			status.throwIfCancelled();
+			
+			Params const new_params(layout, deps, MODE_AUTO);
+			Settings::UpdateAction update;
+			update.setParams(new_params);
+			bool conflict = false;
+			record = m_ptrSettings->conditionalUpdate(
+				m_imageId, update, &conflict
+			);
+			if (conflict && !record.params()) {
+				// If there was a conflict, it means
+				// the record was updated by another
+				// thread somewhere between getPageRecord()
+				// and conditionalUpdate().  If that
+				// external update didn't leave page
+				// parameters clear, we are just going
+				// to use it's data, otherwise we need
+				// to process this page again for the
+				// new layout type.
+				continue;
+			}
 		}
+		break;
 	}
 	
-	if (layout.isNull()) {
-		ImageTransformation new_xform(data.xform());
-		new_xform.setPreRotation(pre_rotation);
-		
-		layout = PageSplitFinder::findSplitLine(
-			data.image(), new_xform, data.bwThreshold(),
-			single_page, m_ptrDbg.get()
-		);
-		
-		Params const new_params(layout, deps, mode);
-		m_ptrSettings->setPageParams(m_imageId, new_params);
-		
-		status.throwIfCancelled();
-	}
-	
+	PageLayout const& layout = record.params()->pageLayout();
+	ui_data.setLayoutTypeAutoDetected(
+		record.rule().layoutType() == Rule::AUTO_DETECT
+	);
 	ui_data.setPageLayout(layout);
-	ui_data.setMode(mode);
+	ui_data.setSplitLineMode(record.params()->splitLineMode());
 	
-	m_ptrPageSequence->setLogicalPagesInImage(m_imageId, layout.numSubPages());
+	m_ptrPageSequence->setLogicalPagesInImage(
+		m_imageId, layout.numSubPages()
+	);
 	
 	if (m_ptrNextTask) {
 		return m_ptrNextTask->process(status, data, layout);
@@ -199,8 +207,12 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	
 	QObject::connect(
-		view, SIGNAL(manualPageLayoutSet(PageLayout const&)),
-		opt_widget, SLOT(manualPageLayoutSet(PageLayout const&))
+		view, SIGNAL(pageLayoutSetLocally(PageLayout const&)),
+		opt_widget, SLOT(pageLayoutSetExternally(PageLayout const&))
+	);
+	QObject::connect(
+		opt_widget, SIGNAL(pageLayoutSetLocally(PageLayout const&)),
+		view, SLOT(pageLayoutSetExternally(PageLayout const&))
 	);
 }
 

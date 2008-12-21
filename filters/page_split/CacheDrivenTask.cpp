@@ -18,7 +18,6 @@
 
 #include "CacheDrivenTask.h"
 #include "Thumbnail.h"
-#include "LayoutTypeResolver.h"
 #include "IncompleteThumbnail.h"
 #include "Settings.h"
 #include "PageInfo.h"
@@ -49,19 +48,14 @@ CacheDrivenTask::process(
 	ImageTransformation const& xform)
 {
 	OrthogonalRotation const pre_rotation(xform.preRotation());
+	Dependencies const deps(page_info.metadata().size(), pre_rotation);
 	
-	Rule const rule(m_ptrSettings->getRuleFor(page_info.imageId()));
-	LayoutTypeResolver const resolver(rule.layoutType());
-	int const num_logical_pages = resolver.numLogicalPages(
-		page_info.metadata(), pre_rotation
+	Settings::Record const record(
+		m_ptrSettings->getPageRecord(page_info.imageId())
 	);
-	bool const single_page = (num_logical_pages == 1);
+	Params const* params = record.params();
 	
-	Dependencies const deps(page_info.metadata().size(), pre_rotation, single_page);
-	
-	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.imageId()));
-	if (!params.get() || !deps.matches(params->dependencies())) {
-		
+	if (!params || !params->dependencies().matches(deps)) {
 		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(

@@ -31,14 +31,35 @@ namespace page_split
 
 OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 :	m_ptrSettings(settings),
-	m_ignoreAutoManualToggle(0)
+	m_ignoreAutoManualToggle(0),
+	m_ignoreLayoutTypeToggle(0)
 {
 	setupUi(this);
 	
-	connect(singlePageBtn, SIGNAL(clicked()), this, SLOT(singlePageSelected()));
-	connect(twoPagesBtn, SIGNAL(clicked()), this, SLOT(twoPagesSelected()));
-	connect(changeBtn, SIGNAL(clicked()), this, SLOT(showChangeDialog()));
-	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+	connect(
+		singlePageUncutBtn, SIGNAL(toggled(bool)),
+		this, SLOT(layoutTypeButtonToggled(bool))
+	);
+	connect(
+		leftPagePlusOffcutBtn, SIGNAL(toggled(bool)),
+		this, SLOT(layoutTypeButtonToggled(bool))
+	);
+	connect(
+		rightPagePlusOffcutBtn, SIGNAL(toggled(bool)),
+		this, SLOT(layoutTypeButtonToggled(bool))
+	);
+	connect(
+		twoPagesBtn, SIGNAL(toggled(bool)),
+		this, SLOT(layoutTypeButtonToggled(bool))
+	);
+	connect(
+		changeBtn, SIGNAL(clicked()),
+		this, SLOT(showChangeDialog())
+	);
+	connect(
+		autoBtn, SIGNAL(toggled(bool)),
+		this, SLOT(splitLineModeChanged(bool))
+	);
 }
 
 OptionsWidget::~OptionsWidget()
@@ -48,21 +69,40 @@ OptionsWidget::~OptionsWidget()
 void
 OptionsWidget::preUpdateUI(ImageId const& image_id)
 {
-	ScopedIncDec<int> guard(m_ignoreAutoManualToggle);
+	ScopedIncDec<int> guard1(m_ignoreAutoManualToggle);
+	ScopedIncDec<int> guard2(m_ignoreLayoutTypeToggle);
 	
 	m_imageId = image_id;
-	Rule const rule(m_ptrSettings->getRuleFor(image_id));
+	Rule const rule(m_ptrSettings->getPageRecord(image_id).rule());
 	
-	singlePageBtn->setChecked(rule.layoutType() == Rule::SINGLE_PAGE);
-	twoPagesBtn->setChecked(rule.layoutType() == Rule::TWO_PAGES);
+	switch (rule.layoutType()) {
+		case Rule::AUTO_DETECT:
+			// Uncheck all buttons.  Can only be done
+			// by playing with exclusiveness.
+			twoPagesBtn->setChecked(true);
+			twoPagesBtn->setAutoExclusive(false);
+			twoPagesBtn->setChecked(false);
+			twoPagesBtn->setAutoExclusive(true);
+			break;
+		case Rule::SINGLE_PAGE_UNCUT:
+			singlePageUncutBtn->setChecked(true);
+			break;
+		case Rule::LEFT_PAGE_PLUS_OFFCUT:
+			leftPagePlusOffcutBtn->setChecked(true);
+			break;
+		case Rule::RIGHT_PAGE_PLUS_OFFCUT:
+			rightPagePlusOffcutBtn->setChecked(true);
+			break;
+		case Rule::TWO_PAGES:
+			twoPagesBtn->setChecked(true);
+			break;
+	}
 	
 	if (rule.layoutType() == Rule::AUTO_DETECT) {
 		changeBtn->setEnabled(false);
-		autoBtn->setChecked(true);
 		scopeLabel->setText("?");
 	} else {
 		changeBtn->setEnabled(true);
-		manualBtn->setChecked(true);
 		if (rule.scope() == Rule::THIS_PAGE_ONLY) {
 			scopeLabel->setText(tr("This page only"));
 		} else {
@@ -70,6 +110,13 @@ OptionsWidget::preUpdateUI(ImageId const& image_id)
 		}
 	}
 	
+	// Uncheck both the Auto and Manual buttons.
+	autoBtn->setChecked(true);
+	autoBtn->setAutoExclusive(false);
+	autoBtn->setChecked(false);
+	autoBtn->setAutoExclusive(true);
+	
+	// And disable both of them.
 	autoBtn->setEnabled(false);
 	manualBtn->setEnabled(false);
 }
@@ -77,7 +124,8 @@ OptionsWidget::preUpdateUI(ImageId const& image_id)
 void
 OptionsWidget::postUpdateUI(UiData const& ui_data)
 {
-	ScopedIncDec<int> guard(m_ignoreAutoManualToggle);
+	ScopedIncDec<int> guard1(m_ignoreAutoManualToggle);
+	ScopedIncDec<int> guard2(m_ignoreLayoutTypeToggle);
 	
 	m_uiData = ui_data;
 
@@ -85,27 +133,39 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 	autoBtn->setEnabled(true);
 	manualBtn->setEnabled(true);
 	
-	if (ui_data.mode() == MODE_AUTO) {
+	if (ui_data.splitLineMode() == MODE_AUTO) {
 		autoBtn->setChecked(true);
 	} else {
 		manualBtn->setChecked(true);
 	}
 	
-	AutoDetectedLayout const auto_layout = ui_data.autoDetectedLayout();
-	if (auto_layout != NO_AUTO_DETECTION) {
-		singlePageBtn->setChecked(auto_layout == SINGLE_PAGE);
-		twoPagesBtn->setChecked(auto_layout == TWO_PAGES);
+	switch (ui_data.pageLayout().type()) {
+		case PageLayout::SINGLE_PAGE_UNCUT:
+			singlePageUncutBtn->setChecked(true);
+			break;
+		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
+			leftPagePlusOffcutBtn->setChecked(true);
+			break;
+		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+			rightPagePlusOffcutBtn->setChecked(true);
+			break;
+		case PageLayout::TWO_PAGES:
+			twoPagesBtn->setChecked(true);
+			break;
+	}
+	
+	if (ui_data.layoutTypeAutoDetected()) {
 		scopeLabel->setText(tr("Auto detected"));
 	}
 }
 
 void
-OptionsWidget::manualPageLayoutSet(PageLayout const& page_layout)
+OptionsWidget::pageLayoutSetExternally(PageLayout const& page_layout)
 {
 	ScopedIncDec<int> guard(m_ignoreAutoManualToggle);
 	
 	m_uiData.setPageLayout(page_layout);
-	m_uiData.setMode(MODE_MANUAL);
+	m_uiData.setSplitLineMode(MODE_MANUAL);
 	commitCurrentParams();
 	
 	manualBtn->setChecked(true);
@@ -114,27 +174,196 @@ OptionsWidget::manualPageLayoutSet(PageLayout const& page_layout)
 }
 
 void
-OptionsWidget::singlePageSelected()
+OptionsWidget::layoutTypeButtonToggled(bool const checked)
 {
-	m_ptrSettings->applyToPage(m_imageId, Rule::SINGLE_PAGE);
-	m_ptrSettings->clearPageParams(m_imageId);
-	emit reloadRequested();
+	Rule::LayoutType rlt;
+	PageLayout::Type plt;
+	
+	QObject* button = sender();
+	if (button == singlePageUncutBtn) {
+		rlt = Rule::SINGLE_PAGE_UNCUT;
+		plt = PageLayout::SINGLE_PAGE_UNCUT;
+	} else if (button == leftPagePlusOffcutBtn) {
+		rlt = Rule::LEFT_PAGE_PLUS_OFFCUT;
+		plt = PageLayout::LEFT_PAGE_PLUS_OFFCUT;
+	} else if (button == rightPagePlusOffcutBtn) {
+		rlt = Rule::RIGHT_PAGE_PLUS_OFFCUT;
+		plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
+	} else {
+		assert(button == twoPagesBtn);
+		rlt = Rule::TWO_PAGES;
+		plt = PageLayout::TWO_PAGES;
+	}
+	
+	Settings::UpdateAction update;
+	update.setLayoutType(rlt);
+	
+	scopeLabel->setText(tr("This page only"));
+	
+	if (m_uiData.splitLineMode() == MODE_AUTO &&
+			rlt != Rule::SINGLE_PAGE_UNCUT) {
+		m_ptrSettings->updatePage(m_imageId, update);
+		emit reloadRequested();
+	} else {
+		PageLayout const new_layout(
+			plt, m_uiData.pageLayout().splitLine()
+		);
+		Params const new_params(
+			new_layout, m_uiData.dependencies(),
+			m_uiData.splitLineMode()
+		);
+		
+		update.setParams(new_params);
+		m_ptrSettings->updatePage(m_imageId, update);
+		
+		m_uiData.setPageLayout(new_layout);
+		emit pageLayoutSetLocally(new_layout);
+		emit invalidateThumbnail(PageId(m_imageId));
+	}
 }
 
 void
-OptionsWidget::twoPagesSelected()
+OptionsWidget::singlePageUncutToggled(bool const checked)
 {
-	m_ptrSettings->applyToPage(m_imageId, Rule::TWO_PAGES);
-	m_ptrSettings->clearPageParams(m_imageId);
-	emit reloadRequested();
+	if (!checked || m_ignoreLayoutTypeToggle) {
+		return;
+	}
+	
+	PageLayout const new_layout(
+		PageLayout::SINGLE_PAGE_UNCUT,
+		m_uiData.pageLayout().splitLine()
+	);
+	Params const new_params(
+		new_layout, m_uiData.dependencies(),
+		m_uiData.splitLineMode()
+	);
+	
+	Settings::UpdateAction update;
+	update.setLayoutType(Rule::SINGLE_PAGE_UNCUT);
+	update.setParams(new_params);
+	
+	m_ptrSettings->updatePage(m_imageId, update);
+	scopeLabel->setText(tr("This page only"));
+	
+	m_uiData.setPageLayout(new_layout);
+	emit pageLayoutSetLocally(new_layout);
+	emit invalidateThumbnail(PageId(m_imageId));
+}
+
+void
+OptionsWidget::leftPagePlusOffcutToggled(bool const checked)
+{
+	if (!checked || m_ignoreLayoutTypeToggle) {
+		return;
+	}
+	
+	Settings::UpdateAction update;
+	update.setLayoutType(Rule::LEFT_PAGE_PLUS_OFFCUT);
+	
+	scopeLabel->setText(tr("This page only"));
+	
+	if (m_uiData.splitLineMode() == MODE_AUTO) {
+		m_ptrSettings->updatePage(m_imageId, update);
+		emit reloadRequested();
+	} else {
+		PageLayout const new_layout(
+			PageLayout::LEFT_PAGE_PLUS_OFFCUT,
+			m_uiData.pageLayout().splitLine()
+		);
+		Params const new_params(
+			new_layout, m_uiData.dependencies(),
+			m_uiData.splitLineMode()
+		);
+		
+		update.setParams(new_params);
+		m_ptrSettings->updatePage(m_imageId, update);
+		
+		m_uiData.setPageLayout(new_layout);
+		emit pageLayoutSetLocally(new_layout);
+		emit invalidateThumbnail(PageId(m_imageId));
+	}
+}
+
+void
+OptionsWidget::rightPagePlusOffcutToggled(bool const checked)
+{
+	if (!checked || m_ignoreLayoutTypeToggle) {
+		return;
+	}
+	
+	Settings::UpdateAction update;
+	update.setLayoutType(Rule::RIGHT_PAGE_PLUS_OFFCUT);
+	
+	scopeLabel->setText(tr("This page only"));
+	
+	if (m_uiData.splitLineMode() == MODE_AUTO) {
+		m_ptrSettings->updatePage(m_imageId, update);
+		emit reloadRequested();
+	} else {
+		PageLayout const new_layout(
+			PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
+			m_uiData.pageLayout().splitLine()
+		);
+		Params const new_params(
+			new_layout, m_uiData.dependencies(),
+			m_uiData.splitLineMode()
+		);
+		
+		update.setParams(new_params);
+		m_ptrSettings->updatePage(m_imageId, update);
+		
+		m_uiData.setPageLayout(new_layout);
+		emit pageLayoutSetLocally(new_layout);
+		emit invalidateThumbnail(PageId(m_imageId));
+	}
+}
+
+void
+OptionsWidget::twoPagesToggled(bool const checked)
+{
+	if (!checked || m_ignoreLayoutTypeToggle) {
+		return;
+	}
+	
+	Settings::UpdateAction update;
+	update.setLayoutType(Rule::TWO_PAGES);
+	
+	scopeLabel->setText(tr("This page only"));
+	
+	if (m_uiData.splitLineMode() == MODE_AUTO) {
+		m_ptrSettings->updatePage(m_imageId, update);
+		emit reloadRequested();
+	} else {
+		PageLayout const new_layout(
+			PageLayout::TWO_PAGES,
+			m_uiData.pageLayout().splitLine()
+		);
+		Params const new_params(
+			new_layout, m_uiData.dependencies(),
+			m_uiData.splitLineMode()
+		);
+		
+		update.setParams(new_params);
+		m_ptrSettings->updatePage(m_imageId, update);
+		
+		m_uiData.setPageLayout(new_layout);
+		emit pageLayoutSetLocally(new_layout);
+		emit invalidateThumbnail(PageId(m_imageId));
+	}
 }
 
 void
 OptionsWidget::showChangeDialog()
 {
-	Rule const rule(m_ptrSettings->getRuleFor(m_imageId));
+	Settings::Record const record(m_ptrSettings->getPageRecord(m_imageId));
+	Params const* params = record.params();
+	if (!params) {
+		return;
+	}
+	
 	SplitModeDialog* dialog = new SplitModeDialog(
-		this, rule, m_uiData.autoDetectedLayout()
+		this, record.rule(), params->pageLayout().type(),
+		params->splitLineMode() == MODE_AUTO
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
@@ -148,26 +377,30 @@ void
 OptionsWidget::ruleSet(Rule const& rule)
 {
 	if (rule.scope() == Rule::THIS_PAGE_ONLY) {
-		m_ptrSettings->applyToPage(m_imageId, rule.layoutType());
+		Settings::UpdateAction update;
+		update.setLayoutType(rule.layoutType());
+		m_ptrSettings->updatePage(m_imageId, update);
 	} else {
-		m_ptrSettings->applyToAllPages(rule.layoutType());
+		m_ptrSettings->setLayoutTypeForAllPages(rule.layoutType());
 	}
 	emit reloadRequested();
 }
 
 void
-OptionsWidget::modeChanged(bool const auto_mode)
+OptionsWidget::splitLineModeChanged(bool const auto_mode)
 {
 	if (m_ignoreAutoManualToggle) {
 		return;
 	}
 	
 	if (auto_mode) {
-		m_uiData.setMode(MODE_AUTO);
-		m_ptrSettings->clearPageParams(m_imageId);
+		Settings::UpdateAction update;
+		update.clearParams();
+		m_ptrSettings->updatePage(m_imageId, update);
+		m_uiData.setSplitLineMode(MODE_AUTO);
 		emit reloadRequested();
 	} else {
-		m_uiData.setMode(MODE_MANUAL);
+		m_uiData.setSplitLineMode(MODE_MANUAL);
 		commitCurrentParams();
 	}
 }
@@ -177,17 +410,19 @@ OptionsWidget::commitCurrentParams()
 {
 	Params const params(
 		m_uiData.pageLayout(),
-		m_uiData.dependencies(), m_uiData.mode()
+		m_uiData.dependencies(), m_uiData.splitLineMode()
 	);
-	m_ptrSettings->setPageParams(m_imageId, params);
+	Settings::UpdateAction update;
+	update.setParams(params);
+	m_ptrSettings->updatePage(m_imageId, update);
 }
 
 
 /*============================= Widget::UiData ==========================*/
 
 OptionsWidget::UiData::UiData()
-:	m_mode(MODE_AUTO),
-	m_autoDetectedLayout(NO_AUTO_DETECTION)
+:	m_splitLineMode(MODE_AUTO),
+	m_layoutTypeAutoDetected(false)
 {
 }
 
@@ -220,27 +455,27 @@ OptionsWidget::UiData::dependencies() const
 }
 
 void
-OptionsWidget::UiData::setMode(AutoManualMode const mode)
+OptionsWidget::UiData::setSplitLineMode(AutoManualMode const mode)
 {
-	m_mode = mode;
+	m_splitLineMode = mode;
 }
 
 AutoManualMode
-OptionsWidget::UiData::mode() const
+OptionsWidget::UiData::splitLineMode() const
 {
-	return m_mode;
+	return m_splitLineMode;
+}
+
+bool
+OptionsWidget::UiData::layoutTypeAutoDetected() const
+{
+	return m_layoutTypeAutoDetected;
 }
 
 void
-OptionsWidget::UiData::setAutoDetectedLayout(AutoDetectedLayout const layout)
+OptionsWidget::UiData::setLayoutTypeAutoDetected(bool const val)
 {
-	m_autoDetectedLayout = layout;
-}
-
-AutoDetectedLayout
-OptionsWidget::UiData::autoDetectedLayout() const
-{
-	return m_autoDetectedLayout;
+	m_layoutTypeAutoDetected = val;
 }
 
 } // namespace page_split

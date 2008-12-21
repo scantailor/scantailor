@@ -27,18 +27,16 @@
 #include <QDomDocument>
 #include <algorithm>
 #include <math.h>
+#include <assert.h>
 
 PageLayout::PageLayout()
-:	m_leftPageValid(false),
-	m_rightPageValid(false)
+:	m_type(SINGLE_PAGE_UNCUT)
 {
 }
 
-PageLayout::PageLayout(QLineF const& split_line,
-	bool left_page_valid, bool right_page_valid)
+PageLayout::PageLayout(Type const type, QLineF const& split_line)
 :	m_splitLine(split_line),
-	m_leftPageValid(left_page_valid),
-	m_rightPageValid(right_page_valid)
+	m_type(type)
 {
 }
 
@@ -48,22 +46,58 @@ PageLayout::PageLayout(QDomElement const& layout_el)
 			layout_el.namedItem("split-line").toElement()
 		)
 	),
-	m_leftPageValid(layout_el.attribute("leftPageValid") == "1"),
-	m_rightPageValid(layout_el.attribute("rightPageValid") == "1")
+	m_type(SINGLE_PAGE_UNCUT)
 {
+	if (layout_el.hasAttribute("type")) {
+		m_type = typeFromString(layout_el.attribute("type"));
+	} else {
+		// Backwards compatibility with versions <= 0.9.1
+		
+		bool const left_page = (
+			layout_el.attribute("leftPageValid") == "1"
+		);
+		bool const right_page = (
+			layout_el.attribute("rightPageValid") == "1"
+		);
+		
+		if (left_page && right_page) {
+			m_type = TWO_PAGES;
+		} else if (left_page && !right_page) {
+			m_type = LEFT_PAGE_PLUS_OFFCUT;
+		} else if (!left_page && right_page) {
+			m_type = RIGHT_PAGE_PLUS_OFFCUT;
+		}
+	}
+}
+
+PageLayout
+PageLayout::singlePageUncut()
+{
+	return PageLayout(SINGLE_PAGE_UNCUT, QLineF());
+}
+
+PageLayout
+PageLayout::leftPagePlusOffcut(QLineF const& split_line)
+{
+	return PageLayout(LEFT_PAGE_PLUS_OFFCUT, split_line);
+}
+
+PageLayout
+PageLayout::rightPagePlusOffcut(QLineF const& split_line)
+{
+	return PageLayout(RIGHT_PAGE_PLUS_OFFCUT, split_line);
+}
+
+PageLayout
+PageLayout::twoPages(QLineF const& split_line)
+{
+	return PageLayout(TWO_PAGES, split_line);
 }
 
 int
 PageLayout::numSubPages() const
 {
-	int cnt = 0;
-	if (m_leftPageValid) {
-		++cnt;
-	}
-	if (m_rightPageValid) {
-		++cnt;
-	}
-	return cnt;
+	return m_type == TWO_PAGES ? 2 : 1;
 }
 
 QLineF
@@ -107,8 +141,33 @@ PageLayout::inscribedSplitLine(QRectF const& rect) const
 }
 
 QPolygonF
-PageLayout::leftPage(QRectF const& rect) const
+PageLayout::singlePageOutline(QRectF const& rect) const
 {
+	switch (m_type) {
+		case SINGLE_PAGE_UNCUT:
+			return rect;
+		case LEFT_PAGE_PLUS_OFFCUT:
+			return leftPageOutline(rect);
+		case RIGHT_PAGE_PLUS_OFFCUT:
+			return rightPageOutline(rect);
+		case TWO_PAGES:
+			break;
+	}
+	
+	return QPolygonF();
+}
+
+QPolygonF
+PageLayout::leftPageOutline(QRectF const& rect) const
+{
+	switch (m_type) {
+		case LEFT_PAGE_PLUS_OFFCUT:
+		case TWO_PAGES:
+			break;
+		default:
+			return QPolygonF();
+	}
+	
 	if (m_splitLine.p1().y() == m_splitLine.p2().y()) {
 		return QPolygonF();
 	}
@@ -138,8 +197,15 @@ PageLayout::leftPage(QRectF const& rect) const
 }
 
 QPolygonF
-PageLayout::rightPage(QRectF const& rect) const
+PageLayout::rightPageOutline(QRectF const& rect) const
 {
+	switch (m_type) {
+		case RIGHT_PAGE_PLUS_OFFCUT:
+		case TWO_PAGES:
+			break;
+		default:
+			return QPolygonF();
+	}
 	if (m_splitLine.p1().y() == m_splitLine.p2().y()) {
 		return QPolygonF();
 	}
@@ -171,44 +237,32 @@ PageLayout::rightPage(QRectF const& rect) const
 QPolygonF
 PageLayout::pageOutline(QRectF const& rect, PageId::SubPage const page) const
 {
-	if (m_leftPageValid && m_rightPageValid) {
-		switch (page) {
-			case PageId::LEFT_PAGE:
-				return leftPage(rect);
-			case PageId::RIGHT_PAGE:
-				return rightPage(rect);
-			default:;
-		}
+	switch (page) {
+		case PageId::SINGLE_PAGE:
+			return singlePageOutline(rect);
+		case PageId::LEFT_PAGE:
+			return leftPageOutline(rect);
+		case PageId::RIGHT_PAGE:
+			return rightPageOutline(rect);
 	}
 	
-	if (m_leftPageValid) {
-		return leftPage(rect);
-	} else if (m_rightPageValid) {
-		return rightPage(rect);
-	} else {
-		return QPolygonF();
-	}
+	assert(!"Unreachable");
+	return QPolygonF();
 }
 
 PageLayout
 PageLayout::transformed(QTransform const& xform) const
 {
-	QLineF const line(xform.map(m_splitLine));
-	return PageLayout(line, m_leftPageValid, m_rightPageValid);
+	return PageLayout(m_type, xform.map(m_splitLine));
 }
 
 QDomElement
 PageLayout::toXml(QDomDocument& doc, QString const& name) const
 {
-	if (isNull()) {
-		return QDomElement();
-	}
-	
 	XmlMarshaller marshaller(doc);
 	
 	QDomElement el(doc.createElement(name));
-	el.setAttribute("leftPageValid", m_leftPageValid ? 1 : 0);
-	el.setAttribute("rightPageValid", m_rightPageValid ? 1 : 0);
+	el.setAttribute("type", typeToString(m_type));
 	el.appendChild(marshaller.lineF(m_splitLine, "split-line"));
 	
 	return el;
@@ -318,3 +372,38 @@ PageLayout::clipTopBottom(QLineF const& line, double y_top, double y_bottom)
 	return QLineF(p_top, p_bottom);
 }
 
+PageLayout::Type
+PageLayout::typeFromString(QString const& str)
+{
+	if (str == "left-page") {
+		return LEFT_PAGE_PLUS_OFFCUT;
+	} else if (str == "right-page") {
+		return RIGHT_PAGE_PLUS_OFFCUT;
+	} else if (str == "two-pages") {
+		return TWO_PAGES;
+	} else { // "single-uncut"
+		return SINGLE_PAGE_UNCUT;
+	}
+}
+
+QString
+PageLayout::typeToString(Type const type)
+{
+	char const* str = 0;
+	switch (type) {
+		case SINGLE_PAGE_UNCUT:
+			str = "single-uncut";
+			break;
+		case LEFT_PAGE_PLUS_OFFCUT:
+			str = "left-page";
+			break;
+		case RIGHT_PAGE_PLUS_OFFCUT:
+			str = "right-page";
+			break;
+		case TWO_PAGES:
+			str = "two-pages";
+			break;
+	}
+	
+	return QString::fromAscii(str);
+}

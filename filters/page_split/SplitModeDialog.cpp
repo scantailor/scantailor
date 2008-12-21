@@ -25,10 +25,12 @@ namespace page_split
 
 SplitModeDialog::SplitModeDialog(
 	QWidget* const parent, Rule const& rule,
-	AutoDetectedLayout const auto_detected_layout)
+	PageLayout::Type const auto_detected_layout_type,
+	bool const auto_detected_layout_type_valid)
 :	QDialog(parent),
 	m_layoutType(rule.layoutType()),
-	m_autoDetectedLayout(auto_detected_layout)
+	m_autoDetectedLayoutType(auto_detected_layout_type),
+	m_autoDetectedLayoutTypeValid(auto_detected_layout_type_valid)
 {
 	setupUi(this);
 	layoutTypeLabel->setPixmap(QPixmap(iconFor(m_layoutType)));
@@ -96,14 +98,23 @@ SplitModeDialog::combinedLayoutType() const
 		return m_layoutType;
 	}
 	
-	switch (m_autoDetectedLayout) {
-		case SINGLE_PAGE:
-			return Rule::SINGLE_PAGE;
-		case TWO_PAGES:
-			return Rule::TWO_PAGES;
-		default:
-			return m_layoutType;
+	if (!m_autoDetectedLayoutTypeValid) {
+		return Rule::AUTO_DETECT;
 	}
+	
+	switch (m_autoDetectedLayoutType) {
+		case PageLayout::SINGLE_PAGE_UNCUT:
+			return Rule::SINGLE_PAGE_UNCUT;
+		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
+			return Rule::LEFT_PAGE_PLUS_OFFCUT;
+		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+			return Rule::RIGHT_PAGE_PLUS_OFFCUT;
+		case PageLayout::TWO_PAGES:
+			return Rule::TWO_PAGES;
+	}
+	
+	assert(!"Unreachable");
+	return Rule::AUTO_DETECT;
 }
 
 char const*
@@ -112,15 +123,21 @@ SplitModeDialog::iconFor(Rule::LayoutType const layout_type)
 	char const* resource = "";
 	
 	switch (layout_type) {
-	case Rule::AUTO_DETECT:
-		resource = ":/icons/layout_type_auto.png";
-		break;
-	case Rule::SINGLE_PAGE:
-		resource = ":/icons/single_page.png";
-		break;
-	case Rule::TWO_PAGES:
-		resource = ":/icons/two_pages.png";
-		break;
+		case Rule::AUTO_DETECT:
+			resource = ":/icons/layout_type_auto.png";
+			break;
+		case Rule::SINGLE_PAGE_UNCUT:
+			resource = ":/icons/single_page_uncut_selected.png";
+			break;
+		case Rule::LEFT_PAGE_PLUS_OFFCUT:
+			resource = ":/icons/left_page_plus_offcut_selected.png";
+			break;
+		case Rule::RIGHT_PAGE_PLUS_OFFCUT:
+			resource = ":/icons/right_page_plus_offcut_selected.png";
+			break;
+		case Rule::TWO_PAGES:
+			resource = ":/icons/two_pages_selected.png";
+			break;
 	}
 	
 	return resource;

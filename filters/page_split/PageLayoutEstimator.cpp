@@ -16,14 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "PageSplitFinder.h"
+#include "PageLayoutEstimator.h"
 #include "PageLayout.h"
 #include "OrthogonalRotation.h"
 #include "VertLineFinder.h"
 #include "ContentSpanFinder.h"
+#include "ImageMetadata.h"
+#include "PageSequence.h"
 #include "DebugImages.h"
 #include "Dpi.h"
-#include "Dpm.h"
 #include "ImageTransformation.h"
 #include "foundation/Span.h"
 #include "imageproc/Binarize.h"
@@ -35,7 +36,6 @@
 #include "imageproc/ReduceThreshold.h"
 #include "imageproc/ConnComp.h"
 #include "imageproc/ConnCompEraserExt.h"
-#include "imageproc/Connectivity.h"
 #include "imageproc/SkewFinder.h"
 #include "imageproc/Constants.h"
 #include "imageproc/RasterOp.h"
@@ -53,6 +53,7 @@
 #include <QImage>
 #include <QPointF>
 #include <QPoint>
+#include <QLineF>
 #include <QPainter>
 #include <QColor>
 #include <QPen>
@@ -121,19 +122,26 @@ PageLayout selectSinglePageSplitLine(
 		QLineF const& line = ltr_lines.front();
 		double const x_center = 0.5 * (line.p1().x() + line.p2().x());
 		if (x_center < 0.5 * image_size.width()) {
-			return PageLayout(line, false, true);
+			return PageLayout(PageLayout::RIGHT_PAGE_PLUS_OFFCUT, line);
 		} else {
-			return PageLayout(line, true, false);
+			return PageLayout(PageLayout::LEFT_PAGE_PLUS_OFFCUT, line);
 		}
 	}
 	
 	if (left_sum > right_sum) {
 		// Probably the horizontal shadow from a page touches the left
 		// border, which means that the left page was cut off.
-		return PageLayout(ltr_lines.front(), false, true);
+		return PageLayout(
+			PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
+			ltr_lines.front()
+		);
 	} else {
-		return PageLayout(ltr_lines.back(), true, false);
+		return PageLayout(
+			PageLayout::LEFT_PAGE_PLUS_OFFCUT,
+			ltr_lines.back()
+		);
 	}
+	
 }
 
 PageLayout selectTwoPageSplitLine(
@@ -144,7 +152,7 @@ PageLayout selectTwoPageSplitLine(
 	if (ltr_lines.empty()) {
 		return PageLayout();
 	} else if (ltr_lines.size() == 1) {
-		return PageLayout(ltr_lines.front(), true, true);
+		return PageLayout(PageLayout::TWO_PAGES, ltr_lines.front());
 	}
 	
 	// Find the line closest to the center.
@@ -160,43 +168,94 @@ PageLayout selectTwoPageSplitLine(
 		}
 	}
 	
-	return PageLayout(*best_line, true, true);
+	return PageLayout(PageLayout::TWO_PAGES, *best_line);
+}
+
+int numPages(
+	Rule::LayoutType const layout_type,
+	ImageTransformation const& pre_xform)
+{
+	int num_pages = 0;
+	
+	switch (layout_type) {
+		case Rule::AUTO_DETECT: {
+			QSize const image_size(
+				pre_xform.origRect().size().toSize()
+			);
+			num_pages = PageSequence::adviseNumberOfLogicalPages(
+				ImageMetadata(image_size, pre_xform.origDpi()),
+				pre_xform.preRotation()
+			);
+			break;
+		}
+		case Rule::SINGLE_PAGE_UNCUT:
+		case Rule::LEFT_PAGE_PLUS_OFFCUT:
+		case Rule::RIGHT_PAGE_PLUS_OFFCUT:
+			num_pages = 1;
+			break;
+		case Rule::TWO_PAGES:
+			num_pages = 2;
+			break;
+	}
+	
+	return num_pages;
 }
 
 } // anonymous namespace
 
 
 PageLayout
-PageSplitFinder::findSplitLine(
-	QImage const& input, ImageTransformation const& pre_xform,
+PageLayoutEstimator::estimatePageLayout(
+	Rule::LayoutType const layout_type, QImage const& input,
+	ImageTransformation const& pre_xform,
 	BinaryThreshold const bw_threshold,
-	bool const single_page, DebugImages* dbg)
+	DebugImages* const dbg)
 {
-	PageLayout layout(
-		splitPagesByFindingVerticalLines(
-			input, pre_xform, bw_threshold, single_page, dbg
-		)
-	);
+	if (layout_type == Rule::SINGLE_PAGE_UNCUT) {
+		return PageLayout(PageLayout::SINGLE_PAGE_UNCUT, QLineF());
+	}
 	
-	if (layout.isNull()) {
-		layout = splitPagesByFindingVerticalWhitespace(
-			input, pre_xform, bw_threshold, single_page, dbg
+	PageLayout layout(cutAtFoldingLine(layout_type, input, pre_xform, dbg));
+	
+	if (layout.type() == PageLayout::SINGLE_PAGE_UNCUT) {
+		// The folding line wasn't found.
+		layout = cutAtWhitespace(
+			layout_type, input, pre_xform, bw_threshold, dbg
 		);
 	}
 	
 	return layout;
 }
 
+/**
+ * \brief Attempts to find a suitable whitespace to draw a splitting line through.
+ *
+ * \param layout_type The type of a layout to detect.  If set to
+ *        something other than Rule::AUTO_DETECT, the returned
+ *        layout will have the same type.
+ * \param input The input image.  Will be converted to grayscale unless
+ *        it's already grayscale.
+ * \param pre_xform The logical transformation applied to the input image.
+ *        The resulting page layout will be in transformed coordinates.
+ * \param bw_threshold The global binarization threshold for the input image.
+ * \param dbg An optional sink for debugging images.
+ * \return Even if no suitable whitespace was found, this function
+ *         will return a PageLayout consistent with the layout_type requested.
+ */
 PageLayout
-PageSplitFinder::splitPagesByFindingVerticalWhitespace(
-	QImage const& input, ImageTransformation const& pre_xform,
+PageLayoutEstimator::cutAtWhitespace(
+	Rule::LayoutType const layout_type, QImage const& input,
+	ImageTransformation const& pre_xform,
 	BinaryThreshold const bw_threshold,
-	bool const single_page, DebugImages* dbg)
+	DebugImages* const dbg)
 {
 	QTransform xform;
 	
 	// Convert to B/W and rotate.
 	BinaryImage img(to300DpiBinary(input, xform, bw_threshold));
+	
+	// Note: here we assume the only transformation applied
+	// to the input image is orthogonal rotation.
 	img = orthogonalRotation(img, pre_xform.preRotation().toDegrees());
 	if (dbg) {
 		dbg->add(img, "bw300");
@@ -210,8 +269,8 @@ PageSplitFinder::splitPagesByFindingVerticalWhitespace(
 	
 	// From now on we work with 150 dpi images.
 	
-	bool const left_cutoff = checkForLeftCutoff(img);
-	bool const right_cutoff = checkForRightCutoff(img);
+	bool const left_offcut = checkForLeftOffcut(img);
+	bool const right_offcut = checkForRightOffcut(img);
 	
 	SkewFinder skew_finder;
 	// We work with 150dpi image, so no further reduction.
@@ -246,27 +305,122 @@ PageSplitFinder::splitPagesByFindingVerticalWhitespace(
 		}
 	}
 	
+	int const num_pages = numPages(layout_type, pre_xform);
 	PageLayout const layout(
-		findSplitLineDeskewed(
-			img, single_page, left_cutoff, right_cutoff, dbg
+		cutAtWhitespaceDeskewed150(
+			layout_type, num_pages, img,
+			left_offcut, right_offcut, dbg
 		)
 	);
 	return layout.transformed(xform.inverted());
 }
 
+/**
+ * \brief Attempts to find a suitable whitespace to draw a splitting line through.
+ *
+ * \param layout_type The type of a layout to detect.  If set to
+ *        something other than Rule::AUTO_DETECT, the returned
+ *        layout will have the same type.
+ * \param num_pages The number of pages (1 or 2) in the layout.
+ * \param input The black and white, 150 DPI input image.
+ * \param left_offcut True if there seems to be garbage on the left side.
+ * \param right_offcut True if there seems to be garbage on the right side.
+ * \param dbg An optional sink for debugging images.
+ * \return A PageLAyout consistent with the layout_type requested.
+ */
 PageLayout
-PageSplitFinder::splitPagesByFindingVerticalLines(
-	QImage const& input, ImageTransformation const& pre_xform,
-	imageproc::BinaryThreshold bw_threshold,
-	bool const single_page, DebugImages* dbg)
+PageLayoutEstimator::cutAtWhitespaceDeskewed150(
+	Rule::LayoutType const layout_type, int const num_pages,
+	BinaryImage const& input,
+	bool const left_offcut, bool const right_offcut,
+	DebugImages* dbg)
 {
+	using namespace boost::lambda;
+	
+	int const width = input.width();
+	int const height = input.height();
+	
+	BinaryImage cc_img(input.size(), WHITE);
+
+	{
+		ConnCompEraser cc_eraser(input, CONN8);
+		ConnComp cc;
+		while (!(cc = cc_eraser.nextConnComp()).isNull()) {
+			if (cc.width() < 5 || cc.height() < 5) {
+				continue;
+			}
+			if ((double)cc.height() / cc.width() > 6) {
+				continue;
+			}
+			cc_img.fill(cc.rect(), BLACK);
+		}
+	}
+	
+	if (dbg) {
+		dbg->add(cc_img, "cc_img");
+	}
+	
+	ContentSpanFinder span_finder;
+	span_finder.setMinContentWidth(2);
+	span_finder.setMinWhitespaceWidth(8);
+	
+	std::deque<Span> spans;
+	SlicedHistogram hist(cc_img, SlicedHistogram::COLS);
+	span_finder.find(hist, bind(&std::deque<Span>::push_back, var(spans), _1));
+	
+	if (dbg) {
+		visualizeSpans(*dbg, spans, input, "spans");
+	}
+	
+	if (num_pages == 1) {
+		return processContentSpansSinglePage(
+			layout_type, spans, width, height,
+			left_offcut, right_offcut
+		);
+	} else {
+		// This helps if we have 2 pages with one page containing nothing
+		// but a small amount of garbage.
+		removeInsignificantEdgeSpans(spans);
+		if (dbg) {
+			visualizeSpans(*dbg, spans, input, "spans_refined");
+		}
+		
+		return processContentSpansTwoPages(
+			layout_type, spans, width, height
+		);
+	}
+}
+
+/**
+ * \brief Attempts to find the folding line and cut the image there.
+ *
+ * \param layout_type The type of a layout to detect.  If set to
+ *        something other than Rule::AUTO_DETECT, the returned
+ *        layout will have the same type, except in the case
+ *        where a folding line wasn't found.
+ * \param input The input image.  Will be converted to grayscale unless
+ *        it's already grayscale.
+ * \param pre_xform The logical transformation applied to the input image.
+ *        The resulting page layout will be in transformed coordinates.
+ * \param dbg An optional sink for debugging images.
+ * \return If no folding line was found, a default-constructed PageLayout
+ *         will be returned (that has a type of PageLayout::SINGLE_PAGE_UNCUT).
+ *         Otherwise the proper page layout will be returned.
+ */
+PageLayout
+PageLayoutEstimator::cutAtFoldingLine(
+	Rule::LayoutType const layout_type, QImage const& input,
+	ImageTransformation const& pre_xform, DebugImages* const dbg)
+{
+	int const num_pages = numPages(layout_type, pre_xform);
+	
 	QImage hor_shadows;
 	
 	int const max_lines = 8;
 	std::vector<QLineF> lines(
 		VertLineFinder::findLines(
 			input, pre_xform, max_lines, dbg,
-			single_page ? &hor_shadows : 0
+			num_pages == 1 ? &hor_shadows : 0
 		)
 	);
 	
@@ -276,7 +430,7 @@ PageSplitFinder::splitPagesByFindingVerticalLines(
 	
 	std::sort(lines.begin(), lines.end(), CenterComparator());
 	
-	if (single_page) {
+	if (num_pages == 1) {
 		return selectSinglePageSplitLine(
 			lines, input.size(), hor_shadows, dbg
 		);
@@ -286,7 +440,7 @@ PageSplitFinder::splitPagesByFindingVerticalLines(
 }
 
 imageproc::BinaryImage
-PageSplitFinder::to300DpiBinary(
+PageLayoutEstimator::to300DpiBinary(
 	QImage const& img, QTransform& xform,
 	BinaryThreshold const binary_threshold)
 {
@@ -309,7 +463,7 @@ PageSplitFinder::to300DpiBinary(
 }
 
 BinaryImage
-PageSplitFinder::removeGarbageAnd2xDownscale(
+PageLayoutEstimator::removeGarbageAnd2xDownscale(
 	BinaryImage const& image, DebugImages* dbg)
 {
 	BinaryImage reduced(ReduceThreshold(image)(2));
@@ -352,7 +506,7 @@ PageSplitFinder::removeGarbageAnd2xDownscale(
 }
 
 bool
-PageSplitFinder::checkForLeftCutoff(BinaryImage const& image)
+PageLayoutEstimator::checkForLeftOffcut(BinaryImage const& image)
 {
 	int const margin = 2; // Some scanners leave garbage near page borders.
 	int const width = 3;
@@ -362,7 +516,7 @@ PageSplitFinder::checkForLeftCutoff(BinaryImage const& image)
 }
 
 bool
-PageSplitFinder::checkForRightCutoff(BinaryImage const& image)
+PageLayoutEstimator::checkForRightOffcut(BinaryImage const& image)
 {
 	int const margin = 2; // Some scanners leave garbage near page borders.
 	int const width = 3;
@@ -371,67 +525,8 @@ PageSplitFinder::checkForRightCutoff(BinaryImage const& image)
 	return image.countBlackPixels(rect) != 0;
 }
 
-PageLayout
-PageSplitFinder::findSplitLineDeskewed(
-	BinaryImage const& input, bool const single_page,
-	bool const left_cutoff, bool const right_cutoff,
-	DebugImages* dbg)
-{
-	using namespace boost::lambda;
-	
-	int const width = input.width();
-	int const height = input.height();
-	
-	BinaryImage cc_img(input.size(), WHITE);
-
-	{
-		ConnCompEraser cc_eraser(input, CONN8);
-		ConnComp cc;
-		while (!(cc = cc_eraser.nextConnComp()).isNull()) {
-			if (cc.width() < 5 || cc.height() < 5) {
-				continue;
-			}
-			if ((double)cc.height() / cc.width() > 6) {
-				continue;
-			}
-			cc_img.fill(cc.rect(), BLACK);
-		}
-	}
-	
-	if (dbg) {
-		dbg->add(cc_img, "cc_img");
-	}
-	
-	ContentSpanFinder span_finder;
-	span_finder.setMinContentWidth(2);
-	span_finder.setMinWhitespaceWidth(8);
-	
-	std::deque<Span> spans;
-	SlicedHistogram hist(cc_img, SlicedHistogram::COLS);
-	span_finder.find(hist, bind(&std::deque<Span>::push_back, var(spans), _1));
-	
-	if (dbg) {
-		visualizeSpans(*dbg, spans, input, "spans");
-	}
-	
-	if (single_page) {
-		return processContentSpansSinglePage(
-			spans, width, height, left_cutoff, right_cutoff
-		);
-	} else {
-		// This helps if we have 2 pages with one page containing nothing
-		// but a small amount of garbage.
-		removeInsignificantEdgeSpans(spans);
-		if (dbg) {
-			visualizeSpans(*dbg, spans, input, "spans_refined");
-		}
-		
-		return processContentSpansTwoPages(spans, width, height);
-	}
-}
-
 void
-PageSplitFinder::visualizeSpans(
+PageLayoutEstimator::visualizeSpans(
 	DebugImages& dbg, std::deque<Span> const& spans,
 	BinaryImage const& image, char const* label)
 {
@@ -455,7 +550,7 @@ PageSplitFinder::visualizeSpans(
 }
 
 void
-PageSplitFinder::removeInsignificantEdgeSpans(std::deque<Span>& spans)
+PageLayoutEstimator::removeInsignificantEdgeSpans(std::deque<Span>& spans)
 {
 	if (spans.empty()) {
 		return;
@@ -504,19 +599,29 @@ PageSplitFinder::removeInsignificantEdgeSpans(std::deque<Span>& spans)
 }
 
 PageLayout
-PageSplitFinder::processContentSpansSinglePage(
+PageLayoutEstimator::processContentSpansSinglePage(
+	Rule::LayoutType const layout_type,
 	std::deque<Span> const& spans, int const width, int const height,
-	bool const left_cutoff, bool const right_cutoff)
+	bool const left_offcut, bool const right_offcut)
 {
+	assert(layout_type == Rule::AUTO_DETECT
+			|| layout_type == Rule::LEFT_PAGE_PLUS_OFFCUT
+			|| layout_type == Rule::RIGHT_PAGE_PLUS_OFFCUT);
+	
 	// Just to be able to break from it.
-	while (left_cutoff && !right_cutoff) {
+	while (layout_type == Rule::RIGHT_PAGE_PLUS_OFFCUT ||
+			(layout_type == Rule::AUTO_DETECT &&
+			left_offcut && !right_offcut)) {
 		double x;
 		if (spans.empty()) {
-			x = 0;
+			x = 0.0;
 		} else if (spans.front().begin() > 0) {
 			x = 0.5 * spans.front().begin();
 		} else {
-			if (spans.front().width() > width / 2) {
+			if (layout_type != Rule::RIGHT_PAGE_PLUS_OFFCUT &&
+					spans.front().width() > width / 2) {
+				// Probably it's the content span.
+				// Maybe we should cut it from the other side.
 				break;
 			} else if (spans.size() > 1) {
 				x = Span(spans[0], spans[1]).center();
@@ -524,18 +629,23 @@ PageSplitFinder::processContentSpansSinglePage(
 				x = std::min(spans[0].end() + 20, width);
 			}
 		}
-		return PageLayout(vertLine(x), false, true);
+		return PageLayout(PageLayout::RIGHT_PAGE_PLUS_OFFCUT, vertLine(x));
 	}
 	
 	// Just to be able to break from it.
-	while (right_cutoff && !left_cutoff) {
+	while (layout_type == Rule::LEFT_PAGE_PLUS_OFFCUT ||
+			(layout_type == Rule::AUTO_DETECT &&
+			right_offcut && !left_offcut)) {
 		double x;
 		if (spans.empty()) {
 			x = width;
 		} else if (spans.back().end() < width) {
 			x = Span(spans.back(), width).center();
 		} else {
-			if (spans.back().width() > width / 2) {
+			if (layout_type != Rule::LEFT_PAGE_PLUS_OFFCUT &&
+					spans.back().width() > width / 2) {
+				// Probably it's the content span.
+				// Maybe we should cut it from the other side.
 				break;
 			} else if (spans.size() > 1) {
 				x = Span(spans[spans.size() - 2], spans.back()).center();
@@ -543,24 +653,30 @@ PageSplitFinder::processContentSpansSinglePage(
 				x = std::max(spans.back().begin() - 20, 0);
 			}
 		}
-		return PageLayout(vertLine(x), true, false);
+		return PageLayout(PageLayout::LEFT_PAGE_PLUS_OFFCUT, vertLine(x));
 	}
 	
 	if (spans.empty()) {
-		return PageLayout(vertLine(0), false, true);
+		return PageLayout::singlePageUncut();
 	} else {
+		// If there is more whitespace before the first content
+		// span than after the last one, cut on the left,
+		// otherwise cut on the right.
 		if (spans.front().begin() < width - spans.back().end()) {
-			return PageLayout(vertLine(0), false, true);
+			return PageLayout::rightPagePlusOffcut(vertLine(0.0));
 		} else {
-			return PageLayout(vertLine(width), true, false);
+			return PageLayout::leftPagePlusOffcut(vertLine(width));
 		}
 	}
 }
 
 PageLayout
-PageSplitFinder::processContentSpansTwoPages(
+PageLayoutEstimator::processContentSpansTwoPages(
+	Rule::LayoutType const layout_type,
 	std::deque<Span> const& spans, int const width, int const height)
 {
+	assert(layout_type == Rule::AUTO_DETECT || layout_type == Rule::TWO_PAGES);
+	
 	double x;
 	if (spans.empty()) {
 		x = 0.5 * width;
@@ -645,11 +761,11 @@ PageSplitFinder::processContentSpansTwoPages(
 		Span const gap(spans[widest_gap],  spans[widest_gap + 1]);
 		x = gap.center();
 	}
-	return PageLayout(vertLine(x), true, true);
+	return PageLayout(PageLayout::TWO_PAGES, vertLine(x));
 }
 
 PageLayout
-PageSplitFinder::processTwoPagesWithSingleSpan(Span const& span, int width)
+PageLayoutEstimator::processTwoPagesWithSingleSpan(Span const& span, int width)
 {
 	double const page_center = 0.5 * width;
 	double const box_center = span.center();
@@ -671,11 +787,11 @@ PageSplitFinder::processTwoPagesWithSingleSpan(Span const& span, int width)
 		}
 	}
 	
-	return PageLayout(vertLine(x), true, true);
+	return PageLayout(PageLayout::TWO_PAGES, vertLine(x));
 }
 
 QLineF
-PageSplitFinder::vertLine(double x)
+PageLayoutEstimator::vertLine(double x)
 {
 	return QLineF(x, 0.0, x, 1.0);
 }

@@ -9,13 +9,11 @@ ADD_SUBDIRECTORY(ui)
 
 SET(
 	sources
-	AutoDetectedLayout.h
-	LayoutTypeResolver.cpp LayoutTypeResolver.h
 	ImageView.cpp ImageView.h
 	Thumbnail.cpp Thumbnail.h
 	Params.cpp Params.h
 	Dependencies.cpp Dependencies.h
-	PageSplitFinder.cpp PageSplitFinder.h
+	PageLayoutEstimator.cpp PageLayoutEstimator.h
 	VertLineFinder.cpp VertLineFinder.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h

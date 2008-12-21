@@ -27,7 +27,6 @@
 #include "ImageId.h"
 #include "Dependencies.h"
 #include "AutoManualMode.h"
-#include "AutoDetectedLayout.h"
 
 class ImageId;
 
@@ -57,18 +56,18 @@ public:
 		
 		Dependencies const& dependencies() const;
 		
-		void setMode(AutoManualMode mode);
+		void setSplitLineMode(AutoManualMode mode);
 		
-		AutoManualMode mode() const;
+		AutoManualMode splitLineMode() const;
 		
-		void setAutoDetectedLayout(AutoDetectedLayout layout);
+		bool layoutTypeAutoDetected() const;
 		
-		AutoDetectedLayout autoDetectedLayout() const;
+		void setLayoutTypeAutoDetected(bool val);
 	private:
 		PageLayout m_pageLayout;
 		Dependencies m_deps;
-		AutoManualMode m_mode;
-		AutoDetectedLayout m_autoDetectedLayout;
+		AutoManualMode m_splitLineMode;
+		bool m_layoutTypeAutoDetected;
 	};
 	
 	
@@ -79,18 +78,26 @@ public:
 	void preUpdateUI(ImageId const& image_id);
 	
 	void postUpdateUI(UiData const& ui_data);
+signals:
+	void pageLayoutSetLocally(PageLayout const& page_layout);
 public slots:
-	void manualPageLayoutSet(PageLayout const& page_layout);
+	void pageLayoutSetExternally(PageLayout const& page_layout);
 private slots:
-	void singlePageSelected();
+	void layoutTypeButtonToggled(bool checked);
 	
-	void twoPagesSelected();
+	void singlePageUncutToggled(bool checked);
+	
+	void leftPagePlusOffcutToggled(bool checked);
+	
+	void rightPagePlusOffcutToggled(bool checked);
+	
+	void twoPagesToggled(bool checked);
 	
 	void showChangeDialog();
 	
 	void ruleSet(Rule const& rule);
 	
-	void modeChanged(bool auto_mode);
+	void splitLineModeChanged(bool auto_mode);
 private:
 	void commitCurrentParams();
 	
@@ -98,6 +105,7 @@ private:
 	ImageId m_imageId;
 	UiData m_uiData;
 	int m_ignoreAutoManualToggle;
+	int m_ignoreLayoutTypeToggle;
 };
 
 } // namespace page_split

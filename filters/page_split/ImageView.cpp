@@ -24,13 +24,9 @@
 #include <QRectF>
 #include <QLineF>
 #include <QMouseEvent>
-#include <QContextMenuEvent>
-#include <QMenu>
-#include <QAction>
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
-#include <QPixmapCache>
 #include <Qt>
 #include <QDebug>
 #include <algorithm>
@@ -44,31 +40,11 @@ double const ImageView::m_maxSkewAngleCtg(1.0 / tan(65 * imageproc::constants::D
 ImageView::ImageView(QImage const& image,
 	ImageTransformation const& xform, PageLayout const& layout)
 :	ImageViewBase(image, xform),
-	m_pContextMenu(new QMenu(this)),
-	m_pLeftHalfAction(0),
-	m_pRightHalfAction(0),
 	m_imgSkewingHandle(":/icons/aqua-sphere.png"),
 	m_pageLayout(layout),
 	m_state(DEFAULT_STATE)
 {
 	setMouseTracking(true);
-	
-	m_pLeftHalfAction = m_pContextMenu->addAction(
-		tr("Left Half", "context menu item")
-	);
-	m_pRightHalfAction = m_pContextMenu->addAction(
-		tr("Right Half", "context menu item")
-	);
-	m_pLeftHalfAction->setCheckable(true);
-	m_pRightHalfAction->setCheckable(true);
-	QActionGroup* action_group = new QActionGroup(this);
-	m_pLeftHalfAction->setActionGroup(action_group);
-	m_pRightHalfAction->setActionGroup(action_group);
-	action_group->setExclusive(true);
-	connect(
-		m_pLeftHalfAction, SIGNAL(toggled(bool)),
-		this, SLOT(leftHalfToggled(bool))
-	);
 }
 
 ImageView::~ImageView()
@@ -76,25 +52,45 @@ ImageView::~ImageView()
 }
 
 void
+ImageView::pageLayoutSetExternally(PageLayout const& layout)
+{
+	m_pageLayout = layout;
+	m_state = DEFAULT_STATE;
+	update();
+}
+
+void
 ImageView::paintOverImage(QPainter& painter)
 {
-	if (m_pageLayout.isNull()) {
-		return;
-	}
-	
 	painter.setRenderHints(QPainter::Antialiasing, false);
 	
 	painter.setPen(Qt::NoPen);
 	QRectF const virt_rect(physToVirt().resultingRect());
-	if (m_pageLayout.leftPageValid()) {
-		painter.setBrush(QColor(0, 0, 255, 50));
-		painter.drawPolygon(m_pageLayout.leftPage(virt_rect));
-	}
-	if (m_pageLayout.rightPageValid()) {
-		painter.setBrush(QColor(255, 0, 0, 50));
-		painter.drawPolygon(m_pageLayout.rightPage(virt_rect));
-	}
 	
+	switch (m_pageLayout.type()) {
+		case PageLayout::SINGLE_PAGE_UNCUT:
+			painter.setBrush(QColor(0, 0, 255, 50));
+			painter.drawRect(virt_rect);
+			return; // No Split Line will be drawn.
+		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
+		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+			painter.setBrush(QColor(0, 0, 255, 50));
+			painter.drawPolygon(
+				m_pageLayout.singlePageOutline(virt_rect)
+			);
+			break;
+		case PageLayout::TWO_PAGES:
+			painter.setBrush(QColor(0, 0, 255, 50));
+			painter.drawPolygon(
+				m_pageLayout.leftPageOutline(virt_rect)
+			);
+			painter.setBrush(QColor(255, 0, 0, 50));
+			painter.drawPolygon(
+				m_pageLayout.rightPageOutline(virt_rect)
+			);
+			break;
+	}
+		
 	PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
 	QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
 	
@@ -198,7 +194,7 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 	
 	if (event->button() == Qt::LeftButton && m_state != DEFAULT_STATE) {
 		m_state = DEFAULT_STATE;
-		emit manualPageLayoutSet(m_pageLayout);
+		emit pageLayoutSetLocally(m_pageLayout);
 	}
 }
 
@@ -211,7 +207,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 	}
 	
 	if (m_state == DEFAULT_STATE) {
-		if (!m_pageLayout.isNull()) {
+		//if (!m_pageLayout.isNull()) {
 			if (m_topHandleRect.contains(event->pos()) ||
 			    m_bottomHandleRect.contains(event->pos())) {
 				if (event->buttons() & Qt::LeftButton) {
@@ -224,7 +220,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 			} else {
 				ensureCursorShape(Qt::ArrowCursor);
 			}
-		}
+		//}
 	} else {
 		QPointF movement(event->pos() - m_initialMousePos);
 		movement.setY(0);
@@ -259,11 +255,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 		QLineF const new_split_line(new_touch_point, new_other_point);
 		
 		// Page layout in widget coordinates.
-		PageLayout widget_layout(
-			new_split_line,
-			m_pageLayout.leftPageValid(),
-			m_pageLayout.rightPageValid()
-		);
+		PageLayout widget_layout(m_pageLayout.type(), new_split_line);
 		m_pageLayout = widget_layout.transformed(widgetToVirtual());
 		update();
 	}
@@ -277,41 +269,8 @@ ImageView::hideEvent(QHideEvent* const event)
 	m_state = DEFAULT_STATE;
 	ensureCursorShape(Qt::ArrowCursor);
 	if (old_state != DEFAULT_STATE) {
-		emit manualPageLayoutSet(m_pageLayout);
+		emit pageLayoutSetLocally(m_pageLayout);
 	}
-}
-
-void
-ImageView::contextMenuEvent(QContextMenuEvent* const event)
-{
-	if (m_state != DEFAULT_STATE) {
-		return;
-	}
-	if (m_pageLayout.leftPageValid() == m_pageLayout.rightPageValid()) {
-		return;
-	}
-	
-	event->accept();
-	m_pLeftHalfAction->setChecked(m_pageLayout.leftPageValid());
-	m_pRightHalfAction->setChecked(m_pageLayout.rightPageValid());
-	m_pContextMenu->popup(event->globalPos());
-}
-
-void
-ImageView::leftHalfToggled(bool const left_enabled)
-{
-	if (m_pageLayout.leftPageValid() == m_pageLayout.rightPageValid()) {
-		return;
-	}
-	if (m_pageLayout.leftPageValid() == left_enabled) {
-		return;
-	}
-	
-	m_pageLayout = PageLayout(
-		m_pageLayout.splitLine(), left_enabled, !left_enabled
-	);
-	update();
-	emit manualPageLayoutSet(m_pageLayout);
 }
 
 /**
@@ -387,9 +346,16 @@ bool
 ImageView::isCursorNearSplitLine(
 	QPointF const& cursor_pos, QPointF* touchpoint, QPointF* far_end) const
 {
+#if 0
 	if (m_pageLayout.isNull()) {
 		return false;
 	}
+#else
+	if (m_pageLayout.type() == PageLayout::SINGLE_PAGE_UNCUT) {
+		// No split line in this mode.
+		return false;
+	}
+#endif
 	
 	double const max_distance = 5.0; // screen pixels
 	double const max_distance_sq = max_distance * max_distance;

@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>220</width>
-    <height>291</height>
+    <width>234</width>
+    <height>281</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -18,32 +18,37 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
       <string>Page Layout</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout" name="verticalLayout" >
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <property name="sizeConstraint" >
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
         <item>
-         <spacer>
+         <spacer name="horizontalSpacer" >
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
-            <width>40</width>
+            <width>13</width>
             <height>20</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="QToolButton" name="singlePageBtn" >
+         <widget class="QToolButton" name="singlePageUncutBtn" >
           <property name="icon" >
-           <iconset resource="../../../resources/resources.qrc" >:/icons/single_page.png</iconset>
+           <iconset resource="../../../resources/resources.qrc" >
+            <normaloff>:/icons/single_page_uncut.png</normaloff>
+            <normalon>:/icons/single_page_uncut_selected.png</normalon>:/icons/single_page_uncut.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -57,12 +62,17 @@
           <property name="checked" >
            <bool>false</bool>
           </property>
+          <property name="autoExclusive" >
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="twoPagesBtn" >
+         <widget class="QToolButton" name="leftPagePlusOffcutBtn" >
           <property name="icon" >
-           <iconset resource="../../../resources/resources.qrc" >:/icons/two_pages.png</iconset>
+           <iconset resource="../../../resources/resources.qrc" >
+            <normaloff>:/icons/left_page_plus_offcut.png</normaloff>
+            <normalon>:/icons/left_page_plus_offcut_selected.png</normalon>:/icons/left_page_plus_offcut.png</iconset>
           </property>
           <property name="iconSize" >
            <size>
@@ -73,16 +83,64 @@
           <property name="checkable" >
            <bool>true</bool>
           </property>
+          <property name="autoExclusive" >
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
-         <spacer>
+         <widget class="QToolButton" name="rightPagePlusOffcutBtn" >
+          <property name="icon" >
+           <iconset resource="../../../resources/resources.qrc" >
+            <normaloff>:/icons/right_page_plus_offcut.png</normaloff>
+            <normalon>:/icons/right_page_plus_offcut_selected.png</normalon>:/icons/right_page_plus_offcut.png</iconset>
+          </property>
+          <property name="iconSize" >
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable" >
+           <bool>true</bool>
+          </property>
+          <property name="checked" >
+           <bool>false</bool>
+          </property>
+          <property name="autoExclusive" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="twoPagesBtn" >
+          <property name="icon" >
+           <iconset resource="../../../resources/resources.qrc" >
+            <normaloff>:/icons/two_pages.png</normaloff>
+            <normalon>:/icons/two_pages_selected.png</normalon>:/icons/two_pages.png</iconset>
+          </property>
+          <property name="iconSize" >
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="checkable" >
+           <bool>true</bool>
+          </property>
+          <property name="autoExclusive" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2" >
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
-            <width>40</width>
+            <width>13</width>
             <height>20</height>
            </size>
           </property>
@@ -107,7 +165,7 @@
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>40</width>
             <height>20</height>
@@ -127,7 +185,7 @@
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>40</width>
             <height>20</height>
@@ -153,7 +211,7 @@
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>40</width>
             <height>20</height>
@@ -195,7 +253,7 @@
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0" >
            <size>
             <width>40</width>
             <height>20</height>
@@ -213,7 +271,7 @@
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>20</width>
        <height>40</height>

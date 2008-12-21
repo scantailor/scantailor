@@ -42,8 +42,7 @@ public:
 	
 	Dependencies(QDomElement const& el);
 	
-	Dependencies(QSize const& image_size,
-		OrthogonalRotation rotation, bool single_page);
+	Dependencies(QSize const& image_size, OrthogonalRotation rotation);
 	
 	bool matches(Dependencies const& other) const;
 	
@@ -53,7 +52,6 @@ public:
 private:
 	QSize m_imageSize;
 	OrthogonalRotation m_rotation;
-	bool m_singlePage;
 };
 
 } // namespace page_split

@@ -16,10 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_PAGESPLITFINDER_H_
-#define PAGE_SPLIT_PAGESPLITFINDER_H_
+#ifndef PAGE_SPLIT_PAGELAYOUTESTIMATOR_H_
+#define PAGE_SPLIT_PAGELAYOUTESTIMATOR_H_
 
 #include "foundation/VirtualFunction.h"
+#include "Rule.h"
 #include <QLineF>
 #include <deque>
 
@@ -36,29 +37,50 @@ namespace imageproc
 {
 	class BinaryImage;
 	class BinaryThreshold;
-	class SlicedHistogram;
 }
 
 namespace page_split
 {
 
-class PageSplitFinder
+class PageLayoutEstimator
 {
 public:
-	static PageLayout findSplitLine(
-		QImage const& input, ImageTransformation const& pre_xform,
+	/**
+	 * \brief Estimates the page layout according to the provided layout type.
+	 *
+	 * \param layout_type The type of a layout to detect.  If set to
+	 *        something other than Rule::AUTO_DETECT, the returned
+	 *        layout will have the same type.
+	 * \param input The input image.  Will be converted to grayscale unless
+	 *        it's already grayscale.
+	 * \param pre_xform The logical transformation applied to the input image.
+	 *        The resulting page layout will be in transformed coordinates.
+	 * \param bw_threshold The global binarization threshold for the
+	 *        input image.
+	 * \param dbg An optional sink for debugging images.
+	 * \return The estimated PageLayout of type consistent with the
+	 *         requested layout type.
+	 */
+	static PageLayout estimatePageLayout(
+		Rule::LayoutType layout_type, QImage const& input,
+		ImageTransformation const& pre_xform,
 		imageproc::BinaryThreshold bw_threshold,
-		bool single_page, DebugImages* dbg = 0);
+		DebugImages* dbg = 0);
 private:
-	static PageLayout splitPagesByFindingVerticalLines(
-		QImage const& input, ImageTransformation const& pre_xform,
-		imageproc::BinaryThreshold bw_threshold,
-		bool single_page, DebugImages* dbg);
+	static PageLayout cutAtFoldingLine(
+		Rule::LayoutType layout_type, QImage const& input,
+		ImageTransformation const& pre_xform, DebugImages* dbg);
 	
-	static PageLayout splitPagesByFindingVerticalWhitespace(
-		QImage const& input, ImageTransformation const& pre_xform,
+	static PageLayout cutAtWhitespace(
+		Rule::LayoutType layout_type, QImage const& input,
+		ImageTransformation const& pre_xform,
 		imageproc::BinaryThreshold const bw_threshold,
-		bool const single_page, DebugImages* dbg);
+		DebugImages* dbg);
+	
+	static PageLayout cutAtWhitespaceDeskewed150(
+		Rule::LayoutType layout_type, int num_pages,
+		imageproc::BinaryImage const& input,
+		bool left_offcut, bool right_offcut, DebugImages* dbg);
 	
 	static imageproc::BinaryImage to300DpiBinary(
 		QImage const& img, QTransform& xform,
@@ -67,13 +89,9 @@ private:
 	static imageproc::BinaryImage removeGarbageAnd2xDownscale(
 		imageproc::BinaryImage const& image, DebugImages* dbg);
 	
-	static bool checkForLeftCutoff(imageproc::BinaryImage const& image);
+	static bool checkForLeftOffcut(imageproc::BinaryImage const& image);
 	
-	static bool checkForRightCutoff(imageproc::BinaryImage const& image);
-	
-	static PageLayout findSplitLineDeskewed(
-		imageproc::BinaryImage const& input, bool single_page,
-		bool left_cutoff, bool right_cutoff, DebugImages* dbg);
+	static bool checkForRightOffcut(imageproc::BinaryImage const& image);
 	
 	static void visualizeSpans(
 		DebugImages& dbg, std::deque<Span> const& spans,
@@ -82,11 +100,13 @@ private:
 	static void removeInsignificantEdgeSpans(std::deque<Span>& spans);
 	
 	static PageLayout processContentSpansSinglePage(
+		Rule::LayoutType layout_type,
 		std::deque<Span> const& spans,
 		int width, int height,
-		bool left_cutoff, bool right_cutoff);
+		bool left_offcut, bool right_offcut);
 		
 	static PageLayout processContentSpansTwoPages(
+		Rule::LayoutType layout_type,
 		std::deque<Span> const& spans,
 		int width, int height);
 	

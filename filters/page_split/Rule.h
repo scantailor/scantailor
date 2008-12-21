@@ -27,7 +27,13 @@ namespace page_split
 class Rule
 {
 public:
-	enum LayoutType { AUTO_DETECT, SINGLE_PAGE, TWO_PAGES };
+	enum LayoutType {
+		AUTO_DETECT,
+		SINGLE_PAGE_UNCUT,
+		LEFT_PAGE_PLUS_OFFCUT,
+		RIGHT_PAGE_PLUS_OFFCUT,
+		TWO_PAGES
+	};
 	
 	enum Scope { THIS_PAGE_ONLY, ALL_PAGES };
 	

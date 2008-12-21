@@ -17,8 +17,8 @@
 */
 
 #include "Settings.h"
-#include "Utils.h"
 #include <QMutexLocker>
+#include <assert.h>
 
 namespace page_split
 {
@@ -37,39 +37,8 @@ Settings::clear()
 {
 	QMutexLocker locker(&m_mutex);
 	
-	m_perPageLayoutType.clear();
-	m_perPageParams.clear();
+	m_perPageRecords.clear();
 	m_defaultLayoutType = Rule::AUTO_DETECT;
-}
-
-void
-Settings::applyToPage(
-	ImageId const& image_id, Rule::LayoutType const layout_type)
-{
-	QMutexLocker locker(&m_mutex);
-	Utils::mapSetValue(m_perPageLayoutType, image_id, layout_type);
-}
-
-void
-Settings::applyToAllPages(Rule::LayoutType const layout_type)
-{
-	QMutexLocker locker(&m_mutex);
-	
-	m_perPageLayoutType.clear();
-	m_defaultLayoutType = layout_type;
-}
-
-Rule
-Settings::getRuleFor(ImageId const& image_id) const
-{
-	QMutexLocker locker(&m_mutex);
-	
-	PerPageLayoutType::const_iterator it(m_perPageLayoutType.find(image_id));
-	if (it != m_perPageLayoutType.end()) {
-		return Rule(it->second, Rule::THIS_PAGE_ONLY);
-	} else {
-		return Rule(m_defaultLayoutType, Rule::ALL_PAGES);
-	}
 }
 
 Rule::LayoutType
@@ -80,31 +49,277 @@ Settings::defaultLayoutType() const
 }
 
 void
-Settings::setPageParams(
-	ImageId const& image_id, Params const& params)
-{
-	QMutexLocker locker(&m_mutex);
-	Utils::mapSetValue(m_perPageParams, image_id, params);
-}
-
-void
-Settings::clearPageParams(ImageId const& image_id)
-{
-	QMutexLocker locker(&m_mutex);
-	m_perPageParams.erase(image_id);
-}
-
-std::auto_ptr<Params>
-Settings::getPageParams(ImageId const& image_id) const
+Settings::setLayoutTypeForAllPages(Rule::LayoutType const layout_type)
 {
 	QMutexLocker locker(&m_mutex);
 	
-	PerPageParams::const_iterator it(m_perPageParams.find(image_id));
-	if (it != m_perPageParams.end()) {
-		return std::auto_ptr<Params>(new Params(it->second));
-	} else {
-		return std::auto_ptr<Params>();
+	PerPageRecords::iterator it(m_perPageRecords.begin());
+	PerPageRecords::iterator const end(m_perPageRecords.end());
+	while (it != end) {
+		if (it->second.hasLayoutTypeConflict(layout_type)) {
+			m_perPageRecords.erase(it++);
+		} else {
+			++it;
+		}
 	}
+	
+	m_defaultLayoutType = layout_type;
+}
+
+Settings::Record
+Settings::getPageRecord(ImageId const& image_id) const
+{
+	QMutexLocker locker(&m_mutex);
+	
+	PerPageRecords::const_iterator it(m_perPageRecords.find(image_id));
+	if (it == m_perPageRecords.end()) {
+		return Record(m_defaultLayoutType);
+	} else {
+		return Record(it->second, m_defaultLayoutType);
+	}
+}
+
+void
+Settings::updatePage(ImageId const& image_id, UpdateAction const& action)
+{
+	QMutexLocker locker(&m_mutex);
+	
+	PerPageRecords::iterator it(m_perPageRecords.lower_bound(image_id));
+	if (it == m_perPageRecords.end() ||
+			m_perPageRecords.key_comp()(image_id, it->first)) {
+		// No record exists for this page.
+		
+		Record record(m_defaultLayoutType);
+		record.update(action);
+		
+		if (record.hasLayoutTypeConflict()) {
+			record.clearParams();
+		}
+		
+		if (!record.isNull()) {
+			m_perPageRecords.insert(
+				it, PerPageRecords::value_type(image_id, record)
+			);
+		}
+	} else {
+		// A record was found.
+		
+		Record record(it->second, m_defaultLayoutType);
+		record.update(action);
+		
+		if (record.hasLayoutTypeConflict()) {
+			record.clearParams();
+		}
+		
+		if (record.isNull()) {
+			m_perPageRecords.erase(it);
+		} else {
+			it->second = record;
+		}
+	}
+}
+
+Settings::Record
+Settings::conditionalUpdate(
+	ImageId const& image_id, UpdateAction const& action, bool* conflict)
+{
+	QMutexLocker locker(&m_mutex);
+	
+	PerPageRecords::iterator it(m_perPageRecords.lower_bound(image_id));
+	if (it == m_perPageRecords.end() ||
+			m_perPageRecords.key_comp()(image_id, it->first)) {
+		// No record exists for this page.
+		
+		Record record(m_defaultLayoutType);
+		record.update(action);
+		
+		if (record.hasLayoutTypeConflict()) {
+			if (conflict) {
+				*conflict = true;
+			}
+			return Record(m_defaultLayoutType);
+		}
+		
+		if (!record.isNull()) {
+			m_perPageRecords.insert(
+				it, PerPageRecords::value_type(image_id, record)
+			);
+		}
+		
+		if (conflict) {
+			*conflict = false;
+		}
+		return record;
+	} else {
+		// A record was found.
+		
+		Record record(it->second, m_defaultLayoutType);
+		record.update(action);
+		
+		if (record.hasLayoutTypeConflict()) {
+			if (conflict) {
+				*conflict = true;
+			}
+			return Record(m_defaultLayoutType);
+		}
+		
+		if (record.isNull()) {
+			m_perPageRecords.erase(it);
+		} else {
+			it->second = record;
+		}
+		
+		if (conflict) {
+			*conflict = false;
+		}
+		return record;
+	}
+}
+
+
+/*======================= Settings::BaseRecord ======================*/
+
+Settings::BaseRecord::BaseRecord()
+:	m_params(PageLayout(), Dependencies(), MODE_AUTO),
+	m_layoutType(Rule::AUTO_DETECT),
+	m_paramsValid(false),
+	m_layoutTypeValid(false)
+{
+}
+
+void
+Settings::BaseRecord::setParams(Params const& params)
+{
+	m_params = params;
+	m_paramsValid = true;
+}
+
+void
+Settings::BaseRecord::setLayoutType(Rule::LayoutType const layout_type)
+{
+	m_layoutType = layout_type;
+	m_layoutTypeValid = true;
+}
+
+bool
+Settings::BaseRecord::hasLayoutTypeConflict(
+	Rule::LayoutType const default_layout_type) const
+{
+	if (!m_paramsValid) {
+		// No data - no conflict.
+		return false;
+	}
+	
+	Rule::LayoutType layout_type = default_layout_type;
+	if (m_layoutTypeValid) {
+		layout_type = m_layoutType;
+	}
+	
+	if (layout_type == Rule::AUTO_DETECT) {
+		// This one is compatible with everything.
+		return false;
+	}
+	
+	switch (m_params.pageLayout().type()) {
+		case PageLayout::SINGLE_PAGE_UNCUT:
+			return layout_type != Rule::SINGLE_PAGE_UNCUT;
+		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
+			return layout_type != Rule::LEFT_PAGE_PLUS_OFFCUT;
+		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+			return layout_type != Rule::RIGHT_PAGE_PLUS_OFFCUT;
+		case PageLayout::TWO_PAGES:
+			return layout_type != Rule::TWO_PAGES;
+	}
+	
+	assert(!"Unreachable");
+	return false;
+}
+
+
+/*========================= Settings::Record ========================*/
+
+Settings::Record::Record(Rule::LayoutType const default_layout_type)
+:	m_defaultLayoutType(default_layout_type)
+{
+}
+	
+Settings::Record::Record(
+	BaseRecord const& base_record,
+	Rule::LayoutType const default_layout_type)
+:	BaseRecord(base_record),
+	m_defaultLayoutType(default_layout_type)
+{
+}
+
+Rule
+Settings::Record::rule() const
+{
+	if (m_layoutTypeValid) {
+		return Rule(m_layoutType, Rule::THIS_PAGE_ONLY);
+	} else {
+		return Rule(m_defaultLayoutType, Rule::ALL_PAGES);
+	}
+}
+
+void
+Settings::Record::update(UpdateAction const& action)
+{
+	switch (action.m_layoutTypeAction) {
+		case UpdateAction::SET:
+			setLayoutType(action.m_layoutType);
+			break;
+		case UpdateAction::CLEAR:
+			clearLayoutType();
+			break;
+		case UpdateAction::DONT_TOUCH:
+			break;
+	}
+	
+	switch (action.m_paramsAction) {
+		case UpdateAction::SET:
+			setParams(action.m_params);
+			break;
+		case UpdateAction::CLEAR:
+			clearParams();
+			break;
+		case UpdateAction::DONT_TOUCH:
+			break;
+	}
+}
+
+bool
+Settings::Record::hasLayoutTypeConflict() const
+{
+	return BaseRecord::hasLayoutTypeConflict(m_defaultLayoutType);
+}
+
+
+/*======================= Settings::UpdateAction ======================*/
+
+void
+Settings::UpdateAction::setLayoutType(Rule::LayoutType const layout_type)
+{
+	m_layoutType = layout_type;
+	m_layoutTypeAction = SET;
+}
+
+void
+Settings::UpdateAction::clearLayoutType()
+{
+	m_layoutTypeAction = CLEAR;
+}
+
+void
+Settings::UpdateAction::setParams(Params const& params)
+{
+	m_params = params;
+	m_paramsAction = SET;
+}
+
+void
+Settings::UpdateAction::clearParams()
+{
+	m_paramsAction = CLEAR;
 }
 
 } // namespace page_split

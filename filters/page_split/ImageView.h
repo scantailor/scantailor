@@ -21,7 +21,6 @@
 
 #include "ImageViewBase.h"
 #include "PageLayout.h"
-#include "AutoDetectedLayout.h"
 #include <QPoint>
 #include <QPointF>
 #include <QRectF>
@@ -42,7 +41,9 @@ public:
 	
 	virtual ~ImageView();
 signals:
-	void manualPageLayoutSet(PageLayout const& layout);
+	void pageLayoutSetLocally(PageLayout const& layout);
+public slots:
+	void pageLayoutSetExternally(PageLayout const& layout);
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	
@@ -55,10 +56,6 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* event);
 	
 	virtual void hideEvent(QHideEvent* event);
-	
-	virtual void contextMenuEvent(QContextMenuEvent* event);
-private slots:
-	void leftHalfToggled(bool left_enabled);
 private:
 	enum State { DEFAULT_STATE, DRAGGING_SPLIT_LINE, SKEWING_SPLIT_LINE };
 	
@@ -84,10 +81,6 @@ private:
 	 * which is why we have xdiff / ydiff and not the other way around.
 	 */
 	static double const m_maxSkewAngleCtg;
-	
-	QMenu* m_pContextMenu;
-	QAction* m_pLeftHalfAction;
-	QAction* m_pRightHalfAction;
 	
 	QPixmap m_imgSkewingHandle;
 	

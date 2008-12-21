@@ -48,13 +48,28 @@ Thumbnail::paintOverImage(
 	painter.setWorldTransform(image_to_display);
 	
 	painter.setPen(Qt::NoPen);
-	if (m_layout.leftPageValid()) {
-		painter.setBrush(QColor(0, 0, 255, 50));
-		painter.drawPolygon(m_layout.leftPage(rect));
-	}
-	if (m_layout.rightPageValid()) {
-		painter.setBrush(QColor(255, 0, 0, 50));
-		painter.drawPolygon(m_layout.rightPage(rect));
+	switch (m_layout.type()) {
+		case PageLayout::SINGLE_PAGE_UNCUT:
+			painter.setBrush(QColor(0, 0, 255, 50));
+			painter.drawRect(rect);
+			return; // No split line will be drawn.
+		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
+		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+			painter.setBrush(QColor(0, 0, 255, 50));
+			painter.drawPolygon(
+				m_layout.singlePageOutline(rect)
+			);
+			break;
+		case PageLayout::TWO_PAGES:
+			painter.setBrush(QColor(0, 0, 255, 50));
+			painter.drawPolygon(
+				m_layout.leftPageOutline(rect)
+			);
+			painter.setBrush(QColor(255, 0, 0, 50));
+			painter.drawPolygon(
+				m_layout.rightPageOutline(rect)
+			);
+			break;
 	}
 	
 	painter.setRenderHint(QPainter::Antialiasing, true);

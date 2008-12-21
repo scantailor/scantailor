@@ -21,7 +21,7 @@
 
 #include "ui_PageSplitModeDialog.h"
 #include "Rule.h"
-#include "AutoDetectedLayout.h"
+#include "PageLayout.h"
 #include <QDialog>
 
 namespace page_split
@@ -32,7 +32,8 @@ class SplitModeDialog : public QDialog, private Ui::PageSplitModeDialog
 	Q_OBJECT
 public:
 	SplitModeDialog(QWidget* parent, Rule const& rule,
-		AutoDetectedLayout auto_detected_layout);
+		PageLayout::Type auto_detected_layout_type,
+		bool auto_detected_layout_type_valid);
 	
 	virtual ~SplitModeDialog();
 signals:
@@ -49,7 +50,8 @@ private:
 	static char const* iconFor(Rule::LayoutType layout_type);
 	
 	Rule::LayoutType m_layoutType;
-	AutoDetectedLayout m_autoDetectedLayout;
+	PageLayout::Type m_autoDetectedLayoutType;
+	bool m_autoDetectedLayoutTypeValid;
 };
 
 } // namespace page_split

@@ -28,22 +28,19 @@ namespace page_split
 {
 
 Dependencies::Dependencies()
-:	m_singlePage(false)
 {
 }
 
 Dependencies::Dependencies(QDomElement const& el)
 :	m_imageSize(XmlUnmarshaller::size(el.namedItem("size").toElement())),
-	m_rotation(XmlUnmarshaller::rotation(el.namedItem("rotation").toElement())),
-	m_singlePage(el.namedItem("sub-pages").toElement().text() == "1")
+	m_rotation(XmlUnmarshaller::rotation(el.namedItem("rotation").toElement()))
 {
 }
 
-Dependencies::Dependencies(QSize const& image_size,
-	OrthogonalRotation const rotation, bool const single_page)
+Dependencies::Dependencies(
+	QSize const& image_size, OrthogonalRotation const rotation)
 :	m_imageSize(image_size),
-	m_rotation(rotation),
-	m_singlePage(single_page)
+	m_rotation(rotation)
 {
 }
 
@@ -54,9 +51,6 @@ Dependencies::matches(Dependencies const& other) const
 		return false;
 	}
 	if (m_rotation != other.m_rotation) {
-		return false;
-	}
-	if (m_singlePage != other.m_singlePage) {
 		return false;
 	}
 	return true;
@@ -74,10 +68,6 @@ Dependencies::toXml(QDomDocument& doc, QString const& tag_name) const
 	QDomElement el(doc.createElement(tag_name));
 	el.appendChild(marshaller.rotation(m_rotation, "rotation"));
 	el.appendChild(marshaller.size(m_imageSize, "size"));
-	
-	QDomElement subpages_el(doc.createElement("sub-pages"));
-	el.appendChild(subpages_el);
-	subpages_el.appendChild(doc.createTextNode(m_singlePage ? "1" : "2"));
 	
 	return el;
 }

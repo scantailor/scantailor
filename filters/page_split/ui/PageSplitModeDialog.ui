@@ -15,9 +15,9 @@
   <property name="windowTitle" >
    <string>Split Pages</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout" name="horizontalLayout" >
      <item>
       <spacer>
        <property name="orientation" >
@@ -33,6 +33,9 @@
      </item>
      <item>
       <widget class="QLabel" name="layoutTypeLabel" >
+       <property name="frameShape" >
+        <enum>QFrame::StyledPanel</enum>
+       </property>
        <property name="pixmap" >
         <pixmap resource="../../../resources/resources.qrc" >:/icons/layout_type_auto.png</pixmap>
        </property>
@@ -77,6 +80,9 @@
        </widget>
       </item>
      </layout>
+     <zorder>modeAuto</zorder>
+     <zorder>modeManual</zorder>
+     <zorder>frame</zorder>
     </widget>
    </item>
    <item>
