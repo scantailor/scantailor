@@ -63,6 +63,9 @@ static QImage monoMsbToGrayscale(QImage const& src)
 		dst_line += dst_bpl;
 	}
 	
+	dst.setDotsPerMeterX(src.dotsPerMeterX());
+	dst.setDotsPerMeterY(src.dotsPerMeterY());
+	
 	return dst;
 }
 
@@ -100,6 +103,9 @@ static QImage monoLsbToGrayscale(QImage const& src)
 		dst_line += dst_bpl;
 	}
 	
+	dst.setDotsPerMeterX(src.dotsPerMeterX());
+	dst.setDotsPerMeterY(src.dotsPerMeterY());
+	
 	return dst;
 }
 
@@ -120,6 +126,9 @@ static QImage anyToGrayscale(QImage const& src)
 		}
 		dst_line += dst_bpl;
 	}
+	
+	dst.setDotsPerMeterX(src.dotsPerMeterX());
+	dst.setDotsPerMeterY(src.dotsPerMeterY());
 	
 	return dst;
 }
