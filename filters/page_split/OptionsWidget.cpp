@@ -176,6 +176,10 @@ OptionsWidget::pageLayoutSetExternally(PageLayout const& page_layout)
 void
 OptionsWidget::layoutTypeButtonToggled(bool const checked)
 {
+	if (!checked || m_ignoreLayoutTypeToggle) {
+		return;
+	}
+	
 	Rule::LayoutType rlt;
 	PageLayout::Type plt;
 	
