@@ -70,8 +70,8 @@ PolynomialSurface::PolynomialSurface(
 	m_coeffs.resize(dimensions.width());
 	
 	prepareEquationsAndDataPoints(src, equations, data_points);
-	assert(equations.size() == dimensions.width() * dimensions.height());
-	assert(data_points.size() == num_terms);
+	assert(int(equations.size()) == dimensions.width() * dimensions.height());
+	assert(int(data_points.size()) == num_data_points);
 	
 	leastSquaresFit(dimensions, &equations[0], &m_coeffs[0], &data_points[0]);
 }
@@ -120,8 +120,8 @@ PolynomialSurface::PolynomialSurface(
 	m_coeffs.resize(dimensions.width());
 	
 	prepareEquationsAndDataPoints(src, mask, equations, data_points);
-	assert(equations.size() == dimensions.width() * dimensions.height());
-	assert(data_points.size() == num_terms);
+	assert(int(equations.size()) == dimensions.width() * dimensions.height());
+	assert(int(data_points.size()) == num_data_points);
 	
 	leastSquaresFit(dimensions, &equations[0], &m_coeffs[0], &data_points[0]);
 }
