@@ -711,9 +711,6 @@ void seedFillGray4(QImage& seed_img, QImage const& mask_img)
 	uint8_t* seed_line = seed_img.bits();
 	uint8_t const* mask_line = mask_img.bits();
 	
-	uint8_t* const seed_top_line = seed_line;
-	uint8_t const* const mask_top_line = mask_line;
-	
 	int const seed_bpl = seed_img.bytesPerLine();
 	int const mask_bpl = mask_img.bytesPerLine();
 	
