@@ -35,12 +35,28 @@ namespace imageproc
  * \param src The source image.
  * \param xform The transformation from source to destination.
  *        Only affine transformations are supported.
- * \param dst_rect The are in source image coordinates to return
+ * \param dst_rect The area in source image coordinates to return
  *        as a destination image.
  * \param background_color Used to fill areas not represented in the source image.
  * \param min_mapping_area Defines the minimum rectangle in the source image
  *        that maps to a destination pixel.  This can be used to control
  *        smoothing.
+ * \return The transformed image.  It's format may differ from the
+ *         source image format, for example Format_Indexed8 may
+ *         be transformed to Format_RGB32, if the source image
+ *         contains colors other than shades of gray.
+ */
+QImage transform(
+	QImage const& src, QTransform const& xform,
+	QRect const& dst_rect, QColor const& background_color,
+	QSizeF const& min_mapping_area = QSizeF(0.9, 0.9));
+
+/**
+ * \brief Apply an affine transformation to the image.
+ *
+ * Same as transform(), except the source image image is converted
+ * to grayscale before transforming it.  The resulting image
+ * will be grayscale as well.
  */
 QImage transformToGray(
 	QImage const& src, QTransform const& xform,

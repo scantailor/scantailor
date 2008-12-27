@@ -36,6 +36,9 @@
 namespace imageproc
 {
 
+namespace
+{
+
 struct XLess
 {
 	bool operator()(QPointF const& lhs, QPointF const& rhs) const {
@@ -48,6 +51,86 @@ struct YLess
 	bool operator()(QPointF const& lhs, QPointF const& rhs) const {
 		return lhs.y() < rhs.y();
 	}
+};
+
+class Gray
+{
+public:
+	Gray() : m_grayLevel(0) {}
+	
+	void add(uint8_t const gray_level, unsigned const area) {
+		m_grayLevel += gray_level * area;
+	}
+	
+	uint8_t result(unsigned const total_area) const {
+		unsigned const half_area = total_area >> 1;
+		unsigned const res = (m_grayLevel + half_area) / total_area;
+		return static_cast<uint8_t>(res);
+	}
+private:
+	unsigned m_grayLevel;
+};
+
+class RGB32
+{
+public:
+	RGB32() : m_red(0), m_green(0), m_blue(0) {}
+	
+	void add(uint32_t rgb, unsigned const area) {
+		m_blue += (rgb & 0xFF) * area;
+		rgb >>= 8;
+		m_green += (rgb & 0xFF) * area;
+		rgb >>= 8;
+		m_red += (rgb & 0xFF) * area;
+	}
+	
+	uint32_t result(unsigned const total_area) const {
+		unsigned const half_area = total_area >> 1;
+		uint32_t rgb = 0x0000FF00;
+		rgb |= (m_red + half_area) / total_area;
+		rgb <<= 8;
+		rgb |= (m_green + half_area) / total_area;
+		rgb <<= 8;
+		rgb |= (m_blue + half_area) / total_area;
+		return rgb;
+	}
+private:
+	unsigned m_red;
+	unsigned m_green;
+	unsigned m_blue;
+};
+
+class ARGB32
+{
+public:
+	ARGB32() : m_alpha(0), m_red(0), m_green(0), m_blue(0) {}
+	
+	void add(uint32_t argb, unsigned const area) {
+		m_blue += (argb & 0xFF) * area;
+		argb >>= 8;
+		m_green += (argb & 0xFF) * area;
+		argb >>= 8;
+		m_red += (argb & 0xFF) * area;
+		argb >>= 8;
+		m_alpha += argb * area;
+	}
+	
+	uint32_t result(unsigned const total_area) const {
+		unsigned const half_area = total_area >> 1;
+		uint32_t argb = (m_alpha + half_area) / total_area;
+		argb <<= 8;
+		argb |= (m_red + half_area) / total_area;
+		argb <<= 8;
+		argb |= (m_green + half_area) / total_area;
+		argb <<= 8;
+		argb |= (m_blue + half_area) / total_area;
+		return argb;
+	}
+private:
+	unsigned m_alpha;
+	unsigned m_red;
+	unsigned m_green;
+	unsigned m_blue;
 };
 
 static QSizeF calcSrcUnitSize(QTransform const& xform, QSizeF const& min)
@@ -73,9 +156,10 @@ static QSizeF calcSrcUnitSize(QTransform const& xform, QSizeF const& min)
 	);
 }
 
-static QImage transformGrayToGray(
-	QImage const& src, QTransform const& xform,
-	QRect const& dst_rect, QColor const background_color,
+template<typename StorageUnit, typename Mixer>
+static void transformGeneric(
+	QImage const& src, QImage& dst, QTransform const& xform,
+	QRect const& dst_rect, StorageUnit const background_color,
 	QSizeF const& min_mapping_area)
 {
 	int const sw = src.width();
@@ -83,13 +167,10 @@ static QImage transformGrayToGray(
 	int const dw = dst_rect.width();
 	int const dh = dst_rect.height();
 	
-	QImage dst(dw, dh, QImage::Format_Indexed8);
-	dst.setColorTable(src.colorTable());
-	
-	uint8_t const* const src_data = src.bits();
-	uint8_t* dst_line = dst.bits();
-	int const src_bpl = src.bytesPerLine();
-	int const dst_bpl = dst.bytesPerLine();
+	StorageUnit const* const src_data = reinterpret_cast<StorageUnit const*>(src.bits());
+	StorageUnit* dst_line = reinterpret_cast<StorageUnit*>(dst.bits());
+	int const src_units_per_line = src.bytesPerLine() / sizeof(StorageUnit);
+	int const dst_units_per_line = dst.bytesPerLine() / sizeof(StorageUnit);
 	
 	QTransform inv_xform;
 	inv_xform.translate(dst_rect.x(), dst_rect.y());
@@ -103,9 +184,9 @@ static QImage transformGrayToGray(
 	int const src32_unit_w = std::max<int>(1, qRound(src32_unit_size.width()));
 	int const src32_unit_h = std::max<int>(1, qRound(src32_unit_size.height()));
 	
-	unsigned const background_gray_level = qGray(background_color.rgb());
+	//unsigned const background_gray_level = qGray(background_color.rgb());
 	
-	for (int dy = 0; dy < dh; ++dy, dst_line += dst_bpl) {
+	for (int dy = 0; dy < dh; ++dy, dst_line += dst_units_per_line) {
 		double const f_dy_center = dy + 0.5;
 		double const f_sx32_base = f_dy_center * inv_xform.m21() + inv_xform.dx();
 		double const f_sy32_base = f_dy_center * inv_xform.m22() + inv_xform.dy();
@@ -127,7 +208,7 @@ static QImage transformGrayToGray(
 			
 			if (src_bottom < 0 || src_right < 0 || src_left >= sw || src_top >= sh) {
 				// Completely outside of src image.
-				dst_line[dx] = background_gray_level;
+				dst_line[dx] = background_color;
 				continue;
 			}
 			
@@ -182,7 +263,8 @@ static QImage transformGrayToGray(
 			assert(src_bottom >= src_top);
 			assert(src_right >= src_left);
 			
-			unsigned gray_level = background_gray_level * background_area;
+			Mixer mixer;
+			mixer.add(background_color, background_area);
 			
 			unsigned const left_fraction = 32 - (src32_left & 31);
 			unsigned const top_fraction = 32 - (src32_top & 31);
@@ -194,18 +276,18 @@ static QImage transformGrayToGray(
 			
 			unsigned const src_area = (src32_bottom - src32_top) * (src32_right - src32_left);
 			
-			uint8_t const* src_line = &src_data[src_top * src_bpl];
+			StorageUnit const* src_line = &src_data[src_top * src_units_per_line];
 			
 			if (src_top == src_bottom) {
 				if (src_left == src_right) {
 					// dst pixel maps to a single src pixel
-					uint8_t const c = src_line[src_left];
+					StorageUnit const c = src_line[src_left];
 					if (background_area == 0) {
 						// common case optimization
 						dst_line[dx] = c;
 						continue;
 					}
-					gray_level += c * src_area;
+					mixer.add(c, src_area);
 				} else {
 					// dst pixel maps to a horizontal line of src pixels
 					unsigned const vert_fraction = src32_bottom - src32_top;
@@ -213,13 +295,13 @@ static QImage transformGrayToGray(
 					unsigned const middle_area = vert_fraction << 5;
 					unsigned const right_area = vert_fraction * right_fraction;
 					
-					gray_level += src_line[src_left] * left_area;
+					mixer.add(src_line[src_left], left_area);
 					
 					for (int sx = src_left + 1; sx < src_right; ++sx) {
-						gray_level += src_line[sx] * middle_area;
+						mixer.add(src_line[sx], middle_area);
 					}
 					
-					gray_level += src_line[src_right] * right_area;
+					mixer.add(src_line[src_right], right_area);
 				}
 			} else if (src_left == src_right) {
 				// dst pixel maps to a vertical line of src pixels
@@ -229,16 +311,16 @@ static QImage transformGrayToGray(
 				unsigned const bottom_area =  hor_fraction * bottom_fraction;
 				
 				src_line += src_left;
-				gray_level += *src_line * top_area;
+				mixer.add(*src_line, top_area);
 				
-				src_line += src_bpl;
+				src_line += src_units_per_line;
 				
 				for (int sy = src_top + 1; sy < src_bottom; ++sy) {
-					gray_level += *src_line * middle_area;
-					src_line += src_bpl;
+					mixer.add(*src_line, middle_area);
+					src_line += src_units_per_line;
 				}
 				
-				gray_level += *src_line * bottom_area;
+				mixer.add(*src_line, bottom_area);
 			} else {
 				// dst pixel maps to a block of src pixels
 				unsigned const top_area = top_fraction << 5;
@@ -251,51 +333,95 @@ static QImage transformGrayToGray(
 				unsigned const bottomright_area = bottom_fraction * right_fraction;
 				
 				// process the top-left corner
-				gray_level += src_line[src_left] * topleft_area;
+				mixer.add(src_line[src_left], topleft_area);
 				
 				// process the top line (without corners)
 				for (int sx = src_left + 1; sx < src_right; ++sx) {
-					gray_level += src_line[sx] * top_area;
+					mixer.add(src_line[sx], top_area);
 				}
 				
 				// process the top-right corner
-				gray_level += src_line[src_right] * topright_area;
+				mixer.add(src_line[src_right], topright_area);
 				
-				src_line += src_bpl;
+				src_line += src_units_per_line;
 				
 				// process middle lines
 				for (int sy = src_top + 1; sy < src_bottom; ++sy) {
-					gray_level += src_line[src_left] * left_area;
+					mixer.add(src_line[src_left], left_area);
 					
 					for (int sx = src_left + 1; sx < src_right; ++sx) {
-						gray_level += src_line[sx] << (5 + 5);
+						mixer.add(src_line[sx], 32*32);
 					}
 					
-					gray_level += src_line[src_right] * right_area;
+					mixer.add(src_line[src_right], right_area);
 					
-					src_line += src_bpl;
+					src_line += src_units_per_line;
 				}
 				
 				// process bottom-left corner
-				gray_level += src_line[src_left] * bottomleft_area;
+				mixer.add(src_line[src_left], bottomleft_area);
 				
 				// process the bottom line (without corners)
 				for (int sx = src_left + 1; sx < src_right; ++sx) {
-					gray_level += src_line[sx] * bottom_area;
+					mixer.add(src_line[sx], bottom_area);
 				}
 				
 				// process the bottom-right corner
-				gray_level += src_line[src_right] * bottomright_area;
+				mixer.add(src_line[src_right], bottomright_area);
 			}
 			
 			unsigned const total_area = src_area + background_area;
-			unsigned const pix_value = (gray_level + (total_area >> 1)) / total_area;
-			assert(pix_value < 256);
-			dst_line[dx] = static_cast<uint8_t>(pix_value);
+			dst_line[dx] = mixer.result(total_area);
 		}
 	}
+}
+
+} // anonymous namespace
+
+QImage transform(
+	QImage const& src, QTransform const& xform,
+	QRect const& dst_rect, QColor const& background_color,
+	QSizeF const& min_mapping_area)
+{
+	if (src.isNull() || dst_rect.isEmpty()) {
+		return QImage();
+	}
 	
-	return dst;
+	if (!xform.isAffine()) {
+		throw std::invalid_argument("transform: only affine transformations are supported");
+	}
+	
+	if (!dst_rect.isValid()) {
+		throw std::invalid_argument("transform: dst_rect is invalid");
+	}
+	
+	if (src.format() == QImage::Format_Indexed8 && src.allGray()) {
+		QImage dst(dst_rect.size(), QImage::Format_Indexed8);
+		dst.setColorTable(createGrayscalePalette());
+		transformGeneric<uint8_t, Gray>(
+			toGrayscale(src), dst, xform, dst_rect,
+			qGray(background_color.rgb()), min_mapping_area
+		);
+		return dst;
+	} else {
+		if (src.hasAlphaChannel() || qAlpha(background_color.rgba()) != 0xff) {
+			QImage dst(dst_rect.size(), QImage::Format_ARGB32);
+			transformGeneric<uint32_t, ARGB32>(
+				src.convertToFormat(QImage::Format_ARGB32),
+				dst, xform, dst_rect, background_color.rgba(),
+				min_mapping_area
+			);
+			return dst;
+		} else {
+			QImage dst(dst_rect.size(), QImage::Format_RGB32);
+			transformGeneric<uint32_t, RGB32>(
+				src.convertToFormat(QImage::Format_RGB32),
+				dst, xform, dst_rect, background_color.rgb(),
+				min_mapping_area
+			);
+			return dst;
+		}
+	}
 }
 
 QImage transformToGray(
@@ -303,8 +429,8 @@ QImage transformToGray(
 	QRect const& dst_rect, QColor const& background_color,
 	QSizeF const& min_mapping_area)
 {
-	if (src.isNull()) {
-		return src;
+	if (src.isNull() || dst_rect.isEmpty()) {
+		return QImage();
 	}
 	
 	if (!xform.isAffine()) {
@@ -315,10 +441,15 @@ QImage transformToGray(
 		throw std::invalid_argument("transformToGray: dst_rect is invalid");
 	}
 	
-	return transformGrayToGray(
-		toGrayscale(src), xform, dst_rect,
-		background_color, min_mapping_area
+	QImage dst(dst_rect.size(), QImage::Format_Indexed8);
+	dst.setColorTable(createGrayscalePalette());
+	
+	transformGeneric<uint8_t, Gray>(
+		toGrayscale(src), dst, xform, dst_rect,
+		qGray(background_color.rgb()), min_mapping_area
 	);
+	
+	return dst;
 }
 
 } // namespace imageproc
