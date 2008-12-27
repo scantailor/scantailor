@@ -21,6 +21,8 @@
 
 #include "ImageTransformation.h"
 #include "Margins.h"
+#include "IntrusivePtr.h"
+#include <QTimer>
 #include <QWidget>
 #include <QPixmap>
 #include <QImage>
@@ -32,6 +34,7 @@
 #include <Qt>
 
 class QPainter;
+class BackgroundExecutor;
 
 /**
  * \brief The base class for widgets that display and manipulate images.
@@ -180,7 +183,11 @@ protected:
 	 *       and unsetCursor().
 	 */
 	void ensureCursorShape(Qt::CursorShape cursor_shape);
+private slots:
+	void initiateBuildingHqVersion();
 private:
+	class HqTransformTask;
+	
 	void updateWidgetTransform();
 	
 	void updateWidgetTransformAndFixFocalPoint(FocalPointMode mode);
@@ -189,11 +196,57 @@ private:
 	
 	void adjustAndSetNewFocalPoint(QPointF new_focal_point);
 	
+	void hqVersionBuilt(QPoint const& origin, QImage const& image);
+	
+	void validateHqPixmap();
+	
+	static BackgroundExecutor& backgroundExecutor();
+	
+	/**
+	 * The client-side image.  Used to build a high-quality version
+	 * for delayed rendering.
+	 */
+	QImage m_image;
+	
+	/**
+	 * This timer is used for delaying the construction of
+	 * a high quality image version.
+	 */
+	QTimer m_timer;
+	
 	/**
 	 * The image handle.  Note that the actual data of a QPixmap lives
 	 * in another process on most platforms.
 	 */
 	QPixmap m_pixmap;
+	
+	/**
+	 * The high quality, pre-transformed version of m_pixmap.
+	 */
+	QPixmap m_hqPixmap;
+	
+	/**
+	 * The position, in widget coordinates, where m_hqPixmap is to be drawn.
+	 */
+	QPoint m_hqPixmapPos;
+	
+	/**
+	 * The transformation used to build m_hqPixmap.
+	 * It's used to detect if m_hqPixmap needs to be rebuild.
+	 */
+	QTransform m_hqXform;
+	
+	/**
+	 * The ID (QImage::cacheKey()) of the image that was used
+	 * to build m_hqPixmap.  It's used to detect if m_hqPixmap
+	 * needs to be rebuild.
+	 */
+	qint64 m_hqSourceId;
+	
+	/**
+	 * The pending (if any) high quality transformation task.
+	 */
+	IntrusivePtr<HqTransformTask> m_ptrHqTransformTask;
 	
 	/**
 	 * A set of logical transformations on m_pixmap, to translate

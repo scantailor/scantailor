@@ -17,10 +17,15 @@
 */
 
 #include "ImageViewBase.h.moc"
+#include "NonCopyable.h"
 #include "PixmapRenderer.h"
+#include "BackgroundExecutor.h"
 #include "Dpm.h"
 #include "Dpi.h"
 #include "imageproc/PolygonUtils.h"
+#include "imageproc/Transform.h"
+#include <QPointer>
+#include <QAtomicInt>
 #include <QPainter>
 #include <QPainterPath>
 #include <QBrush>
@@ -36,22 +41,76 @@
 
 using namespace imageproc;
 
+class ImageViewBase::HqTransformTask :
+	public AbstractCommand0<IntrusivePtr<AbstractCommand0<void> > >,
+	public QObject
+{
+	DECLARE_NON_COPYABLE(HqTransformTask)
+public:
+	HqTransformTask(
+		ImageViewBase* image_view,
+		QImage const& image, QTransform const& xform,
+		QSize const& target_size);
+	
+	void cancel() { m_ptrResult->cancel(); }
+	
+	bool const isCancelled() const { return m_ptrResult->isCancelled(); }
+	
+	virtual IntrusivePtr<AbstractCommand0<void> > operator()();
+private:
+	class Result : public AbstractCommand0<void>
+	{
+	public:
+		Result(ImageViewBase* image_view);
+		
+		void setData(QPoint const& origin, QImage const& hq_image);
+		
+		void cancel() { m_cancelFlag.fetchAndStoreRelaxed(1); }
+		
+		bool isCancelled() const { return m_cancelFlag.fetchAndAddRelaxed(0) != 0; }
+		
+		virtual void operator()();
+	private:
+		QPointer<ImageViewBase> m_ptrImageView;
+		QPoint m_origin;
+		QImage m_hqImage;
+		mutable QAtomicInt m_cancelFlag;
+	};
+	
+	IntrusivePtr<Result> m_ptrResult;
+	QImage m_image;
+	QTransform m_xform;
+	QSize m_targetSize;
+};
+
+
 ImageViewBase::ImageViewBase(QImage const& image)
-:	m_pixmap(QPixmap::fromImage(image)),
+:	m_image(image),
+	m_pixmap(QPixmap::fromImage(image)),
 	m_physToVirt(image.rect(), Dpm(image)),
 	m_focalPoint(0.5 * image.width(), 0.5 * image.height()),
 	m_zoom(1.0),
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_isDraggingInProgress(false)
 {
+	m_timer.setSingleShot(true);
+	m_timer.setInterval(150); // msec
+	connect(
+		&m_timer, SIGNAL(timeout()),
+		this, SLOT(initiateBuildingHqVersion())
+	);
+	
 	setAttribute(Qt::WA_OpaquePaintEvent);
 	updateWidgetTransform();
+	
+	initiateBuildingHqVersion();
 }
 
 ImageViewBase::ImageViewBase(
 	QImage const& image, ImageTransformation const& pre_transform,
 	Margins const& margins)
-:	m_pixmap(QPixmap::fromImage(image)),
+:	m_image(image),
+	m_pixmap(QPixmap::fromImage(image)),
 	m_physToVirt(pre_transform),
 	m_focalPoint(0.5 * image.width(), 0.5 * image.height()),
 	m_margins(margins),
@@ -59,7 +118,16 @@ ImageViewBase::ImageViewBase(
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_isDraggingInProgress(false)
 {
+	m_timer.setSingleShot(true);
+	m_timer.setInterval(150); // msec
+	connect(
+		&m_timer, SIGNAL(timeout()),
+		this, SLOT(initiateBuildingHqVersion())
+	);
+	
 	updateWidgetTransformAndFixFocalPoint(CENTER_IF_FITS);
+	
+	initiateBuildingHqVersion();
 }
 
 ImageViewBase::~ImageViewBase()
@@ -69,20 +137,35 @@ ImageViewBase::~ImageViewBase()
 void
 ImageViewBase::paintEvent(QPaintEvent* const event)
 {
-	double const xscale = m_virtualToWidget.m11();
-	
 	QPainter painter(this);
 	painter.save();
 	
+#if !defined(Q_WS_X11)
+	double const xscale = m_virtualToWidget.m11();
+	
 	// Width of a source pixel in mm, as it's displayed on screen.
 	double const pixel_width = widthMM() * xscale / width();
-#if !defined(Q_WS_X11)
+	
 	// On X11 SmoothPixmapTransform is too slow.
 	painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
 #endif
-	painter.setWorldTransform(m_physToVirt.transform() * m_virtualToWidget);
 	
-	PixmapRenderer::drawPixmap(painter, m_pixmap);
+	validateHqPixmap();
+	if (!m_hqPixmap.isNull()) {
+		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);
+	} else {
+		painter.setWorldTransform(
+			m_physToVirt.transform() * m_virtualToWidget
+		);
+		PixmapRenderer::drawPixmap(painter, m_pixmap);
+		
+		// If m_ptrHqTransformTask is not null after validateHqPixmap(),
+		// that means the right version is being built.
+		if (!m_ptrHqTransformTask) {
+			// Schedule construction of a high quality version.
+			m_timer.start();
+		}
+	}
 	
 	painter.setRenderHints(QPainter::Antialiasing, true);
 	painter.setWorldMatrixEnabled(false);
@@ -272,6 +355,7 @@ ImageViewBase::resetZoom()
 void
 ImageViewBase::updateImage(QImage const& image)
 {
+	m_image = image;
 	m_pixmap = QPixmap::fromImage(image);
 	update();
 }
@@ -486,5 +570,123 @@ ImageViewBase::adjustAndSetNewFocalPoint(QPointF const new_focal_point)
 		// Move the image so that the new focal point
 		// is at the center of the widget.
 		updateWidgetTransform();
+	}
+}
+
+void
+ImageViewBase::initiateBuildingHqVersion()
+{
+	QTransform const xform(m_physToVirt.transform() * m_virtualToWidget);
+	IntrusivePtr<HqTransformTask> const task(
+		new HqTransformTask(this, m_image, xform, size())
+	);
+	
+	backgroundExecutor().enqueueTask(task);
+	
+	m_ptrHqTransformTask = task;
+	m_hqXform = xform;
+	m_hqSourceId = m_image.cacheKey();
+}
+
+/**
+ * Gets called from HqTransformationTask::Result.
+ */
+void
+ImageViewBase::hqVersionBuilt(
+	QPoint const& origin, QImage const& image)
+{
+	m_hqPixmap = QPixmap::fromImage(image);
+	m_hqPixmapPos = origin;
+	m_ptrHqTransformTask.reset();
+	update();
+}
+
+/**
+ * Resets m_hqPixmap and cancels the transformation task if
+ * the high-quality pixmap was built (or is being built) with
+ * a transformation other than the current one or from the
+ * source image other than the current one.
+ */
+void
+ImageViewBase::validateHqPixmap()
+{
+	if (m_hqXform != m_physToVirt.transform() * m_virtualToWidget
+			|| m_hqSourceId != m_image.cacheKey()) {
+		m_hqPixmap = QPixmap();
+		if (m_ptrHqTransformTask.get()) {
+			m_ptrHqTransformTask->cancel();
+			m_ptrHqTransformTask.reset();
+		}
+	}
+}
+
+BackgroundExecutor&
+ImageViewBase::backgroundExecutor()
+{
+	static BackgroundExecutor executor;
+	return executor;
+}
+
+
+/*==================== ImageViewBase::HqTransformTask ======================*/
+
+ImageViewBase::HqTransformTask::HqTransformTask(
+	ImageViewBase* image_view,
+	QImage const& image, QTransform const& xform,
+	QSize const& target_size)
+:	m_ptrResult(new Result(image_view)),
+	m_image(image),
+	m_xform(xform),
+	m_targetSize(target_size)
+{
+}
+
+IntrusivePtr<AbstractCommand0<void> >
+ImageViewBase::HqTransformTask::operator()()
+{
+	if (isCancelled()) {
+		return IntrusivePtr<AbstractCommand0<void> >();
+	}
+	
+	QRect const target_rect(
+		m_xform.map(
+			QRectF(m_image.rect())
+		).boundingRect().toRect().intersected(
+			QRect(QPoint(0, 0), m_targetSize)
+		)
+	);
+	
+	QImage hq_image(transform(m_image, m_xform, target_rect, Qt::white));
+#if defined(Q_WS_X11)
+	// ARGB32_Premultiplied is an optimal format for X11 + XRender.
+	hq_image = hq_image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+#endif
+	m_ptrResult->setData(target_rect.topLeft(), hq_image);
+	
+	return m_ptrResult;
+}
+
+
+/*================ ImageViewBase::HqTransformTask::Result ================*/
+
+ImageViewBase::HqTransformTask::Result::Result(
+	ImageViewBase* image_view)
+:	m_ptrImageView(image_view)
+{
+}
+
+void
+ImageViewBase::HqTransformTask::Result::setData(
+	QPoint const& origin, QImage const& hq_image)
+{
+	m_hqImage = hq_image;
+	m_origin = origin;
+}
+
+void
+ImageViewBase::HqTransformTask::Result::operator()()
+{
+	if (m_ptrImageView && !isCancelled()) {
+		m_ptrImageView->hqVersionBuilt(m_origin, m_hqImage);
 	}
 }
