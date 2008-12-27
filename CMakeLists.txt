@@ -170,6 +170,7 @@ SOURCE_GROUP("Generated Sources" FILES ${ui_sources} ${resource_sources})
 SET(
 	sources
 	main.cpp Application.cpp Application.h
+	BackgroundExecutor.cpp BackgroundExecutor.h
 	PixmapRenderer.cpp PixmapRenderer.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
