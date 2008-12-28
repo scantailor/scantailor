@@ -32,6 +32,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "DebugImages.h"
 #include "OutputGenerator.h"
+#include "TiffWriter.h"
 #include <QImage>
 #include <QString>
 #include <QObject>
@@ -101,7 +102,8 @@ Task::process(
 
 	QImage const q_img(generator.process(data, status, m_ptrDbg.get()));
 	QString const out_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
-	q_img.save(out_path);
+	
+	TiffWriter::writeImage(out_path, q_img);
 	
 	m_rThumbnailCache.recreateThumbnail(ImageId(out_path), q_img);
 	

@@ -41,7 +41,7 @@ Utils::outFilePath(
 	);
 	
 	QString const out_path(
-		QString::fromAscii("%1/%2_%3.png").arg(
+		QString::fromAscii("%1/%2_%3.tiff").arg(
 			out_dir, padded_number, base_file_name
 		)
 	);
