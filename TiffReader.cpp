@@ -396,9 +396,9 @@ Dpi
 TiffReader::getDpi(float xres, float yres, unsigned res_unit)
 {
 	switch (res_unit) {
-		case 2: // inch
+		case RESUNIT_INCH: // inch
 			return Dpi(qRound(xres), qRound(yres));
-		case 3: // cm
+		case RESUNIT_CENTIMETER: // cm
 			return Dpm(qRound(xres * 100), qRound(yres * 100));
 	}
 	return Dpi();
