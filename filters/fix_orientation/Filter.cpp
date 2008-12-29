@@ -34,6 +34,7 @@
 #include <boost/lambda/bind.hpp>
 #include <QString>
 #include <QObject>
+#include <QCoreApplication>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNode>
@@ -56,7 +57,9 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return QObject::tr("Fix Orientation");
+	return QCoreApplication::translate(
+		"fix_orientation::Filter", "Fix Orientation"
+	);
 }
 
 PageSequence::View

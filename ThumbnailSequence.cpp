@@ -528,7 +528,9 @@ ThumbnailSequence::Impl::getLabelGroup(PageInfo const& page_info)
 	
 	QString text(file_name);
 	if (page_info.isMultiPageFile() || page_num > 0) {
-		text = QObject::tr("%1 (page %2)").arg(file_name).arg(page_num + 1);
+		text = ThumbnailSequence::tr(
+			"%1 (page %2)"
+		).arg(file_name).arg(page_num + 1);
 	}
 	
 	std::auto_ptr<QGraphicsSimpleTextItem> text_item(

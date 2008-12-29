@@ -99,7 +99,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>Colors</string>
+      <string>Mode</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3" >
       <item>

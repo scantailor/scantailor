@@ -79,7 +79,6 @@ Thumbnail::paintOverImage(
 	// For some reason, if we let Qt round the coordinates,
 	// the result is slightly different.
 	painter.drawRect(content_rect.toRect());
-	}
 #endif
 }
 

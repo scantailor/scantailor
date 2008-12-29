@@ -30,6 +30,7 @@
 #include <boost/lambda/bind.hpp>
 #include <QString>
 #include <QObject>
+#include <QCoreApplication>
 #include <QDomDocument>
 #include <QDomElement>
 
@@ -49,7 +50,9 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return QObject::tr("Select Content");
+	return QCoreApplication::translate(
+		"select_content::Filter", "Select Content"
+	);
 }
 
 PageSequence::View

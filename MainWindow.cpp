@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "config.h"
 #include "MainWindow.h.moc"
 #include "WorkerThread.h"
 #include "PageSequence.h"
@@ -855,8 +856,10 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 			!m_ptrFilterListModel->getPageLayoutFilter()
 			->checkReadyForOutput(*m_ptrPages, &page.id())) {
 		QString const err_text(
-			tr("You can't output pages yet.\nFirst you need to process"
-			" all of them with the \"Page Layout\" filter.")
+			tr("Output is not yet possible, as the final size"
+			" of pages is not yet known.\nTo determine it,"
+			" run batch processing at \"Select Content\" or"
+			" \"Page Layout\".")
 		);
 		setOptionsWidget(new FilterOptionsWidget, TRANSFER_OWNERSHIP);
 		setImageWidget(new ErrorWidget(err_text), TRANSFER_OWNERSHIP);
@@ -888,7 +891,8 @@ MainWindow::updateWindowTitle()
 	} else {
 		project_name = QFileInfo(m_projectFile).baseName();
 	}
-	setWindowTitle(tr("%1 - Scan Tailor").arg(project_name));
+	QString const version(QString::fromUtf8(VERSION));
+	setWindowTitle(tr("%1 - Scan Tailor %2").arg(project_name, version));
 }
 
 bool

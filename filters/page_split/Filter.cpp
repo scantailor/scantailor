@@ -33,6 +33,7 @@
 #include <boost/lambda/bind.hpp>
 #include <QString>
 #include <QObject>
+#include <QCoreApplication>
 #include <QDomElement>
 #include <stddef.h>
 
@@ -53,7 +54,7 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return QObject::tr("Split pages");
+	return QCoreApplication::translate("page_split::Filter", "Split Pages");
 }
 
 PageSequence::View

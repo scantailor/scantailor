@@ -1,0 +1,10 @@
+/* This file is a template for config.h, for use with CMake. */
+
+#ifndef SCANTAILOR_CONFIG_H_
+#define SCANTAILOR_CONFIG_H_
+
+#define VERSION "@VERSION@"
+#define TRANSLATIONS_DIR_REL "@TRANSLATIONS_DIR_REL@"
+#define TRANSLATIONS_DIR_ABS "@TRANSLATIONS_DIR_ABS@"
+
+#endif

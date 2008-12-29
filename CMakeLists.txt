@@ -1,4 +1,6 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
+
+SET(FILES_TO_TRANSLATE)
 
 IF(COMMAND cmake_policy)
 	# Suppress warnings.
@@ -143,6 +145,15 @@ IF(WIN32)
 	)
 ENDIF(WIN32)
 
+# Prepare config.h
+IF(WIN32)
+	SET(TRANSLATIONS_DIR_REL "translations")
+ELSE(WIN32)
+	SET(TRANSLATIONS_DIR_REL "share/scantailor/translations")
+ENDIF(WIN32)
+SET(TRANSLATIONS_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${TRANSLATIONS_DIR_REL}")
+CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
+
 
 ADD_SUBDIRECTORY(boost)
 ADD_SUBDIRECTORY(foundation)
@@ -246,6 +257,40 @@ TARGET_LINK_LIBRARIES(
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
 
+MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET _sources_ _ts_files_)
+	SET(_sources)
+	SET(_ts_files)
+	FOREACH(_file ${ARGV})
+		GET_FILENAME_COMPONENT(_abs "${_file}" ABSOLUTE)
+		GET_FILENAME_COMPONENT(_ext "${_file}" EXT)
+		IF(_ext STREQUAL .ts)
+			LIST(APPEND _ts_files "${_abs}")
+		ELSE(_ext STREQUAL .ts)
+			LIST(APPEND _sources "${_abs}")
+		ENDIF(_ext STREQUAL .ts)
+	ENDFOREACH(_file)
+	
+	ADD_CUSTOM_TARGET(
+		update_translations
+		COMMAND "${QT_LUPDATE_EXECUTABLE}"
+		${_sources} -ts ${_ts_files}
+		DEPENDS ${_sources}
+	)
+ENDMACRO(CREATE_UPDATE_TRANSLATIONS_TARGET)
+
+# Translations
+FILE(GLOB abs_sources ABSOLUTE ${sources})
+FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})
+SET(TRANSLATION_SOURCES ${TRANSLATION_SOURCES} ${abs_sources} ${abs_ui_files})
+FILE(GLOB TRANSLATION_FILES translations/*.ts)
+
+CREATE_UPDATE_TRANSLATIONS_TARGET(${TRANSLATION_SOURCES} ${TRANSLATION_FILES})
+QT4_ADD_TRANSLATION(QM_FILES ${TRANSLATION_FILES})
+ADD_CUSTOM_TARGET(compile_translations ALL DEPENDS ${QM_FILES})
+
+INSTALL(FILES ${QM_FILES} DESTINATION "${TRANSLATIONS_DIR_REL}/")
+
+# Tests
 ADD_TEST(ImageProcTests imageproc/tests/imageproc_tests --log_level=message)
 ADD_TEST(ScanTaylorTests tests/tests --log_level=message)
 

@@ -342,7 +342,7 @@ OptionsWidget::showApplyAlignmentDialog()
 {
 	ApplyDialog* dialog = new ApplyDialog(this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
-	dialog->setWindowTitle(tr("Apply Margins"));
+	dialog->setWindowTitle(tr("Apply Alignment"));
 	connect(
 		dialog, SIGNAL(accepted(Scope)),
 		this, SLOT(applyAlignment(Scope))

@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "config.h"
 #include "Application.h"
 #include "NewOpenProjectDialog.h"
 #include "PngMetadataLoader.h"
@@ -23,7 +24,9 @@
 #include "JpegMetadataLoader.h"
 #include <QMetaType>
 #include <QtPlugin>
+#include <QLocale>
 #include <QString>
+#include <QTranslator>
 
 #ifdef Q_WS_WIN
 // Import static plugins
@@ -33,6 +36,19 @@ Q_IMPORT_PLUGIN(qjpeg)
 int main(int argc, char** argv)
 {
 	Application app(argc, argv);
+	
+	QString const locale(QLocale::system().name());
+	QTranslator translator;
+	
+	// Try loading from the current directory.
+	if (!translator.load(locale)) {
+		// Now try loading from where it's supposed to be.
+		QString path(QString::fromUtf8(TRANSLATIONS_DIR_ABS));
+		path += QChar('/');
+		path += locale;
+		translator.load(path);
+	}
+	app.installTranslator(&translator);
 	
 	// This information is used by QSettings.
 	app.setApplicationName("Scan Tailor");

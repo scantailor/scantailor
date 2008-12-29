@@ -27,3 +27,10 @@ SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
 
 ADD_LIBRARY(output STATIC ${sources} ${ui_sources})
+
+FILE(GLOB abs_sources ABSOLUTE ${sources})
+FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})
+SET(
+	TRANSLATION_SOURCES ${TRANSLATION_SOURCES}
+	${abs_sources} ${abs_ui_files} PARENT_SCOPE
+)

@@ -36,6 +36,7 @@
 #include <QSizeF>
 #include <QString>
 #include <QObject>
+#include <QCoreApplication>
 #include <QDomDocument>
 #include <QDomElement>
 
@@ -55,7 +56,7 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return QObject::tr("Page Layout");
+	return QCoreApplication::translate("page_layout::Filter", "Page Layout");
 }
 
 PageSequence::View

@@ -602,7 +602,7 @@ FixDpiDialog::TreeModel::data(QModelIndex const& index, int const role) const
 	} else if (ptr == &m_allPagesNodeId) {
 		// 'All Pages'.
 		if (role == Qt::DisplayRole) {
-			return tr("All Pages");
+			return FixDpiDialog::tr("All Pages");
 		} else if (role == Qt::UserRole) {
 			return m_dpiCounts.ifConsistentDpi().toSize();
 		}
@@ -624,7 +624,9 @@ FixDpiDialog::TreeModel::data(QModelIndex const& index, int const role) const
 			if (file.imageInfo().size() == 1) {
 				return fname;
 			} else {
-				return tr("%1 (page %2)").arg(fname).arg(item.imageIdx + 1);
+				return FixDpiDialog::tr(
+					"%1 (page %2)"
+				).arg(fname).arg(item.imageIdx + 1);
 			}
 		} else if (role == Qt::UserRole) {
 			Dpi const dpi(file.imageInfo()[item.imageIdx].dpi());
