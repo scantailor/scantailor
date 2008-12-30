@@ -23,6 +23,7 @@
 #include "Rule.h"
 #include <QLineF>
 #include <deque>
+#include <memory>
 
 class QRect;
 class QPoint;
@@ -67,10 +68,10 @@ public:
 		imageproc::BinaryThreshold bw_threshold,
 		DebugImages* dbg = 0);
 private:
-	static PageLayout cutAtFoldingLine(
+	static std::auto_ptr<PageLayout> tryCutAtFoldingLine(
 		Rule::LayoutType layout_type, QImage const& input,
 		ImageTransformation const& pre_xform, DebugImages* dbg);
-	
+		
 	static PageLayout cutAtWhitespace(
 		Rule::LayoutType layout_type, QImage const& input,
 		ImageTransformation const& pre_xform,

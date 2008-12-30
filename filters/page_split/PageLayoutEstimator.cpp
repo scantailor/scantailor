@@ -86,7 +86,17 @@ struct CenterComparator
 	}
 };
 
-PageLayout selectSinglePageSplitLine(
+/**
+ * \brief Try to auto-detect a page layout for a single-page configuration.
+ *
+ * \param ltr_lines Folding line candidates sorted from left to right.
+ * \param image_size The dimentions of the page image.
+ * \param hor_shadows A downscaled grayscale image that contains
+ *        long enough and not too thin horizontal lines.
+ * \param dbg An optional sink for debugging images.
+ * \return The page layout detected or a null auto_ptr.
+ */
+std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	std::vector<QLineF> const& ltr_lines, QSize const& image_size,
 	QImage const& hor_shadows, DebugImages* dbg)
 {
@@ -94,16 +104,12 @@ PageLayout selectSinglePageSplitLine(
 		dbg->add(hor_shadows, "hor_shadows");
 	}
 	
-	if (ltr_lines.empty()) {
-		return PageLayout();
-	}
-	
 	QRect left_area(hor_shadows.rect());
-	left_area.setWidth(std::min(20, hor_shadows.width()));
+	left_area.setWidth(std::min(5, hor_shadows.width()));
 	QRect right_area(left_area);
 	right_area.moveRight(hor_shadows.rect().right());
 	
-	BinaryImage const hor_shadows_bin(binarizeOtsu(hor_shadows));
+	BinaryImage const hor_shadows_bin(binarizeMokji(hor_shadows, 20, 30));
 	if (dbg) {
 		dbg->add(hor_shadows_bin, "hor_shadows_bin");
 	}
@@ -115,48 +121,66 @@ PageLayout selectSinglePageSplitLine(
 		// touches the left or the right edge.  This probably means it
 		// doesn't have a split line there as well, and those that
 		// we found are false positives.
-		return PageLayout();
+		return std::auto_ptr<PageLayout>(
+			new PageLayout(
+				PageLayout::SINGLE_PAGE_UNCUT, QLineF()
+			)
+		);
 	}
 	
-	if (ltr_lines.size() == 1) {
+	if (ltr_lines.empty()) {
+		return std::auto_ptr<PageLayout>();
+	} else if (ltr_lines.size() == 1) {
 		QLineF const& line = ltr_lines.front();
+		PageLayout::Type plt;
 		double const x_center = 0.5 * (line.p1().x() + line.p2().x());
 		if (x_center < 0.5 * image_size.width()) {
-			return PageLayout(PageLayout::RIGHT_PAGE_PLUS_OFFCUT, line);
+			plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
 		} else {
-			return PageLayout(PageLayout::LEFT_PAGE_PLUS_OFFCUT, line);
+			plt = PageLayout::LEFT_PAGE_PLUS_OFFCUT;
 		}
-	}
-	
-	if (left_sum > right_sum) {
-		// Probably the horizontal shadow from a page touches the left
-		// border, which means that the left page was cut off.
-		return PageLayout(
-			PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
-			ltr_lines.front()
-		);
+		return std::auto_ptr<PageLayout>(new PageLayout(plt, line));
 	} else {
-		return PageLayout(
-			PageLayout::LEFT_PAGE_PLUS_OFFCUT,
-			ltr_lines.back()
-		);
+		if (left_sum > right_sum) {
+			return std::auto_ptr<PageLayout>(
+				new PageLayout(
+					PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
+					ltr_lines.front()
+				)
+			);
+		} else {
+			return std::auto_ptr<PageLayout>(
+				new PageLayout(
+					PageLayout::LEFT_PAGE_PLUS_OFFCUT,
+					ltr_lines.back()
+				)
+			);
+		}
 	}
 	
 }
 
-PageLayout selectTwoPageSplitLine(
+/**
+ * \brief Try to auto-detect a page layout for a two-page configuration.
+ *
+ * \param ltr_lines Folding line candidates sorted from left to right.
+ * \param image_size The dimentions of the page image.
+ * \return The page layout detected or a null auto_ptr.
+ */
+std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
 	std::vector<QLineF> const& ltr_lines, QSize const& image_size)
 {
-	int const width = image_size.width();
-	
 	if (ltr_lines.empty()) {
-		return PageLayout();
+		// Impossible to detect the page layout.
+		return std::auto_ptr<PageLayout>();
 	} else if (ltr_lines.size() == 1) {
-		return PageLayout(PageLayout::TWO_PAGES, ltr_lines.front());
+		return std::auto_ptr<PageLayout>(
+			new PageLayout(PageLayout::TWO_PAGES, ltr_lines.front())
+		);
 	}
 	
 	// Find the line closest to the center.
-	double const global_center = 0.5 * width;
+	double const global_center = 0.5 * image_size.width();
 	double min_distance = std::numeric_limits<double>::max();
 	QLineF const* best_line = 0;
 	BOOST_FOREACH (QLineF const& line, ltr_lines) {
@@ -168,7 +192,9 @@ PageLayout selectTwoPageSplitLine(
 		}
 	}
 	
-	return PageLayout(PageLayout::TWO_PAGES, *best_line);
+	return std::auto_ptr<PageLayout>(
+		new PageLayout(PageLayout::TWO_PAGES, *best_line)
+	);
 }
 
 int numPages(
@@ -215,16 +241,80 @@ PageLayoutEstimator::estimatePageLayout(
 		return PageLayout(PageLayout::SINGLE_PAGE_UNCUT, QLineF());
 	}
 	
-	PageLayout layout(cutAtFoldingLine(layout_type, input, pre_xform, dbg));
+	std::auto_ptr<PageLayout> layout(
+		tryCutAtFoldingLine(layout_type, input, pre_xform, dbg)
+	);
+	if (layout.get()) {
+		return *layout;
+	}
 	
-	if (layout.type() == PageLayout::SINGLE_PAGE_UNCUT) {
-		// The folding line wasn't found.
-		layout = cutAtWhitespace(
-			layout_type, input, pre_xform, bw_threshold, dbg
+	return cutAtWhitespace(layout_type, input, pre_xform, bw_threshold, dbg);
+}
+
+/**
+ * \brief Attempts to find the folding line and cut the image there.
+ *
+ * \param layout_type The type of a layout to detect.  If set to
+ *        something other than Rule::AUTO_DETECT, the returned
+ *        layout will have the same type.  The layout type of
+ *        Rule::SINGLE_PAGE_UNCUT is not handled here.
+ * \param input The input image.  Will be converted to grayscale unless
+ *        it's already grayscale.
+ * \param pre_xform The logical transformation applied to the input image.
+ *        The resulting page layout will be in transformed coordinates.
+ * \param dbg An optional sink for debugging images.
+ * \return The detected page layout, or a null auto_ptr if page layout
+ *         could not be detected.
+ */
+std::auto_ptr<PageLayout>
+PageLayoutEstimator::tryCutAtFoldingLine(
+	Rule::LayoutType const layout_type, QImage const& input,
+	ImageTransformation const& pre_xform, DebugImages* const dbg)
+{
+	int const num_pages = numPages(layout_type, pre_xform);
+	
+	QImage hor_shadows;
+	
+	int const max_lines = 8;
+	std::vector<QLineF> lines(
+		VertLineFinder::findLines(
+			input, pre_xform, max_lines, dbg,
+			num_pages == 1 ? &hor_shadows : 0
+		)
+	);
+	
+	std::sort(lines.begin(), lines.end(), CenterComparator());
+	
+	if (layout_type == Rule::LEFT_PAGE_PLUS_OFFCUT) {
+		if (lines.empty()) {
+			return std::auto_ptr<PageLayout>();
+		}
+		return std::auto_ptr<PageLayout>(
+			new PageLayout(
+				PageLayout::LEFT_PAGE_PLUS_OFFCUT,
+				lines.back()
+			)
+		);
+	} else if (layout_type == Rule::RIGHT_PAGE_PLUS_OFFCUT) {
+		if (lines.empty()) {
+			return std::auto_ptr<PageLayout>();
+		}
+		return std::auto_ptr<PageLayout>(
+			new PageLayout(
+				PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
+				lines.front()
+			)
 		);
 	}
 	
-	return layout;
+	if (num_pages == 1) {
+		assert(layout_type == Rule::AUTO_DETECT);
+		return autoDetectSinglePageLayout(
+			lines, input.size(), hor_shadows, dbg
+		);
+	} else {
+		return autoDetectTwoPageLayout(lines, input.size());
+	}
 }
 
 /**
@@ -388,54 +478,6 @@ PageLayoutEstimator::cutAtWhitespaceDeskewed150(
 		return processContentSpansTwoPages(
 			layout_type, spans, width, height
 		);
-	}
-}
-
-/**
- * \brief Attempts to find the folding line and cut the image there.
- *
- * \param layout_type The type of a layout to detect.  If set to
- *        something other than Rule::AUTO_DETECT, the returned
- *        layout will have the same type, except in the case
- *        where a folding line wasn't found.
- * \param input The input image.  Will be converted to grayscale unless
- *        it's already grayscale.
- * \param pre_xform The logical transformation applied to the input image.
- *        The resulting page layout will be in transformed coordinates.
- * \param dbg An optional sink for debugging images.
- * \return If no folding line was found, a default-constructed PageLayout
- *         will be returned (that has a type of PageLayout::SINGLE_PAGE_UNCUT).
- *         Otherwise the proper page layout will be returned.
- */
-PageLayout
-PageLayoutEstimator::cutAtFoldingLine(
-	Rule::LayoutType const layout_type, QImage const& input,
-	ImageTransformation const& pre_xform, DebugImages* const dbg)
-{
-	int const num_pages = numPages(layout_type, pre_xform);
-	
-	QImage hor_shadows;
-	
-	int const max_lines = 8;
-	std::vector<QLineF> lines(
-		VertLineFinder::findLines(
-			input, pre_xform, max_lines, dbg,
-			num_pages == 1 ? &hor_shadows : 0
-		)
-	);
-	
-	if (lines.empty()) {
-		return PageLayout();
-	}
-	
-	std::sort(lines.begin(), lines.end(), CenterComparator());
-	
-	if (num_pages == 1) {
-		return selectSinglePageSplitLine(
-			lines, input.size(), hor_shadows, dbg
-		);
-	} else {
-		return selectTwoPageSplitLine(lines, input.size());
 	}
 }
 
