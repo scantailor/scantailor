@@ -27,6 +27,7 @@
 #include "ImageId.h"
 #include "Dependencies.h"
 #include "AutoManualMode.h"
+#include <QIcon>
 
 class ImageId;
 
@@ -85,25 +86,21 @@ public slots:
 private slots:
 	void layoutTypeButtonToggled(bool checked);
 	
-	void singlePageUncutToggled(bool checked);
-	
-	void leftPagePlusOffcutToggled(bool checked);
-	
-	void rightPagePlusOffcutToggled(bool checked);
-	
-	void twoPagesToggled(bool checked);
-	
 	void showChangeDialog();
 	
 	void ruleSet(Rule const& rule);
 	
 	void splitLineModeChanged(bool auto_mode);
+	
+	void flipSidesButtonClicked();
 private:
 	void commitCurrentParams();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	ImageId m_imageId;
 	UiData m_uiData;
+	QIcon m_flipLeftToRightIcon;
+	QIcon m_flipRightToLeftIcon;
 	int m_ignoreAutoManualToggle;
 	int m_ignoreLayoutTypeToggle;
 };

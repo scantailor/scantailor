@@ -224,9 +224,8 @@ Settings::BaseRecord::hasLayoutTypeConflict(
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			return layout_type != Rule::SINGLE_PAGE_UNCUT;
 		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-			return layout_type != Rule::LEFT_PAGE_PLUS_OFFCUT;
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			return layout_type != Rule::RIGHT_PAGE_PLUS_OFFCUT;
+			return layout_type != Rule::PAGE_PLUS_OFFCUT;
 		case PageLayout::TWO_PAGES:
 			return layout_type != Rule::TWO_PAGES;
 	}

@@ -89,6 +89,8 @@ struct CenterComparator
 /**
  * \brief Try to auto-detect a page layout for a single-page configuration.
  *
+ * \param layout_type The requested layout type.  The layout type of
+ *        Rule::SINGLE_PAGE_UNCUT is not handled here.
  * \param ltr_lines Folding line candidates sorted from left to right.
  * \param image_size The dimentions of the page image.
  * \param hor_shadows A downscaled grayscale image that contains
@@ -97,6 +99,7 @@ struct CenterComparator
  * \return The page layout detected or a null auto_ptr.
  */
 std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
+	Rule::LayoutType const layout_type,
 	std::vector<QLineF> const& ltr_lines, QSize const& image_size,
 	QImage const& hor_shadows, DebugImages* dbg)
 {
@@ -116,7 +119,8 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	unsigned const left_sum = hor_shadows_bin.countBlackPixels(left_area);
 	unsigned const right_sum = hor_shadows_bin.countBlackPixels(right_area);
 	
-	if (left_sum == 0 && right_sum == 0) {
+	if (left_sum == 0 && right_sum == 0
+			&& layout_type == Rule::AUTO_DETECT) {
 		// Looks like this scan doesn't have a horizontal shadow that
 		// touches the left or the right edge.  This probably means it
 		// doesn't have a split line there as well, and those that
@@ -129,6 +133,7 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	}
 	
 	if (ltr_lines.empty()) {
+		// Impossible to detect the layout type.
 		return std::auto_ptr<PageLayout>();
 	} else if (ltr_lines.size() == 1) {
 		QLineF const& line = ltr_lines.front();
@@ -215,8 +220,7 @@ int numPages(
 			break;
 		}
 		case Rule::SINGLE_PAGE_UNCUT:
-		case Rule::LEFT_PAGE_PLUS_OFFCUT:
-		case Rule::RIGHT_PAGE_PLUS_OFFCUT:
+		case Rule::PAGE_PLUS_OFFCUT:
 			num_pages = 1;
 			break;
 		case Rule::TWO_PAGES:
@@ -285,32 +289,9 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 	
 	std::sort(lines.begin(), lines.end(), CenterComparator());
 	
-	if (layout_type == Rule::LEFT_PAGE_PLUS_OFFCUT) {
-		if (lines.empty()) {
-			return std::auto_ptr<PageLayout>();
-		}
-		return std::auto_ptr<PageLayout>(
-			new PageLayout(
-				PageLayout::LEFT_PAGE_PLUS_OFFCUT,
-				lines.back()
-			)
-		);
-	} else if (layout_type == Rule::RIGHT_PAGE_PLUS_OFFCUT) {
-		if (lines.empty()) {
-			return std::auto_ptr<PageLayout>();
-		}
-		return std::auto_ptr<PageLayout>(
-			new PageLayout(
-				PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
-				lines.front()
-			)
-		);
-	}
-	
 	if (num_pages == 1) {
-		assert(layout_type == Rule::AUTO_DETECT);
 		return autoDetectSinglePageLayout(
-			lines, input.size(), hor_shadows, dbg
+			layout_type, lines, input.size(), hor_shadows, dbg
 		);
 	} else {
 		return autoDetectTwoPageLayout(lines, input.size());
@@ -647,21 +628,18 @@ PageLayoutEstimator::processContentSpansSinglePage(
 	bool const left_offcut, bool const right_offcut)
 {
 	assert(layout_type == Rule::AUTO_DETECT
-			|| layout_type == Rule::LEFT_PAGE_PLUS_OFFCUT
-			|| layout_type == Rule::RIGHT_PAGE_PLUS_OFFCUT);
+			|| layout_type == Rule::PAGE_PLUS_OFFCUT);
 	
 	// Just to be able to break from it.
-	while (layout_type == Rule::RIGHT_PAGE_PLUS_OFFCUT ||
-			(layout_type == Rule::AUTO_DETECT &&
-			left_offcut && !right_offcut)) {
+	while (left_offcut && !right_offcut
+			&& layout_type == Rule::AUTO_DETECT) {
 		double x;
 		if (spans.empty()) {
 			x = 0.0;
 		} else if (spans.front().begin() > 0) {
 			x = 0.5 * spans.front().begin();
 		} else {
-			if (layout_type != Rule::RIGHT_PAGE_PLUS_OFFCUT &&
-					spans.front().width() > width / 2) {
+			if (spans.front().width() > width / 2) {
 				// Probably it's the content span.
 				// Maybe we should cut it from the other side.
 				break;
@@ -671,21 +649,19 @@ PageLayoutEstimator::processContentSpansSinglePage(
 				x = std::min(spans[0].end() + 20, width);
 			}
 		}
-		return PageLayout(PageLayout::RIGHT_PAGE_PLUS_OFFCUT, vertLine(x));
+		return PageLayout::rightPagePlusOffcut(vertLine(x));
 	}
 	
 	// Just to be able to break from it.
-	while (layout_type == Rule::LEFT_PAGE_PLUS_OFFCUT ||
-			(layout_type == Rule::AUTO_DETECT &&
-			right_offcut && !left_offcut)) {
+	while (right_offcut && !left_offcut
+			&& layout_type == Rule::AUTO_DETECT) {
 		double x;
 		if (spans.empty()) {
 			x = width;
 		} else if (spans.back().end() < width) {
 			x = Span(spans.back(), width).center();
 		} else {
-			if (layout_type != Rule::LEFT_PAGE_PLUS_OFFCUT &&
-					spans.back().width() > width / 2) {
+			if (spans.back().width() > width / 2) {
 				// Probably it's the content span.
 				// Maybe we should cut it from the other side.
 				break;
@@ -695,7 +671,7 @@ PageLayoutEstimator::processContentSpansSinglePage(
 				x = std::max(spans.back().begin() - 20, 0);
 			}
 		}
-		return PageLayout(PageLayout::LEFT_PAGE_PLUS_OFFCUT, vertLine(x));
+		return PageLayout::leftPagePlusOffcut(vertLine(x));
 	}
 	
 	if (spans.empty()) {

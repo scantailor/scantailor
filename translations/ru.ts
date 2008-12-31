@@ -547,7 +547,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="62"/>
         <source>Mode</source>
-        <translation>Конфигурация</translation>
+        <translation>Тип разреза</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="68"/>
@@ -585,7 +585,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="25"/>
         <source>Page Layout</source>
-        <translation>Конфигурация</translation>
+        <translation>Тип разреза</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="154"/>

@@ -106,9 +106,9 @@ SplitModeDialog::combinedLayoutType() const
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			return Rule::SINGLE_PAGE_UNCUT;
 		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-			return Rule::LEFT_PAGE_PLUS_OFFCUT;
+			return Rule::PAGE_PLUS_OFFCUT;
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			return Rule::RIGHT_PAGE_PLUS_OFFCUT;
+			return Rule::PAGE_PLUS_OFFCUT;
 		case PageLayout::TWO_PAGES:
 			return Rule::TWO_PAGES;
 	}
@@ -129,11 +129,8 @@ SplitModeDialog::iconFor(Rule::LayoutType const layout_type)
 		case Rule::SINGLE_PAGE_UNCUT:
 			resource = ":/icons/single_page_uncut_selected.png";
 			break;
-		case Rule::LEFT_PAGE_PLUS_OFFCUT:
-			resource = ":/icons/left_page_plus_offcut_selected.png";
-			break;
-		case Rule::RIGHT_PAGE_PLUS_OFFCUT:
-			resource = ":/icons/right_page_plus_offcut_selected.png";
+		case Rule::PAGE_PLUS_OFFCUT:
+			resource = ":/icons/right_plus_offcut_selected.png";
 			break;
 		case Rule::TWO_PAGES:
 			resource = ":/icons/two_pages_selected.png";
