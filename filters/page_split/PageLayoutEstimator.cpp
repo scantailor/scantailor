@@ -77,12 +77,15 @@ using namespace imageproc;
 namespace
 {
 
+double lineCenterX(QLineF const& line)
+{
+	return 0.5 * (line.p1().x() + line.p2().x());
+}
+
 struct CenterComparator
 {
 	bool operator()(QLineF const& line1, QLineF const& line2) const {
-		double const line1_x_center = 0.5 * (line1.p1().x() + line1.p2().x());
-		double const line2_x_center = 0.5 * (line2.p1().x() + line2.p2().x());
-		return line1_x_center < line2_x_center;
+		return lineCenterX(line1) < lineCenterX(line2);
 	}
 };
 
@@ -119,8 +122,25 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	unsigned const left_sum = hor_shadows_bin.countBlackPixels(left_area);
 	unsigned const right_sum = hor_shadows_bin.countBlackPixels(right_area);
 	
-	if (left_sum == 0 && right_sum == 0
-			&& layout_type == Rule::AUTO_DETECT) {
+	// A loop just to be able to break from it.
+	while (left_sum == 0 && right_sum == 0) {
+		// This whole branch (loop) leads to SINGLE_PAGE_UNCUT,
+		// which conflicts with PAGE_PLUS_OFFCUT.
+		if (layout_type == Rule::PAGE_PLUS_OFFCUT) {
+			break;
+		}
+		
+		// If we have a single single line close to the edge,
+		// then it's unlikely to be SINGLE_PAGE_UNCUT
+		if (ltr_lines.size() == 1) {
+			QLineF const& line = ltr_lines.front();
+			double const image_center = 0.5 * image_size.width();
+			double const line_center = lineCenterX(line);
+			if (fabs(image_center - line_center) > 0.8 * image_center) {
+				break;
+			}
+		}
+		
 		// Looks like this scan doesn't have a horizontal shadow that
 		// touches the left or the right edge.  This probably means it
 		// doesn't have a split line there as well, and those that
@@ -137,8 +157,8 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 		return std::auto_ptr<PageLayout>();
 	} else if (ltr_lines.size() == 1) {
 		QLineF const& line = ltr_lines.front();
+		double const x_center = lineCenterX(line);
 		PageLayout::Type plt;
-		double const x_center = 0.5 * (line.p1().x() + line.p2().x());
 		if (x_center < 0.5 * image_size.width()) {
 			plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
 		} else {
@@ -189,7 +209,7 @@ std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
 	double min_distance = std::numeric_limits<double>::max();
 	QLineF const* best_line = 0;
 	BOOST_FOREACH (QLineF const& line, ltr_lines) {
-		double const line_center = 0.5 * (line.p1().x() + line.p2().x());
+		double const line_center = lineCenterX(line);
 		double const distance = fabs(line_center - global_center);
 		if (distance < min_distance) {
 			min_distance = distance;
@@ -255,6 +275,31 @@ PageLayoutEstimator::estimatePageLayout(
 	return cutAtWhitespace(layout_type, input, pre_xform, bw_threshold, dbg);
 }
 
+namespace
+{
+
+class BadTwoPageSplitter
+{
+public:
+	BadTwoPageSplitter(int image_width)
+	: m_imageCenter(0.5 * image_width),
+	m_distFromCenterThreshold(0.6 * m_imageCenter) {}
+	
+	/**
+	 * Returns true if the line is too close to an edge
+	 * to be the line splitting two pages
+	 */
+	bool operator()(QLineF const& line) {
+		double const dist = fabs(lineCenterX(line) - m_imageCenter);
+		return dist > m_distFromCenterThreshold;
+	}
+private:
+	double m_imageCenter;
+	double m_distFromCenterThreshold;
+};
+
+} // anonymous namespace
+
 /**
  * \brief Attempts to find the folding line and cut the image there.
  *
@@ -294,6 +339,15 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 			layout_type, lines, input.size(), hor_shadows, dbg
 		);
 	} else {
+		assert(num_pages == 2);
+		// In two page mode we ignore the lines that are too close
+		// to the edge.
+		lines.erase(
+			std::remove_if(
+				lines.begin(), lines.end(),
+				BadTwoPageSplitter(input.width())
+			), lines.end()
+		);
 		return autoDetectTwoPageLayout(lines, input.size());
 	}
 }
