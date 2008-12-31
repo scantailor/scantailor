@@ -19,7 +19,6 @@
 #include "TiffWriter.h"
 #include "Dpm.h"
 #include <QtGlobal>
-#include <QSysInfo>
 #include <QFile>
 #include <QIODevice>
 #include <QImage>
@@ -277,9 +276,9 @@ TiffWriter::writeBitonalOrIndexed8Image(
 	if (image.format() == QImage::Format_Indexed8) {
 		return write8bitLines(tif, image);
 	} else {
-		bool const host_le = (QSysInfo::ByteOrder == QSysInfo::LittleEndian);
-		bool const image_le = (image.format() == QImage::Format_MonoLSB);
-		if (host_le != image_le) {
+		bool const host_lsb2msb = (HOST_FILLORDER == FILLORDER_LSB2MSB);
+		bool const image_lsb2msb = (image.format() == QImage::Format_MonoLSB);
+		if (host_lsb2msb != image_lsb2msb) {
 			return writeBinaryLinesReversed(tif, image);
 		} else {
 			return writeBinaryLinesAsIs(tif, image);
@@ -308,7 +307,7 @@ TiffWriter::writeRGB32Image(
 	// On a little-endian machine, 0xAARRGGBB is stored
 	// in QImage as "BB GG RR AA", and offset will point to BB.
 	int offset = 0;
-	if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
+	if (HOST_BIGENDIAN) {
 		// On a big-endian machine, 0xAARRGGBB is be stored
 		// in QImage as "AA RR GG BB", and offset will point to RR.
 		offset = 1;
