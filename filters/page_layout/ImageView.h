@@ -86,6 +86,12 @@ private:
 	struct StateBeforeResizing
 	{
 		/**
+		 * Transformation from m_origXform coordinates to widget
+		 * coordinates.
+		 */
+		QTransform origToWidget;
+		
+		/**
 		 * Transformation from widget coordinates to m_origXform coordinates
 		 */
 		QTransform widgetToOrig;

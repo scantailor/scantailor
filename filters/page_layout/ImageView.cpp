@@ -217,6 +217,7 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 		m_beforeResizing.middleWidgetRect = orig_to_widget.mapRect(
 			m_middleRect
 		);
+		m_beforeResizing.origToWidget = orig_to_widget;
 		m_beforeResizing.widgetToOrig = widget_to_orig;
 		m_beforeResizing.mousePos = event->pos();
 		m_beforeResizing.focalPoint = getWidgetFocalPoint();
@@ -337,38 +338,50 @@ ImageView::resizeInnerRect(QPoint const delta)
 	int right_adjust = 0;
 	int top_adjust = 0;
 	int bottom_adjust = 0;
-	int effective_dx = 0;
-	int effective_dy = 0;
 	
 	if (m_innerResizingMask & LEFT_EDGE) {
-		left_adjust = effective_dx = delta.x();
+		left_adjust = delta.x();
 		if (m_leftRightLinked) {
 			right_adjust = -left_adjust;
 		}
 	} else if (m_innerResizingMask & RIGHT_EDGE) {
-		right_adjust = effective_dx = delta.x();
+		right_adjust = delta.x();
 		if (m_leftRightLinked) {
 			left_adjust = -right_adjust;
 		}
 	}
 	if (m_innerResizingMask & TOP_EDGE) {
-		top_adjust = effective_dy = delta.y();
+		top_adjust = delta.y();
 		if (m_topBottomLinked) {
 			bottom_adjust = -top_adjust;
 		}
 	} else if (m_innerResizingMask & BOTTOM_EDGE) {
-		bottom_adjust = effective_dy = delta.y();
+		bottom_adjust = delta.y();
 		if (m_topBottomLinked) {
 			top_adjust = -bottom_adjust;
 		}
 	}
 	
-	{
-		QRectF widget_rect(m_beforeResizing.middleWidgetRect);
-		widget_rect.adjust(-left_adjust, -top_adjust, -right_adjust, -bottom_adjust);
-		
-		m_middleRect = m_beforeResizing.widgetToOrig.mapRect(widget_rect);
-		forceNonNegativeHardMargins(m_middleRect); // invalidates widget_rect
+	QRectF widget_rect(m_beforeResizing.middleWidgetRect);
+	widget_rect.adjust(-left_adjust, -top_adjust, -right_adjust, -bottom_adjust);
+	
+	m_middleRect = m_beforeResizing.widgetToOrig.mapRect(widget_rect);
+	forceNonNegativeHardMargins(m_middleRect);
+	widget_rect = m_beforeResizing.origToWidget.mapRect(m_middleRect);
+	
+	int effective_dx = 0;
+	int effective_dy = 0;
+	
+	QRectF const& old_widget_rect = m_beforeResizing.middleWidgetRect;
+	if (m_innerResizingMask & LEFT_EDGE) {
+		effective_dx = old_widget_rect.left() - widget_rect.left();
+	} else if (m_innerResizingMask & RIGHT_EDGE) {
+		effective_dx = old_widget_rect.right() - widget_rect.right();
+	}
+	if (m_innerResizingMask & TOP_EDGE) {
+		effective_dy = old_widget_rect.top() - widget_rect.top();
+	} else if (m_innerResizingMask & BOTTOM_EDGE) {
+		effective_dy = old_widget_rect.bottom()- widget_rect.bottom();
 	}
 	
 	// Updating the focal point is what makes the image move
