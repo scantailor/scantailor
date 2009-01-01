@@ -54,11 +54,11 @@ class ImageViewBase : public QWidget
 {
 	Q_OBJECT
 public:
-	ImageViewBase(QImage const& image);
+	ImageViewBase(QImage const& image, bool hq_transform = true);
 	
 	ImageViewBase(
 		QImage const& image, ImageTransformation const& pre_transform,
-		Margins const& margins = Margins());
+		Margins const& margins = Margins(), bool hq_transform = true);
 	
 	virtual ~ImageViewBase();
 protected:
@@ -127,20 +127,23 @@ protected:
 	QRectF getVisibleWidgetRect() const;
 	
 	/**
-	 * \brief Get the focal point in physical image coordinates.
+	 * \brief Get the focal point in widget coordinates.
 	 *
-	 * The focal point is the image point that will be displayed at the
-	 * center of the widget.
+	 * The typical usage pattern for this function is:
+	 * \code
+	 * QPointF fp(obj.getWidgetFocalPoint());
+	 * obj.setWidgetFocalPoint(fp + delta);
+	 * \endcode
+	 * As a result, the image will be moved by delta widget pixels.
 	 */
-	QPointF getFocalPoint() const { return m_focalPoint; }
+	QPointF getWidgetFocalPoint() const { return m_widgetFocalPoint; }
 	
 	/**
-	 * \brief Set the focal point in physical image coordinates.
+	 * \brief Set the focal point in widget coordinates.
 	 *
-	 * The focal point is the image point that will be displayed at the
-	 * center of the widget.
+	 * \see getWidgetFocalPoint()
 	 */
-	void setFocalPoint(QPointF const& focal_point);
+	void setWidgetFocalPoint(QPointF const& widget_fp);
 	
 	/**
 	 * \brief Resets the zoom to the default value.
@@ -187,14 +190,19 @@ private slots:
 	void initiateBuildingHqVersion();
 private:
 	class HqTransformTask;
+	class TempFocalPointAdjuster;
 	
 	void updateWidgetTransform();
 	
 	void updateWidgetTransformAndFixFocalPoint(FocalPointMode mode);
 	
-	QPointF getIdealFocalPoint(FocalPointMode mode) const;
+	QPointF getIdealWidgetFocalPoint(FocalPointMode mode) const;
 	
-	void adjustAndSetNewFocalPoint(QPointF new_focal_point);
+	void adjustAndSetNewWidgetFP(QPointF proposed_widget_fp);
+	
+	QPointF centeredWidgetFocalPoint() const;
+	
+	void setWidgetFocalPointWithoutMoving(QPointF new_widget_fp);
 	
 	void hqVersionBuilt(QPoint const& origin, QImage const& image);
 	
@@ -265,9 +273,21 @@ private:
 	QTransform m_widgetToVirtual;
 	
 	/**
-	 * The point in m_pixmap that is supposed to be at the center of the widget.
+	 * An arbitrary point in widget coordinates that corresponds
+	 * to m_pixmapFocalPoint in m_pixmap coordinates.
+	 * Moving m_widgetFocalPoint followed by updateWidgetTransform()
+	 * will cause the image to move on screen.
 	 */
-	QPointF m_focalPoint;
+	QPointF m_widgetFocalPoint;
+	
+	/**
+	 * An arbitrary point in m_pixmap coordinates that corresponds
+	 * to m_widgetFocalPoint in widget coordinates.
+	 * Unlike m_widgetFocalPoint, this one is not supposed to be
+	 * moved independently.  It's supposed to moved together with
+	 * m_widgetFocalPoint for zooming into a specific position.
+	 */
+	QPointF m_pixmapFocalPoint;
 	
 	/**
 	 * Used for dragging the image.  Holds the last cursor position
@@ -291,6 +311,8 @@ private:
 	Qt::CursorShape m_currentCursorShape;
 	
 	bool m_isDraggingInProgress;
+	
+	bool m_hqXformEnabled;
 };
 
 #endif

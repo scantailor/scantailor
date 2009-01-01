@@ -25,7 +25,7 @@ class BasicImageView : public ImageViewBase
 {
 	Q_OBJECT
 public:
-	BasicImageView(QImage const& image);
+	BasicImageView(QImage const& image, bool hq_transform);
 	
 	virtual ~BasicImageView();
 protected:

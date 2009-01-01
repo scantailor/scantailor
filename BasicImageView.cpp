@@ -18,8 +18,8 @@
 
 #include "BasicImageView.h.moc"
 
-BasicImageView::BasicImageView(QImage const& image)
-:	ImageViewBase(image)
+BasicImageView::BasicImageView(QImage const& image, bool hq_transform)
+:	ImageViewBase(image, hq_transform)
 {
 }
 

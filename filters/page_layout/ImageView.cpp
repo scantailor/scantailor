@@ -219,7 +219,7 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 		);
 		m_beforeResizing.widgetToOrig = widget_to_orig;
 		m_beforeResizing.mousePos = event->pos();
-		m_beforeResizing.focalPoint = getFocalPoint();
+		m_beforeResizing.focalPoint = getWidgetFocalPoint();
 		
 		// We make sure that only one of inner mask and middle mask
 		// is non-zero.  Note that inner mask takes precedence, as
@@ -374,12 +374,8 @@ ImageView::resizeInnerRect(QPoint const delta)
 	// Updating the focal point is what makes the image move
 	// as we drag an inner edge.
 	QPointF fp(m_beforeResizing.focalPoint);
-	fp = physToVirt().transform().map(fp);
-	fp = virtualToWidget().map(fp);
-	fp -= QPointF(effective_dx, effective_dy);
-	fp = widgetToVirtual().map(fp);
-	fp = physToVirt().transformBack().map(fp);
-	setFocalPoint(fp);
+	fp += QPointF(effective_dx, effective_dy);
+	setWidgetFocalPoint(fp);
 	
 	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
 		m_pageId, origRectToSizeMM(m_middleRect)
