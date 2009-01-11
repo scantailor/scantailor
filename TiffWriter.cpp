@@ -216,7 +216,7 @@ TiffWriter::writeImage(QIODevice& device, QImage const& image)
 void
 TiffWriter::setDpm(TiffHandle const& tif, Dpm const& dpm)
 {
-	if (!dpm.isNull()) {
+	if (dpm.isNull()) {
 		return;
 	}
 	float const xres_cm = 0.01 * dpm.horizontal();
