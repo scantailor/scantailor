@@ -248,7 +248,8 @@ TiffWriter::writeBitonalOrIndexed8Image(
 			if (image.numColors() < 2) {
 				photometric = PHOTOMETRIC_MINISWHITE;
 			}
-		default: photometric = PHOTOMETRIC_PALETTE; // FIXME
+			break;
+		default:;
 	}
 	
 	TIFFSetField(tif.handle(), TIFFTAG_COMPRESSION, compression);
