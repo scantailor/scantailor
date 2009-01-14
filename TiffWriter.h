@@ -71,9 +71,6 @@ private:
 	static bool writeBinaryLinesReversed(
 		TiffHandle const& tif, QImage const& image);
 	
-	static void copyArgbToRgba(
-		uint32_t const* src, uint32_t* dst, size_t num_words);
-	
 	static uint8_t const m_reverseBitsLUT[256];
 };
 

@@ -176,7 +176,9 @@ TiffWriter::writeImage(QIODevice& device, QImage const& image)
 	
 	TiffHandle tif(
 		TIFFClientOpen(
-			"file", "wm", &device, &deviceRead, &deviceWrite,
+			// Libtiff seems to be buggy with L or H flags,
+			// so we use B.
+			"file", "wBm", &device, &deviceRead, &deviceWrite,
 			&deviceSeek, &deviceClose, &deviceSize,
 			&deviceMap, &deviceUnmap
 		)
@@ -277,9 +279,7 @@ TiffWriter::writeBitonalOrIndexed8Image(
 	if (image.format() == QImage::Format_Indexed8) {
 		return write8bitLines(tif, image);
 	} else {
-		bool const host_lsb2msb = (HOST_FILLORDER == FILLORDER_LSB2MSB);
-		bool const image_lsb2msb = (image.format() == QImage::Format_MonoLSB);
-		if (host_lsb2msb != image_lsb2msb) {
+		if (image.format() == QImage::Format_MonoLSB) {
 			return writeBinaryLinesReversed(tif, image);
 		} else {
 			return writeBinaryLinesAsIs(tif, image);
@@ -303,25 +303,17 @@ TiffWriter::writeRGB32Image(
 	
 	std::vector<uint8_t> tmp_line(width * 3);
 	
-	// We will be writing RGB triplets in native byte order.
-	
-	// On a little-endian machine, 0xAARRGGBB is stored
-	// in QImage as "BB GG RR AA", and offset will point to BB.
-	int offset = 0;
-	if (HOST_BIGENDIAN) {
-		// On a big-endian machine, 0xAARRGGBB is be stored
-		// in QImage as "AA RR GG BB", and offset will point to RR.
-		offset = 1;
-	}
+	// Libtiff expects "RR GG BB" sequences regardless of CPU byte order.
 	
 	for (int y = 0; y < height; ++y) {
-		uint8_t const* p_src = image.scanLine(y) + offset;
+		uint32_t const* p_src = (uint32_t const*)image.scanLine(y);
 		uint8_t* p_dst = &tmp_line[0];
 		for (int x = 0; x < width; ++x) {
-			p_dst[0] = p_src[0];
-			p_dst[1] = p_src[1];
-			p_dst[2] = p_src[2];
-			p_src += 4;
+			uint32_t const ARGB = *p_src;
+			p_dst[0] = static_cast<uint8_t>(ARGB >> 16);
+			p_dst[1] = static_cast<uint8_t>(ARGB >> 8);
+			p_dst[2] = static_cast<uint8_t>(ARGB);
+			++p_src;
 			p_dst += 3;
 		}
 		if (TIFFWriteScanline(tif.handle(), &tmp_line[0], y) == -1) {
@@ -346,13 +338,22 @@ TiffWriter::writeARGB32Image(
 	int const width = image.width();
 	int const height = image.height();
 	
-	std::vector<uint32_t> tmp_line(width);
+	std::vector<uint8_t> tmp_line(width * 4);
 	
-	// We will be writing 0xRRGGBBAA words in native byte order.
+	// Libtiff expects "RR GG BB AA" sequences regardless of CPU byte order.
 	
 	for (int y = 0; y < height; ++y) {
-		uint32_t const* src_line = (uint32_t const*)(image.scanLine(y));
-		copyArgbToRgba(src_line, &tmp_line[0], width);
+		uint32_t const* p_src = (uint32_t const*)image.scanLine(y);
+		uint8_t* p_dst = &tmp_line[0];
+		for (int x = 0; x < width; ++x) {
+			uint32_t const ARGB = *p_src;
+			p_dst[0] = static_cast<uint8_t>(ARGB >> 16);
+			p_dst[1] = static_cast<uint8_t>(ARGB >> 8);
+			p_dst[2] = static_cast<uint8_t>(ARGB);
+			p_dst[3] = static_cast<uint8_t>(ARGB >> 24);
+			++p_src;
+			p_dst += 4;
+		}
 		if (TIFFWriteScanline(tif.handle(), &tmp_line[0], y) == -1) {
 			return false;
 		}
@@ -429,21 +430,4 @@ TiffWriter::writeBinaryLinesReversed(
 	}
 	
 	return true;
-}
-
-/**
- * Copy 32bit words from src to dst, converting them like this:\n
- * 0xAARRGGBB -> 0xRRGGBBAA
- */
-void
-TiffWriter::copyArgbToRgba(
-	uint32_t const* const src, uint32_t* const dst,
-	size_t const num_words)
-{
-	for (size_t i = 0; i < num_words; ++i) {
-		uint32_t const src_word = src[i];
-		uint32_t dst_word = (src_word & 0x00FFFFFF) << 8; // RGB
-		dst_word |= (src_word & 0xFF000000) >> 24; // A
-		dst[i] = dst_word;
-	}
 }
