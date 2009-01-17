@@ -249,6 +249,17 @@ TiffWriter::writeBitonalOrIndexed8Image(
 			bits_per_sample = 1;
 			if (image.numColors() < 2) {
 				photometric = PHOTOMETRIC_MINISWHITE;
+			} else {
+				// Some programs don't understand
+				// palettized binary images, so don't
+				// use a palette for black and white images.
+				uint32_t const c0 = image.color(0);
+				uint32_t const c1 = image.color(1);
+				if (c0 == 0xffffffff && c1 == 0xff000000) {
+					photometric = PHOTOMETRIC_MINISWHITE;
+				} else if (c0 == 0xff000000 && c1 == 0xffffffff) {
+					photometric = PHOTOMETRIC_MINISBLACK;
+				}
 			}
 			break;
 		default:;
