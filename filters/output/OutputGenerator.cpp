@@ -276,17 +276,19 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 		
 		BinaryImage dst(m_cropRect.size(), WHITE);
 		
-		QRect dst_rect(m_contentRect);
-		dst_rect.moveTopLeft(
-			normalize_illumination_rect.topLeft()
-			- m_cropRect.topLeft()
-		);
-		
-		QPoint const src_pos(
-			m_contentRect.topLeft() -
-			normalize_illumination_rect.topLeft()
-		);
-		rasterOp<RopSrc>(dst, dst_rect, bw_content, src_pos);
+		if (!m_contentRect.isEmpty()) {
+			QRect dst_rect(m_contentRect);
+			dst_rect.moveTopLeft(
+				normalize_illumination_rect.topLeft()
+				- m_cropRect.topLeft()
+			);
+			
+			QPoint const src_pos(
+				m_contentRect.topLeft() -
+				normalize_illumination_rect.topLeft()
+			);
+			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_pos);
+		}
 		
 		bw_content.release(); // Save memory.
 		
@@ -439,28 +441,27 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 		
 		status.throwIfCancelled();
 		
-		QPainter painter;
-		painter.begin(&dst);
-		painter.setRenderHint(QPainter::SmoothPixmapTransform);
-		
-		QRectF const clip_rect(
-			m_contentRect.translated(-m_cropRect.topLeft())
-		);
-		painter.setClipRect(clip_rect);
-		
-		QPoint const draw_position(
-			small_margins_rect.topLeft() - m_cropRect.topLeft()
-		);
-		
-		// Draw the color part.
-		painter.drawImage(draw_position, norm_illum_color);
-		
-		status.throwIfCancelled();
-		
-		// Draw the B/W part.
-		painter.drawImage(draw_position, bw_content_argb);
-		
-		painter.end();
+		if (!m_contentRect.isEmpty()) {
+			QPainter painter(&dst);
+			painter.setRenderHint(QPainter::SmoothPixmapTransform);
+			
+			QRectF const clip_rect(
+				m_contentRect.translated(-m_cropRect.topLeft())
+			);
+			painter.setClipRect(clip_rect);
+			
+			QPoint const draw_position(
+				small_margins_rect.topLeft() - m_cropRect.topLeft()
+			);
+			
+			// Draw the color part.
+			painter.drawImage(draw_position, norm_illum_color);
+			
+			status.throwIfCancelled();
+			
+			// Draw the B/W part.
+			painter.drawImage(draw_position, bw_content_argb);
+		}
 		
 		return dst;
 	}
@@ -507,14 +508,15 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 	dst.setColorTable(createGrayscalePalette());
 	dst.fill(0xff); // white.
 	
-	QRect src_rect(m_contentRect);
-	src_rect.moveTopLeft(
-		m_contentRect.topLeft() - small_margins_rect.topLeft()
-	);
-	
-	QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
-	
-	drawOver(dst, dst_rect, mixed, src_rect);
+	if (!m_contentRect.isEmpty()) {
+		QRect src_rect(m_contentRect);
+		src_rect.moveTopLeft(
+			m_contentRect.topLeft() - small_margins_rect.topLeft()
+		);
+		
+		QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+		drawOver(dst, dst_rect, mixed, src_rect);
+	}
 	
 	return dst;
 }
