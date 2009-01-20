@@ -35,7 +35,7 @@ namespace imageproc
  *        palette and have the same size as \p rgb_image.
  * \param wr The weighting factor for red color component in the brightness
  *        image.
- * \param bg The weighting factor for blue color component in the brightness
+ * \param wb The weighting factor for blue color component in the brightness
  *        image.
  *
  * The brightness values are normally a weighted sum of red, green and blue

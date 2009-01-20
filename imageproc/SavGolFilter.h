@@ -38,7 +38,7 @@ namespace imageproc
  * \param window_size The apperture size.  If it doesn't completely
  *        fit the image area, no filtering will take place.
  * \param hor_degree The degree of a polynomial in horizontal direction.
- * \param vert_image The degree of a polynomial in vertical direction.
+ * \param vert_degree The degree of a polynomial in vertical direction.
  * \return The filtered grayscale image.
  *
  * \note The window size and degrees are not completely independent.

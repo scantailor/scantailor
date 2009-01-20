@@ -46,7 +46,7 @@ BinaryImage binarizeOtsu(QImage const& src);
  *
  * \param src The source image.  May be in any format.
  * \param max_edge_width The maximum gradient length to consider.
- * \param max_edge_magnitude The minimum color difference in a gradient.
+ * \param min_edge_magnitude The minimum color difference in a gradient.
  * \return A black and white image.
  */
 BinaryImage binarizeMokji(

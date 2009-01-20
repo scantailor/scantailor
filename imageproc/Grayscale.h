@@ -94,7 +94,7 @@ QImage stretchGrayRange(QImage const& src, double black_clip_fraction = 0.0,
  */
 QImage createFramedImage(
 	QSize const& size, unsigned char inner_color = 0xff,
-	unsigned char border_color = 0x00);
+	unsigned char frame_color = 0x00);
 
 } // namespace imageproc
 

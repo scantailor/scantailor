@@ -237,7 +237,7 @@ QImage stretchGrayRange(
 }
 
 QImage createFramedImage(QSize const& size,
-	unsigned char const inner_color, unsigned char const border_color)
+	unsigned char const inner_color, unsigned char const frame_color)
 {
 	QImage image(size, QImage::Format_Indexed8);
 	image.setColorTable(createGrayscalePalette());
@@ -249,14 +249,14 @@ QImage createFramedImage(QSize const& size,
 	unsigned char* line = image.bits();
 	int const bpl = image.bytesPerLine();
 	
-	memset(line, border_color, width);
+	memset(line, frame_color, width);
 	
 	for (int y = 0; y < height; ++y, line += bpl) {
-		line[0] = border_color;
-		line[width - 1] = border_color;
+		line[0] = frame_color;
+		line[width - 1] = frame_color;
 	}
 	
-	memset(line - bpl, border_color, width);
+	memset(line - bpl, frame_color, width);
 	
 	return image;
 }

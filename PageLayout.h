@@ -47,17 +47,10 @@ public:
 	/**
 	 * \brief Construct a page layout.
 	 *
-	 * \param type The layout type.  The type must be consistent with
-	 *        \p left_page_valid and \p right_page_valid.
+	 * \param type The layout type.
 	 * \param split_line The line that splits pages or cuts off garbage.
 	 *        Endpoints don't matter - they only define a line, not a line
 	 *        segment. The split line may not be null.
-	 * \param left_page_valid True if there is a page to the left of
-	 *        \p split_line.
-	 * \param right_page_valid True if there is a page to the right of
-	 *        \p split_line.
-	 *
-	 * At least one of the pages must be valid.  Use 
 	 */
 	PageLayout(Type type, QLineF const& split_line);
 	
