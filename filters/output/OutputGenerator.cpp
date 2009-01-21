@@ -87,6 +87,11 @@ OutputGenerator::OutputGenerator(
 	m_fullPageRect = post_scale.map(
 		pre_xform.resultingCropArea()
 	).boundingRect().toRect();
+	
+	// Make sure both m_cropRect and m_fullPageRect completely
+	// cover m_contentRect.
+	m_cropRect |= m_contentRect;
+	m_fullPageRect |= m_contentRect;
 }
 
 QImage
