@@ -52,7 +52,7 @@ private:
 	
 	void updateImageSizeIfChanged(QImage const& image);
 	
-	void addMissingMetadata(QImage& image) const;
+	void overrideDpi(QImage& image) const;
 	
 	ThumbnailPixmapCache& m_rThumbnailCache;
 	ImageId m_imageId;

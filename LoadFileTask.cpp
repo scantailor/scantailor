@@ -83,7 +83,7 @@ LoadFileTask::operator()()
 			return FilterResultPtr(new ErrorResult(m_imageId.filePath()));
 		} else {
 			updateImageSizeIfChanged(image);
-			addMissingMetadata(image);
+			overrideDpi(image);
 			m_rThumbnailCache.ensureThumbnailExists(m_imageId, image);
 			return m_ptrNextTask->process(*this, FilterData(image));
 		}
@@ -110,13 +110,13 @@ LoadFileTask::updateImageSizeIfChanged(QImage const& image)
 }
 
 void
-LoadFileTask::addMissingMetadata(QImage& image) const
+LoadFileTask::overrideDpi(QImage& image) const
 {
-	if (Dpm(image.dotsPerMeterX(), image.dotsPerMeterY()).isNull()) {
-		Dpm const dpm(m_imageMetadata.dpi());
-		image.setDotsPerMeterX(dpm.horizontal());
-		image.setDotsPerMeterY(dpm.vertical());
-	}
+	// Beware: QImage will have a default DPI when loading
+	// an image that doesn't specify one.
+	Dpm const dpm(m_imageMetadata.dpi());
+	image.setDotsPerMeterX(dpm.horizontal());
+	image.setDotsPerMeterY(dpm.vertical());
 }
 
 
