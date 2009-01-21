@@ -765,7 +765,7 @@ void seedFillGray4(QImage& seed_img, QImage const& mask_img)
 				*p_base_mask,
 				darkest(*p_east_seed, *p_south_seed)
 			);
-			if (darker_than(*p_base_seed, new_val)) {
+			if (!darker_than(new_val, *p_base_seed)) {
 				continue;
 			}
 			
@@ -904,7 +904,7 @@ void seedFillGray8(QImage& seed_img, QImage const& mask_img)
 					darkest(*p_south_seed, *p_south_west_seed)
 				)
 			);
-			if (darker_than(*p_base_seed, new_val)) {
+			if (!darker_than(new_val, *p_base_seed)) {
 				continue;
 			}
 			
