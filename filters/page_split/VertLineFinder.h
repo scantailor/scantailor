@@ -37,7 +37,9 @@ class VertLineFinder
 public:
 	static std::vector<QLineF> findLines(
 		QImage const& image, ImageTransformation const& xform,
-		int max_lines, DebugImages* dbg = 0, QImage* hor_shadows = 0);
+		int max_lines, DebugImages* dbg = 0,
+		QImage* gray_downscaled = 0,
+		QTransform* out_to_downscaled = 0);
 private:
 	class QualityLine
 	{
@@ -77,15 +79,9 @@ private:
 		double m_right;
 	};
 	
-	static QImage detectHorShadows(QImage const& src);
-	
 	static QImage removeDarkVertBorders(QImage const& src);
 	
-	static QImage removeDarkHorBorders(QImage const& src);
-	
 	static void selectVertBorders(QImage& image);
-	
-	static void selectHorBorders(QImage& image);
 	
 	static void buildWeightTable(unsigned weight_table[]);
 };

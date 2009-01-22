@@ -45,6 +45,8 @@
 #include "imageproc/SlicedHistogram.h"
 #include "imageproc/Transform.h"
 #include "imageproc/Grayscale.h"
+#include "imageproc/GrayRasterOp.h"
+#include "imageproc/PolygonRasterizer.h"
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -54,6 +56,7 @@
 #include <QPointF>
 #include <QPoint>
 #include <QLineF>
+#include <QPolygonF>
 #include <QPainter>
 #include <QColor>
 #include <QPen>
@@ -89,6 +92,141 @@ struct CenterComparator
 	}
 };
 
+void selectHorBordersInPlace(QImage& image)
+{
+	int const w = image.width();
+	int const h = image.height();
+	
+	unsigned char* const image_data = image.bits();
+	int const image_bpl = image.bytesPerLine();
+	
+	std::vector<unsigned char> tmp_line(h, 0x00);
+	
+	for (int x = 0; x < w; ++x) {
+		// Left to right.
+		unsigned char* p_image = image_data + x;
+		unsigned char prev_pixel = 0x00; // Black vertical border.
+		for (int y = 0; y < h; ++y, p_image += image_bpl) {
+			prev_pixel = std::max(*p_image, prev_pixel);
+			tmp_line[y] = prev_pixel;
+		}
+		
+		// Right to left
+		p_image = image_data + x + (h - 1) * image_bpl;
+		prev_pixel = 0x00; // Black vertical border.
+		for (int y = h - 1; y >= 0; --y, p_image -= image_bpl) {
+			prev_pixel = std::max(
+				*p_image,
+				std::min(prev_pixel, tmp_line[y])
+			);
+			*p_image = prev_pixel;
+		}
+	}
+}
+
+QImage removeDarkHorBorders(QImage const& src)
+{
+	QImage dst(src);
+	
+	selectHorBordersInPlace(dst);
+	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
+	
+	return dst;
+}
+
+QImage detectHorShadows(QImage const& src)
+{
+	QImage long_hor_lines(openGray(src, QSize(100, 1), 0xff));
+	long_hor_lines = removeDarkHorBorders(long_hor_lines);
+	return openGray(long_hor_lines, QSize(100, 1), 0xff);
+}
+
+void countOffcutPixels(
+	unsigned* left_sum, unsigned* right_sum,
+	QLineF const& left_line, QLineF const& right_line,
+	QImage const& gray_downscaled, QImage const& hor_shadows,
+	QTransform const& out_to_downscaled, DebugImages* dbg)
+{
+	assert(left_sum && right_sum);
+	
+	QImage seed(createFramedImage(gray_downscaled.size()));
+	
+	// Remove parts of the vertical seed lines.
+	// We don't want seed pixels to touch text.
+	{
+		int const width = seed.width();
+		int const height = seed.height();
+		uint8_t* seed_line = seed.bits();
+		int const seed_stride = seed.bytesPerLine();
+		int const from = height / 10;
+		int const to = height - from;
+		seed_line += from * seed_stride;
+		for (int y = from; y < to; ++y) {
+			seed_line[0] = 0xff;
+			seed_line[width - 1] = 0xff;
+			seed_line += seed_stride;
+		}
+	}
+	
+	grayRasterOp<GRopDarkest<GRopSrc, GRopDst> >(
+		seed, hor_shadows
+	);
+	
+	seedFillGrayInPlace(seed, gray_downscaled, CONN8);
+	
+	typedef GRopInvert<
+		GRopUnclippedSubtract<GRopDst, GRopSrc>
+	> SubtractBorders;
+	grayRasterOp<SubtractBorders>(seed, gray_downscaled);
+	if (dbg) {
+		dbg->add(seed, "borders_removed");
+	}
+	
+	BinaryImage bin_img(binarizeWolf(seed, QSize(51, 51)));
+	seed = QImage();
+	
+	PageLayout const left_layout(
+		PageLayout(
+			PageLayout::LEFT_PAGE_PLUS_OFFCUT, left_line
+		).transformed(out_to_downscaled)
+	);
+	QPolygonF const left_poly(
+		left_layout.singlePageOutline(
+			gray_downscaled.rect()
+		)
+	);
+	
+	PageLayout const right_layout(
+		PageLayout(
+			PageLayout::RIGHT_PAGE_PLUS_OFFCUT, right_line
+		).transformed(out_to_downscaled)
+	);
+	QPolygonF const right_poly(
+		right_layout.singlePageOutline(
+			gray_downscaled.rect()
+		)
+	);
+	
+	BinaryImage left_offcut(bin_img);
+	PolygonRasterizer::fillExcept(
+		left_offcut, WHITE, left_poly, Qt::WindingFill
+	);
+	*left_sum = left_offcut.countBlackPixels();
+	if (dbg) {
+		dbg->add(left_offcut, "left_offcut");
+	}
+	
+	left_offcut.release();
+	BinaryImage right_offcut(bin_img.release());
+	PolygonRasterizer::fillExcept(
+		right_offcut, WHITE, right_poly, Qt::WindingFill
+	);
+	*right_sum = right_offcut.countBlackPixels();
+	if (dbg) {
+		dbg->add(right_offcut, "right_offcut");
+	}
+}
+
 /**
  * \brief Try to auto-detect a page layout for a single-page configuration.
  *
@@ -104,8 +242,10 @@ struct CenterComparator
 std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	Rule::LayoutType const layout_type,
 	std::vector<QLineF> const& ltr_lines, QSize const& image_size,
-	QImage const& hor_shadows, DebugImages* dbg)
+	QImage const& gray_downscaled, QTransform const& out_to_downscaled,
+	DebugImages* dbg)
 {
+	QImage const hor_shadows(detectHorShadows(gray_downscaled));
 	if (dbg) {
 		dbg->add(hor_shadows, "hor_shadows");
 	}
@@ -119,8 +259,8 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	if (dbg) {
 		dbg->add(hor_shadows_bin, "hor_shadows_bin");
 	}
-	unsigned const left_sum = hor_shadows_bin.countBlackPixels(left_area);
-	unsigned const right_sum = hor_shadows_bin.countBlackPixels(right_area);
+	unsigned left_sum = hor_shadows_bin.countBlackPixels(left_area);
+	unsigned right_sum = hor_shadows_bin.countBlackPixels(right_area);
 	
 	// A loop just to be able to break from it.
 	while (left_sum == 0 && right_sum == 0) {
@@ -166,6 +306,14 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 		}
 		return std::auto_ptr<PageLayout>(new PageLayout(plt, line));
 	} else {
+		if ((left_sum == 0) == (right_sum == 0)) {
+			countOffcutPixels(
+				&left_sum, &right_sum,
+				ltr_lines.front(), ltr_lines.back(),
+				gray_downscaled, hor_shadows,
+				out_to_downscaled, dbg
+			);
+		}
 		if (left_sum > right_sum) {
 			return std::auto_ptr<PageLayout>(
 				new PageLayout(
@@ -322,21 +470,53 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 {
 	int const num_pages = numPages(layout_type, pre_xform);
 	
-	QImage hor_shadows;
+	QImage gray_downscaled;
+	QTransform out_to_downscaled;
 	
 	int const max_lines = 8;
 	std::vector<QLineF> lines(
 		VertLineFinder::findLines(
 			input, pre_xform, max_lines, dbg,
-			num_pages == 1 ? &hor_shadows : 0
+			num_pages == 1 ? &gray_downscaled : 0,
+			num_pages == 1 ? &out_to_downscaled : 0
 		)
 	);
 	
 	std::sort(lines.begin(), lines.end(), CenterComparator());
 	
 	if (num_pages == 1) {
+		// If all of the lines are close to one of the edges,
+		// that means they can't be the edges of a pages,
+		// so we take only one of them, the one closest to
+		// the center.
+		while (lines.size() > 1) { // just to be able to break from it.
+			QLineF const left_line(lines.front());
+			QLineF const right_line(lines.back());
+			double const center(0.5 * input.width());
+			double const threshold = 0.3 * center;
+			double left_dist = center - lineCenterX(left_line);
+			double right_dist = center - lineCenterX(right_line);
+			if ((left_dist < 0) != (right_dist < 0)) {
+				// They are from the opposite sides
+				// from the center line.
+				break;
+			}
+			
+			left_dist = fabs(left_dist);
+			right_dist = fabs(right_dist);
+			if (left_dist < threshold || right_dist < threshold) {
+				// At least one of them is relatively close
+				// to the center.
+				break;
+			}
+			
+			lines.clear();
+			lines.push_back(left_dist < right_dist ? left_line : right_line);
+			break;
+		}
 		return autoDetectSinglePageLayout(
-			layout_type, lines, input.size(), hor_shadows, dbg
+			layout_type, lines, input.size(), gray_downscaled,
+			out_to_downscaled, dbg
 		);
 	} else {
 		assert(num_pages == 2);

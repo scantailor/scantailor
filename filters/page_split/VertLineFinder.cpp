@@ -47,7 +47,8 @@ using namespace imageproc;
 std::vector<QLineF>
 VertLineFinder::findLines(
 	QImage const& image, ImageTransformation const& xform,
-	int const max_lines, DebugImages* dbg, QImage* hor_shadows)
+	int const max_lines, DebugImages* dbg,
+	QImage* gray_downscaled, QTransform* out_to_downscaled)
 {
 	ImageTransformation xform_100dpi(xform);
 	xform_100dpi.preScaleToDpi(Dpi(100, 100));
@@ -61,8 +62,12 @@ VertLineFinder::findLines(
 		)
 	);
 	
-	if (hor_shadows) {
-		*hor_shadows = detectHorShadows(gray100);
+	if (gray_downscaled) {
+		*gray_downscaled = gray100;
+	}
+	if (out_to_downscaled) {
+		*out_to_downscaled = xform.transformBack()
+				* xform_100dpi.transform();
 	}
 	
 	QImage preprocessed(removeDarkVertBorders(gray100));
@@ -200,30 +205,11 @@ VertLineFinder::findLines(
 }
 
 QImage
-VertLineFinder::detectHorShadows(QImage const& src)
-{
-	QImage long_hor_lines(openGray(src, QSize(100, 1), 0xff));
-	long_hor_lines = removeDarkHorBorders(long_hor_lines);
-	return openGray(long_hor_lines, QSize(100, 1), 0xff);
-}
-
-QImage
 VertLineFinder::removeDarkVertBorders(QImage const& src)
 {
 	QImage dst(src);
 	
 	selectVertBorders(dst);
-	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
-	
-	return dst;
-}
-
-QImage
-VertLineFinder::removeDarkHorBorders(QImage const& src)
-{
-	QImage dst(src);
-	
-	selectHorBorders(dst);
 	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
 	
 	return dst;
@@ -256,39 +242,6 @@ VertLineFinder::selectVertBorders(QImage& image)
 				std::min(prev_pixel, tmp_line[x])
 			);
 			image_line[x] = prev_pixel;
-		}
-	}
-}
-
-void
-VertLineFinder::selectHorBorders(QImage& image)
-{
-	int const w = image.width();
-	int const h = image.height();
-	
-	unsigned char* const image_data = image.bits();
-	int const image_bpl = image.bytesPerLine();
-	
-	std::vector<unsigned char> tmp_line(h, 0x00);
-	
-	for (int x = 0; x < w; ++x) {
-		// Left to right.
-		unsigned char* p_image = image_data + x;
-		unsigned char prev_pixel = 0x00; // Black vertical border.
-		for (int y = 0; y < h; ++y, p_image += image_bpl) {
-			prev_pixel = std::max(*p_image, prev_pixel);
-			tmp_line[y] = prev_pixel;
-		}
-		
-		// Right to left
-		p_image = image_data + x + (h - 1) * image_bpl;
-		prev_pixel = 0x00; // Black vertical border.
-		for (int y = h - 1; y >= 0; --y, p_image -= image_bpl) {
-			prev_pixel = std::max(
-				*p_image,
-				std::min(prev_pixel, tmp_line[y])
-			);
-			*p_image = prev_pixel;
 		}
 	}
 }
