@@ -605,7 +605,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="225"/>
         <source>Auto</source>
-        <translation>Автомтически</translation>
+        <translation>Автоматически</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="241"/>
