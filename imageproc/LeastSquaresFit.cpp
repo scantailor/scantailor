@@ -16,11 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _ISOC99SOURCE // For copysign()
+
 #include "LeastSquaresFit.h"
 #include <QSize>
 #include <stdexcept>
 #include <math.h>
 #include <assert.h>
+
+#ifdef _MSC_VER
+#undef copysign // Just in case.
+#define copysign _copysign
+#endif
 
 namespace imageproc
 {
@@ -33,7 +40,7 @@ void leastSquaresFit(QSize const& C_size, double* C, double* x, double* d)
 	if (width < 0 || height < 0 || height < width) {
 		throw std::invalid_argument("leastSquaresFit: invalid dimensions");
 	}
-
+	
 	// Calculate a QR decomposition of C using Givens rotations.
 	// We store R in place of C, while Q is not stored at all.
 	// Instead, we rotate the d vector on the fly.
@@ -43,11 +50,30 @@ void leastSquaresFit(QSize const& C_size, double* C, double* x, double* d)
 		for (int i = j + 1; i < height; ++i, ij += width) {
 			double const a = C[jj];
 			double const b = C[ij];
-			double const radius = sqrt(a*a + b*b);
-			double const cos = a / radius;
-			double const sin = b / radius;
 			
-			C[jj] = radius;
+			if (b == 0.0) {
+				continue;
+			}
+			
+			double sin, cos;
+			
+			if (a == 0.0) {
+				cos = 0.0;
+				sin = copysign(1.0, b);
+				C[jj] = fabs(b);
+			} else if (fabs(b) > fabs(a)) {
+				double const t = a / b;
+				double const u = copysign(sqrt(1.0 + t*t), b);
+				sin = 1.0 / u;
+				cos = sin * t;
+				C[jj] = b * u;
+			} else {
+				double const t = b / a;
+				double const u = copysign(sqrt(1.0 + t*t), a);
+				cos = 1.0 / u;
+				sin = cos * t;
+				C[jj] = a * u;
+			}
 			C[ij] = 0.0;
 			
 			int ik = ij + 1; // i * width + k
