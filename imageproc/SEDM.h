@@ -82,9 +82,7 @@ public:
 	 * distance to, and borders are to DIST_TO_NO_BORDERS,
 	 * then the whole distance map will consist of these values.
 	 */
-	static uint32_t const INFINITY = ~uint32_t(0) - 1;
-	// Note that -1 is an implementation detail.
-	// It exists to make sure INFINITY + 1 doesn't overflow.
+	static uint32_t const INFINITY;
 	
 	/**
 	 * \brief Constructs a null distance map.

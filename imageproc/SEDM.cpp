@@ -28,6 +28,10 @@
 namespace imageproc
 {
 
+// Note that -1 is an implementation detail.
+// It exists to make sure INFINITY + 1 doesn't overflow.
+uint32_t const SEDM::INFINITY = ~uint32_t(0) - 1;
+
 SEDM::SEDM()
 :	m_pData(0),
 	m_size(),

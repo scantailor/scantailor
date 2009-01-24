@@ -32,6 +32,9 @@
 namespace imageproc
 {
 
+uint32_t const ConnectivityMap::BACKGROUND;
+uint32_t const ConnectivityMap::UNTAGGED_FG;
+
 ConnectivityMap::ConnectivityMap()
 :	m_pData(0),
 	m_size(),
