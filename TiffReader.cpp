@@ -319,7 +319,11 @@ TiffReader::readImage(QIODevice& device, int const page_num)
 			return QImage();
 		}
 		
-		image = QImage(info.width, info.height, QImage::Format_ARGB32);
+		image = QImage(
+			info.width, info.height,
+			info.samples_per_pixel == 3
+			? QImage::Format_RGB32 : QImage::Format_ARGB32
+		);
 		if (image.isNull()) {
 			throw std::bad_alloc();
 		}
