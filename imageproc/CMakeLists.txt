@@ -37,6 +37,10 @@ SET(
 	SavGolFilter.cpp SavGolFilter.h
 	DrawOver.cpp DrawOver.h
 	AdjustBrightness.cpp AdjustBrightness.h
+	SEDM.cpp SEDM.h
+	ConnectivityMap.cpp ConnectivityMap.h
+	InfluenceMap.cpp InfluenceMap.h
+	MaxWhitespaceFinder.cpp MaxWhitespaceFinder.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})
