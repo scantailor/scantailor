@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ namespace imageproc
 {
 	class BinaryImage;
 	class ConnComp;
+	class SEDM;
 }
 
 namespace select_content
@@ -44,33 +45,61 @@ public:
 		TaskStatus const& status, FilterData const& data,
 		DebugImages* dbg = 0);
 private:
+	class Garbage;
+	
+	static void segmentGarbage(
+		imageproc::BinaryImage const& garbage,
+		imageproc::BinaryImage& hor_garbage,
+		imageproc::BinaryImage& vert_garbage,
+		DebugImages* dbg);
+	
+	static void trimContentBlocksInPlace(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage& content_blocks);
+	
+	static void inPlaceRemoveAreasTouchingBorders(
+		imageproc::BinaryImage& content_blocks, DebugImages* dbg);
+	
+	static imageproc::BinaryImage estimateTextMask(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage const& content_blocks,
+		DebugImages* dbg);
+	
 	static void filterShadows(
 		TaskStatus const& status, imageproc::BinaryImage& shadows,
 		DebugImages* dbg);
 	
-	static imageproc::BinaryImage getLighterContent(
-		QImage const& gray, imageproc::BinaryThreshold reference_threshold,
-		imageproc::BinaryImage const& content_mask);
+	static QRect trimLeft(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage const& content_blocks,
+		imageproc::BinaryImage const& text_mask, QRect const& area,
+		Garbage& garbage, DebugImages* dbg);
 	
-	static bool isBigAndDark(imageproc::ConnComp const& cc);
+	static QRect trimRight(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage const& content_blocks,
+		imageproc::BinaryImage const& text_mask, QRect const& area,
+		Garbage& garbage, DebugImages* dbg);
 	
-	static bool isWindingComponent(imageproc::BinaryImage const& cc_img);
+	static QRect trimTop(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage const& content_blocks,
+		imageproc::BinaryImage const& text_mask, QRect const& area,
+		Garbage& garbage, DebugImages* dbg);
 	
-	static QRect trimLeftRight(
-		imageproc::BinaryImage const& img,
-		imageproc::BinaryImage const& img_lighter, QRect const& area);
+	static QRect trimBottom(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage const& content_blocks,
+		imageproc::BinaryImage const& text_mask, QRect const& area,
+		Garbage& garbage, DebugImages* dbg);
 	
-	static QRect trimTopBottom(
-		imageproc::BinaryImage const& img,
-		imageproc::BinaryImage const& img_lighter, QRect const& area);
-	
-	static QRect processColumn(
-		imageproc::BinaryImage const& img,
-		imageproc::BinaryImage const& img_lighter, QRect const& area);
-	
-	static QRect processRow(
-		imageproc::BinaryImage const& img,
-		imageproc::BinaryImage const& img_lighter, QRect const& area);
+	static QRect trim(
+		imageproc::BinaryImage const& content,
+		imageproc::BinaryImage const& content_blocks,
+		imageproc::BinaryImage const& text_mask,
+		QRect const& area, QRect const& new_area,
+		QRect const& removed_area, Garbage& garbage,
+		bool& can_retry_grouped, DebugImages* dbg);
 };
 
 } // namespace select_content
