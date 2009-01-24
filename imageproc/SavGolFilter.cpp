@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _ISOC99SOURCE // For copysign()
+
 #include "SavGolFilter.h"
 #include "Grayscale.h"
 #include <QImage>
@@ -29,6 +31,11 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
+
+#ifdef _MSC_VER
+#undef copysign // Just in case.
+#define copysign _copysign
+#endif
 
 namespace imageproc
 {
@@ -184,13 +191,33 @@ SavGolKernel::QR()
 		for (int i = j + 1; i < m_numDataPoints; ++i, ij += m_numTerms) {
 			double const a = m_equations[jj];
 			double const b = m_equations[ij];
-			double const radius = sqrt(a*a + b*b);
-			double const cos = a / radius;
-			double const sin = b / radius;
+			
+			if (b == 0.0) {
+				continue;
+			}
+			
+			double sin, cos;
+			
+			if (a == 0.0) {
+				cos = 0.0;
+				sin = copysign(1.0, b);
+				m_equations[jj] = fabs(b);
+			} else if (fabs(b) > fabs(a)) {
+				double const t = a / b;
+				double const u = copysign(sqrt(1.0 + t*t), b);
+				sin = 1.0 / u;
+				cos = sin * t;
+				m_equations[jj] = b * u;
+			} else {
+				double const t = b / a;
+				double const u = copysign(sqrt(1.0 + t*t), a);
+				cos = 1.0 / u;
+				sin = cos * t;
+				m_equations[jj] = a * u;
+			}
+			m_equations[ij] = 0.0;
 			
 			m_rotations.push_back(Rotation(sin, cos));
-			m_equations[jj] = radius;
-			m_equations[ij] = 0.0;
 			
 			int ik = ij + 1; // i * m_numTerms + k
 			int jk = jj + 1; // j * m_numTerms + k
