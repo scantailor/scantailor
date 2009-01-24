@@ -26,6 +26,7 @@ namespace detail
 {
 
 extern unsigned char const bitCounts[256];
+extern unsigned char const reversedBits[256];
 
 template<typename T, int BytesRemaining>
 class NonZeroBits
@@ -43,6 +44,48 @@ class NonZeroBits<T, 1>
 public:
 	static unsigned char count(T val) {
 		return bitCounts[static_cast<unsigned char>(val)];
+	}
+};
+
+
+template<typename T, int TotalBytes, int Offset, bool Done = false>
+struct ReverseBytes
+{
+	static T result(T const val) {
+		int const left_shift = (TotalBytes - Offset - 1) * 8;
+		int const right_shift = Offset * 8;
+		
+		typedef unsigned char Byte;
+		Byte const left_byte = static_cast<Byte>(val >> left_shift);
+		Byte const right_byte = static_cast<Byte>(val >> right_shift);
+		
+		T res(
+			ReverseBytes<
+				T, TotalBytes, Offset + 1,
+				Offset == TotalBytes / 2
+			>::result(val)
+		);
+		res |= T(reversedBits[left_byte]) << right_shift;
+		res |= T(reversedBits[right_byte]) << left_shift;
+		
+		return res;
+	}
+};
+
+template<typename T, int TotalBytes, int Offset>
+struct ReverseBytes<T, TotalBytes, Offset, true>
+{
+	static T result(T) {
+		return T();
+	}
+};
+
+template<typename T>
+struct ReverseBytes<T, 1, 0, false>
+{
+	static T result(T const val) {
+		typedef unsigned char Byte;
+		return T(reversedBits[static_cast<Byte>(val)]);
 	}
 };
 
@@ -131,6 +174,12 @@ template<typename T>
 int countNonZeroBits(T const val)
 {
 	return detail::NonZeroBits<T, sizeof(T)>::count(val);
+}
+
+template<typename T>
+T reverseBits(T const val)
+{
+	return detail::ReverseBytes<T, sizeof(T), 0>::result(val);
 }
 
 template<typename T>
