@@ -74,7 +74,7 @@ public:
 	
 	void setSize(size_t size) { m_data.resize(size); }
 	
-	int operator[](size_t idx) const { return m_data[idx]; }
+	int const& operator[](size_t idx) const { return m_data[idx]; }
 	
 	int& operator[](size_t idx) { return m_data[idx]; }
 private:
