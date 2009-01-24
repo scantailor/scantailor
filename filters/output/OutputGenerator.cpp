@@ -48,7 +48,6 @@
 #include <QRect>
 #include <QRectF>
 #include <QPointF>
-#include <QPainter>
 #include <QtGlobal>
 #include <QDebug>
 #include <vector>
@@ -125,34 +124,19 @@ OutputGenerator::processColorOrGrayscale(FilterData const& input,
 {
 	uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(input.grayImage());
 	
+	status.throwIfCancelled();
+	
+	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
+	
 	if (input.origImage().allGray()) {
-		status.throwIfCancelled();
 		return transformToGray(
-			input.grayImage(), m_toUncropped, m_cropRect,
-			qRgb(dominant_gray, dominant_gray, dominant_gray)
+			input.grayImage(), m_toUncropped, m_cropRect, bg_color
+		);
+	} else {
+		return transform(
+			input.origImage(), m_toUncropped, m_cropRect, bg_color
 		);
 	}
-	
-	QImage target(m_cropRect.size(), QImage::Format_RGB32);
-	target.fill(qRgb(dominant_gray, dominant_gray, dominant_gray));
-	
-	status.throwIfCancelled();
-	
-	{
-		QPainter painter(&target);
-		painter.setRenderHint(QPainter::SmoothPixmapTransform);
-		painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-		
-		QTransform target_xform(m_toUncropped);
-		target_xform *= QTransform().translate(-m_cropRect.left(), -m_cropRect.top());
-		painter.setTransform(target_xform);
-		
-		painter.drawImage(QPointF(0.0, 0.0), input.origImage());
-	}
-	
-	status.throwIfCancelled();
-	
-	return target;
 }
 
 namespace
@@ -181,6 +165,47 @@ struct CombineInverted
 		return static_cast<uint8_t>(res);
 	}
 };
+
+/**
+ * Fills areas of \p mixed with pixels from \p bw_content in
+ * areas where \p bw_mask is black.  Supported \p mixed image formats
+ * are Indexed8 grayscale, RGB32 and ARGB32.
+ * The \p MixedPixel type is uint8_t for Indexed8 grayscale and uint32_t
+ * for RGB32 and ARGB32.
+ */
+template<typename MixedPixel>
+void combineMixed(
+	QImage& mixed, BinaryImage const& bw_content,
+	BinaryImage const& bw_mask)
+{
+	MixedPixel* mixed_line = reinterpret_cast<MixedPixel*>(mixed.bits());
+	int const mixed_stride = mixed.bytesPerLine() / sizeof(MixedPixel);
+	uint32_t const* bw_content_line = bw_content.data();
+	int const bw_content_stride = bw_content.wordsPerLine();
+	uint32_t const* bw_mask_line = bw_mask.data();
+	int const bw_mask_stride = bw_mask.wordsPerLine();
+	int const width = mixed.width();
+	int const height = mixed.height();
+	uint32_t const msb = uint32_t(1) << 31;
+	
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
+				uint32_t tmp = bw_content_line[x >> 5];
+				tmp >>= (31 - (x & 31));
+				tmp &= uint32_t(1);
+				// Now it's 0 for white and 1 for black.
+				
+				--tmp; // 0 becomes 0xffffffff and 1 becomes 0.
+				
+				mixed_line[x] = static_cast<MixedPixel>(tmp);
+			}
+		}
+		mixed_line += mixed_stride;
+		bw_content_line += bw_content_stride;
+		bw_mask_line += bw_mask_stride;
+	}
+}
 
 } // anonymous namespace
 
@@ -394,113 +419,37 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 	
 	status.throwIfCancelled();
 	
-	if (!input.origImage().allGray()) {
-		bw_mask.invert();
-		QImage bw_content_argb(bw_content.toQImage());
-		bw_content.release();
-		
-		status.throwIfCancelled();
-		
-		bw_content_argb.setAlphaChannel(toGrayscale(bw_mask.toQImage()));
-		bw_mask.release();
-		
-		status.throwIfCancelled();
-		
-		// First draw a color version of the area covered by
-		// small_margins_rect here, then we are going to
-		// adjust its brightness.
-		QImage norm_illum_color(
-			normalized_illumination.size(), QImage::Format_RGB32
+	QImage mixed;
+	if (input.origImage().allGray()) {
+		mixed = normalized_illumination;
+	} else {
+		mixed = transform(
+			input.origImage(), m_toUncropped,
+			normalize_illumination_rect,
+			Qt::white
 		);
-		norm_illum_color.fill(0xffffffff); // opaque white
-		
-		status.throwIfCancelled();
-		
-		{
-			QPainter painter(&norm_illum_color);
-			painter.setRenderHint(QPainter::SmoothPixmapTransform);
-			
-			QTransform target_xform(m_toUncropped);
-			target_xform *= QTransform().translate(
-				-small_margins_rect.left(),
-				-small_margins_rect.top()
-			);
-			
-			painter.setTransform(target_xform);
-			painter.drawImage(QPointF(0.0, 0.0), input.origImage());
-		}
 		
 		status.throwIfCancelled();
 		
 		adjustBrightnessGrayscale(
-			norm_illum_color, normalized_illumination
+			mixed, normalized_illumination
 		);
 		if (dbg) {
-			dbg->add(norm_illum_color, "norm_illum_color");
+			dbg->add(mixed, "norm_illum_color");
 		}
-		
-		status.throwIfCancelled();
-		
-		QImage dst(m_cropRect.size(), QImage::Format_ARGB32_Premultiplied);
-		dst.fill(0xffffffff); // opaque white
-		
-		status.throwIfCancelled();
-		
-		if (!m_contentRect.isEmpty()) {
-			QPainter painter(&dst);
-			painter.setRenderHint(QPainter::SmoothPixmapTransform);
-			
-			QRectF const clip_rect(
-				m_contentRect.translated(-m_cropRect.topLeft())
-			);
-			painter.setClipRect(clip_rect);
-			
-			QPoint const draw_position(
-				small_margins_rect.topLeft() - m_cropRect.topLeft()
-			);
-			
-			// Draw the color part.
-			painter.drawImage(draw_position, norm_illum_color);
-			
-			status.throwIfCancelled();
-			
-			// Draw the B/W part.
-			painter.drawImage(draw_position, bw_content_argb);
-		}
-		
-		return dst;
 	}
-	
-	QImage mixed(normalized_illumination);
 	
 	// Save memory.
 	normalized_illumination = QImage();
 	holder = QImage();
 	
-	uint8_t* mixed_line = mixed.bits();
-	int const mixed_bpl = mixed.bytesPerLine();
-	uint32_t const* bw_content_line = bw_content.data();
-	int const bw_content_wpl = bw_content.wordsPerLine();
-	uint32_t const* bw_mask_line = bw_mask.data();
-	int const bw_mask_wpl = bw_mask.wordsPerLine();
-	int const width = mixed.width();
-	int const height = mixed.height();
-	uint32_t const msb = uint32_t(1) << 31;
-	
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
-				uint32_t const bit = (
-					bw_content_line[x >> 5] >> (31 - (x & 31))
-				) & uint32_t(1);
-				
-				// 1 becomes 0 (black), 0 becomes 0xff (white)
-				mixed_line[x] = static_cast<uint8_t>(bit - 1);
-			}
-		}
-		mixed_line += mixed_bpl;
-		bw_content_line += bw_content_wpl;
-		bw_mask_line += bw_mask_wpl;
+	if (mixed.format() == QImage::Format_Indexed8) {
+		combineMixed<uint8_t>(mixed, bw_content, bw_mask);
+	} else {
+		assert(mixed.format() == QImage::Format_RGB32
+			|| mixed.format() == QImage::Format_ARGB32);
+		
+		combineMixed<uint32_t>(mixed, bw_content, bw_mask);
 	}
 	
 	// Save memory.
@@ -509,9 +458,13 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 	
 	status.throwIfCancelled();
 	
-	QImage dst(m_cropRect.size(), QImage::Format_Indexed8);
-	dst.setColorTable(createGrayscalePalette());
-	dst.fill(0xff); // white.
+	QImage dst(m_cropRect.size(), mixed.format());
+	if (mixed.format() == QImage::Format_Indexed8) {
+		dst.setColorTable(createGrayscalePalette());
+		dst.fill(0xff); // White.
+	} else {
+		dst.fill(0xffffffff); // Opaque white.
+	}
 	
 	if (!m_contentRect.isEmpty()) {
 		QRect src_rect(m_contentRect);
