@@ -67,8 +67,15 @@ BinaryImage binarizeSauvola(QImage const& src, QSize window_size);
  * C. Wolf, J.M. Jolion, F. Chassaing. "Text localization, enhancement and
  * binarization in multimedia documents."
  * http://liris.cnrs.fr/christian.wolf/papers/icpr2002v.pdf
+ *
+ * \param src The image to binarize.
+ * \param window_size The dimensions of a pixel neighborhood to consider.
+ * \param lower_bound The minimum possible gray level that can be made white.
+ * \param upper_bound The maximum possible gray level that can be made black.
  */
-BinaryImage binarizeWolf(QImage const& src, QSize window_size);
+BinaryImage binarizeWolf(
+	QImage const& src, QSize window_size,
+	unsigned char lower_bound = 1, unsigned char upper_bound = 254);
 
 } // namespace imageproc
 

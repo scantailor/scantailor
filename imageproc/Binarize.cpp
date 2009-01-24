@@ -134,7 +134,9 @@ BinaryImage binarizeSauvola(QImage const& src, QSize const window_size)
 	return bw_img;
 }
 
-BinaryImage binarizeWolf(QImage const& src, QSize const window_size)
+BinaryImage binarizeWolf(
+	QImage const& src, QSize const window_size,
+	unsigned char const lower_bound, unsigned char const upper_bound)
 {
 	if (window_size.isEmpty()) {
 		throw std::invalid_argument("binarizeWolf: invalid window_size");
@@ -220,7 +222,9 @@ BinaryImage binarizeWolf(QImage const& src, QSize const window_size)
 			
 			uint32_t const msb = uint32_t(1) << 31;
 			uint32_t const mask = msb >> (x & 31);
-			if (int(gray_line[x]) < threshold) {
+			if (gray_line[x] < lower_bound ||
+					(gray_line[x] <= upper_bound &&
+					int(gray_line[x]) < threshold)) {
 				// black
 				bw_line[x >> 5] |= mask;
 			} else {
