@@ -198,6 +198,8 @@ void combineMixed(
 				
 				--tmp; // 0 becomes 0xffffffff and 1 becomes 0.
 				
+				tmp |= 0xff000000; // Force opacity.
+				
 				mixed_line[x] = static_cast<MixedPixel>(tmp);
 			}
 		}
