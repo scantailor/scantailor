@@ -369,8 +369,8 @@ ImageView::resizeInnerRect(QPoint const delta)
 	forceNonNegativeHardMargins(m_middleRect);
 	widget_rect = m_beforeResizing.origToWidget.mapRect(m_middleRect);
 	
-	int effective_dx = 0;
-	int effective_dy = 0;
+	double effective_dx = 0;
+	double effective_dy = 0;
 	
 	QRectF const& old_widget_rect = m_beforeResizing.middleWidgetRect;
 	if (m_innerResizingMask & LEFT_EDGE) {
