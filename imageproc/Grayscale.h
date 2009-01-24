@@ -96,6 +96,15 @@ QImage createFramedImage(
 	QSize const& size, unsigned char inner_color = 0xff,
 	unsigned char frame_color = 0x00);
 
+/**
+ * \brief Find the darkest gray level of an image.
+ *
+ * \param image The image to process.  If it's null, 0xff will
+ *        be returned as the darkest image.  If it's not grayscale,
+ *        a grayscale copy will be created.
+ */
+unsigned char darkestGrayLevel(QImage const& image);
+
 } // namespace imageproc
 
 #endif

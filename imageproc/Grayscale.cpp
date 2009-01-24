@@ -23,6 +23,7 @@
 #include <QColor>
 #include <QtGlobal>
 #include <stdexcept>
+#include <algorithm>
 #include <string.h>
 #include <stdint.h>
 
@@ -259,6 +260,28 @@ QImage createFramedImage(QSize const& size,
 	memset(line - bpl, frame_color, width);
 	
 	return image;
+}
+
+unsigned char darkestGrayLevel(QImage const& image)
+{
+	QImage const gray(toGrayscale(image));
+	
+	int const width = image.width();
+	int const height = image.height();
+	
+	unsigned char const* line = image.bits();
+	int const bpl = image.bytesPerLine();
+	
+	unsigned char darkest = 0xff;
+	
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			darkest = std::min(darkest, line[x]);
+		}
+		line += bpl;
+	}
+	
+	return darkest;
 }
 
 GrayscaleHistogram::GrayscaleHistogram(QImage const& img)
