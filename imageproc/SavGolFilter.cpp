@@ -281,7 +281,7 @@ SavGolKernel::recalcForOrigin(QPoint const& origin)
 	}
 }
 
-void
+inline void
 SavGolKernel::convolve(uint8_t* dst, uint8_t const* src_top_left, int src_bpl) const
 {
 	uint8_t const* p_src = src_top_left;

@@ -151,7 +151,7 @@ IntegralImage<T>::beginRow()
 }
 
 template<typename T>
-T
+inline T
 IntegralImage<T>::sum(QRect const& rect) const
 {
 	// Keep in mind that row 0 and column 0 are fake.
