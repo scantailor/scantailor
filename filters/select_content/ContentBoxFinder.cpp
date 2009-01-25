@@ -807,6 +807,11 @@ ContentBoxFinder::estimateTextMask(
 				total_weight += val;
 			}
 			
+			if (total_weight == 0) {
+				//qDebug() << "no black pixels at all";
+				continue;
+			}
+			
 			double const min_fill_factor = 0.17;
 			double const max_fill_factor = 0.65;
 			
