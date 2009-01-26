@@ -307,12 +307,15 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages)
 	
 	clear();
 	
-	PageId const cur_page(pages.curPage().id());
-	
-	CompositeItem* cur_item = 0;
-	
-	double offset = 0;
 	size_t const num_pages = pages.numPages();
+	if (num_pages == 0) {
+		return;
+	}
+	
+	PageId const cur_page(pages.curPage().id());
+	CompositeItem* cur_item = 0;
+	double offset = 0;
+	
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page_info(pages.pageAt(i));
 		
