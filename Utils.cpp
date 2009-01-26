@@ -20,6 +20,8 @@
 #include <QString>
 #include <QByteArray>
 #include <QFile>
+#include <Qt>
+#include <QTextDocument> // Qt::escape() is actually declare there.
 
 #ifdef Q_WS_WIN
 #include <windows.h>
@@ -41,4 +43,18 @@ Utils::overwritingRename(QString const& from, QString const& to)
 		QFile::encodeName(to).data()
 	) == 0;
 #endif
+}
+
+QString
+Utils::richTextForLink(
+	QString const& label, QString const& target)
+{
+	return QString::fromAscii(
+		"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\""
+		"\"http://www.w3.org/TR/REC-html40/strict.dtd\">"
+		"<html><head><meta name=\"qrichtext\" content=\"1\" />"
+		"</head><body><p style=\"margin-top:0px; margin-bottom:0px;"
+		"margin-left:0px; margin-right:0px; -qt-block-indent:0;"
+		"text-indent:0px;\"><a href=\"%1\">%2</a></p></body></html>"
+	).arg(Qt::escape(target), Qt::escape(label));
 }

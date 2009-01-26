@@ -54,6 +54,8 @@ OptionsWidget::OptionsWidget(
 	);
 	
 	setupUi(this);
+	widestPageLink->setText(Utils::richTextForLink(widestPageLink->text()));
+	tallestPageLink->setText(Utils::richTextForLink(tallestPageLink->text()));
 	updateLinkDisplay(topBottomLink, m_topBottomLinked);
 	updateLinkDisplay(leftRightLink, m_leftRightLinked);
 	enableDisableAlignmentButtons();

@@ -42,6 +42,20 @@ public:
 	static QString doubleToString(double val) {
 		return QString::number(val, 'g', 16);
 	}
+	
+	/**
+	 * \brief Generate rich text, complete with headers and stuff,
+	 *        for a clickable link.
+	 *
+	 * \param label The text to show as a link.
+	 * \param target A URL or something else.  If the link will
+	 *        be used in a QLable, this string will be passed
+	 *        to QLabel::linkActivated(QString const&).
+	 * \return The resulting reach text.
+	 */
+	static QString richTextForLink(
+		QString const& label,
+		QString const& target = QString(QChar('#')));
 };
 
 template<typename M, typename K, typename V>
