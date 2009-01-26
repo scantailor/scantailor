@@ -51,6 +51,7 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QRect>
+#include <QRectF>
 #include <QSize>
 #include <QImage>
 #include <QPointF>
@@ -241,9 +242,10 @@ void countOffcutPixels(
  */
 std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	Rule::LayoutType const layout_type,
-	std::vector<QLineF> const& ltr_lines, QSize const& image_size,
-	QImage const& gray_downscaled, QTransform const& out_to_downscaled,
-	DebugImages* dbg)
+	std::vector<QLineF> const& ltr_lines,
+	QRectF const& virtual_image_rect,
+	QImage const& gray_downscaled,
+	QTransform const& out_to_downscaled, DebugImages* dbg)
 {
 	QImage const hor_shadows(detectHorShadows(gray_downscaled));
 	if (dbg) {
@@ -262,6 +264,8 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	unsigned left_sum = hor_shadows_bin.countBlackPixels(left_area);
 	unsigned right_sum = hor_shadows_bin.countBlackPixels(right_area);
 	
+	double const image_center = virtual_image_rect.center().x();
+	
 	// A loop just to be able to break from it.
 	while (left_sum == 0 && right_sum == 0) {
 		// This whole branch (loop) leads to SINGLE_PAGE_UNCUT,
@@ -274,7 +278,6 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 		// then it's unlikely to be SINGLE_PAGE_UNCUT
 		if (ltr_lines.size() == 1) {
 			QLineF const& line = ltr_lines.front();
-			double const image_center = 0.5 * image_size.width();
 			double const line_center = lineCenterX(line);
 			if (fabs(image_center - line_center) > 0.8 * image_center) {
 				break;
@@ -297,9 +300,9 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 		return std::auto_ptr<PageLayout>();
 	} else if (ltr_lines.size() == 1) {
 		QLineF const& line = ltr_lines.front();
-		double const x_center = lineCenterX(line);
+		double const line_center = lineCenterX(line);
 		PageLayout::Type plt;
-		if (x_center < 0.5 * image_size.width()) {
+		if (line_center < image_center) {
 			plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
 		} else {
 			plt = PageLayout::LEFT_PAGE_PLUS_OFFCUT;
@@ -341,7 +344,8 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
  * \return The page layout detected or a null auto_ptr.
  */
 std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
-	std::vector<QLineF> const& ltr_lines, QSize const& image_size)
+	std::vector<QLineF> const& ltr_lines,
+	QRectF const& virtual_image_rect)
 {
 	if (ltr_lines.empty()) {
 		// Impossible to detect the page layout.
@@ -353,12 +357,12 @@ std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
 	}
 	
 	// Find the line closest to the center.
-	double const global_center = 0.5 * image_size.width();
+	double const image_center = virtual_image_rect.center().x();
 	double min_distance = std::numeric_limits<double>::max();
 	QLineF const* best_line = 0;
 	BOOST_FOREACH (QLineF const& line, ltr_lines) {
 		double const line_center = lineCenterX(line);
-		double const distance = fabs(line_center - global_center);
+		double const distance = fabs(line_center - image_center);
 		if (distance < min_distance) {
 			min_distance = distance;
 			best_line = &line;
@@ -429,7 +433,7 @@ namespace
 class BadTwoPageSplitter
 {
 public:
-	BadTwoPageSplitter(int image_width)
+	BadTwoPageSplitter(double image_width)
 	: m_imageCenter(0.5 * image_width),
 	m_distFromCenterThreshold(0.6 * m_imageCenter) {}
 	
@@ -484,6 +488,11 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 	
 	std::sort(lines.begin(), lines.end(), CenterComparator());
 	
+	QRectF const virtual_image_rect(
+		pre_xform.transform().mapRect(input.rect())
+	);
+	QPointF const center(virtual_image_rect.center());
+	
 	if (num_pages == 1) {
 		// If all of the lines are close to one of the edges,
 		// that means they can't be the edges of a pages,
@@ -492,10 +501,9 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 		while (lines.size() > 1) { // just to be able to break from it.
 			QLineF const left_line(lines.front());
 			QLineF const right_line(lines.back());
-			double const center(0.5 * input.width());
-			double const threshold = 0.3 * center;
-			double left_dist = center - lineCenterX(left_line);
-			double right_dist = center - lineCenterX(right_line);
+			double const threshold = 0.3 * center.x();
+			double left_dist = center.x() - lineCenterX(left_line);
+			double right_dist = center.x() - lineCenterX(right_line);
 			if ((left_dist < 0) != (right_dist < 0)) {
 				// They are from the opposite sides
 				// from the center line.
@@ -515,7 +523,7 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 			break;
 		}
 		return autoDetectSinglePageLayout(
-			layout_type, lines, input.size(), gray_downscaled,
+			layout_type, lines, virtual_image_rect, gray_downscaled,
 			out_to_downscaled, dbg
 		);
 	} else {
@@ -525,10 +533,10 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 		lines.erase(
 			std::remove_if(
 				lines.begin(), lines.end(),
-				BadTwoPageSplitter(input.width())
+				BadTwoPageSplitter(virtual_image_rect.width())
 			), lines.end()
 		);
-		return autoDetectTwoPageLayout(lines, input.size());
+		return autoDetectTwoPageLayout(lines, virtual_image_rect);
 	}
 }
 
