@@ -20,6 +20,7 @@
 #define PROJECTCREATIONCONTEXT_H_
 
 #include "NonCopyable.h"
+#include "ImageFileInfo.h"
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -27,16 +28,22 @@
 
 class ProjectFilesDialog;
 class FixDpiDialog;
-class ImageFileInfo;
+class QWidget;
 
 class ProjectCreationContext : public QObject
 {
 	Q_OBJECT
 	DECLARE_NON_COPYABLE(ProjectCreationContext)
 public:
-	ProjectCreationContext();
+	ProjectCreationContext(QWidget* parent);
 	
 	virtual ~ProjectCreationContext();
+	
+	std::vector<ImageFileInfo> const& files() const { return m_files; }
+	
+	QString const& outDir() const { return m_outDir; }
+signals:
+	void done(ProjectCreationContext* context);
 private slots:
 	void projectFilesSubmitted();
 	
@@ -48,13 +55,13 @@ private slots:
 private:
 	void showProjectFilesDialog();
 	
-	void showFixDpiDialog(std::vector<ImageFileInfo> const& files);
-	
-	void showMainWindow(std::vector<ImageFileInfo> const& files);
+	void showFixDpiDialog();
 	
 	QPointer<ProjectFilesDialog> m_ptrProjectFilesDialog;
 	QPointer<FixDpiDialog> m_ptrFixDpiDialog;
 	QString m_outDir;
+	std::vector<ImageFileInfo> m_files;
+	QWidget* m_pParent;
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,25 +20,12 @@
 #define APPLICATION_H_
 
 #include <QApplication>
-#include <memory>
-
-class NewOpenProjectDialog;
 
 class Application : public QApplication
 {
 	Q_OBJECT
 public:
 	Application(int& argc, char** argv);
-	
-	void showNewOpenProjectDialog();
-private slots:
-	void newProject();
-	
-	void openProject();
-	
-	void projectContextDestroyed();
-private:
-	std::auto_ptr<NewOpenProjectDialog> m_ptrNewOpenProjectDialog;
 };
 
 #endif

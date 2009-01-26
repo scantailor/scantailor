@@ -189,9 +189,9 @@ SET(
 	ImageFileInfo.cpp ImageFileInfo.h
 	ImageMetadata.cpp ImageMetadata.h
 	PageLayout.cpp PageLayout.h
+	RecentProjects.cpp RecentProjects.h
 	FixDpiDialog.cpp FixDpiDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
-	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	MainWindow.cpp MainWindow.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
 	PhysicalTransformation.cpp PhysicalTransformation.h
@@ -221,7 +221,7 @@ SET(
 	ImageLoader.cpp ImageLoader.h
 	ErrorWidget.cpp ErrorWidget.h
 	OrthogonalRotation.cpp OrthogonalRotation.h
-	NewOpenProjectDialog.cpp NewOpenProjectDialog.h
+	NewOpenProjectPanel.cpp NewOpenProjectPanel.h
 	ProjectFilesDialog.cpp ProjectFilesDialog.h
 	WorkerThread.cpp WorkerThread.h
 	LoadFileTask.cpp LoadFileTask.h

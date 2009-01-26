@@ -18,6 +18,8 @@
 
 #include "config.h"
 #include "MainWindow.h.moc"
+#include "NewOpenProjectPanel.h"
+#include "RecentProjects.h"
 #include "WorkerThread.h"
 #include "PageSequence.h"
 #include "ThumbnailSequence.h"
@@ -33,6 +35,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailFactory.h"
 #include "ContentBoxPropagator.h"
+#include "ProjectCreationContext.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -56,8 +59,10 @@
 #include "ScopedIncDec.h"
 #include <boost/foreach.hpp>
 #include <QLineF>
+#include <QWidget>
 #include <QCloseEvent>
 #include <QStackedLayout>
+#include <QGridLayout>
 #include <QLayoutItem>
 #include <QAbstractListModel>
 #include <QFileInfo>
@@ -71,6 +76,7 @@
 #include <QMessageBox>
 #include <QPalette>
 #include <QSettings>
+#include <QDomDocument>
 #include <QDebug>
 #include <algorithm>
 #include <stddef.h>
@@ -127,88 +133,26 @@ private:
 };
 
 
-MainWindow::MainWindow(
-	std::vector<ImageFileInfo> const& files, QString const& out_dir)
-:	m_ptrPages(new PageSequence(files, PageSequence::AUTO_PAGES)),
-	m_outDir(out_dir),
-	m_ptrThumbnailCache(createThumbnailCache()),
+MainWindow::MainWindow()
+:	m_ptrPages(new PageSequence),
 	m_ptrWorkerThread(new WorkerThread),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_debug(false),
-	m_batchProcessing(false)
+	m_batchProcessing(false),
+	m_closing(false)
 {
 	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
 	
-	construct();
-}
-
-MainWindow::MainWindow(
-	QString const& project_file, ProjectReader const& project_reader)
-:	m_ptrPages(project_reader.pages()),
-	m_outDir(project_reader.outputDirectory()),
-	m_projectFile(project_file),
-	m_ptrThumbnailCache(createThumbnailCache()),
-	m_ptrWorkerThread(new WorkerThread),
-	m_curFilter(0),
-	m_ignoreSelectionChanges(0),
-	m_debug(false),
-	m_batchProcessing(false)
-{
-	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
-	project_reader.readFilterSettings(m_ptrFilterListModel->filters());
-	
-	construct();
-}
-
-MainWindow::~MainWindow()
-{
-	if (m_ptrCurTask) {
-		m_ptrCurTask->cancel();
-		m_ptrCurTask.reset();
-	}
-	m_ptrWorkerThread->shutdown();
-	
-	removeWidgetsFromLayout(m_pImageFrameLayout, false);
-	removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
-	m_ptrTabbedDebugImages->clear();
-}
-
-std::auto_ptr<ThumbnailPixmapCache>
-MainWindow::createThumbnailCache()
-{
-	QSize const max_pixmap_size(200, 200);
-	
-	return std::auto_ptr<ThumbnailPixmapCache>(
-		new ThumbnailPixmapCache(
-			m_outDir+"/cache/thumbs", max_pixmap_size, 40, 5
-		)
-	);
-}
-
-void
-MainWindow::construct()
-{
-	// This needs to horizontally fit into thumbView.
 	m_maxLogicalThumbSize = QSize(250, 160);
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
 	
+	setupThumbView(); // Expects m_ptrThumbSequence to be initialized.
+	
 	m_ptrTabbedDebugImages.reset(new QTabWidget);
 	actionStopBatchProcessing->setEnabled(false);
-	
-	setupThumbView();
-	
-	m_ptrContentBoxPropagator.reset(
-		new ContentBoxPropagator(
-			m_ptrFilterListModel->getPageLayoutFilter(),
-			m_ptrFilterListModel->createCompositeCacheDrivenTask(
-				m_outDir,
-				m_ptrFilterListModel->getSelectContentFilterIdx()
-			)
-		)
-	);
 	
 	addAction(actionNextPage);
 	addAction(actionPrevPage);
@@ -222,8 +166,6 @@ MainWindow::construct()
 		m_ptrFilterListModel->index(0, 0),
 		QItemSelectionModel::SelectCurrent
 	);
-	
-	resetThumbSequence();
 	
 	connect(
 		filterList->selectionModel(),
@@ -261,6 +203,14 @@ MainWindow::construct()
 	);
 	
 	connect(
+		actionNewProject, SIGNAL(triggered(bool)),
+		this, SLOT(newProject())
+	);
+	connect(
+		actionOpenProject, SIGNAL(triggered(bool)),
+		this, SLOT(openProject())
+	);
+	connect(
 		actionSaveProject, SIGNAL(triggered(bool)),
 		this, SLOT(saveProjectTriggered())
 	);
@@ -269,8 +219,144 @@ MainWindow::construct()
 		this, SLOT(saveProjectAsTriggered())
 	);
 	
+	updateProjectActions();
+	updateBatchProcessingActions();
 	updateWindowTitle();
-	loadImage();
+	updateMainArea();
+}
+
+
+MainWindow::~MainWindow()
+{
+	cancelOngoingTask();
+	m_ptrWorkerThread->shutdown();
+	
+	removeWidgetsFromLayout(m_pImageFrameLayout, false);
+	removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
+	m_ptrTabbedDebugImages->clear();
+}
+
+void
+MainWindow::cancelOngoingTask()
+{
+	if (m_ptrCurTask) {
+		m_ptrCurTask->cancel();
+		m_ptrCurTask.reset();
+	}
+}
+
+void
+MainWindow::switchToNewProject(
+	IntrusivePtr<PageSequence> const& pages,
+	QString const& out_dir, QString const& project_file_path,
+	ProjectReader const* project_reader)
+{
+	m_ptrPages = pages;
+	m_outDir = out_dir;
+	m_projectFile = project_file_path;
+	
+	if (m_batchProcessing) {
+		splitter->widget(0)->setVisible(true);
+		m_batchProcessing = false;
+	}
+	
+	cancelOngoingTask();
+	
+	// Recreate the filter list model, and let filters load
+	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
+	if (project_reader) {
+		project_reader->readFilterSettings(
+			m_ptrFilterListModel->filters()
+		);
+	}
+	
+	// Connect the filter list model to the view and select
+	// the first item.
+	{
+		ScopedIncDec<int> guard(m_ignoreSelectionChanges);
+		filterList->setModel(m_ptrFilterListModel.get());
+		filterList->selectionModel()->select(
+			m_ptrFilterListModel->index(0, 0),
+			QItemSelectionModel::SelectCurrent
+		);
+		m_curFilter = 0;
+		
+		// Setting a data model also implicitly sets a new
+		// selection model, so we have to reconnect to it.
+		connect(
+			filterList->selectionModel(),
+			SIGNAL(selectionChanged(QItemSelection const&, QItemSelection const&)),
+			this, SLOT(filterSelectionChanged(QItemSelection const&))
+		);
+	}
+	
+	m_ptrContentBoxPropagator.reset(
+		new ContentBoxPropagator(
+			m_ptrFilterListModel->getPageLayoutFilter(),
+			m_ptrFilterListModel->createCompositeCacheDrivenTask(
+				m_outDir,
+				m_ptrFilterListModel->getSelectContentFilterIdx()
+			)
+		)
+	);
+	
+	// Thumbnails are stored relative to the output directory,
+	// so recreate the thumbnail cache.
+	m_ptrThumbnailCache = createThumbnailCache();
+	resetThumbSequence();
+	
+	updateProjectActions();
+	updateBatchProcessingActions();
+	updateWindowTitle();
+	updateMainArea();
+}
+
+std::auto_ptr<ThumbnailPixmapCache>
+MainWindow::createThumbnailCache()
+{
+	QSize const max_pixmap_size(200, 200);
+	
+	return std::auto_ptr<ThumbnailPixmapCache>(
+		new ThumbnailPixmapCache(
+			m_outDir+"/cache/thumbs", max_pixmap_size, 40, 5
+		)
+	);
+}
+
+void
+MainWindow::showNewOpenProjectPanel()
+{
+	std::auto_ptr<QWidget> outer_widget(new QWidget);
+	QGridLayout* layout = new QGridLayout(outer_widget.get());
+	outer_widget->setLayout(layout);
+	
+	NewOpenProjectPanel* nop = new NewOpenProjectPanel(outer_widget.get());
+	
+	// We use asynchronous connections because otherwise we
+	// would be deleting a widget from its event handler, which
+	// Qt doesn't like.
+	connect(
+		nop, SIGNAL(newProject()),
+		this, SLOT(newProject()),
+		Qt::QueuedConnection
+	);
+	connect(
+		nop, SIGNAL(openProject()),
+		this, SLOT(openProject()),
+		Qt::QueuedConnection
+	);
+	connect(
+		nop, SIGNAL(openRecentProject(QString const&)),
+		this, SLOT(openProject(QString const&)),
+		Qt::QueuedConnection
+	);
+	
+	layout->addWidget(nop, 1, 1);
+	layout->setColumnStretch(0, 1);
+	layout->setColumnStretch(2, 1);
+	layout->setRowStretch(0, 1);
+	layout->setRowStretch(2, 1);
+	setImageWidget(outer_widget.release(), TRANSFER_OWNERSHIP);
 }
 
 void
@@ -294,71 +380,24 @@ MainWindow::setupThumbView()
 void
 MainWindow::closeEvent(QCloseEvent* const event)
 {
-	if (m_projectFile.isEmpty()) {
-		switch (promptProjectSave()) {
-			case SAVE:
-				saveProjectTriggered();
-				// fall through
-			case DONT_SAVE:
-				event->accept();
-				break;
-			case CANCEL:
-				event->ignore();
-				break;
-		}
-		return;
-	}
-	
-	QFileInfo const project_file(m_projectFile);
-	QFileInfo const backup_file(
-		project_file.absoluteDir(),
-		QString::fromAscii("Backup.")+project_file.fileName()
-	);
-	QString const backup_file_path(backup_file.absoluteFilePath());
-	
-	ProjectWriter writer(m_outDir, m_ptrPages);
-	
-	if (!writer.write(backup_file_path, m_ptrFilterListModel->filters())) {
-		QFile::remove(backup_file_path);
-		switch (promptProjectSave()) {
-			case SAVE:
-				saveProjectTriggered();
-				// fall through
-			case DONT_SAVE:
-				event->accept();
-				return;
-			case CANCEL:
-				event->ignore();
-				return;
-		}
-	}
-	
-	if (compareFiles(m_projectFile, backup_file_path)) {
-		QFile::remove(backup_file_path);
+	if (m_closing) {
 		event->accept();
-		return;
+	} else {
+		event->ignore();
+		startTimer(0);
 	}
+}
+
+void
+MainWindow::timerEvent(QTimerEvent* const event)
+{
+	// We only use the timer event for delayed closing of the window.
+	killTimer(event->timerId());
 	
-	switch (promptProjectSave()) {
-		case SAVE:
-			if (!Utils::overwritingRename(backup_file_path, m_projectFile)) {
-				event->ignore();
-				QMessageBox::warning(
-					this, tr("Error"),
-					tr("Error saving the project file!")
-				);
-				return;
-			}
-			// fall through
-		case DONT_SAVE:
-			QFile::remove(backup_file_path);
-			event->accept();
-			return;
-		case CANCEL:
-			event->ignore();
-			return;
+	if (closeProjectInteractive()) {
+		m_closing = true;
+		close();
 	}
-	
 }
 
 MainWindow::SavePromptResult
@@ -414,6 +453,8 @@ MainWindow::compareFiles(QString const& fpath1, QString const& fpath2)
 void
 MainWindow::resetThumbSequence()
 {
+	assert(m_ptrThumbSequence.get());
+	
 	IntrusivePtr<CompositeCacheDrivenTask> const task(
 		m_ptrFilterListModel->createCompositeCacheDrivenTask(
 			m_outDir, m_curFilter
@@ -576,7 +617,7 @@ MainWindow::goToPage(PageId const& page_id)
 {
 	m_ptrPages->setCurPage(page_id);
 	m_ptrThumbSequence->setCurrentThumbnail(page_id);
-	loadImage();
+	updateMainArea();
 }
 
 void
@@ -591,7 +632,7 @@ MainWindow::pageSelected(
 		if (m_batchProcessing) {
 			stopBatchProcessing();
 		} else {
-			loadImage();
+			updateMainArea();
 		}
 	}
 }
@@ -607,10 +648,7 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 		return;
 	}
 	
-	if (m_ptrCurTask) {
-		m_ptrCurTask->cancel();
-		m_ptrCurTask.reset();
-	}
+	cancelOngoingTask();
 	
 	bool const was_below_select_content = isBelowSelectContent(m_curFilter);
 	m_curFilter = selected.front().top();
@@ -619,31 +657,30 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	if (!was_below_select_content && now_below_select_content) {
 		// IMPORTANT: this needs to go before resetting thumbnails,
 		// because it may affect them.
-		m_ptrContentBoxPropagator->propagate(*m_ptrPages);
+		if (m_ptrContentBoxPropagator.get()) {
+			m_ptrContentBoxPropagator->propagate(*m_ptrPages);
+		} // Otherwise probably no project is loaded.
 	}
 	
 	resetThumbSequence();
 	
 	updateBatchProcessingActions();
 	
-	loadImage();
+	updateMainArea();
 }
 
 void
 MainWindow::reloadRequested()
 {
-	loadImage();
+	updateMainArea();
 }
 
 void
 MainWindow::startBatchProcessing()
 {
-	if (m_ptrCurTask) {
-		// The current task is being cancelled because
-		// it's probably not a batch processing task.
-		m_ptrCurTask->cancel();
-		m_ptrCurTask.reset();
-	}
+	// The current task is being cancelled because
+	// it's probably not a batch processing task.
+	cancelOngoingTask();
 	
 	m_batchProcessing = true;
 	updateBatchProcessingActions();
@@ -652,7 +689,7 @@ MainWindow::startBatchProcessing()
 	
 	PageInfo const page_info(m_ptrPages->setFirstPage(getCurrentView()));
 	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
-	loadImage();
+	updateMainArea();
 }
 
 void
@@ -662,12 +699,9 @@ MainWindow::stopBatchProcessing()
 		return;
 	}
 	
-	if (m_ptrCurTask) {
-		// The current task is being cancelled because
-		// it's probably a batch processing task.
-		m_ptrCurTask->cancel();
-		m_ptrCurTask.reset();
-	}
+	// The current task is being cancelled because
+	// it's probably a batch processing task.
+	cancelOngoingTask();
 	
 	splitter->widget(0)->setVisible(true);
 	
@@ -780,7 +814,110 @@ MainWindow::saveProjectAsTriggered()
 			"project/lastDir",
 			QFileInfo(m_projectFile).absolutePath()
 		);
+		
+		RecentProjects rp;
+		rp.read();
+		rp.setMostRecent(m_projectFile);
+		rp.write();
 	}
+}
+
+void
+MainWindow::newProject()
+{
+	if (!closeProjectInteractive()) {
+		return;
+	}
+	
+	// It will delete itself when it's done.
+	ProjectCreationContext* context = new ProjectCreationContext(this);
+	connect(
+		context, SIGNAL(done(ProjectCreationContext*)),
+		this, SLOT(newProjectCreated(ProjectCreationContext*))
+	);
+}
+
+void
+MainWindow::newProjectCreated(ProjectCreationContext* context)
+{
+	IntrusivePtr<PageSequence> pages(
+		new PageSequence(context->files(), PageSequence::AUTO_PAGES)
+	);
+	switchToNewProject(pages, context->outDir());
+}
+
+void
+MainWindow::openProject()
+{
+	if (!closeProjectInteractive()) {
+		return;
+	}
+	
+	QSettings settings;
+	QString const project_dir(settings.value("project/lastDir").toString());
+	
+	QString const project_file(
+		QFileDialog::getOpenFileName(
+			0, tr("Open Project"),
+			project_dir,
+			tr("Scan Tailor Projects")+" (*.ScanTailor)"
+		)
+	);
+	if (project_file.isEmpty()) {
+		// Cancelled by user.
+		return;
+	}
+	
+	openProject(project_file);
+}
+
+void
+MainWindow::openProject(QString const& project_file)
+{
+	QFile file(project_file);
+	if (!file.open(QIODevice::ReadOnly)) {
+		QMessageBox::warning(
+			0, tr("Error"),
+			tr("Unable to open the project file.")
+		);
+		return;
+	}
+	
+	QDomDocument doc;
+	if (!doc.setContent(&file)) {
+		QMessageBox::warning(
+			0, tr("Error"),
+			tr("The project file is broken.")
+		);
+		return;
+	}
+	
+	file.close();
+	
+	ProjectReader reader(doc);
+	if (!reader.success()) {
+		QMessageBox::warning(
+			0, tr("Error"),
+			tr("Unable to interpret the project file.")
+		);
+		return;
+	}
+	
+	RecentProjects rp;
+	rp.read();
+	rp.setMostRecent(project_file);
+	rp.write();
+	
+	QSettings settings;
+	settings.setValue(
+		"project/lastDir",
+		QFileInfo(project_file).absolutePath()
+	);
+	
+	switchToNewProject(
+		reader.pages(), reader.outputDirectory(),
+		project_file, &reader
+	);
 }
 
 void
@@ -796,11 +933,20 @@ MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
 }
 
 void
+MainWindow::updateProjectActions()
+{
+	bool const loaded = isProjectLoaded();
+	actionSaveProject->setEnabled(loaded);
+	actionSaveProjectAs->setEnabled(loaded);
+}
+
+void
 MainWindow::updateBatchProcessingActions()
 {
-	bool const ok = !isOutputFilter() ||
+	bool const ok = m_ptrPages->numImages() != 0 &&
+		(!isOutputFilter() ||
 		m_ptrFilterListModel->getPageLayoutFilter()
-		->checkReadyForOutput(*m_ptrPages);
+		->checkReadyForOutput(*m_ptrPages));
 	
 	actionStartBatchProcessing->setEnabled(ok && !m_batchProcessing);
 	actionStopBatchProcessing->setEnabled(ok && m_batchProcessing);
@@ -837,13 +983,17 @@ MainWindow::getCurrentView() const
 }
 
 void
-MainWindow::loadImage()
+MainWindow::updateMainArea()
 {
-	int page_num = 0;
-	PageInfo const page_info(
-		m_ptrPages->curPage(getCurrentView(), &page_num)
-	);
-	loadImage(page_info, page_num);
+	if (m_ptrPages->numImages() == 0) {
+		showNewOpenProjectPanel();
+	} else {
+		int page_num = 0;
+		PageInfo const page_info(
+			m_ptrPages->curPage(getCurrentView(), &page_num)
+		);
+		loadImage(page_info, page_num);
+	}
 }
 
 void
@@ -869,10 +1019,9 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 	
 	m_ptrFilterListModel->getFilter(m_curFilter)->preUpdateUI(this, page.id());
 	
-	if (m_ptrCurTask) {
-		m_ptrCurTask->cancel();
-		m_ptrCurTask.reset();
-	}
+	cancelOngoingTask();
+	
+	assert(m_ptrThumbnailCache.get());
 	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
 		page, page_num, m_outDir, m_curFilter,
 		*m_ptrThumbnailCache, m_ptrPages,
@@ -894,6 +1043,93 @@ MainWindow::updateWindowTitle()
 	}
 	QString const version(QString::fromUtf8(VERSION));
 	setWindowTitle(tr("%1 - Scan Tailor %2").arg(project_name, version));
+}
+
+/**
+ * \brief Closes the currently project, prompting to save it if necessary.
+ *
+ * \return true if the project was closed, false if the user cancelled the process.
+ */
+bool
+MainWindow::closeProjectInteractive()
+{
+	if (!isProjectLoaded()) {
+		return true;
+	}
+	
+	if (m_projectFile.isEmpty()) {
+		switch (promptProjectSave()) {
+			case SAVE:
+				saveProjectTriggered();
+				// fall through
+			case DONT_SAVE:
+				break;
+			case CANCEL:
+				return false;
+		}
+		closeProjectWithoutSaving();
+		return true;
+	}
+	
+	QFileInfo const project_file(m_projectFile);
+	QFileInfo const backup_file(
+		project_file.absoluteDir(),
+		QString::fromAscii("Backup.")+project_file.fileName()
+	);
+	QString const backup_file_path(backup_file.absoluteFilePath());
+	
+	ProjectWriter writer(m_outDir, m_ptrPages);
+	
+	if (!writer.write(backup_file_path, m_ptrFilterListModel->filters())) {
+		// Backup file could not be written???
+		QFile::remove(backup_file_path);
+		switch (promptProjectSave()) {
+			case SAVE:
+				saveProjectTriggered();
+				// fall through
+			case DONT_SAVE:
+				break;
+			case CANCEL:
+				return false;
+		}
+		closeProjectWithoutSaving();
+		return true;
+	}
+	
+	if (compareFiles(m_projectFile, backup_file_path)) {
+		// The project hasn't really changed.
+		QFile::remove(backup_file_path);
+		closeProjectWithoutSaving();
+		return true;
+	}
+	
+	switch (promptProjectSave()) {
+		case SAVE:
+			if (!Utils::overwritingRename(
+					backup_file_path, m_projectFile)) {
+				QMessageBox::warning(
+					this, tr("Error"),
+					tr("Error saving the project file!")
+				);
+				return false;
+			}
+			// fall through
+		case DONT_SAVE:
+			QFile::remove(backup_file_path);
+			break;
+		case CANCEL:
+			return false;
+	}
+	
+	closeProjectWithoutSaving();
+	return true;
+}
+	
+void
+MainWindow::closeProjectWithoutSaving()
+{
+	IntrusivePtr<PageSequence> pages(new PageSequence());
+	switchToNewProject(pages, QString());
 }
 
 bool

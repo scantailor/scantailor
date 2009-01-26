@@ -19,15 +19,16 @@
 #include "ProjectCreationContext.h.moc"
 #include "ProjectFilesDialog.h"
 #include "FixDpiDialog.h"
-#include "MainWindow.h"
 #include "ImageFileInfo.h"
 #include <QString>
+#include <Qt>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <algorithm>
 #include <assert.h>
 
-ProjectCreationContext::ProjectCreationContext()
+ProjectCreationContext::ProjectCreationContext(QWidget* parent)
+:	m_pParent(parent)
 {
 	showProjectFilesDialog();
 }
@@ -58,15 +59,13 @@ bool haveUndefinedDpi(T const& container)
 void
 ProjectCreationContext::projectFilesSubmitted()
 {
-	std::vector<ImageFileInfo> const files(
-		m_ptrProjectFilesDialog->inProjectFiles()
-	);
+	m_files = m_ptrProjectFilesDialog->inProjectFiles();
 	m_outDir = m_ptrProjectFilesDialog->outputDirectory();
 	
-	if (!haveUndefinedDpi(files)) {
-		showMainWindow(files);
+	if (!haveUndefinedDpi(m_files)) {
+		emit done(this);
 	} else {
-		showFixDpiDialog(files);
+		showFixDpiDialog();
 	}
 }
 
@@ -81,7 +80,8 @@ ProjectCreationContext::projectFilesDialogDestroyed()
 void
 ProjectCreationContext::fixedDpiSubmitted()
 {
-	showMainWindow(m_ptrFixDpiDialog->files());
+	m_files = m_ptrFixDpiDialog->files();
+	emit done(this);
 }
 
 void
@@ -94,9 +94,12 @@ void
 ProjectCreationContext::showProjectFilesDialog()
 {
 	assert(!m_ptrProjectFilesDialog);
-	m_ptrProjectFilesDialog = new ProjectFilesDialog();
+	m_ptrProjectFilesDialog = new ProjectFilesDialog(m_pParent);
 	m_ptrProjectFilesDialog->setAttribute(Qt::WA_DeleteOnClose);
 	m_ptrProjectFilesDialog->setAttribute(Qt::WA_QuitOnClose, false);
+	if (m_pParent) {
+		m_ptrProjectFilesDialog->setWindowModality(Qt::WindowModal);
+	}
 	connect(
 		m_ptrProjectFilesDialog, SIGNAL(accepted()),
 		this, SLOT(projectFilesSubmitted())
@@ -109,13 +112,15 @@ ProjectCreationContext::showProjectFilesDialog()
 }
 
 void
-ProjectCreationContext::showFixDpiDialog(
-	std::vector<ImageFileInfo> const& files)
+ProjectCreationContext::showFixDpiDialog()
 {
 	assert(!m_ptrFixDpiDialog);
-	m_ptrFixDpiDialog = new FixDpiDialog(files);
+	m_ptrFixDpiDialog = new FixDpiDialog(m_files, m_pParent);
 	m_ptrFixDpiDialog->setAttribute(Qt::WA_DeleteOnClose);
 	m_ptrFixDpiDialog->setAttribute(Qt::WA_QuitOnClose, false);
+	if (m_pParent) {
+		m_ptrFixDpiDialog->setWindowModality(Qt::WindowModal);
+	}
 	connect(
 		m_ptrFixDpiDialog, SIGNAL(accepted()),
 		this, SLOT(fixedDpiSubmitted())
@@ -127,13 +132,4 @@ ProjectCreationContext::showFixDpiDialog(
 	m_ptrFixDpiDialog->show();
 }
 
-void
-ProjectCreationContext::showMainWindow(
-	std::vector<ImageFileInfo> const& files)
-{
-	MainWindow* window = new MainWindow(files, m_outDir);
-	window->setAttribute(Qt::WA_DeleteOnClose);
-	window->showMaximized();
-	deleteLater();
-}
 

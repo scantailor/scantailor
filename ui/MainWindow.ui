@@ -22,14 +22,6 @@
    <string notr="true" />
   </property>
   <widget class="QWidget" name="centralwidget" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>27</y>
-     <width>613</width>
-     <height>418</height>
-    </rect>
-   </property>
    <property name="sizePolicy" >
     <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
      <horstretch>0</horstretch>
@@ -119,7 +111,7 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug" >
@@ -132,6 +124,9 @@
     <property name="title" >
      <string>File</string>
     </property>
+    <addaction name="actionNewProject" />
+    <addaction name="actionOpenProject" />
+    <addaction name="separator" />
     <addaction name="actionSaveProject" />
     <addaction name="actionSaveProjectAs" />
    </widget>
@@ -208,6 +203,22 @@
    </property>
    <property name="text" >
     <string>Stop Batch Processing</string>
+   </property>
+  </action>
+  <action name="actionNewProject" >
+   <property name="text" >
+    <string>New Project ...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionOpenProject" >
+   <property name="text" >
+    <string>Open Project ...</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>

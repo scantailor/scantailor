@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@
 #include "BackgroundTask.h"
 #include "FilterResult.h"
 #include "PageSequence.h"
-#include "ImageFileInfo.h"
 #include <QMainWindow>
 #include <QString>
 #include <QPointer>
@@ -44,22 +43,26 @@ class WorkerThread;
 class ProjectReader;
 class DebugImages;
 class ContentBoxPropagator;
+class ProjectCreationContext;
 class QLineF;
 class QRectF;
 class QLayout;
 
-class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::MainWindow
+class MainWindow :
+	public QMainWindow,
+	private FilterUiInterface,
+	private Ui::MainWindow
 {
 	DECLARE_NON_COPYABLE(MainWindow)
 	Q_OBJECT
 public:
-	MainWindow(std::vector<ImageFileInfo> const& files, QString const& out_dir);
-	
-	MainWindow(QString const& project_file, ProjectReader const& project_reader);
+	MainWindow();
 	
 	virtual ~MainWindow();
 protected:
 	virtual void closeEvent(QCloseEvent* event);
+	
+	virtual void timerEvent(QTimerEvent* event);
 private slots:
 	void nextPage();
 	
@@ -83,13 +86,23 @@ private slots:
 	
 	void invalidateAllThumbnailsSlot();
 	
-	void filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result);
+	void filterResult(
+		BackgroundTaskPtr const& task,
+		FilterResultPtr const& result);
 	
 	void debugToggled(bool enabled);
 	
 	void saveProjectTriggered();
 	
 	void saveProjectAsTriggered();
+	
+	void newProject();
+	
+	void newProjectCreated(ProjectCreationContext* context);
+	
+	void openProject();
+	
+	void openProject(QString const& project_file);
 private:
 	class FilterListModel;
 	
@@ -108,11 +121,19 @@ private:
 	
 	virtual void invalidateAllThumbnails();
 	
+	void cancelOngoingTask();
+	
+	void switchToNewProject(
+		IntrusivePtr<PageSequence> const& pages,
+		QString const& out_dir,
+		QString const& project_file_path = QString(),
+		ProjectReader const* project_reader = 0);
+	
 	std::auto_ptr<ThumbnailPixmapCache> createThumbnailCache();
 	
-	void construct();
-	
 	void setupThumbView();
+	
+	void showNewOpenProjectPanel();
 	
 	SavePromptResult promptProjectSave();
 	
@@ -122,7 +143,11 @@ private:
 	
 	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
 	
+	void updateProjectActions();
+	
 	void updateBatchProcessingActions();
+	
+	bool isProjectLoaded() const { return !m_outDir.isEmpty(); }
 	
 	bool isBelowSelectContent() const;
 	
@@ -134,11 +159,15 @@ private:
 	
 	PageSequence::View getCurrentView() const;
 	
-	void loadImage();
+	void updateMainArea();
 	
 	void loadImage(PageInfo const& page, int page_num);
 	
 	void updateWindowTitle();
+	
+	bool closeProjectInteractive();
+	
+	void closeProjectWithoutSaving();
 	
 	bool saveProjectWithFeedback(QString const& project_file);
 	
@@ -162,6 +191,7 @@ private:
 	int m_ignoreSelectionChanges;
 	bool m_debug;
 	bool m_batchProcessing;
+	bool m_closing;
 };
 
 #endif

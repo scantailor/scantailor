@@ -18,7 +18,7 @@
 
 #include "config.h"
 #include "Application.h"
-#include "NewOpenProjectDialog.h"
+#include "MainWindow.h"
 #include "PngMetadataLoader.h"
 #include "TiffMetadataLoader.h"
 #include "JpegMetadataLoader.h"
@@ -27,6 +27,7 @@
 #include <QLocale>
 #include <QString>
 #include <QTranslator>
+#include <Qt>
 
 #ifdef Q_WS_WIN
 // Import static plugins
@@ -59,7 +60,9 @@ int main(int argc, char** argv)
 	TiffMetadataLoader::registerMyself();
 	JpegMetadataLoader::registerMyself();
 	
-	app.showNewOpenProjectDialog();
+	MainWindow* main_wnd = new MainWindow();
+	main_wnd->setAttribute(Qt::WA_DeleteOnClose);
+	main_wnd->showMaximized();
 	
 	return app.exec();
 }

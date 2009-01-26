@@ -107,27 +107,27 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="903"/>
+        <location filename="../MainWindow.cpp" line="1128"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="905"/>
+        <location filename="../MainWindow.cpp" line="1130"/>
         <source>Error saving the project file!</source>
         <translation>Ошибка при сохранении файла!</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="162"/>
+        <location filename="../ui/MainWindow.ui" line="157"/>
         <source>Save Project</source>
         <translation>Сохранить проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="367"/>
+        <location filename="../MainWindow.cpp" line="399"/>
         <source>Save this project?</source>
         <translation>Сохранить этот проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="765"/>
+        <location filename="../MainWindow.cpp" line="855"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекты Scan Tailor</translation>
     </message>
@@ -139,14 +139,9 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
 Для их определения, прогоните пакетную обработку на этапах &quot;Полезная Область&apos; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="889"/>
+        <location filename="../MainWindow.cpp" line="1026"/>
         <source>Unnamed</source>
         <translation>Без имени</translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="893"/>
-        <source>%1 - Scan Tailor</source>
-        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="19"/>
@@ -154,88 +149,161 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="157"/>
+        <location filename="../ui/MainWindow.ui" line="152"/>
         <source>Debug</source>
         <translation>Режим отладки</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="165"/>
+        <location filename="../ui/MainWindow.ui" line="160"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="170"/>
+        <location filename="../ui/MainWindow.ui" line="165"/>
         <source>Save Project As ...</source>
         <translation>Сохранить проект как ...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="175"/>
+        <location filename="../ui/MainWindow.ui" line="170"/>
         <source>Next Page</source>
         <translation>Следующая страница</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="178"/>
+        <location filename="../ui/MainWindow.ui" line="173"/>
         <source>PgDown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="186"/>
+        <location filename="../ui/MainWindow.ui" line="181"/>
         <source>Previous Page</source>
         <translation>Предыдущая страница</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="189"/>
+        <location filename="../ui/MainWindow.ui" line="184"/>
         <source>PgUp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="201"/>
+        <location filename="../ui/MainWindow.ui" line="196"/>
         <source>Start Batch Processing</source>
         <translation>Запустить пакетную обработку</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="210"/>
+        <location filename="../ui/MainWindow.ui" line="205"/>
         <source>Stop Batch Processing</source>
         <translation>Остановить пакетную обработку</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="127"/>
+        <location filename="../ui/MainWindow.ui" line="119"/>
         <source>Tools</source>
         <translation>Инструменты</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="133"/>
+        <location filename="../ui/MainWindow.ui" line="125"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="140"/>
+        <location filename="../ui/MainWindow.ui" line="135"/>
         <source>Process</source>
         <translation>Обработка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="862"/>
+        <location filename="../MainWindow.cpp" line="1000"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="853"/>
+        <source>Open Project</source>
+        <translation>Открыть проект</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="874"/>
+        <source>Unable to open the project file.</source>
+        <translation>Не удалось открыть файл проекта.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="883"/>
+        <source>The project file is broken.</source>
+        <translation>Файл проекта поврежден.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="894"/>
+        <source>Unable to interpret the project file.</source>
+        <translation>Не удалось импортировать проект.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1031"/>
+        <source>%1 - Scan Tailor %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="210"/>
+        <source>New Project ...</source>
+        <translation>Новый проект ...</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="213"/>
+        <source>Ctrl+N</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="218"/>
+        <source>Open Project ...</source>
+        <translation>Открыть проект ...</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="221"/>
+        <source>Ctrl+O</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>NewOpenProjectDialog</name>
     <message>
-        <location filename="../ui/NewOpenProjectDialog.ui" line="13"/>
-        <source>Scan Tailor</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../ui/NewOpenProjectDialog.ui" line="19"/>
         <source>New Project</source>
-        <translation>Новый проект</translation>
+        <translation type="obsolete">Новый проект</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectDialog.ui" line="29"/>
         <source>Open Project</source>
-        <translation>Открыть проект</translation>
+        <translation type="obsolete">Открыть проект</translation>
+    </message>
+</context>
+<context>
+    <name>NewOpenProjectPanel</name>
+    <message>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="19"/>
+        <source>Form</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="43"/>
+        <source>New Project</source>
+        <translation type="obsolete">Новый проект</translation>
+    </message>
+    <message>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="69"/>
+        <source>Open Project</source>
+        <translation type="obsolete">Открыть проект</translation>
+    </message>
+    <message>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="94"/>
+        <source>Recent Projects</source>
+        <translation>Недавние проекты</translation>
+    </message>
+    <message>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="43"/>
+        <source>New Project ...</source>
+        <translation>Новый проект ...</translation>
+    </message>
+    <message>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="69"/>
+        <source>Open Project ...</source>
+        <translation>Открыть проект ...</translation>
     </message>
 </context>
 <context>
@@ -520,10 +588,10 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;widest_page&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Widest Page&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;widest_page&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Самая широкая страница&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;widest_page&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Самая широкая страница&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="651"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="647"/>
         <source>Go to the tallest page.</source>
         <translation>Перейти к самой высокой странице.</translation>
     </message>
@@ -534,7 +602,17 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;tallest_page&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Tallest Page&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;tallest_page&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Самая высокая страница&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;p, li { white-space: pre-wrap; }&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;tallest_page&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;Самая высокая страница&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="607"/>
+        <source>Widest Page</source>
+        <translation>Самая широкая страница</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="650"/>
+        <source>Tallest Page</source>
+        <translation>Самая высокая страница</translation>
     </message>
 </context>
 <context>
@@ -588,29 +666,34 @@ p, li { white-space: pre-wrap; }
         <translation>Тип разреза</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="154"/>
+        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="133"/>
         <source>?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="179"/>
+        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="158"/>
         <source>Change ...</source>
         <translation>Изменить ...</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="204"/>
+        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="183"/>
         <source>Split Line</source>
         <translation>Разделительная линия</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="225"/>
+        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="213"/>
         <source>Auto</source>
         <translation>Автоматически</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="241"/>
+        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="229"/>
         <source>Manual</source>
         <translation>Вручную</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="295"/>
+        <source>...</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -731,32 +814,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="53"/>
         <source>Open Project</source>
-        <translation>Открыть проект</translation>
+        <translation type="obsolete">Открыть проект</translation>
     </message>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="55"/>
         <source>Scan Tailor Projects</source>
-        <translation>Проекты Scan Tailor</translation>
+        <translation type="obsolete">Проекты Scan Tailor</translation>
     </message>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="86"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="68"/>
         <source>Unable to open the project file.</source>
-        <translation>Не удалось открыть файл проекта.</translation>
+        <translation type="obsolete">Не удалось открыть файл проекта.</translation>
     </message>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="77"/>
         <source>The project file is broken.</source>
-        <translation>Файл проекта поврежден.</translation>
+        <translation type="obsolete">Файл проекта поврежден.</translation>
     </message>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="88"/>
         <source>Unable to interpret the project file.</source>
-        <translation>Не удалось импортировать проект.</translation>
+        <translation type="obsolete">Не удалось импортировать проект.</translation>
     </message>
 </context>
 <context>
@@ -785,7 +868,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="533"/>
+        <location filename="../ThumbnailSequence.cpp" line="536"/>
         <source>%1 (page %2)</source>
         <translation>%1 (стр. %2)</translation>
     </message>
@@ -894,12 +977,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_layout::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="332"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="334"/>
         <source>Apply Margins</source>
         <translation>Применить поля</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="345"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="347"/>
         <source>Apply Alignment</source>
         <translation>Применить выравнивание</translation>
     </message>
@@ -915,17 +998,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="335"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="214"/>
         <source>This page only</source>
         <translation>Только для этой страницы</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="109"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="111"/>
         <source>All pages</source>
         <translation>Для всех страниц</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="158"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="174"/>
         <source>Auto detected</source>
         <translation>Определено автоматически</translation>
     </message>
