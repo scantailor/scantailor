@@ -21,6 +21,7 @@
 
 #include "ImageViewBase.h"
 #include <QRectF>
+#include <QString>
 
 class ImageTransformation;
 class QMenu;
@@ -69,6 +70,10 @@ private:
 	void forceMinWidthAndHeight(QRectF& widget_rect) const;
 	
 	void forceInsideImage(QRectF& widget_rect) const;
+	
+	QString m_defaultStatusTip;
+	
+	QString m_resizeStatusTip;
 	
 	/**
 	 * The context menu to be shown if there is no content box.

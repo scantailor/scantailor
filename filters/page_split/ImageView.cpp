@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,10 @@ ImageView::ImageView(QImage const& image,
 	m_pageLayout(layout),
 	m_state(DEFAULT_STATE)
 {
+	m_baseStatusTip = statusTip();
+	m_dragHandleStatusTip = tr("Drag this handle to skew the line.");
+	m_dragLineStatusTip = tr("This line can be dragged.");
+	
 	setMouseTracking(true);
 }
 
@@ -207,20 +211,21 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 	}
 	
 	if (m_state == DEFAULT_STATE) {
-		//if (!m_pageLayout.isNull()) {
-			if (m_topHandleRect.contains(event->pos()) ||
-			    m_bottomHandleRect.contains(event->pos())) {
-				if (event->buttons() & Qt::LeftButton) {
-					ensureCursorShape(Qt::ClosedHandCursor);
-				} else {
-					ensureCursorShape(Qt::OpenHandCursor);
-				}
-			} else if (isCursorNearSplitLine(event->pos())) {
-				ensureCursorShape(Qt::SplitHCursor);
+		if (m_topHandleRect.contains(event->pos()) ||
+				m_bottomHandleRect.contains(event->pos())) {
+			ensureStatusTip(m_dragHandleStatusTip);
+			if (event->buttons() & Qt::LeftButton) {
+				ensureCursorShape(Qt::ClosedHandCursor);
 			} else {
-				ensureCursorShape(Qt::ArrowCursor);
+				ensureCursorShape(Qt::OpenHandCursor);
 			}
-		//}
+		} else if (isCursorNearSplitLine(event->pos())) {
+			ensureStatusTip(m_dragLineStatusTip);
+			ensureCursorShape(Qt::SplitHCursor);
+		} else {
+			ensureStatusTip(m_baseStatusTip);
+			ensureCursorShape(Qt::ArrowCursor);
+		}
 	} else {
 		QPointF movement(event->pos() - m_initialMousePos);
 		movement.setY(0);

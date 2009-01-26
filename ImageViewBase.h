@@ -26,6 +26,7 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QImage>
+#include <QString>
 #include <QTransform>
 #include <QPoint>
 #include <QPointF>
@@ -186,6 +187,14 @@ protected:
 	 *       and unsetCursor().
 	 */
 	void ensureCursorShape(Qt::CursorShape cursor_shape);
+	
+	/**
+	 * \brief A better version of setStatusTip().
+	 *
+	 * Unlike setStatusTip(), this method will display the tooltip
+	 * immediately, not when the mouse enters the widget next time.
+	 */
+	void ensureStatusTip(QString const& status_tip);
 private slots:
 	void initiateBuildingHqVersion();
 private:

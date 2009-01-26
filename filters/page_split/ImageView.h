@@ -24,6 +24,7 @@
 #include <QPoint>
 #include <QPointF>
 #include <QRectF>
+#include <QString>
 
 class QRect;
 class QMenu;
@@ -83,6 +84,15 @@ private:
 	static double const m_maxSkewAngleCtg;
 	
 	QPixmap m_imgSkewingHandle;
+	
+	/**
+	 * The status tip coming from ImageViewBase.
+	 */
+	QString m_baseStatusTip;
+	
+	QString m_dragHandleStatusTip;
+	
+	QString m_dragLineStatusTip;
 	
 	/**
 	 * Page layout in virtual image coordinates.

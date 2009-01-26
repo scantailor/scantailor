@@ -25,6 +25,7 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPixmap>
+#include <QString>
 #include <utility>
 
 class QRect;
@@ -75,6 +76,13 @@ private:
 	QRectF m_leftRotationHandle;
 	
 	QRectF m_rightRotationHandle;
+	
+	/**
+	 * The status tip coming from ImageViewBase.
+	 */
+	QString m_baseStatusTip;
+	
+	QString m_dragHandleStatusTip;
 	
 	double m_mouseVertOffset;
 	

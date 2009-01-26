@@ -32,6 +32,9 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" >
+    <property name="bottomMargin" >
+     <number>0</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" >
       <item>
@@ -96,6 +99,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="statusTip" >
+         <string>Use PgUp, PgDown or Q, W to navigate between pages.</string>
+        </property>
         <property name="alignment" >
          <set>Qt::AlignHCenter|Qt::AlignTop</set>
         </property>
@@ -141,6 +147,7 @@
    <addaction name="menuProcess" />
    <addaction name="menuDebug" />
   </widget>
+  <widget class="QStatusBar" name="statusBar" />
   <action name="actionDebug" >
    <property name="checkable" >
     <bool>true</bool>
@@ -219,6 +226,28 @@
    </property>
    <property name="shortcut" >
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionPrevPageQ" >
+   <property name="text" >
+    <string>Previous Page</string>
+   </property>
+   <property name="shortcut" >
+    <string>Q</string>
+   </property>
+   <property name="autoRepeat" >
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionNextPageW" >
+   <property name="text" >
+    <string>Next Page</string>
+   </property>
+   <property name="shortcut" >
+    <string>W</string>
+   </property>
+   <property name="autoRepeat" >
+    <bool>false</bool>
    </property>
   </action>
  </widget>

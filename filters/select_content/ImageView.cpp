@@ -44,6 +44,10 @@ ImageView::ImageView(
 {
 	setMouseTracking(true);
 	
+	m_defaultStatusTip = tr("Use the context menu to enable / disable the content box.");
+	m_resizeStatusTip = tr("Drag lines or corners to resize the content box.");
+	ensureStatusTip(m_defaultStatusTip);
+	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
 	QAction* remove = m_pInsideBoxMenu->addAction(tr("Remove Content Box"));
 	connect(create, SIGNAL(triggered(bool)), this, SLOT(createContentBox()));
@@ -123,6 +127,11 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 		int const mask = cursorLocationMask(event->pos());
 		int const ver = mask & (TOP_EDGE|BOTTOM_EDGE);
 		int const hor = mask & (LEFT_EDGE|RIGHT_EDGE);
+		if (ver || hor) {
+			ensureStatusTip(m_resizeStatusTip);
+		} else {
+			ensureStatusTip(m_defaultStatusTip);
+		}
 		if (!ver && !hor) {
 			ensureCursorShape(Qt::ArrowCursor);
 		} else if (ver && !hor) {
@@ -197,14 +206,7 @@ ImageView::contextMenuEvent(QContextMenuEvent* const event)
 	}
 	
 	event->accept();
-	if (m_contentRect.isEmpty()) {
-		m_pNoContentMenu->popup(event->globalPos());
-	} else {
-		QRectF const widget_rect(virtualToWidget().mapRect(m_contentRect));
-		if (widget_rect.contains(event->pos())) {
-			m_pInsideBoxMenu->popup(event->globalPos());
-		}
-	}
+	m_pNoContentMenu->popup(event->globalPos());
 }
 
 void

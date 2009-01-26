@@ -64,6 +64,8 @@ ImageView::ImageView(
 	m_leftRightLinked(opt_widget.leftRightLinked()),
 	m_topBottomLinked(opt_widget.topBottomLinked())
 {
+	ensureStatusTip(tr("Resize margins by dragging any of the solid lines."));
+	
 	setMouseTracking(true);
 	
 	recalcBoxesAndFit(opt_widget.marginsMM());

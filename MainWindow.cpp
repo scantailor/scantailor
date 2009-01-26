@@ -154,9 +154,6 @@ MainWindow::MainWindow()
 	m_ptrTabbedDebugImages.reset(new QTabWidget);
 	actionStopBatchProcessing->setEnabled(false);
 	
-	addAction(actionNextPage);
-	addAction(actionPrevPage);
-	
 	m_debug = actionDebug->isChecked();
 	m_pImageFrameLayout = new QStackedLayout(imageViewFrame);
 	m_pOptionsFrameLayout = new QStackedLayout(filterOptions);
@@ -166,6 +163,16 @@ MainWindow::MainWindow()
 		m_ptrFilterListModel->index(0, 0),
 		QItemSelectionModel::SelectCurrent
 	);
+	
+	addAction(actionNextPage);
+	addAction(actionPrevPage);
+	addAction(actionPrevPageQ);
+	addAction(actionNextPageW);
+	
+	connect(actionPrevPage, SIGNAL(triggered(bool)), this, SLOT(prevPage()));
+	connect(actionNextPage, SIGNAL(triggered(bool)), this, SLOT(nextPage()));
+	connect(actionPrevPageQ, SIGNAL(triggered(bool)), this, SLOT(prevPage()));
+	connect(actionNextPageW, SIGNAL(triggered(bool)), this, SLOT(nextPage()));
 	
 	connect(
 		filterList->selectionModel(),
@@ -184,9 +191,6 @@ MainWindow::MainWindow()
 		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
 		this, SLOT(pageSelected(PageInfo const&, QRectF const&, bool, bool))
 	);
-	
-	connect(actionNextPage, SIGNAL(triggered(bool)), this, SLOT(nextPage()));
-	connect(actionPrevPage, SIGNAL(triggered(bool)), this, SLOT(prevPage()));
 	
 	connect(
 		actionStartBatchProcessing, SIGNAL(triggered(bool)),

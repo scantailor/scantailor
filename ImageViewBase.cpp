@@ -35,6 +35,8 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QResizeEvent>
+#include <QStatusTipEvent>
+#include <QApplication>
 #include <QDebug>
 #include <algorithm>
 #include <assert.h>
@@ -153,6 +155,8 @@ ImageViewBase::ImageViewBase(
 	m_pixmapFocalPoint = m_physToVirt.transformBack().map(
 		m_physToVirt.resultingRect().center()
 	);
+	
+	ensureStatusTip(tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible."));
 	
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(150); // msec
@@ -453,6 +457,26 @@ ImageViewBase::ensureCursorShape(Qt::CursorShape const cursor_shape)
 		m_currentCursorShape = cursor_shape;
 		setCursor(cursor_shape);
 	}
+}
+
+void
+ImageViewBase::ensureStatusTip(QString const& status_tip)
+{
+	QString const cur_status_tip(statusTip());
+	if (cur_status_tip.constData() == status_tip.constData()) {
+		return;
+	}
+	if (cur_status_tip == status_tip) {
+		return;
+	}
+	
+	setStatusTip(status_tip);
+	
+	// Note that setStatusTip() alone is not enough,
+	// as it's only taken into account when the mouse
+	// enters the widget.
+	QStatusTipEvent tip_event(status_tip);
+	QApplication::sendEvent(this, &tip_event);
 }
 
 /**
