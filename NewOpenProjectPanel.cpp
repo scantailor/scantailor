@@ -38,11 +38,13 @@
 #include <QLabel>
 #include <Qt>
 #include <QDebug>
+#include <algorithm>
 
 NewOpenProjectPanel::NewOpenProjectPanel(QWidget* parent)
 :	QWidget(parent)
 {
 	setupUi(this);
+	
 	recentProjectsGroup->setLayout(new QVBoxLayout);
 	newProjectLabel->setText(
 		Utils::richTextForLink(newProjectLabel->text())
@@ -50,14 +52,6 @@ NewOpenProjectPanel::NewOpenProjectPanel(QWidget* parent)
 	openProjectLabel->setText(
 		Utils::richTextForLink(openProjectLabel->text())
 	);
-	
-	int left = 0, top = 0, right = 0, bottom = 0;
-	layout()->getContentsMargins(&left, &top, &right, &bottom);
-	left += MARGIN;
-	top += MARGIN;
-	right += MARGIN;
-	bottom += MARGIN;
-	layout()->setContentsMargins(left, top, right, bottom);
 	
 	RecentProjects rp;
 	rp.read();
@@ -108,48 +102,56 @@ NewOpenProjectPanel::addRecentProject(QString const& file_path)
 void
 NewOpenProjectPanel::paintEvent(QPaintEvent* event)
 {
+	// In fact Qt doesn't draw QWidget's background, unless
+	// autoFillBackground property is set, so we can safely
+	// draw our borders and shadows in the margins area.
+	
+	int left = 0, top = 0, right = 0, bottom = 0;
+	layout()->getContentsMargins(&left, &top, &right, &bottom);
+	
 	QRect const widget_rect(rect());
+	QRect const except_margins(
+		widget_rect.adjusted(left, top, -right, -bottom)
+	);
 	
-	if (m_lastPaintSize == widget_rect.size()) {
-		setMask(m_mask);
-	} else {
-		QRegion reg(
-			widget_rect.adjusted(
-				MARGIN, MARGIN, -MARGIN, -MARGIN
-			)
-		);
-		setMask(reg);
-		m_mask = reg;
-	}
-	
-	QWidget::paintEvent(event);
-	
-	clearMask();
-	
-	int const border = 1;
-	int const shadow = MARGIN - border;
+	int const border = 1; // Solid line border width.
+	int const shadow = std::min(right, bottom) - border;
 	
 	QPainter painter(this);
 	
 	// Draw the border.
-	{
-		painter.setPen(QPen(palette().windowText(), border));
-		QRect rect(widget_rect);
-		rect.adjust(MARGIN, MARGIN, -MARGIN, -MARGIN);
-		// Note that we specify the coordinates excluding
-		// pen width.
-		painter.drawRect(rect);
-	}
+	painter.setPen(QPen(palette().windowText(), border));
+	
+	// Note that we specify the coordinates excluding
+	// pen width.
+	painter.drawRect(except_margins);
 	
 	QColor const dark(Qt::darkGray);
 	QColor const light(Qt::transparent);
+	
+	if (shadow <= 0) {
+		return;
+	}
+	
+	// Let's adjust the margins to exclude borders.
+	left -= border;
+	right -= border;
+	top -= border;
+	bottom -= border;
+	
+	// This rectangle extends 1 pixel into each shadow area.
+	QRect const extended(
+		except_margins.adjusted(
+			-border - 1, -border - 1, border + 1, border + 1
+		)
+	);
 	
 	// Right shadow.
 	{
 		QRect rect(widget_rect);
 		rect.setWidth(shadow);
-		rect.moveRight(widget_rect.right());
-		rect.adjust(0, MARGIN + shadow, 0, -shadow);
+		rect.moveLeft(extended.right());
+		rect.adjust(0, top + shadow, 0, -bottom);
 		QLinearGradient grad(rect.topLeft(), rect.topRight());
 		grad.setColorAt(0, dark);
 		grad.setColorAt(1, light);
@@ -160,8 +162,8 @@ NewOpenProjectPanel::paintEvent(QPaintEvent* event)
 	{
 		QRect rect(widget_rect);
 		rect.setHeight(shadow);
-		rect.moveBottom(widget_rect.bottom());
-		rect.adjust(MARGIN + shadow, 0, -shadow, 0);
+		rect.moveTop(extended.bottom());
+		rect.adjust(left + shadow, 0, -right, 0);
 		QLinearGradient grad(rect.topLeft(), rect.bottomLeft());
 		grad.setColorAt(0, dark);
 		grad.setColorAt(1, light);
@@ -171,7 +173,7 @@ NewOpenProjectPanel::paintEvent(QPaintEvent* event)
 	// Bottom-right corner.
 	{
 		QRect rect(0, 0, shadow, shadow);
-		rect.moveBottomRight(widget_rect.bottomRight());
+		rect.moveTopLeft(extended.bottomRight());
 		QRadialGradient grad(rect.topLeft(), shadow);
 		grad.setColorAt(0, dark);
 		grad.setColorAt(1, light);
@@ -181,7 +183,7 @@ NewOpenProjectPanel::paintEvent(QPaintEvent* event)
 	// Top-right corner.
 	{
 		QRect rect(0, 0, shadow, shadow);
-		rect.moveTopRight(QPoint(widget_rect.right(), MARGIN));
+		rect.moveTopLeft(extended.topRight() + QPoint(0, border));
 		QRadialGradient grad(rect.bottomLeft(), shadow);
 		grad.setColorAt(0, dark);
 		grad.setColorAt(1, light);
@@ -191,7 +193,7 @@ NewOpenProjectPanel::paintEvent(QPaintEvent* event)
 	// Bottom-left corner.
 	{
 		QRect rect(0, 0, shadow, shadow);
-		rect.moveBottomLeft(QPoint(MARGIN, widget_rect.bottom()));
+		rect.moveTopLeft(extended.bottomLeft() + QPoint(border, 0));
 		QRadialGradient grad(rect.topRight(), shadow);
 		grad.setColorAt(0, dark);
 		grad.setColorAt(1, light);

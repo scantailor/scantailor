@@ -21,8 +21,6 @@
 
 #include "ui_NewOpenProjectPanel.h"
 #include <QWidget>
-#include <QRegion>
-#include <QSize>
 
 class QString;
 
@@ -40,12 +38,7 @@ signals:
 protected:
 	virtual void paintEvent(QPaintEvent* event);
 private:
-	enum { MARGIN = 7 };
-	
 	void addRecentProject(QString const& file_path);
-	
-	QRegion m_mask;
-	QSize m_lastPaintSize;
 };
 
 #endif
