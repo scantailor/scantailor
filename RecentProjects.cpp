@@ -84,6 +84,6 @@ RecentProjects::setMostRecent(QString const& file_path)
 	if (it != end) {
 		m_projectFiles.splice(begin, m_projectFiles, it);
 	} else {
-		m_projectFiles.push_back(file_path);
+		m_projectFiles.push_front(file_path);
 	}
 }
