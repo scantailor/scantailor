@@ -472,11 +472,13 @@ ImageViewBase::ensureStatusTip(QString const& status_tip)
 	
 	setStatusTip(status_tip);
 	
-	// Note that setStatusTip() alone is not enough,
-	// as it's only taken into account when the mouse
-	// enters the widget.
-	QStatusTipEvent tip_event(status_tip);
-	QApplication::sendEvent(this, &tip_event);
+	if (underMouse()) {
+		// Note that setStatusTip() alone is not enough,
+		// as it's only taken into account when the mouse
+		// enters the widget.
+		QStatusTipEvent tip_event(status_tip);
+		QApplication::sendEvent(this, &tip_event);
+	}
 }
 
 /**
