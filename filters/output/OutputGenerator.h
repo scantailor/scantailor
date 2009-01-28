@@ -53,19 +53,29 @@ public:
 	QImage process(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 private:
-	QImage processColorOrGrayscale(FilterData const& input,
+	QImage processAsIs(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
-	QImage processMixedOrBitonal(FilterData const& input,
+	QImage processImpl(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
 	
 	static QSize to300dpi(QSize const& size, Dpi const& source_dpi);
 	
+	static QImage normalizeIlluminationGray(
+		TaskStatus const& status,
+		QImage const& input, QTransform const& xform,
+		QRect const& target_rect, DebugImages* dbg);
+	
 	static QImage detectPictures(
 		QImage const& input_300dpi, TaskStatus const& status,
 		DebugImages* dbg = 0);
+	
+	imageproc::BinaryImage estimateBinarizationMask(
+		TaskStatus const& status, QImage const& gray_source,
+		QRect const& source_rect, QRect const& source_sub_rect,
+		DebugImages* const dbg) const;
 	
 	imageproc::BinaryImage binarize(
 		QImage const& image, Dpi const& image_dpi) const;

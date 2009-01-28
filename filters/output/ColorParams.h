@@ -19,6 +19,7 @@
 #ifndef OUTPUT_COLORPARAMS_H_
 #define OUTPUT_COLORPARAMS_H_
 
+#include "ColorGrayscaleOptions.h"
 #include <QColor>
 
 namespace output
@@ -48,11 +49,20 @@ public:
 	ThresholdMode thresholdMode() const { return m_thresholdMode; }
 	
 	void setThresholdMode(ThresholdMode mode) { m_thresholdMode = mode; }
+	
+	ColorGrayscaleOptions const& colorGrayscaleOptions() const {
+		return m_colorGrayscaleOptions;
+	}
+	
+	void setColorGrayscaleOptions(ColorGrayscaleOptions const& opt) {
+		m_colorGrayscaleOptions = opt;
+	}
 private:
 	QRgb m_lightColor;
 	QRgb m_darkColor;
 	ColorMode m_colorMode;
 	ThresholdMode m_thresholdMode;
+	ColorGrayscaleOptions m_colorGrayscaleOptions;
 };
 
 } // namespace output

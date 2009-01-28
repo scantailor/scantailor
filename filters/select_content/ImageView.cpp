@@ -38,7 +38,7 @@ ImageView::ImageView(
 	QRectF const& content_rect)
 :	ImageViewBase(image, xform),
 	m_pNoContentMenu(new QMenu(this)),
-	m_pInsideBoxMenu(new QMenu(this)),
+	m_pHaveContentMenu(new QMenu(this)),
 	m_contentRect(content_rect),
 	m_resizingMask(0)
 {
@@ -49,7 +49,7 @@ ImageView::ImageView(
 	ensureStatusTip(m_defaultStatusTip);
 	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
-	QAction* remove = m_pInsideBoxMenu->addAction(tr("Remove Content Box"));
+	QAction* remove = m_pHaveContentMenu->addAction(tr("Remove Content Box"));
 	connect(create, SIGNAL(triggered(bool)), this, SLOT(createContentBox()));
 	connect(remove, SIGNAL(triggered(bool)), this, SLOT(removeContentBox()));
 }
@@ -206,7 +206,12 @@ ImageView::contextMenuEvent(QContextMenuEvent* const event)
 	}
 	
 	event->accept();
-	m_pNoContentMenu->popup(event->globalPos());
+	
+	if (m_contentRect.isEmpty()) {
+		m_pNoContentMenu->popup(event->globalPos());
+	} else {
+		m_pHaveContentMenu->popup(event->globalPos());
+	}
 }
 
 void

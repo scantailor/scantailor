@@ -17,6 +17,7 @@
 */
 
 #include "Params.h"
+#include "ColorGrayscaleOptions.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
 #include <QDomDocument>
@@ -45,6 +46,11 @@ Params::Params(QDomElement const& el)
 	m_colorParams.setThresholdMode(
 		parseThresholdMode(cp.attribute("thresholdMode"))
 	);
+	m_colorParams.setColorGrayscaleOptions(
+		ColorGrayscaleOptions(
+			cp.namedItem("color-or-grayscale").toElement()
+		)
+	);
 }
 
 QDomElement
@@ -65,6 +71,12 @@ Params::toXml(QDomDocument& doc, QString const& name) const
 	cp.setAttribute(
 		"thresholdMode",
 		formatThresholdMode(m_colorParams.thresholdMode())
+	);
+	
+	cp.appendChild(
+		m_colorParams.colorGrayscaleOptions().toXml(
+			doc, "color-or-grayscale"
+		)
 	);
 	
 	el.appendChild(cp);

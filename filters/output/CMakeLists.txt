@@ -21,6 +21,8 @@ SET(
 	Thumbnail.cpp Thumbnail.h
 	Utils.cpp Utils.h
 	Params.cpp Params.h
+	ColorGrayscaleOptions.cpp ColorGrayscaleOptions.h
+	RenderParams.cpp RenderParams.h
 	ColorParams.h Scope.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

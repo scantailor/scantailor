@@ -81,9 +81,9 @@ private:
 	QMenu* m_pNoContentMenu;
 	
 	/**
-	 * The context menu to be shown when right clicking inside the content box.
+	 * The context menu to be shown if there exists a content box.
 	 */
-	QMenu* m_pInsideBoxMenu;
+	QMenu* m_pHaveContentMenu;
 	
 	/**
 	 * Content box in virtual image coordinates.

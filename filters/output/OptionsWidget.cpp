@@ -40,15 +40,16 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	setupUi(this);
 	
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
-	colorModeSelector->addItem(tr("Bitonal"), ColorParams::BITONAL);
+	//colorModeSelector->addItem(tr("Bitonal"), ColorParams::BITONAL);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
 	
 	thresholdSelector->addItem(QString::fromAscii("Otsu"), ColorParams::OTSU);
+#if 0
 	thresholdSelector->addItem(QString::fromAscii("Mokji"), ColorParams::MOKJI);
 	thresholdSelector->addItem(QString::fromAscii("Sauvola"), ColorParams::SAUVOLA);
 	thresholdSelector->addItem(QString::fromAscii("Wolf"), ColorParams::WOLF);
-	
+#endif
 	updateColorsDisplay();
 	
 	connect(
@@ -58,6 +59,14 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	connect(
 		colorModeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(colorModeChanged(int))
+	);
+	connect(
+		whiteMarginsCB, SIGNAL(clicked(bool)),
+		this, SLOT(whiteMarginsToggled(bool))
+	);
+	connect(
+		equalizeIlluminationCB, SIGNAL(clicked(bool)),
+		this, SLOT(equalizeIlluminationToggled(bool))
 	);
 	connect(
 		lightColorButton, SIGNAL(clicked()),
@@ -103,6 +112,31 @@ OptionsWidget::colorModeChanged(int const idx)
 	m_colorParams.setColorMode((ColorParams::ColorMode)mode);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	updateColorsDisplay();
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::whiteMarginsToggled(bool const checked)
+{
+	ColorGrayscaleOptions opt(m_colorParams.colorGrayscaleOptions());
+	opt.setWhiteMargins(checked);
+	if (!checked) {
+		opt.setNormalizeIllumination(false);
+		equalizeIlluminationCB->setChecked(false);
+	}
+	m_colorParams.setColorGrayscaleOptions(opt);
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+	equalizeIlluminationCB->setEnabled(checked);
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::equalizeIlluminationToggled(bool const checked)
+{
+	ColorGrayscaleOptions opt(m_colorParams.colorGrayscaleOptions());
+	opt.setNormalizeIllumination(checked);
+	m_colorParams.setColorGrayscaleOptions(opt);
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	emit reloadRequested();
 }
 
@@ -230,11 +264,11 @@ OptionsWidget::updateColorsDisplay()
 	int const color_mode_idx = colorModeSelector->findData(color_mode);
 	colorModeSelector->setCurrentIndex(color_mode_idx);
 	
-	bool const show_bitonal_options = (
+	bool const show_bitonal_options = false;/*(
 		color_mode == ColorParams::BLACK_AND_WHITE
 		|| color_mode == ColorParams::BITONAL
 	);
-	
+	*/
 	bitonalOptionsWidget->setVisible(show_bitonal_options);
 	lightColorButton->setEnabled(color_mode == ColorParams::BITONAL);
 	darkColorButton->setEnabled(color_mode == ColorParams::BITONAL);
@@ -249,6 +283,19 @@ OptionsWidget::updateColorsDisplay()
 		}
 		lightColorButton->setIcon(createIcon(m_lightColorPixmap));
 		darkColorButton->setIcon(createIcon(m_darkColorPixmap));
+	}
+	
+	bool const color_grayscale_options_visible = (
+		color_mode == ColorParams::COLOR_GRAYSCALE
+	);
+	customOptionsPanel->setVisible(color_grayscale_options_visible);
+	if (color_grayscale_options_visible) {
+		ColorGrayscaleOptions const opt(
+			m_colorParams.colorGrayscaleOptions()
+		);
+		whiteMarginsCB->setChecked(opt.whiteMargins());
+		equalizeIlluminationCB->setChecked(opt.normalizeIllumination());
+		equalizeIlluminationCB->setEnabled(opt.whiteMargins());
 	}
 	
 	ColorParams::ThresholdMode const threshold_mode = m_colorParams.thresholdMode();

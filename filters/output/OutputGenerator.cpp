@@ -23,6 +23,7 @@
 #include "Utils.h"
 #include "DebugImages.h"
 #include "EstimateBackground.h"
+#include "RenderParams.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include "imageproc/BinaryImage.h"
@@ -97,17 +98,7 @@ QImage
 OutputGenerator::process(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-	QImage image;
-	switch (m_colorParams.colorMode()) {
-		case ColorParams::BLACK_AND_WHITE:
-		case ColorParams::BITONAL:
-		case ColorParams::MIXED:
-			image = processMixedOrBitonal(input, status, dbg);
-			break;
-		case ColorParams::COLOR_GRAYSCALE:
-			image = processColorOrGrayscale(input, status, dbg);
-			break;
-	}
+	QImage image(processImpl(input, status, dbg));
 	assert(!image.isNull());
 	
 	// Set the correct DPI.
@@ -119,7 +110,7 @@ OutputGenerator::process(FilterData const& input,
 }
 
 QImage
-OutputGenerator::processColorOrGrayscale(FilterData const& input,
+OutputGenerator::processAsIs(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
 	uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(input.grayImage());
@@ -212,9 +203,126 @@ void combineMixed(
 } // anonymous namespace
 
 QImage
-OutputGenerator::processMixedOrBitonal(FilterData const& input,
+OutputGenerator::normalizeIlluminationGray(
+	TaskStatus const& status,
+	QImage const& input, QTransform const& xform,
+	QRect const& target_rect, DebugImages* const dbg)
+{
+	QImage to_be_normalized(
+		transformToGray(
+			input, xform, target_rect,
+			Qt::black // <-- Important!
+		)
+	);
+	if (dbg) {
+		dbg->add(to_be_normalized, "to_be_normalized");
+	}
+	
+	status.throwIfCancelled();
+	
+	PolynomialSurface const bg_ps(
+		estimateBackground(
+			to_be_normalized, status, dbg
+		)
+	);
+	
+	status.throwIfCancelled();
+	
+	QImage background(bg_ps.render(to_be_normalized.size()));
+	if (dbg) {
+		dbg->add(background, "background");
+	}
+	
+	status.throwIfCancelled();
+	
+	grayRasterOp<RaiseAboveBackground>(background, to_be_normalized);
+	if (dbg) {
+		dbg->add(background, "normalized_illumination");
+	}
+	
+	return background;
+}
+
+imageproc::BinaryImage
+OutputGenerator::estimateBinarizationMask(
+	TaskStatus const& status, QImage const& gray_source,
+	QRect const& source_rect, QRect const& source_sub_rect,
+	DebugImages* const dbg) const
+{
+	assert(gray_source.format() == QImage::Format_Indexed8);
+	assert(source_rect.contains(source_sub_rect));
+	
+	// If we need to strip some of the margins from a grayscale
+	// image, we may actually do it without copying anything.
+	// We are going to construct a QImage from existing data.
+	// That image won't own that data, but gray_source is not
+	// going anywhere, so it's fine.
+	
+	QImage trimmed_image;
+	
+	if (source_rect == source_sub_rect) {
+		trimmed_image = gray_source; // Shallow copy.
+	} else {
+		// Sub-rectangle in input image coordinates.
+		QRect relative_subrect(source_sub_rect);
+		relative_subrect.moveTopLeft(
+			source_sub_rect.topLeft() - source_rect.topLeft()
+		);
+		
+		int const bpl = gray_source.bytesPerLine();
+		int const offset = relative_subrect.top() * bpl
+				+ relative_subrect.left();
+		
+		trimmed_image = QImage(
+			gray_source.bits() + offset,
+			relative_subrect.width(), relative_subrect.height(),
+			bpl, gray_source.format()
+		);
+		trimmed_image.setColorTable(gray_source.colorTable());
+	}
+	
+	status.throwIfCancelled();
+	
+	QSize const downscaled_size(to300dpi(trimmed_image.size(), m_dpi));
+	
+	// A 300dpi version of trimmed_image.
+	QImage downscaled_input(
+		scaleToGray(trimmed_image, downscaled_size)
+	);
+	trimmed_image = QImage(); // Save memory.
+	
+	status.throwIfCancelled();
+	
+	// Light areas indicate pictures.
+	QImage picture_areas(
+		detectPictures(downscaled_input, status, dbg)
+	);
+	downscaled_input = QImage(); // Save memory.
+	
+	status.throwIfCancelled();
+	
+	BinaryThreshold const threshold(
+		BinaryThreshold::mokjiThreshold(picture_areas, 5, 26)
+	);
+	
+	// Scale back to original size.
+	picture_areas = scaleToGray(
+		picture_areas, source_sub_rect.size()
+	);
+	
+	return BinaryImage(picture_areas, threshold);
+}
+
+QImage
+OutputGenerator::processImpl(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
+	RenderParams const render_params(m_colorParams);
+	
+	if (!render_params.whiteMargins()) {
+		return processAsIs(input, status, dbg);
+	}
+	
 	// The whole image minus the part cut off by the split line.
 	QRect const big_margins_rect(m_fullPageRect);
 	
@@ -245,70 +353,48 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 #endif
 	);
 	
-	QImage to_be_normalized(
-		transformToGray(
-			input.grayImage(), m_toUncropped,
-			normalize_illumination_rect,
-			Qt::black // <-- Important!
-		)
-	);
-	if (dbg) {
-		dbg->add(to_be_normalized, "to_be_normalized");
-	}
+	QImage maybe_normalized;
 	
-	status.throwIfCancelled();
-	
-	PolynomialSurface const bg_ps(
-		estimateBackground(
-			to_be_normalized, status, dbg
-		)
-	);
-	
-	status.throwIfCancelled();
-	
-	QImage normalized_illumination(
-		bg_ps.render(to_be_normalized.size())
-	);
-	if (dbg) {
-		dbg->add(normalized_illumination, "background");
-	}
-	
-	status.throwIfCancelled();
-	
-	grayRasterOp<RaiseAboveBackground>(
-		normalized_illumination, to_be_normalized
-	);
-	if (dbg) {
-		dbg->add(normalized_illumination, "normalized_illumination");
-	}
-	
-	to_be_normalized = QImage(); // Save memory.
-	
-	status.throwIfCancelled();
-	
-	QSize const savgol_window(
-		from300dpi(QSize(7, 7), m_dpi).expandedTo(QSize(7, 7))
-	);
-	QImage normalized_and_smoothed(
-		savGolFilter(normalized_illumination, savgol_window, 4, 4)
-	);
-	if (dbg) {
-		dbg->add(normalized_and_smoothed, "smoothed");
-	}
-	
-	status.throwIfCancelled();
-	
-	if (m_colorParams.colorMode() != ColorParams::MIXED) {
-		// This means it's BLACK_AND_WHITE or BITONAL.
-		
-		BinaryImage bw_content(
-			binarize(normalized_and_smoothed, m_dpi)
+	if (render_params.normalizeIllumination()) {
+		maybe_normalized = normalizeIlluminationGray(
+			status, input.grayImage(), m_toUncropped,
+			normalize_illumination_rect, dbg
 		);
-		morphologicalSmoothInPlace(bw_content, status);
-		
+	} else {
+		maybe_normalized = transform(
+			input.origImage(), m_toUncropped,
+			normalize_illumination_rect, Qt::white
+		);
+	}
+	
+	status.throwIfCancelled();
+	
+	QImage maybe_smoothed;
+	
+	// We only do smoothing if we are going to do binarization later.
+	if (!render_params.needBinarization()) {
+		maybe_smoothed = maybe_normalized;
+	} else {
+		QSize const savgol_window(
+			from300dpi(QSize(7, 7), m_dpi).expandedTo(QSize(7, 7))
+		);
+		maybe_smoothed = savGolFilter(
+			maybe_normalized, savgol_window, 4, 4
+		);
+		if (dbg) {
+			dbg->add(maybe_smoothed, "smoothed");
+		}
+	}
+	
+	status.throwIfCancelled();
+	
+	if (render_params.binaryOutput()) {
 		BinaryImage dst(m_cropRect.size(), WHITE);
 		
 		if (!m_contentRect.isEmpty()) {
+			BinaryImage bw_content(binarize(maybe_smoothed, m_dpi));
+			morphologicalSmoothInPlace(bw_content, status);
+			
 			QRect dst_rect(m_contentRect);
 			dst_rect.moveTopLeft(
 				normalize_illumination_rect.topLeft()
@@ -319,149 +405,96 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 				m_contentRect.topLeft() -
 				normalize_illumination_rect.topLeft()
 			);
+			
 			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_pos);
 		}
-		
-		bw_content.release(); // Save memory.
 		
 		QImage bitonal(dst.toQImage());
 		
 		dst.release(); // Save memory.
-		
+#if 0
 		if (m_colorParams.colorMode() == ColorParams::BITONAL) {
 			colorizeBitonal(
 				bitonal, m_colorParams.lightColor(),
 				m_colorParams.darkColor()
 			);
 		}
-		
+#endif
 		return bitonal;
 	}
 	
-	// For detecting pictures on a scan, we need to get rid of
-	// big margins.  The more extra space we have, the more chances
-	// there are for false positives.  Still, because we need
-	// to detect gradients, we don't want content touching the edge,
-	// which means zero margins won't be OK.
-	
-	// If we need to strip some of the margins from a grayscale
-	// image, we may actually do it without copying anything.
-	// We are going to construct a QImage from existing data,
-	// that image won't hold that data, so we need someone
-	// else to hold it ...
-	QImage holder(normalized_illumination);
-	
-	if (normalize_illumination_rect != small_margins_rect) {
-		// The area of normalized_illumination we actually need.
-		QRect subrect(small_margins_rect);
-		subrect.moveTopLeft(
-			small_margins_rect.topLeft() - big_margins_rect.topLeft()
-		);
-		
-		// This prevents a copy-on-write when we access holder.bits().
-		normalized_illumination = QImage();
-		
-		int const bpl = holder.bytesPerLine();
-		normalized_illumination = QImage(
-			holder.bits() + subrect.left() + subrect.top() * bpl,
-			subrect.width(), subrect.height(),
-			bpl, holder.format()
-		);
-		normalized_illumination.setColorTable(holder.colorTable());
-	}
-	
-	status.throwIfCancelled();
-	
-	// A 300dpi version of normalized_illumination.
-	QImage normalized_illumination_300(
-		scaleToGray(
-			normalized_illumination,
-			to300dpi(normalized_illumination.size(), m_dpi)
-		)
-	);
-	
-	status.throwIfCancelled();
-	
-	// Light areas indicate pictures.
-	QImage picture_areas(
-		detectPictures(normalized_illumination_300, status, dbg)
-	);
-	normalized_illumination_300 = QImage();
-	
-	status.throwIfCancelled();
-	
-	BinaryThreshold const image_mask_threshold(
-		BinaryThreshold::mokjiThreshold(picture_areas, 5, 26)
-	);
-	
-	picture_areas = scaleToGray(
-		picture_areas, normalized_illumination.size()
-	);
-	
-	// Black areas in bw_mask indicate areas to be binarized.
-	BinaryImage bw_mask(picture_areas, image_mask_threshold);
-	picture_areas = QImage();
-	if (dbg) {
-		dbg->add(bw_mask, "bw_mask");
-	}
-	
-	status.throwIfCancelled();
-	
-	GrayscaleHistogram const hist(normalized_and_smoothed, bw_mask);
-	normalized_and_smoothed = QImage(); // Save memory.
-	
-	status.throwIfCancelled();
-	
-	BinaryThreshold const bw_thresh(BinaryThreshold::otsuThreshold(hist));
-	BinaryImage bw_content(normalized_illumination, bw_thresh);
-	morphologicalSmoothInPlace(bw_content, status);
-	if (dbg) {
-		dbg->add(bw_content, "bw_content");
-	}
-	
-	status.throwIfCancelled();
-	
-	QImage mixed;
-	if (input.origImage().allGray()) {
-		mixed = normalized_illumination;
-	} else {
-		mixed = transform(
-			input.origImage(), m_toUncropped,
-			normalize_illumination_rect,
-			Qt::white
+	if (!input.origImage().allGray()) {
+		QImage tmp(
+			transform(
+				input.origImage(), m_toUncropped,
+				normalize_illumination_rect,
+				Qt::white
+			)
 		);
 		
 		status.throwIfCancelled();
 		
-		adjustBrightnessGrayscale(
-			mixed, normalized_illumination
-		);
+		adjustBrightnessGrayscale(tmp, maybe_normalized);
+		maybe_normalized = tmp;
 		if (dbg) {
-			dbg->add(mixed, "norm_illum_color");
+			dbg->add(maybe_normalized, "norm_illum_color");
 		}
 	}
 	
-	// Save memory.
-	normalized_illumination = QImage();
-	holder = QImage();
-	
-	if (mixed.format() == QImage::Format_Indexed8) {
-		combineMixed<uint8_t>(mixed, bw_content, bw_mask);
-	} else {
-		assert(mixed.format() == QImage::Format_RGB32
-			|| mixed.format() == QImage::Format_ARGB32);
+	if (render_params.mixedOutput()) {
+		// For detecting pictures on a scan, we need to get rid of
+		// big margins.  The more extra space we have, the more chances
+		// there are for false positives.  Still, because we need
+		// to detect gradients, we don't want content touching the edge,
+		// which means zero margins won't be OK.
+		BinaryImage bw_mask(
+			estimateBinarizationMask(
+				status, maybe_normalized,
+				normalize_illumination_rect,
+				small_margins_rect, dbg
+			)
+		);
+		if (dbg) {
+			dbg->add(bw_mask, "bw_mask");
+		}
 		
-		combineMixed<uint32_t>(mixed, bw_content, bw_mask);
+		status.throwIfCancelled();
+		
+		GrayscaleHistogram const hist(maybe_smoothed, bw_mask);
+		maybe_smoothed = QImage(); // Save memory.
+		
+		status.throwIfCancelled();
+		
+		BinaryThreshold const bw_thresh(
+			BinaryThreshold::otsuThreshold(hist)
+		);
+		
+		BinaryImage bw_content(maybe_normalized, bw_thresh);
+		morphologicalSmoothInPlace(bw_content, status);
+		if (dbg) {
+			dbg->add(bw_content, "bw_content");
+		}
+		
+		status.throwIfCancelled();
+		
+		if (maybe_normalized.format() == QImage::Format_Indexed8) {
+			combineMixed<uint8_t>(
+				maybe_normalized, bw_content, bw_mask
+			);
+		} else {
+			assert(maybe_normalized.format() == QImage::Format_RGB32
+				|| maybe_normalized.format() == QImage::Format_ARGB32);
+			
+			combineMixed<uint32_t>(
+				maybe_normalized, bw_content, bw_mask
+			);
+		}
 	}
-	
-	// Save memory.
-	bw_content.release();
-	bw_mask.release();
 	
 	status.throwIfCancelled();
 	
-	QImage dst(m_cropRect.size(), mixed.format());
-	if (mixed.format() == QImage::Format_Indexed8) {
+	QImage dst(m_cropRect.size(), maybe_normalized.format());
+	if (maybe_normalized.format() == QImage::Format_Indexed8) {
 		dst.setColorTable(createGrayscalePalette());
 		dst.fill(0xff); // White.
 	} else {
@@ -475,7 +508,7 @@ OutputGenerator::processMixedOrBitonal(FilterData const& input,
 		);
 		
 		QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
-		drawOver(dst, dst_rect, mixed, src_rect);
+		drawOver(dst, dst_rect, maybe_normalized, src_rect);
 	}
 	
 	return dst;
@@ -581,6 +614,9 @@ BinaryImage
 OutputGenerator::binarize(QImage const& image, Dpi const& image_dpi) const
 {
 	BinaryImage bin_img;
+#if 1
+	bin_img = binarizeOtsu(image);
+#else
 	switch (m_colorParams.thresholdMode()) {
 		case ColorParams::OTSU:
 			bin_img = binarizeOtsu(image);
@@ -600,6 +636,7 @@ OutputGenerator::binarize(QImage const& image, Dpi const& image_dpi) const
 			);
 			break;
 	}
+#endif
 	assert(!bin_img.isNull());
 	
 	return bin_img;
