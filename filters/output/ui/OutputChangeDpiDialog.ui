@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>255</width>
-    <height>233</height>
+    <width>235</width>
+    <height>215</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,59 +14,39 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" >
    <item>
-    <widget class="QGroupBox" name="groupBox" >
+    <widget class="QGroupBox" name="dpiGroup" >
      <property name="title" >
       <string>DPI</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout" >
       <item>
-       <spacer name="horizontalSpacer" >
+       <spacer name="horizontalSpacer_3" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>40</width>
+          <width>0</width>
           <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
       <item>
-       <widget class="QLineEdit" name="xDpi" >
-        <property name="maximumSize" >
-         <size>
-          <width>45</width>
-          <height>16777215</height>
-         </size>
+       <widget class="QComboBox" name="dpiSelector" >
+        <property name="duplicatesEnabled" >
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>x</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="yDpi" >
-        <property name="maximumSize" >
-         <size>
-          <width>45</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2" >
+       <spacer name="horizontalSpacer_4" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>40</width>
+          <width>0</width>
           <height>20</height>
          </size>
         </property>
@@ -109,7 +89,7 @@
      <property name="sizeHint" stdset="0" >
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>1</height>
       </size>
      </property>
     </spacer>

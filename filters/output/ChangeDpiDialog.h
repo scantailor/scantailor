@@ -38,7 +38,13 @@ public:
 signals:
 	void accepted(Dpi const& dpi, Scope scope);
 private slots:
+	void dpiSelectionChanged(int index);
+	
+	void customDpiChanged(QString const& dpi_str);
+	
 	void onSubmit();
+private:
+	int m_customItemIdx;
 };
 
 } // namespace output

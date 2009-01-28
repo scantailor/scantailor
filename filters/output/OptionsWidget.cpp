@@ -248,10 +248,14 @@ OptionsWidget::createIcon(QPixmap const& pixmap)
 void
 OptionsWidget::updateDpiDisplay()
 {
-	dpiLabel->setText(
-		QString::fromAscii("%1 x %2")
-		.arg(m_dpi.horizontal()).arg(m_dpi.vertical())
-	);
+	if (m_dpi.horizontal() != m_dpi.vertical()) {
+		dpiLabel->setText(
+			QString::fromAscii("%1 x %2")
+			.arg(m_dpi.horizontal()).arg(m_dpi.vertical())
+		);
+	} else {
+		dpiLabel->setText(QString::number(m_dpi.horizontal()));
+	}
 }
 
 void

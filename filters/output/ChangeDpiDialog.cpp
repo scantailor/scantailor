@@ -18,8 +18,11 @@
 
 #include "ChangeDpiDialog.h.moc"
 #include "Dpi.h"
+#include <QVariant>
 #include <QIntValidator>
 #include <QMessageBox>
+#include <boost/foreach.hpp>
+#include <algorithm>
 
 namespace output
 {
@@ -29,16 +32,44 @@ ChangeDpiDialog::ChangeDpiDialog(QWidget* parent, Dpi const& dpi)
 {
 	setupUi(this);
 	
-	xDpi->setText(QString::number(dpi.horizontal()));
-	yDpi->setText(QString::number(dpi.vertical()));
+	dpiSelector->setValidator(new QIntValidator(dpiSelector));
 	
-	xDpi->setMaxLength(4);
-	yDpi->setMaxLength(4);
-	QIntValidator* xDpiValidator = new QIntValidator(xDpi);
-	xDpi->setValidator(xDpiValidator);
-	QIntValidator* yDpiValidator = new QIntValidator(yDpi);
-	yDpi->setValidator(yDpiValidator);
+	static int const common_dpis[] = {
+		300, 400, 600
+	};
 	
+	int const requested_dpi = std::max(dpi.horizontal(), dpi.vertical());
+	
+	int selected_index = -1;
+	BOOST_FOREACH(int const cdpi, common_dpis) {
+		if (cdpi == requested_dpi) {
+			selected_index = dpiSelector->count();
+		}
+		dpiSelector->addItem(QString::number(cdpi), cdpi);
+	}
+	
+	m_customItemIdx = dpiSelector->count();
+	dpiSelector->addItem(tr("Custom"));
+	
+	if (selected_index == -1) {
+		selected_index = m_customItemIdx;
+		dpiSelector->setEditable(true);
+		// It looks like we need to set a new validator
+		// every time we make the combo box editable.
+		dpiSelector->setValidator(
+			new QIntValidator(0, 9999, dpiSelector)
+		);
+	}
+	dpiSelector->setCurrentIndex(selected_index);
+	
+	connect(
+		dpiSelector, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(dpiSelectionChanged(int))
+	);
+	connect(
+		dpiSelector, SIGNAL(editTextChanged(QString const&)),
+		this, SLOT(customDpiChanged(QString const&))
+	);
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }
 
@@ -47,25 +78,42 @@ ChangeDpiDialog::~ChangeDpiDialog()
 }
 
 void
+ChangeDpiDialog::dpiSelectionChanged(int const index)
+{
+	QVariant const var(dpiSelector->itemData(index));
+	dpiSelector->setEditable(var.isNull());
+	if (var.isNull()) {
+		dpiSelector->setItemText(m_customItemIdx, "600");
+		// It looks like we need to set a new validator
+		// every time we make the combo box editable.
+		dpiSelector->setValidator(
+			new QIntValidator(0, 9999, dpiSelector)
+		);
+	} else {
+		dpiSelector->setItemText(m_customItemIdx, tr("Custom"));
+	}
+}
+
+void
+ChangeDpiDialog::customDpiChanged(QString const& dpi_str)
+{
+	dpiSelector->setItemText(m_customItemIdx, dpi_str);
+}
+
+void
 ChangeDpiDialog::onSubmit()
 {
-	if (xDpi->text().isEmpty()) {
+	QString const dpi_str(dpiSelector->currentText());
+	if (dpi_str.isEmpty()) {
 		QMessageBox::warning(
 			this, tr("Error"),
-			tr("Horizontal DPI is not set.")
-		);
-		return;
-	}
-	if (yDpi->text().isEmpty()) {
-		QMessageBox::warning(
-			this, tr("Error"),
-			tr("Vertical DPI is not set.")
+			tr("Custom DPI is not set.")
 		);
 		return;
 	}
 	
-	Dpi const dpi(xDpi->text().toInt(), yDpi->text().toInt());
-	if (dpi.horizontal() < 72 || dpi.vertical() < 72) {
+	int const dpi = dpi_str.toInt();
+	if (dpi < 72) {
 		QMessageBox::warning(
 			this, tr("Error"),
 			tr("DPI is too low!")
@@ -73,7 +121,7 @@ ChangeDpiDialog::onSubmit()
 		return;
 	}
 	
-	if (dpi.horizontal() > 1200 || dpi.vertical() > 1200) {
+	if (dpi > 1200) {
 		QMessageBox::warning(
 			this, tr("Error"),
 			tr("DPI is too high!")
@@ -83,7 +131,7 @@ ChangeDpiDialog::onSubmit()
 	
 	Scope const scope = allPagesRB->isChecked() ? ALL_PAGES : THIS_PAGE_ONLY;
 	
-	emit accepted(dpi, scope);
+	emit accepted(Dpi(dpi, dpi), scope);
 	
 	// We assume the default connection from accepted() to accept()
 	// was removed.
