@@ -389,6 +389,11 @@ ProjectFilesDialog::setInputDir(QString const& dir)
 	);
 	
 	m_ptrOffProjectFiles->assign(items.begin(), items.end());
+	
+	if (m_ptrInProjectFiles->count() == 0) {
+		offProjectList->selectAll();
+		addToProject();
+	}
 }
 
 void
