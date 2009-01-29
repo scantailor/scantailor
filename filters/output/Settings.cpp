@@ -26,7 +26,7 @@ namespace output
 {
 
 Settings::Settings()
-:	m_defaultDpi(300, 300)
+:	m_defaultDpi(600, 600)
 {
 }
 
@@ -39,7 +39,7 @@ Settings::clear()
 {
 	QMutexLocker const locker(&m_mutex);
 	
-	m_defaultDpi = Dpi(300, 300);
+	m_defaultDpi = Dpi(600, 600);
 	m_defaultColorParams = ColorParams();
 	m_perPageDpi.clear();
 	m_perPageColorParams.clear();
