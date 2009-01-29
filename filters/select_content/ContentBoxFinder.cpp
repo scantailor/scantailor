@@ -155,8 +155,8 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	rasterOp<RopOr<RopSrc, RopDst> >(hor_shadows_seed, ver_shadows_seed);
 	BinaryImage shadows_seed(hor_shadows_seed.release());
+	rasterOp<RopOr<RopSrc, RopDst> >(shadows_seed, ver_shadows_seed);
 	ver_shadows_seed.release();
 	if (dbg) {
 		dbg->add(shadows_seed, "shadows_seed");
@@ -320,18 +320,18 @@ ContentBoxFinder::findContentBox(
 	
 	QRect content_rect(content_blocks.contentBoundingBox());
 	
-	BinaryImage initial_hor_garbage(garbage.size(), WHITE);
-	BinaryImage initial_vert_garbage(garbage.size(), WHITE);
-	segmentGarbage(garbage, initial_hor_garbage, initial_vert_garbage, dbg);
+	// Temporarily reuse hor_shadows_seed and ver_shadows_seed.
+	// It's OK they are null.
+	segmentGarbage(garbage, hor_shadows_seed, ver_shadows_seed, dbg);
 	garbage.release();
 	
 	if (dbg) {
-		dbg->add(initial_hor_garbage, "initial_hor_garbage");
-		dbg->add(initial_vert_garbage, "initial_vert_garbage");
+		dbg->add(hor_shadows_seed, "initial_hor_garbage");
+		dbg->add(ver_shadows_seed, "initial_vert_garbage");
 	}
 	
-	Garbage hor_garbage(Garbage::HOR, initial_hor_garbage.release());
-	Garbage vert_garbage(Garbage::VERT, initial_vert_garbage.release());
+	Garbage hor_garbage(Garbage::HOR, hor_shadows_seed.release());
+	Garbage vert_garbage(Garbage::VERT, ver_shadows_seed.release());
 	
 	enum Side { LEFT = 1, RIGHT = 2, TOP = 4, BOTTOM = 8 };
 	int side_mask = LEFT|RIGHT|TOP|BOTTOM;
@@ -631,19 +631,36 @@ ContentBoxFinder::segmentGarbage(
 	imageproc::BinaryImage& vert_garbage,
 	DebugImages* dbg)
 {
+	hor_garbage = openBrick(garbage, QSize(200, 1), WHITE);
+	
+	QRect rect(garbage.rect());
+	rect.setHeight(1);
+	rasterOp<RopOr<RopSrc, RopDst> >(
+		hor_garbage, rect, garbage, rect.topLeft()
+	);
+	rect.moveBottom(garbage.rect().bottom());
+	rasterOp<RopOr<RopSrc, RopDst> >(
+		hor_garbage, rect, garbage, rect.topLeft()
+	);
+	
+	vert_garbage = openBrick(garbage, QSize(1, 200), WHITE);
+	
+	rect = garbage.rect();
+	rect.setWidth(1);
+	rasterOp<RopOr<RopSrc, RopDst> >(
+		vert_garbage, rect, garbage, rect.topLeft()
+	);
+	rect.moveRight(garbage.rect().right());
+	rasterOp<RopOr<RopSrc, RopDst> >(
+		vert_garbage, rect, garbage, rect.topLeft()
+	);
+	
 	ConnectivityMap cmap(garbage.size());
 	
-	BinaryImage borders(garbage.size(), WHITE);
-	borders.fillExcept(borders.rect().adjusted(1, 0, -1, 0), BLACK);
-	rasterOp<RopAnd<RopSrc, RopDst> >(borders, garbage);
-	cmap.addComponent(borders);
-	
-	borders.fillExcept(borders.rect().adjusted(1, 0, -1, 0), WHITE);
-	borders.fillExcept(borders.rect().adjusted(0, 1, 0, -1), BLACK);
-	rasterOp<RopAnd<RopSrc, RopDst> >(borders, garbage);
-	cmap.addComponent(borders);
-	
-	borders.release();
+	cmap.addComponent(vert_garbage);
+	vert_garbage.fill(WHITE);
+	cmap.addComponent(hor_garbage);
+	hor_garbage.fill(WHITE);
 	
 	InfluenceMap imap(cmap, garbage);
 	cmap = ConnectivityMap();
