@@ -97,21 +97,21 @@ INCLUDE_DIRECTORIES("${TIFF_INCLUDE_DIR}")
 IF(UNIX)
 	# We need to manually use XRender.
 	FIND_PATH(
-		XRENDER_H_LOCATION Xrender.h
+		X11_INCLUDE_PATH extensions/Xrender.h
 		PATHS /usr/local /usr
-		PATH_SUFFIXES include/X11/extensions X11/include/extensions
-		DOC "The location of Xrender.h."
+		PATH_SUFFIXES include/X11 X11/include
+		DOC "The path to extensions/Xrender.h."
 	)
-	IF (NOT XRENDER_H_LOCATION)
+	IF (NOT X11_INCLUDE_PATH)
 		MESSAGE(
 			FATAL_ERROR
 			"Could not find Xrender.h\n"
 			"Most likely you need to install a package called\n"
 			"libxrender-dev or libXrender-dev or similar."
 		)
-	ENDIF(NOT XRENDER_H_LOCATION)
+	ENDIF(NOT X11_INCLUDE_PATH)
 	
-	INCLUDE_DIRECTORIES("${XRENDER_H_LOCATION}")
+	INCLUDE_DIRECTORIES("${X11_INCLUDE_PATH}")
 	
 	FindPthreads()
 	IF(PTHREADS_FOUND)
