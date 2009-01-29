@@ -135,6 +135,10 @@
     <addaction name="separator" />
     <addaction name="actionSaveProject" />
     <addaction name="actionSaveProjectAs" />
+    <addaction name="separator" />
+    <addaction name="actionCloseProject" />
+    <addaction name="separator" />
+    <addaction name="actionQuit" />
    </widget>
    <widget class="QMenu" name="menuProcess" >
     <property name="title" >
@@ -248,6 +252,22 @@
    </property>
    <property name="autoRepeat" >
     <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionCloseProject" >
+   <property name="text" >
+    <string>Close Project</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionQuit" >
+   <property name="text" >
+    <string>Quit</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

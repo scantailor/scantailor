@@ -222,6 +222,14 @@ MainWindow::MainWindow()
 		actionSaveProjectAs, SIGNAL(triggered(bool)),
 		this, SLOT(saveProjectAsTriggered())
 	);
+	connect(
+		actionCloseProject, SIGNAL(triggered(bool)),
+		this, SLOT(closeProject())
+	);
+	connect(
+		actionQuit, SIGNAL(triggered(bool)),
+		this, SLOT(close())
+	);
 	
 	updateProjectActions();
 	updateBatchProcessingActions();
@@ -922,6 +930,12 @@ MainWindow::openProject(QString const& project_file)
 		reader.pages(), reader.outputDirectory(),
 		project_file, &reader
 	);
+}
+
+void
+MainWindow::closeProject()
+{
+	closeProjectInteractive();
 }
 
 void

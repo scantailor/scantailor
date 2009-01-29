@@ -103,6 +103,8 @@ private slots:
 	void openProject();
 	
 	void openProject(QString const& project_file);
+	
+	void closeProject();
 private:
 	class FilterListModel;
 	
