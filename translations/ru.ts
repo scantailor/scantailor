@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru">
-<defaultcodec></defaultcodec>
 <context>
     <name>DeskewOptionsWidget</name>
     <message>
@@ -314,17 +313,17 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Открыть проект</translation>
     </message>
     <message>
-        <location filename="../ui/NewOpenProjectPanel.ui" line="94"/>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="103"/>
         <source>Recent Projects</source>
         <translation>Недавние проекты</translation>
     </message>
     <message>
-        <location filename="../ui/NewOpenProjectPanel.ui" line="43"/>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="52"/>
         <source>New Project ...</source>
         <translation>Новый проект ...</translation>
     </message>
     <message>
-        <location filename="../ui/NewOpenProjectPanel.ui" line="69"/>
+        <location filename="../ui/NewOpenProjectPanel.ui" line="78"/>
         <source>Open Project ...</source>
         <translation>Открыть проект ...</translation>
     </message>
@@ -436,22 +435,17 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="48"/>
-        <source>x</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="81"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="61"/>
         <source>Scope</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="87"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="67"/>
         <source>This page only</source>
         <translation>Только к этой странице</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="97"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="77"/>
         <source>All pages</source>
         <translation>Ко всем страницам</translation>
     </message>
@@ -489,27 +483,27 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Режим</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="161"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="226"/>
         <source>Light</source>
         <translation>Светлый</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="182"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="247"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="175"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="240"/>
         <source>Dark</source>
         <translation>Темный</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="208"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="273"/>
         <source>B/W Threshold</source>
         <translation>Черно-белый порог</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="266"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="331"/>
         <source>Apply To ...</source>
         <translation>Применить к ...</translation>
     </message>
@@ -517,6 +511,16 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="102"/>
         <source>Mode</source>
         <translation>Режим</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="171"/>
+        <source>White margins</source>
+        <translation>Белые поля</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="178"/>
+        <source>Equalize illumination</source>
+        <translation>Выровнять освещение</translation>
     </message>
 </context>
 <context>
@@ -732,47 +736,47 @@ p, li { white-space: pre-wrap; }
         <translation>Директория вывода</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="583"/>
+        <location filename="../ProjectFilesDialog.cpp" line="588"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="467"/>
+        <location filename="../ProjectFilesDialog.cpp" line="472"/>
         <source>No files in project!</source>
         <translation>В проекте нет файлов!</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="476"/>
+        <location filename="../ProjectFilesDialog.cpp" line="481"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
         <translation>Директория ввода не задана или не существует.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="485"/>
+        <location filename="../ProjectFilesDialog.cpp" line="490"/>
         <source>Input and output directories can&apos;t be the same.</source>
         <translation>Дируктории ввода и вывода не могут совпадать.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="494"/>
+        <location filename="../ProjectFilesDialog.cpp" line="499"/>
         <source>Create Directory?</source>
         <translation>Создать директорию?</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="495"/>
+        <location filename="../ProjectFilesDialog.cpp" line="500"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
         <translation>Директория вывода не существует.  Создать ее?</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="507"/>
+        <location filename="../ProjectFilesDialog.cpp" line="512"/>
         <source>Unable to create output directory.</source>
         <translation>Невозможно создать директорию вывода.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="516"/>
+        <location filename="../ProjectFilesDialog.cpp" line="521"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
         <translation>Директория вывода не задана или не существует.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="588"/>
+        <location filename="../ProjectFilesDialog.cpp" line="593"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
@@ -941,29 +945,39 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::ChangeDpiDialog</name>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="78"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="126"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="56"/>
         <source>Horizontal DPI is not set.</source>
-        <translation>Горизонтальный DPI не установлен.</translation>
+        <translation type="obsolete">Горизонтальный DPI не установлен.</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="63"/>
         <source>Vertical DPI is not set.</source>
-        <translation>Вертикальный DPI не установлен. </translation>
+        <translation type="obsolete">Вертикальный DPI не установлен. </translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="72"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="120"/>
         <source>DPI is too low!</source>
         <translation>DPI слишком низкий!</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="80"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="128"/>
         <source>DPI is too high!</source>
         <translation>DPI слишком высокий!</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="93"/>
+        <source>Custom</source>
+        <translation>Особый</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="111"/>
+        <source>DPI is not set.</source>
+        <translation>DPI не указан.</translation>
     </message>
 </context>
 <context>
@@ -984,7 +998,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="43"/>
         <source>Bitonal</source>
-        <translation>Двухтоновый</translation>
+        <translation type="obsolete">Двухтоновый</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="44"/>

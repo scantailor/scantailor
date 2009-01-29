@@ -107,7 +107,7 @@ ChangeDpiDialog::onSubmit()
 	if (dpi_str.isEmpty()) {
 		QMessageBox::warning(
 			this, tr("Error"),
-			tr("Custom DPI is not set.")
+			tr("DPI is not set.")
 		);
 		return;
 	}
