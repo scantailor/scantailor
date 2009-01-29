@@ -74,7 +74,7 @@ ApplyDialog::everyPageSelected()
 	rangeTo->setEnabled(true);
 	
 	QString const cur_page_str(QString::number(m_curPage + 1));
-	rangeFrom->setText("1");
+	rangeFrom->setText(cur_page_str);
 	rangeTo->setText(QString::number(m_numPages));
 }
 
@@ -85,7 +85,7 @@ ApplyDialog::everyOtherPageSelected()
 	rangeTo->setEnabled(true);
 	
 	QString const cur_page_str(QString::number(m_curPage + 1));
-	rangeFrom->setText("1");
+	rangeFrom->setText(cur_page_str);
 	rangeTo->setText(QString::number(m_numPages));
 }
 
