@@ -829,7 +829,7 @@ ContentBoxFinder::estimateTextMask(
 				continue;
 			}
 			
-			double const min_fill_factor = 0.17;
+			double const min_fill_factor = 0.22;
 			double const max_fill_factor = 0.65;
 			
 			int const center_y = (weighted_y + total_weight / 2) / total_weight;
