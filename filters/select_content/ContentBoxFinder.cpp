@@ -410,6 +410,16 @@ ContentBoxFinder::findContentBox(
 				side_mask |= BOTTOM|LEFT|RIGHT;
 			}
 		}
+		
+		if (content_rect.width() < 8 || content_rect.height() < 8) {
+			content_rect = QRect();
+			break;
+		} else if (content_rect.width() < 30 &&
+				content_rect.height() >
+				content_rect.width() * 20) {
+			content_rect = QRect();
+			break;
+		}
 	}
 	
 	// Transform back from 150dpi.
@@ -1130,8 +1140,16 @@ ContentBoxFinder::trim(
 	}
 	
 	// Don't trim too much.
-	if (removed_area.width() * removed_area.height() >
+	while (removed_area.width() * removed_area.height() >
 			0.3 * (new_area.width() * new_area.height())) {
+		// It's a loop just to be able to break from it.
+		
+		// There is a special case when there is nothing but
+		// garbage on the page.  Let's try to handle it here.
+		if (removed_area.width() < 6 || removed_area.height() < 6) {
+			break;
+		}
+		
 		if (dbg) {
 			QPainter painter(&visualized);
 			painter.setPen(Qt::NoPen);
