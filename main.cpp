@@ -47,8 +47,14 @@ int main(int argc, char** argv)
 		QString path(QString::fromUtf8(TRANSLATIONS_DIR_ABS));
 		path += QChar('/');
 		path += locale;
-		translator.load(path);
+		if (!translator.load(path)) {
+			path = QString::fromUtf8(TRANSLATIONS_DIR_REL);
+			path += QChar('/');
+			path += locale;
+			translator.load(path);
+		}
 	}
+	
 	app.installTranslator(&translator);
 	
 	// This information is used by QSettings.
