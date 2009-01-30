@@ -1,0 +1,71 @@
+The icons in this folder and in sub-folders have different origins and
+different licenses.  Details follow.
+
+
+Origin: Created by Scan Tailor developers or contributors
+Website: http://scantailor.sourceforge.net/
+License: GNU GPL version 3 or above
+Files:
+aqua-sphere.png
+aque-sphere.svg
+layout-type-auto.png
+left_page_plus_offcut.png
+left_page_plus_offcut_selected.png
+left_page_thumb.png
+right_page_plus_offcut.png
+right_page_plus_offcut_selected.png
+right_page_thumb.png
+single_page_uncut.png
+single_page_uncut_selected.png
+two_pages.png
+two_pages_selected.png 
+
+
+Origin: The GNU Image Manipulation Project (GIMP)
+Website: http://gimp.org/
+License: GNU GPL version 2 or above
+Files:
+stock-center-24.png
+stock-gravity-east-24.png
+stock-gravity-north-24.png
+stock-gravity-north-east-24.png
+stock-gravity-north-west-24.png
+stock-gravity-south-24.png
+stock-gravity-south-east-24.png
+stock-gravity-south-west-24.png
+stock-gravity-west-24.png
+stock-vchain-24.png
+stock-vchain-broken-24.png
+
+
+Origin: F-Spot
+Website: http://f-spot.org/
+License: GNU GPL version 2 or above
+Files:
+object-rotate-left.png
+object-rotate-right.png
+
+
+Origin: GNOME Project
+Website: http://gnome.org/
+License: GNU GPL version 3 or above
+Files:
+16x16/media-playback-start.png
+16x16/media-playback-stop.png
+
+
+Origin: Tango Desktop Project
+Website: http://tango.freedesktop.org/
+License: Creative Commons Attribution Share-Alike 2.5 License
+Files:
+big-down-arrow.png
+big-left-arrow.png
+big-right-arrow.png
+big-up-arrow.png
+
+
+Origin: Mark James
+Website: http://www.famfamfam.com/lab/icons/silk/
+License: Creative Commons Attribution 2.5 License
+Files:
+arrow_in.png
