@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/arrow_in.png</file>
     <file>icons/single_page_uncut_selected.png</file>
     <file>icons/right_page_plus_offcut_selected.png</file>
     <file>icons/two_pages_selected.png</file>

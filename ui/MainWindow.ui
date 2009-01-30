@@ -99,8 +99,15 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip" >
+         <string>Scroll to a selected page automatically.</string>
+        </property>
         <property name="text" >
-         <string>&lt; ></string>
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset resource="../resources/resources.qrc" >
+          <normaloff>:/icons/arrow_in.png</normaloff>:/icons/arrow_in.png</iconset>
         </property>
         <property name="checkable" >
          <bool>true</bool>
