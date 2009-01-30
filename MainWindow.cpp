@@ -651,7 +651,7 @@ MainWindow::pageSelected(
 	PageInfo const& page_info, QRectF const& thumb_rect,
 	bool const by_user, bool const was_already_selected)
 {
-	if (focusButton->isChecked()) {
+	if (by_user || focusButton->isChecked()) {
 		thumbView->ensureVisible(thumb_rect, 0, 0);
 	}
 	
