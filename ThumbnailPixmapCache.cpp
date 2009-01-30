@@ -793,7 +793,7 @@ ThumbnailPixmapCache::Impl::processLoadResult(LoadResultEvent* result)
 	ThumbnailLoadResult const load_result(result->status(), pixmap);
 	typedef boost::weak_ptr<CompletionHandler> WeakHandler;
 	BOOST_FOREACH (WeakHandler const& wh, completion_handlers) {
-		boost::shared_ptr<CompletionHandler> const sh(wh);
+		boost::shared_ptr<CompletionHandler> const sh(wh.lock());
 		if (sh.get()) {
 			(*sh)(load_result);
 		}
