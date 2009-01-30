@@ -21,8 +21,8 @@
 
 #include "NonCopyable.h"
 #include "ThumbnailLoadResult.h"
-#include "boost_signals.h"
-#include <boost/function.hpp>
+#include "AbstractCommand.h"
+#include <boost/weak_ptr.hpp>
 #include <memory>
 
 class ImageId;
@@ -36,6 +36,10 @@ class ThumbnailPixmapCache
 	DECLARE_NON_COPYABLE(ThumbnailPixmapCache)
 public:
 	enum Status { LOADED, LOAD_FAILED, QUEUED };
+	
+	typedef AbstractCommand1<
+		void, ThumbnailLoadResult const&
+	> CompletionHandler;
 	
 	/**
 	 * \brief Constructor.  To be called from the GUI thread only.
@@ -111,8 +115,7 @@ public:
 	 */
 	Status loadRequest(
 		ImageId const& image_id, QPixmap& pixmap,
-		boost::slot<boost::function<void (ThumbnailLoadResult const&)> >
-		completion_handler);
+		boost::weak_ptr<CompletionHandler> const& completion_handler);
 	
 	/**
 	 * \brief If no thumbnail exists for this image, create it.
@@ -138,8 +141,6 @@ public:
 	 */
 	void recreateThumbnail(ImageId const& image_id, QImage const& image);
 private:
-	typedef boost::signal<void (ThumbnailLoadResult const&)> CompletionSignal;
-	
 	class Item;
 	class Impl;
 	

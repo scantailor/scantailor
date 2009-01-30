@@ -19,10 +19,11 @@
 #include "ThumbnailBase.h"
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailLoadResult.h"
+#include "NonCopyable.h"
+#include "AbstractCommand.h"
 #include "PixmapRenderer.h"
 #include "imageproc/PolygonUtils.h"
-#include "boost_signals.h"
-#include <boost/bind.hpp>
+#include <boost/weak_ptr.hpp>
 #include <QPixmap>
 #include <QPainter>
 #include <QColor>
@@ -38,14 +39,28 @@
 
 using namespace imageproc;
 
+class ThumbnailBase::LoadCompletionHandler :
+	public AbstractCommand1<void, ThumbnailLoadResult const&>
+{
+	DECLARE_NON_COPYABLE(LoadCompletionHandler)
+public:
+	LoadCompletionHandler(ThumbnailBase* thumb) : m_pThumb(thumb) {}
+	
+	virtual void operator()(ThumbnailLoadResult const& result) {
+		m_pThumb->handleLoadResult(result);
+	}
+private:
+	ThumbnailBase* m_pThumb;
+};
+
+
 ThumbnailBase::ThumbnailBase(
 	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
 	ImageId const& image_id, ImageTransformation const& image_xform)
 :	m_rThumbnailCache(thumbnail_cache),
 	m_maxSize(max_size),
 	m_imageId(image_id),
-	m_imageXform(image_xform),
-	m_pixmapLoadPending(false)
+	m_imageXform(image_xform)
 {
 	setImageXform(m_imageXform);
 }
@@ -66,14 +81,14 @@ ThumbnailBase::paint(QPainter* painter,
 {
 	QPixmap pixmap;
 	
-	if (!m_pixmapLoadPending) {
-		ThumbnailPixmapCache::Status const status =
-		m_rThumbnailCache.loadRequest(
-			m_imageId, pixmap,
-			boost::bind(&ThumbnailBase::handleLoadResult, this, _1)
+	if (!m_ptrCompletionHandler.get()) {
+		boost::shared_ptr<LoadCompletionHandler> handler(
+			new LoadCompletionHandler(this)
 		);
+		ThumbnailPixmapCache::Status const status =
+			m_rThumbnailCache.loadRequest(m_imageId, pixmap, handler);
 		if (status == ThumbnailPixmapCache::QUEUED) {
-			m_pixmapLoadPending = true;
+			m_ptrCompletionHandler.swap(handler);
 		}
 	}
 	
@@ -187,7 +202,7 @@ ThumbnailBase::setImageXform(ImageTransformation const& image_xform)
 void
 ThumbnailBase::handleLoadResult(ThumbnailLoadResult const& result)
 {
-	m_pixmapLoadPending = false;
+	m_ptrCompletionHandler.reset();
 	
 	if (result.status() != ThumbnailLoadResult::LOAD_FAILED) {
 		// Note that we don't store result.pixmap() in

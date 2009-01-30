@@ -40,6 +40,8 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
+#include <boost/foreach.hpp>
+#include <vector>
 
 using namespace ::boost;
 using namespace ::boost::multi_index;
@@ -48,16 +50,39 @@ using namespace ::boost::multi_index;
 class ThumbnailPixmapCache::Item
 {
 public:
-	enum Status { QUEUED, IN_PROGRESS, LOADED, LOAD_FAILED };
+	enum Status {
+		/**
+		 * The background threaed hasn't touched it yet.
+		 */
+		QUEUED,
+		
+		/**
+		 * The image is currently being loaded by a background
+		 * thread, or it has been loaded, but the main thread
+		 * hasn't yet received the loaded image, or it's currently
+		 * converting it to a pixmap.
+		 */
+		IN_PROGRESS,
+		
+		/**
+		 * The image was loaded and then converted to a pixmap
+		 * by the main thread.
+		 */
+		LOADED,
+		
+		/**
+		 * The image could not be loaded.
+		 */
+		LOAD_FAILED
+	};
 	
 	ImageId imageId;
 	
 	mutable QPixmap pixmap; /**< Guaranteed to be set if status is LOADED */
 	
-	/**
-	 * Set if status is QUEUED or IN_PROGRESS, null otherwise.
-	 */
-	mutable std::auto_ptr<CompletionSignal> completionSignal;
+	mutable std::vector<
+		boost::weak_ptr<CompletionHandler>
+	> completionHandlers;
 	
 	/**
 	 * The total image loading attempts (of any images) by
@@ -87,8 +112,7 @@ public:
 	
 	Status request(
 		ImageId const& image_id, QPixmap& pixmap, bool load_now = false,
-		boost::slot<boost::function<void (ThumbnailLoadResult const&)> >*
-		completion_handler = 0);
+		boost::weak_ptr<CompletionHandler> const* completion_handler = 0);
 	
 	void ensureThumbnailExists(ImageId const& image_id, QImage const& image);
 	
@@ -137,6 +161,8 @@ private:
 	
 	static QImage makeThumbnail(
 		QImage const& image, QSize const& max_thumb_size);
+	
+	void queuedToInProgress(LoadQueue::iterator const& lq_it);
 	
 	void postLoadResult(
 		LoadQueue::iterator const& lq_it, QImage const& image,
@@ -259,8 +285,7 @@ ThumbnailPixmapCache::loadNow(ImageId const& image_id, QPixmap& pixmap)
 ThumbnailPixmapCache::Status
 ThumbnailPixmapCache::loadRequest(
 	ImageId const& image_id, QPixmap& pixmap,
-	boost::slot<boost::function<void (ThumbnailLoadResult const&)> >
-	completion_handler)
+	boost::weak_ptr<CompletionHandler> const& completion_handler)
 {
 	return m_ptrImpl->request(image_id, pixmap, false, &completion_handler);
 }
@@ -324,8 +349,7 @@ ThumbnailPixmapCache::Impl::~Impl()
 ThumbnailPixmapCache::Status
 ThumbnailPixmapCache::Impl::request(
 	ImageId const& image_id, QPixmap& pixmap, bool const load_now,
-	boost::slot<boost::function<void (ThumbnailLoadResult const&)> >*
-	completion_handler)
+	boost::weak_ptr<CompletionHandler> const* completion_handler)
 {
 	assert(QCoreApplication::instance()->thread() == QThread::currentThread());
 	
@@ -376,8 +400,7 @@ ThumbnailPixmapCache::Impl::request(
 	
 	if (k_it != m_itemsByKey.end()) {
 		assert(k_it->status == Item::QUEUED || k_it->status == Item::IN_PROGRESS);
-		assert(k_it->completionSignal.get());
-		k_it->completionSignal->connect(*completion_handler);
+		k_it->completionHandlers.push_back(*completion_handler);
 		
 		if (k_it->status == Item::QUEUED) {
 			// Because we've got a new request for this item,
@@ -404,12 +427,12 @@ ThumbnailPixmapCache::Impl::request(
 	// end of the remove queue.
 	
 	assert(lq_it->status == Item::QUEUED);
-	assert(lq_it->completionSignal.get());
+	assert(lq_it->completionHandlers.empty());
 	
 	if (m_endOfLoadedItems == m_removeQueue.end()) {
 		m_endOfLoadedItems = m_items.project<RemoveQueueTag>(lq_it);
 	}
-	lq_it->completionSignal->connect(*completion_handler);
+	lq_it->completionHandlers.push_back(*completion_handler);
 	
 	if (m_numQueuedItems++ == 0) {
 		if (m_threadStarted) {
@@ -561,22 +584,10 @@ ThumbnailPixmapCache::Impl::backgroundProcessing()
 				break;
 			}
 			
-			// QUEUED -> IN_PROGRESS
-			
 			// By marking the item as IN_PROGRESS, we prevent it
 			// from being processed again before the GUI thread
 			// receives our LoadResultEvent.
-			lq_it->status = Item::IN_PROGRESS;
-			assert(m_numQueuedItems > 0);
-			--m_numQueuedItems;
-			
-			// Move it item to the end of load queue.
-			// The point is to keep QUEUED items before any others.
-			m_loadQueue.relocate(m_loadQueue.end(), lq_it);
-			
-			// Going from QUEUED to IN_PROGRESS doesn't require
-			// moving it in the remove queue, as we only remove
-			// LOADED items.
+			queuedToInProgress(lq_it);
 			
 			if (m_totalLoadAttempts - lq_it->precedingLoadAttempts
 					> m_expirationThreshold) {
@@ -689,6 +700,24 @@ ThumbnailPixmapCache::Impl::makeThumbnail(
 }
 
 void
+ThumbnailPixmapCache::Impl::queuedToInProgress(LoadQueue::iterator const& lq_it)
+{
+	assert(lq_it->status == Item::QUEUED);
+	lq_it->status = Item::IN_PROGRESS;
+	
+	assert(m_numQueuedItems > 0);
+	--m_numQueuedItems;
+	
+	// Move it item to the end of load queue.
+	// The point is to keep QUEUED items before any others.
+	m_loadQueue.relocate(m_loadQueue.end(), lq_it);
+	
+	// Going from QUEUED to IN_PROGRESS doesn't require
+	// moving it in the remove queue, as we only remove
+	// LOADED items.
+}
+
+void
 ThumbnailPixmapCache::Impl::postLoadResult(
 	LoadQueue::iterator const& lq_it, QImage const& image,
 	ThumbnailLoadResult::Status const status)
@@ -705,7 +734,7 @@ ThumbnailPixmapCache::Impl::processLoadResult(LoadResultEvent* result)
 	QPixmap pixmap(QPixmap::fromImage(result->image()));
 	result->releaseImage();
 	
-	std::auto_ptr<CompletionSignal> completion_signal;
+	std::vector<boost::weak_ptr<CompletionHandler> > completion_handlers;
 	
 	{
 		QMutexLocker const locker(&m_mutex);
@@ -721,10 +750,14 @@ ThumbnailPixmapCache::Impl::processLoadResult(LoadResultEvent* result)
 		
 		Item const& item = *lq_it;
 		
-		item.pixmap = pixmap;
-		assert(item.completionSignal.get());
-		completion_signal = item.completionSignal;
-		assert(!item.completionSignal.get());
+		if (result->status() == ThumbnailLoadResult::LOADED
+				&& pixmap.isNull()) {
+			// That's a special case caused by cachePixmapLocked().
+			assert(!item.pixmap.isNull());
+		} else {
+			item.pixmap = pixmap;
+		}
+		item.completionHandlers.swap(completion_handlers);
 		
 		if (result->status() == ThumbnailLoadResult::LOADED) {
 			// Maybe remove an older item.
@@ -758,7 +791,13 @@ ThumbnailPixmapCache::Impl::processLoadResult(LoadResultEvent* result)
 	
 	// Notify listeners.
 	ThumbnailLoadResult const load_result(result->status(), pixmap);
-	(*completion_signal)(load_result);
+	typedef boost::weak_ptr<CompletionHandler> WeakHandler;
+	BOOST_FOREACH (WeakHandler const& wh, completion_handlers) {
+		boost::shared_ptr<CompletionHandler> const sh(wh);
+		if (sh.get()) {
+			(*sh)(load_result);
+		}
+	}
 }
 
 void
@@ -811,8 +850,8 @@ ThumbnailPixmapCache::Impl::cachePixmapLocked(
 		return;
 	}
 	
-	Item::Status const new_status =
-		pixmap.isNull() ? Item::LOAD_FAILED : Item::LOADED;
+	Item::Status const new_status = pixmap.isNull()
+			? Item::LOAD_FAILED : Item::LOADED;
 	
 	// Check if such item already exists.
 	ItemsByKey::iterator const k_it(m_itemsByKey.find(image_id));
@@ -838,32 +877,48 @@ ThumbnailPixmapCache::Impl::cachePixmapLocked(
 		
 		rq_it->pixmap = pixmap;
 		
-		assert(!rq_it->completionSignal.get());
+		assert(rq_it->completionHandlers.empty());
 		return;
 	}
 	
-	LoadQueue::iterator const lq_it(m_items.project<LoadQueueTag>(k_it));
-	RemoveQueue::iterator const rq_it(m_items.project<RemoveQueueTag>(k_it));
-	
 	switch (k_it->status) {
-		case Item::QUEUED:
-			assert(k_it->completionSignal.get());
-			assert(m_numQueuedItems > 0);
-			k_it->completionSignal.reset();
-			m_loadQueue.relocate(m_loadQueue.end(), lq_it);
-			--m_numQueuedItems;
-			break;
-		case Item::LOAD_FAILED:
-			break;
-		default:
-			// It's not safe to touch IN_PROGRESS items,
-			// and there is no point in replacing LOADED ones.
+		case Item::LOADED:
+			// There is no point in replacing LOADED items.
+		case Item::IN_PROGRESS:
+			// It's unsafe to touch IN_PROGRESS items.
 			return;
+		default:
+			break;
 	}
+	
+	if (new_status == Item::LOADED && k_it->status == Item::QUEUED) {
+		// Not so fast.  We can't go from QUEUED to LOADED directly.
+		// Well, maybe we can, but we'd have to invoke the completion
+		// handlers right now.  We'd rather do it asynchronously,
+		// so let's transition it to IN_PROGRESS and send
+		// a LoadResultEvent asynchronously.
+		
+		assert(!k_it->completionHandlers.empty());
+		
+		LoadQueue::iterator const lq_it(
+			m_items.project<LoadQueueTag>(k_it)
+		);
+		
+		lq_it->pixmap = pixmap;
+		queuedToInProgress(lq_it);
+		postLoadResult(lq_it, QImage(), ThumbnailLoadResult::LOADED);
+		return;
+	}
+	
+	assert(k_it->status == Item::LOAD_FAILED);
 	
 	k_it->status = new_status;
 	k_it->pixmap = pixmap;
+	
 	if (new_status == Item::LOADED) {
+		RemoveQueue::iterator const rq_it(
+			m_items.project<RemoveQueueTag>(k_it)
+		);
 		m_removeQueue.relocate(m_endOfLoadedItems, rq_it);
 		++m_numLoadedItems;
 	}
@@ -878,23 +933,15 @@ ThumbnailPixmapCache::Item::Item(ImageId const& image_id,
 	precedingLoadAttempts(preceding_load_attempts),
 	status(st)
 {
-	switch (status) {
-		case QUEUED:
-		case IN_PROGRESS:
-			completionSignal.reset(new CompletionSignal);
-		default:;
-	}
 }
 
 ThumbnailPixmapCache::Item::Item(Item const& other)
 :	imageId(other.imageId),
 	pixmap(other.pixmap),
-	completionSignal(other.completionSignal),
+	completionHandlers(other.completionHandlers),
 	precedingLoadAttempts(other.precedingLoadAttempts),
 	status(other.status)
 {
-	// Note: other.completionSignal actually gets reset,
-	// but it's not a problem for us.
 }
 
 

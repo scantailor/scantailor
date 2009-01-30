@@ -21,7 +21,7 @@
 
 #include "ImageId.h"
 #include "ImageTransformation.h"
-#include "boost_signals.h"
+#include <boost/shared_ptr.hpp>
 #include <QTransform>
 #include <QGraphicsItem>
 #include <QSizeF>
@@ -30,7 +30,7 @@
 class ThumbnailPixmapCache;
 class ThumbnailLoadResult;
 
-class ThumbnailBase : public QGraphicsItem, public boost::signalslib::trackable
+class ThumbnailBase : public QGraphicsItem
 {
 public:
 	ThumbnailBase(
@@ -72,6 +72,8 @@ protected:
 	
 	QTransform const& imageToThumb() const { return m_postScaleXform; }
 private:
+	class LoadCompletionHandler;
+	
 	void handleLoadResult(ThumbnailLoadResult const& result);
 	
 	ThumbnailPixmapCache& m_rThumbnailCache;
@@ -80,7 +82,7 @@ private:
 	ImageTransformation m_imageXform;
 	QRectF m_boundingRect;
 	QTransform m_postScaleXform;
-	bool m_pixmapLoadPending;
+	boost::shared_ptr<LoadCompletionHandler> m_ptrCompletionHandler;
 };
 
 #endif
