@@ -74,6 +74,10 @@ private slots:
 		PageInfo const& page_info, QRectF const& thumb_rect,
 		bool by_user, bool was_already_selected);
 	
+	void thumbViewFocusToggled(bool checked);
+	
+	void thumbViewScrolled();
+	
 	void filterSelectionChanged(QItemSelection const& selected);
 	
 	void reloadRequested();

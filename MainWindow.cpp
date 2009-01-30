@@ -65,6 +65,7 @@
 #include <QGridLayout>
 #include <QLayoutItem>
 #include <QAbstractListModel>
+#include <QScrollBar>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -190,6 +191,19 @@ MainWindow::MainWindow()
 		m_ptrThumbSequence.get(),
 		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
 		this, SLOT(pageSelected(PageInfo const&, QRectF const&, bool, bool))
+	);
+	
+	connect(
+		thumbView->verticalScrollBar(), SIGNAL(sliderMoved(int)),
+		this, SLOT(thumbViewScrolled())
+	);
+	connect(
+		thumbView->verticalScrollBar(), SIGNAL(valueChanged(int)),
+		this, SLOT(thumbViewScrolled())
+	);
+	connect(
+		focusButton, SIGNAL(clicked(bool)),
+		this, SLOT(thumbViewFocusToggled(bool))
 	);
 	
 	connect(
@@ -637,7 +651,9 @@ MainWindow::pageSelected(
 	PageInfo const& page_info, QRectF const& thumb_rect,
 	bool const by_user, bool const was_already_selected)
 {
-	thumbView->ensureVisible(thumb_rect, 0, 0);
+	if (focusButton->isChecked()) {
+		thumbView->ensureVisible(thumb_rect, 0, 0);
+	}
 	
 	if (by_user) {
 		m_ptrPages->setCurPage(page_info.id());
@@ -646,6 +662,48 @@ MainWindow::pageSelected(
 		} else {
 			updateMainArea();
 		}
+	}
+}
+
+void
+MainWindow::thumbViewFocusToggled(bool const checked)
+{
+	QRectF const rect(m_ptrThumbSequence->currentItemSceneRect());
+	if (rect.isNull()) {
+		// No current item.
+		return;
+	}
+	
+	if (checked) {
+		thumbView->ensureVisible(rect, 0, 0);
+	}
+}
+
+void
+MainWindow::thumbViewScrolled()
+{
+	QRectF const rect(m_ptrThumbSequence->currentItemSceneRect());
+	if (rect.isNull()) {
+		// No current item.
+		return;
+	}
+	
+	QRectF const viewport_rect(thumbView->viewport()->rect());
+	QRectF const viewport_item_rect(
+		thumbView->viewportTransform().mapRect(rect)
+	);
+	
+	double const intersection_threshold = 0.5;
+	if (viewport_item_rect.top() >= viewport_rect.top() &&
+			viewport_item_rect.top() + viewport_item_rect.height()
+			* intersection_threshold <= viewport_rect.bottom()) {
+		// Item is visible.
+	} else if (viewport_item_rect.bottom() <= viewport_rect.bottom() &&
+			viewport_item_rect.bottom() - viewport_item_rect.height()
+			* intersection_threshold >= viewport_rect.top()) {
+		// Item is visible.
+	} else {
+		focusButton->setChecked(false);
 	}
 }
 
@@ -675,9 +733,9 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	}
 	
 	resetThumbSequence();
+	focusButton->setChecked(true);
 	
 	updateBatchProcessingActions();
-	
 	updateMainArea();
 }
 

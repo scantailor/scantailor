@@ -56,6 +56,13 @@ public:
 	void invalidateAllThumbnails();
 	
 	void setCurrentThumbnail(PageId const& page_id);
+	
+	/**
+	 * \brief The bounding rectangle in scene coordinates of the current item.
+	 *
+	 * Returns a null rectangle if no item is currently selected.
+	 */
+	QRectF currentItemSceneRect() const;
 signals:
 	void pageSelected(
 		PageInfo const& page_info, QRectF const& thumb_rect,

@@ -96,6 +96,8 @@ public:
 	
 	void setCurrentThumbnail(PageId const& page_id);
 	
+	QRectF currentItemSceneRect() const;
+	
 	void itemSelected(PageInfo const& page_info, CompositeItem* item);
 private:
 	class ItemsByIdTag;
@@ -256,6 +258,12 @@ void
 ThumbnailSequence::setCurrentThumbnail(PageId const& page_id)
 {
 	m_ptrImpl->setCurrentThumbnail(page_id);
+}
+
+QRectF
+ThumbnailSequence::currentItemSceneRect() const
+{
+	return m_ptrImpl->currentItemSceneRect();
 }
 
 void
@@ -421,6 +429,18 @@ ThumbnailSequence::Impl::setCurrentThumbnail(PageId const& page_id)
 	m_rOwner.emitPageSelected(
 		id_it->pageInfo, id_it->composite, by_user, was_already_selected
 	);
+}
+
+QRectF
+ThumbnailSequence::Impl::currentItemSceneRect() const
+{
+	if (!m_pSelectedItem) {
+		return QRectF();
+	}
+	
+	return m_pSelectedItem->mapToScene(
+		m_pSelectedItem->boundingRect()
+	).boundingRect();
 }
 
 void
