@@ -630,7 +630,7 @@ ThumbnailPixmapCache::Impl::loadSaveThumbnail(
 {
 	QString const thumb_file_path(getThumbFilePath(image_id, thumb_dir));
 	
-	QImage image(ImageLoader::load(thumb_file_path, image_id.page()));
+	QImage image(ImageLoader::load(thumb_file_path, 0));
 	if (!image.isNull()) {
 		return image;
 	}
