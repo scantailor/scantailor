@@ -1,7 +1,6 @@
 FIND_PROGRAM(
 	MAKENSIS_EXE makensis
-	PATHS C: D: E: F: G: H: ENV PATH
-	PATH_SUFFIXES "Program Files/NSIS"
+	PATHS "[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\NSIS;InstallLocation]"
 )
 IF(NOT MAKENSIS_EXE)
 	MESSAGE(
