@@ -1,7 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
 
-SET(FILES_TO_TRANSLATE)
-
 IF(COMMAND cmake_policy)
 	# Suppress warnings.
 	cmake_policy(SET CMP0003 NEW)
@@ -11,8 +9,7 @@ PROJECT("Scan Tailor")
 
 ENABLE_TESTING()
 
-FILE(READ "${PROJECT_SOURCE_DIR}/VERSION" VERSION)
-STRING(REGEX MATCH "[-.0-9A-Za-z]+" VERSION "${VERSION}")
+FILE(STRINGS "${PROJECT_SOURCE_DIR}/VERSION" VERSION LIMIT_COUNT 1)
 
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
@@ -319,7 +316,7 @@ INSTALL(FILES ${QM_FILES} DESTINATION "${TRANSLATIONS_DIR_REL}/")
 ADD_TEST(ImageProcTests imageproc/tests/imageproc_tests --log_level=message)
 ADD_TEST(ScanTaylorTests tests/tests --log_level=message)
 
-# Packaging
+# Source code packaging
 SET(CPACK_CMAKE_GENERATOR "")
 SET(CPACK_SOURCE_GENERATOR "TGZ")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "scantailor-${VERSION}")
@@ -333,3 +330,8 @@ SET(
 	"${CMAKE_BINARY_DIR}"
 )
 INCLUDE(CPack)
+
+# Installer for Windows.
+IF(WIN32)
+	ADD_SUBDIRECTORY(packaging/windows)
+ENDIF(WIN32)

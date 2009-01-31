@@ -1,0 +1,104 @@
+!define VERSION "@VERSION@"
+!define VERSION_QUAD "@VERSION_QUAD@"
+!define LICENSE_FILE "@LICENSE_FILE@"
+!define MINGWM10_DLL "@MINGWM10_DLL@"
+!define INSTALLER_FILENAME "@INSTALLER_FILENAME@"
+!define UNINST_REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scan Tailor"
+
+# The window identifier of the main Scan Tailor window.
+!define WNDCLASS "ScanTailor_Window"
+
+!include "MUI2.nsh"
+BrandingText " " # To remove the mention of NullSoft.
+#LoadLanguageFile "${NSISDIR}\Contrib\Language files\Russian.nlf"
+
+Name "Scan Tailor version ${VERSION}"
+
+OutFile "${INSTALLER_FILENAME}"
+
+installDir "$PROGRAMFILES\Scan Tailor"
+InstallDirRegKey HKLM "${UNINST_REGKEY}" "InstallLocation"
+
+RequestExecutionLevel admin
+
+XPStyle on
+
+AllowSkipFiles off
+
+SetCompressor /SOLID /FINAL lzma
+
+!if "${VERSION_QUAD}" != ""
+  VIAddVersionKey "ProductName" "Scan Tailor"
+  VIAddVersionKey "Comments" "Interactive post-processing tool for scanned pages."
+  VIAddVersionKey "CompanyName" "Joseph Artsimovich"
+  #VIAddVersionKey "LegalTrademarks" "Test Application is a trademark of Fake company"
+  VIAddVersionKey "LegalCopyright" "© Joseph Artsimovich"
+  VIAddVersionKey "FileDescription" ""
+  VIAddVersionKey "FileVersion" "${VERSION}"
+  VIProductVersion "${VERSION_QUAD}"
+!endif
+
+!define MUI_ABORTWARNING
+
+# Installer Pages
+!insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+!insertmacro MUI_LANGUAGE "English"
+
+Section "Installer Section"
+  SetOutPath $INSTDIR
+  File scantailor.exe
+  !if "${MINGWM10_DLL}" != ""
+    File "${MINGWM10_DLL}"
+  !endif
+  SetOutPath "$INSTDIR\translations"
+  File *.qm
+  
+  WriteUninstaller $INSTDIR\Uninstaller.exe
+  
+  # Write uninstall registry records.
+  WriteRegStr HKLM "${UNINST_REGKEY}" "DisplayName" "Scan Tailor"
+  WriteRegStr HKLM "${UNINST_REGKEY} "UninstallString" "$INSTDIR\Uninstaller.exe"
+  
+  # Create menu shortcuts.
+  SetShellVarContext all
+  CreateDirectory "$SMPROGRAMS\Scan Tailor"
+  CreateShortcut "$SMPROGRAMS\Scan Tailor\Scan Tailor.lnk" "$INSTDIR\scantailor.exe"
+SectionEnd
+
+
+Function un.onInit
+  FindWindow $0 "${WNDCLASS}" ""
+  StrCmp $0 0 continueInstall
+    MessageBox MB_ICONSTOP|MB_OK "The application you are trying to remove is running. Close it and try again."
+    Abort
+  continueInstall:
+FunctionEnd
+
+
+Section "Uninstall"
+  # Remove program files.
+  Delete $INSTDIR\scantailor.exe
+  Delete $INSTDIR\mingwm10.dll
+  Delete $INSTDIR\Uninstaller.exe
+  
+  # Remove translations.
+  Delete $INSTDIR\translations\*.qm
+  RMDir $INSTDIR\translations
+  
+  # Remove the installation directory.
+  RMDir "$INSTDIR"
+
+  # Remove the uninstall record from the registry.
+  DeleteRegKey HKLM "${UNINST_REGKEY}"
+
+  # Remove menu entries
+  SetShellVarContext all
+  RMDir /r "$SMPROGRAMS\Scan Tailor"
+SectionEnd
