@@ -22,6 +22,7 @@ IF(MINGW)
 			"Could not find mingw10.dll\n"				"It should be in the 'bin' subdirectory of your MinGW installation."
 		)
 	ENDIF(NOT MINGWM10_DLL)
+	TO_NATIVE_PATH("${MINGWM10_DLL}" MINGWM10_DLL)
 ELSE(MINGW)
 	SET(MINGWM10_DLL "")
 ENDIF(MINGW)

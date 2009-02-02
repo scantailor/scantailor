@@ -16,6 +16,7 @@ INCLUDE(CheckIncludeFileCXX)
 INCLUDE(cmake/FindPthreads.cmake)
 INCLUDE(cmake/SetDefaultBuildType.cmake)
 INCLUDE(cmake/SetDefaultGccFlags.cmake)
+INCLUDE(cmake/ToNativePath.cmake)
 
 ST_SET_DEFAULT_BUILD_TYPE(Release)
 IF(CMAKE_COMPILER_IS_GNUCC)

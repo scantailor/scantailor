@@ -4,6 +4,7 @@ PROJECT(deps)
 
 INCLUDE(../../../cmake/SetDefaultBuildType.cmake)
 INCLUDE(../../../cmake/SetDefaultGccFlags.cmake)
+INCLUDE(../../../cmake/ToNativePath.cmake)
 
 ST_SET_DEFAULT_BUILD_TYPE(Release)
 ST_SET_DEFAULT_GCC_FLAGS()
@@ -191,12 +192,6 @@ IF(EXISTS "${QT_DIR}/projects.pro.orig")
 	FILE(REMOVE "${QT_DIR}/projects.pro.orig")
 ENDIF(EXISTS "${QT_DIR}/projects.pro.orig")
 
-
-# FILE(TO_NATIVE_PATH ...) is broken on MinGW.
-MACRO(TO_NATIVE_PATH PATH OUT)
-	FILE(TO_NATIVE_PATH "${PATH}" "${OUT}")
-	STRING(REPLACE "/" "\\" "${OUT}" "${${OUT}}")
-ENDMACRO(TO_NATIVE_PATH)
 
 TO_NATIVE_PATH("${JPEG_DIR}" JPEG_INCLUDE_DIR)
 TO_NATIVE_PATH("${ZLIB_DIR}" ZLIB_INCLUDE_DIR)
