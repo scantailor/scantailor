@@ -32,6 +32,9 @@
     <cursorShape>ArrowCursor</cursorShape>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout" >
+    <property name="bottomMargin" >
+     <number>0</number>
+    </property>
     <item>
      <widget class="QSplitter" name="splitter" >
       <property name="sizePolicy" >
@@ -99,7 +102,7 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
+        <property name="statusTip" >
          <string>Scroll to a selected page automatically.</string>
         </property>
         <property name="text" >

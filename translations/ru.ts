@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru">
-<defaultcodec></defaultcodec>
 <context>
     <name>DeskewOptionsWidget</name>
     <message>
@@ -115,12 +114,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="1218"/>
+        <location filename="../MainWindow.cpp" line="1219"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1220"/>
+        <location filename="../MainWindow.cpp" line="1221"/>
         <source>Error saving the project file!</source>
         <translation>Ошибка при сохранении файла!</translation>
     </message>
@@ -135,7 +134,7 @@
         <translation>Сохранить этот проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="933"/>
+        <location filename="../MainWindow.cpp" line="934"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекты Scan Tailor</translation>
     </message>
@@ -147,7 +146,7 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
 Для их определения, прогоните пакетную обработку на этапах &quot;Полезная Область&apos; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1116"/>
+        <location filename="../MainWindow.cpp" line="1117"/>
         <source>Unnamed</source>
         <translation>Без имени</translation>
     </message>
@@ -217,33 +216,33 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
         <translation>Обработка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1090"/>
+        <location filename="../MainWindow.cpp" line="1091"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="931"/>
+        <location filename="../MainWindow.cpp" line="932"/>
         <source>Open Project</source>
         <translation>Открыть проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="952"/>
+        <location filename="../MainWindow.cpp" line="953"/>
         <source>Unable to open the project file.</source>
         <translation>Не удалось открыть файл проекта.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="961"/>
+        <location filename="../MainWindow.cpp" line="962"/>
         <source>The project file is broken.</source>
         <translation>Файл проекта поврежден.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="972"/>
+        <location filename="../MainWindow.cpp" line="973"/>
         <source>Unable to interpret the project file.</source>
         <translation>Не удалось импортировать проект.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1121"/>
+        <location filename="../MainWindow.cpp" line="1122"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
