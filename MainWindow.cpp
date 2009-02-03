@@ -755,6 +755,7 @@ MainWindow::startBatchProcessing()
 	m_batchProcessing = true;
 	updateBatchProcessingActions();
 	
+	focusButton->setChecked(true);
 	splitter->widget(0)->setVisible(false);
 	
 	PageInfo const page_info(m_ptrPages->setFirstPage(getCurrentView()));
