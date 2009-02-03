@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS><TS version="1.1" language="ru">
+<defaultcodec></defaultcodec>
 <context>
     <name>DeskewOptionsWidget</name>
     <message>
@@ -219,7 +220,7 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
         <location filename="../MainWindow.cpp" line="1091"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
-        <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
+        <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.  Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="932"/>
