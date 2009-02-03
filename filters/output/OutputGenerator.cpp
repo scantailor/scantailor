@@ -34,6 +34,7 @@
 #include "imageproc/Scale.h"
 #include "imageproc/Morphology.h"
 #include "imageproc/Connectivity.h"
+#include "imageproc/ConnCompEraser.h"
 #include "imageproc/SeedFill.h"
 #include "imageproc/Constants.h"
 #include "imageproc/Grayscale.h"
@@ -43,6 +44,7 @@
 #include "imageproc/SavGolFilter.h"
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
+#include "imageproc/SEDM.h"
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -393,7 +395,24 @@ OutputGenerator::processImpl(FilterData const& input,
 		
 		if (!m_contentRect.isEmpty()) {
 			BinaryImage bw_content(binarize(maybe_smoothed, m_dpi));
+			if (dbg) {
+				dbg->add(bw_content, "bw_content");
+			}
+			status.throwIfCancelled();
+			
+			bw_content = despeckle(bw_content, m_dpi, status, dbg);
+			if (dbg) {
+				dbg->add(bw_content, "despeckled");
+			}
+			
+			status.throwIfCancelled();
+			
 			morphologicalSmoothInPlace(bw_content, status);
+			if (dbg) {
+				dbg->add(bw_content, "edges_smoothed");
+			}
+			
+			status.throwIfCancelled();
 			
 			QRect dst_rect(m_contentRect);
 			dst_rect.moveTopLeft(
@@ -469,10 +488,25 @@ OutputGenerator::processImpl(FilterData const& input,
 			BinaryThreshold::otsuThreshold(hist)
 		);
 		
+		status.throwIfCancelled();
+		
 		BinaryImage bw_content(maybe_normalized, bw_thresh);
-		morphologicalSmoothInPlace(bw_content, status);
 		if (dbg) {
 			dbg->add(bw_content, "bw_content");
+		}
+		
+		status.throwIfCancelled();
+		
+		bw_content = despeckle(bw_content, m_dpi, status, dbg);
+		if (dbg) {
+			dbg->add(bw_content, "despeckled");
+		}
+		
+		status.throwIfCancelled();
+		
+		morphologicalSmoothInPlace(bw_content, status);
+		if (dbg) {
+			dbg->add(bw_content, "edges_smoothed");
 		}
 		
 		status.throwIfCancelled();
@@ -640,6 +674,186 @@ OutputGenerator::binarize(QImage const& image, Dpi const& image_dpi) const
 	assert(!bin_img.isNull());
 	
 	return bin_img;
+}
+
+/**
+ * Remove small connected components that are considered to be garbage.
+ * Both the size and the distance to other components are taken into account.
+ * \note This function only works effectively when the DPI is symmetric,
+ * that is, its horizontal and vertical components are equal.
+ */
+imageproc::BinaryImage
+OutputGenerator::despeckle(
+	imageproc::BinaryImage const& src, Dpi const& dpi,
+	TaskStatus const& status, DebugImages* const dbg)
+{
+	// We label connected components as belonging to one
+	// of the following classes:
+	// Class 0: Very small components - to be removed unconditionally.
+	// Class 1: Larger components. Will be removed if there are
+	//          no higher class components in the vicinity.
+	// ...
+	// Class X: Very large components that won't be removed.
+	
+	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
+	double const factor = min_dpi / 300.0;
+	double const squared_factor = factor * factor;
+	
+	// The upper bounds for various classes are defined in terms
+	// of the number of pixels in a connected component.
+	int const class0_upper_bound = qRound(4 * squared_factor);
+	int const class1_upper_bound = qRound(16 * squared_factor);
+	int const class2_upper_bound = qRound(80 * squared_factor);
+	
+	// The maximum squared distance that preserves the component.
+	uint32_t const class1_preserving_sqdist = qRound(3 * 3 * squared_factor);
+	uint32_t const class2_preserving_sqdist = qRound(15 * 15 * squared_factor);
+	
+	QImage labelled_seeds(src.size(), QImage::Format_Indexed8);
+	labelled_seeds.setColorTable(createGrayscalePalette());
+	labelled_seeds.fill(0);
+	uint8_t* const ls_data = labelled_seeds.bits();
+	int const ls_stride = labelled_seeds.bytesPerLine();
+	
+	status.throwIfCancelled();
+	
+	ConnCompEraser eraser(src, CONN8);
+	for (;;) {
+		ConnComp const cc(eraser.nextConnComp());
+		if (cc.isNull()) {
+			break;
+		}
+		
+		uint8_t label = 0;
+		int const pix_count = cc.pixCount();
+		if (pix_count > class2_upper_bound) {
+			label = 3;
+		} else if (pix_count > class1_upper_bound) {
+			label = 2;
+		} else if (pix_count > class0_upper_bound) {
+			label = 1;
+		}
+		
+		int const x = cc.seed().x();
+		int const y = cc.seed().y();
+		ls_data[y * ls_stride + x] = label;
+	}
+	
+	status.throwIfCancelled();
+	
+	BinaryImage accepted(
+		selectGrayLevelAndSeedFill(labelled_seeds, 3, src, CONN8)
+	);
+	if (dbg) {
+		dbg->add(accepted, "accepted_class3");
+	}
+	
+	status.throwIfCancelled();
+	
+	// Process 2nd class.
+	addNeighborsInPlace(
+		status, accepted, class2_preserving_sqdist,
+		selectGrayLevelAndSeedFill(labelled_seeds, 2, src, CONN8)
+	);
+	if (dbg) {
+		dbg->add(accepted, "accepted_class2");
+	}
+	
+	status.throwIfCancelled();
+	
+	// Process 1st class.
+	addNeighborsInPlace(
+		status, accepted, class1_preserving_sqdist,
+		selectGrayLevelAndSeedFill(labelled_seeds, 1, src, CONN8)
+	);
+	if (dbg) {
+		dbg->add(accepted, "accepted_class1");
+	}
+	
+	return accepted;
+}
+
+/**
+ * This helper function extracts a seed binary image from a grayscale
+ * image by taking only pixels with the specified gray level, and then
+ * does a seed-fill with the extracted seed and the provided mask.
+ */
+imageproc::BinaryImage
+OutputGenerator::selectGrayLevelAndSeedFill(
+	QImage const& gray, uint8_t const level,
+	imageproc::BinaryImage const& mask,
+	imageproc::Connectivity const connectivity)
+{
+	uint8_t const* gray_line = gray.bits();
+	int const gray_stride = gray.bytesPerLine();
+	
+	BinaryImage seed(gray.size(), WHITE);
+	uint32_t* seed_line = seed.data();
+	int const seed_stride = seed.wordsPerLine();
+	
+	int const width = seed.width();
+	int const height = seed.height();
+	
+	uint32_t const msb = uint32_t(1) << 31;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (gray_line[x] == level) {
+				seed_line[x >> 5] |= msb >> (x & 31);
+			}
+		}
+		gray_line += gray_stride;
+		seed_line += seed_stride;
+	}
+	
+	return seedFill(seed, mask, connectivity);
+}
+
+/**
+ * Adds those and only those connected components in \p candidates,
+ * that have a squared distance to any black pixel in \p seed
+ * less than \p max_neighbor_sqdist.
+ */
+void
+OutputGenerator::addNeighborsInPlace(
+	TaskStatus const& status, imageproc::BinaryImage& seed,
+	uint32_t const max_neighbor_sqdist,
+	imageproc::BinaryImage const& candidates)
+{
+	SEDM sedm(seed, SEDM::DIST_TO_BLACK, SEDM::DIST_TO_NO_BORDERS);
+	uint32_t const* sedm_line = sedm.data();
+	int const sedm_stride = sedm.stride();
+	
+	status.throwIfCancelled();
+	
+	BinaryImage neighbors_seed(seed.size(), WHITE);
+	uint32_t* nbs_line = neighbors_seed.data();
+	int const nbs_stride = neighbors_seed.wordsPerLine();
+	
+	status.throwIfCancelled();
+	
+	int const width = seed.width();
+	int const height = seed.height();
+	
+	uint32_t const msb = uint32_t(1) << 31;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (sedm_line[x] <= max_neighbor_sqdist) {
+				nbs_line[x >> 5] |= msb >> (x & 31);
+			}
+		}
+		sedm_line += sedm_stride;
+		nbs_line += nbs_stride;
+	}
+	
+	sedm = SEDM();
+	
+	status.throwIfCancelled();
+	
+	neighbors_seed = seedFill(neighbors_seed, candidates, CONN8);
+	
+	status.throwIfCancelled();
+	
+	rasterOp<RopOr<RopSrc, RopDst> >(seed, neighbors_seed);
 }
 
 void

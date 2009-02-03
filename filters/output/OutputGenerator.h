@@ -19,12 +19,14 @@
 #ifndef OUTPUT_OUTPUTGENERATOR_H_
 #define OUTPUT_OUTPUTGENERATOR_H_
 
+#include "imageproc/Connectivity.h"
 #include "Dpi.h"
 #include "ColorParams.h"
 #include <QRect>
 #include <QTransform>
 #include <QColor>
 #include <QPolygonF>
+#include <stdint.h>
 
 class TaskStatus;
 class DebugImages;
@@ -79,6 +81,20 @@ private:
 	
 	imageproc::BinaryImage binarize(
 		QImage const& image, Dpi const& image_dpi) const;
+	
+	static imageproc::BinaryImage despeckle(
+		imageproc::BinaryImage const& src, Dpi const& dpi,
+		TaskStatus const& status, DebugImages* dbg);
+	
+	static imageproc::BinaryImage selectGrayLevelAndSeedFill(
+		QImage const& gray, uint8_t level,
+		imageproc::BinaryImage const& mask,
+		imageproc::Connectivity connectivity);
+	
+	static void addNeighborsInPlace(
+		TaskStatus const& status, imageproc::BinaryImage& seed,
+		uint32_t max_neighbor_sqdist,
+		imageproc::BinaryImage const& candidates);
 	
 	static void morphologicalSmoothInPlace(
 		imageproc::BinaryImage& img, TaskStatus const& status);
