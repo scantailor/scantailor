@@ -31,7 +31,7 @@ class ImageView : public ImageViewBase
 {
 	Q_OBJECT
 public:
-	ImageView(QImage const& image);
+	ImageView(QImage const& image, QImage const& downscaled_image);
 	
 	virtual ~ImageView();
 protected:

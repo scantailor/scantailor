@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include <QResizeEvent>
 #include <QStatusTipEvent>
 #include <QApplication>
+#include <Qt>
 #include <QDebug>
 #include <algorithm>
 #include <assert.h>
@@ -116,44 +117,32 @@ private:
 };
 
 
-ImageViewBase::ImageViewBase(QImage const& image, bool const hq_transform)
-:	m_image(image),
-	m_pixmap(QPixmap::fromImage(image)),
-	m_physToVirt(image.rect(), Dpm(image)),
-	m_pixmapFocalPoint(0.5 * image.width(), 0.5 * image.height()),
-	m_zoom(1.0),
-	m_currentCursorShape(Qt::ArrowCursor),
-	m_isDraggingInProgress(false),
-	m_hqXformEnabled(hq_transform)
-{
-	m_widgetFocalPoint = centeredWidgetFocalPoint();
-	
-	m_timer.setSingleShot(true);
-	m_timer.setInterval(150); // msec
-	connect(
-		&m_timer, SIGNAL(timeout()),
-		this, SLOT(initiateBuildingHqVersion())
-	);
-	
-	setAttribute(Qt::WA_OpaquePaintEvent);
-	updateWidgetTransform();
-}
-
 ImageViewBase::ImageViewBase(
-	QImage const& image, ImageTransformation const& pre_transform,
-	Margins const& margins, bool const hq_transform)
+	QImage const& image, QImage const& downscaled_image,
+	ImageTransformation const& pre_transform,
+	Margins const& margins)
 :	m_image(image),
-	m_pixmap(QPixmap::fromImage(image)),
-	m_physToVirt(pre_transform),
+	m_imageToVirt(pre_transform),
 	m_margins(margins),
 	m_zoom(1.0),
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_isDraggingInProgress(false),
-	m_hqXformEnabled(hq_transform)
+	m_hqTransformEnabled(true)
 {
+	if (downscaled_image.isNull()) {
+		m_pixmap = QPixmap::fromImage(createDownscaledImage(image));
+	} else {
+		m_pixmap = QPixmap::fromImage(downscaled_image);
+	}
+	
+	m_pixmapToImage.scale(
+		(double)m_image.width() / m_pixmap.width(),
+		(double)m_image.height() / m_pixmap.height()
+	);
+	
 	m_widgetFocalPoint = centeredWidgetFocalPoint();
-	m_pixmapFocalPoint = m_physToVirt.transformBack().map(
-		m_physToVirt.resultingRect().center()
+	m_pixmapFocalPoint = m_imageToVirt.transformBack().map(
+		m_imageToVirt.resultingRect().center()
 	);
 	
 	ensureStatusTip(tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible."));
@@ -170,6 +159,54 @@ ImageViewBase::ImageViewBase(
 
 ImageViewBase::~ImageViewBase()
 {
+}
+
+void
+ImageViewBase::hqTransformSetEnabled(bool const enabled)
+{
+	if (!enabled && m_hqTransformEnabled) {
+		// Turning off.
+		m_hqTransformEnabled = false;
+		if (m_ptrHqTransformTask.get()) {
+			m_ptrHqTransformTask->cancel();
+			m_ptrHqTransformTask.reset();
+		}
+		if (!m_hqPixmap.isNull()) {
+			m_hqPixmap = QPixmap();
+			update();
+		}
+	} else if (enabled && !m_hqTransformEnabled) {
+		// Turning on.
+		m_hqTransformEnabled = true;
+		update();
+	}
+}
+
+QImage
+ImageViewBase::createDownscaledImage(QImage const& image)
+{
+	assert(!image.isNull());
+	
+	// Original and downscaled DPM.
+	Dpm const o_dpm(image);
+	Dpm const d_dpm(Dpi(300, 300));
+	
+	int const o_w = image.width();
+	int const o_h = image.height();
+	
+	int d_w = o_w * d_dpm.horizontal() / o_dpm.horizontal();
+	int d_h = o_h * d_dpm.vertical() / o_dpm.vertical();
+	d_w = qBound(1, d_w, o_w);
+	d_h = qBound(1, d_h, o_h);
+	
+	if (d_w * 1.2 > o_w || d_h * 1.2 > o_h) {
+		// Sizes are close - no point in downscaling.
+		return image;
+	}
+	
+	QTransform xform;
+	xform.scale((double)d_w / o_w, (double)d_h / o_h);
+	return transform(image, xform, QRect(0, 0, d_w, d_h), Qt::white);
 }
 
 void
@@ -193,13 +230,14 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);
 	} else {
 		painter.setWorldTransform(
-			m_physToVirt.transform() * m_virtualToWidget
+			m_pixmapToImage * m_imageToVirt.transform()
+			* m_virtualToWidget
 		);
 		PixmapRenderer::drawPixmap(painter, m_pixmap);
 		
 		// If m_ptrHqTransformTask is not null after validateHqPixmap(),
 		// that means the right version is being built.
-		if (!m_ptrHqTransformTask && m_hqXformEnabled) {
+		if (!m_ptrHqTransformTask && m_hqTransformEnabled) {
 			// Schedule construction of a high quality version.
 			m_timer.start();
 		}
@@ -214,16 +252,16 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	
 	QPolygonF const image_area(
 		PolygonUtils::round(
-			virtualToWidget().map(
-				physToVirt().transform().map(
-					physToVirt().origRect()
+			m_virtualToWidget.map(
+				m_imageToVirt.transform().map(
+					m_imageToVirt.origRect()
 				)
 			)
 		)
 	);
 	QPolygonF const crop_area(
 		PolygonUtils::round(
-			virtualToWidget().map(physToVirt().resultingCropArea())
+			m_virtualToWidget.map(m_imageToVirt.resultingCropArea())
 		)
 	);
 	
@@ -336,7 +374,7 @@ ImageViewBase::handleImageDragging(QMouseEvent* const event)
 bool
 ImageViewBase::isDraggingPossible() const
 {
-	QRectF const image_rect(m_physToVirt.resultingRect());
+	QRectF const image_rect(m_imageToVirt.resultingRect());
 	QRectF const widget_rect(m_virtualToWidget.mapRect(image_rect));
 	if (widget_rect.top() <= -1.0) {
 		return true;
@@ -370,7 +408,7 @@ ImageViewBase::marginsRect() const
 QRectF
 ImageViewBase::getVisibleWidgetRect() const
 {
-	QRectF const image_rect(m_physToVirt.resultingRect());
+	QRectF const image_rect(m_imageToVirt.resultingRect());
 	QRectF const widget_rect(m_virtualToWidget.mapRect(image_rect));
 	return widget_rect.intersected(marginsRect());
 }
@@ -396,52 +434,44 @@ ImageViewBase::resetZoom()
 }
 
 void
-ImageViewBase::updateImage(QImage const& image)
-{
-	m_image = image;
-	m_pixmap = QPixmap::fromImage(image);
-	update();
-}
-
-void
-ImageViewBase::updateTransform(ImageTransformation const& phys_to_virt)
+ImageViewBase::updateTransform(ImageTransformation const& image_to_virt)
 {
 	TempFocalPointAdjuster const temp_fp(*this);
 	
-	m_physToVirt = phys_to_virt;
+	m_imageToVirt = image_to_virt;
 	updateWidgetTransform();
 	update();
 }
 
 void
 ImageViewBase::updateTransformAndFixFocalPoint(
-	ImageTransformation const& phys_to_virt, FocalPointMode const mode)
+	ImageTransformation const& image_to_virt, FocalPointMode const mode)
 {
 	TempFocalPointAdjuster const temp_fp(*this);
 	
-	m_physToVirt = phys_to_virt;
+	m_imageToVirt = image_to_virt;
 	updateWidgetTransformAndFixFocalPoint(mode);
 	update();
 }
 
 void
 ImageViewBase::updateTransformPreservingScale(
-	ImageTransformation const& phys_to_virt)
+	ImageTransformation const& image_to_virt)
 {
 	TempFocalPointAdjuster const temp_fp(*this);
 	
-	// An arbitrary line in physical coordinates.
-	QLineF const phys_line(0.0, 0.0, 1.0, 1.0);
+	// An arbitrary line in image coordinates.
+	QLineF const image_line(0.0, 0.0, 1.0, 1.0);
 	
 	QLineF const widget_line_before(
-		m_virtualToWidget.map(m_physToVirt.transform().map(phys_line))
+		m_virtualToWidget.map(m_imageToVirt.transform().map(image_line))
 	);
 	
-	m_physToVirt = phys_to_virt;
+	m_imageToVirt = image_to_virt;
 	updateWidgetTransform();
 	
 	QLineF const widget_line_after(
-		m_virtualToWidget.map(m_physToVirt.transform().map(phys_line))
+		m_virtualToWidget.map(m_imageToVirt.transform().map(image_line))
 	);
 	
 	m_zoom *= widget_line_before.length() / widget_line_after.length();
@@ -484,16 +514,16 @@ ImageViewBase::ensureStatusTip(QString const& status_tip)
 /**
  * Updates m_virtualToWidget and m_widgetToVirtual.\n
  * To be called whenever any of the following is modified:
- * m_physToVirt, m_widgetFocalPoint, m_pixmapFocalPoint, m_zoom.
+ * m_imageToVirt, m_widgetFocalPoint, m_pixmapFocalPoint, m_zoom.
  * Modifying both m_widgetFocalPoint and m_pixmapFocalPoint in a way
  * that doesn't cause image movement doesn't require calling this method.
  */
 void
 ImageViewBase::updateWidgetTransform()
 {
-	QRectF const virt_rect(m_physToVirt.resultingRect());
+	QRectF const virt_rect(m_imageToVirt.resultingRect());
 	QPointF const virt_origin(
-		m_physToVirt.transform().map(
+		m_imageToVirt.transform().map(
 			m_pixmapFocalPoint
 		)
 	);
@@ -521,7 +551,7 @@ ImageViewBase::updateWidgetTransform()
 /**
  * Updates m_virtualToWidget and m_widgetToVirtual and adjusts
  * the focal point if necessary.\n
- * To be called whenever m_physToVirt is modified in such a way that
+ * To be called whenever m_imageToVirt is modified in such a way that
  * may invalidate the focal point.
  */
 void
@@ -565,7 +595,7 @@ ImageViewBase::getIdealWidgetFocalPoint(FocalPointMode const mode) const
 	
 	// The virtual image rectangle in widget coordinates.
 	QRectF const image_area(
-		m_virtualToWidget.mapRect(m_physToVirt.resultingRect())
+		m_virtualToWidget.mapRect(m_imageToVirt.resultingRect())
 	);
 	
 	// Unused display space from each side.
@@ -684,7 +714,7 @@ void
 ImageViewBase::setWidgetFocalPointWithoutMoving(QPointF const new_widget_fp)
 {
 	m_widgetFocalPoint = new_widget_fp;
-	m_pixmapFocalPoint = m_physToVirt.transformBack().map(
+	m_pixmapFocalPoint = m_imageToVirt.transformBack().map(
 		m_widgetToVirtual.map(m_widgetFocalPoint)
 	);
 }
@@ -692,7 +722,11 @@ ImageViewBase::setWidgetFocalPointWithoutMoving(QPointF const new_widget_fp)
 void
 ImageViewBase::initiateBuildingHqVersion()
 {
-	QTransform const xform(m_physToVirt.transform() * m_virtualToWidget);
+	if (!m_hqTransformEnabled) {
+		return;
+	}
+	
+	QTransform const xform(m_imageToVirt.transform() * m_virtualToWidget);
 	IntrusivePtr<HqTransformTask> const task(
 		new HqTransformTask(this, m_image, xform, size())
 	);
@@ -711,6 +745,10 @@ void
 ImageViewBase::hqVersionBuilt(
 	QPoint const& origin, QImage const& image)
 {
+	if (!m_hqTransformEnabled) {
+		return;
+	}
+	
 	m_hqPixmap = QPixmap::fromImage(image);
 	m_hqPixmapPos = origin;
 	m_ptrHqTransformTask.reset();
@@ -721,12 +759,14 @@ ImageViewBase::hqVersionBuilt(
  * Resets m_hqPixmap and cancels the transformation task if
  * the high-quality pixmap was built (or is being built) with
  * a transformation other than the current one or from the
- * source image other than the current one.
+ * source image other than the current one, or if high-quality
+ * transformations are currently disabled.
  */
 void
 ImageViewBase::validateHqPixmap()
 {
-	if (m_hqXform != m_physToVirt.transform() * m_virtualToWidget
+	if (!m_hqTransformEnabled ||
+			m_hqXform != m_imageToVirt.transform() * m_virtualToWidget
 			|| m_hqSourceId != m_image.cacheKey()) {
 		m_hqPixmap = QPixmap();
 		if (m_ptrHqTransformTask.get()) {
@@ -772,7 +812,12 @@ ImageViewBase::HqTransformTask::operator()()
 		)
 	);
 	
-	QImage hq_image(transform(m_image, m_xform, target_rect, Qt::white));
+	QImage hq_image(
+		transform(
+			m_image, m_xform, target_rect,
+			Qt::white, QSizeF(0.0, 0.0)
+		)
+	);
 #if defined(Q_WS_X11)
 	// ARGB32_Premultiplied is an optimal format for X11 + XRender.
 	hq_image = hq_image.convertToFormat(QImage::Format_ARGB32_Premultiplied);

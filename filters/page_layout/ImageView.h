@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@ class ImageView : public ImageViewBase
 public:
 	ImageView(
 		IntrusivePtr<Settings> const& settings, PageId const& page_id,
-		QImage const& image, ImageTransformation const& xform,
+		QImage const& image, QImage const& downscaled_image,
+		ImageTransformation const& xform,
 		QRectF const& adapted_content_rect,
 		OptionsWidget const& opt_widget);
 	

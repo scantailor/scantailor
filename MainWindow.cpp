@@ -574,8 +574,7 @@ MainWindow::setImageWidget(
 	} else {
 		m_ptrTabbedDebugImages->addTab(widget, "Main");
 		BOOST_FOREACH (DebugImages::Item& item, debug_images->items()) {
-			bool const hq_transform = false;
-			QWidget* widget = new BasicImageView(item.image(), hq_transform);
+			QWidget* widget = new BasicImageView(item.image());
 			m_imageWidgetCleanup.add(widget);
 			m_ptrTabbedDebugImages->addTab(widget, item.label());
 			item.image() = QImage(); // Save memory.

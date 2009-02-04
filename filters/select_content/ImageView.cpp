@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ namespace select_content
 {
 
 ImageView::ImageView(
-	QImage const& image, ImageTransformation const& xform,
-	QRectF const& content_rect)
-:	ImageViewBase(image, xform),
+	QImage const& image, QImage const& downscaled_image,
+	ImageTransformation const& xform, QRectF const& content_rect)
+:	ImageViewBase(image, downscaled_image, xform),
 	m_pNoContentMenu(new QMenu(this)),
 	m_pHaveContentMenu(new QMenu(this)),
 	m_contentRect(content_rect),
@@ -227,7 +227,7 @@ ImageView::createContentBox()
 		return;
 	}
 	
-	QRectF const virtual_rect(physToVirt().resultingRect());
+	QRectF const virtual_rect(imageToVirt().resultingRect());
 	QRectF content_rect(0, 0, virtual_rect.width() * 0.7, virtual_rect.height() * 0.7);
 	content_rect.moveCenter(virtual_rect.center());
 	m_contentRect = content_rect;

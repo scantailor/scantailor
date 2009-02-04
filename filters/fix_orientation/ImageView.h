@@ -31,7 +31,9 @@ class ImageView : public ImageViewBase
 {
 	Q_OBJECT
 public:
-	ImageView(QImage const& image, ImageTransformation const& xform);
+	ImageView(
+		QImage const& image, QImage const& downscaled_image,
+		ImageTransformation const& xform);
 	
 	virtual ~ImageView();
 public slots:

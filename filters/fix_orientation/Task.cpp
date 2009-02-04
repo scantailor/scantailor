@@ -47,6 +47,7 @@ public:
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	QImage m_image;
+	QImage m_downscaledImage;
 	ImageId m_imageId;
 	ImageTransformation m_xform;
 	bool m_batchProcessing;
@@ -103,6 +104,7 @@ Task::UiUpdater::UiUpdater(
 	bool const batch_processing)
 :	m_ptrFilter(filter),
 	m_image(image),
+	m_downscaledImage(ImageView::createDownscaledImage(image)),
 	m_imageId(image_id),
 	m_xform(xform),
 	m_batchProcessing(batch_processing)
@@ -124,7 +126,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		return;
 	}
 	
-	ImageView* view = new ImageView(m_image, m_xform);
+	ImageView* view = new ImageView(m_image, m_downscaledImage, m_xform);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 	QObject::connect(
 		opt_widget, SIGNAL(rotated(OrthogonalRotation)),

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,8 +35,10 @@ double const ImageView::m_maxRotationSin = sin(
 	m_maxRotationDeg * imageproc::constants::DEG2RAD
 );
 
-ImageView::ImageView(QImage const& image, ImageTransformation const& xform)
-:	ImageViewBase(image, xform),
+ImageView::ImageView(
+	QImage const& image, QImage const& downscaled_image,
+	ImageTransformation const& xform)
+:	ImageViewBase(image, downscaled_image, xform),
 	m_imgRotationHandle(":/icons/aqua-sphere.png"),
 	m_mouseVertOffset(0.0),
 	m_state(DEFAULT_STATE)
@@ -54,11 +56,11 @@ ImageView::~ImageView()
 void
 ImageView::manualDeskewAngleSetExternally(double const degrees)
 {
-	if (physToVirt().postRotation() == degrees) {
+	if (imageToVirt().postRotation() == degrees) {
 		return;
 	}
 	
-	ImageTransformation new_xform(physToVirt());
+	ImageTransformation new_xform(imageToVirt());
 	new_xform.setPostRotation(degrees);
 	updateTransform(new_xform);
 }
@@ -157,7 +159,7 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 	
 	if (event->button() == Qt::LeftButton && m_state != DEFAULT_STATE) {
 		m_state = DEFAULT_STATE;
-		emit manualDeskewAngleSet(physToVirt().postRotation());
+		emit manualDeskewAngleSet(imageToVirt().postRotation());
 	}
 }
 
@@ -196,7 +198,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 		double angle_deg = angle_rad * imageproc::constants::RAD2DEG;
 		angle_deg = qBound(-m_maxRotationDeg, angle_deg, m_maxRotationDeg);
 		
-		ImageTransformation new_xform(physToVirt());
+		ImageTransformation new_xform(imageToVirt());
 		new_xform.setPostRotation(angle_deg);
 		updateTransformPreservingScale(new_xform);
 	}
@@ -210,7 +212,7 @@ ImageView::hideEvent(QHideEvent* const event)
 	m_state = DEFAULT_STATE;
 	ensureCursorShape(Qt::ArrowCursor);
 	if (old_state != DEFAULT_STATE) {
-		emit manualDeskewAngleSet(physToVirt().postRotation());
+		emit manualDeskewAngleSet(imageToVirt().postRotation());
 	}
 }
 
@@ -252,8 +254,8 @@ ImageView::getRotationArcSquare() const
 std::pair<QPointF, QPointF>
 ImageView::getRotationHandles(QRectF const& arc_square) const
 {
-	double const rot_sin = physToVirt().postRotationSin();
-	double const rot_cos = physToVirt().postRotationCos();
+	double const rot_sin = imageToVirt().postRotationSin();
+	double const rot_cos = imageToVirt().postRotationCos();
 	double const arc_radius = 0.5 * arc_square.width();
 	QPointF const arc_center(arc_square.center());
 	QPointF left_handle(-rot_cos * arc_radius, -rot_sin * arc_radius);

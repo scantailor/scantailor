@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,9 +46,10 @@ namespace page_layout
 
 ImageView::ImageView(
 	IntrusivePtr<Settings> const& settings, PageId const& page_id,
-	QImage const& image, ImageTransformation const& xform,
+	QImage const& image, QImage const& downscaled_image,
+	ImageTransformation const& xform,
 	QRectF const& adapted_content_rect, OptionsWidget const& opt_widget)
-:	ImageViewBase(image, xform, Margins(5.0, 5.0, 5.0, 5.0)),
+:	ImageViewBase(image, downscaled_image, xform, Margins(5.0, 5.0, 5.0, 5.0)),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_origXform(xform),
@@ -156,7 +157,7 @@ ImageView::paintOverImage(QPainter& painter)
 {
 	// Pretend we are drawing in m_origXform coordinates.
 	painter.setWorldTransform(
-		m_origXform.transformBack() * physToVirt().transform()
+		m_origXform.transformBack() * imageToVirt().transform()
 		* painter.worldTransform()
 	);
 	
@@ -209,11 +210,11 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 
 	if (event->button() == Qt::LeftButton) {
 		QTransform const orig_to_widget(
-			m_origXform.transformBack() * physToVirt().transform()
+			m_origXform.transformBack() * imageToVirt().transform()
 			* virtualToWidget()
 		);
 		QTransform const widget_to_orig(
-			widgetToVirtual() * physToVirt().transformBack()
+			widgetToVirtual() * imageToVirt().transformBack()
 			* m_origXform.transform()
 		);
 		m_beforeResizing.middleWidgetRect = orig_to_widget.mapRect(
@@ -543,7 +544,7 @@ int
 ImageView::cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const
 {
 	QTransform const orig_to_widget(
-		m_origXform.transformBack() * physToVirt().transform()
+		m_origXform.transformBack() * imageToVirt().transform()
 		* virtualToWidget()
 	);
 	QRect const rect(orig_to_widget.mapRect(orig_rect).toRect());

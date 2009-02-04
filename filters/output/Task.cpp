@@ -59,6 +59,7 @@ private:
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;
 	QImage m_image;
+	QImage m_downscaledImage;
 	bool m_batchProcessing;
 };
 
@@ -126,6 +127,7 @@ Task::UiUpdater::UiUpdater(
 	m_ptrDbg(dbg_img),
 	m_pageId(page_id),
 	m_image(image),
+	m_downscaledImage(ImageView::createDownscaledImage(image)),
 	m_batchProcessing(batch)
 {
 }
@@ -145,7 +147,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		return;
 	}
 	
-	ImageView* view = new ImageView(m_image);
+	ImageView* view = new ImageView(m_image, m_downscaledImage);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 }
 

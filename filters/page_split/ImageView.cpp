@@ -37,9 +37,10 @@ namespace page_split
 
 double const ImageView::m_maxSkewAngleCtg(1.0 / tan(65 * imageproc::constants::DEG2RAD));
 
-ImageView::ImageView(QImage const& image,
+ImageView::ImageView(
+	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout)
-:	ImageViewBase(image, xform),
+:	ImageViewBase(image, downscaled_image, xform),
 	m_imgSkewingHandle(":/icons/aqua-sphere.png"),
 	m_pageLayout(layout),
 	m_state(DEFAULT_STATE)
@@ -69,7 +70,7 @@ ImageView::paintOverImage(QPainter& painter)
 	painter.setRenderHints(QPainter::Antialiasing, false);
 	
 	painter.setPen(Qt::NoPen);
-	QRectF const virt_rect(physToVirt().resultingRect());
+	QRectF const virt_rect(imageToVirt().resultingRect());
 	
 	switch (m_pageLayout.type()) {
 		case PageLayout::SINGLE_PAGE_UNCUT:

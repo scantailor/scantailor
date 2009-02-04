@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
+	QImage m_downscaledImage;
 	PageId m_pageId;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
@@ -276,6 +277,7 @@ Task::UiUpdater::UiUpdater(
 :	m_ptrFilter(filter),
 	m_ptrDbg(dbg_img),
 	m_image(image),
+	m_downscaledImage(ImageView::createDownscaledImage(image)),
 	m_pageId(page_id),
 	m_xform(xform),
 	m_uiData(ui_data),
@@ -298,7 +300,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		return;
 	}
 	
-	ImageView* view = new ImageView(m_image, m_xform);
+	ImageView* view = new ImageView(m_image, m_downscaledImage, m_xform);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	
 	QObject::connect(

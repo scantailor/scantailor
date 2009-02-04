@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,27 +41,64 @@ class BackgroundExecutor;
  * \brief The base class for widgets that display and manipulate images.
  *
  * This class operates with 3 coordinate systems:
- * \li Physical image coordinates, where m_pixmap.rect() is defined.
+ * \li Image coordinates, where m_image.rect() is defined.
+ * \li Pixmap coordinates, where m_pixmap.rect() is defined.
+ *     m_pixmap is constructed from a downscaled version of m_image.
  * \li Virtual image coordinates.  We need them because we are not
- *     displaying m_pixmap as is, instead we display a pre-transformed
+ *     displaying m_image as is.  Instead, we display a pre-transformed
  *     version of it.  So, the virtual image coordinates reference the
  *     pixels of an imaginary image that we would get if we actually
- *     transformed m_pixmap the way we want.
+ *     pre-transformed m_image the way we want.
  * \li Widget coordinates, where this->rect() is defined.
  *
- * \see m_physToVirt, m_virtualToWidget, m_widgetToVirtual.
+ * \see m_pixmapToImage, m_imageToVirt, m_virtualToWidget, m_widgetToVirtual.
  */
 class ImageViewBase : public QWidget
 {
 	Q_OBJECT
 public:
-	ImageViewBase(QImage const& image, bool hq_transform = true);
-	
+	/**
+	 * \brief ImageViewBase constructor.
+	 *
+	 * \param image The image to display.
+	 * \param downscaled_image The downscaled version of \p image.
+	 *        If it's null, it will be created automatically.
+	 *        The exact scale doesn't matter.
+	 *        The whole idea of having a downscaled version is
+	 *        to speed up real-time rendering of high-resolution
+	 *        images.  Note that the delayed high quality transform
+	 *        operates on the original image, not the downscaled one.
+	 * \param pre_transform A logical transformation applied on \p image.
+	 * \param margins Reserve extra space near the widget borders.
+	 *        The units are widget pixels.  This reserved area may
+	 *        still be covered by parts of the image that are outside
+	 *        of pre_transform.resultingRect().
+	 */
 	ImageViewBase(
-		QImage const& image, ImageTransformation const& pre_transform,
-		Margins const& margins = Margins(), bool hq_transform = true);
+		QImage const& image, QImage const& downscaled_image,
+		ImageTransformation const& pre_transform,
+		Margins const& margins = Margins());
 	
 	virtual ~ImageViewBase();
+	
+	/**
+	 * \brief Enable or disable the high-quality transform.
+	 */
+	void hqTransformSetEnabled(bool enabled);
+	
+	/**
+	 * \brief A stand-alone function to create a downscaled image
+	 *        to be passed to the constructor.
+	 *
+	 * The point of using this function instead of letting
+	 * the constructor do the job is that this function may
+	 * be called from a background thread, while the constructor
+	 * can't.
+	 *
+	 * \param image The input image, not null, and with DPI set correctly.
+	 * \return The image downscaled by an unspecified degree.
+	 */
+	static QImage createDownscaledImage(QImage const& image);
 protected:
 	enum FocalPointMode { CENTER_IF_FITS, DONT_CENTER };
 	
@@ -103,7 +140,7 @@ protected:
 	 */
 	void handleImageDragging(QMouseEvent* event);
 	
-	ImageTransformation const& physToVirt() const { return m_physToVirt; }
+	ImageTransformation const& imageToVirt() const { return m_imageToVirt; }
 	
 	QTransform const& virtualToWidget() const { return m_virtualToWidget; }
 	
@@ -154,29 +191,23 @@ protected:
 	void resetZoom();
 	
 	/**
-	 * \brief Replaces the current image with another one.
-	 *
-	 * The new image must have the same dimensions and the same DPI.
+	 * \brief Updates image-to-virtual and recalculates
+	 *        virtual-to-widget transformations.
 	 */
-	void updateImage(QImage const& image);
-	
-	/**
-	 * \brief Updates physical-to-virtual and recalculates
-	 *        virtual-to-physical transformations.
-	 */
-	void updateTransform(ImageTransformation const& phys_to_virt);
+	void updateTransform(ImageTransformation const& image_to_virt);
 	
 	/**
 	 * \brief Same as updateTransform(), but adjusts the focal point
 	 *        to improve screen space usage.
 	 */
 	void updateTransformAndFixFocalPoint(
-		ImageTransformation const& phys_to_virt, FocalPointMode mode);
+		ImageTransformation const& image_to_virt, FocalPointMode mode);
 	
 	/**
 	 * \brief Same as updateTransform(), but preserves the visual image scale.
 	 */
-	void updateTransformPreservingScale(ImageTransformation const& phys_to_virt);
+	void updateTransformPreservingScale(
+		ImageTransformation const& image_to_virt);
 	
 	/**
 	 * \brief A faster version of setCursor().
@@ -266,10 +297,15 @@ private:
 	IntrusivePtr<HqTransformTask> m_ptrHqTransformTask;
 	
 	/**
-	 * A set of logical transformations on m_pixmap, to translate
-	 * from physical to virtual image coordinates and back.
+	 * Transformation from m_pixmap coordinates to m_image coordinates.
 	 */
-	ImageTransformation m_physToVirt;
+	QTransform m_pixmapToImage;
+	
+	/**
+	 * A set of logical transformations on m_image, to translate
+	 * from image to virtual image coordinates and back.
+	 */
+	ImageTransformation m_imageToVirt;
 	
 	/**
 	 * Transformation from virtual image coordinates to widget coordinates.
@@ -321,7 +357,7 @@ private:
 	
 	bool m_isDraggingInProgress;
 	
-	bool m_hqXformEnabled;
+	bool m_hqTransformEnabled;
 };
 
 #endif

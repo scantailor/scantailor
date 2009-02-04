@@ -59,6 +59,7 @@ private:
 	IntrusivePtr<Settings> m_ptrSettings;
 	PageId m_pageId;
 	QImage m_image;
+	QImage m_downscaledImage;
 	ImageTransformation m_xform;
 	QRectF m_adaptedContentRect;
 	bool m_aggSizeChanged;
@@ -145,6 +146,7 @@ Task::UiUpdater::UiUpdater(
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_image(image),
+	m_downscaledImage(ImageView::createDownscaledImage(image)),
 	m_xform(xform),
 	m_adaptedContentRect(adapted_content_rect),
 	m_aggSizeChanged(agg_size_changed),
@@ -172,8 +174,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	}
 	
 	ImageView* view = new ImageView(
-		m_ptrSettings, m_pageId, m_image, m_xform,
-		m_adaptedContentRect, *opt_widget
+		m_ptrSettings, m_pageId, m_image, m_downscaledImage,
+		m_xform, m_adaptedContentRect, *opt_widget
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
 	

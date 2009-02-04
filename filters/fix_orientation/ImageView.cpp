@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@
 namespace fix_orientation
 {
 
-ImageView::ImageView(QImage const& image, ImageTransformation const& xform)
-:	ImageViewBase(image, xform)
+ImageView::ImageView(
+	QImage const& image, QImage const& downscaled_image,
+	ImageTransformation const& xform)
+:	ImageViewBase(image, downscaled_image, xform)
 {
 }
 
@@ -34,11 +36,11 @@ ImageView::~ImageView()
 void
 ImageView::setPreRotation(OrthogonalRotation const rotation)
 {
-	if (physToVirt().preRotation() == rotation) {
+	if (imageToVirt().preRotation() == rotation) {
 		return;
 	}
 	
-	ImageTransformation new_xform(physToVirt());
+	ImageTransformation new_xform(imageToVirt());
 	new_xform.setPreRotation(rotation);
 	updateTransform(new_xform); // should call update()
 }
