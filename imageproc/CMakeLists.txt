@@ -34,6 +34,7 @@ SET(
 	LeastSquaresFit.cpp LeastSquaresFit.h
 	PolynomialLine.cpp PolynomialSurface.h
 	PolynomialSurface.cpp PolynomialSurface.h
+	SavGolKernel.cpp SavGolKernel.h
 	SavGolFilter.cpp SavGolFilter.h
 	DrawOver.cpp DrawOver.h
 	AdjustBrightness.cpp AdjustBrightness.h

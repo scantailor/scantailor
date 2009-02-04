@@ -16,26 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define _ISOC99SOURCE // For copysign()
-
 #include "SavGolFilter.h"
+#include "SavGolKernel.h"
 #include "Grayscale.h"
 #include <QImage>
 #include <QSize>
 #include <QPoint>
 #include <QtGlobal>
-#include <algorithm>
-#include <vector>
 #include <stdexcept>
 #include <stdint.h>
-#include <string.h>
-#include <math.h>
 #include <assert.h>
-
-#ifdef _MSC_VER
-#undef copysign // Just in case.
-#define copysign _copysign
-#endif
 
 namespace imageproc
 {
@@ -48,248 +38,30 @@ int calcNumTerms(int const hor_degree, int const vert_degree)
 	return (hor_degree + 1) * (vert_degree + 1);
 }
 
-
-class SavGolKernel
+class Kernel : public SavGolKernel
 {
 public:
-	SavGolKernel(
-		QSize const& size, QPoint const& origin,
-		int hor_degree, int vert_degree);
+	Kernel(QSize const& size, QPoint const& origin,
+		int hor_degree, int vert_degree)
+	: SavGolKernel(size, origin, hor_degree, vert_degree) {}
 	
-	void recalcForOrigin(QPoint const& origin);
-	
-	void convolve(uint8_t* dst, uint8_t const* src_top_left, int src_bpl) const;
-private:
-	struct Rotation
-	{
-		double sin;
-		double cos;
-		
-		Rotation(double s, double c) : sin(s), cos(c) {}
-	};
-	
-	void QR();
-	
-	/**
-	 * A matrix of m_numDataPoints rows and m_numVars columns.
-	 * Stored row by row.
-	 */
-	std::vector<double> m_equations;
-	
-	/**
-	 * The data points, in the same order as rows in m_equations.
-	 */
-	std::vector<double> m_dataPoints;
-	
-	/**
-	 * The polynomial coefficients of size m_numVars.  Only exists to save
-	 * one allocation when recalculating the kernel for different data points.
-	 */
-	std::vector<double> m_coeffs;
-	
-	/**
-	 * The rotations applied to m_equations as part of QR factorization.
-	 * Later these same rotations are applied to a copy of m_dataPoints.
-	 * We could avoid storing rotations and rotate m_dataPoints on the fly,
-	 * but in that case we would have to rotate m_equations again when
-	 * recalculating the kernel for different data points.
-	 */
-	std::vector<Rotation> m_rotations;
-	
-	/**
-	 * The convolution kernel of size m_numDataPoints.
-	 */
-	std::vector<double> m_kernel;
-	
-	/**
-	 * The degree of the polynomial in horizontal direction.
-	 */
-	int m_horDegree;
-	
-	/**
-	 * The degree of the polynomial in vertical direction.
-	 */
-	int m_vertDegree;
-	
-	/**
-	 * The width of the convolution kernel.
-	 */
-	int m_width;
-	
-	/**
-	 * The height of the convolution kernel.
-	 */
-	int m_height;
-	
-	/**
-	 * The number of terms in the polynomial.
-	 */
-	int m_numTerms;
-	
-	/**
-	 * The number of data points.  This corresponds to the number of items
-	 * in the convolution kernel.
-	 */
-	int m_numDataPoints;
+	void convolve(
+		uint8_t* dst, uint8_t const* src_top_left,
+		int src_bpl) const;
 };
 
-SavGolKernel::SavGolKernel(
-	QSize const& size, QPoint const& origin,
-	int const hor_degree, int const vert_degree)
-:	m_horDegree(hor_degree),
-	m_vertDegree(vert_degree),
-	m_width(size.width()),
-	m_height(size.height()),
-	m_numTerms(calcNumTerms(hor_degree, vert_degree)),
-	m_numDataPoints(size.width() * size.height())
-{
-	assert(hor_degree >= 0 && vert_degree >= 0);
-	assert(m_numTerms <= m_numDataPoints);
-	
-	// Allocate memory.
-	m_dataPoints.resize(m_numDataPoints, 0.0);
-	m_coeffs.resize(m_numTerms);
-	m_kernel.resize(m_numDataPoints);
-	
-	// Prepare equations.
-	m_equations.reserve(m_numTerms * m_numDataPoints);
-	for (int y = 1; y <= m_height; ++y) {
-		for (int x = 1; x <= m_width; ++x) {
-			double pow1 = 1.0;
-			for (int i = 0; i <= m_vertDegree; ++i) {
-				double pow2 = pow1;
-				for (int j = 0; j <= m_horDegree; ++j) {
-					m_equations.push_back(pow2);
-					pow2 *= x;
-				}
-				pow1 *= y;
-			}
-		}
-	}
-	
-	QR();
-	recalcForOrigin(origin);
-}
-
-/**
- * Perform a QR factorization of m_equations by Givens rotations.
- * We store R in place of m_equations, and we don't store Q anywhere,
- * but we do store the rotations in the order they were performed.
- */
-void
-SavGolKernel::QR()
-{
-	m_rotations.clear();
-	m_rotations.reserve(
-		m_numTerms * (m_numTerms - 1) / 2
-		+ (m_numDataPoints - m_numTerms) * m_numTerms
-	);
-	
-	int jj = 0; // j * m_numTerms + j
-	for (int j = 0; j < m_numTerms; ++j, jj += m_numTerms + 1) {
-		int ij = jj + m_numTerms; // i * m_numTerms + j
-		for (int i = j + 1; i < m_numDataPoints; ++i, ij += m_numTerms) {
-			double const a = m_equations[jj];
-			double const b = m_equations[ij];
-			
-			if (b == 0.0) {
-				continue;
-			}
-			
-			double sin, cos;
-			
-			if (a == 0.0) {
-				cos = 0.0;
-				sin = copysign(1.0, b);
-				m_equations[jj] = fabs(b);
-			} else if (fabs(b) > fabs(a)) {
-				double const t = a / b;
-				double const u = copysign(sqrt(1.0 + t*t), b);
-				sin = 1.0 / u;
-				cos = sin * t;
-				m_equations[jj] = b * u;
-			} else {
-				double const t = b / a;
-				double const u = copysign(sqrt(1.0 + t*t), a);
-				cos = 1.0 / u;
-				sin = cos * t;
-				m_equations[jj] = a * u;
-			}
-			m_equations[ij] = 0.0;
-			
-			m_rotations.push_back(Rotation(sin, cos));
-			
-			int ik = ij + 1; // i * m_numTerms + k
-			int jk = jj + 1; // j * m_numTerms + k
-			for (int k = j + 1; k < m_numTerms; ++k, ++ik, ++jk) {
-				double const temp = cos * m_equations[jk] + sin * m_equations[ik];
-				m_equations[ik] = cos * m_equations[ik] - sin * m_equations[jk];
-				m_equations[jk] = temp;
-			}
-		}
-	}
-}
-
-void
-SavGolKernel::recalcForOrigin(QPoint const& origin)
-{
-	std::fill(m_dataPoints.begin(), m_dataPoints.end(), 0.0);
-	m_dataPoints[origin.y() * m_width + origin.x()] = 1.0;
-	
-	// Rotate data points.
-	double* const dp = &m_dataPoints[0];
-	std::vector<Rotation>::const_iterator rot(m_rotations.begin());
-	for (int j = 0; j < m_numTerms; ++j) {
-		for (int i = j + 1; i < m_numDataPoints; ++i, ++rot) {
-			double const temp = rot->cos * dp[j] + rot->sin * dp[i];
-			dp[i] = rot->cos * dp[i] - rot->sin * dp[j];
-			dp[j] = temp;
-		}
-	}
-	
-	// Solve R*x = d by back-substitution.
-	int ii = m_numTerms * m_numTerms - 1; // i * m_numTerms + i
-	for (int i = m_numTerms - 1; i >= 0; --i, ii -= m_numTerms + 1) {
-		double sum = dp[i];
-		int ik = ii + 1;
-		for (int k = i + 1; k < m_numTerms; ++k, ++ik) {
-			sum -= m_equations[ik] * m_coeffs[k];
-		}
-		
-		assert(m_equations[ii] != 0.0);
-		m_coeffs[i] = sum / m_equations[ii];
-	}
-	
-	int ki = 0;
-	for (int y = 1; y <= m_height; ++y) {
-		for (int x = 1; x <= m_width; ++x) {
-			double sum = 0.0;
-			double pow1 = 1.0;
-			int ci = 0;
-			for (int i = 0; i <= m_vertDegree; ++i) {
-				double pow2 = pow1;
-				for (int j = 0; j <= m_horDegree; ++j) {
-					sum += pow2 * m_coeffs[ci];
-					++ci;
-					pow2 *= x;
-				}
-				pow1 *= y;
-			}
-			m_kernel[ki] = sum;
-			++ki;
-		}
-	}
-}
-
 inline void
-SavGolKernel::convolve(uint8_t* dst, uint8_t const* src_top_left, int src_bpl) const
+Kernel::convolve(uint8_t* dst, uint8_t const* src_top_left, int src_bpl) const
 {
 	uint8_t const* p_src = src_top_left;
-	double const* p_kernel = &m_kernel[0];
-	double sum = 0.0;
+	double const* p_kernel = data();
+	double sum = 0.5; // For rounding purposes.
 	
-	for (int y = 0; y < m_height; ++y, p_src += src_bpl) {
-		for (int x = 0; x < m_width; ++x) {
+	int const w = width();
+	int const h = height();
+	
+	for (int y = 0; y < h; ++y, p_src += src_bpl) {
+		for (int x = 0; x < w; ++x) {
 			sum += p_src[x] * *p_kernel;
 			++p_kernel;
 		}
@@ -356,7 +128,7 @@ QImage savGolFilterGrayToGray(
 	// Top-left corner.
 	uint8_t const* src_line = src_data;
 	uint8_t* dst_line = dst_data;
-	SavGolKernel kernel(window_size, QPoint(0, 0), hor_degree, vert_degree);
+	Kernel kernel(window_size, QPoint(0, 0), hor_degree, vert_degree);
 	for (int y = 0; y < k_top; ++y, dst_line += dst_bpl) {
 		k_origin.setY(y);
 		for (int x = 0; x < k_left; ++x) {
