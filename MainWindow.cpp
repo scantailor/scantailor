@@ -538,7 +538,14 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 	m_pOptionsFrameLayout->addWidget(widget);
 	m_ptrOptionsWidget = widget;
 	
-	connect(widget, SIGNAL(reloadRequested()), this, SLOT(reloadRequested()));
+	// We use an asynchronous connection here, because the slot
+	// will probably delete the options panel, which could be
+	// responsible for the emission of this signal.  Qt doesn't
+	// like when we delete an object while it's emitting a singal.
+	connect(
+		widget, SIGNAL(reloadRequested()),
+		this, SLOT(reloadRequested()), Qt::QueuedConnection
+	);
 	connect(
 		widget, SIGNAL(invalidateThumbnail(PageId const&)),
 		this, SLOT(invalidateThumbnailSlot(PageId const&))
