@@ -507,6 +507,7 @@ TiffReader::readAndUnpackLines(
 			while (bits_in_accum < bits_per_sample) {
 				accum <<= 8;
 				accum |= *src;
+				bits_in_accum += 8;
 				++src;
 			}
 			bits_in_accum -= bits_per_sample;
