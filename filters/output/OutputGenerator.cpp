@@ -701,7 +701,7 @@ OutputGenerator::despeckle(
 	// of the number of pixels in a connected component.
 	int const class0_upper_bound = qRound(4 * squared_factor);
 	int const class1_upper_bound = qRound(16 * squared_factor);
-	int const class2_upper_bound = qRound(60 * squared_factor);
+	int const class2_upper_bound = qRound(100 * squared_factor);
 	
 	// The maximum squared distance that preserves the component.
 	uint32_t const class1_preserving_sqdist = qRound(8 * 8 * squared_factor);
@@ -846,6 +846,10 @@ OutputGenerator::addNeighborsInPlace(
 		for (int x = 0; x < width; ++x) {
 			InfluenceMap::Cell const* cell = imap_line + x;
 			uint32_t const label = cell->label;
+			
+			// Zero labels can only be in the padding area.
+			assert(label != 0);
+			
 			if (labels_ok[label]) {
 				// Already accepted.
 				continue;
@@ -856,7 +860,7 @@ OutputGenerator::addNeighborsInPlace(
 			
 			// Northern neighbor.
 			InfluenceMap::Cell const* neighbor = cell - imap_stride;
-			if (neighbor->label != label) {
+			if (neighbor->label && neighbor->label != label) {
 				int const nbh_x = x;
 				int const nbh_y = y - 1;
 				int const x2 = nbh_x + neighbor->vec.x;
@@ -872,7 +876,7 @@ OutputGenerator::addNeighborsInPlace(
 			
 			// Western neighbor.
 			neighbor = cell - 1;
-			if (neighbor->label != label) {
+			if (neighbor->label && neighbor->label != label) {
 				int const nbh_x = x - 1;
 				int const nbh_y = y;
 				int const x2 = nbh_x + neighbor->vec.x;
@@ -888,7 +892,7 @@ OutputGenerator::addNeighborsInPlace(
 			
 			// Eastern neighbor.
 			neighbor = cell + 1;
-			if (neighbor->label != label) {
+			if (neighbor->label && neighbor->label != label) {
 				int const nbh_x = x + 1;
 				int const nbh_y = y;
 				int const x2 = nbh_x + neighbor->vec.x;
@@ -904,7 +908,7 @@ OutputGenerator::addNeighborsInPlace(
 			
 			// Southern neighbor.
 			neighbor = cell + imap_stride;
-			if (neighbor->label != label) {
+			if (neighbor->label && neighbor->label != label) {
 				int const nbh_x = x;
 				int const nbh_y = y + 1;
 				int const x2 = nbh_x + neighbor->vec.x;
