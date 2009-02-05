@@ -29,6 +29,9 @@ latest stable version.
    anyway, but at least you won't have to rebuild the programs that come with
    Qt.  Still, the source-only Qt plus a manual MinGW installation is supported,
    but this document assumes you are using the mingw version.
+7. NSIS 2.x (tested with 2.42)
+   Homepage: http://nsis.sourceforge.net/
+
 
 
                                     Instructions
@@ -113,8 +116,10 @@ latest stable version.
    cd C:\build\scantailor-build
    mingw32-make 2> log.txt
 
-   If everything went right, scantailor.exe will appear in the current directory.
-   It needs mingwm10.dll to run, which you may take from the MinGW bin directory.
+   If everything went right, the installer named scantailor-VERSION-install.exe
+   will appear in the current directory.  The VERSION part of the name will
+   be replaced by the actual version, taken from a file called "VERSION" in
+   the root of the source directory.
 
 
                                Patching libtiff
