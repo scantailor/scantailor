@@ -94,7 +94,8 @@ private:
 	static void addNeighborsInPlace(
 		TaskStatus const& status, imageproc::BinaryImage& seed,
 		uint32_t max_neighbor_sqdist,
-		imageproc::BinaryImage const& candidates);
+		imageproc::BinaryImage const& candidates,
+		DebugImages* dbg);
 	
 	static void morphologicalSmoothInPlace(
 		imageproc::BinaryImage& img, TaskStatus const& status);

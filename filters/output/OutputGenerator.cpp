@@ -44,7 +44,8 @@
 #include "imageproc/SavGolFilter.h"
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
-#include "imageproc/SEDM.h"
+#include "imageproc/ConnectivityMap.h"
+#include "imageproc/InfluenceMap.h"
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -57,6 +58,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 using namespace imageproc;
 
@@ -415,10 +417,7 @@ OutputGenerator::processImpl(FilterData const& input,
 			status.throwIfCancelled();
 			
 			QRect dst_rect(m_contentRect);
-			dst_rect.moveTopLeft(
-				normalize_illumination_rect.topLeft()
-				- m_cropRect.topLeft()
-			);
+			dst_rect.moveTopLeft(m_contentRect.topLeft() - m_cropRect.topLeft());
 			
 			QPoint const src_pos(
 				m_contentRect.topLeft() -
@@ -442,6 +441,23 @@ OutputGenerator::processImpl(FilterData const& input,
 		return bitonal;
 	}
 	
+	BinaryImage bw_mask;
+	if (render_params.mixedOutput()) {
+		// This should go before the block with
+		// adjustBrightnessGrayscale(), it may convert
+		// maybe_normalized from grayscale to color mode.
+		bw_mask = estimateBinarizationMask(
+			status, toGrayscale(maybe_normalized),
+			normalize_illumination_rect,
+			small_margins_rect, dbg
+		);
+		if (dbg) {
+			dbg->add(bw_mask, "bw_mask");
+		}
+		
+		status.throwIfCancelled();
+	}
+	
 	if (!input.origImage().allGray()) {
 		QImage tmp(
 			transform(
@@ -461,24 +477,6 @@ OutputGenerator::processImpl(FilterData const& input,
 	}
 	
 	if (render_params.mixedOutput()) {
-		// For detecting pictures on a scan, we need to get rid of
-		// big margins.  The more extra space we have, the more chances
-		// there are for false positives.  Still, because we need
-		// to detect gradients, we don't want content touching the edge,
-		// which means zero margins won't be OK.
-		BinaryImage bw_mask(
-			estimateBinarizationMask(
-				status, maybe_normalized,
-				normalize_illumination_rect,
-				small_margins_rect, dbg
-			)
-		);
-		if (dbg) {
-			dbg->add(bw_mask, "bw_mask");
-		}
-		
-		status.throwIfCancelled();
-		
 		GrayscaleHistogram const hist(maybe_smoothed, bw_mask);
 		maybe_smoothed = QImage(); // Save memory.
 		
@@ -703,11 +701,11 @@ OutputGenerator::despeckle(
 	// of the number of pixels in a connected component.
 	int const class0_upper_bound = qRound(4 * squared_factor);
 	int const class1_upper_bound = qRound(16 * squared_factor);
-	int const class2_upper_bound = qRound(80 * squared_factor);
+	int const class2_upper_bound = qRound(60 * squared_factor);
 	
 	// The maximum squared distance that preserves the component.
-	uint32_t const class1_preserving_sqdist = qRound(3 * 3 * squared_factor);
-	uint32_t const class2_preserving_sqdist = qRound(15 * 15 * squared_factor);
+	uint32_t const class1_preserving_sqdist = qRound(8 * 8 * squared_factor);
+	uint32_t const class2_preserving_sqdist = qRound(30 * 30 * squared_factor);
 	
 	QImage labelled_seeds(src.size(), QImage::Format_Indexed8);
 	labelled_seeds.setColorTable(createGrayscalePalette());
@@ -745,7 +743,7 @@ OutputGenerator::despeckle(
 		selectGrayLevelAndSeedFill(labelled_seeds, 3, src, CONN8)
 	);
 	if (dbg) {
-		dbg->add(accepted, "accepted_class3");
+		//dbg->add(accepted, "accepted_class3");
 	}
 	
 	status.throwIfCancelled();
@@ -753,10 +751,11 @@ OutputGenerator::despeckle(
 	// Process 2nd class.
 	addNeighborsInPlace(
 		status, accepted, class2_preserving_sqdist,
-		selectGrayLevelAndSeedFill(labelled_seeds, 2, src, CONN8)
+		selectGrayLevelAndSeedFill(labelled_seeds, 2, src, CONN8),
+		dbg
 	);
 	if (dbg) {
-		dbg->add(accepted, "accepted_class2");
+		//dbg->add(accepted, "accepted_class2");
 	}
 	
 	status.throwIfCancelled();
@@ -764,10 +763,11 @@ OutputGenerator::despeckle(
 	// Process 1st class.
 	addNeighborsInPlace(
 		status, accepted, class1_preserving_sqdist,
-		selectGrayLevelAndSeedFill(labelled_seeds, 1, src, CONN8)
+		selectGrayLevelAndSeedFill(labelled_seeds, 1, src, CONN8),
+		dbg
 	);
 	if (dbg) {
-		dbg->add(accepted, "accepted_class1");
+		//dbg->add(accepted, "accepted_class1");
 	}
 	
 	return accepted;
@@ -815,45 +815,129 @@ OutputGenerator::selectGrayLevelAndSeedFill(
  */
 void
 OutputGenerator::addNeighborsInPlace(
-	TaskStatus const& status, imageproc::BinaryImage& seed,
+	TaskStatus const& status, imageproc::BinaryImage& accepted,
 	uint32_t const max_neighbor_sqdist,
-	imageproc::BinaryImage const& candidates)
+	imageproc::BinaryImage const& candidates,
+	DebugImages* const dbg)
 {
-	SEDM sedm(seed, SEDM::DIST_TO_BLACK, SEDM::DIST_TO_NO_BORDERS);
-	uint32_t const* sedm_line = sedm.data();
-	int const sedm_stride = sedm.stride();
+	ConnectivityMap cmap(candidates, CONN8);
+	cmap.addComponent(accepted);
 	
 	status.throwIfCancelled();
 	
-	BinaryImage neighbors_seed(seed.size(), WHITE);
-	uint32_t* nbs_line = neighbors_seed.data();
-	int const nbs_stride = neighbors_seed.wordsPerLine();
+	InfluenceMap imap(cmap);
+	cmap = ConnectivityMap();
 	
 	status.throwIfCancelled();
 	
-	int const width = seed.width();
-	int const height = seed.height();
+	std::vector<uint8_t> labels_ok(imap.maxLabel() + 1);
+	
+	// This corresponds to:
+	// cmap.addComponent(accepted);
+	labels_ok[imap.maxLabel()] = 1;
+	
+	int const width = imap.size().width();
+	int const height = imap.size().height();
+	
+	InfluenceMap::Cell const* imap_line = imap.data();
+	int const imap_stride = imap.stride();
+	
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			InfluenceMap::Cell const* cell = imap_line + x;
+			uint32_t const label = cell->label;
+			if (labels_ok[label]) {
+				// Already accepted.
+				continue;
+			}
+			
+			int const x1 = x + cell->vec.x;
+			int const y1 = y + cell->vec.y;
+			
+			// Northern neighbor.
+			InfluenceMap::Cell const* neighbor = cell - imap_stride;
+			if (neighbor->label != label) {
+				int const nbh_x = x;
+				int const nbh_y = y - 1;
+				int const x2 = nbh_x + neighbor->vec.x;
+				int const y2 = nbh_y + neighbor->vec.y;
+				int const dx = x1 - x2;
+				int const dy = y1 - y2;
+				uint32_t const sqdist = dx * dx + dy * dy;
+				if (sqdist <= max_neighbor_sqdist) {
+					labels_ok[label] = 1;
+					continue;
+				}
+			}
+			
+			// Western neighbor.
+			neighbor = cell - 1;
+			if (neighbor->label != label) {
+				int const nbh_x = x - 1;
+				int const nbh_y = y;
+				int const x2 = nbh_x + neighbor->vec.x;
+				int const y2 = nbh_y + neighbor->vec.y;
+				int const dx = x1 - x2;
+				int const dy = y1 - y2;
+				uint32_t const sqdist = dx * dx + dy * dy;
+				if (sqdist <= max_neighbor_sqdist) {
+					labels_ok[label] = 1;
+					continue;
+				}
+			}
+			
+			// Eastern neighbor.
+			neighbor = cell + 1;
+			if (neighbor->label != label) {
+				int const nbh_x = x + 1;
+				int const nbh_y = y;
+				int const x2 = nbh_x + neighbor->vec.x;
+				int const y2 = nbh_y + neighbor->vec.y;
+				int const dx = x1 - x2;
+				int const dy = y1 - y2;
+				uint32_t const sqdist = dx * dx + dy * dy;
+				if (sqdist <= max_neighbor_sqdist) {
+					labels_ok[label] = 1;
+					continue;
+				}
+			}
+			
+			// Southern neighbor.
+			neighbor = cell + imap_stride;
+			if (neighbor->label != label) {
+				int const nbh_x = x;
+				int const nbh_y = y + 1;
+				int const x2 = nbh_x + neighbor->vec.x;
+				int const y2 = nbh_y + neighbor->vec.y;
+				int const dx = x1 - x2;
+				int const dy = y1 - y2;
+				uint32_t const sqdist = dx * dx + dy * dy;
+				if (sqdist <= max_neighbor_sqdist) {
+					labels_ok[label] = 1;
+					continue;
+				}
+			}
+		}
+		imap_line += imap_stride;
+	}
+	
+	status.throwIfCancelled();
+	
+	imap_line = imap.data();
+	uint32_t* accepted_line = accepted.data();
+	int const accepted_stride = accepted.wordsPerLine();
 	
 	uint32_t const msb = uint32_t(1) << 31;
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
-			if (sedm_line[x] <= max_neighbor_sqdist) {
-				nbs_line[x >> 5] |= msb >> (x & 31);
+			InfluenceMap::Cell const* cell = imap_line + x;
+			if (cell->distSq == 0 && labels_ok[cell->label]) {
+				accepted_line[x >> 5] |= msb >> (x & 31);
 			}
 		}
-		sedm_line += sedm_stride;
-		nbs_line += nbs_stride;
+		imap_line += imap_stride;
+		accepted_line += accepted_stride;
 	}
-	
-	sedm = SEDM();
-	
-	status.throwIfCancelled();
-	
-	neighbors_seed = seedFill(neighbors_seed, candidates, CONN8);
-	
-	status.throwIfCancelled();
-	
-	rasterOp<RopOr<RopSrc, RopDst> >(seed, neighbors_seed);
 }
 
 void
