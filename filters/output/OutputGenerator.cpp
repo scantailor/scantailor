@@ -458,7 +458,9 @@ OutputGenerator::processImpl(FilterData const& input,
 		status.throwIfCancelled();
 	}
 	
-	if (!input.origImage().allGray()) {
+	if (render_params.normalizeIllumination()
+			&& !input.origImage().allGray()) {
+		assert(maybe_normalized.format() == QImage::Format_Indexed8);
 		QImage tmp(
 			transform(
 				input.origImage(), m_toUncropped,
@@ -830,7 +832,9 @@ OutputGenerator::addNeighborsInPlace(
 	
 	status.throwIfCancelled();
 	
-	std::vector<uint8_t> labels_ok(imap.maxLabel() + 1);
+	// Highest bit: contains a large enough neighbor in the vicinity.
+	// The rest of bits: the number of pixels in a connected component.
+	std::vector<uint32_t> labels_ok(imap.maxLabel() + 1);
 	
 	// This corresponds to:
 	// cmap.addComponent(accepted);
@@ -842,18 +846,29 @@ OutputGenerator::addNeighborsInPlace(
 	InfluenceMap::Cell const* imap_line = imap.data();
 	int const imap_stride = imap.stride();
 	
-	for (int y = 0; y < height; ++y) {
+	// First pass: collect the number of pixels in each connected components.
+	for (int y = 0; y < height; ++y, imap_line += imap_stride) {
+		for (int x = 0; x < width; ++x) {
+			++labels_ok[imap_line[x].label];
+		}
+	}
+	
+	uint32_t const msb = uint32_t(1) << 31;
+	
+	// Second pass: find the neighboring influence zones and check if the
+	// influence sources are close enough.
+	imap_line = imap.data();
+	for (int y = 0; y < height; ++y, imap_line += imap_stride) {
 		for (int x = 0; x < width; ++x) {
 			InfluenceMap::Cell const* cell = imap_line + x;
 			uint32_t const label = cell->label;
 			
-			// Zero labels can only be in the padding area.
-			assert(label != 0);
-			
-			if (labels_ok[label]) {
+			if (labels_ok[label] & msb) {
 				// Already accepted.
 				continue;
 			}
+			
+			uint32_t const sqdist_threshold = max_neighbor_sqdist; //labels_ok[label];
 			
 			int const x1 = x + cell->vec.x;
 			int const y1 = y + cell->vec.y;
@@ -868,8 +883,8 @@ OutputGenerator::addNeighborsInPlace(
 				int const dx = x1 - x2;
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= max_neighbor_sqdist) {
-					labels_ok[label] = 1;
+				if (sqdist <= sqdist_threshold) {
+					labels_ok[label] |= msb;
 					continue;
 				}
 			}
@@ -884,8 +899,8 @@ OutputGenerator::addNeighborsInPlace(
 				int const dx = x1 - x2;
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= max_neighbor_sqdist) {
-					labels_ok[label] = 1;
+				if (sqdist <= sqdist_threshold) {
+					labels_ok[label] |= msb;
 					continue;
 				}
 			}
@@ -900,8 +915,8 @@ OutputGenerator::addNeighborsInPlace(
 				int const dx = x1 - x2;
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= max_neighbor_sqdist) {
-					labels_ok[label] = 1;
+				if (sqdist <= sqdist_threshold) {
+					labels_ok[label] |= msb;
 					continue;
 				}
 			}
@@ -916,13 +931,12 @@ OutputGenerator::addNeighborsInPlace(
 				int const dx = x1 - x2;
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= max_neighbor_sqdist) {
-					labels_ok[label] = 1;
+				if (sqdist <= sqdist_threshold) {
+					labels_ok[label] |= msb;
 					continue;
 				}
 			}
 		}
-		imap_line += imap_stride;
 	}
 	
 	status.throwIfCancelled();
@@ -931,11 +945,10 @@ OutputGenerator::addNeighborsInPlace(
 	uint32_t* accepted_line = accepted.data();
 	int const accepted_stride = accepted.wordsPerLine();
 	
-	uint32_t const msb = uint32_t(1) << 31;
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 			InfluenceMap::Cell const* cell = imap_line + x;
-			if (cell->distSq == 0 && labels_ok[cell->label]) {
+			if (cell->distSq == 0 && (labels_ok[cell->label] & msb)) {
 				accepted_line[x >> 5] |= msb >> (x & 31);
 			}
 		}
