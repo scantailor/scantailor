@@ -822,8 +822,27 @@ OutputGenerator::addNeighborsInPlace(
 	imageproc::BinaryImage const& candidates,
 	DebugImages* const dbg)
 {
+	int const width = accepted.width();
+	int const height = accepted.height();
+	uint32_t const msb = uint32_t(1) << 31;
+	
 	ConnectivityMap cmap(candidates, CONN8);
 	cmap.addComponent(accepted);
+	
+	status.throwIfCancelled();
+	
+	// Highest bit: contains a large enough neighbor in the vicinity.
+	// The rest of bits: the number of pixels in a connected component.
+	std::vector<uint32_t> labels_info(cmap.maxLabel() + 1);
+	
+	// Collect the number of pixels in each connected components.
+	uint32_t const* cmap_line = cmap.data();
+	int const cmap_stride = cmap.stride();
+	for (int y = 0; y < height; ++y, cmap_line += cmap_stride) {
+		for (int x = 0; x < width; ++x) {
+			++labels_info[cmap_line[x]];
+		}
+	}
 	
 	status.throwIfCancelled();
 	
@@ -832,43 +851,21 @@ OutputGenerator::addNeighborsInPlace(
 	
 	status.throwIfCancelled();
 	
-	// Highest bit: contains a large enough neighbor in the vicinity.
-	// The rest of bits: the number of pixels in a connected component.
-	std::vector<uint32_t> labels_ok(imap.maxLabel() + 1);
-	
-	// This corresponds to:
-	// cmap.addComponent(accepted);
-	labels_ok[imap.maxLabel()] = 1;
-	
-	int const width = imap.size().width();
-	int const height = imap.size().height();
-	
+	// Dind the neighboring influence zones and check if the
+	// influence sources are close enough.
 	InfluenceMap::Cell const* imap_line = imap.data();
 	int const imap_stride = imap.stride();
-	
-	// First pass: collect the number of pixels in each connected components.
-	for (int y = 0; y < height; ++y, imap_line += imap_stride) {
-		for (int x = 0; x < width; ++x) {
-			++labels_ok[imap_line[x].label];
-		}
-	}
-	
-	uint32_t const msb = uint32_t(1) << 31;
-	
-	// Second pass: find the neighboring influence zones and check if the
-	// influence sources are close enough.
-	imap_line = imap.data();
 	for (int y = 0; y < height; ++y, imap_line += imap_stride) {
 		for (int x = 0; x < width; ++x) {
 			InfluenceMap::Cell const* cell = imap_line + x;
 			uint32_t const label = cell->label;
 			
-			if (labels_ok[label] & msb) {
+			if (labels_info[label] & msb) {
 				// Already accepted.
 				continue;
 			}
 			
-			uint32_t const sqdist_threshold = max_neighbor_sqdist; //labels_ok[label];
+			uint32_t const sqdist_threshold = labels_info[label] * 4;
 			
 			int const x1 = x + cell->vec.x;
 			int const y1 = y + cell->vec.y;
@@ -884,7 +881,7 @@ OutputGenerator::addNeighborsInPlace(
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
 				if (sqdist <= sqdist_threshold) {
-					labels_ok[label] |= msb;
+					labels_info[label] |= msb;
 					continue;
 				}
 			}
@@ -900,7 +897,7 @@ OutputGenerator::addNeighborsInPlace(
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
 				if (sqdist <= sqdist_threshold) {
-					labels_ok[label] |= msb;
+					labels_info[label] |= msb;
 					continue;
 				}
 			}
@@ -916,7 +913,7 @@ OutputGenerator::addNeighborsInPlace(
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
 				if (sqdist <= sqdist_threshold) {
-					labels_ok[label] |= msb;
+					labels_info[label] |= msb;
 					continue;
 				}
 			}
@@ -932,7 +929,7 @@ OutputGenerator::addNeighborsInPlace(
 				int const dy = y1 - y2;
 				uint32_t const sqdist = dx * dx + dy * dy;
 				if (sqdist <= sqdist_threshold) {
-					labels_ok[label] |= msb;
+					labels_info[label] |= msb;
 					continue;
 				}
 			}
@@ -948,7 +945,8 @@ OutputGenerator::addNeighborsInPlace(
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 			InfluenceMap::Cell const* cell = imap_line + x;
-			if (cell->distSq == 0 && (labels_ok[cell->label] & msb)) {
+			if (cell->distSq == 0 &&
+					(labels_info[cell->label] & msb)) {
 				accepted_line[x >> 5] |= msb >> (x & 31);
 			}
 		}
