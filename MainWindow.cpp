@@ -328,7 +328,11 @@ MainWindow::switchToNewProject(
 	
 	// Thumbnails are stored relative to the output directory,
 	// so recreate the thumbnail cache.
-	m_ptrThumbnailCache = createThumbnailCache();
+	if (out_dir.isEmpty()) {
+		m_ptrThumbnailCache.reset();
+	} else {
+		m_ptrThumbnailCache = createThumbnailCache();
+	}
 	resetThumbSequence();
 	
 	updateProjectActions();
@@ -479,23 +483,32 @@ MainWindow::compareFiles(QString const& fpath1, QString const& fpath2)
 void
 MainWindow::resetThumbSequence()
 {
-	assert(m_ptrThumbSequence.get());
-	
-	IntrusivePtr<CompositeCacheDrivenTask> const task(
-		m_ptrFilterListModel->createCompositeCacheDrivenTask(
-			m_outDir, m_curFilter
-		)
-	);
-	
-	m_ptrThumbSequence->setThumbnailFactory(
-		IntrusivePtr<ThumbnailFactory>(
-			new ThumbnailFactory(
-				*m_ptrThumbnailCache, m_maxLogicalThumbSize, task
+	if (m_ptrThumbnailCache.get()) {
+		IntrusivePtr<CompositeCacheDrivenTask> const task(
+			m_ptrFilterListModel->createCompositeCacheDrivenTask(
+				m_outDir, m_curFilter
 			)
-		)
-	);
+		);
+		
+		m_ptrThumbSequence->setThumbnailFactory(
+			IntrusivePtr<ThumbnailFactory>(
+				new ThumbnailFactory(
+					*m_ptrThumbnailCache,
+					m_maxLogicalThumbSize, task
+				)
+			)
+		);
+	}
 	
 	m_ptrThumbSequence->reset(m_ptrPages->snapshot(getCurrentView()));
+	
+	if (!m_ptrThumbnailCache.get()) {
+		// Empty project.
+		assert(m_ptrPages->numImages() == 0);
+		m_ptrThumbSequence->setThumbnailFactory(
+			IntrusivePtr<ThumbnailFactory>()
+		);
+	}
 }
 
 void
