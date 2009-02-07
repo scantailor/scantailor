@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #include "Settings.h"
 #include <QVariant>
 #include <QColorDialog>
-#include <QIcon>
 #include <QSize>
 #include <Qt>
 
@@ -30,26 +29,14 @@ namespace output
 {
 
 OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
-:	m_ptrSettings(settings),
-	m_lightColorPixmap(QSize(16, 16)),
-	m_darkColorPixmap(QSize(16, 16))
+:	m_ptrSettings(settings)
 {
-	m_lightColorPixmap.fill(m_colorParams.lightColor());
-	m_darkColorPixmap.fill(m_colorParams.darkColor());
-	
 	setupUi(this);
 	
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
-	//colorModeSelector->addItem(tr("Bitonal"), ColorParams::BITONAL);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
 	
-	thresholdSelector->addItem(QString::fromAscii("Otsu"), ColorParams::OTSU);
-#if 0
-	thresholdSelector->addItem(QString::fromAscii("Mokji"), ColorParams::MOKJI);
-	thresholdSelector->addItem(QString::fromAscii("Sauvola"), ColorParams::SAUVOLA);
-	thresholdSelector->addItem(QString::fromAscii("Wolf"), ColorParams::WOLF);
-#endif
 	updateColorsDisplay();
 	
 	connect(
@@ -69,16 +56,8 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 		this, SLOT(equalizeIlluminationToggled(bool))
 	);
 	connect(
-		lightColorButton, SIGNAL(clicked()),
-		this, SLOT(lightColorButtonClicked())
-	);
-	connect(
-		darkColorButton, SIGNAL(clicked()),
-		this, SLOT(darkColorButtonClicked())
-	);
-	connect(
-		thresholdSelector, SIGNAL(currentIndexChanged(int)),
-		this, SLOT(thresholdModeChanged(int))
+		despeckleCB, SIGNAL(clicked(bool)),
+		this, SLOT(despeckleToggled(bool))
 	);
 	connect(
 		applyColorsButton, SIGNAL(clicked()),
@@ -141,10 +120,11 @@ OptionsWidget::equalizeIlluminationToggled(bool const checked)
 }
 
 void
-OptionsWidget::thresholdModeChanged(int const idx)
+OptionsWidget::despeckleToggled(bool const checked)
 {
-	int const mode = thresholdSelector->itemData(idx).toInt();
-	m_colorParams.setThresholdMode((ColorParams::ThresholdMode)mode);
+	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
+	opt.setDespeckle(checked);
+	m_colorParams.setBlackWhiteOptions(opt);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	emit reloadRequested();
 }
@@ -203,49 +183,6 @@ OptionsWidget::applyColorsConfirmed(Scope const scope)
 }
 
 void
-OptionsWidget::lightColorButtonClicked()
-{
-	QColor const color(QColorDialog::getColor(m_colorParams.lightColor(), this));
-	if (!color.isValid()) {
-		// The dialog was closed.
-		return;
-	}
-	
-	m_colorParams.setLightColor(color.rgb());
-	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
-	m_lightColorPixmap.fill(m_colorParams.lightColor());
-	lightColorButton->setIcon(createIcon(m_lightColorPixmap));
-	
-	emit reloadRequested();
-}
-
-void
-OptionsWidget::darkColorButtonClicked()
-{
-	QColor const color(QColorDialog::getColor(m_colorParams.darkColor(), this));
-	if (!color.isValid()) {
-		// The dialog was closed.
-		return;
-	}
-	
-	m_colorParams.setDarkColor(color.rgb());
-	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
-	m_darkColorPixmap.fill(m_colorParams.darkColor());
-	darkColorButton->setIcon(createIcon(m_darkColorPixmap));
-	
-	emit reloadRequested();
-}
-
-QIcon
-OptionsWidget::createIcon(QPixmap const& pixmap)
-{
-	QIcon icon(pixmap);
-	icon.addPixmap(pixmap, QIcon::Disabled, QIcon::Off);
-	icon.addPixmap(pixmap, QIcon::Disabled, QIcon::On);
-	return icon;
-}
-
-void
 OptionsWidget::updateDpiDisplay()
 {
 	if (m_dpi.horizontal() != m_dpi.vertical()) {
@@ -262,37 +199,26 @@ void
 OptionsWidget::updateColorsDisplay()
 {
 	colorModeSelector->blockSignals(true);
-	thresholdSelector->blockSignals(true);
 	
 	ColorParams::ColorMode const color_mode = m_colorParams.colorMode();
 	int const color_mode_idx = colorModeSelector->findData(color_mode);
 	colorModeSelector->setCurrentIndex(color_mode_idx);
 	
-	bool const show_bitonal_options = false;/*(
-		color_mode == ColorParams::BLACK_AND_WHITE
-		|| color_mode == ColorParams::BITONAL
-	);
-	*/
-	bitonalOptionsWidget->setVisible(show_bitonal_options);
-	lightColorButton->setEnabled(color_mode == ColorParams::BITONAL);
-	darkColorButton->setEnabled(color_mode == ColorParams::BITONAL);
-	
-	if (show_bitonal_options) {
-		if (color_mode == ColorParams::BLACK_AND_WHITE) {
-			m_lightColorPixmap.fill(Qt::white);
-			m_darkColorPixmap.fill(Qt::black);
-		} else if (color_mode == ColorParams::BITONAL) {
-			m_lightColorPixmap.fill(m_colorParams.lightColor());
-			m_darkColorPixmap.fill(m_colorParams.darkColor());
-		}
-		lightColorButton->setIcon(createIcon(m_lightColorPixmap));
-		darkColorButton->setIcon(createIcon(m_darkColorPixmap));
+	bool color_grayscale_options_visible = false;
+	bool bw_options_visible = false;
+	switch (color_mode) {
+		case ColorParams::BLACK_AND_WHITE:
+			bw_options_visible = true;
+			break;
+		case ColorParams::COLOR_GRAYSCALE:
+			color_grayscale_options_visible = true;
+			break;
+		case ColorParams::MIXED:
+			bw_options_visible = true;
+			break;
 	}
 	
-	bool const color_grayscale_options_visible = (
-		color_mode == ColorParams::COLOR_GRAYSCALE
-	);
-	customOptionsPanel->setVisible(color_grayscale_options_visible);
+	colorGrayscaleOptions->setVisible(color_grayscale_options_visible);
 	if (color_grayscale_options_visible) {
 		ColorGrayscaleOptions const opt(
 			m_colorParams.colorGrayscaleOptions()
@@ -302,12 +228,14 @@ OptionsWidget::updateColorsDisplay()
 		equalizeIlluminationCB->setEnabled(opt.whiteMargins());
 	}
 	
-	ColorParams::ThresholdMode const threshold_mode = m_colorParams.thresholdMode();
-	int const threshold_idx = thresholdSelector->findData(threshold_mode);
-	thresholdSelector->setCurrentIndex(threshold_idx);
+	bwOptions->setVisible(bw_options_visible);
+	if (bw_options_visible) {
+		despeckleCB->setChecked(
+			m_colorParams.blackWhiteOptions().despeckle()
+		);
+	}
 	
 	colorModeSelector->blockSignals(false);
-	thresholdSelector->blockSignals(false);
 }
 
 } // namespace output

@@ -28,9 +28,11 @@ RenderParams::RenderParams(ColorParams const& cp)
 {
 	switch (cp.colorMode()) {
 		case ColorParams::BLACK_AND_WHITE:
-		case ColorParams::BITONAL:
 			m_mask |= WHITE_MARGINS|NORMALIZE_ILLUMINATION
 					|NEED_BINARIZATION;
+			if (cp.blackWhiteOptions().despeckle()) {
+				m_mask |= DESPECKLE;
+			}
 			break;
 		case ColorParams::COLOR_GRAYSCALE: {
 			ColorGrayscaleOptions const opt(
@@ -47,6 +49,9 @@ RenderParams::RenderParams(ColorParams const& cp)
 		case ColorParams::MIXED:
 			m_mask |= WHITE_MARGINS|NORMALIZE_ILLUMINATION
 					|NEED_BINARIZATION|MIXED_OUTPUT;
+			if (cp.blackWhiteOptions().despeckle()) {
+				m_mask |= DESPECKLE;
+			}
 			break;
 	}
 }

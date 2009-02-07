@@ -21,6 +21,8 @@
 #include <QVariant>
 #include <QIntValidator>
 #include <QMessageBox>
+#include <QLineEdit>
+#include <QDebug>
 #include <boost/foreach.hpp>
 #include <algorithm>
 
@@ -39,36 +41,40 @@ ChangeDpiDialog::ChangeDpiDialog(QWidget* parent, Dpi const& dpi)
 	};
 	
 	int const requested_dpi = std::max(dpi.horizontal(), dpi.vertical());
+	m_customDpiString = QString::number(requested_dpi);
 	
 	int selected_index = -1;
 	BOOST_FOREACH(int const cdpi, common_dpis) {
 		if (cdpi == requested_dpi) {
 			selected_index = dpiSelector->count();
 		}
-		dpiSelector->addItem(QString::number(cdpi), cdpi);
+		QString const cdpi_str(QString::number(cdpi));
+		dpiSelector->addItem(cdpi_str, cdpi_str);
 	}
 	
 	m_customItemIdx = dpiSelector->count();
-	dpiSelector->addItem(tr("Custom"));
+	dpiSelector->addItem(tr("Custom"), m_customDpiString);
 	
-	if (selected_index == -1) {
-		selected_index = m_customItemIdx;
+	if (selected_index != -1) {
+		dpiSelector->setCurrentIndex(selected_index);
+	} else {
+		dpiSelector->setCurrentIndex(m_customItemIdx);
 		dpiSelector->setEditable(true);
+		dpiSelector->lineEdit()->setText(m_customDpiString);
 		// It looks like we need to set a new validator
 		// every time we make the combo box editable.
 		dpiSelector->setValidator(
 			new QIntValidator(0, 9999, dpiSelector)
 		);
 	}
-	dpiSelector->setCurrentIndex(selected_index);
 	
 	connect(
-		dpiSelector, SIGNAL(currentIndexChanged(int)),
+		dpiSelector, SIGNAL(activated(int)),
 		this, SLOT(dpiSelectionChanged(int))
 	);
 	connect(
 		dpiSelector, SIGNAL(editTextChanged(QString const&)),
-		this, SLOT(customDpiChanged(QString const&))
+		this, SLOT(dpiEditTextChanged(QString const&))
 	);
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }
@@ -80,24 +86,24 @@ ChangeDpiDialog::~ChangeDpiDialog()
 void
 ChangeDpiDialog::dpiSelectionChanged(int const index)
 {
-	QVariant const var(dpiSelector->itemData(index));
-	dpiSelector->setEditable(var.isNull());
-	if (var.isNull()) {
-		dpiSelector->setItemText(m_customItemIdx, "600");
+	dpiSelector->setEditable(index == m_customItemIdx);
+	if (index == m_customItemIdx) {
+		dpiSelector->setEditText(m_customDpiString);
+		dpiSelector->lineEdit()->selectAll();
 		// It looks like we need to set a new validator
 		// every time we make the combo box editable.
 		dpiSelector->setValidator(
 			new QIntValidator(0, 9999, dpiSelector)
 		);
-	} else {
-		dpiSelector->setItemText(m_customItemIdx, tr("Custom"));
 	}
 }
 
 void
-ChangeDpiDialog::customDpiChanged(QString const& dpi_str)
+ChangeDpiDialog::dpiEditTextChanged(QString const& text)
 {
-	dpiSelector->setItemText(m_customItemIdx, dpi_str);
+	if (dpiSelector->currentIndex() == m_customItemIdx) {
+		m_customDpiString = text;
+	}
 }
 
 void

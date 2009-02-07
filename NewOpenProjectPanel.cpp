@@ -85,7 +85,10 @@ void
 NewOpenProjectPanel::addRecentProject(QString const& file_path)
 {
 	QFileInfo const file_info(file_path);
-	QString const base_name(file_info.baseName());
+	QString base_name(file_info.baseName());
+	if (base_name.isEmpty()) {
+		base_name = QChar('_');
+	}
 	QLabel* label = new QLabel(recentProjectsGroup);
 	label->setWordWrap(true);
 	label->setTextFormat(Qt::RichText);

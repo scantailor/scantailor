@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,37 +16,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_CHANGEDPIDIALOG_H_
-#define OUTPUT_CHANGEDPIDIALOG_H_
+#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
+#define OUTPUT_BLACK_WHITE_OPTIONS_H_
 
-#include "ui_OutputChangeDpiDialog.h"
-#include "Scope.h"
-#include <QDialog>
-#include <QString>
-
-class Dpi;
+class QString;
+class QDomDocument;
+class QDomElement;
 
 namespace output
 {
 
-class ChangeDpiDialog : public QDialog, private Ui::OutputChangeDpiDialog
+class BlackWhiteOptions
 {
-	Q_OBJECT
 public:
-	ChangeDpiDialog(QWidget* parent, Dpi const& dpi);
+	BlackWhiteOptions() : m_despeckle(true) {}
 	
-	virtual ~ChangeDpiDialog();
-signals:
-	void accepted(Dpi const& dpi, Scope scope);
-private slots:
-	void dpiSelectionChanged(int index);
+	BlackWhiteOptions(QDomElement const& el);
 	
-	void dpiEditTextChanged(QString const& text);
+	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
-	void onSubmit();
+	bool despeckle() const { return m_despeckle; }
+	
+	void setDespeckle(bool enabled) { m_despeckle = enabled; }
 private:
-	int m_customItemIdx;
-	QString m_customDpiString;
+	bool m_despeckle;
 };
 
 } // namespace output

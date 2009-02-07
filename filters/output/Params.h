@@ -42,17 +42,9 @@ public:
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
-	static QRgb parseColor(QString const& str, QRgb dflt);
-	
 	static ColorParams::ColorMode parseColorMode(QString const& str);
 	
-	static ColorParams::ThresholdMode parseThresholdMode(QString const& str);
-	
-	static QString formatColor(QRgb color);
-	
 	static QString formatColorMode(ColorParams::ColorMode mode);
-	
-	static QString formatThresholdMode(ColorParams::ThresholdMode mode);
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;

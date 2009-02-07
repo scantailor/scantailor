@@ -31,45 +31,14 @@ public:
 	
 	RenderParams(ColorParams const& color_params);
 	
-	void setWhiteMargins(bool val) {
-		m_mask = val ? m_mask | WHITE_MARGINS : 0;
-	}
-	
 	bool whiteMargins() const { return (m_mask & WHITE_MARGINS) != 0; }
-	
-	void setNormalizeIllumination(bool val) {
-		if (val) {
-			m_mask |= NORMALIZE_ILLUMINATION|WHITE_MARGINS;
-		} else {
-			m_mask &= ~(MIXED_OUTPUT|NEED_BINARIZATION);
-		}
-	}
 	
 	bool normalizeIllumination() const {
 		return (m_mask & NORMALIZE_ILLUMINATION) != 0;
 	}
 	
-	void setNeedBinarization(bool val) {
-		if (val) {
-			m_mask |= NEED_BINARIZATION|NORMALIZE_ILLUMINATION
-					|WHITE_MARGINS;
-		} else {
-			m_mask &= ~(NEED_BINARIZATION|MIXED_OUTPUT);
-		}
-	}
-	
 	bool needBinarization() const {
 		return (m_mask & NEED_BINARIZATION) != 0;
-	}
-	
-	void setMixedOutput(bool val) {
-		if (val) {
-			m_mask |= WHITE_MARGINS|NEED_BINARIZATION
-					|NORMALIZE_ILLUMINATION
-					|WHITE_MARGINS;
-		} else {
-			m_mask &= ~MIXED_OUTPUT;
-		}
 	}
 	
 	bool mixedOutput() const {
@@ -80,12 +49,17 @@ public:
 		return (m_mask & (NEED_BINARIZATION|MIXED_OUTPUT))
 				== NEED_BINARIZATION;
 	}
+	
+	bool despeckle() const {
+		return (m_mask & DESPECKLE) != 0;
+	}
 private:
 	enum {
 		WHITE_MARGINS = 1,
 		NORMALIZE_ILLUMINATION = 2,
 		NEED_BINARIZATION = 4,
-		MIXED_OUTPUT = 8
+		DESPECKLE = 8,
+		MIXED_OUTPUT = 16
 	};
 	
 	int m_mask;

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,39 +16,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_CHANGEDPIDIALOG_H_
-#define OUTPUT_CHANGEDPIDIALOG_H_
-
-#include "ui_OutputChangeDpiDialog.h"
-#include "Scope.h"
-#include <QDialog>
+#include "BlackWhiteOptions.h"
+#include <QDomDocument>
+#include <QDomElement>
 #include <QString>
-
-class Dpi;
 
 namespace output
 {
 
-class ChangeDpiDialog : public QDialog, private Ui::OutputChangeDpiDialog
+BlackWhiteOptions::BlackWhiteOptions(QDomElement const& el)
+:	m_despeckle(el.attribute("despeckle") != "0")
 {
-	Q_OBJECT
-public:
-	ChangeDpiDialog(QWidget* parent, Dpi const& dpi);
-	
-	virtual ~ChangeDpiDialog();
-signals:
-	void accepted(Dpi const& dpi, Scope scope);
-private slots:
-	void dpiSelectionChanged(int index);
-	
-	void dpiEditTextChanged(QString const& text);
-	
-	void onSubmit();
-private:
-	int m_customItemIdx;
-	QString m_customDpiString;
-};
+	// Note that we default to true if the attribute is not found.
+}
+
+QDomElement
+BlackWhiteOptions::toXml(QDomDocument& doc, QString const& name) const
+{
+	QDomElement el(doc.createElement(name));
+	el.setAttribute("despeckle", m_despeckle ? "1" : "0");
+	return el;
+}
 
 } // namespace output
-
-#endif

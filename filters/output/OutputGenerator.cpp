@@ -379,12 +379,9 @@ OutputGenerator::processImpl(FilterData const& input,
 	if (!render_params.needBinarization()) {
 		maybe_smoothed = maybe_normalized;
 	} else {
-		QSize const savgol_window(
-			from300dpi(QSize(7, 7), m_dpi).expandedTo(QSize(7, 7))
-		);
-		maybe_smoothed = savGolFilter(
-			maybe_normalized, savgol_window, 4, 4
-		);
+		maybe_smoothed = smoothToGrayscale(maybe_normalized, m_dpi);
+		maybe_normalized.save("maybe_normalized.png");
+		maybe_smoothed.save("maybe_smoothed.png");
 		if (dbg) {
 			dbg->add(maybe_smoothed, "smoothed");
 		}
@@ -402,9 +399,13 @@ OutputGenerator::processImpl(FilterData const& input,
 			}
 			status.throwIfCancelled();
 			
-			bw_content = despeckle(bw_content, m_dpi, status, dbg);
-			if (dbg) {
-				dbg->add(bw_content, "despeckled");
+			if (render_params.despeckle()) {
+				bw_content = despeckle(
+					bw_content, m_dpi, status, dbg
+				);
+				if (dbg) {
+					dbg->add(bw_content, "despeckled");
+				}
 			}
 			
 			status.throwIfCancelled();
@@ -497,9 +498,13 @@ OutputGenerator::processImpl(FilterData const& input,
 		
 		status.throwIfCancelled();
 		
-		bw_content = despeckle(bw_content, m_dpi, status, dbg);
-		if (dbg) {
-			dbg->add(bw_content, "despeckled");
+		if (render_params.despeckle()) {
+			bw_content = despeckle(
+				bw_content, m_dpi, status, dbg
+			);
+			if (dbg) {
+				dbg->add(bw_content, "despeckled");
+			}
 		}
 		
 		status.throwIfCancelled();
@@ -642,6 +647,28 @@ OutputGenerator::detectPictures(
 	}
 	
 	return holes_filled;
+}
+
+QImage
+OutputGenerator::smoothToGrayscale(QImage const& src, Dpi const& dpi)
+{
+	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
+	int window;
+	int degree;
+	if (min_dpi <= 200) {
+		window = 5;
+		degree = 3;
+	} else if (min_dpi <= 400) {
+		window = 7;
+		degree = 4;
+	} else if (min_dpi <= 800) {
+		window = 11;
+		degree = 4;
+	} else {
+		window = 11;
+		degree = 2;
+	}
+	return savGolFilter(src, QSize(window, window), degree, degree);
 }
 
 BinaryImage

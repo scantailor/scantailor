@@ -82,6 +82,8 @@ private:
 	imageproc::BinaryImage binarize(
 		QImage const& image, Dpi const& image_dpi) const;
 	
+	static QImage smoothToGrayscale(QImage const& src, Dpi const& dpi);
+	
 	static imageproc::BinaryImage despeckle(
 		imageproc::BinaryImage const& src, Dpi const& dpi,
 		TaskStatus const& status, DebugImages* dbg);

@@ -34,6 +34,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="dpiSelector" >
+        <property name="insertPolicy" >
+         <enum>QComboBox::NoInsert</enum>
+        </property>
         <property name="duplicatesEnabled" >
          <bool>true</bool>
         </property>

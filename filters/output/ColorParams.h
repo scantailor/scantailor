@@ -20,7 +20,7 @@
 #define OUTPUT_COLORPARAMS_H_
 
 #include "ColorGrayscaleOptions.h"
-#include <QColor>
+#include "BlackWhiteOptions.h"
 
 namespace output
 {
@@ -28,27 +28,13 @@ namespace output
 class ColorParams
 {
 public:
-	enum ColorMode { BLACK_AND_WHITE, BITONAL, COLOR_GRAYSCALE, MIXED };
-	enum ThresholdMode { OTSU, MOKJI, SAUVOLA, WOLF };
+	enum ColorMode { BLACK_AND_WHITE, COLOR_GRAYSCALE, MIXED };
 	
-	ColorParams() : m_lightColor(0xFFFFFFFF), m_darkColor(0xFF000000),
-	m_colorMode(BLACK_AND_WHITE), m_thresholdMode(OTSU) {}
+	ColorParams(): m_colorMode(BLACK_AND_WHITE) {}
 	
 	ColorMode colorMode() const { return m_colorMode; }
 	
 	void setColorMode(ColorMode mode) { m_colorMode = mode; }
-	
-	QRgb lightColor() const { return m_lightColor; }
-	
-	void setLightColor(QRgb color) { m_lightColor = color; }
-	
-	QRgb darkColor() const { return m_darkColor; }
-	
-	void setDarkColor(QRgb color) { m_darkColor = color; }
-	
-	ThresholdMode thresholdMode() const { return m_thresholdMode; }
-	
-	void setThresholdMode(ThresholdMode mode) { m_thresholdMode = mode; }
 	
 	ColorGrayscaleOptions const& colorGrayscaleOptions() const {
 		return m_colorGrayscaleOptions;
@@ -57,12 +43,18 @@ public:
 	void setColorGrayscaleOptions(ColorGrayscaleOptions const& opt) {
 		m_colorGrayscaleOptions = opt;
 	}
+	
+	BlackWhiteOptions const& blackWhiteOptions() const {
+		return m_bwOptions;
+	}
+	
+	void setBlackWhiteOptions(BlackWhiteOptions const& opt) {
+		m_bwOptions = opt;
+	}
 private:
-	QRgb m_lightColor;
-	QRgb m_darkColor;
 	ColorMode m_colorMode;
-	ThresholdMode m_thresholdMode;
 	ColorGrayscaleOptions m_colorGrayscaleOptions;
+	BlackWhiteOptions m_bwOptions;
 };
 
 } // namespace output
