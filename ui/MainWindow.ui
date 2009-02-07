@@ -103,7 +103,7 @@
          </sizepolicy>
         </property>
         <property name="statusTip" >
-         <string>Scroll to a selected page automatically.</string>
+         <string>Thumbnail list auto-scrolling.</string>
         </property>
         <property name="text" >
          <string/>
