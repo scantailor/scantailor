@@ -380,8 +380,6 @@ OutputGenerator::processImpl(FilterData const& input,
 		maybe_smoothed = maybe_normalized;
 	} else {
 		maybe_smoothed = smoothToGrayscale(maybe_normalized, m_dpi);
-		maybe_normalized.save("maybe_normalized.png");
-		maybe_smoothed.save("maybe_smoothed.png");
 		if (dbg) {
 			dbg->add(maybe_smoothed, "smoothed");
 		}
