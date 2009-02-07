@@ -89,11 +89,12 @@ HoughLineDetector::HoughLineDetector(
 	// We bias distances to make them non-negative.
 	m_distanceBias = -min_distance;
 	
-	int const num_distance_bins = (int)ceil(
-		(max_distance - min_distance + 1.0) * m_recipDistanceResolution
+	double const max_biased_distance = max_distance + m_distanceBias;
+	int const max_bin = int(
+		max_biased_distance * m_recipDistanceResolution + 0.5
 	);
 	
-	m_histWidth = num_distance_bins;
+	m_histWidth = max_bin + 1;
 	m_histHeight = num_angles;
 	m_histogram.resize(m_histWidth * m_histHeight, 0);
 }
