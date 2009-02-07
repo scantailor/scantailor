@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -848,7 +848,8 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		);
 		
 		if (next_page.id() == cur_page.id()) {
-			stopBatchProcessing();
+			m_ptrPages->setFirstPage(getCurrentView());
+			stopBatchProcessing(); // This will call loadImage().
 		} else {
 			loadImage(next_page, page_num);
 		}
