@@ -41,9 +41,15 @@ public:
 	
 	std::vector<ImageFileInfo> inProjectFiles() const;
 private slots:
+	static QString sanitizePath(QString const& path);
+	
 	void inpDirBrowse();
 	
 	void outDirBrowse();
+	
+	void inpDirEdited(QString const& text);
+	
+	void outDirEdited(QString const& text);
 	
 	void outDirChanged();
 	
@@ -58,7 +64,7 @@ private:
 	class SortedFileList;
 	class ItemVisualOrdering;
 	
-	void setInputDir(QString const& dir);
+	void setInputDir(QString const& dir, bool auto_add_files = true);
 	
 	void setOutputDir(QString const& dir);
 	

@@ -37,6 +37,7 @@
 #include <QTimerEvent>
 #include <QBrush>
 #include <QColor>
+#include <QDebug>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/construct.hpp>
@@ -224,6 +225,14 @@ ProjectFilesDialog::ProjectFilesDialog(QWidget* parent)
 	
 	connect(inpDirBrowseBtn, SIGNAL(clicked()), this, SLOT(inpDirBrowse()));
 	connect(outDirBrowseBtn, SIGNAL(clicked()), this, SLOT(outDirBrowse()));
+	connect(
+		inpDirLine, SIGNAL(textEdited(QString const&)),
+		this, SLOT(inpDirEdited(QString const&))
+	);
+	connect(
+		outDirLine, SIGNAL(textEdited(QString const&)),
+		this, SLOT(outDirEdited(QString const&))
+	);
 	connect(outDirLine, SIGNAL(textChanged(QString const&)), this, SLOT(outDirChanged()));
 	connect(addToProjectBtn, SIGNAL(clicked()), this, SLOT(addToProject()));
 	connect(removeFromProjectBtn, SIGNAL(clicked()), this, SLOT(removeFromProject()));
@@ -276,6 +285,19 @@ ProjectFilesDialog::inProjectFiles() const
 	return files;
 }
 
+QString
+ProjectFilesDialog::sanitizePath(QString const& path)
+{
+	QString trimmed(path.trimmed());
+	if (trimmed.startsWith(QChar('"')) && trimmed.endsWith(QChar('"'))) {
+		trimmed.chop(1);
+		if (!trimmed.isEmpty()) {
+			trimmed.remove(0, 1);
+		}
+	}
+	return trimmed;
+}
+
 void
 ProjectFilesDialog::inpDirBrowse()
 {
@@ -315,6 +337,18 @@ ProjectFilesDialog::outDirBrowse()
 }
 
 void
+ProjectFilesDialog::inpDirEdited(QString const& text)
+{
+	setInputDir(sanitizePath(text), /* auto_add_files= */false);
+}
+
+void
+ProjectFilesDialog::outDirEdited(QString const& text)
+{
+	setOutputDir(sanitizePath(text));
+}
+
+void
 ProjectFilesDialog::outDirChanged()
 {
 	m_autoCreateOutDir = false;
@@ -345,7 +379,7 @@ void pushItemWithFlags(
 } // anonymous namespace
 
 void
-ProjectFilesDialog::setInputDir(QString const& dir)
+ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 {
 	using namespace boost;
 	using namespace boost::lambda;
@@ -390,7 +424,7 @@ ProjectFilesDialog::setInputDir(QString const& dir)
 	
 	m_ptrOffProjectFiles->assign(items.begin(), items.end());
 	
-	if (m_ptrInProjectFiles->count() == 0) {
+	if (auto_add_files && m_ptrInProjectFiles->count() == 0) {
 		offProjectList->selectAll();
 		addToProject();
 	}
