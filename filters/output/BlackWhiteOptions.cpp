@@ -25,7 +25,8 @@ namespace output
 {
 
 BlackWhiteOptions::BlackWhiteOptions(QDomElement const& el)
-:	m_despeckle(el.attribute("despeckle") != "0")
+:	m_thresholdAdjustment(el.attribute("thresholdAdj").toInt()),
+	m_despeckle(el.attribute("despeckle") != "0")
 {
 	// Note that we default to true if the attribute is not found.
 }
@@ -34,6 +35,7 @@ QDomElement
 BlackWhiteOptions::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
+	el.setAttribute("thresholdAdj", m_thresholdAdjustment);
 	el.setAttribute("despeckle", m_despeckle ? "1" : "0");
 	return el;
 }

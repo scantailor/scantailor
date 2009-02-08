@@ -20,8 +20,11 @@
 #include "ChangeDpiDialog.h"
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
+#include "../../Utils.h"
+#include "ScopedIncDec.h"
 #include <QVariant>
 #include <QColorDialog>
+#include <QString>
 #include <QSize>
 #include <Qt>
 
@@ -29,13 +32,22 @@ namespace output
 {
 
 OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
-:	m_ptrSettings(settings)
+:	m_ptrSettings(settings),
+	m_ignoreThresholdChanges(0)
 {
 	setupUi(this);
 	
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
+	
+	darkerThresholdLink->setText(
+		Utils::richTextForLink(darkerThresholdLink->text())
+	);
+	lighterThresholdLink->setText(
+		Utils::richTextForLink(lighterThresholdLink->text())
+	);
+	thresholdSlider->setToolTip(QString::number(thresholdSlider->value()));
 	
 	updateColorsDisplay();
 	
@@ -58,6 +70,22 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	connect(
 		despeckleCB, SIGNAL(clicked(bool)),
 		this, SLOT(despeckleToggled(bool))
+	);
+	connect(
+		lighterThresholdLink, SIGNAL(linkActivated(QString const&)),
+		this, SLOT(setLighterThreshold())
+	);
+	connect(
+		darkerThresholdLink, SIGNAL(linkActivated(QString const&)),
+		this, SLOT(setDarkerThreshold())
+	);
+	connect(
+		neutralThresholdBtn, SIGNAL(clicked()),
+		this, SLOT(setNeutralThreshold())
+	);
+	connect(
+		thresholdSlider, SIGNAL(valueChanged(int)),
+		this, SLOT(bwThresholdChanged(int))
 	);
 	connect(
 		applyColorsButton, SIGNAL(clicked()),
@@ -124,6 +152,40 @@ OptionsWidget::despeckleToggled(bool const checked)
 {
 	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
 	opt.setDespeckle(checked);
+	m_colorParams.setBlackWhiteOptions(opt);
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::setLighterThreshold()
+{
+	thresholdSlider->setValue(thresholdSlider->value() - 1);
+}
+
+void
+OptionsWidget::setDarkerThreshold()
+{
+	thresholdSlider->setValue(thresholdSlider->value() + 1);
+}
+
+void
+OptionsWidget::setNeutralThreshold()
+{
+	thresholdSlider->setValue(0);
+}
+
+void
+OptionsWidget::bwThresholdChanged(int const value)
+{
+	thresholdSlider->setToolTip(QString::number(value));
+	
+	if (m_ignoreThresholdChanges) {
+		return;
+	}
+	
+	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
+	opt.setThresholdAdjustment(value);
 	m_colorParams.setBlackWhiteOptions(opt);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	emit reloadRequested();
@@ -232,6 +294,10 @@ OptionsWidget::updateColorsDisplay()
 	if (bw_options_visible) {
 		despeckleCB->setChecked(
 			m_colorParams.blackWhiteOptions().despeckle()
+		);
+		ScopedIncDec<int> const guard(m_ignoreThresholdChanges);
+		thresholdSlider->setValue(
+			m_colorParams.blackWhiteOptions().thresholdAdjustment()
 		);
 	}
 	

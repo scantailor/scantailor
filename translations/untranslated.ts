@@ -124,53 +124,53 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="953"/>
+        <location filename="../MainWindow.cpp" line="954"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="951"/>
+        <location filename="../MainWindow.cpp" line="952"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1238"/>
+        <location filename="../MainWindow.cpp" line="1239"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="972"/>
+        <location filename="../MainWindow.cpp" line="973"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="981"/>
+        <location filename="../MainWindow.cpp" line="982"/>
         <source>The project file is broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="992"/>
+        <location filename="../MainWindow.cpp" line="993"/>
         <source>Unable to interpret the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1110"/>
+        <location filename="../MainWindow.cpp" line="1111"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1136"/>
+        <location filename="../MainWindow.cpp" line="1137"/>
         <source>Unnamed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1141"/>
+        <location filename="../MainWindow.cpp" line="1142"/>
         <source>%1 - Scan Tailor %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1240"/>
+        <location filename="../MainWindow.cpp" line="1241"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -478,13 +478,23 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="257"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="339"/>
         <source>Apply To ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="219"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="221"/>
         <source>Despeckle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="275"/>
+        <source>Thinner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="307"/>
+        <source>Thicker</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -683,47 +693,47 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="588"/>
+        <location filename="../ProjectFilesDialog.cpp" line="622"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="472"/>
+        <location filename="../ProjectFilesDialog.cpp" line="506"/>
         <source>No files in project!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="481"/>
+        <location filename="../ProjectFilesDialog.cpp" line="515"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="490"/>
+        <location filename="../ProjectFilesDialog.cpp" line="524"/>
         <source>Input and output directories can&apos;t be the same.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="499"/>
+        <location filename="../ProjectFilesDialog.cpp" line="533"/>
         <source>Create Directory?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="500"/>
+        <location filename="../ProjectFilesDialog.cpp" line="534"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="512"/>
+        <location filename="../ProjectFilesDialog.cpp" line="546"/>
         <source>Unable to create output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="521"/>
+        <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="593"/>
+        <location filename="../ProjectFilesDialog.cpp" line="627"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
@@ -893,17 +903,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="36"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="40"/>
         <source>Black and White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="37"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="41"/>
         <source>Color / Grayscale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="38"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="42"/>
         <source>Mixed</source>
         <translation type="unfinished"></translation>
     </message>

@@ -483,9 +483,12 @@ OutputGenerator::processImpl(FilterData const& input,
 		
 		status.throwIfCancelled();
 		
-		BinaryThreshold const bw_thresh(
+		BinaryThreshold bw_thresh(
 			BinaryThreshold::otsuThreshold(hist)
 		);
+		int const adjusted_thresh = bw_thresh +
+			m_colorParams.blackWhiteOptions().thresholdAdjustment();
+		bw_thresh = BinaryThreshold(qBound(0, adjusted_thresh, 255));
 		
 		status.throwIfCancelled();
 		
@@ -672,33 +675,13 @@ OutputGenerator::smoothToGrayscale(QImage const& src, Dpi const& dpi)
 BinaryImage
 OutputGenerator::binarize(QImage const& image, Dpi const& image_dpi) const
 {
-	BinaryImage bin_img;
-#if 1
-	bin_img = binarizeOtsu(image);
-#else
-	switch (m_colorParams.thresholdMode()) {
-		case ColorParams::OTSU:
-			bin_img = binarizeOtsu(image);
-			break;
-		case ColorParams::MOKJI:
-			// TODO: max_edge_width must depend on the transformation.
-			bin_img = binarizeMokji(image, 5, 40);
-			break;
-		case ColorParams::SAUVOLA:
-			bin_img = binarizeSauvola(
-				image, calcLocalWindowSize(image_dpi)
-			);
-			break;
-		case ColorParams::WOLF:
-			bin_img = binarizeWolf(
-				image, calcLocalWindowSize(image_dpi)
-			);
-			break;
-	}
-#endif
-	assert(!bin_img.isNull());
-	
-	return bin_img;
+	BinaryThreshold bw_thresh(
+		BinaryThreshold::otsuThreshold(image)
+	);
+	int const adjusted_thresh = bw_thresh +
+		m_colorParams.blackWhiteOptions().thresholdAdjustment();
+	bw_thresh = BinaryThreshold(qBound(0, adjusted_thresh, 255));
+	return BinaryImage(image, bw_thresh);
 }
 
 /**

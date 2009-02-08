@@ -29,16 +29,21 @@ namespace output
 class BlackWhiteOptions
 {
 public:
-	BlackWhiteOptions() : m_despeckle(true) {}
+	BlackWhiteOptions() : m_thresholdAdjustment(0), m_despeckle(true) {}
 	
 	BlackWhiteOptions(QDomElement const& el);
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
+	int thresholdAdjustment() const { return m_thresholdAdjustment; }
+	
+	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
+	
 	bool despeckle() const { return m_despeckle; }
 	
 	void setDespeckle(bool enabled) { m_despeckle = enabled; }
 private:
+	int m_thresholdAdjustment;
 	bool m_despeckle;
 };
 

@@ -60,6 +60,14 @@ private slots:
 	void equalizeIlluminationToggled(bool checked);
 	
 	void despeckleToggled(bool checked);
+	
+	void setLighterThreshold();
+	
+	void setDarkerThreshold();
+	
+	void setNeutralThreshold();
+	
+	void bwThresholdChanged(int value);
 private:
 	void updateDpiDisplay();
 	
@@ -69,6 +77,7 @@ private:
 	PageId m_pageId;
 	Dpi m_dpi;
 	ColorParams m_colorParams;
+	int m_ignoreThresholdChanges;
 };
 
 } // namespace output
