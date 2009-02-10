@@ -24,7 +24,10 @@
 #include "ScopedIncDec.h"
 #include <QVariant>
 #include <QColorDialog>
+#include <QToolTip>
 #include <QString>
+#include <QCursor>
+#include <QPoint>
 #include <QSize>
 #include <Qt>
 
@@ -178,11 +181,24 @@ OptionsWidget::setNeutralThreshold()
 void
 OptionsWidget::bwThresholdChanged(int const value)
 {
-	thresholdSlider->setToolTip(QString::number(value));
+	QString const tooltip_text(QString::number(value));
+	thresholdSlider->setToolTip(tooltip_text);
 	
 	if (m_ignoreThresholdChanges) {
 		return;
 	}
+	
+	// Show the tooltip immediately.
+	QPoint const center(thresholdSlider->rect().center());
+	QPoint tooltip_pos(thresholdSlider->mapFromGlobal(QCursor::pos()));
+	if (tooltip_pos.x() < 0 || tooltip_pos.x() >= thresholdSlider->width()) {
+		tooltip_pos.setX(center.x());
+	}
+	if (tooltip_pos.y() < 0 || tooltip_pos.y() >= thresholdSlider->height()) {
+		tooltip_pos.setY(center.y());
+	}
+	tooltip_pos = thresholdSlider->mapToGlobal(tooltip_pos);
+	QToolTip::showText(tooltip_pos, tooltip_text, thresholdSlider);
 	
 	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
 	opt.setThresholdAdjustment(value);
