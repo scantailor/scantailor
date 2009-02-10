@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,27 +22,48 @@
 #include <QLineF>
 #include <boost/foreach.hpp>
 #include <algorithm>
+#include <stddef.h>
 #include <math.h>
 #include <assert.h>
 
 namespace imageproc
 {
 
+double const PolygonUtils::ROUNDING_MULTIPLIER = 1 << 12;
+double const PolygonUtils::ROUNDING_RECIP_MULTIPLIER = 1.0 / ROUNDING_MULTIPLIER;
+
 class PolygonUtils::Before
 {
 public:
 	bool operator()(QPointF const& lhs, QPointF const& rhs) const {
-		if (lhs.x() < rhs.x()) {
-			return true;
-		} else if (rhs.x() < lhs.x()) {
-			return false;
-		} else {
-			return lhs.y() < rhs.y();
-		}
+		return compare(lhs, rhs) < 0;
 	}
 	
 	bool operator()(QLineF const& lhs, QLineF const& rhs) {
-		return operator()(lhs.p1(), rhs.p1());
+		int comp = compare(lhs.p1(), rhs.p1());
+		if (comp != 0) {
+			return comp;
+		}
+		return compare(lhs.p2(), rhs.p2());
+	}
+private:
+	static int compare(QPointF const& lhs, QPointF const& rhs) {
+		double const dx = lhs.x() - rhs.x();
+		double const dy = lhs.y() - rhs.y();
+		if (fabs(dx) > fabs(dy)) {
+			if (dx < 0.0) {
+				return -1;
+			} else if (dx > 0.0) {
+				return 1;
+			}
+		} else {
+			if (dy < 0.0) {
+				return -1;
+			} else if (dy > 0.0) {
+				return 1;
+			}
+		}
+		return 0;
 	}
 };
 
@@ -71,19 +92,19 @@ PolygonUtils::fuzzyCompare(QPolygonF const& poly1, QPolygonF const& poly2)
 	
 	assert(poly1.size() >= 2 && poly2.size() >= 2);
 	
-	QPolygonF rounded1(round(poly1));
-	QPolygonF rounded2(round(poly2));
+	QPolygonF closed1(poly1);
+	QPolygonF closed2(poly2);
 	
 	// Close if necessary.
-	if (rounded1.back() != rounded1.front()) {
-		rounded1.push_back(rounded1.front());
+	if (closed1.back() != closed1.front()) {
+		closed1.push_back(closed1.front());
 	}
-	if (rounded2.back() != rounded2.front()) {
-		rounded2.push_back(rounded2.front());
+	if (closed2.back() != closed2.front()) {
+		closed2.push_back(closed2.front());
 	}
 	
-	std::vector<QLineF> edges1(extractAndNormalizeEdges(rounded1));
-	std::vector<QLineF> edges2(extractAndNormalizeEdges(rounded2));
+	std::vector<QLineF> edges1(extractAndNormalizeEdges(closed1));
+	std::vector<QLineF> edges2(extractAndNormalizeEdges(closed2));
 	
 	if (edges1.size() != edges2.size()) {
 		return false;
@@ -92,7 +113,7 @@ PolygonUtils::fuzzyCompare(QPolygonF const& poly1, QPolygonF const& poly2)
 	std::sort(edges1.begin(), edges1.end(), Before());
 	std::sort(edges2.begin(), edges2.end(), Before());
 	
-	return edges1 == edges2;
+	return fuzzyCompareImpl(edges1, edges2);
 }
 
 QPointF
@@ -104,9 +125,7 @@ PolygonUtils::roundPoint(QPointF const& p)
 double
 PolygonUtils::roundValue(double const val)
 {
-	double const multiplier = 1 << 10;
-	double const r_multiplier = 1.0 / multiplier;
-	return floor(val * multiplier + 0.5) * r_multiplier;
+	return floor(val * ROUNDING_MULTIPLIER + 0.5) * ROUNDING_RECIP_MULTIPLIER;
 }
 
 std::vector<QLineF>
@@ -129,7 +148,7 @@ void
 PolygonUtils::maybeAddNormalizedEdge(
 	std::vector<QLineF>& edges, QPointF const& p1, QPointF const& p2)
 {
-	if (p1 == p2) {
+	if (fuzzyCompareImpl(p1, p2)) {
 		return;
 	}
 	
@@ -138,6 +157,36 @@ PolygonUtils::maybeAddNormalizedEdge(
 	} else {
 		edges.push_back(QLineF(p1, p2));
 	}
+}
+
+bool
+PolygonUtils::fuzzyCompareImpl(
+	std::vector<QLineF> const& lines1,
+	std::vector<QLineF> const& lines2)
+{
+	assert(lines1.size() == lines2.size());
+	size_t const size = lines1.size();
+	for (size_t i = 0; i < size; ++i) {
+		if (!fuzzyCompareImpl(lines1[i], lines2[i])) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool
+PolygonUtils::fuzzyCompareImpl(QLineF const& line1, QLineF const& line2)
+{
+	return fuzzyCompareImpl(line1.p1(), line2.p1()) &&
+			fuzzyCompareImpl(line1.p2(), line2.p2());
+}
+
+bool
+PolygonUtils::fuzzyCompareImpl(QPointF const& p1, QPointF const& p2)
+{
+	double const dx = fabs(p1.x() - p2.x());
+	double const dy = fabs(p1.y() - p2.y());
+	return dx <= ROUNDING_RECIP_MULTIPLIER && dy <= ROUNDING_RECIP_MULTIPLIER;
 }
 
 } // namespace imageproc

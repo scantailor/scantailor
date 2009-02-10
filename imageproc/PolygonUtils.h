@@ -34,10 +34,10 @@ public:
 	/**
 	 * \brief Adjust vertices to more round coordinates.
 	 *
-	 * The method exists to workaround bugs in QPainterPath and QPolygonF
+	 * This method exists to workaround bugs in QPainterPath and QPolygonF
 	 * composition operations.  It turns out rounding vertex coordinates
 	 * solves many of those bugs.  We don't round to integer values, we
-	 * only make a very minor adjustments.
+	 * only make very minor adjustments.
 	 */
 	static QPolygonF round(QPolygonF const& poly);
 	
@@ -63,6 +63,17 @@ private:
 	
 	static void maybeAddNormalizedEdge(
 		std::vector<QLineF>& edges, QPointF const& p1, QPointF const& p2);
+	
+	static bool fuzzyCompareImpl(
+		std::vector<QLineF> const& lines1,
+		std::vector<QLineF> const& lines2);
+	
+	static bool fuzzyCompareImpl(QLineF const& line1, QLineF const& line2);
+	
+	static bool fuzzyCompareImpl(QPointF const& p1, QPointF const& p2);
+	
+	static double const ROUNDING_MULTIPLIER;
+	static double const ROUNDING_RECIP_MULTIPLIER;
 };
 
 } // namespace imageproc
