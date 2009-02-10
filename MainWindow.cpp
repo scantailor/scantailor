@@ -751,8 +751,8 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 		} // Otherwise probably no project is loaded.
 	}
 	
+	focusButton->setChecked(true); // Should go before resetThumbSequence().
 	resetThumbSequence();
-	focusButton->setChecked(true);
 	
 	updateBatchProcessingActions();
 	updateMainArea();
