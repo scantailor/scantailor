@@ -18,6 +18,7 @@
 
 #include "TiffWriter.h"
 #include "Dpm.h"
+#include "imageproc/Constants.h"
 #include <QtGlobal>
 #include <QFile>
 #include <QIODevice>
@@ -30,6 +31,7 @@
 #include <tiff.h>
 #include <tiffio.h>
 #include <string.h>
+#include <math.h>
 #include <assert.h>
 
 /**
@@ -218,14 +220,31 @@ TiffWriter::writeImage(QIODevice& device, QImage const& image)
 void
 TiffWriter::setDpm(TiffHandle const& tif, Dpm const& dpm)
 {
+	using namespace imageproc::constants;
+	
 	if (dpm.isNull()) {
 		return;
 	}
-	float const xres_cm = 0.01 * dpm.horizontal();
-	float const yres_cm = 0.01 * dpm.vertical();
-	uint16 const unit = RESUNIT_CENTIMETER;
-	TIFFSetField(tif.handle(), TIFFTAG_XRESOLUTION, xres_cm);
-	TIFFSetField(tif.handle(), TIFFTAG_YRESOLUTION, yres_cm);
+	
+	float xres = 0.01 * dpm.horizontal(); // cm
+	float yres = 0.01 * dpm.vertical(); // cm
+	uint16 unit = RESUNIT_CENTIMETER;
+	
+	// If we have a round (or almost round) DPI, then
+	// write it as DPI rather than dots per cm.
+	double const xdpi = dpm.horizontal() * DPM2DPI;
+	double const ydpi = dpm.vertical() * DPM2DPI;
+	double const rounded_xdpi = floor(xdpi + 0.5);
+	double const rounded_ydpi = floor(ydpi + 0.5);
+	if (fabs(xdpi - rounded_xdpi) < 0.02 &&
+			fabs(ydpi - rounded_ydpi) < 0.02) {
+		xres = rounded_xdpi;
+		yres = rounded_ydpi;
+		unit = RESUNIT_INCH;
+	}
+	
+	TIFFSetField(tif.handle(), TIFFTAG_XRESOLUTION, xres);
+	TIFFSetField(tif.handle(), TIFFTAG_YRESOLUTION, yres);
 	TIFFSetField(tif.handle(), TIFFTAG_RESOLUTIONUNIT, unit);
 }
 
