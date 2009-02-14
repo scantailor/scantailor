@@ -20,17 +20,19 @@
 */
 
 #include "SEDM.h"
-#include "imageproc/BinaryImage.h"
+#include "BinaryImage.h"
+#include "ConnectivityMap.h"
 #include <algorithm>
 #include <string.h>
+#include <math.h>
 #include <assert.h>
 
 namespace imageproc
 {
 
 // Note that -1 is an implementation detail.
-// It exists to make sure INFINITY + 1 doesn't overflow.
-uint32_t const SEDM::INFINITY = ~uint32_t(0) - 1;
+// It exists to make sure INF_DIST + 1 doesn't overflow.
+uint32_t const SEDM::INF_DIST = ~uint32_t(0) - 1;
 
 SEDM::SEDM()
 :	m_pData(0),
@@ -53,7 +55,7 @@ SEDM::SEDM(
 	int const width = m_size.width();
 	int const height = m_size.height();
 	
-	m_data.resize((width + 2) * (height + 2), INFINITY);
+	m_data.resize((width + 2) * (height + 2), INF_DIST);
 	m_stride = width + 2;
 	m_pData = &m_data[0] + m_stride + 1;
 	
@@ -83,9 +85,9 @@ SEDM::SEDM(
 	uint32_t initial_distance[2];
 	if (dist_type == DIST_TO_WHITE) {
 		initial_distance[0] = 0; // white
-		initial_distance[1] = INFINITY; // black
+		initial_distance[1] = INF_DIST; // black
 	} else {
-		initial_distance[0] = INFINITY; // white
+		initial_distance[0] = INF_DIST; // white
 		initial_distance[1] = 0; // black
 	}
 	
@@ -104,6 +106,38 @@ SEDM::SEDM(
 	
 	processColumns();
 	processRows();
+}
+
+SEDM::SEDM(ConnectivityMap& cmap)
+:	m_pData(0),
+	m_size(cmap.size()),
+	m_stride(0)
+{
+	if (m_size.isEmpty()) {
+		return;
+	}
+	
+	int const width = m_size.width();
+	int const height = m_size.height();
+	
+	m_data.resize((width + 2) * (height + 2), INF_DIST);
+	m_stride = width + 2;
+	m_pData = &m_data[0] + m_stride + 1;
+	
+	uint32_t* p_dist = m_pData;
+	uint32_t const* p_label = cmap.data();
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x, ++p_dist, ++p_label) {
+			if (*p_label) {
+				*p_dist = 0;
+			}
+		}
+		p_dist += 2;
+		p_label += 2;
+	}
+	
+	processColumns(cmap);
+	processRows(cmap);
 }
 
 SEDM::SEDM(SEDM const& other)
@@ -137,8 +171,8 @@ inline uint32_t
 SEDM::distSq(
 	int const x1, int const x2, uint32_t const dy_sq)
 {
-	if (dy_sq == INFINITY) {
-		return INFINITY;
+	if (dy_sq == INF_DIST) {
+		return INF_DIST;
 	}
 	int const dx = x1 - x2;
 	uint32_t const dx_sq = dx * dx;
@@ -181,6 +215,46 @@ SEDM::processColumns()
 }
 
 void
+SEDM::processColumns(ConnectivityMap& cmap)
+{
+	int const width = m_size.width() + 2;
+	int const height = m_size.height() + 2;
+	
+	uint32_t* p_sqd = &m_data[0];
+	uint32_t* p_label = cmap.paddedData();
+	for (int x = 0; x < width; ++x, ++p_sqd, ++p_label) {
+		// (d + 1)^2 = d^2 + 2d + 1
+		uint32_t b = 1; // 2d + 1 in the above formula.
+		for (int todo = height - 1; todo > 0; --todo) {
+			uint32_t const sqd = *p_sqd + b;
+			p_sqd += width;
+			p_label += width;
+			if (sqd < *p_sqd) {
+				*p_sqd = sqd;
+				*p_label = p_label[-width];
+				b += 2;
+			} else {
+				b = 1;
+			}
+		}
+		
+		b = 1;
+		for (int todo = height - 1; todo > 0; --todo) {
+			uint32_t const sqd = *p_sqd + b;
+			p_sqd -= width;
+			p_label -= width;
+			if (sqd < *p_sqd) {
+				*p_sqd = sqd;
+				*p_label = p_label[width];
+				b += 2;
+			} else {
+				b = 1;
+			}
+		}
+	}
+}
+
+void
 SEDM::processRows()
 {
 	int const width = m_size.width() + 2;
@@ -206,12 +280,11 @@ SEDM::processRows()
 				s[0] = x;
 			} else {
 				int const x2 = s[q];
-				if (line[x] != INFINITY && line[x2] != INFINITY) {
+				if (line[x] != INF_DIST && line[x2] != INF_DIST) {
 					int w = (x * x + line[x]) - (x2 * x2 + line[x2]);
 					w /= (x - x2) << 1;
 					++w;
-					assert(w > 0);
-					if (w < width) {
+					if ((unsigned)w < (unsigned)width) {
 						++q;
 						s[q] = x;
 						t[q] = w;
@@ -225,6 +298,61 @@ SEDM::processRows()
 		for (int x = width - 1; x >= 0; --x) {
 			int const x2 = s[q];
 			line[x] = distSq(x, x2, row_copy[x2]);
+			if (x == t[q]) {
+				--q;
+			}
+		}
+	}
+}
+
+void
+SEDM::processRows(ConnectivityMap& cmap)
+{
+	int const width = m_size.width() + 2;
+	int const height = m_size.height() + 2;
+	
+	std::vector<int> s(width, 0);
+	std::vector<int> t(width, 0);
+	std::vector<uint32_t> row_copy(width, 0);
+	std::vector<uint32_t> cmap_row_copy(width, 0);
+	
+	uint32_t* line = &m_data[0];
+	uint32_t* cmap_line = cmap.paddedData();
+	for (int y = 0; y < height; ++y, line += width, cmap_line += width) {
+		int q = 0;
+		s[0] = 0;
+		t[0] = 0;
+		for (int x = 1; x < width; ++x) {
+			while (q >= 0 && distSq(t[q], s[q], line[s[q]])
+					> distSq(t[q], x, line[x])) {
+				--q;
+			}
+			
+			if (q < 0) {
+				q = 0;
+				s[0] = x;
+			} else {
+				int const x2 = s[q];
+				if (line[x] != INF_DIST && line[x2] != INF_DIST) {
+					int w = (x * x + line[x]) - (x2 * x2 + line[x2]);
+					w /= (x - x2) << 1;
+					++w;
+					if ((unsigned)w < (unsigned)width) {
+						++q;
+						s[q] = x;
+						t[q] = w;
+					}
+				}
+			}
+		}
+		
+		memcpy(&row_copy[0], line, width * sizeof(*line));
+		memcpy(&cmap_row_copy[0], cmap_line, width * sizeof(*cmap_line));
+		
+		for (int x = width - 1; x >= 0; --x) {
+			int const x2 = s[q];
+			line[x] = distSq(x, x2, row_copy[x2]);
+			cmap_line[x] = cmap_row_copy[x2];
 			if (x == t[q]) {
 				--q;
 			}

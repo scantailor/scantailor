@@ -28,6 +28,7 @@ namespace imageproc
 {
 
 class BinaryImage;
+class ConnectivityMap;
 
 /**
  * \brief The squared euclidean distance map.
@@ -82,7 +83,7 @@ public:
 	 * distance to, and borders are to DIST_TO_NO_BORDERS,
 	 * then the whole distance map will consist of these values.
 	 */
-	static uint32_t const INFINITY;
+	static uint32_t const INF_DIST;
 	
 	/**
 	 * \brief Constructs a null distance map.
@@ -109,6 +110,19 @@ public:
 	explicit SEDM(
 		BinaryImage const& image, DistType dist_type = DIST_TO_WHITE,
 		Borders borders = DIST_TO_ALL_BORDERS);
+	
+	/**
+	 * \brief Build a distance map from a connectivity map.
+	 *
+	 * For every zero label in the connectivity map, the distance
+	 * map will store the squared straight-line distance to the
+	 * nearest non-zero label.
+	 * \note Besides building a distance map, it will modify
+	 *       the connectivity map by overwriting zero labels
+	 *       with the nearest non-zero label.  This applies to
+	 *       the padding areas of the connectivity map as well.
+	 */
+	explicit SEDM(ConnectivityMap& cmap);
 	
 	SEDM(SEDM const& other);
 	
@@ -142,7 +156,11 @@ private:
 	
 	void processColumns();
 	
+	void processColumns(ConnectivityMap& cmap);
+	
 	void processRows();
+	
+	void processRows(ConnectivityMap& cmap);
 	
 	std::vector<uint32_t> m_data;
 	uint32_t* m_pData;
