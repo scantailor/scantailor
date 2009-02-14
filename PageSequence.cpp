@@ -151,6 +151,23 @@ PageSequence::setLogicalPagesInImage(ImageId const& image_id, int const num_page
 }
 
 void
+PageSequence::setLogicalPagesInAllImages(int const num_pages)
+{
+	assert(num_pages >= 1 && num_pages <= 2);
+	
+	bool was_modified = false;
+	
+	{
+		QMutexLocker locker(&m_mutex);
+		setLogicalPagesInAllImagesImpl(num_pages, &was_modified);
+	}
+	
+	if (was_modified) {
+		emit modified();
+	}
+}
+
+void
 PageSequence::autoSetLogicalPagesInImage(
 	ImageId const& image_id, OrthogonalRotation const rotation)
 {
@@ -358,6 +375,35 @@ PageSequence::setLogicalPagesInImageImpl(
 			break;
 		}
 		logical_pages_seen += image.numLogicalPages;
+	}
+}
+
+void
+PageSequence::setLogicalPagesInAllImagesImpl(
+	int const num_pages, bool* modified)
+{
+	assert(num_pages >= 1 && num_pages <= 2);
+	
+	int logical_pages_seen = 0;
+	int const num_images = m_images.size();
+	for (int i = 0; i < num_images; ++i) {
+		ImageDesc& image = m_images[i];
+		int const delta = num_pages - image.numLogicalPages;
+		if (delta == 0) {
+			continue;
+		}
+		
+		m_totalLogicalPages += delta;
+		if (logical_pages_seen < m_curLogicalPage) {
+			m_curLogicalPage += delta;
+		}
+		logical_pages_seen += image.numLogicalPages;
+		image.numLogicalPages = num_pages;
+		*modified = true;
+	}
+	
+	if (num_pages == 1) {
+		m_curSubPage = 0;
 	}
 }
 

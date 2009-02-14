@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "Params.h"
 #include "PageId.h"
+#include "PageSequence.h"
 #include "ScopedIncDec.h"
 #include <QPixmap>
 #include <assert.h>
@@ -29,8 +30,11 @@
 namespace page_split
 {
 
-OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+OptionsWidget::OptionsWidget(
+	IntrusivePtr<Settings> const& settings,
+	IntrusivePtr<PageSequence> const& page_sequence)
 :	m_ptrSettings(settings),
+	m_ptrPages(page_sequence),
 	m_ignoreAutoManualToggle(0),
 	m_ignoreLayoutTypeToggle(0)
 {
@@ -272,8 +276,28 @@ OptionsWidget::ruleSet(Rule const& rule)
 		Settings::UpdateAction update;
 		update.setLayoutType(rule.layoutType());
 		m_ptrSettings->updatePage(m_imageId, update);
+		switch (rule.layoutType()) {
+			case Rule::SINGLE_PAGE_UNCUT:
+			case Rule::PAGE_PLUS_OFFCUT:
+				m_ptrPages->setLogicalPagesInImage(m_imageId, 1);
+				break;
+			case Rule::TWO_PAGES:
+				m_ptrPages->setLogicalPagesInImage(m_imageId, 2);
+				break;
+			default:;
+		}
 	} else {
 		m_ptrSettings->setLayoutTypeForAllPages(rule.layoutType());
+		switch (rule.layoutType()) {
+			case Rule::SINGLE_PAGE_UNCUT:
+			case Rule::PAGE_PLUS_OFFCUT:
+				m_ptrPages->setLogicalPagesInAllImages(1);
+				break;
+			case Rule::TWO_PAGES:
+				m_ptrPages->setLogicalPagesInAllImages(2);
+				break;
+			default:;
+		}
 	}
 	emit reloadRequested();
 }

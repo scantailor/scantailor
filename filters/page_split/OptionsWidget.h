@@ -30,6 +30,7 @@
 #include <QIcon>
 
 class ImageId;
+class PageSequence;
 
 namespace page_split
 {
@@ -72,7 +73,8 @@ public:
 	};
 	
 	
-	OptionsWidget(IntrusivePtr<Settings> const& settings);
+	OptionsWidget(IntrusivePtr<Settings> const& settings,
+		IntrusivePtr<PageSequence> const& page_sequence);
 	
 	virtual ~OptionsWidget();
 	
@@ -97,6 +99,7 @@ private:
 	void commitCurrentParams();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
+	IntrusivePtr<PageSequence> m_ptrPages;
 	ImageId m_imageId;
 	UiData m_uiData;
 	QIcon m_flipLeftToRightIcon;

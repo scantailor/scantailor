@@ -57,6 +57,8 @@ public:
 	
 	void setLogicalPagesInImage(ImageId const& image_id, int num_pages);
 	
+	void setLogicalPagesInAllImages(int num_pages);
+	
 	void autoSetLogicalPagesInImage(
 		ImageId const& image_id, OrthogonalRotation rotation);
 	
@@ -102,6 +104,9 @@ private:
 	
 	void setLogicalPagesInImageImpl(
 		ImageId const& image_id, int num_pages, bool* modified);
+	
+	void setLogicalPagesInAllImagesImpl(
+		int num_pages, bool* modified);
 	
 	void autoSetLogicalPagesInImageImpl(
 		ImageId const& image_id, OrthogonalRotation rotation, bool* modified);
