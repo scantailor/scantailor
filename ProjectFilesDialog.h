@@ -51,8 +51,6 @@ private slots:
 	
 	void outDirEdited(QString const& text);
 	
-	void outDirChanged();
-	
 	void addToProject();
 	
 	void removeFromProject();
@@ -81,7 +79,7 @@ private:
 	std::auto_ptr<SortedFileList> m_ptrInProjectFilesSorted;
 	int m_loadTimerId;
 	bool m_metadataLoadFailed;
-	bool m_autoCreateOutDir;
+	bool m_autoOutDir;
 };
 
 #endif

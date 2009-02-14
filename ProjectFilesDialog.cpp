@@ -211,7 +211,7 @@ ProjectFilesDialog::ProjectFilesDialog(QWidget* parent)
 	m_ptrInProjectFilesSorted(new SortedFileList(*m_ptrInProjectFiles)),
 	m_loadTimerId(0),
 	m_metadataLoadFailed(false),
-	m_autoCreateOutDir(false)
+	m_autoOutDir(true)
 {
 	m_supportedExtensions.insert("png");
 	m_supportedExtensions.insert("jpg");
@@ -233,7 +233,6 @@ ProjectFilesDialog::ProjectFilesDialog(QWidget* parent)
 		outDirLine, SIGNAL(textEdited(QString const&)),
 		this, SLOT(outDirEdited(QString const&))
 	);
-	connect(outDirLine, SIGNAL(textChanged(QString const&)), this, SLOT(outDirChanged()));
 	connect(addToProjectBtn, SIGNAL(clicked()), this, SLOT(addToProject()));
 	connect(removeFromProjectBtn, SIGNAL(clicked()), this, SLOT(removeFromProject()));
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onOK()));
@@ -345,13 +344,7 @@ ProjectFilesDialog::inpDirEdited(QString const& text)
 void
 ProjectFilesDialog::outDirEdited(QString const& text)
 {
-	setOutputDir(sanitizePath(text));
-}
-
-void
-ProjectFilesDialog::outDirChanged()
-{
-	m_autoCreateOutDir = false;
+	m_autoOutDir = false;
 }
 
 namespace
@@ -360,6 +353,10 @@ namespace
 struct FileInfoLess
 {
 	bool operator()(QFileInfo const& lhs, QFileInfo const& rhs) const {
+		if (lhs == rhs) {
+			// This takes into account filesystem's case sensitivity.
+			return false;
+		}
 		return lhs.absoluteFilePath() < rhs.absoluteFilePath();
 	}
 };
@@ -384,10 +381,9 @@ ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 	using namespace boost;
 	using namespace boost::lambda;
 	
-	inpDirLine->setText(dir);
-	if (outDirLine->text().isEmpty()) {
+	inpDirLine->setText(QDir::toNativeSeparators(dir));
+	if (m_autoOutDir) {
 		outDirLine->setText(QDir::cleanPath(dir + QDir::separator() + "out"));
-		m_autoCreateOutDir = true;
 	}
 	
 	QFileInfoList files(QDir(dir).entryInfoList(QDir::Files));
@@ -527,8 +523,8 @@ ProjectFilesDialog::onOK()
 	
 	if (out_dir.isAbsolute() && !out_dir.exists()) {
 		// Maybe create it.
-		bool create = m_autoCreateOutDir;
-		if (!m_autoCreateOutDir) {
+		bool create = m_autoOutDir;
+		if (!m_autoOutDir) {
 			create = QMessageBox::question(
 				this, tr("Create Directory?"),
 				tr("Output directory doesn't exist.  Create it?"),
