@@ -246,6 +246,7 @@ SET(
 	XmlUnmarshaller.cpp XmlUnmarshaller.h
 	AtomicFileOverwriter.cpp AtomicFileOverwriter.h
 	EstimateBackground.cpp EstimateBackground.h
+	Despeckle.cpp Despeckle.h
 	Utils.cpp Utils.h
 	AutoManualMode.h
 	AbstractCommand.h

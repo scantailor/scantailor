@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -84,20 +84,9 @@ private:
 	
 	static QImage smoothToGrayscale(QImage const& src, Dpi const& dpi);
 	
-	static imageproc::BinaryImage despeckle(
-		imageproc::BinaryImage const& src, Dpi const& dpi,
+	static void despeckleInPlace(
+		imageproc::BinaryImage& image, Dpi const& dpi,
 		TaskStatus const& status, DebugImages* dbg);
-	
-	static imageproc::BinaryImage selectGrayLevelAndSeedFill(
-		QImage const& gray, uint8_t level,
-		imageproc::BinaryImage const& mask,
-		imageproc::Connectivity connectivity);
-	
-	static void addNeighborsInPlace(
-		TaskStatus const& status, imageproc::BinaryImage& seed,
-		uint32_t max_neighbor_sqdist,
-		imageproc::BinaryImage const& candidates,
-		DebugImages* dbg);
 	
 	static void morphologicalSmoothInPlace(
 		imageproc::BinaryImage& img, TaskStatus const& status);

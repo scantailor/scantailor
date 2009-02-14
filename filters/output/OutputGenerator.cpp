@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "Utils.h"
 #include "DebugImages.h"
 #include "EstimateBackground.h"
+#include "Despeckle.h"
 #include "RenderParams.h"
 #include "Dpi.h"
 #include "Dpm.h"
@@ -44,8 +45,6 @@
 #include "imageproc/SavGolFilter.h"
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
-#include "imageproc/ConnectivityMap.h"
-#include "imageproc/InfluenceMap.h"
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -398,9 +397,7 @@ OutputGenerator::processImpl(FilterData const& input,
 			status.throwIfCancelled();
 			
 			if (render_params.despeckle()) {
-				bw_content = despeckle(
-					bw_content, m_dpi, status, dbg
-				);
+				despeckleInPlace(bw_content, m_dpi, status, dbg);
 				if (dbg) {
 					dbg->add(bw_content, "despeckled");
 				}
@@ -500,9 +497,7 @@ OutputGenerator::processImpl(FilterData const& input,
 		status.throwIfCancelled();
 		
 		if (render_params.despeckle()) {
-			bw_content = despeckle(
-				bw_content, m_dpi, status, dbg
-			);
+			despeckleInPlace(bw_content, m_dpi, status, dbg);
 			if (dbg) {
 				dbg->add(bw_content, "despeckled");
 			}
@@ -690,277 +685,17 @@ OutputGenerator::binarize(QImage const& image, Dpi const& image_dpi) const
  * \note This function only works effectively when the DPI is symmetric,
  * that is, its horizontal and vertical components are equal.
  */
-imageproc::BinaryImage
-OutputGenerator::despeckle(
-	imageproc::BinaryImage const& src, Dpi const& dpi,
-	TaskStatus const& status, DebugImages* const dbg)
+void
+OutputGenerator::despeckleInPlace(
+	imageproc::BinaryImage& image, Dpi const& dpi,
+	TaskStatus const& status, DebugImages* dbg)
 {
-	// We label connected components as belonging to one
-	// of the following classes:
-	// Class 0: Very small components - to be removed unconditionally.
-	// Class 1: Larger components. Will be removed if there are
-	//          no higher class components in the vicinity.
-	// ...
-	// Class X: Very large components that won't be removed.
-	
 	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
 	double const factor = min_dpi / 300.0;
 	double const squared_factor = factor * factor;
 	
-	// The upper bounds for various classes are defined in terms
-	// of the number of pixels in a connected component.
-	int const class0_upper_bound = qRound(4 * squared_factor);
-	int const class1_upper_bound = qRound(16 * squared_factor);
-	int const class2_upper_bound = qRound(100 * squared_factor);
-	
-	// The maximum squared distance that preserves the component.
-	uint32_t const class1_preserving_sqdist = qRound(8 * 8 * squared_factor);
-	uint32_t const class2_preserving_sqdist = qRound(30 * 30 * squared_factor);
-	
-	QImage labelled_seeds(src.size(), QImage::Format_Indexed8);
-	labelled_seeds.setColorTable(createGrayscalePalette());
-	labelled_seeds.fill(0);
-	uint8_t* const ls_data = labelled_seeds.bits();
-	int const ls_stride = labelled_seeds.bytesPerLine();
-	
-	status.throwIfCancelled();
-	
-	ConnCompEraser eraser(src, CONN8);
-	for (;;) {
-		ConnComp const cc(eraser.nextConnComp());
-		if (cc.isNull()) {
-			break;
-		}
-		
-		uint8_t label = 0;
-		int const pix_count = cc.pixCount();
-		if (pix_count > class2_upper_bound) {
-			label = 3;
-		} else if (pix_count > class1_upper_bound) {
-			label = 2;
-		} else if (pix_count > class0_upper_bound) {
-			label = 1;
-		}
-		
-		int const x = cc.seed().x();
-		int const y = cc.seed().y();
-		ls_data[y * ls_stride + x] = label;
-	}
-	
-	status.throwIfCancelled();
-	
-	BinaryImage accepted(
-		selectGrayLevelAndSeedFill(labelled_seeds, 3, src, CONN8)
-	);
-	if (dbg) {
-		//dbg->add(accepted, "accepted_class3");
-	}
-	
-	status.throwIfCancelled();
-	
-	// Process 2nd class.
-	addNeighborsInPlace(
-		status, accepted, class2_preserving_sqdist,
-		selectGrayLevelAndSeedFill(labelled_seeds, 2, src, CONN8),
-		dbg
-	);
-	if (dbg) {
-		//dbg->add(accepted, "accepted_class2");
-	}
-	
-	status.throwIfCancelled();
-	
-	// Process 1st class.
-	addNeighborsInPlace(
-		status, accepted, class1_preserving_sqdist,
-		selectGrayLevelAndSeedFill(labelled_seeds, 1, src, CONN8),
-		dbg
-	);
-	if (dbg) {
-		//dbg->add(accepted, "accepted_class1");
-	}
-	
-	return accepted;
-}
-
-/**
- * This helper function extracts a seed binary image from a grayscale
- * image by taking only pixels with the specified gray level, and then
- * does a seed-fill with the extracted seed and the provided mask.
- */
-imageproc::BinaryImage
-OutputGenerator::selectGrayLevelAndSeedFill(
-	QImage const& gray, uint8_t const level,
-	imageproc::BinaryImage const& mask,
-	imageproc::Connectivity const connectivity)
-{
-	uint8_t const* gray_line = gray.bits();
-	int const gray_stride = gray.bytesPerLine();
-	
-	BinaryImage seed(gray.size(), WHITE);
-	uint32_t* seed_line = seed.data();
-	int const seed_stride = seed.wordsPerLine();
-	
-	int const width = seed.width();
-	int const height = seed.height();
-	
-	uint32_t const msb = uint32_t(1) << 31;
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			if (gray_line[x] == level) {
-				seed_line[x >> 5] |= msb >> (x & 31);
-			}
-		}
-		gray_line += gray_stride;
-		seed_line += seed_stride;
-	}
-	
-	return seedFill(seed, mask, connectivity);
-}
-
-/**
- * Adds those and only those connected components in \p candidates,
- * that have a squared distance to any black pixel in \p seed
- * less than \p max_neighbor_sqdist.
- */
-void
-OutputGenerator::addNeighborsInPlace(
-	TaskStatus const& status, imageproc::BinaryImage& accepted,
-	uint32_t const max_neighbor_sqdist,
-	imageproc::BinaryImage const& candidates,
-	DebugImages* const dbg)
-{
-	int const width = accepted.width();
-	int const height = accepted.height();
-	uint32_t const msb = uint32_t(1) << 31;
-	
-	ConnectivityMap cmap(candidates, CONN8);
-	cmap.addComponent(accepted);
-	
-	status.throwIfCancelled();
-	
-	// Highest bit: contains a large enough neighbor in the vicinity.
-	// The rest of bits: the number of pixels in a connected component.
-	std::vector<uint32_t> labels_info(cmap.maxLabel() + 1);
-	
-	// Collect the number of pixels in each connected components.
-	uint32_t const* cmap_line = cmap.data();
-	int const cmap_stride = cmap.stride();
-	for (int y = 0; y < height; ++y, cmap_line += cmap_stride) {
-		for (int x = 0; x < width; ++x) {
-			++labels_info[cmap_line[x]];
-		}
-	}
-	
-	status.throwIfCancelled();
-	
-	InfluenceMap imap(cmap);
-	cmap = ConnectivityMap();
-	
-	status.throwIfCancelled();
-	
-	// Dind the neighboring influence zones and check if the
-	// influence sources are close enough.
-	InfluenceMap::Cell const* imap_line = imap.data();
-	int const imap_stride = imap.stride();
-	for (int y = 0; y < height; ++y, imap_line += imap_stride) {
-		for (int x = 0; x < width; ++x) {
-			InfluenceMap::Cell const* cell = imap_line + x;
-			uint32_t const label = cell->label;
-			
-			if (labels_info[label] & msb) {
-				// Already accepted.
-				continue;
-			}
-			
-			uint32_t const sqdist_threshold = labels_info[label] * 4;
-			
-			int const x1 = x + cell->vec.x;
-			int const y1 = y + cell->vec.y;
-			
-			// Northern neighbor.
-			InfluenceMap::Cell const* neighbor = cell - imap_stride;
-			if (neighbor->label && neighbor->label != label) {
-				int const nbh_x = x;
-				int const nbh_y = y - 1;
-				int const x2 = nbh_x + neighbor->vec.x;
-				int const y2 = nbh_y + neighbor->vec.y;
-				int const dx = x1 - x2;
-				int const dy = y1 - y2;
-				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= sqdist_threshold) {
-					labels_info[label] |= msb;
-					continue;
-				}
-			}
-			
-			// Western neighbor.
-			neighbor = cell - 1;
-			if (neighbor->label && neighbor->label != label) {
-				int const nbh_x = x - 1;
-				int const nbh_y = y;
-				int const x2 = nbh_x + neighbor->vec.x;
-				int const y2 = nbh_y + neighbor->vec.y;
-				int const dx = x1 - x2;
-				int const dy = y1 - y2;
-				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= sqdist_threshold) {
-					labels_info[label] |= msb;
-					continue;
-				}
-			}
-			
-			// Eastern neighbor.
-			neighbor = cell + 1;
-			if (neighbor->label && neighbor->label != label) {
-				int const nbh_x = x + 1;
-				int const nbh_y = y;
-				int const x2 = nbh_x + neighbor->vec.x;
-				int const y2 = nbh_y + neighbor->vec.y;
-				int const dx = x1 - x2;
-				int const dy = y1 - y2;
-				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= sqdist_threshold) {
-					labels_info[label] |= msb;
-					continue;
-				}
-			}
-			
-			// Southern neighbor.
-			neighbor = cell + imap_stride;
-			if (neighbor->label && neighbor->label != label) {
-				int const nbh_x = x;
-				int const nbh_y = y + 1;
-				int const x2 = nbh_x + neighbor->vec.x;
-				int const y2 = nbh_y + neighbor->vec.y;
-				int const dx = x1 - x2;
-				int const dy = y1 - y2;
-				uint32_t const sqdist = dx * dx + dy * dy;
-				if (sqdist <= sqdist_threshold) {
-					labels_info[label] |= msb;
-					continue;
-				}
-			}
-		}
-	}
-	
-	status.throwIfCancelled();
-	
-	imap_line = imap.data();
-	uint32_t* accepted_line = accepted.data();
-	int const accepted_stride = accepted.wordsPerLine();
-	
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			InfluenceMap::Cell const* cell = imap_line + x;
-			if (cell->distSq == 0 &&
-					(labels_info[cell->label] & msb)) {
-				accepted_line[x >> 5] |= msb >> (x & 31);
-			}
-		}
-		imap_line += imap_stride;
-		accepted_line += accepted_stride;
-	}
+	int const big_object_threshold = qRound(100 * squared_factor);
+	::despeckleInPlace(image, big_object_threshold, dbg);
 }
 
 void
