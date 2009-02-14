@@ -130,7 +130,7 @@ SplitModeDialog::iconFor(Rule::LayoutType const layout_type)
 			resource = ":/icons/single_page_uncut_selected.png";
 			break;
 		case Rule::PAGE_PLUS_OFFCUT:
-			resource = ":/icons/right_plus_offcut_selected.png";
+			resource = ":/icons/right_page_plus_offcut_selected.png";
 			break;
 		case Rule::TWO_PAGES:
 			resource = ":/icons/two_pages_selected.png";
