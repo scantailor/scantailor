@@ -892,6 +892,10 @@ MainWindow::saveProjectAsTriggered()
 			tr("Scan Tailor Projects")+" (*.ScanTailor)"
 		)
 	);
+	if (project_file.isEmpty()) {
+		return;
+	}
+	
 	if (!project_file.endsWith(".ScanTailor", Qt::CaseInsensitive)) {
 		project_file += ".ScanTailor";
 	}
