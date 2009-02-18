@@ -652,6 +652,8 @@ void despeckleInPlace(
 	}
 	components.resize(next_avail_component);
 	
+	uint32_t const max_label = next_avail_component - 1;
+	
 	// Remapping individual pixels.
 	cmap_line = cmap_data;
 	for (int y = 0; y < height; ++y) {
@@ -785,6 +787,10 @@ void despeckleInPlace(
 			target_source_idx.push_back(i);
 		}
 		assert(target_source_idx.size() - 1 == conn.target);
+	}
+	for (uint32_t label = target_source_idx.size();
+			label <= max_label; ++label) {
+		target_source_idx.push_back(num_target_sources);
 	}
 	
 	// Labels of components that are to be retained.
