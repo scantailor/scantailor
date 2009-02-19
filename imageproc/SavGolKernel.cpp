@@ -115,6 +115,7 @@ SavGolKernel::QR()
 			double const b = m_equations[ij];
 			
 			if (b == 0.0) {
+				m_rotations.push_back(Rotation(1.0, 0.0));
 				continue;
 			}
 			
