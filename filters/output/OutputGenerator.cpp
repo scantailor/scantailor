@@ -886,7 +886,7 @@ OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 	
 	int best_pos = 0;
 	int best_sum = integral_hist[window_size - 1];
-	for (int i = 1; i < num_colors - window_size; ++i) {
+	for (int i = 1; i <= num_colors - window_size; ++i) {
 		int const sum = integral_hist[i + window_size - 1] - integral_hist[i - 1];
 		if (sum > best_sum) {
 			best_sum = sum;
