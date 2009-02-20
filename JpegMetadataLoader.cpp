@@ -251,6 +251,11 @@ JpegMetadataLoader::loadMetadata(
 	// The other possible value is JPEG_SUSPENDED, but we never suspend it.
 	assert(header_status == JPEG_HEADER_OK);
 	
+	if (!jpeg_start_decompress(cinfo.ptr())) {
+		// libjpeg doesn't support all compression types.
+		return GENERIC_ERROR;
+	}
+	
 	QSize const size(cinfo->image_width, cinfo->image_height);
 	Dpi dpi;
 	if (cinfo->density_unit == 1) {
