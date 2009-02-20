@@ -264,7 +264,9 @@ TiffWriter::writeBitonalOrIndexed8Image(
 	switch (image.format()) {
 		case QImage::Format_Mono:
 		case QImage::Format_MonoLSB:
-			compression = COMPRESSION_CCITTFAX4;
+			// Don't use CCITTFAX4 compression, as Photoshop
+			// has problems with it.
+			//compression = COMPRESSION_CCITTFAX4;
 			bits_per_sample = 1;
 			if (image.numColors() < 2) {
 				photometric = PHOTOMETRIC_MINISWHITE;
