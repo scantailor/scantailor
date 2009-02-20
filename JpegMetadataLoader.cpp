@@ -128,6 +128,7 @@ JpegSourceManager::fillInputBufferImpl()
 		m_buf[1] = JPEG_EOI;
 		bytes_in_buffer = 2;
 	}
+	next_input_byte = m_buf;
 	return 1;
 }
 
