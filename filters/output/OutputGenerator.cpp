@@ -123,10 +123,21 @@ OutputGenerator::processAsIs(FilterData const& input,
 	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
 	
 	if (input.origImage().allGray()) {
+		if (m_cropRect.isEmpty()) {
+			QImage image(1, 1, QImage::Format_Indexed8);
+			image.setColorTable(createGrayscalePalette());
+			image.fill(dominant_gray);
+			return image;
+		}
 		return transformToGray(
 			input.grayImage(), m_toUncropped, m_cropRect, bg_color
 		);
 	} else {
+		if (m_cropRect.isEmpty()) {
+			QImage image(1, 1, QImage::Format_RGB32);
+			image.fill(bg_color.rgb());
+			return image;
+		}
 		return transform(
 			input.origImage(), m_toUncropped, m_cropRect, bg_color
 		);
@@ -387,7 +398,7 @@ OutputGenerator::processImpl(FilterData const& input,
 	status.throwIfCancelled();
 	
 	if (render_params.binaryOutput()) {
-		BinaryImage dst(m_cropRect.size(), WHITE);
+		BinaryImage dst(m_cropRect.size().expandedTo(QSize(1, 1)), WHITE);
 		
 		if (!m_contentRect.isEmpty()) {
 			BinaryImage bw_content(binarize(maybe_smoothed, m_dpi));
@@ -528,7 +539,10 @@ OutputGenerator::processImpl(FilterData const& input,
 	
 	status.throwIfCancelled();
 	
-	QImage dst(m_cropRect.size(), maybe_normalized.format());
+	QImage dst(
+		m_cropRect.size().expandedTo(QSize(1, 1)),
+		maybe_normalized.format()
+	);
 	if (maybe_normalized.format() == QImage::Format_Indexed8) {
 		dst.setColorTable(createGrayscalePalette());
 		dst.fill(0xff); // White.
