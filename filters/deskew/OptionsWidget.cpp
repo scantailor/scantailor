@@ -36,6 +36,7 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 	setupUi(this);
 	angleSpinBox->setSuffix(QChar(0x00B0)); // the degree symbol
 	angleSpinBox->setRange(-MAX_ANGLE, MAX_ANGLE);
+	angleSpinBox->adjustSize();
 	setSpinBoxUnknownState();
 	
 	connect(
@@ -134,7 +135,9 @@ OptionsWidget::setSpinBoxUnknownState()
 {
 	ScopedIncDec<int> guard(m_ignoreSpinBoxChanges);
 	
-	angleSpinBox->setRange(0, 0);
+	angleSpinBox->setSpecialValueText("?");
+	angleSpinBox->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+	angleSpinBox->setValue(angleSpinBox->minimum());
 	angleSpinBox->setEnabled(false);
 }
 
@@ -143,8 +146,11 @@ OptionsWidget::setSpinBoxKnownState(double const angle)
 {
 	ScopedIncDec<int> guard(m_ignoreSpinBoxChanges);
 	
-	angleSpinBox->setRange(-MAX_ANGLE, MAX_ANGLE);
+	angleSpinBox->setSpecialValueText("");
 	angleSpinBox->setValue(angle);
+	
+	// Right alignment doesn't work correctly, so we use the left one.
+	angleSpinBox->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 	angleSpinBox->setEnabled(true);
 }
 
