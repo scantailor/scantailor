@@ -684,6 +684,27 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>unitsComboBox</tabstop>
+  <tabstop>topBottomLink</tabstop>
+  <tabstop>topMarginSpinBox</tabstop>
+  <tabstop>bottomMarginSpinBox</tabstop>
+  <tabstop>leftRightLink</tabstop>
+  <tabstop>leftMarginSpinBox</tabstop>
+  <tabstop>rightMarginSpinBox</tabstop>
+  <tabstop>applyMarginsBtn</tabstop>
+  <tabstop>alignWithOthersCB</tabstop>
+  <tabstop>alignTopLeftBtn</tabstop>
+  <tabstop>alignTopBtn</tabstop>
+  <tabstop>alignTopRightBtn</tabstop>
+  <tabstop>alignLeftBtn</tabstop>
+  <tabstop>alignCenterBtn</tabstop>
+  <tabstop>alignRightBtn</tabstop>
+  <tabstop>alignBottomLeftBtn</tabstop>
+  <tabstop>alignBottomBtn</tabstop>
+  <tabstop>alignBottomRightBtn</tabstop>
+  <tabstop>applyAlignmentBtn</tabstop>
+ </tabstops>
  <resources>
   <include location="../../../resources/resources.qrc" />
  </resources>
