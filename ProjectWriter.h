@@ -25,6 +25,7 @@
 #include "PageId.h"
 #include "VirtualFunction.h"
 #include <QString>
+#include <Qt>
 #include <vector>
 #include <map>
 
@@ -111,6 +112,7 @@ private:
 	ImageIds m_imageIds; // image id -> numeric id
 	PageIds m_pageIds; // page id -> numeric id
 	MetadataByImage m_metadataByImage;
+	Qt::LayoutDirection m_layoutDirection;
 };
 
 template<typename OutFunc>

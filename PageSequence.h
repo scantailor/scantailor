@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QMutex>
 #include <QString>
+#include <Qt>
 #include <vector>
 #include <stddef.h>
 
@@ -45,13 +46,17 @@ public:
 	enum View { IMAGE_VIEW, PAGE_VIEW };
 	enum Pages { ONE_PAGE, TWO_PAGES, AUTO_PAGES };
 	
-	PageSequence();
+	PageSequence(Qt::LayoutDirection layout_direction = Qt::LeftToRight);
 	
-	PageSequence(std::vector<ImageInfo> const& images);
+	PageSequence(std::vector<ImageInfo> const& images,
+		Qt::LayoutDirection layout_direction);
 	
-	PageSequence(std::vector<ImageFileInfo> const& files, Pages pages);
+	PageSequence(std::vector<ImageFileInfo> const& files,
+		Pages pages, Qt::LayoutDirection layout_direction);
 	
 	virtual ~PageSequence();
+	
+	Qt::LayoutDirection layoutDirection() const;
 	
 	PageSequenceSnapshot snapshot(View view) const;
 	
@@ -99,8 +104,11 @@ private:
 		ImageDesc(ImageId const& id, ImageMetadata const& metadata,
 			bool multi_page_file, Pages pages);
 		
-		PageId::SubPage logicalPageToSubPage(int logical_page) const;
+		PageId::SubPage logicalPageToSubPage(int logical_page,
+			PageId::SubPage const* sub_pages_in_order) const;
 	};
+	
+	void initSubPagesInOrder(Qt::LayoutDirection layout_direction);
 	
 	void setLogicalPagesInImageImpl(
 		ImageId const& image_id, int num_pages, bool* modified);
@@ -125,6 +133,7 @@ private:
 	
 	mutable QMutex m_mutex;
 	std::vector<ImageDesc> m_images;
+	PageId::SubPage m_subPagesInOrder[2];
 	int m_totalLogicalPages;
 	int m_curImage;
 	int m_curLogicalPage; // Not within the current image, but overall.

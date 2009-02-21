@@ -936,7 +936,10 @@ void
 MainWindow::newProjectCreated(ProjectCreationContext* context)
 {
 	IntrusivePtr<PageSequence> pages(
-		new PageSequence(context->files(), PageSequence::AUTO_PAGES)
+		new PageSequence(
+			context->files(), PageSequence::AUTO_PAGES,
+			context->layoutDirection()
+		)
 	);
 	switchToNewProject(pages, context->outDir());
 }

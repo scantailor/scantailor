@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QString>
+#include <Qt>
 #include <vector>
 
 class ProjectFilesDialog;
@@ -42,6 +43,8 @@ public:
 	std::vector<ImageFileInfo> const& files() const { return m_files; }
 	
 	QString const& outDir() const { return m_outDir; }
+	
+	Qt::LayoutDirection layoutDirection() const { return m_layoutDirection; }
 signals:
 	void done(ProjectCreationContext* context);
 private slots:
@@ -61,6 +64,7 @@ private:
 	QPointer<FixDpiDialog> m_ptrFixDpiDialog;
 	QString m_outDir;
 	std::vector<ImageFileInfo> m_files;
+	Qt::LayoutDirection m_layoutDirection;
 	QWidget* m_pParent;
 };
 

@@ -28,7 +28,8 @@
 #include <assert.h>
 
 ProjectCreationContext::ProjectCreationContext(QWidget* parent)
-:	m_pParent(parent)
+:	m_layoutDirection(Qt::LeftToRight),
+	m_pParent(parent)
 {
 	showProjectFilesDialog();
 }
@@ -61,6 +62,10 @@ ProjectCreationContext::projectFilesSubmitted()
 {
 	m_files = m_ptrProjectFilesDialog->inProjectFiles();
 	m_outDir = m_ptrProjectFilesDialog->outputDirectory();
+	m_layoutDirection = Qt::LeftToRight;
+	if (m_ptrProjectFilesDialog->isRtlLayout()) {
+		m_layoutDirection = Qt::RightToLeft;
+	}
 	
 	if (!haveUndefinedDpi(m_files)) {
 		emit done(this);

@@ -284,6 +284,12 @@ ProjectFilesDialog::inProjectFiles() const
 	return files;
 }
 
+bool
+ProjectFilesDialog::isRtlLayout() const
+{
+	return rtlLayoutCB->isChecked();
+}
+
 QString
 ProjectFilesDialog::sanitizePath(QString const& path)
 {

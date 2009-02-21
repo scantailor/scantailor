@@ -32,6 +32,11 @@ ProjectReader::ProjectReader(QDomDocument const& doc)
 	QDomElement project_el(m_doc.documentElement());
 	m_outDir = project_el.attribute("outputDirectory");
 	
+	Qt::LayoutDirection layout_direction = Qt::LeftToRight;
+	if (project_el.attribute("layoutDirection") == "RTL") {
+		layout_direction = Qt::RightToLeft;
+	}
+	
 	QDomElement const dirs_el(project_el.namedItem("directories").toElement());
 	if (dirs_el.isNull()) {
 		return;
@@ -48,7 +53,7 @@ ProjectReader::ProjectReader(QDomDocument const& doc)
 	if (images_el.isNull()) {
 		return;
 	}
-	processImages(images_el);
+	processImages(images_el, layout_direction);
 	
 	QDomElement const pages_el(project_el.namedItem("pages").toElement());
 	if (pages_el.isNull()) {
@@ -147,7 +152,9 @@ ProjectReader::processFiles(QDomElement const& files_el)
 }
 
 void
-ProjectReader::processImages(QDomElement const& images_el)
+ProjectReader::processImages(
+	QDomElement const& images_el,
+	Qt::LayoutDirection const layout_direction)
 {
 	QString const image_tag_name("image");
 	
@@ -197,7 +204,7 @@ ProjectReader::processImages(QDomElement const& images_el)
 	}
 	
 	if (!images.empty()) {
-		m_ptrPages.reset(new PageSequence(images));
+		m_ptrPages.reset(new PageSequence(images, layout_direction));
 	}
 }
 

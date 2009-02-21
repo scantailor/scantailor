@@ -26,6 +26,7 @@
 #include "IntrusivePtr.h"
 #include <QString>
 #include <QDomDocument>
+#include <Qt>
 #include <vector>
 #include <map>
 
@@ -77,7 +78,8 @@ private:
 	
 	void processFiles(QDomElement const& files_el);
 	
-	void processImages(QDomElement const& images_el);
+	void processImages(QDomElement const& images_el,
+		Qt::LayoutDirection layout_direction);
 	
 	ImageMetadata processImageMetadata(QDomElement const& image_el);
 	

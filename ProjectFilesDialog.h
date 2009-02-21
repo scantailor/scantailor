@@ -40,6 +40,8 @@ public:
 	QString outputDirectory() const;
 	
 	std::vector<ImageFileInfo> inProjectFiles() const;
+	
+	bool isRtlLayout() const;
 private slots:
 	static QString sanitizePath(QString const& path);
 	

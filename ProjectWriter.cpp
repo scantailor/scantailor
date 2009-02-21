@@ -33,7 +33,8 @@
 ProjectWriter::ProjectWriter(
 	QString const& out_dir, IntrusivePtr<PageSequence> const& page_sequence)
 :	m_outDir(out_dir),
-	m_pages(page_sequence->snapshot(PageSequence::PAGE_VIEW))
+	m_pages(page_sequence->snapshot(PageSequence::PAGE_VIEW)),
+	m_layoutDirection(page_sequence->layoutDirection())
 {
 	int next_id = 1;
 	size_t const num_pages = m_pages.numPages();
@@ -78,6 +79,10 @@ ProjectWriter::write(QString const& file_path, std::vector<FilterPtr> const& fil
 	QDomElement root_el(doc.createElement("project"));
 	doc.appendChild(root_el);
 	root_el.setAttribute("outputDirectory", m_outDir);
+	root_el.setAttribute(
+		"layoutDirection",
+		m_layoutDirection == Qt::LeftToRight ? "LTR" : "RTL"
+	);
 	
 	root_el.appendChild(processDirectories(doc));
 	root_el.appendChild(processFiles(doc));

@@ -44,8 +44,6 @@ public:
 	
 	SubPage subPage() const { return m_subPage; }
 	
-	int subPageNum() const { return m_subPage == RIGHT_PAGE ? 1 : 0; }
-	
 	QString subPageAsString() const { return subPageToString(m_subPage); }
 	
 	static QString subPageToString(SubPage sub_page);

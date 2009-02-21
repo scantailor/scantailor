@@ -29,20 +29,25 @@
 #include <stddef.h>
 #include <assert.h>
 
-PageSequence::PageSequence()
+PageSequence::PageSequence(Qt::LayoutDirection const layout_direction)
 :	m_totalLogicalPages(0),
 	m_curImage(0),
 	m_curLogicalPage(0),
 	m_curSubPage(0)
 {
+	initSubPagesInOrder(layout_direction);
 }
 
-PageSequence::PageSequence(std::vector<ImageInfo> const& info)
+PageSequence::PageSequence(
+	std::vector<ImageInfo> const& info,
+	Qt::LayoutDirection const layout_direction)
 :	m_totalLogicalPages(0),
 	m_curImage(0),
 	m_curLogicalPage(0),
 	m_curSubPage(0)
 {
+	initSubPagesInOrder(layout_direction);
+	
 	BOOST_FOREACH(ImageInfo const& image, info) {
 		m_images.push_back(
 			ImageDesc(
@@ -55,12 +60,15 @@ PageSequence::PageSequence(std::vector<ImageInfo> const& info)
 }
 
 PageSequence::PageSequence(
-	std::vector<ImageFileInfo> const& files, Pages const pages)
+	std::vector<ImageFileInfo> const& files,
+	Pages const pages, Qt::LayoutDirection const layout_direction)
 :	m_totalLogicalPages(0),
 	m_curImage(0),
 	m_curLogicalPage(0),
 	m_curSubPage(0)
 {
+	initSubPagesInOrder(layout_direction);
+	
 	BOOST_FOREACH(ImageFileInfo const& file, files) {
 		QString const& file_path = file.fileInfo().absoluteFilePath();
 		std::vector<ImageMetadata> const& images = file.imageInfo();
@@ -79,6 +87,29 @@ PageSequence::~PageSequence()
 {
 }
 
+Qt::LayoutDirection
+PageSequence::layoutDirection() const
+{
+	if (m_subPagesInOrder[0] == PageId::LEFT_PAGE) {
+		return Qt::LeftToRight;
+	} else {
+		assert(m_subPagesInOrder[0] == PageId::RIGHT_PAGE);
+		return Qt::RightToLeft;
+	}
+}
+
+void
+PageSequence::initSubPagesInOrder(Qt::LayoutDirection const layout_direction)
+{
+	if (layout_direction == Qt::LeftToRight) {
+		m_subPagesInOrder[0] = PageId::LEFT_PAGE;
+		m_subPagesInOrder[1] = PageId::RIGHT_PAGE;
+	} else {
+		m_subPagesInOrder[0] = PageId::RIGHT_PAGE;
+		m_subPagesInOrder[1] = PageId::LEFT_PAGE;
+	}
+}
+
 PageSequenceSnapshot
 PageSequence::snapshot(View const view) const
 {
@@ -95,7 +126,12 @@ PageSequence::snapshot(View const view) const
 			ImageDesc const& image = m_images[i];
 			assert(image.numLogicalPages >= 1 && image.numLogicalPages <= 2);
 			for (int j = 0; j < image.numLogicalPages; ++j) {
-				PageId const id(image.id, image.logicalPageToSubPage(j));
+				PageId const id(
+					image.id,
+					image.logicalPageToSubPage(
+						j, m_subPagesInOrder
+					)
+				);
 				pages.push_back(
 					PageInfo(
 						id, image.metadata,
@@ -464,7 +500,14 @@ PageSequence::setCurPageImpl(PageId const& page_id, bool* modified)
 	for (int i = 0; i < num_images; ++i) {
 		ImageDesc const& image = m_images[i];
 		if (image.id == page_id.imageId()) {
-			int sub_page = page_id.subPageNum();
+			int sub_page = 0;
+			for (; sub_page < 2; ++sub_page) {
+				if (m_subPagesInOrder[sub_page] == page_id.subPage()) {
+					break;
+				}
+			}
+			assert(sub_page <= 1);
+			
 			if (sub_page >= image.numLogicalPages) {
 				sub_page = image.numLogicalPages - 1;
 			}
@@ -560,12 +603,9 @@ PageSequence::curSubPageLocked(ImageDesc const& image, View const view) const
 {
 	if (view == IMAGE_VIEW || image.numLogicalPages == 1) {
 		return PageId::SINGLE_PAGE;
-	} else if (m_curSubPage == 0) {
-		return PageId::LEFT_PAGE;
-	} else {
-		assert(m_curSubPage == 1);
-		return PageId::RIGHT_PAGE;
 	}
+	
+	return m_subPagesInOrder[m_curSubPage];
 }
 
 
@@ -629,16 +669,15 @@ PageSequence::ImageDesc::ImageDesc(
 }
 
 PageId::SubPage
-PageSequence::ImageDesc::logicalPageToSubPage(int const logical_page) const
+PageSequence::ImageDesc::logicalPageToSubPage(
+	int const logical_page, PageId::SubPage const* sub_pages_in_order) const
 {
 	assert(numLogicalPages >= 1 && numLogicalPages <= 2);
 	assert(logical_page >= 0 && logical_page < numLogicalPages);
 	
 	if (numLogicalPages == 1) {
 		return PageId::SINGLE_PAGE;
-	} else if (logical_page == 0) {
-		return PageId::LEFT_PAGE;
 	} else {
-		return PageId::RIGHT_PAGE;
+		return sub_pages_in_order[logical_page];
 	}
 }
