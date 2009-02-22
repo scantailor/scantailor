@@ -630,7 +630,7 @@ MainWindow::invalidateAllThumbnailsSlot()
 void
 MainWindow::nextPage()
 {
-	if (m_batchProcessing) {
+	if (m_batchProcessing || !isProjectLoaded()) {
 		return;
 	}
 	
@@ -645,7 +645,7 @@ MainWindow::nextPage()
 void
 MainWindow::prevPage()
 {
-	if (m_batchProcessing) {
+	if (m_batchProcessing || !isProjectLoaded()) {
 		return;
 	}
 	

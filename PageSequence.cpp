@@ -528,7 +528,11 @@ PageSequence::setCurPageImpl(PageId const& page_id, bool* modified)
 PageInfo
 PageSequence::setPrevPageImpl(View const view, int* page_num, bool& modified)
 {
-	assert((size_t)m_curImage <= m_images.size());
+	if (m_images.empty()) {
+		return PageInfo();
+	}
+	
+	assert((size_t)m_curImage < m_images.size());
 	
 	ImageDesc const* image = &m_images[m_curImage];
 	if (view == PAGE_VIEW && m_curSubPage == 1) {
@@ -565,7 +569,11 @@ PageSequence::setPrevPageImpl(View const view, int* page_num, bool& modified)
 PageInfo
 PageSequence::setNextPageImpl(View const view, int* page_num, bool& modified)
 {
-	assert((size_t)m_curImage <= m_images.size());
+	if (m_images.empty()) {
+		return PageInfo();
+	}
+	
+	assert((size_t)m_curImage < m_images.size());
 	
 	ImageDesc const* image = &m_images[m_curImage];
 	if (view == PAGE_VIEW && m_curSubPage == 0 && image->numLogicalPages > 1) {
