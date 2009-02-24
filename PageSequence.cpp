@@ -501,9 +501,11 @@ PageSequence::setCurPageImpl(PageId const& page_id, bool* modified)
 		ImageDesc const& image = m_images[i];
 		if (image.id == page_id.imageId()) {
 			int sub_page = 0;
-			for (; sub_page < 2; ++sub_page) {
-				if (m_subPagesInOrder[sub_page] == page_id.subPage()) {
-					break;
+			if (page_id.subPage() != PageId::SINGLE_PAGE) {
+				for (; sub_page < 2; ++sub_page) {
+					if (m_subPagesInOrder[sub_page] == page_id.subPage()) {
+						break;
+					}
 				}
 			}
 			assert(sub_page <= 1);
