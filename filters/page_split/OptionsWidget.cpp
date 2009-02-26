@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -201,6 +201,7 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 	}
 	
 	Rule::LayoutType rlt;
+	int logical_pages = 1;
 	
 	QObject* button = sender();
 	if (button == singlePageUncutBtn) {
@@ -210,12 +211,15 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 	} else {
 		assert(button == twoPagesBtn);
 		rlt = Rule::TWO_PAGES;
+		logical_pages = 2;
 	}
 	
 	Settings::UpdateAction update;
 	update.setLayoutType(rlt);
 	
 	scopeLabel->setText(tr("This page only"));
+	
+	m_ptrPages->setLogicalPagesInImage(m_imageId, logical_pages);
 	
 	if (rlt == Rule::PAGE_PLUS_OFFCUT ||
 			(rlt != Rule::SINGLE_PAGE_UNCUT &&
