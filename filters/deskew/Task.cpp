@@ -38,7 +38,7 @@
 #include "imageproc/SkewFinder.h"
 #include "imageproc/RasterOp.h"
 #include "imageproc/ReduceThreshold.h"
-#include "imageproc/ExpandPower2.h"
+#include "imageproc/UpscaleIntegerTimes.h"
 #include "imageproc/SeedFill.h"
 #include "imageproc/Connectivity.h"
 #include "imageproc/Morphology.h"
@@ -233,7 +233,7 @@ Task::cleanup(TaskStatus const& status, BinaryImage& image, Dpi const& dpi)
 	
 	status.throwIfCancelled();
 	
-	BinaryImage seed(expandPower2(opened, image.size(), WHITE));
+	BinaryImage seed(upscaleIntegerTimes(opened, image.size(), WHITE));
 	opened.release();
 	
 	status.throwIfCancelled();

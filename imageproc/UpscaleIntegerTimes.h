@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_EXPANDPOWER2_H_
-#define IMAGEPROC_EXPANDPOWER2_H_
+#ifndef IMAGEPROC_UPSCALE_INTEGER_TIMES_H_
+#define IMAGEPROC_UPSCALE_INTEGER_TIMES_H_
 
 #include "BWColor.h"
 
@@ -29,21 +29,20 @@ namespace imageproc
 class BinaryImage;
 
 /**
- * \brief Expand the image in both directions by a power of 2.
+ * \brief Upscale a binary image integer times in each direction.
  */
-BinaryImage expandPower2(BinaryImage const& src, int exponent);
+BinaryImage upscaleIntegerTimes(BinaryImage const& src, int xscale, int yscale);
 
 /**
- * \brief Expand the image in both directions by a power of 2.
+ * \brief Upscale a binary image integer times in each direction
+ *        and add padding if necessary.
  *
- * In this case, expanding factor will be calculated based on \p dst_size.
- * The resulting image will have a size equal to \p dst_size, which doesn't
- * have to be src.size() multiplied by a certain power of 2.  If it's not,
- * it's considered that the caller wants a slightly bigger resulting image
- * than src.size() multiplied by a certain power of 2.  That extra area
- * will be filled with \p bgcolor.
+ * The resulting image will have a size of \p dst_size, which is achieved
+ * by upscaling the source image integer times in each direction and then
+ * adding a padding to reach the requested size.
  */
-BinaryImage expandPower2(BinaryImage const& src, QSize const& dst_size, BWColor bgcolor);
+BinaryImage upscaleIntegerTimes(
+	BinaryImage const& src, QSize const& dst_size, BWColor padding);
 
 } // namespace imageproc
 

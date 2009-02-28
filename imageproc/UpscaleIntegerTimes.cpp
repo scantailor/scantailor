@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ExpandPower2.h"
+#include "UpscaleIntegerTimes.h"
 #include "BinaryImage.h"
 #include <QSize>
 #include <QRect>
@@ -35,7 +35,9 @@ inline uint32_t multiplyBit(uint32_t bit, int times)
 	return (uint32_t(0) - bit) >> (32 - times);
 }
 
-void expandImpl(BinaryImage& dst, BinaryImage const& src, int const power)
+void expandImpl(
+	BinaryImage& dst, BinaryImage const& src,
+	int const xscale, int const yscale)
 {
 	int const sw = src.width();
 	int const sh = src.height();
@@ -56,7 +58,7 @@ void expandImpl(BinaryImage& dst, BinaryImage const& src, int const power)
 			uint32_t const src_word = src_line[sx >> 5];
 			int const src_bit = 31 - (sx & 31);
 			uint32_t const bit = (src_word >> src_bit) & uint32_t(1);
-			int todo = power;
+			int todo = xscale;
 			
 			while (dst_bits_remaining <= todo) {
 				dst_word |= multiplyBit(bit, dst_bits_remaining);
@@ -77,7 +79,7 @@ void expandImpl(BinaryImage& dst, BinaryImage const& src, int const power)
 		
 		uint32_t const* first_dst_line = dst_line;
 		dst_line += dst_wpl;
-		for (int line = 1; line < power; ++line, dst_line += dst_wpl) {
+		for (int line = 1; line < yscale; ++line, dst_line += dst_wpl) {
 			memcpy(dst_line, first_dst_line, dst_wpl * 4);
 		}
 	}
@@ -85,40 +87,42 @@ void expandImpl(BinaryImage& dst, BinaryImage const& src, int const power)
 
 } // anonymous namespace
 
-BinaryImage expandPower2(BinaryImage const& src, int const exponent)
+BinaryImage upscaleIntegerTimes(
+	BinaryImage const& src, int const xscale, int const yscale)
 {
-	if (src.isNull() || exponent == 0) {
+	if (src.isNull() || (xscale == 1 && yscale == 1)) {
 		return src;
 	}
 	
-	if (exponent < 0) {
-		throw std::runtime_error("expandPower2: exponent can't be negative");
+	if (xscale < 0 || yscale < 0) {
+		throw std::runtime_error("upscaleIntegerTimes: scaling factors can't be negative");
 	}
 	
-	BinaryImage dst(src.width() << exponent, src.height() << exponent);
-	expandImpl(dst, src, 1 << exponent);
+	BinaryImage dst(src.width() * xscale, src.height() * yscale);
+	expandImpl(dst, src, xscale, yscale);
 	
 	return dst;
 }
 
-BinaryImage expandPower2(
-	BinaryImage const& src, QSize const& dst_size, BWColor const bgcolor)
+BinaryImage upscaleIntegerTimes(
+	BinaryImage const& src, QSize const& dst_size, BWColor const padding)
 {
 	if (src.isNull()) {
 		BinaryImage dst(dst_size);
-		dst.fill(bgcolor);
+		dst.fill(padding);
 		return dst;
 	}
 	
-	int const factor = dst_size.width() / src.width();
-	if (factor != dst_size.height() / src.height()) {
-		throw std::invalid_argument("expandPower2: bad dst_size aspect");
+	int const xscale = dst_size.width() / src.width();
+	int const yscale = dst_size.height() / src.height();
+	if (xscale < 1 || yscale < 1) {
+		throw std::invalid_argument("upscaleIntegerTimes: bad dst_size");
 	}
 	
 	BinaryImage dst(dst_size);
-	expandImpl(dst, src, factor);
-	QRect const rect(0, 0, src.width() * factor, src.height() * factor);
-	dst.fillExcept(rect, bgcolor);
+	expandImpl(dst, src, xscale, yscale);
+	QRect const rect(0, 0, src.width() * xscale, src.height() * yscale);
+	dst.fillExcept(rect, padding);
 	
 	return dst;
 }
