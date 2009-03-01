@@ -22,6 +22,7 @@
 #include "FilterData.h"
 #include "ImageTransformation.h"
 #include "Dpi.h"
+#include "Despeckle.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
 #include "imageproc/Binarize.h"
@@ -202,8 +203,8 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	BinaryImage despeckled(openBrick(content, QSize(2, 2)));
-	despeckled = seedFill(despeckled, content, CONN8);
+	int const big_object_threshold = 25;
+	BinaryImage despeckled(despeckle(content, big_object_threshold));
 	if (dbg) {
 		dbg->add(despeckled, "despeckled");
 	}
