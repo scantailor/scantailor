@@ -64,7 +64,8 @@
 #include <QStackedLayout>
 #include <QGridLayout>
 #include <QLayoutItem>
-#include <QAbstractListModel>
+#include <QAbstractTableModel>
+#include <QHeaderView>
 #include <QScrollBar>
 #include <QFileInfo>
 #include <QFile>
@@ -83,7 +84,7 @@
 #include <stddef.h>
 #include <assert.h>
 
-class MainWindow::FilterListModel : public QAbstractListModel
+class MainWindow::FilterListModel : public QAbstractTableModel
 {
 	DECLARE_NON_COPYABLE(FilterListModel)
 public:
@@ -117,6 +118,8 @@ public:
 	
 	int getOutputFilterIdx() const { return m_outputFilterIdx; }
 	
+	virtual int columnCount(QModelIndex const& parent) const;
+	
 	virtual int rowCount(QModelIndex const& parent) const;
 	
 	virtual QVariant data(QModelIndex const& index, int role) const;
@@ -149,6 +152,25 @@ MainWindow::MainWindow()
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
+	filterList->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+	filterList->horizontalHeader()->hide();
+	filterList->verticalHeader()->setResizeMode(QHeaderView::Fixed);
+	filterList->verticalHeader()->setMovable(false);
+	filterList->setModel(m_ptrFilterListModel.get());
+	filterList->selectionModel()->select(
+		m_ptrFilterListModel->index(0, 0),
+		QItemSelectionModel::SelectCurrent
+	);
+	
+	// Set the maximum height of the filter list to exactly fit
+	// all of its items.
+	filterList->resizeRowsToContents();
+	filterList->setMaximumHeight(filterList->verticalHeader()->length());
+	filterList->setMaximumHeight(
+		filterList->maximumHeight() +
+		(filterList->verticalScrollBar()->maximum() -
+		filterList->verticalScrollBar()->minimum())
+	);
 	
 	setupThumbView(); // Expects m_ptrThumbSequence to be initialized.
 	
@@ -158,12 +180,6 @@ MainWindow::MainWindow()
 	m_debug = actionDebug->isChecked();
 	m_pImageFrameLayout = new QStackedLayout(imageViewFrame);
 	m_pOptionsFrameLayout = new QStackedLayout(filterOptions);
-	
-	filterList->setModel(m_ptrFilterListModel.get());
-	filterList->selectionModel()->select(
-		m_ptrFilterListModel->index(0, 0),
-		QItemSelectionModel::SelectCurrent
-	);
 	
 	addAction(actionNextPage);
 	addAction(actionPrevPage);
@@ -1397,6 +1413,12 @@ MainWindow::FilterListModel::createCompositeCacheDrivenTask(
 	assert(fix_orientation_task);
 	
 	return fix_orientation_task;
+}
+
+int
+MainWindow::FilterListModel::columnCount(QModelIndex const& parent) const
+{
+	return 1;
 }
 
 int
