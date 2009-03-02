@@ -63,6 +63,8 @@ protected:
 	virtual void closeEvent(QCloseEvent* event);
 	
 	virtual void timerEvent(QTimerEvent* event);
+public slots:
+	void openProject(QString const& project_file);
 private slots:
 	void nextPage();
 	
@@ -105,8 +107,6 @@ private slots:
 	void newProjectCreated(ProjectCreationContext* context);
 	
 	void openProject();
-	
-	void openProject(QString const& project_file);
 	
 	void closeProject();
 private:

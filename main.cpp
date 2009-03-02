@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <QtPlugin>
 #include <QLocale>
 #include <QString>
+#include <QStringList>
 #include <QTranslator>
 #include <Qt>
 
@@ -69,6 +70,13 @@ int main(int argc, char** argv)
 	MainWindow* main_wnd = new MainWindow();
 	main_wnd->setAttribute(Qt::WA_DeleteOnClose);
 	main_wnd->showMaximized();
+	
+	// Note that we use app.arguments() rather than argv,
+	// because the former is Unicode-safe under Windows.
+	QStringList const args(app.arguments());
+	if (args.size() > 1) {
+		main_wnd->openProject(args[1]);
+	}
 	
 	return app.exec();
 }
