@@ -8,6 +8,8 @@
 # The window identifier of the main Scan Tailor window.
 !define WNDCLASS "ScanTailor_Window"
 
+!include "@REGISTER_EXTENSION_NSH@"
+
 !include "MUI2.nsh"
 BrandingText " " # To remove the mention of NullSoft.
 #LoadLanguageFile "${NSISDIR}\Contrib\Language files\Russian.nlf"
@@ -32,7 +34,7 @@ SetCompressor /SOLID /FINAL lzma
   VIAddVersionKey "Comments" "Interactive post-processing tool for scanned pages."
   VIAddVersionKey "CompanyName" "Joseph Artsimovich"
   #VIAddVersionKey "LegalTrademarks" "Test Application is a trademark of Fake company"
-  VIAddVersionKey "LegalCopyright" "© Joseph Artsimovich"
+  VIAddVersionKey "LegalCopyright" "ï¿½ Joseph Artsimovich"
   VIAddVersionKey "FileDescription" ""
   VIAddVersionKey "FileVersion" "${VERSION}"
   VIProductVersion "${VERSION_QUAD}"
@@ -70,6 +72,10 @@ Section "Installer Section"
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Scan Tailor"
   CreateShortcut "$SMPROGRAMS\Scan Tailor\Scan Tailor.lnk" "$INSTDIR\scantailor.exe"
+  
+  # Register the ".ScanTailor" file extension.
+  ${registerExtension} "$INSTDIR\scantailor.exe" ".ScanTailor" \
+  "Scan Tailor Project" "$INSTDIR\scantailor.exe,0"
 SectionEnd
 
 
@@ -83,6 +89,9 @@ FunctionEnd
 
 
 Section "Uninstall"
+  # Unregister the ".ScanTailor" file extension.
+  ${unregisterExtension} ".ScanTailor" "Scan Tailor Project"
+  
   # Remove program files.
   Delete $INSTDIR\scantailor.exe
   Delete $INSTDIR\mingwm10.dll
