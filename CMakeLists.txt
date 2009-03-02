@@ -268,7 +268,20 @@ SET(
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
 
-ADD_EXECUTABLE(scantailor WIN32 ${sources} ${ui_sources} ${resource_sources})
+SET(win32_resource_file)
+IF(WIN32)
+	SET(win32_resource_file resources/win32/resources.rc)
+	FILE(GLOB win32_resources resources/win32/*.ico)
+	SET_SOURCE_FILES_PROPERTIES(
+		"${win32_resource_file}" PROPERTIES
+		OBJECT_DEPENDS ${win32_resources}
+	)
+ENDIF(WIN32)
+
+ADD_EXECUTABLE(
+	scantailor WIN32 ${sources} ${ui_sources}
+	${resource_sources} ${win32_resource_file}
+)
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output
