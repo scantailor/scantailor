@@ -25,6 +25,7 @@
 #include <QMetaType>
 #include <QtPlugin>
 #include <QLocale>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QTranslator>
@@ -62,6 +63,7 @@ int main(int argc, char** argv)
 	app.setApplicationName("Scan Tailor");
 	app.setOrganizationName("Scan Tailor");
 	app.setOrganizationDomain("scantailor.sourceforge.net");
+	QSettings settings;
 	
 	PngMetadataLoader::registerMyself();
 	TiffMetadataLoader::registerMyself();
@@ -69,7 +71,11 @@ int main(int argc, char** argv)
 	
 	MainWindow* main_wnd = new MainWindow();
 	main_wnd->setAttribute(Qt::WA_DeleteOnClose);
-	main_wnd->showMaximized();
+	if (settings.value("mainWindow/maximized") == false) {
+		main_wnd->show();
+	} else {
+		main_wnd->showMaximized();
+	}
 	
 	// Note that we use app.arguments() rather than argv,
 	// because the former is Unicode-safe under Windows.
