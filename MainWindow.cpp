@@ -693,8 +693,13 @@ MainWindow::prevPage()
 void
 MainWindow::goToPage(PageId const& page_id)
 {
+	focusButton->setChecked(true);
 	m_ptrPages->setCurPage(page_id);
+	
+	// This will result in pageSelected() being called
+	// with by_user == false.
 	m_ptrThumbSequence->setCurrentThumbnail(page_id);
+	
 	updateMainArea();
 }
 
