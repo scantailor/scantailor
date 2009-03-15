@@ -36,7 +36,9 @@
 class AbstractFilter;
 class ThumbnailPixmapCache;
 class ThumbnailSequence;
+class StageSequence;
 class FilterOptionsWidget;
+class ProcessingIndicationWidget;
 class PageInfo;
 class QStackedLayout;
 class WorkerThread;
@@ -44,6 +46,7 @@ class ProjectReader;
 class DebugImages;
 class ContentBoxPropagator;
 class ProjectCreationContext;
+class CompositeCacheDrivenTask;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -110,8 +113,6 @@ private slots:
 	
 	void closeProject();
 private:
-	class FilterListModel;
-	
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
@@ -147,11 +148,11 @@ private:
 	
 	void resetThumbSequence();
 	
-	void removeWidgetsFromLayout(QLayout* layout, bool delete_widgets);
+	void removeWidgetsFromLayout(QLayout* layout);
+	
+	void removeFilterOptionsWidget();
 	
 	void updateProjectActions();
-	
-	void updateBatchProcessingActions();
 	
 	bool isProjectLoaded() const { return !m_outDir.isEmpty(); }
 	
@@ -177,8 +178,17 @@ private:
 	
 	bool saveProjectWithFeedback(QString const& project_file);
 	
+	BackgroundTaskPtr createCompositeTask(
+		PageInfo const& page, int page_num, int last_filter_idx);
+	
+	IntrusivePtr<CompositeCacheDrivenTask>
+	createCompositeCacheDrivenTask(int last_filter_idx);
+	
+	std::auto_ptr<QWidget> createBatchProcessingWidget();
+	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<StageSequence> m_ptrStages;
 	QString m_outDir;
 	QString m_projectFile;
 	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
@@ -188,8 +198,9 @@ private:
 	QStackedLayout* m_pOptionsFrameLayout;
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
 	std::auto_ptr<QTabWidget> m_ptrTabbedDebugImages;
-	std::auto_ptr<FilterListModel> m_ptrFilterListModel;
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
+	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
+	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;
 	BackgroundTaskPtr m_ptrCurTask;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;

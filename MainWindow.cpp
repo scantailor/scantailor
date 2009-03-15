@@ -22,6 +22,7 @@
 #include "RecentProjects.h"
 #include "WorkerThread.h"
 #include "PageSequence.h"
+#include "StageSequence.h"
 #include "ThumbnailSequence.h"
 #include "PageInfo.h"
 #include "ImageId.h"
@@ -36,6 +37,8 @@
 #include "ThumbnailFactory.h"
 #include "ContentBoxPropagator.h"
 #include "ProjectCreationContext.h"
+#include "SkinnedButton.h"
+#include "ProcessingIndicationWidget.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -84,61 +87,9 @@
 #include <stddef.h>
 #include <assert.h>
 
-class MainWindow::FilterListModel : public QAbstractTableModel
-{
-	DECLARE_NON_COPYABLE(FilterListModel)
-public:
-	FilterListModel(IntrusivePtr<PageSequence> const& page_sequence);
-	
-	virtual ~FilterListModel();
-	
-	std::vector<FilterPtr> const& filters() const { return m_filters; }
-	
-	FilterPtr const& getFilter(int filter_idx) const;
-	
-	int getFilterIndex(FilterPtr const& filter) const;
-	
-	BackgroundTaskPtr createCompositeTask(
-		PageInfo const& page, int page_num,
-		QString const& out_dir, int last_filter_idx,
-		ThumbnailPixmapCache& thumbnail_cache,
-		IntrusivePtr<PageSequence> const& page_sequence,
-		bool batch_processing, bool debug);
-	
-	IntrusivePtr<CompositeCacheDrivenTask>
-	createCompositeCacheDrivenTask(QString const& out_dir, int last_filter_idx);
-	
-	IntrusivePtr<page_layout::Filter> const& getPageLayoutFilter() const {
-		return m_ptrPageLayoutFilter;
-	}
-	
-	int getSelectContentFilterIdx() const { return m_selectContentFilterIdx; }
-	
-	int getPageLayoutFilterIdx() const { return m_pageLayoutFilterIdx; }
-	
-	int getOutputFilterIdx() const { return m_outputFilterIdx; }
-	
-	virtual int columnCount(QModelIndex const& parent) const;
-	
-	virtual int rowCount(QModelIndex const& parent) const;
-	
-	virtual QVariant data(QModelIndex const& index, int role) const;
-private:
-	IntrusivePtr<fix_orientation::Filter> m_ptrFixOrientationFilter;
-	IntrusivePtr<page_split::Filter> m_ptrPageSplitFilter;
-	IntrusivePtr<deskew::Filter> m_ptrDeskewFilter;
-	IntrusivePtr<select_content::Filter> m_ptrSelectContentFilter;
-	IntrusivePtr<page_layout::Filter> m_ptrPageLayoutFilter;
-	IntrusivePtr<output::Filter> m_ptrOutputFilter;
-	std::vector<FilterPtr> m_filters;
-	int m_selectContentFilterIdx;
-	int m_pageLayoutFilterIdx;
-	int m_outputFilterIdx;
-};
-
-
 MainWindow::MainWindow()
 :	m_ptrPages(new PageSequence),
+	m_ptrStages(new StageSequence(m_ptrPages)),
 	m_ptrWorkerThread(new WorkerThread),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
@@ -146,36 +97,19 @@ MainWindow::MainWindow()
 	m_batchProcessing(false),
 	m_closing(false)
 {
-	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
-	
 	m_maxLogicalThumbSize = QSize(250, 160);
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
-	filterList->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-	filterList->horizontalHeader()->hide();
-	filterList->verticalHeader()->setResizeMode(QHeaderView::Fixed);
-	filterList->verticalHeader()->setMovable(false);
-	filterList->setModel(m_ptrFilterListModel.get());
-	filterList->selectionModel()->select(
-		m_ptrFilterListModel->index(0, 0),
-		QItemSelectionModel::SelectCurrent
-	);
+	m_ptrBatchProcessingWidget = createBatchProcessingWidget();
+	m_ptrProcessingIndicationWidget.reset(new ProcessingIndicationWidget);
 	
-	// Set the maximum height of the filter list to exactly fit
-	// all of its items.
-	filterList->resizeRowsToContents();
-	filterList->setMaximumHeight(filterList->verticalHeader()->length());
-	filterList->setMaximumHeight(
-		filterList->maximumHeight() +
-		(filterList->verticalScrollBar()->maximum() -
-		filterList->verticalScrollBar()->minimum())
-	);
+	filterList->setStages(m_ptrStages);
+	filterList->selectRow(0);
 	
 	setupThumbView(); // Expects m_ptrThumbSequence to be initialized.
 	
 	m_ptrTabbedDebugImages.reset(new QTabWidget);
-	actionStopBatchProcessing->setEnabled(false);
 	
 	m_debug = actionDebug->isChecked();
 	m_pImageFrameLayout = new QStackedLayout(imageViewFrame);
@@ -195,6 +129,10 @@ MainWindow::MainWindow()
 		filterList->selectionModel(),
 		SIGNAL(selectionChanged(QItemSelection const&, QItemSelection const&)),
 		this, SLOT(filterSelectionChanged(QItemSelection const&))
+	);
+	connect(
+		filterList, SIGNAL(launchBatchProcessing()),
+		this, SLOT(startBatchProcessing())
 	);
 	
 	connect(
@@ -220,15 +158,6 @@ MainWindow::MainWindow()
 	connect(
 		focusButton, SIGNAL(clicked(bool)),
 		this, SLOT(thumbViewFocusToggled(bool))
-	);
-	
-	connect(
-		actionStartBatchProcessing, SIGNAL(triggered(bool)),
-		this, SLOT(startBatchProcessing())
-	);
-	connect(
-		actionStopBatchProcessing, SIGNAL(triggered(bool)),
-		this, SLOT(stopBatchProcessing())
 	);
 	
 	connect(
@@ -262,7 +191,6 @@ MainWindow::MainWindow()
 	);
 	
 	updateProjectActions();
-	updateBatchProcessingActions();
 	updateWindowTitle();
 	updateMainArea();
 
@@ -283,8 +211,8 @@ MainWindow::~MainWindow()
 	cancelOngoingTask();
 	m_ptrWorkerThread->shutdown();
 	
-	removeWidgetsFromLayout(m_pImageFrameLayout, false);
-	removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
+	removeWidgetsFromLayout(m_pImageFrameLayout);
+	removeWidgetsFromLayout(m_pOptionsFrameLayout);
 	m_ptrTabbedDebugImages->clear();
 }
 
@@ -314,11 +242,11 @@ MainWindow::switchToNewProject(
 	
 	cancelOngoingTask();
 	
-	// Recreate the filter list model, and let filters load
-	m_ptrFilterListModel.reset(new FilterListModel(m_ptrPages));
+	// Recreate the stages, and load their state.
+	m_ptrStages.reset(new StageSequence(pages));
 	if (project_reader) {
 		project_reader->readFilterSettings(
-			m_ptrFilterListModel->filters()
+			m_ptrStages->filters()
 		);
 	}
 	
@@ -326,11 +254,8 @@ MainWindow::switchToNewProject(
 	// the first item.
 	{
 		ScopedIncDec<int> guard(m_ignoreSelectionChanges);
-		filterList->setModel(m_ptrFilterListModel.get());
-		filterList->selectionModel()->select(
-			m_ptrFilterListModel->index(0, 0),
-			QItemSelectionModel::SelectCurrent
-		);
+		filterList->setStages(m_ptrStages);
+		filterList->selectRow(0);
 		m_curFilter = 0;
 		
 		// Setting a data model also implicitly sets a new
@@ -344,10 +269,9 @@ MainWindow::switchToNewProject(
 	
 	m_ptrContentBoxPropagator.reset(
 		new ContentBoxPropagator(
-			m_ptrFilterListModel->getPageLayoutFilter(),
-			m_ptrFilterListModel->createCompositeCacheDrivenTask(
-				m_outDir,
-				m_ptrFilterListModel->getSelectContentFilterIdx()
+			m_ptrStages->pageLayoutFilter(),
+			createCompositeCacheDrivenTask(
+				m_ptrStages->selectContentFilterIdx()
 			)
 		)
 	);
@@ -362,7 +286,6 @@ MainWindow::switchToNewProject(
 	resetThumbSequence();
 	
 	updateProjectActions();
-	updateBatchProcessingActions();
 	updateWindowTitle();
 	updateMainArea();
 }
@@ -413,6 +336,35 @@ MainWindow::showNewOpenProjectPanel()
 	layout->setRowStretch(0, 1);
 	layout->setRowStretch(2, 1);
 	setImageWidget(outer_widget.release(), TRANSFER_OWNERSHIP);
+}
+
+std::auto_ptr<QWidget>
+MainWindow::createBatchProcessingWidget()
+{
+	std::auto_ptr<QWidget> outer_widget(new QWidget);
+	QGridLayout* layout = new QGridLayout(outer_widget.get());
+	outer_widget->setLayout(layout);
+	
+	SkinnedButton* btn = new SkinnedButton(
+		":/icons/stop-big.png",
+		":/icons/stop-big-hovered.png",
+		":/icons/stop-big-pressed.png",
+		outer_widget.get()
+	);
+	btn->setStatusTip(tr("Stop batch processing"));
+	
+	layout->addWidget(btn, 1, 1);
+	layout->setColumnStretch(0, 1);
+	layout->setColumnStretch(2, 1);
+	layout->setRowStretch(0, 1);
+	layout->setRowStretch(2, 1);
+	
+	connect(
+		btn, SIGNAL(clicked()),
+		this, SLOT(stopBatchProcessing())
+	);
+	
+	return outer_widget;
 }
 
 void
@@ -518,9 +470,7 @@ MainWindow::resetThumbSequence()
 {
 	if (m_ptrThumbnailCache.get()) {
 		IntrusivePtr<CompositeCacheDrivenTask> const task(
-			m_ptrFilterListModel->createCompositeCacheDrivenTask(
-				m_outDir, m_curFilter
-			)
+			createCompositeCacheDrivenTask(m_curFilter)
 		);
 		
 		m_ptrThumbSequence->setThumbnailFactory(
@@ -548,7 +498,7 @@ void
 MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const ownership)
 {
 	if (m_ptrOptionsWidget != widget) {
-		removeWidgetsFromLayout(m_pOptionsFrameLayout, false);
+		removeWidgetsFromLayout(m_pOptionsFrameLayout);
 	}
 	
 	// Delete the old widget we were owning, if any.
@@ -611,7 +561,7 @@ MainWindow::setImageWidget(
 	QWidget* widget, Ownership const ownership,
 	DebugImages* debug_images)
 {
-	removeWidgetsFromLayout(m_pImageFrameLayout, false);
+	removeWidgetsFromLayout(m_pImageFrameLayout);
 	
 	m_ptrTabbedDebugImages->clear();
 	
@@ -792,7 +742,6 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	focusButton->setChecked(true); // Should go before resetThumbSequence().
 	resetThumbSequence();
 	
-	updateBatchProcessingActions();
 	updateMainArea();
 }
 
@@ -805,18 +754,29 @@ MainWindow::reloadRequested()
 void
 MainWindow::startBatchProcessing()
 {
-	// The current task is being cancelled because
-	// it's probably not a batch processing task.
-	cancelOngoingTask();
+	if (m_batchProcessing || !isProjectLoaded()) {
+		return;
+	}
 	
 	m_batchProcessing = true;
-	updateBatchProcessingActions();
 	
 	focusButton->setChecked(true);
-	splitter->widget(0)->setVisible(false);
 	
-	PageInfo const page_info(m_ptrPages->setFirstPage(getCurrentView()));
-	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
+	removeFilterOptionsWidget();
+	filterList->setBatchProcessingInProgress(true);
+	filterList->setEnabled(false);
+	
+	if (!m_ptrCurTask) {
+		m_ptrPages->setNextPage(getCurrentView());
+		// Don't change the current thumbnail - that's intentional.
+		// In batch processing mode we highlight the page that
+		// was just processed, while processing the next one.
+		// Keep in mind that next one will have a question mark
+		// on it until it's fully processed.
+	}
+	
+	cancelOngoingTask();
+	
 	updateMainArea();
 }
 
@@ -831,10 +791,9 @@ MainWindow::stopBatchProcessing()
 	// it's probably a batch processing task.
 	cancelOngoingTask();
 	
-	splitter->widget(0)->setVisible(true);
-	
 	m_batchProcessing = false;
-	updateBatchProcessingActions();
+	filterList->setBatchProcessingInProgress(false);
+	filterList->setEnabled(true);
 	
 	// The necessity to explicitly select a thumbnail comes from the fact
 	// that during batch processing we select not the thumbnail that is
@@ -856,17 +815,14 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 	if (!m_batchProcessing) {
 		if (!result->filter()) {
 			// Error loading file.  No special action is necessary.
-		} else if (result->filter() != m_ptrFilterListModel->getFilter(m_curFilter)) {
+		} else if (result->filter() != m_ptrStages->filterAt(m_curFilter)) {
 			// Error from one of the previous filters.
-			int const idx = m_ptrFilterListModel->getFilterIndex(result->filter());
+			int const idx = m_ptrStages->findFilter(result->filter());
 			assert(idx >= 0);
 			m_curFilter = idx;
 			
 			ScopedIncDec<int> selection_guard(m_ignoreSelectionChanges);
-			filterList->selectionModel()->select(
-				m_ptrFilterListModel->index(idx, 0),
-				QItemSelectionModel::SelectCurrent
-			);
+			filterList->selectRow(idx);
 		}
 	}
 	
@@ -1062,16 +1018,25 @@ MainWindow::closeProject()
 	closeProjectInteractive();
 }
 
+/**
+ * Note: the removed widgets are not deleted.
+ */
 void
-MainWindow::removeWidgetsFromLayout(QLayout* layout, bool delete_widgets)
+MainWindow::removeWidgetsFromLayout(QLayout* layout)
 {
 	QLayoutItem *child;
 	while ((child = layout->takeAt(0))) {
-		if (delete_widgets) {
-			delete child->widget();
-		}
 		delete child;
 	}
+}
+
+void
+MainWindow::removeFilterOptionsWidget()
+{
+	removeWidgetsFromLayout(m_pOptionsFrameLayout);
+	
+	// Delete the old widget we were owning, if any.
+	m_optionsWidgetCleanup.clear();
 }
 
 void
@@ -1080,18 +1045,6 @@ MainWindow::updateProjectActions()
 	bool const loaded = isProjectLoaded();
 	actionSaveProject->setEnabled(loaded);
 	actionSaveProjectAs->setEnabled(loaded);
-}
-
-void
-MainWindow::updateBatchProcessingActions()
-{
-	bool const ok = m_ptrPages->numImages() != 0 &&
-		(!isOutputFilter() ||
-		m_ptrFilterListModel->getPageLayoutFilter()
-		->checkReadyForOutput(*m_ptrPages));
-	
-	actionStartBatchProcessing->setEnabled(ok && !m_batchProcessing);
-	actionStopBatchProcessing->setEnabled(ok && m_batchProcessing);
 }
 
 bool
@@ -1103,7 +1056,7 @@ MainWindow::isBelowSelectContent() const
 bool
 MainWindow::isBelowSelectContent(int const filter_idx) const
 {
-	return (filter_idx > m_ptrFilterListModel->getSelectContentFilterIdx());
+	return (filter_idx > m_ptrStages->selectContentFilterIdx());
 }
 
 bool
@@ -1115,13 +1068,13 @@ MainWindow::isOutputFilter() const
 bool
 MainWindow::isOutputFilter(int const filter_idx) const
 {
-	return (filter_idx == m_ptrFilterListModel->getOutputFilterIdx());
+	return (filter_idx == m_ptrStages->outputFilterIdx());
 }
 
 PageSequence::View
 MainWindow::getCurrentView() const
 {
-	return m_ptrFilterListModel->getFilter(m_curFilter)->getView();
+	return m_ptrStages->filterAt(m_curFilter)->getView();
 }
 
 void
@@ -1141,34 +1094,43 @@ MainWindow::updateMainArea()
 void
 MainWindow::loadImage(PageInfo const& page, int const page_num)
 {
-	removeWidgetsFromLayout(m_pImageFrameLayout, false);
-	m_ptrTabbedDebugImages->clear();
-	m_imageWidgetCleanup.clear();
+	cancelOngoingTask();
 	
 	if (isOutputFilter() &&
-			!m_ptrFilterListModel->getPageLayoutFilter()
+			!m_ptrStages->pageLayoutFilter()
 			->checkReadyForOutput(*m_ptrPages, &page.id())) {
+		
+		// Switch to the first page - the user will need
+		// to process all pages in batch mode.
+		PageInfo const first_page(
+			m_ptrPages->setFirstPage(getCurrentView())
+		);
+		m_ptrThumbSequence->setCurrentThumbnail(first_page.id());
+		
 		QString const err_text(
 			tr("Output is not yet possible, as the final size"
 			" of pages is not yet known.\nTo determine it,"
 			" run batch processing at \"Select Content\" or"
 			" \"Page Layout\".")
 		);
+		
 		setOptionsWidget(new FilterOptionsWidget, TRANSFER_OWNERSHIP);
 		setImageWidget(new ErrorWidget(err_text), TRANSFER_OWNERSHIP);
 		return;
 	}
 	
-	m_ptrFilterListModel->getFilter(m_curFilter)->preUpdateUI(this, page.id());
-	
-	cancelOngoingTask();
+	if (m_batchProcessing) {
+		setImageWidget(m_ptrBatchProcessingWidget.get(), KEEP_OWNERSHIP);
+	} else {
+		if (m_pImageFrameLayout->indexOf(m_ptrProcessingIndicationWidget.get()) != -1) {
+			m_ptrProcessingIndicationWidget->processingRestartedEffect();
+		}
+		setImageWidget(m_ptrProcessingIndicationWidget.get(), KEEP_OWNERSHIP);
+		m_ptrStages->filterAt(m_curFilter)->preUpdateUI(this, page.id());
+	}
 	
 	assert(m_ptrThumbnailCache.get());
-	m_ptrCurTask = m_ptrFilterListModel->createCompositeTask(
-		page, page_num, m_outDir, m_curFilter,
-		*m_ptrThumbnailCache, m_ptrPages,
-		m_batchProcessing, m_debug
-	);
+	m_ptrCurTask = createCompositeTask(page, page_num, m_curFilter);
 	if (m_ptrCurTask) {
 		m_ptrWorkerThread->performTask(m_ptrCurTask);
 	}
@@ -1222,7 +1184,7 @@ MainWindow::closeProjectInteractive()
 	
 	ProjectWriter writer(m_outDir, m_ptrPages);
 	
-	if (!writer.write(backup_file_path, m_ptrFilterListModel->filters())) {
+	if (!writer.write(backup_file_path, m_ptrStages->filters())) {
 		// Backup file could not be written???
 		QFile::remove(backup_file_path);
 		switch (promptProjectSave()) {
@@ -1279,7 +1241,7 @@ MainWindow::saveProjectWithFeedback(QString const& project_file)
 {
 	ProjectWriter writer(m_outDir, m_ptrPages);
 	
-	if (!writer.write(project_file, m_ptrFilterListModel->filters())) {
+	if (!writer.write(project_file, m_ptrStages->filters())) {
 		QMessageBox::warning(
 			this, tr("Error"),
 			tr("Error saving the project file!")
@@ -1290,62 +1252,9 @@ MainWindow::saveProjectWithFeedback(QString const& project_file)
 	return true;
 }
 
-
-/*====================== MainWindow::FilterListModel =====================*/
-
-MainWindow::FilterListModel::FilterListModel(
-	IntrusivePtr<PageSequence> const& page_sequence)
-:	m_ptrFixOrientationFilter(new fix_orientation::Filter(page_sequence)),
-	m_ptrPageSplitFilter(new page_split::Filter(page_sequence)),
-	m_ptrDeskewFilter(new deskew::Filter()),
-	m_ptrSelectContentFilter(new select_content::Filter()),
-	m_ptrPageLayoutFilter(new page_layout::Filter(page_sequence)),
-	m_ptrOutputFilter(new output::Filter())
-{
-	m_filters.push_back(m_ptrFixOrientationFilter);
-	m_filters.push_back(m_ptrPageSplitFilter);
-	m_filters.push_back(m_ptrDeskewFilter);
-	
-	m_selectContentFilterIdx = m_filters.size();
-	m_filters.push_back(m_ptrSelectContentFilter);
-	
-	m_pageLayoutFilterIdx = m_filters.size();
-	m_filters.push_back(m_ptrPageLayoutFilter);
-	
-	m_outputFilterIdx = m_filters.size();
-	m_filters.push_back(m_ptrOutputFilter);
-}
-
-MainWindow::FilterListModel::~FilterListModel()
-{
-}
-
-MainWindow::FilterPtr const&
-MainWindow::FilterListModel::getFilter(int const filter_idx) const
-{
-	return m_filters[filter_idx];
-}
-
-int
-MainWindow::FilterListModel::getFilterIndex(FilterPtr const& filter) const
-{
-	size_t const num_filters = m_filters.size();
-	for (size_t i = 0; i < num_filters; ++i) {
-		if (m_filters[i] == filter) {
-			return i;
-		}
-	}
-	
-	return -1;
-}
-
 BackgroundTaskPtr
-MainWindow::FilterListModel::createCompositeTask(
-	PageInfo const& page, int const page_num,
-	QString const& out_dir, int const last_filter_idx,
-	ThumbnailPixmapCache& thumbnail_cache,
-	IntrusivePtr<PageSequence> const& page_sequence,
-	bool const batch_processing, bool debug)
+MainWindow::createCompositeTask(
+	PageInfo const& page, int const page_num, int const last_filter_idx)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
 	IntrusivePtr<page_split::Task> page_split_task;
@@ -1354,40 +1263,45 @@ MainWindow::FilterListModel::createCompositeTask(
 	IntrusivePtr<page_layout::Task> page_layout_task;
 	IntrusivePtr<output::Task> output_task;
 	
-	if (batch_processing) {
+	bool debug = m_debug;
+	if (m_batchProcessing) {
 		debug = false;
 	}
 	
-	switch (last_filter_idx) {
-	case 5:
-		output_task = m_ptrOutputFilter->createTask(
-			page.id(), page_num, out_dir,
-			thumbnail_cache, batch_processing, debug
+	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
+		output_task = m_ptrStages->outputFilter()->createTask(
+			page.id(), page_num, m_outDir,
+			*m_ptrThumbnailCache, m_batchProcessing, debug
 		);
 		debug = false;
-	case 4:
-		page_layout_task = m_ptrPageLayoutFilter->createTask(
-			page.id(), output_task, batch_processing, debug
+	}
+	if (last_filter_idx >= m_ptrStages->pageLayoutFilterIdx()) {
+		page_layout_task = m_ptrStages->pageLayoutFilter()->createTask(
+			page.id(), output_task, m_batchProcessing, debug
 		);
 		debug = false;
-	case 3:
-		select_content_task = m_ptrSelectContentFilter->createTask(
-			page.id(), page_layout_task, batch_processing, debug
+	}
+	if (last_filter_idx >= m_ptrStages->selectContentFilterIdx()) {
+		select_content_task = m_ptrStages->selectContentFilter()->createTask(
+			page.id(), page_layout_task, m_batchProcessing, debug
 		);
 		debug = false;
-	case 2:
-		deskew_task = m_ptrDeskewFilter->createTask(
-			page.id(), select_content_task, batch_processing, debug
+	}
+	if (last_filter_idx >= m_ptrStages->deskewFilterIdx()) {
+		deskew_task = m_ptrStages->deskewFilter()->createTask(
+			page.id(), select_content_task, m_batchProcessing, debug
 		);
 		debug = false;
-	case 1:
-		page_split_task = m_ptrPageSplitFilter->createTask(
-			page.id(), deskew_task, batch_processing, debug
+	}
+	if (last_filter_idx >= m_ptrStages->pageSplitFilterIdx()) {
+		page_split_task = m_ptrStages->pageSplitFilter()->createTask(
+			page.id(), deskew_task, m_batchProcessing, debug
 		);
 		debug = false;
-	case 0:
-		fix_orientation_task = m_ptrFixOrientationFilter->createTask(
-			page.id(), page_split_task, batch_processing
+	}
+	if (last_filter_idx >= m_ptrStages->fixOrientationFilterIdx()) {
+		fix_orientation_task = m_ptrStages->fixOrientationFilter()->createTask(
+			page.id(), page_split_task, m_batchProcessing
 		);
 		debug = false;
 	}
@@ -1395,15 +1309,14 @@ MainWindow::FilterListModel::createCompositeTask(
 	
 	return BackgroundTaskPtr(
 		new LoadFileTask(
-			page, thumbnail_cache,
-			page_sequence, fix_orientation_task
+			page, *m_ptrThumbnailCache,
+			m_ptrPages, fix_orientation_task
 		)
 	);
 }
 
 IntrusivePtr<CompositeCacheDrivenTask>
-MainWindow::FilterListModel::createCompositeCacheDrivenTask(
-	QString const& out_dir, int const last_filter_idx)
+MainWindow::createCompositeCacheDrivenTask(int const last_filter_idx)
 {
 	IntrusivePtr<fix_orientation::CacheDrivenTask> fix_orientation_task;
 	IntrusivePtr<page_split::CacheDrivenTask> page_split_task;
@@ -1412,48 +1325,32 @@ MainWindow::FilterListModel::createCompositeCacheDrivenTask(
 	IntrusivePtr<page_layout::CacheDrivenTask> page_layout_task;
 	IntrusivePtr<output::CacheDrivenTask> output_task;
 	
-	switch (last_filter_idx) {
-	case 5:
-		output_task = m_ptrOutputFilter->createCacheDrivenTask(out_dir);
-	case 4:
-		page_layout_task = m_ptrPageLayoutFilter->createCacheDrivenTask(
-			output_task
-		);
-	case 3:
-		select_content_task = m_ptrSelectContentFilter->createCacheDrivenTask(
-			page_layout_task
-		);
-	case 2:
-		deskew_task = m_ptrDeskewFilter->createCacheDrivenTask(select_content_task);
-	case 1:
-		page_split_task = m_ptrPageSplitFilter->createCacheDrivenTask(deskew_task);
-	case 0:
-		fix_orientation_task = m_ptrFixOrientationFilter->createCacheDrivenTask(
-			page_split_task
-		);
+	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
+		output_task = m_ptrStages->outputFilter()
+				->createCacheDrivenTask(m_outDir);
 	}
+	if (last_filter_idx >= m_ptrStages->pageLayoutFilterIdx()) {
+		page_layout_task = m_ptrStages->pageLayoutFilter()
+				->createCacheDrivenTask(output_task);
+	}
+	if (last_filter_idx >= m_ptrStages->selectContentFilterIdx()) {
+		select_content_task = m_ptrStages->selectContentFilter()
+				->createCacheDrivenTask(page_layout_task);
+	}
+	if (last_filter_idx >= m_ptrStages->deskewFilterIdx()) {
+		deskew_task = m_ptrStages->deskewFilter()
+				->createCacheDrivenTask(select_content_task);
+	}
+	if (last_filter_idx >= m_ptrStages->pageSplitFilterIdx()) {
+		page_split_task = m_ptrStages->pageSplitFilter()
+				->createCacheDrivenTask(deskew_task);
+	}
+	if (last_filter_idx >= m_ptrStages->fixOrientationFilterIdx()) {
+		fix_orientation_task = m_ptrStages->fixOrientationFilter()
+				->createCacheDrivenTask(page_split_task);
+	}
+	
 	assert(fix_orientation_task);
 	
 	return fix_orientation_task;
-}
-
-int
-MainWindow::FilterListModel::columnCount(QModelIndex const& parent) const
-{
-	return 1;
-}
-
-int
-MainWindow::FilterListModel::rowCount(QModelIndex const& parent) const
-{
-	return m_filters.size();
-}
-
-QVariant
-MainWindow::FilterListModel::data(QModelIndex const& index, int const role) const
-{
-	if (role == Qt::DisplayRole) {
-		return m_filters[index.row()]->getName();
-	}
-	return QVariant();
 }

@@ -42,6 +42,7 @@ SET(
 	ConnectivityMap.cpp ConnectivityMap.h
 	InfluenceMap.cpp InfluenceMap.h
 	MaxWhitespaceFinder.cpp MaxWhitespaceFinder.h
+	ColorInterpolation.cpp ColorInterpolation.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

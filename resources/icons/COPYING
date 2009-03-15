@@ -69,3 +69,15 @@ Website: http://www.famfamfam.com/lab/icons/silk/
 License: Creative Commons Attribution 2.5 License
 Files:
 arrow_in.png
+
+
+Origin: Amarok
+Website: http://amarok.kde.org/
+License: GNU GPL version 2 or above
+Files (derived from default-theme-clean.svg):
+play-small.png
+play-small-hovered.png
+play-small-pressed.png
+stop-big.png
+stop-big-hovered.png
+stop-big-pressed.png

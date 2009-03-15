@@ -142,8 +142,7 @@ ELSE(NOT HAVE_STDINT_H)
 ENDIF(NOT HAVE_STDINT_H)
 
 ADD_DEFINITIONS(
-	${QT_DEFINITIONS} -DBOOST_SIGNALS_NAMESPACE=signals
-	-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION
+	${QT_DEFINITIONS} -DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION
 )
 
 IF(WIN32)
@@ -203,6 +202,9 @@ SET(
 	main.cpp Application.cpp Application.h
 	BackgroundExecutor.cpp BackgroundExecutor.h
 	PixmapRenderer.cpp PixmapRenderer.h
+	SkinnedButton.cpp SkinnedButton.h
+	BubbleAnimation.cpp BubbleAnimation.h
+	ProcessingIndicationWidget.cpp ProcessingIndicationWidget.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
 	ImageInfo.cpp ImageInfo.h
@@ -218,6 +220,7 @@ SET(
 	ImageTransformation.cpp ImageTransformation.h
 	ImageViewBase.cpp ImageViewBase.h
 	BasicImageView.cpp BasicImageView.h
+	StageListView.cpp StageListView.h
 	ThumbnailLoadResult.h
 	ThumbnailPixmapCache.cpp ThumbnailPixmapCache.h
 	ThumbnailBase.cpp ThumbnailBase.h
@@ -231,6 +234,7 @@ SET(
 	PageInfo.cpp PageInfo.h
 	BackgroundTask.cpp BackgroundTask.h
 	PageSequence.cpp PageSequence.h
+	StageSequence.cpp StageSequence.h
 	FilterData.cpp FilterData.h
 	ImageMetadataLoader.cpp ImageMetadataLoader.h
 	TiffReader.cpp TiffReader.h
@@ -261,6 +265,7 @@ SET(
 	FilterResult.h
 	CompositeCacheDrivenTask.h
 	Margins.h
+	NoFocusItemDelegate.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h
