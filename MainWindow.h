@@ -68,6 +68,8 @@ protected:
 	virtual void timerEvent(QTimerEvent* event);
 public slots:
 	void openProject(QString const& project_file);
+private:
+	enum MainAreaAction { LOAD_IMAGE, CLEAR_MAIN_AREA };
 private slots:
 	void nextPage();
 	
@@ -89,7 +91,7 @@ private slots:
 	
 	void startBatchProcessing();
 	
-	void stopBatchProcessing();
+	void stopBatchProcessing(MainAreaAction main_area = LOAD_IMAGE);
 	
 	void invalidateThumbnailSlot(PageId const& page_id);
 	
@@ -151,6 +153,8 @@ private:
 	void removeWidgetsFromLayout(QLayout* layout);
 	
 	void removeFilterOptionsWidget();
+	
+	void removeImageWidget();
 	
 	void updateProjectActions();
 	

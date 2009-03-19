@@ -231,16 +231,13 @@ MainWindow::switchToNewProject(
 	QString const& out_dir, QString const& project_file_path,
 	ProjectReader const* project_reader)
 {
+	stopBatchProcessing(CLEAR_MAIN_AREA);
+	
+	cancelOngoingTask();
+	
 	m_ptrPages = pages;
 	m_outDir = out_dir;
 	m_projectFile = project_file_path;
-	
-	if (m_batchProcessing) {
-		splitter->widget(0)->setVisible(true);
-		m_batchProcessing = false;
-	}
-	
-	cancelOngoingTask();
 	
 	// Recreate the stages, and load their state.
 	m_ptrStages.reset(new StageSequence(pages));
@@ -285,6 +282,7 @@ MainWindow::switchToNewProject(
 	}
 	resetThumbSequence();
 	
+	removeFilterOptionsWidget();
 	updateProjectActions();
 	updateWindowTitle();
 	updateMainArea();
@@ -561,12 +559,7 @@ MainWindow::setImageWidget(
 	QWidget* widget, Ownership const ownership,
 	DebugImages* debug_images)
 {
-	removeWidgetsFromLayout(m_pImageFrameLayout);
-	
-	m_ptrTabbedDebugImages->clear();
-	
-	// Delete the old widget we were owning, if any.
-	m_imageWidgetCleanup.clear();
+	removeImageWidget();
 	
 	if (ownership == TRANSFER_OWNERSHIP) {
 		m_imageWidgetCleanup.add(widget);
@@ -584,6 +577,17 @@ MainWindow::setImageWidget(
 		}
 		m_pImageFrameLayout->addWidget(m_ptrTabbedDebugImages.get());
 	}
+}
+
+void
+MainWindow::removeImageWidget()
+{
+	removeWidgetsFromLayout(m_pImageFrameLayout);
+	
+	m_ptrTabbedDebugImages->clear();
+	
+	// Delete the old widget we were owning, if any.
+	m_imageWidgetCleanup.clear();
 }
 
 void
@@ -781,7 +785,7 @@ MainWindow::startBatchProcessing()
 }
 
 void
-MainWindow::stopBatchProcessing()
+MainWindow::stopBatchProcessing(MainAreaAction main_area)
 {
 	if (!m_batchProcessing) {
 		return;
@@ -802,7 +806,15 @@ MainWindow::stopBatchProcessing()
 	int page_num = 0;
 	PageInfo const page_info(m_ptrPages->curPage(getCurrentView(), &page_num));
 	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
-	loadImage(page_info, page_num);
+	
+	switch (main_area) {
+		case LOAD_IMAGE:
+			loadImage(page_info, page_num);
+			break;
+		case CLEAR_MAIN_AREA:
+			removeImageWidget();
+			break;
+	}
 }
 
 void
