@@ -72,6 +72,7 @@ public:
 
 StageListView::StageListView(QWidget* parent)
 :	QTableView(parent),
+	m_sizeHint(QTableView::sizeHint()),
 	m_pModel(0),
 	m_curBatchAnimationFrame(0),
 	m_timerId(0),
@@ -130,7 +131,11 @@ StageListView::setStages(IntrusivePtr<StageSequence> const& stages)
 	// rid of the scrollbars, but not more.
 	int height = verticalHeader()->length();
 	height += this->height() - viewport()->height();
-	setMaximumHeight(height);
+	m_sizeHint.setHeight(height);
+	QSizePolicy sp(QSizePolicy::Preferred, QSizePolicy::Maximum);
+	sp.setVerticalStretch(1);
+	setSizePolicy(sp);
+	updateGeometry();
 }
 
 void

@@ -36,6 +36,8 @@ public:
 	virtual ~StageListView();
 	
 	void setStages(IntrusivePtr<StageSequence> const& stages);
+	
+	virtual QSize sizeHint() const { return m_sizeHint; }
 signals:
 	void launchBatchProcessing();
 public slots:
@@ -58,6 +60,7 @@ private:
 	
 	void createBatchAnimationSequence(int square_side);
 	
+	QSize m_sizeHint;
 	Model* m_pModel;
 	QPointer<QWidget> m_ptrLaunchBtn;
 	std::vector<QPixmap> m_batchAnimationPixmaps;
