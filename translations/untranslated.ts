@@ -114,22 +114,22 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/MainWindow.ui" line="197"/>
+        <location filename="../ui/MainWindow.ui" line="216"/>
         <source>Save Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="437"/>
+        <location filename="../MainWindow.cpp" line="422"/>
         <source>Save this project?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="961"/>
+        <location filename="../MainWindow.cpp" line="955"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="959"/>
+        <location filename="../MainWindow.cpp" line="953"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -139,22 +139,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="980"/>
+        <location filename="../MainWindow.cpp" line="974"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="989"/>
+        <location filename="../MainWindow.cpp" line="983"/>
         <source>The project file is broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1000"/>
+        <location filename="../MainWindow.cpp" line="994"/>
         <source>Unable to interpret the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1118"/>
+        <location filename="../MainWindow.cpp" line="1115"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation type="unfinished"></translation>
@@ -180,123 +180,113 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="132"/>
+        <location filename="../ui/MainWindow.ui" line="159"/>
         <source>Use PgUp, PgDown or Q, W to navigate between pages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="154"/>
+        <location filename="../ui/MainWindow.ui" line="181"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="160"/>
+        <location filename="../ui/MainWindow.ui" line="187"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="174"/>
-        <source>Process</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/MainWindow.ui" line="192"/>
+        <location filename="../ui/MainWindow.ui" line="211"/>
         <source>Debug</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="200"/>
+        <location filename="../ui/MainWindow.ui" line="219"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="205"/>
+        <location filename="../ui/MainWindow.ui" line="224"/>
         <source>Save Project As ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="277"/>
+        <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Next Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="213"/>
+        <location filename="../ui/MainWindow.ui" line="232"/>
         <source>PgDown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="266"/>
+        <location filename="../ui/MainWindow.ui" line="267"/>
         <source>Previous Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="224"/>
+        <location filename="../ui/MainWindow.ui" line="243"/>
         <source>PgUp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="236"/>
-        <source>Start Batch Processing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/MainWindow.ui" line="245"/>
-        <source>Stop Batch Processing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/MainWindow.ui" line="250"/>
+        <location filename="../ui/MainWindow.ui" line="251"/>
         <source>New Project ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="253"/>
+        <location filename="../ui/MainWindow.ui" line="254"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="258"/>
+        <location filename="../ui/MainWindow.ui" line="259"/>
         <source>Open Project ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="261"/>
+        <location filename="../ui/MainWindow.ui" line="262"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="269"/>
+        <location filename="../ui/MainWindow.ui" line="270"/>
         <source>Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="280"/>
+        <location filename="../ui/MainWindow.ui" line="281"/>
         <source>W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="288"/>
+        <location filename="../ui/MainWindow.ui" line="289"/>
         <source>Close Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="291"/>
+        <location filename="../ui/MainWindow.ui" line="292"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="296"/>
+        <location filename="../ui/MainWindow.ui" line="297"/>
         <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="299"/>
+        <location filename="../ui/MainWindow.ui" line="300"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="106"/>
+        <location filename="../ui/MainWindow.ui" line="133"/>
         <source>Thumbnail list auto-scrolling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="354"/>
+        <source>Stop batch processing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -820,6 +810,14 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>StageListView</name>
+    <message>
+        <location filename="../StageListView.cpp" line="223"/>
+        <source>Launch batch processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ThumbnailSequence</name>
     <message>
         <location filename="../ThumbnailSequence.cpp" line="556"/>
@@ -976,7 +974,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="218"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="220"/>
         <source>This page only</source>
         <translation type="unfinished"></translation>
     </message>
