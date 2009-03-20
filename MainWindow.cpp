@@ -334,6 +334,8 @@ MainWindow::showNewOpenProjectPanel()
 	layout->setRowStretch(0, 1);
 	layout->setRowStretch(2, 1);
 	setImageWidget(outer_widget.release(), TRANSFER_OWNERSHIP);
+	
+	filterList->setBatchProcessingPossible(false);
 }
 
 std::auto_ptr<QWidget>
@@ -745,7 +747,6 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	
 	focusButton->setChecked(true); // Should go before resetThumbSequence().
 	resetThumbSequence();
-	
 	updateMainArea();
 }
 
@@ -1092,6 +1093,10 @@ MainWindow::getCurrentView() const
 void
 MainWindow::updateMainArea()
 {
+	filterList->setBatchProcessingPossible(true);
+	// Both showNewOpenProjectPanel() and loadImage()
+	// can set it to false though.
+	
 	if (m_ptrPages->numImages() == 0) {
 		showNewOpenProjectPanel();
 	} else {
@@ -1103,14 +1108,21 @@ MainWindow::updateMainArea()
 	}
 }
 
+bool
+MainWindow::checkReadyForOutput(PageId const* ignore) const
+{
+	return m_ptrStages->pageLayoutFilter()->checkReadyForOutput(
+		*m_ptrPages, ignore
+	);
+}
+
 void
 MainWindow::loadImage(PageInfo const& page, int const page_num)
 {
 	cancelOngoingTask();
 	
-	if (isOutputFilter() &&
-			!m_ptrStages->pageLayoutFilter()
-			->checkReadyForOutput(*m_ptrPages, &page.id())) {
+	if (isOutputFilter() && !checkReadyForOutput(&page.id())) {
+		filterList->setBatchProcessingPossible(false);
 		
 		// Switch to the first page - the user will need
 		// to process all pages in batch mode.

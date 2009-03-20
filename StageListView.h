@@ -41,6 +41,8 @@ public:
 signals:
 	void launchBatchProcessing();
 public slots:
+	void setBatchProcessingPossible(bool possible);
+	
 	void setBatchProcessingInProgress(bool in_progress);
 protected slots:
 	virtual void selectionChanged(
@@ -48,6 +50,8 @@ protected slots:
 		QItemSelection const& deselected);
 private slots:
 	void placeLaunchButton();
+	
+	void updateLaunchButtonVisibility();
 	
 	void ensureSelectedRowVisible();
 protected:
@@ -66,6 +70,7 @@ private:
 	std::vector<QPixmap> m_batchAnimationPixmaps;
 	int m_curBatchAnimationFrame;
 	int m_timerId;
+	bool m_batchProcessingPossible;
 	bool m_batchProcessingInProgress;
 };
 

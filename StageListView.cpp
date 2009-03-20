@@ -76,6 +76,7 @@ StageListView::StageListView(QWidget* parent)
 	m_pModel(0),
 	m_curBatchAnimationFrame(0),
 	m_timerId(0),
+	m_batchProcessingPossible(false),
 	m_batchProcessingInProgress(false)
 {
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -139,6 +140,17 @@ StageListView::setStages(IntrusivePtr<StageSequence> const& stages)
 }
 
 void
+StageListView::setBatchProcessingPossible(bool const possible)
+{
+	if (m_batchProcessingPossible == possible) {
+		return;
+	}
+	m_batchProcessingPossible = possible;
+	
+	updateLaunchButtonVisibility();
+}
+
+void
 StageListView::setBatchProcessingInProgress(bool const in_progress)
 {
 	if (m_batchProcessingInProgress == in_progress) {
@@ -146,9 +158,7 @@ StageListView::setBatchProcessingInProgress(bool const in_progress)
 	}
 	m_batchProcessingInProgress = in_progress;
 	
-	if (m_ptrLaunchBtn) {
-		m_ptrLaunchBtn->setVisible(!in_progress);
-	}
+	updateLaunchButtonVisibility();
 	
 	if (in_progress) {
 		initiateBatchAnimationFrameRendering();
@@ -232,7 +242,30 @@ StageListView::placeLaunchButton()
 		);
 		m_ptrLaunchBtn = btn;
 		setIndexWidget(idx, btn);
+#if 0
+		// This doesn't work for some reason.
+		updateLaunchButtonVisibility();
+#else
+		QTimer::singleShot(0, this, SLOT(updateLaunchButtonVisibility()));
+#endif
 	}
+}
+
+void
+StageListView::updateLaunchButtonVisibility()
+{
+	if (!m_ptrLaunchBtn) {
+		return;
+	}
+	
+	bool const visible = m_batchProcessingPossible
+			&& !m_batchProcessingInProgress;
+	
+	if (visible != m_ptrLaunchBtn->isVisible()) {
+		// Don't ask me why it's necessary - it should not be.
+		QTimer::singleShot(0, this, SLOT(updateLaunchButtonVisibility()));
+	}
+	m_ptrLaunchBtn->setVisible(visible);
 }
 
 void

@@ -172,6 +172,8 @@ private:
 	
 	void updateMainArea();
 	
+	bool checkReadyForOutput(PageId const* ignore = 0) const;
+	
 	void loadImage(PageInfo const& page, int page_num);
 	
 	void updateWindowTitle();
