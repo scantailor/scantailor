@@ -22,7 +22,6 @@
 #include "IntrusivePtr.h"
 #include "ChangedStateItemDelegate.h"
 #include <QTableView>
-#include <QPointer>
 #include <QPixmap>
 #include <vector>
 
@@ -50,16 +49,16 @@ protected slots:
 		QItemSelection const& selected,
 		QItemSelection const& deselected);
 private slots:
-	void placeLaunchButton();
-	
-	void updateLaunchButtonVisibility();
-	
 	void ensureSelectedRowVisible();
 protected:
 	virtual void timerEvent(QTimerEvent* event);
 private:
 	class Model;
 	class RightColDelegate;
+	
+	void removeLaunchButton(int row);
+	
+	void placeLaunchButton(int row);
 	
 	void initiateBatchAnimationFrameRendering();
 	
@@ -73,7 +72,7 @@ private:
 	Model* m_pModel;
 	ChangedStateItemDelegate<>* m_pFirstColDelegate;
 	ChangedStateItemDelegate<RightColDelegate>* m_pSecondColDelegate;
-	QPointer<QWidget> m_ptrLaunchBtn;
+	QWidget* m_pLaunchBtn;
 	std::vector<QPixmap> m_batchAnimationPixmaps;
 	int m_curBatchAnimationFrame;
 	int m_timerId;

@@ -100,6 +100,20 @@ StageListView::StageListView(QWidget* parent)
 	v_header->setResizeMode(QHeaderView::ResizeToContents);
 	v_header->setMovable(false);
 	
+	m_pLaunchBtn = new SkinnedButton(
+		":/icons/play-small.png",
+		":/icons/play-small-hovered.png",
+		":/icons/play-small-pressed.png",
+		this
+	);
+	m_pLaunchBtn->setStatusTip(tr("Launch batch processing"));
+	m_pLaunchBtn->hide();
+	
+	connect(
+		m_pLaunchBtn, SIGNAL(clicked()),
+		this, SIGNAL(launchBatchProcessing())
+	);
+	
 	connect(
 		verticalScrollBar(), SIGNAL(rangeChanged(int, int)),
 		this, SLOT(ensureSelectedRowVisible()), Qt::QueuedConnection
@@ -153,7 +167,11 @@ StageListView::setBatchProcessingPossible(bool const possible)
 	}
 	m_batchProcessingPossible = possible;
 	
-	updateLaunchButtonVisibility();
+	if (possible) {
+		placeLaunchButton(selectedRow());
+	} else {
+		removeLaunchButton(selectedRow());
+	}
 }
 
 void
@@ -164,10 +182,10 @@ StageListView::setBatchProcessingInProgress(bool const in_progress)
 	}
 	m_batchProcessingInProgress = in_progress;
 	
-	updateLaunchButtonVisibility();
-	updateRowSpans();
-	
 	if (in_progress) {
+		removeLaunchButton(selectedRow());
+		updateRowSpans(); // Join columns.
+		
 		// Some styles (Oxygen) visually separate items in a selected row.
 		// We really don't want that, so we pretend the items are not selected.
 		m_pFirstColDelegate->flagsForceDisabled(QStyle::State_Selected);
@@ -176,6 +194,9 @@ StageListView::setBatchProcessingInProgress(bool const in_progress)
 		initiateBatchAnimationFrameRendering();
 		m_timerId = startTimer(180);
 	} else {
+		updateRowSpans(); // Separate columns.
+		placeLaunchButton(selectedRow());
+		
 		m_pFirstColDelegate->removeChanges(QStyle::State_Selected);
 		m_pSecondColDelegate->removeChanges(QStyle::State_Selected);
 		
@@ -227,57 +248,12 @@ StageListView::selectionChanged(
 	QTableView::selectionChanged(selected, deselected);
 	
 	if (!deselected.isEmpty()) {
-		setIndexWidget(deselected.front().topLeft(), 0);
+		removeLaunchButton(deselected.front().topLeft().row());
 	}
 	
 	if (!selected.isEmpty()) {
-		placeLaunchButton();
+		placeLaunchButton(selected.front().topLeft().row());
 	}
-}
-
-void
-StageListView::placeLaunchButton()
-{
-	// This loop won't run more than one iteration.
-	BOOST_FOREACH(QModelIndex const& idx, selectionModel()->selectedRows(0)) {
-		std::auto_ptr<QWidget> outer_widget(new QWidget);
-		QHBoxLayout* layout;
-		outer_widget->setLayout((layout = new QHBoxLayout()));
-		layout->setSpacing(0);
-		layout->setContentsMargins(0, 0, 0, 0);
-		layout->addStretch(1);
-		
-		if (!m_ptrLaunchBtn) {
-			SkinnedButton* btn = new SkinnedButton(
-				":/icons/play-small.png",
-				":/icons/play-small-hovered.png",
-				":/icons/play-small-pressed.png",
-				this
-			);
-			btn->setStatusTip(tr("Launch batch processing"));
-			connect(
-				btn, SIGNAL(clicked()),
-				this, SIGNAL(launchBatchProcessing())
-			);
-			m_ptrLaunchBtn = btn;
-		}
-		
-		layout->addWidget(m_ptrLaunchBtn);
-		setIndexWidget(idx, outer_widget.release());
-		updateLaunchButtonVisibility();
-	}
-}
-
-void
-StageListView::updateLaunchButtonVisibility()
-{
-	if (!m_ptrLaunchBtn) {
-		return;
-	}
-	
-	bool const visible = m_batchProcessingPossible
-			&& !m_batchProcessingInProgress;
-	m_ptrLaunchBtn->setVisible(visible);
 }
 
 void
@@ -287,6 +263,36 @@ StageListView::ensureSelectedRowVisible()
 	BOOST_FOREACH(QModelIndex const& idx, selectionModel()->selectedRows(0)) {
 		scrollTo(idx, EnsureVisible);
 	}
+}
+
+void
+StageListView::removeLaunchButton(int const row)
+{
+	if (row == -1) {
+		return;
+	}
+	
+	m_pLaunchBtn->hide();
+	m_pLaunchBtn->setParent(this);
+	setIndexWidget(m_pModel->index(row, 0), 0);
+}
+
+void
+StageListView::placeLaunchButton(int row)
+{
+	if (row == -1) {
+		return;
+	}
+	
+	std::auto_ptr<QWidget> outer_widget(new QWidget);
+	QHBoxLayout* layout;
+	outer_widget->setLayout((layout = new QHBoxLayout()));
+	layout->setSpacing(0);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addStretch(1);
+	layout->addWidget(m_pLaunchBtn);
+	m_pLaunchBtn->show();
+	setIndexWidget(m_pModel->index(row, 0), outer_widget.release());
 }
 
 void
