@@ -265,7 +265,7 @@ SET(
 	FilterResult.h
 	CompositeCacheDrivenTask.h
 	Margins.h
-	NoFocusItemDelegate.h
+	ChangedStateItemDelegate.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h

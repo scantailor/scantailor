@@ -20,6 +20,7 @@
 #define STAGELISTVIEW_H_
 
 #include "IntrusivePtr.h"
+#include "ChangedStateItemDelegate.h"
 #include <QTableView>
 #include <QPointer>
 #include <QPixmap>
@@ -64,8 +65,14 @@ private:
 	
 	void createBatchAnimationSequence(int square_side);
 	
+	void updateRowSpans();
+	
+	int selectedRow() const;
+	
 	QSize m_sizeHint;
 	Model* m_pModel;
+	ChangedStateItemDelegate<>* m_pFirstColDelegate;
+	ChangedStateItemDelegate<RightColDelegate>* m_pSecondColDelegate;
 	QPointer<QWidget> m_ptrLaunchBtn;
 	std::vector<QPixmap> m_batchAnimationPixmaps;
 	int m_curBatchAnimationFrame;

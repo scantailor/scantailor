@@ -18,15 +18,17 @@
 
 #include "StageListView.h.moc"
 #include "StageSequence.h"
-#include "NoFocusItemDelegate.h"
+#include "ChangedStateItemDelegate.h"
 #include "SkinnedButton.h"
 #include "BubbleAnimation.h"
 #include <QAbstractTableModel>
 #include <QStyledItemDelegate>
+#include <QHBoxLayout>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QPainter>
 #include <QPalette>
+#include <QStyle>
 #include <QColor>
 #include <QTimer>
 #include <QTimerEvent>
@@ -74,6 +76,8 @@ StageListView::StageListView(QWidget* parent)
 :	QTableView(parent),
 	m_sizeHint(QTableView::sizeHint()),
 	m_pModel(0),
+	m_pFirstColDelegate(new ChangedStateItemDelegate<>(this)),
+	m_pSecondColDelegate(new ChangedStateItemDelegate<RightColDelegate>(this)),
 	m_curBatchAnimationFrame(0),
 	m_timerId(0),
 	m_batchProcessingPossible(false),
@@ -83,10 +87,10 @@ StageListView::StageListView(QWidget* parent)
 	
 	// Prevent current item visualization. Not to be confused
 	// with selected items.
-	setItemDelegateForColumn(0, new NoFocusItemDelegate<>(this));
-	setItemDelegateForColumn(
-		1, new NoFocusItemDelegate<RightColDelegate>(this)
-	);
+	m_pFirstColDelegate->flagsForceDisabled(QStyle::State_HasFocus);
+	m_pSecondColDelegate->flagsForceDisabled(QStyle::State_HasFocus);
+	setItemDelegateForColumn(0, m_pFirstColDelegate);
+	setItemDelegateForColumn(1, m_pSecondColDelegate);
 	
 	QHeaderView* h_header = horizontalHeader();
 	h_header->setResizeMode(QHeaderView::Stretch);
@@ -128,6 +132,8 @@ StageListView::setStages(IntrusivePtr<StageSequence> const& stages)
 	}
 	m_curBatchAnimationFrame = 0;
 	
+	updateRowSpans();
+	
 	// Limit the vertical size to make it just enough to get
 	// rid of the scrollbars, but not more.
 	int height = verticalHeader()->length();
@@ -159,11 +165,20 @@ StageListView::setBatchProcessingInProgress(bool const in_progress)
 	m_batchProcessingInProgress = in_progress;
 	
 	updateLaunchButtonVisibility();
+	updateRowSpans();
 	
 	if (in_progress) {
+		// Some styles (Oxygen) visually separate items in a selected row.
+		// We really don't want that, so we pretend the items are not selected.
+		m_pFirstColDelegate->flagsForceDisabled(QStyle::State_Selected);
+		m_pSecondColDelegate->flagsForceDisabled(QStyle::State_Selected);
+		
 		initiateBatchAnimationFrameRendering();
 		m_timerId = startTimer(180);
 	} else {
+		m_pFirstColDelegate->removeChanges(QStyle::State_Selected);
+		m_pSecondColDelegate->removeChanges(QStyle::State_Selected);
+		
 		if (m_pModel) {
 			m_pModel->disableBatchProcessingAnimation();
 		}
@@ -190,11 +205,10 @@ StageListView::initiateBatchAnimationFrameRendering()
 		return;
 	}
 	
-	QModelIndexList selection(selectionModel()->selectedRows(0));
-	if (selection.empty()) {
+	int const selected_row = selectedRow();
+	if (selected_row == -1) {
 		return;
 	}
-	int const selected_row = selection.front().row();
 	
 	m_pModel->updateBatchProcessingAnimation(
 		selected_row, m_batchAnimationPixmaps[m_curBatchAnimationFrame]
@@ -213,14 +227,11 @@ StageListView::selectionChanged(
 	QTableView::selectionChanged(selected, deselected);
 	
 	if (!deselected.isEmpty()) {
-		setIndexWidget(deselected.front().bottomRight(), 0);
+		setIndexWidget(deselected.front().topLeft(), 0);
 	}
 	
 	if (!selected.isEmpty()) {
-		// For some reason, if we call setIndexWidget()
-		// right here, the item we set may misteriously
-		// disappear.
-		QTimer::singleShot(0, this, SLOT(placeLaunchButton()));
+		placeLaunchButton();
 	}
 }
 
@@ -228,26 +239,32 @@ void
 StageListView::placeLaunchButton()
 {
 	// This loop won't run more than one iteration.
-	BOOST_FOREACH(QModelIndex const& idx, selectionModel()->selectedRows(1)) {
-		SkinnedButton* btn = new SkinnedButton(
-			":/icons/play-small.png",
-			":/icons/play-small-hovered.png",
-			":/icons/play-small-pressed.png",
-			this
-		);
-		btn->setStatusTip(tr("Launch batch processing"));
-		connect(
-			btn, SIGNAL(clicked()),
-			this, SIGNAL(launchBatchProcessing())
-		);
-		m_ptrLaunchBtn = btn;
-		setIndexWidget(idx, btn);
-#if 0
-		// This doesn't work for some reason.
+	BOOST_FOREACH(QModelIndex const& idx, selectionModel()->selectedRows(0)) {
+		std::auto_ptr<QWidget> outer_widget(new QWidget);
+		QHBoxLayout* layout;
+		outer_widget->setLayout((layout = new QHBoxLayout()));
+		layout->setSpacing(0);
+		layout->setContentsMargins(0, 0, 0, 0);
+		layout->addStretch(1);
+		
+		if (!m_ptrLaunchBtn) {
+			SkinnedButton* btn = new SkinnedButton(
+				":/icons/play-small.png",
+				":/icons/play-small-hovered.png",
+				":/icons/play-small-pressed.png",
+				this
+			);
+			btn->setStatusTip(tr("Launch batch processing"));
+			connect(
+				btn, SIGNAL(clicked()),
+				this, SIGNAL(launchBatchProcessing())
+			);
+			m_ptrLaunchBtn = btn;
+		}
+		
+		layout->addWidget(m_ptrLaunchBtn);
+		setIndexWidget(idx, outer_widget.release());
 		updateLaunchButtonVisibility();
-#else
-		QTimer::singleShot(0, this, SLOT(updateLaunchButtonVisibility()));
-#endif
 	}
 }
 
@@ -260,11 +277,6 @@ StageListView::updateLaunchButtonVisibility()
 	
 	bool const visible = m_batchProcessingPossible
 			&& !m_batchProcessingInProgress;
-	
-	if (visible != m_ptrLaunchBtn->isVisible()) {
-		// Don't ask me why it's necessary - it should not be.
-		QTimer::singleShot(0, this, SLOT(updateLaunchButtonVisibility()));
-	}
 	m_ptrLaunchBtn->setVisible(visible);
 }
 
@@ -295,6 +307,29 @@ StageListView::createBatchAnimationSequence(int const square_side)
 		pixmap.fill(Qt::transparent);
 		animation.nextFrame(head_color, tail_color, &pixmap);
 	}
+}
+
+void
+StageListView::updateRowSpans()
+{
+	if (!m_pModel) {
+		return;
+	}
+	
+	int const count = m_pModel->rowCount(QModelIndex());
+	for (int i = 0; i < count; ++i) {
+		setSpan(i, 0, 1, m_batchProcessingInProgress ? 1 : 2);
+	}
+}
+
+int
+StageListView::selectedRow() const
+{
+	QModelIndexList const selection(selectionModel()->selectedRows(0));
+	if (selection.empty()) {
+		return - 1;
+	}
+	return selection.front().row();
 }
 
 
