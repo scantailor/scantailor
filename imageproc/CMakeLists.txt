@@ -12,7 +12,7 @@ SET(
 	SeedFill.cpp SeedFill.h
 	kFill.cpp kFill.h
 	ConnCompEraser.cpp ConnCompEraser.h
-	ConnCompEraserExt.cpp ConnCompEraser.h
+	ConnCompEraserExt.cpp ConnCompEraserExt.h
 	Grayscale.cpp Grayscale.h
 	RasterOp.h GrayRasterOp.h
 	UpscaleIntegerTimes.cpp UpscaleIntegerTimes.h
@@ -32,7 +32,7 @@ SET(
 	GaussBlur.cpp GaussBlur.h
 	MorphGradientDetect.cpp MorphGradientDetect.h
 	LeastSquaresFit.cpp LeastSquaresFit.h
-	PolynomialLine.cpp PolynomialSurface.h
+	PolynomialLine.cpp PolynomialLine.h
 	PolynomialSurface.cpp PolynomialSurface.h
 	SavGolKernel.cpp SavGolKernel.h
 	SavGolFilter.cpp SavGolFilter.h
