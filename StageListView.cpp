@@ -127,6 +127,11 @@ StageListView::~StageListView()
 void
 StageListView::setStages(IntrusivePtr<StageSequence> const& stages)
 {
+	if (QAbstractItemModel* m = model()) {
+		// Q*View classes don't own their models.
+		m->deleteLater();
+	}
+	
 	m_pModel = new Model(this, stages);
 	setModel(m_pModel);
 	
