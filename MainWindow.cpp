@@ -497,6 +497,13 @@ MainWindow::resetThumbSequence()
 void
 MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const ownership)
 {
+	if (m_batchProcessing) {
+		if (ownership == TRANSFER_OWNERSHIP) {
+			delete widget;
+		}
+		return;
+	}
+	
 	if (m_ptrOptionsWidget != widget) {
 		removeWidgetsFromLayout(m_pOptionsFrameLayout);
 	}
@@ -561,6 +568,13 @@ MainWindow::setImageWidget(
 	QWidget* widget, Ownership const ownership,
 	DebugImages* debug_images)
 {
+	if (m_batchProcessing) {
+		if (ownership == TRANSFER_OWNERSHIP) {
+			delete widget;
+		}
+		return;
+	}
+	
 	removeImageWidget();
 	
 	if (ownership == TRANSFER_OWNERSHIP) {
@@ -763,6 +777,9 @@ MainWindow::startBatchProcessing()
 		return;
 	}
 	
+	// Must be done before settint m_batchProcessing to true.
+	setImageWidget(m_ptrBatchProcessingWidget.get(), KEEP_OWNERSHIP);
+	
 	m_batchProcessing = true;
 	
 	focusButton->setChecked(true);
@@ -805,12 +822,12 @@ MainWindow::stopBatchProcessing(MainAreaAction main_area)
 	// currently being processed, but the one that has been processed
 	// before that.
 	int page_num = 0;
-	PageInfo const page_info(m_ptrPages->curPage(getCurrentView(), &page_num));
-	m_ptrThumbSequence->setCurrentThumbnail(page_info.id());
+	PageInfo const page(m_ptrPages->curPage(getCurrentView(), &page_num));
+	m_ptrThumbSequence->setCurrentThumbnail(page.id());
 	
 	switch (main_area) {
 		case LOAD_IMAGE:
-			loadImage(page_info, page_num);
+			loadImage(page, page_num);
 			break;
 		case CLEAR_MAIN_AREA:
 			removeImageWidget();
@@ -1050,6 +1067,8 @@ MainWindow::removeFilterOptionsWidget()
 	
 	// Delete the old widget we were owning, if any.
 	m_optionsWidgetCleanup.clear();
+	
+	m_ptrOptionsWidget = 0;
 }
 
 void
@@ -1138,14 +1157,12 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 			" \"Page Layout\".")
 		);
 		
-		setOptionsWidget(new FilterOptionsWidget, TRANSFER_OWNERSHIP);
+		removeFilterOptionsWidget();
 		setImageWidget(new ErrorWidget(err_text), TRANSFER_OWNERSHIP);
 		return;
 	}
 	
-	if (m_batchProcessing) {
-		setImageWidget(m_ptrBatchProcessingWidget.get(), KEEP_OWNERSHIP);
-	} else {
+	if (!m_batchProcessing) {
 		if (m_pImageFrameLayout->indexOf(m_ptrProcessingIndicationWidget.get()) != -1) {
 			m_ptrProcessingIndicationWidget->processingRestartedEffect();
 		}
