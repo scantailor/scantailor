@@ -21,7 +21,6 @@
 #include "imageproc/BinaryImage.h"
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/Connectivity.h"
-#include "imageproc/SEDM.h"
 #include <boost/foreach.hpp>
 #include <QDebug>
 #include <vector>
