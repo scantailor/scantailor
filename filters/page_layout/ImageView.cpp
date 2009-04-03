@@ -394,7 +394,7 @@ ImageView::resizeInnerRect(QPoint const delta)
 	setWidgetFocalPoint(fp);
 	
 	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
-		m_pageId, origRectToSizeMM(m_middleRect)
+		m_pageId, origRectToSizeMM(m_middleRect), m_alignment
 	);
 	
 	recalcOuterRect();
@@ -459,7 +459,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 	}
 	
 	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
-		m_pageId, origRectToSizeMM(m_middleRect)
+		m_pageId, origRectToSizeMM(m_middleRect), m_alignment
 	);
 	
 	recalcOuterRect();

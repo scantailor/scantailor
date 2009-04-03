@@ -135,13 +135,14 @@ public:
 	
 	/**
 	 * \brief Same as getAggregateHardSizeMM(), but assumes a specified
-	 *        size for a specified page.
+	 *        size and alignment for a specified page.
 	 *
-	 * This function doesn't modify anything, it just pretents that
-	 * the size of a specified page has changed.
+	 * This function doesn't modify anything, it just pretends that
+	 * the size and alignment of a specified page have changed.
 	 */
 	QSizeF getAggregateHardSizeMM(
-		PageId const& page_id, QSizeF const& hard_size_mm) const;
+		PageId const& page_id, QSizeF const& hard_size_mm,
+		Alignment const& alignment) const;
 	
 	/**
 	 * \brief Find the widest page and return its id.

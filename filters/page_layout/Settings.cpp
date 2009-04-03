@@ -29,6 +29,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <boost/multi_index/composite_key.hpp>
 #include <algorithm>
 #include <functional> // for std::greater<>
 #include <stddef.h>
@@ -53,6 +54,12 @@ public:
 	double hardWidthMM() const;
 	
 	double hardHeightMM() const;
+	
+	double influenceHardWidthMM() const;
+	
+	double influenceHardHeightMM() const;
+	
+	bool alignedWithOthers() const { return !alignment.isNull(); }
 };
 
 
@@ -134,7 +141,8 @@ public:
 	QSizeF getAggregateHardSizeMMLocked() const;
 	
 	QSizeF getAggregateHardSizeMM(
-		PageId const& page_id, QSizeF const& hard_size_mm) const;
+		PageId const& page_id, QSizeF const& hard_size_mm,
+		Alignment const& alignment) const;
 	
 	PageId findWidestPage() const;
 	
@@ -149,13 +157,29 @@ private:
 			ordered_unique<member<Item, PageId, &Item::pageId> >,
 			ordered_non_unique<
 				tag<DescWidthTag>,
-				const_mem_fun<Item, double, &Item::hardWidthMM>,
-				std::greater<double>
+				// ORDER BY alignedWithOthers DESC, hardWidthMM DESC
+				composite_key<
+					Item,
+					const_mem_fun<Item, bool, &Item::alignedWithOthers>,
+					const_mem_fun<Item, double, &Item::hardWidthMM>
+				>,
+				composite_key_compare<
+					std::greater<bool>,
+					std::greater<double>
+				>
 			>,
 			ordered_non_unique<
 				tag<DescHeightTag>,
-				const_mem_fun<Item, double, &Item::hardHeightMM>,
-				std::greater<double>
+				// ORDER BY alignedWithOthers DESC, hardHeightMM DESC
+				composite_key<
+					Item,
+					const_mem_fun<Item, bool, &Item::alignedWithOthers>,
+					const_mem_fun<Item, double, &Item::hardHeightMM>
+				>,
+				composite_key_compare<
+					std::greater<bool>,
+					std::greater<double>
+				>
 			>
 		>
 	> Container;
@@ -265,9 +289,10 @@ Settings::getAggregateHardSizeMM() const
 
 QSizeF
 Settings::getAggregateHardSizeMM(
-	PageId const& page_id, QSizeF const& hard_size_mm) const
+	PageId const& page_id, QSizeF const& hard_size_mm,
+	Alignment const& alignment) const
 {
-	return m_ptrImpl->getAggregateHardSizeMM(page_id, hard_size_mm);
+	return m_ptrImpl->getAggregateHardSizeMM(page_id, hard_size_mm, alignment);
 }
 
 PageId
@@ -305,6 +330,18 @@ double
 Settings::Item::hardHeightMM() const
 {
 	return contentSizeMM.height() + hardMarginsMM.top() + hardMarginsMM.bottom();
+}
+
+double
+Settings::Item::influenceHardWidthMM() const
+{
+	return alignment.isNull() ? 0.0 : hardWidthMM();
+}
+
+double
+Settings::Item::influenceHardHeightMM() const
+{
+	return alignment.isNull() ? 0.0 : hardHeightMM();
 }
 
 
@@ -533,16 +570,21 @@ Settings::Impl::getAggregateHardSizeMMLocked() const
 	Item const& max_width_item = *m_descWidthOrder.begin();
 	Item const& max_height_item = *m_descHeightOrder.begin();
 	
-	double const width = max_width_item.hardWidthMM();
-	double const height = max_height_item.hardHeightMM();
+	double const width = max_width_item.influenceHardWidthMM();
+	double const height = max_height_item.influenceHardHeightMM();
 	
 	return QSizeF(width, height);
 }
 
 QSizeF
 Settings::Impl::getAggregateHardSizeMM(
-	PageId const& page_id, QSizeF const& hard_size_mm) const
+	PageId const& page_id, QSizeF const& hard_size_mm,
+	Alignment const& alignment) const
 {
+	if (alignment.isNull()) {
+		return getAggregateHardSizeMM();
+	}
+	
 	QMutexLocker const locker(&m_mutex);
 	
 	if (m_items.empty()) {
@@ -554,14 +596,14 @@ Settings::Impl::getAggregateHardSizeMM(
 	{
 		DescWidthOrder::iterator it(m_descWidthOrder.begin());
 		if (it->pageId != page_id) {
-			width = it->hardWidthMM();
+			width = it->influenceHardWidthMM();
 		} else {
 			++it;
 			if (it == m_descWidthOrder.end()) {
 				width = hard_size_mm.width();
 			} else {
 				width = std::max(
-					hard_size_mm.width(), it->hardWidthMM()
+					hard_size_mm.width(), it->influenceHardWidthMM()
 				);
 			}
 		}
@@ -572,14 +614,14 @@ Settings::Impl::getAggregateHardSizeMM(
 	{
 		DescHeightOrder::iterator it(m_descHeightOrder.begin());
 		if (it->pageId != page_id) {
-			height = it->hardHeightMM();
+			height = it->influenceHardHeightMM();
 		} else {
 			++it;
 			if (it == m_descHeightOrder.end()) {
 				height = hard_size_mm.height();
 			} else {
 				height = std::max(
-					hard_size_mm.height(), it->hardHeightMM()
+					hard_size_mm.height(), it->influenceHardHeightMM()
 				);
 			}
 		}
