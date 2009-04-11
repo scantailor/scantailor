@@ -23,7 +23,7 @@
 #include "AbstractFilter.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
-#include <memory>
+#include "SafeDeletingQObjectPtr.h"
 
 class PageId;
 class PageLayout;
@@ -78,7 +78,7 @@ private:
 		PageId const& page_id, int numeric_id) const;
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	std::auto_ptr<OptionsWidget> m_ptrOptionsWidget;
+	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
 };
 
 } // namespace deskew

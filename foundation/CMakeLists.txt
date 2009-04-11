@@ -3,6 +3,7 @@ PROJECT("Foundation library")
 SET(
 	sources
 	NonCopyable.h IntrusivePtr.h RefCountable.h
+	SafeDeletingQObjectPtr.h
 	ScopedIncDec.h ScopedDecInc.h
 	Span.h VirtualFunction.h FlagOps.h
 	PerformanceTimer.cpp PerformanceTimer.h
