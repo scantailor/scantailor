@@ -37,6 +37,7 @@
 #include <QDebug>
 #include <boost/foreach.hpp>
 #include <algorithm>
+#include <memory>
 #include <assert.h>
 
 class StageListView::Model : public QAbstractTableModel
