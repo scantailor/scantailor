@@ -19,6 +19,7 @@ FILE(STRINGS "${PROJECT_SOURCE_DIR}/VERSION" VERSION LIMIT_COUNT 1)
 
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
+INCLUDE(FindBoost)
 INCLUDE(cmake/FindPthreads.cmake)
 INCLUDE(cmake/SetDefaultBuildType.cmake)
 INCLUDE(cmake/SetDefaultGccFlags.cmake)
@@ -42,17 +43,33 @@ IF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
 ENDIF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
 
 INCLUDE(FindQt4)
+IF(NOT QT4_FOUND)
+	MESSAGE(
+		FATAL_ERROR "Qt4 could not be found. "
+		"If it's installed in a non-standard location, specify the path to qmake in QT_QMAKE_EXECUTABLE. "
+		"You can do it in interactive mode (ccmake instead of cmake) or using -DVAR=VAL syntax."
+	)
+ENDIF(NOT QT4_FOUND)
 
 FILE(GLOB jpeg_dirs "${outer_dir}/jpeg-[0-9]*")
 FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB boost_dirs "${outer_dir}/boost_1_[0-9]*_[0-9]*")
 
 FIND_PATH(
 	JPEG_INCLUDE_DIR jpeglib.h
 	PATHS /usr/local/include /usr/include ${jpeg_dirs}
 	DOC "Path to libjpeg headers."
 )
+IF(NOT JPEG_INCLUDE_DIR)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find jpeg headers.\n"
+		"You may need to install a package named libjpeg62-dev or similarly."
+	)
+ENDIF(NOT JPEG_INCLUDE_DIR)
+
 FIND_LIBRARY(
 	JPEG_LIBRARY jpeg
 	PATHS /usr/local/lib /usr/lib ${jpeg_dirs}
@@ -65,6 +82,14 @@ FIND_PATH(
 	PATHS /usr/local/include /usr/include ${zlib_dirs}
 	DOC "Path to zlib headers."
 )
+IF(NOT ZLIB_INCLUDE_DIR)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find zlib headers.\n"
+		"You may need to install a package named zlib1g-dev or similarly."
+	)
+ENDIF(NOT ZLIB_INCLUDE_DIR)
+
 FIND_LIBRARY(
 	ZLIB_LIBRARY NAMES zlib z
 	PATHS /usr/local/lib /usr/lib ${zlib_dirs}
@@ -77,6 +102,14 @@ FIND_PATH(
 	PATHS /usr/local/include /usr/include ${png_dirs}
 	DOC "Path to libpng headers."
 )
+IF(NOT PNG_INCLUDE_DIR)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find libpng headers.\n"
+		"You may need to install a package named libpng12-dev or similarly."
+	)
+ENDIF(NOT PNG_INCLUDE_DIR)
+
 FIND_LIBRARY(
 	PNG_LIBRARY png
 	PATHS /usr/local/lib /usr/lib ${png_dirs}
@@ -90,6 +123,14 @@ FIND_PATH(
 	PATH_SUFFIXES libtiff
 	DOC "Path to libtiff headers."
 )
+IF(NOT TIFF_INCLUDE_DIR)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find libtiff headers.\n"
+ 		"You may need to install a package named libtiff4-dev or similarly."
+	)
+ENDIF(NOT TIFF_INCLUDE_DIR)
+
 FIND_LIBRARY(
 	TIFF_LIBRARY tiff
 	PATHS /usr/local/lib /usr/lib ${tiff_dirs}
@@ -97,6 +138,29 @@ FIND_LIBRARY(
 	DOC "Path to tiff library."
 )
 INCLUDE_DIRECTORIES("${TIFF_INCLUDE_DIR}")
+
+IF(WIN32)
+	FIND_PATH(
+		BOOST_ROOT boost-build.jam PATHS ${boost_dirs}
+		DOC "Path to top-level Boost source directory."
+	)
+	SET(Boost_USE_STATIC_LIBS ON)
+ELSE(WIN32)
+	ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
+ENDIF(WIN32)
+
+SET(Boost_USE_MULTITHREADED ON)
+FIND_PACKAGE(Boost 1.35.0 COMPONENTS unit_test_framework prg_exec_monitor)
+IF(NOT Boost_FOUND)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find boost headers or libraries.\n"
+		"You may need to install a package named libboost1.35-dev or similarly."
+	)
+ENDIF(NOT Boost_FOUND)
+
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
 IF(UNIX)
 	# We need to manually use XRender.
@@ -110,8 +174,8 @@ IF(UNIX)
 		MESSAGE(
 			FATAL_ERROR
 			"Could not find Xrender.h\n"
-			"Most likely you need to install a package called\n"
-			"libxrender-dev or libXrender-dev or similar."
+			"You may need to install a package called\n"
+			"libxrender-dev or libXrender-dev or similarly."
 		)
 	ENDIF(NOT X11_INCLUDE_PATH)
 	
@@ -146,10 +210,10 @@ ADD_DEFINITIONS(
 )
 
 IF(WIN32)
-	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
+ 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(. foundation boost ${QT_INCLUDES})
+INCLUDE_DIRECTORIES(. foundation ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
 
@@ -174,7 +238,6 @@ SET(TRANSLATIONS_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${TRANSLATIONS_DIR_REL}")
 CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
 CONFIGURE_FILE(version.h.in ${CMAKE_BINARY_DIR}/version.h @ONLY)
 
-ADD_SUBDIRECTORY(boost)
 ADD_SUBDIRECTORY(foundation)
 ADD_SUBDIRECTORY(imageproc)
 ADD_SUBDIRECTORY(tests)

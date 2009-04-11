@@ -21,7 +21,7 @@ latest stable version.
    If you aren't going to distribute your Scan Tailor build and aren't going
    to open files from untrusted sources, then you don't really need patching it.
 6. Qt 4.x.x (tested with 4.4.2)
-   Homepage: http://trolltech.com
+   Homepage: http://trolltech.com/
    Download Qt -> Open Source -> Application Development -> Qt for Windows: C++
    From there download the mingw version rather than the source-only version.
    By doing so you will get the correct version of MinGW installed, and you'll
@@ -29,7 +29,9 @@ latest stable version.
    anyway, but at least you won't have to rebuild the programs that come with
    Qt.  Still, the source-only Qt plus a manual MinGW installation is supported,
    but this document assumes you are using the mingw version.
-7. NSIS 2.x (tested with 2.42)
+7. Boost (tested with 1.38.0)
+   Homepage: http://boost.org/
+8. NSIS 2.x (tested with 2.42)
    Homepage: http://nsis.sourceforge.net/
 
 
@@ -39,9 +41,10 @@ latest stable version.
 1. Create a build directory.  Its full path should have no spaces.  I suggest
    C:\build
 
-2. Unpack jpeg-6b, libpng, libtiff, zlib and scantailor itself to the build
+2. Unpack jpeg-6b, libpng, libtiff, zlib, boost and scantailor itself to the build
    directory.  You should get a directory structure like this:
    C:\build
+     | boost_1_38_0
      | jpeg-6b
      | libpng-1.2.31
      | scantailor-0.9.0
@@ -80,8 +83,9 @@ latest stable version.
 
    Click "Configure".  Select the project type "MinGW Makefiles".  If any
    paths were not found, enter them manually, then click "Configure" again.
-   If everything went right, the "OK" button will become clickable.
-   Click it.
+   If everything went right, the "Generate" button will become clickable.
+   Click it.  Sometimes it's necessary to click "Configure" more than once
+   before "Generate" becomes clickable.
 
 7. Launch the Qt Command Promt from the Start menu.
    Enter the following there:
@@ -105,12 +109,13 @@ latest stable version.
    Source directory: C:\build\scantailor-0.9.0
    Binary directory: C:\build\scantailor-build
 
-   Click "Configure".  Select project type "MinGW Makefiles".  If any
+   Click "Configure".  Select the project type "MinGW Makefiles".  If any
    paths were not found, enter them manually, then click "Configure" again.
-   If everything went right, the "OK" button will become clickable.
-   Click it.
+   If everything went right, the "Generate" button will become clickable.
+   Click it.  Sometimes it's necessary to click "Configure" more than once
+   before "Generate" becomes clickable.
 
-9. Back in the Qt Command Promt, give the following commands:
+9. Back to the Qt Command Promt, give the following commands:
 
    C:
    cd C:\build\scantailor-build
@@ -127,9 +132,11 @@ latest stable version.
 These instructions assume you've got the patch file from Debian:
 http://packages.debian.org/source/sid/tiff
 There you will find both the original libtiff sources and a separate patch
-in .diff.gz format.  This patch is not a simple one.  It brings more patches
-that need to be applied in a specific order.  Fortunately, we have a CMake
-script that simplifies things a lot.
+in .diff.gz format.  Note that debian packages the original source archive
+inside another archive.  Extract the inner one and uncompress it to the
+build directory (C:\build).  The patch they distribute is not a simple one.
+It brings more patches that need to be applied in a specific order.
+Fortunately, we have a CMake script that simplifies things a lot.
 
 Here are the instructions:
 
@@ -151,10 +158,11 @@ Here are the instructions:
    Source directory: C:\build\scantailor-0.9.0\packaging\windows\patch_libtiff
    Binary directory: C:\build\tiff-patch-dir
 
-   Click "Configure".  Select the project type "MinGW Makefiles".  If any
+  Click "Configure".  Select the project type "MinGW Makefiles".  If any
    paths were not found, enter them manually, then click "Configure" again.
-   If everything went right, the "OK" button will become clickable.
-   Click it.
+   If everything went right, the "Generate" button will become clickable.
+   Click it.  Sometimes it's necessary to click "Configure" more than once
+   before "Generate" becomes clickable.
 
 5. Do the following from the Qt Command Prompt:
 

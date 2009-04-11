@@ -17,6 +17,8 @@ FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
 FILE(GLOB qt_dirs2 "C:/Qt/4.*.*")
+FILE(GLOB boost_dirs "${outer_dir}/boost_1_[0-9]*_[0-9]*")
+FILE(GLOB boost_jam_dirs "${outer_dir}/boost-jam-*")
 
 FIND_PATH(
 	JPEG_DIR jpeglib.h PATHS ${jpeg_dirs}
@@ -38,6 +40,14 @@ FIND_PATH(
 	QT_DIR projects.pro PATHS ${qt_dirs} ${qt_dirs2}
 	DOC "Path to top-level Qt source directory."
 )
+FIND_PATH(
+	BOOST_DIR boost/foreach.hpp PATHS ${boost_dirs}
+	DOC "Path to top-level Boost source directory."
+)
+FIND_PROGRAM(
+	BJAM_EXECUTABLE bjam PATHS ${boost_jam_dirs}
+	DOC "Path to a directory containing bjam executable."
+)
 
 IF(NOT JPEG_DIR)
 	MESSAGE(FATAL_ERROR "JPEG source directory not found. You may specify it manually.")
@@ -49,6 +59,10 @@ ELSEIF(NOT TIFF_DIR)
 	MESSAGE(FATAL_ERROR "TIFF source directory not found. You may specify it manually.")
 ELSEIF(NOT QT_DIR)
 	MESSAGE(FATAL_ERROR "Qt source directory not found. You may specify it manually.")
+ELSEIF(NOT BOOST_DIR)
+	MESSAGE(FATAL_ERROR "Boost source directory not found. You may specify it manually.")
+ELSEIF(NOT BJAM_EXECUTABLE)
+	MESSAGE(FATAL_ERROR "bjam executable not found. You may specify it manually.")
 ENDIF(NOT JPEG_DIR)
 
 MACRO(LIST_ITEMS_PREPEND LIST PREFIX)
@@ -180,6 +194,14 @@ ADD_CUSTOM_COMMAND(
 )
 
 
+#================================= Boost ================================#
+
+ADD_CUSTOM_TARGET(
+	boost "${BJAM_EXECUTABLE}" --with-test toolset=gcc stage
+    WORKING_DIRECTORY "${BOOST_DIR}"
+)
+
+
 #=================================== Qt ===================================#
 
 # Backward compatibility.  We used to patch projects.pro, now we patch
@@ -233,4 +255,6 @@ FILE(
 
 ADD_CUSTOM_TARGET(Qt ALL "${build_qt_fname}")
 
-ADD_DEPENDENCIES(Qt zlib jpeg png tiff)
+# boost added so that boost is built before Qt. That's helpful if build
+# errors occur, as rebuilding boost is much faster than rebuilding Qt.
+ADD_DEPENDENCIES(Qt zlib jpeg png tiff boost)
