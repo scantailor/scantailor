@@ -59,6 +59,7 @@
 #include <algorithm>
 #include <limits>
 #include <math.h>
+#include <stdlib.h>
 #include <limits.h>
 
 namespace select_content

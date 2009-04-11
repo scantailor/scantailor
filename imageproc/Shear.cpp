@@ -23,6 +23,7 @@
 #include <QPoint>
 #include <stdexcept>
 #include <math.h>
+#include <stdlib.h>
 #include <assert.h>
 
 namespace imageproc
