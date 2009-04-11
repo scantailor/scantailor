@@ -104,7 +104,7 @@ ProjectWriter::write(QString const& file_path, std::vector<FilterPtr> const& fil
 		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 QDomElement
