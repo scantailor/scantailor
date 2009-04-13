@@ -26,6 +26,7 @@
 #include "BackgroundTask.h"
 #include "FilterResult.h"
 #include "PageSequence.h"
+#include "BeforeOrAfter.h"
 #include <QMainWindow>
 #include <QString>
 #include <QPointer>
@@ -39,6 +40,7 @@ class ThumbnailSequence;
 class StageSequence;
 class FilterOptionsWidget;
 class ProcessingIndicationWidget;
+class ImageInfo;
 class PageInfo;
 class QStackedLayout;
 class WorkerThread;
@@ -80,6 +82,9 @@ private slots:
 	void pageSelected(
 		PageInfo const& page_info, QRectF const& thumb_rect,
 		bool by_user, bool was_already_selected);
+	
+	void contextMenuRequested(
+		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 	
 	void thumbViewFocusToggled(bool checked);
 	
@@ -183,6 +188,16 @@ private:
 	void closeProjectWithoutSaving();
 	
 	bool saveProjectWithFeedback(QString const& project_file);
+	
+	void showInsertFileDialog(
+		BeforeOrAfter before_or_after, ImageId const& existig);
+	
+	void showRemoveFileDialog(PageInfo const& page_info);
+	
+	void insertImage(ImageInfo const& new_image,
+		BeforeOrAfter before_or_after, ImageId const& existing);
+	
+	void removeFromProject(ImageId image_id);
 	
 	BackgroundTaskPtr createCompositeTask(
 		PageInfo const& page, int page_num, int last_filter_idx);

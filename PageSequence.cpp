@@ -384,6 +384,37 @@ PageSequence::setNextPage(View const view, int* page_num)
 	return info;
 }
 
+bool
+PageSequence::insertImage(ImageInfo const& new_image,
+	BeforeOrAfter before_or_after, ImageId const& existing)
+{
+	bool was_modified = false;
+	
+	{
+		QMutexLocker locker(&m_mutex);
+		return insertImageImpl(new_image, before_or_after, existing, was_modified);
+	}
+	
+	if (was_modified) {
+		emit modified();
+	}
+}
+
+void
+PageSequence::removeImage(ImageId const& image_id)
+{
+	bool was_modified = false;
+	
+	{
+		QMutexLocker locker(&m_mutex);
+		removeImageImpl(image_id, was_modified);
+	}
+	
+	if (was_modified) {
+		emit modified();
+	}
+}
+
 void
 PageSequence::setLogicalPagesInImageImpl(
 	ImageId const& image_id, int const num_pages, bool* modified)
@@ -606,6 +637,84 @@ PageSequence::setNextPageImpl(View const view, int* page_num, bool& modified)
 		id, image->metadata,
 		image->multiPageFile, image->numLogicalPages
 	);
+}
+
+bool
+PageSequence::insertImageImpl(ImageInfo const& new_image,
+	BeforeOrAfter before_or_after, ImageId const& existing, bool& modified)
+{
+	assert(new_image.numSubPages() >= 1 && new_image.numSubPages() <= 2);
+	
+	std::vector<ImageDesc>::iterator it(m_images.begin());
+	std::vector<ImageDesc>::iterator const end(m_images.end());
+	int logical_pages_seen = 0;
+	for (; it != end && it->id != existing; ++it) {
+		logical_pages_seen += it->numLogicalPages;
+	}
+	if (it == end) {
+		// Existing image not found.
+		return false;
+	}
+	if (before_or_after == AFTER) {
+		++it;
+		if (it != end) {
+			logical_pages_seen += it->numLogicalPages;
+		}
+	}
+	
+	ImageDesc const image_desc(
+		new_image.id(), new_image.metadata(),
+		new_image.isMultiPageFile(), new_image.numSubPages()
+	);
+	m_images.insert(it, image_desc);
+	
+	m_totalLogicalPages += new_image.numSubPages();
+	if (logical_pages_seen < m_curLogicalPage) {
+		m_curLogicalPage += new_image.numSubPages();
+	}
+	
+	return true;
+}
+
+void
+PageSequence::removeImageImpl(ImageId const& image_id, bool& modified)
+{
+	if (m_images.empty()) {
+		return;
+	}
+	
+	std::vector<ImageDesc>::iterator it(m_images.begin());
+	std::vector<ImageDesc>::iterator const end(m_images.end());
+	int logical_pages_seen = 0;
+	int idx = 0;
+	for (; it != end && it->id != image_id; ++it, ++idx) {
+		logical_pages_seen += it->numLogicalPages;
+	}
+	if (it == end) {
+		return;
+	}
+	
+	m_totalLogicalPages -= it->numLogicalPages;
+	if (idx == m_curImage) {
+		// Removing the current page.
+		if (idx < int(m_images.size()) - 1) {
+			// Not the last one.
+			// Set the first sub-page of the next image as the current page.
+			m_curLogicalPage -= m_curSubPage;
+			m_curSubPage = 0;
+		} else {
+			// Last one.
+			// Set the last sub-page of the previous image as the current page.
+			--m_curImage;
+			m_curLogicalPage -= m_curSubPage - 1;
+			m_curSubPage = m_images[m_curImage].numLogicalPages - 1;
+		}
+	} else if (logical_pages_seen < m_curLogicalPage) {
+		m_curLogicalPage -= it->numLogicalPages;
+	}
+	
+	m_images.erase(it);
+	modified = true;
 }
 
 PageId::SubPage

@@ -40,10 +40,10 @@ public:
 	
 	virtual ~RefCountable() {}
 	
-	void ref() const { m_refCounter.ref(); }
+	void ref() const { m_refCounter.fetchAndAddRelaxed(1); }
 	
 	void unref() const {
-		if (!m_refCounter.deref()) {
+		if (m_refCounter.fetchAndAddRelease(-1) == 1) {
 			delete this;
 		}
 	}

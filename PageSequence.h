@@ -25,6 +25,7 @@
 #include "ImageId.h"
 #include "PageId.h"
 #include "PageInfo.h"
+#include "BeforeOrAfter.h"
 #include <QObject>
 #include <QMutex>
 #include <QString>
@@ -88,6 +89,20 @@ public:
 	PageInfo setPrevPage(View view, int* page_num = 0);
 	
 	PageInfo setNextPage(View view, int* page_num = 0);
+	
+	/**
+	 * \brief Insert an image before or after the existing one.
+	 *
+	 * The caller has to make sure he is not inserting an image that already
+	 * exists in this PageSequence.
+	 *
+	 * Returns true if the image was inserted, false if the \p existing
+	 * image wasn't found.
+	 */
+	bool insertImage(ImageInfo const& new_image,
+		BeforeOrAfter before_or_after, ImageId const& existing);
+	
+	void removeImage(ImageId const& image_id);
 signals:
 	void modified();
 private:
@@ -128,6 +143,11 @@ private:
 	PageInfo setPrevPageImpl(View view, int* page_num, bool& modified);
 	
 	PageInfo setNextPageImpl(View view, int* page_num, bool& modified);
+	
+	bool insertImageImpl(ImageInfo const& new_image,
+		BeforeOrAfter before_or_after, ImageId const& existing, bool& modified);
+	
+	void removeImageImpl(ImageId const& image_id, bool& modified);
 	
 	PageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
 	

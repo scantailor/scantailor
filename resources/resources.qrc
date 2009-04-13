@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/user-trash.png</file>
+    <file>icons/insert-after-16.png</file>
+    <file>icons/insert-before-16.png</file>
     <file>icons/play-small-hovered.png</file>
     <file>icons/play-small.png</file>
     <file>icons/play-small-pressed.png</file>

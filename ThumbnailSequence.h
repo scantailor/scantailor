@@ -21,6 +21,7 @@
 
 #include "NonCopyable.h"
 #include "IntrusivePtr.h"
+#include "BeforeOrAfter.h"
 #include <QObject>
 #include <memory>
 
@@ -33,6 +34,7 @@ class PageSequenceSnapshot;
 class ThumbnailFactory;
 class QSizeF;
 class QRectF;
+class QPoint;
 
 class ThumbnailSequence : public QObject
 {
@@ -57,6 +59,11 @@ public:
 	
 	void setCurrentThumbnail(PageId const& page_id);
 	
+	void insert(PageInfo const& new_page,
+		BeforeOrAfter before_or_after, PageId const& existing);
+	
+	void remove(ImageId const& image_id);
+	
 	/**
 	 * \brief The bounding rectangle in scene coordinates of the current item.
 	 *
@@ -67,6 +74,9 @@ signals:
 	void pageSelected(
 		PageInfo const& page_info, QRectF const& thumb_rect,
 		bool by_user, bool was_already_selected);
+	
+	void contextMenuRequested(
+		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 private:
 	class Item;
 	class Impl;
@@ -78,6 +88,9 @@ private:
 	void emitPageSelected(
 		PageInfo const& page_info, CompositeItem const* composite,
 		bool by_user, bool was_already_selected);
+		
+	void emitContextMenuRequested(
+		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 	
 	std::auto_ptr<Impl> m_ptrImpl;
 };

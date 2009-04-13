@@ -37,6 +37,7 @@
 #include <QStyle>
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QPalette>
 #include <QApplication>
 #include <QVariant>
@@ -96,9 +97,17 @@ public:
 	
 	void setCurrentThumbnail(PageId const& page_id);
 	
+	void insert(PageInfo const& new_page,
+		BeforeOrAfter before_or_after, PageId const& existing);
+	
+	void remove(ImageId const& image_id);
+	
 	QRectF currentItemSceneRect() const;
 	
 	void itemSelected(PageInfo const& page_info, CompositeItem* item);
+	
+	void contextMenuRequested(
+		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 private:
 	class ItemsByIdTag;
 	class ItemsInOrderTag;
@@ -116,6 +125,8 @@ private:
 	
 	typedef Container::index<ItemsByIdTag>::type ItemsById;
 	typedef Container::index<ItemsInOrderTag>::type ItemsInOrder;
+	
+	void remove(ItemsById::iterator const& id_it);
 	
 	void setThumbnail(
 		ItemsById::iterator const& id_it,
@@ -204,6 +215,8 @@ public:
 protected:
 	virtual QVariant itemChange(GraphicsItemChange change, QVariant const& value);
 	
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event);
+	
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 private:
 	ThumbnailSequence::Impl& m_rOwner;
@@ -260,6 +273,20 @@ ThumbnailSequence::setCurrentThumbnail(PageId const& page_id)
 	m_ptrImpl->setCurrentThumbnail(page_id);
 }
 
+void
+ThumbnailSequence::insert(
+	PageInfo const& new_page,
+	BeforeOrAfter before_or_after, PageId const& existing)
+{
+	m_ptrImpl->insert(new_page, before_or_after, existing);
+}
+
+void
+ThumbnailSequence::remove(ImageId const& image_id)
+{
+	m_ptrImpl->remove(image_id);
+}
+
 QRectF
 ThumbnailSequence::currentItemSceneRect() const
 {
@@ -276,6 +303,14 @@ ThumbnailSequence::emitPageSelected(
 	);
 	emit pageSelected(page_info, thumb_rect, by_user, was_already_selected);
 }
+
+void
+ThumbnailSequence::emitContextMenuRequested(
+	PageInfo const& page_info, QPoint const& screen_pos, bool selected)
+{
+	emit contextMenuRequested(page_info, screen_pos, selected);
+}
+
 
 /*======================== ThumbnailSequence::Impl ==========================*/
 
@@ -391,7 +426,6 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 		
 		offset += new_composite->boundingRect().height() + SPACING;
 		
-		m_graphicsScene.removeItem(old_composite);
 		if (m_pSelectedItem == old_composite) {
 			m_pSelectedItem = 0;
 		}
@@ -431,6 +465,105 @@ ThumbnailSequence::Impl::setCurrentThumbnail(PageId const& page_id)
 	);
 }
 
+void
+ThumbnailSequence::Impl::insert(
+	PageInfo const& page_info,
+	BeforeOrAfter before_or_after, PageId const& existing)
+{
+	ItemsById::iterator id_it(m_itemsById.find(existing));
+	if (id_it == m_itemsById.end()) {
+		return;
+	}
+	
+	ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
+	if (before_or_after == AFTER) {
+		++ord_it;
+	}
+	
+	int page_num = 0;
+	double offset = 0.0;
+	if (!m_items.empty()) {
+		// That's the best thing we can do here.
+		// A proper solution would require renaming files.
+		page_num = m_itemsInOrder.rbegin()->pageNum + 1;
+		
+		if (ord_it != m_itemsInOrder.end()) {
+			offset = ord_it->composite->pos().y();
+		} else {
+			ItemsInOrder::iterator it(ord_it);
+			--it;
+			offset = it->composite->y()
+				+ it->composite->boundingRect().height() + SPACING;
+		}
+	}
+	std::auto_ptr<CompositeItem> composite(
+		getCompositeItem(page_info, page_num)
+	);
+	composite->setPos(0.0, offset);
+	composite->updateSceneRect(m_sceneRect);
+	
+	QPointF const pos_delta(0.0, composite->boundingRect().height() + SPACING);
+	
+	m_itemsInOrder.insert(ord_it, Item(page_info, page_num, composite.get()));
+	m_graphicsScene.addItem(composite.release());
+	
+	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
+	for (; ord_it != ord_end; ++ord_it) {
+		ord_it->composite->setPos(ord_it->composite->pos() + pos_delta);
+		ord_it->composite->updateSceneRect(m_sceneRect);
+	}
+	
+	commitSceneRect();
+}
+
+void
+ThumbnailSequence::Impl::remove(ImageId const& image_id)
+{
+	ItemsById::iterator id_it(
+		m_itemsById.find(PageId(image_id, PageId::SINGLE_PAGE))
+	);
+	if (id_it != m_itemsById.end()) {
+		remove(id_it);
+	}
+	id_it = m_itemsById.find(PageId(image_id, PageId::LEFT_PAGE));
+	if (id_it != m_itemsById.end()) {
+		remove(id_it);
+	}
+	id_it = m_itemsById.find(PageId(image_id, PageId::RIGHT_PAGE));
+	if (id_it != m_itemsById.end()) {
+		remove(id_it);
+	}
+}
+
+void
+ThumbnailSequence::Impl::remove(ItemsById::iterator const& id_it)
+{
+	ScopedIncDec<int> const scope_manager(m_syntheticSelectionScope);
+	
+	QPointF const pos_delta(
+		0.0, -(id_it->composite->boundingRect().height() + SPACING)
+	);
+	
+	if (m_pSelectedItem == id_it->composite) {
+		m_pSelectedItem = 0;
+	}
+	delete id_it->composite;
+	
+	if (pos_delta != QPointF()) {
+		ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
+		ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
+		++ord_it; // Skip the item itself.
+		for (; ord_it != ord_end; ++ord_it) {
+			ord_it->composite->setPos(ord_it->composite->pos() + pos_delta);
+		}
+	}
+	
+	m_itemsById.erase(id_it);
+	
+	m_sceneRect.adjust(0.0, 0.0, pos_delta.x(), pos_delta.y());
+	commitSceneRect();
+}
+
 QRectF
 ThumbnailSequence::Impl::currentItemSceneRect() const
 {
@@ -462,6 +595,13 @@ ThumbnailSequence::Impl::itemSelected(
 }
 
 void
+ThumbnailSequence::Impl::contextMenuRequested(
+	PageInfo const& page_info, QPoint const& screen_pos, bool selected)
+{
+	m_rOwner.emitContextMenuRequested(page_info, screen_pos, selected);
+}
+
+void
 ThumbnailSequence::Impl::setThumbnail(
 	ItemsById::iterator const& id_it, std::auto_ptr<CompositeItem> composite)
 {
@@ -478,13 +618,12 @@ ThumbnailSequence::Impl::setThumbnail(
 	
 	QPointF const pos_delta(0.0, new_size.height() - old_size.height());
 	
-	m_graphicsScene.removeItem(old_composite);
 	if (m_pSelectedItem == old_composite) {
 		m_pSelectedItem = 0;
 	}
 	delete old_composite;
 	
-	if (!pos_delta.isNull()) {
+	if (pos_delta != QPointF(0.0, 0.0)) {
 		ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
 		ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
 		++ord_it; // Skip the item itself.
@@ -513,7 +652,6 @@ ThumbnailSequence::Impl::clear()
 	ItemsInOrder::iterator it(m_itemsInOrder.begin());
 	ItemsInOrder::iterator const end(m_itemsInOrder.end());
 	while (it != end) {
-		m_graphicsScene.removeItem(it->composite);
 		delete it->composite;
 		m_itemsInOrder.erase(it++);
 	}
@@ -765,8 +903,19 @@ ThumbnailSequence::CompositeItem::mousePressEvent(
 	
 	QGraphicsItemGroup::mousePressEvent(event);
 	
+	// For some reason, if we don't do this, right click will result
+	// in the current item being de-selected.
+	event->accept();
+	
 	if (force_selection) {
 		m_rOwner.itemSelected(m_pageInfo, this);
 	}
 }
 
+void
+ThumbnailSequence::CompositeItem::contextMenuEvent(
+	QGraphicsSceneContextMenuEvent* const event)
+{
+	event->accept(); // Prevent it from propagating further.
+	m_rOwner.contextMenuRequested(m_pageInfo, event->screenPos(), isSelected());
+}

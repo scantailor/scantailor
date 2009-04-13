@@ -46,14 +46,6 @@ object-rotate-left.png
 object-rotate-right.png
 
 
-Origin: GNOME Project
-Website: http://gnome.org/
-License: GNU GPL version 3 or above
-Files:
-16x16/media-playback-start.png
-16x16/media-playback-stop.png
-
-
 Origin: Tango Desktop Project
 Website: http://tango.freedesktop.org/
 License: Creative Commons Attribution Share-Alike 2.5 License
@@ -62,6 +54,9 @@ big-down-arrow.png
 big-left-arrow.png
 big-right-arrow.png
 big-up-arrow.png
+insert-before-16.png
+insert-after-16.png
+user-trash.png
 
 
 Origin: Mark James

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,37 +16,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ABSTRACTCOMMAND_H_
-#define ABSTRACTCOMMAND_H_
+#ifndef FIX_DPI_SINGLE_PAGE_DIALOG_H_
+#define FIX_DPI_SINGLE_PAGE_DIALOG_H_
 
-#include "RefCountable.h"
-#include "IntrusivePtr.h"
+#include "ui_FixDpiSinglePageDialog.h"
+#include "Dpi.h"
 
-template<typename R>
-class AbstractCommand0 : public RefCountable
+class QPushButton;
+class ImageId;
+
+class FixDpiSinglePageDialog : public QDialog
 {
+	Q_OBJECT
 public:
-	typedef IntrusivePtr<AbstractCommand0> Ptr;
+	FixDpiSinglePageDialog(
+		ImageId const& image_id, Dpi const& dpi,
+		bool is_multipage_file, QWidget* parent = 0);
 	
-	virtual R operator()() = 0;
-};
-
-template<typename R, typename A1>
-class AbstractCommand1 : public RefCountable
-{
-public:
-	typedef IntrusivePtr<AbstractCommand1> Ptr;
+	Dpi const& dpi() const { return m_dpi; }
+private slots:
+	void dpiComboChangedByUser(int idx);
 	
-	virtual R operator()(A1 arg1) = 0;
-};
-
-template<typename R, typename T1, typename T2>
-class AbstractCommand2 : public RefCountable
-{
-public:
-	typedef IntrusivePtr<AbstractCommand2> Ptr;
+	void dpiValueChanged();
+private:
+	bool isDpiOK() const;
 	
-	virtual R operator()(T1 arg1, T2 arg2) = 0;
+	static bool isDpiOK(int dpi);
+	
+	Ui::FixDpiSinglePageDialog ui;
+	Dpi m_dpi;
+	QPushButton* m_pOkBtn;
 };
 
 #endif

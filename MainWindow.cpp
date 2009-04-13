@@ -24,6 +24,7 @@
 #include "PageSequence.h"
 #include "StageSequence.h"
 #include "ThumbnailSequence.h"
+#include "ImageInfo.h"
 #include "PageInfo.h"
 #include "ImageId.h"
 #include "Utils.h"
@@ -39,6 +40,9 @@
 #include "ProjectCreationContext.h"
 #include "SkinnedButton.h"
 #include "ProcessingIndicationWidget.h"
+#include "ImageMetadataLoader.h"
+#include "OrthogonalRotation.h"
+#include "FixDpiSinglePageDialog.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -60,16 +64,19 @@
 #include "LoadFileTask.h"
 #include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
+#include "ui_RemoveFileDialog.h"
 #include <boost/foreach.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 #include <QLineF>
 #include <QWidget>
+#include <QDialog>
 #include <QCloseEvent>
 #include <QStackedLayout>
 #include <QGridLayout>
 #include <QLayoutItem>
-#include <QAbstractTableModel>
-#include <QHeaderView>
 #include <QScrollBar>
+#include <QPushButton>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -82,6 +89,9 @@
 #include <QPalette>
 #include <QSettings>
 #include <QDomDocument>
+#include <QSortFilterProxyModel>
+#include <QFileSystemModel>
+#include <QFileInfo>
 #include <QDebug>
 #include <algorithm>
 #include <stddef.h>
@@ -145,6 +155,11 @@ MainWindow::MainWindow()
 		m_ptrThumbSequence.get(),
 		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
 		this, SLOT(pageSelected(PageInfo const&, QRectF const&, bool, bool))
+	);
+	connect(
+		m_ptrThumbSequence.get(),
+		SIGNAL(contextMenuRequested(PageInfo const&, QPoint const&, bool)),
+		this, SLOT(contextMenuRequested(PageInfo const&, QPoint const&, bool))
 	);
 	
 	connect(
@@ -239,7 +254,7 @@ MainWindow::switchToNewProject(
 	m_outDir = out_dir;
 	m_projectFile = project_file_path;
 	
-	// Recreate the stages, and load their state.
+	// Recreate the stages and load their state.
 	m_ptrStages.reset(new StageSequence(pages));
 	if (project_reader) {
 		project_reader->readFilterSettings(
@@ -689,6 +704,44 @@ MainWindow::pageSelected(
 		} else {
 			updateMainArea();
 		}
+	}
+}
+
+void
+MainWindow::contextMenuRequested(
+	PageInfo const& page_info_, QPoint const& screen_pos, bool selected)
+{
+	// Make a copy to prevent it from being invalidated.
+	PageInfo const page_info(page_info_);
+	
+	if (!selected) {
+		goToPage(page_info.id());
+	}
+	
+	if (getCurrentView() != PageSequence::IMAGE_VIEW) {
+		// We don't support adding / removing of pages - only of images.
+		return;
+	}
+	
+	QMenu menu;
+	QAction* ins_before = menu.addAction(
+		QIcon(":/icons/insert-before-16.png"), tr("Insert before ...")
+	);
+	QAction* ins_after = menu.addAction(
+		QIcon(":/icons/insert-after-16.png"), tr("Insert after ...")
+	);
+	menu.addSeparator();
+	QAction* remove = menu.addAction(
+		QIcon(":/icons/user-trash.png"), tr("Remove from project ...")
+	);
+	
+	QAction* action = menu.exec(screen_pos);
+	if (action == ins_before) {
+		showInsertFileDialog(BEFORE, page_info.imageId());
+	} else if (action == ins_after) {
+		showInsertFileDialog(AFTER, page_info.imageId());
+	} else if (action == remove) {
+		showRemoveFileDialog(page_info);
 	}
 }
 
@@ -1291,6 +1344,169 @@ MainWindow::saveProjectWithFeedback(QString const& project_file)
 	}
 	
 	return true;
+}
+
+void
+MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& existing)
+{
+	// We need to filter out files already in project.
+	class ProxyModel : public QSortFilterProxyModel
+	{
+	public:
+		ProxyModel(PageSequence const& pages) {
+			setDynamicSortFilter(true);
+			
+			PageSequenceSnapshot const snapshot(pages.snapshot(PageSequence::IMAGE_VIEW));
+			unsigned const count = snapshot.numPages();
+			for (unsigned i = 0; i < count; ++i) {
+				PageInfo const& page = snapshot.pageAt(i);
+				m_inProjectFiles.push_back(QFileInfo(page.imageId().filePath()));
+			}
+		}
+	protected:
+		virtual bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const {
+			QModelIndex const idx(source_parent.child(source_row, 0));
+			QVariant const data(idx.data(QFileSystemModel::FilePathRole));
+			if (data.isNull()) {
+				return true;
+			}
+			return !m_inProjectFiles.contains(QFileInfo(data.toString()));
+		}
+		
+		virtual bool lessThan(QModelIndex const& left, QModelIndex const& right) const {
+			return left.row() < right.row();
+		}
+	private:
+		QFileInfoList m_inProjectFiles;
+	};
+	
+	std::auto_ptr<QFileDialog> dialog(
+		new QFileDialog(
+			this, tr("File to insert"),
+			QFileInfo(existing.filePath()).absolutePath()
+		)
+	);
+	dialog->setFileMode(QFileDialog::ExistingFile);
+	dialog->setProxyModel(new ProxyModel(*m_ptrPages));
+	dialog->setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));
+	
+	dialog->exec();
+	
+	QStringList const files(dialog->selectedFiles());
+	if (files.size() != 1) {
+		assert(files.empty());
+		return;
+	}
+	
+	using namespace boost::lambda;
+	
+	QString const file(files.front());
+	ImageId const image_id(file, 0);
+	
+	std::vector<ImageMetadata> metadata_list;
+	ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
+		file, bind(&std::vector<ImageMetadata>::push_back, var(metadata_list), _1)
+	);
+	if (status != ImageMetadataLoader::LOADED) {
+		QMessageBox::warning(
+			0, tr("Error"),
+			tr("Error opening the image file.")
+		);
+		return;
+	}
+	
+	bool const is_multipage_file = metadata_list.size() > 1;
+	ImageMetadata& metadata = metadata_list.front();
+	
+	if (metadata.dpi().isNull()) {
+		std::auto_ptr<FixDpiSinglePageDialog> dpi_dialog(
+			new FixDpiSinglePageDialog(
+				image_id, metadata.dpi(), is_multipage_file, this
+			)
+		);
+		if (dpi_dialog->exec() != QDialog::Accepted) {
+			return;
+		}
+		metadata.setDpi(dpi_dialog->dpi());
+	}
+	
+	// This has to be done after metadata.setDpi() call above.
+	int const num_sub_pages = PageSequence::adviseNumberOfLogicalPages(
+		metadata, OrthogonalRotation()
+	);
+	ImageInfo const image_info(
+		image_id, metadata, is_multipage_file, num_sub_pages
+	);
+	insertImage(image_info, before_or_after, existing);
+}
+
+void
+MainWindow::showRemoveFileDialog(PageInfo const& page_info)
+{
+	QString const file_path(page_info.imageId().filePath());
+	QString const fname(QFileInfo(file_path).fileName());
+	
+	std::auto_ptr<QDialog> dialog(new QDialog(this));
+	Ui::RemoveFileDialog ui;
+	ui.setupUi(dialog.get());
+	
+	QString image_name(fname);
+	if (page_info.isMultiPageFile()) {
+		image_name = tr("%1 (page %2)").arg(fname).arg(page_info.imageId().page() + 1);
+	}
+	ui.text->setText(ui.text->text().arg(image_name));
+	
+	ui.deleteFromDisk->setEnabled(!page_info.isMultiPageFile());
+	
+	QPushButton* remove_btn = ui.buttonBox->button(QDialogButtonBox::Ok);
+	remove_btn->setText(tr("Remove"));
+	
+	dialog->setWindowModality(Qt::WindowModal);
+	if (dialog->exec() != QDialog::Accepted) {
+		return;
+	}
+	
+	removeFromProject(page_info.imageId());
+	if (ui.deleteFromDisk->isChecked()) {
+		if (!QFile::remove(file_path)) {
+			QMessageBox::warning(
+				0, tr("Error"),
+				tr("Unable to delete file:\n%1").arg(file_path)
+			);
+		}
+	}
+}
+
+void
+MainWindow::insertImage(ImageInfo const& new_image,
+	BeforeOrAfter before_or_after, ImageId const& existing)
+{
+	assert(getCurrentView() == PageSequence::IMAGE_VIEW);
+
+	m_ptrPages->insertImage(new_image, before_or_after, existing);
+	PageInfo const page_info(
+		PageId(new_image.id(), PageId::SINGLE_PAGE), new_image.metadata(),
+		new_image.isMultiPageFile(), new_image.numSubPages()
+	);
+	m_ptrThumbSequence->insert(
+		page_info, before_or_after, PageId(existing, PageId::SINGLE_PAGE)
+	);
+}
+
+void
+MainWindow::removeFromProject(ImageId image_id)
+{
+	// Note that image_id is passed by value intentionally.
+	// We need a local copy, because a reference might come
+	// directly from m_ptrPages, and so will be invalidated
+	// by m_ptrPages->removeImage().
+	
+	m_ptrPages->removeImage(image_id);
+	m_ptrThumbSequence->remove(image_id);
+	m_ptrThumbSequence->setCurrentThumbnail(
+		m_ptrPages->curPage(getCurrentView()).id()
+	);
+	updateMainArea();
 }
 
 BackgroundTaskPtr

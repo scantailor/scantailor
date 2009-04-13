@@ -276,6 +276,7 @@ SET(
 	PageLayout.cpp PageLayout.h
 	RecentProjects.cpp RecentProjects.h
 	FixDpiDialog.cpp FixDpiDialog.h
+	FixDpiSinglePageDialog.cpp FixDpiSinglePageDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
 	MainWindow.cpp MainWindow.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
@@ -325,6 +326,7 @@ SET(
 	AutoManualMode.h
 	AbstractCommand.h
 	AbstractFilter.h
+	BeforeOrAfter.h
 	FilterResult.h
 	CompositeCacheDrivenTask.h
 	Margins.h
