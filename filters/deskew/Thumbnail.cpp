@@ -24,6 +24,8 @@
 #include <QPen>
 #include <QBrush>
 #include <QColor>
+#include <QVector>
+#include <QLineF>
 
 namespace deskew
 {
@@ -42,20 +44,36 @@ Thumbnail::paintOverImage(
 {
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
-	QPen pen(QColor(0x00, 0x00, 0xff));
+	QPen pen(QColor(0, 0, 255, 70));
 	pen.setWidth(1);
 	pen.setCosmetic(true);
 	painter.setPen(pen);
 	
 	QRectF const bounding_rect(boundingRect());
 	
-	QLineF vert_line(bounding_rect.topLeft(), bounding_rect.bottomLeft());
-	vert_line.translate(0.5 * bounding_rect.width(), 0.0);
-	painter.drawLine(vert_line);
+	double const cell_size = 8;
+	double const left = bounding_rect.left();
+	double const right = bounding_rect.right();
+	double const top = bounding_rect.top();
+	double const bottom = bounding_rect.bottom();
+	double const w = bounding_rect.width();
+	double const h = bounding_rect.height();
 	
-	QLineF hor_line(bounding_rect.topLeft(), bounding_rect.topRight());
-	hor_line.translate(0.0, 0.5 * bounding_rect.height());
-	painter.drawLine(hor_line);
+	QPointF const center(bounding_rect.center());
+	QVector<QLineF> lines;
+	for (double y = center.y(); y > 0.0; y -= cell_size) {
+		lines.push_back(QLineF(left, y, right, y));
+	}
+	for (double y = center.y(); (y += cell_size) < h;) {
+		lines.push_back(QLineF(left, y, right, y));
+	}
+	for (double x = center.x(); x > 0.0; x -= cell_size) {
+		lines.push_back(QLineF(x, top, x, bottom));
+	}
+	for (double x = center.x(); (x += cell_size) < w;) {
+		lines.push_back(QLineF(x, top, x, bottom));
+	}
+	painter.drawLines(lines);
 }
 
 } // namespace deskew

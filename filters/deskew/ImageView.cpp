@@ -24,6 +24,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QVector>
+#include <QLineF>
 #include <Qt>
 #include <math.h>
 
