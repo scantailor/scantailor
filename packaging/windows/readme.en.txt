@@ -29,8 +29,10 @@ latest stable version.
    anyway, but at least you won't have to rebuild the programs that come with
    Qt.  Still, the source-only Qt plus a manual MinGW installation is supported,
    but this document assumes you are using the mingw version.
-7. Boost (tested with 1.38.0)
+7. Boost (tested with 1.38.0) and Boost Jam (tested with 3.1.17)
    Homepage: http://boost.org/
+   For Boost, you can download any of the files, provided you know how to unpack it.
+   For Boost Jam, take the file with "ntx86" suffix.
 8. NSIS 2.x (tested with 2.42)
    Homepage: http://nsis.sourceforge.net/
 
@@ -41,10 +43,12 @@ latest stable version.
 1. Create a build directory.  Its full path should have no spaces.  I suggest
    C:\build
 
-2. Unpack jpeg-6b, libpng, libtiff, zlib, boost and scantailor itself to the build
-   directory.  You should get a directory structure like this:
+2. Unpack jpeg-6b, libpng, libtiff, zlib, boost, boost jam, and scantailor
+   itself to the build directory.  You should get a directory structure like
+   this:
    C:\build
      | boost_1_38_0
+     | boost-jam-3.1.17-1-ntx86
      | jpeg-6b
      | libpng-1.2.31
      | scantailor-0.9.0
