@@ -18,6 +18,7 @@
 
 #include "Thumbnail.h"
 #include "Utils.h"
+#include "imageproc/PolygonUtils.h"
 #include <QRectF>
 #include <QSizeF>
 #include <QLineF>
@@ -28,6 +29,8 @@
 #include <QBrush>
 #include <QColor>
 #include <QDebug>
+
+using namespace imageproc;
 
 namespace page_layout
 {
@@ -54,32 +57,42 @@ Thumbnail::paintOverImage(
 	QPainter& painter, QTransform const& image_to_display,
 	QTransform const& thumb_to_display)
 {
-#if 0
 	QTransform const orig_to_presentation(
 		m_origXform.transformBack() * imageXform().transform()
 	);
+	QTransform const orig_to_thumb(
+		orig_to_presentation * image_to_display * thumb_to_display.inverted()
+	);
+	
+	// We work in thumbnail coordinates because we want to adjust
+	// rectangle coordinates by exactly their display width.
+	painter.setWorldTransform(thumb_to_display);
+	
+	QRectF const inner_rect(orig_to_thumb.mapRect(m_adaptedContentRect));
+	QRectF const outer_rect(orig_to_thumb.mapRect(m_outerRect));
+	
+	QPainterPath outer_outline;
+	outer_outline.addPolygon(PolygonUtils::round(outer_rect));
+	
+	QPainterPath content_outline;
+	content_outline.addPolygon(PolygonUtils::round(inner_rect));
 	
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
-	QPen pen(QColor(0x00, 0x00, 0xff));
-	pen.setWidth(1);
+	painter.setPen(Qt::NoPen);
+	painter.setBrush(QColor(0xbb, 0x00, 0xff, 40));
+	painter.drawPath(outer_outline.subtracted(content_outline));
+	
+	QPen pen(QColor(0xbe, 0x5b, 0xec));
 	pen.setCosmetic(true);
+	pen.setWidthF(1.0);
 	painter.setPen(pen);
-	
-	painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
-	
-	QRectF content_rect(
-		(orig_to_presentation * imageToThumb()).mapRect(m_adaptedContentRect)
-	);
-	
-	// Adjust to compensate for pen width.
-	content_rect.adjust(-1, -1, 1, 1);
+	painter.setBrush(Qt::NoBrush);
 	
 	// toRect() is necessary because we turn off antialiasing.
 	// For some reason, if we let Qt round the coordinates,
 	// the result is slightly different.
-	painter.drawRect(content_rect.toRect());
-#endif
+	painter.drawRect(inner_rect.toRect());
 }
 
 void
@@ -103,7 +116,7 @@ Thumbnail::recalcBoxesAndPresentationTransform()
 	
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 	
-	//QRectF const outer_rect(m_mmToOrig.map(poly_mm).boundingRect());
+	m_outerRect = m_mmToOrig.map(poly_mm).boundingRect();
 	
 	ImageTransformation const presentation_xform(
 		Utils::calcPresentationTransform(

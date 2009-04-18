@@ -52,7 +52,6 @@ private:
 	QRectF const m_adaptedContentRect; /**< In m_origXform coortinates. */
 	QSizeF const m_aggregateHardSizeMM;
 	
-	
 	/**
 	 * \brief Image transformation, as provided by the previous filter.
 	 *
@@ -79,6 +78,11 @@ private:
 	 * Transformation from millimeter coordinates to m_origXform coordinates.
 	 */
 	QTransform const m_mmToOrig;
+	
+	/**
+	 * The outer rectangle (bounded by soft margins) in m_origXform coordinates.
+	 */
+	QRectF m_outerRect;
 };
 
 } // namespace page_layout

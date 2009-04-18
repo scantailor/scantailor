@@ -81,7 +81,13 @@ private:
 	ImageId m_imageId;
 	ImageTransformation m_imageXform;
 	QRectF m_boundingRect;
+	
+	/**
+	 * Transforms virtual image coordinates into thumbnail coordinates.
+	 * Valid thumbnail coordinates lie within this->boundingRect().
+	 */
 	QTransform m_postScaleXform;
+	
 	boost::shared_ptr<LoadCompletionHandler> m_ptrCompletionHandler;
 };
 

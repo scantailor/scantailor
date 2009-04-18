@@ -128,11 +128,9 @@ ThumbnailBase::paint(QPainter* painter,
 		
 		PixmapRenderer::drawPixmap(*painter, pixmap);
 		
-		painter->setWorldTransform(thumb_to_display);
-		
-		painter->save();
-		paintOverImage(*painter, image_to_display, thumb_to_display);
 		painter->restore();
+		
+		paintOverImage(*painter, image_to_display, thumb_to_display);
 		
 		// Cover parts of the image that should not be visible with background.
 		// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
@@ -181,9 +179,12 @@ ThumbnailBase::paint(QPainter* painter,
 		
 		painter->setPen(pen);
 		painter->setBrush(brush);
-		painter->drawPath(containing_path.subtracted(intersected_path));
 		
-		painter->restore();
+		painter->setWorldTransform(thumb_to_display);
+		painter->setRenderHint(QPainter::SmoothPixmapTransform);
+		painter->setRenderHint(QPainter::Antialiasing);
+		
+		painter->drawPath(containing_path.subtracted(intersected_path));
 	}
 }
 
@@ -197,8 +198,8 @@ ThumbnailBase::setImageXform(ImageTransformation const& image_xform)
 	
 	m_boundingRect = QRectF(QPointF(0.0, 0.0), scaled_size);
 	
-	double const x_post_scale = m_boundingRect.width() / unscaled_size.width();
-	double const y_post_scale = m_boundingRect.height() / unscaled_size.height();
+	double const x_post_scale = scaled_size.width() / unscaled_size.width();
+	double const y_post_scale = scaled_size.height() / unscaled_size.height();
 	m_postScaleXform.reset();
 	m_postScaleXform.scale(x_post_scale, y_post_scale);
 }
