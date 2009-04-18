@@ -46,7 +46,7 @@ ImageView::ImageView(
 	
 	m_defaultStatusTip = tr("Use the context menu to enable / disable the content box.");
 	m_resizeStatusTip = tr("Drag lines or corners to resize the content box.");
-	ensureStatusTip(m_defaultStatusTip);
+	ensureStatusTip(defaultStatusTip());
 	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
 	QAction* remove = m_pHaveContentMenu->addAction(tr("Remove Content Box"));
@@ -212,6 +212,12 @@ ImageView::contextMenuEvent(QContextMenuEvent* const event)
 	} else {
 		m_pHaveContentMenu->popup(event->globalPos());
 	}
+}
+
+QString
+ImageView::defaultStatusTip() const
+{
+	return m_defaultStatusTip;
 }
 
 void

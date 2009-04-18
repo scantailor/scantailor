@@ -79,6 +79,8 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* event);
 	
 	virtual void hideEvent(QHideEvent* event);
+	
+	virtual QString defaultStatusTip() const;
 private:
 	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
 	enum FitMode { FIT, DONT_FIT };
@@ -135,6 +137,8 @@ private:
 	AggregateSizeChanged commitHardMargins(Margins const& margins_mm);
 	
 	void invalidateThumbnails(AggregateSizeChanged agg_size_changed);
+	
+	QString m_defaultStatusTip;
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	

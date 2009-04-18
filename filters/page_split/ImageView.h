@@ -90,11 +90,6 @@ private:
 	
 	QPixmap m_imgSkewingHandle;
 	
-	/**
-	 * The status tip coming from ImageViewBase.
-	 */
-	QString m_baseStatusTip;
-	
 	QString m_dragHandleStatusTip;
 	
 	QString m_dragLineStatusTip;

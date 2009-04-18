@@ -121,7 +121,9 @@ ImageViewBase::ImageViewBase(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& pre_transform,
 	Margins const& margins)
-:	m_image(image),
+:	m_defaultStatusTip(tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")),
+	m_unrestrictedDragStatusTip(tr("Unrestricted dragging is possible by holding down the Shift key.")),
+	m_image(image),
 	m_imageToVirt(pre_transform),
 	m_margins(margins),
 	m_zoom(1.0),
@@ -145,7 +147,7 @@ ImageViewBase::ImageViewBase(
 		m_imageToVirt.resultingRect().center()
 	);
 	
-	ensureStatusTip(tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible."));
+	ensureStatusTip(defaultStatusTip());
 	
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(150); // msec
@@ -357,11 +359,13 @@ ImageViewBase::handleImageDragging(QMouseEvent* const event)
 			if (!m_isDraggingInProgress && event->button() == Qt::LeftButton) {
 				m_lastMousePos = event->pos();
 				m_isDraggingInProgress = true;
+				ensureStatusTip(m_unrestrictedDragStatusTip);
 			}
 			break;
 		case QEvent::MouseButtonRelease:
 			if (m_isDraggingInProgress && event->button() == Qt::LeftButton) {
 				m_isDraggingInProgress= false;
+				ensureStatusTip(defaultStatusTip());
 			}
 			break;
 		case QEvent::MouseMove:
@@ -373,7 +377,12 @@ ImageViewBase::handleImageDragging(QMouseEvent* const event)
 				QPointF adjusted_fp(m_widgetFocalPoint);
 				adjusted_fp += movement;
 				
-				adjustAndSetNewWidgetFP(adjusted_fp);
+				if (event->modifiers() & Qt::ShiftModifier) {
+					setNewWidgetFP(adjusted_fp);
+				} else {
+					adjustAndSetNewWidgetFP(adjusted_fp);
+				}
+				
 				update();
 			}
 		default:;
@@ -520,6 +529,12 @@ ImageViewBase::ensureStatusTip(QString const& status_tip)
 	}
 }
 
+QString
+ImageViewBase::defaultStatusTip() const
+{
+	return m_defaultStatusTip;
+}
+
 /**
  * Updates m_virtualToWidget and m_widgetToVirtual.\n
  * To be called whenever any of the following is modified:
@@ -652,6 +667,15 @@ ImageViewBase::getIdealWidgetFocalPoint(FocalPointMode const mode) const
 	return widget_focal_point;
 }
 
+void
+ImageViewBase::setNewWidgetFP(QPointF const widget_fp)
+{
+	if (widget_fp != m_widgetFocalPoint) {
+		m_widgetFocalPoint = widget_fp;
+		updateWidgetTransform();
+	}
+}
+
 /**
  * Used when dragging the image.  It adjusts the movement to disallow
  * dragging it away from the ideal position (determined by
@@ -671,8 +695,7 @@ ImageViewBase::adjustAndSetNewWidgetFP(QPointF const proposed_widget_fp)
 	// We don't want the ideal focal point to be equal to the current
 	// one, as that would disallow any movements.
 	QPointF const old_widget_fp(m_widgetFocalPoint);
-	m_widgetFocalPoint = proposed_widget_fp;
-	updateWidgetTransform();
+	setNewWidgetFP(proposed_widget_fp);
 	
 	QPointF const ideal_widget_fp(getIdealWidgetFocalPoint(CENTER_IF_FITS));
 	

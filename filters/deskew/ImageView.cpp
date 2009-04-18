@@ -44,7 +44,6 @@ ImageView::ImageView(
 	m_mouseVertOffset(0.0),
 	m_state(DEFAULT_STATE)
 {
-	m_baseStatusTip = statusTip();
 	m_dragHandleStatusTip = tr("Drag this handle to rotate the image.");
 	
 	setMouseTracking(true);
@@ -203,7 +202,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 				ensureCursorShape(Qt::OpenHandCursor);
 			}
 		} else {
-			ensureStatusTip(m_baseStatusTip);
+			ensureStatusTip(defaultStatusTip());
 			ensureCursorShape(Qt::ArrowCursor);
 		}
 	} else {

@@ -81,11 +81,6 @@ private:
 	
 	QRectF m_rightRotationHandle;
 	
-	/**
-	 * The status tip coming from ImageViewBase.
-	 */
-	QString m_baseStatusTip;
-	
 	QString m_dragHandleStatusTip;
 	
 	double m_mouseVertOffset;

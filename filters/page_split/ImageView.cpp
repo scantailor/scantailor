@@ -45,7 +45,6 @@ ImageView::ImageView(
 	m_pageLayout(layout),
 	m_state(DEFAULT_STATE)
 {
-	m_baseStatusTip = statusTip();
 	m_dragHandleStatusTip = tr("Drag this handle to skew the line.");
 	m_dragLineStatusTip = tr("This line can be dragged.");
 	
@@ -249,7 +248,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 			ensureStatusTip(m_dragLineStatusTip);
 			ensureCursorShape(Qt::SplitHCursor);
 		} else {
-			ensureStatusTip(m_baseStatusTip);
+			ensureStatusTip(defaultStatusTip());
 			ensureCursorShape(Qt::ArrowCursor);
 		}
 	} else {

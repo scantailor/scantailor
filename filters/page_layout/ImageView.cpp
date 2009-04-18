@@ -65,7 +65,8 @@ ImageView::ImageView(
 	m_leftRightLinked(opt_widget.leftRightLinked()),
 	m_topBottomLinked(opt_widget.topBottomLinked())
 {
-	ensureStatusTip(tr("Resize margins by dragging any of the solid lines."));
+	m_defaultStatusTip = tr("Resize margins by dragging any of the solid lines.");
+	ensureStatusTip(defaultStatusTip());
 	
 	setMouseTracking(true);
 	
@@ -332,6 +333,12 @@ ImageView::hideEvent(QHideEvent* const event)
 		
 		invalidateThumbnails(agg_size_changed);
 	}
+}
+
+QString
+ImageView::defaultStatusTip() const
+{
+	return m_defaultStatusTip;
 }
 
 void

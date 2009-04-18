@@ -58,6 +58,8 @@ protected:
 	virtual void hideEvent(QHideEvent* event);
 	
 	virtual void contextMenuEvent(QContextMenuEvent* event);
+	
+	virtual QString defaultStatusTip() const;
 private slots:
 	void createContentBox();
 	

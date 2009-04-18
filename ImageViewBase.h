@@ -228,6 +228,14 @@ protected:
 	 * immediately, not when the mouse enters the widget next time.
 	 */
 	void ensureStatusTip(QString const& status_tip);
+	
+	/**
+	 * \brief Returns the status tip to be associated with this widget
+	 *        in its default state.
+	 *
+	 * Subclasses may reimplement this method.
+	 */
+	virtual QString defaultStatusTip() const;
 private slots:
 	void initiateBuildingHqVersion();
 private:
@@ -240,6 +248,8 @@ private:
 	
 	QPointF getIdealWidgetFocalPoint(FocalPointMode mode) const;
 	
+	void setNewWidgetFP(QPointF widget_fp);
+	
 	void adjustAndSetNewWidgetFP(QPointF proposed_widget_fp);
 	
 	QPointF centeredWidgetFocalPoint() const;
@@ -251,6 +261,10 @@ private:
 	void validateHqPixmap();
 	
 	static BackgroundExecutor& backgroundExecutor();
+	
+	QString m_defaultStatusTip;
+	
+	QString m_unrestrictedDragStatusTip;
 	
 	/**
 	 * The client-side image.  Used to build a high-quality version
