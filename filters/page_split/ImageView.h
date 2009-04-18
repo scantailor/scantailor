@@ -58,7 +58,12 @@ protected:
 	
 	virtual void hideEvent(QHideEvent* event);
 private:
-	enum State { DEFAULT_STATE, DRAGGING_SPLIT_LINE, SKEWING_SPLIT_LINE };
+	enum State {
+		DEFAULT_STATE,
+		DRAGGING_LINE,
+		DRAGGING_TOP_HANDLE,
+		DRAGGING_BOTTOM_HANDLE
+	};
 	
 	static void extendToContain(QRectF& rect, QPointF const& point);
 	

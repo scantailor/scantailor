@@ -95,17 +95,40 @@ ImageView::paintOverImage(QPainter& painter)
 			);
 			break;
 	}
-		
+	
 	PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
 	QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
 	
 	double const handle_half_height = 0.5 * m_imgSkewingHandle.height();
 	
+	bool draw_top_handle = true;
+	bool draw_bottom_handle = true;
+	
+	// There is one case where we don't want to draw one of the
+	// handles: it's when skewing a line in a zoomed image.
+	// The reason is that the handle opposite to the one we are
+	// dragging, is not the rotation origin in this case.
+	if (m_state == DRAGGING_TOP_HANDLE) {
+		QLineF const image_split_line(layout.inscribedSplitLine(image_rect));
+		double const bottom_y = std::max(image_split_line.p1().y(), image_split_line.p2().y());
+		draw_bottom_handle = bottom_y - handle_half_height < height();
+	} else if (m_state == DRAGGING_BOTTOM_HANDLE) {
+		QLineF const image_split_line(layout.inscribedSplitLine(image_rect));
+		double const top_y = std::min(image_split_line.p1().y(), image_split_line.p2().y());
+		draw_top_handle = top_y + handle_half_height > 0.0;
+	}
+	
 	QRectF image_adjusted_rect(image_rect);
-	image_adjusted_rect.adjust(0.0, -handle_half_height, 0.0, handle_half_height);
+	image_adjusted_rect.adjust(
+		0.0, draw_top_handle ? handle_half_height : 0.0,
+		0.0, draw_bottom_handle ? -handle_half_height : 0.0
+	);
 	
 	QRectF widget_adjusted_rect(this->rect());
-	widget_adjusted_rect.adjust(0.0, handle_half_height, 0.0, -handle_half_height);
+	widget_adjusted_rect.adjust(
+		0.0, draw_top_handle ? handle_half_height : 0.0,
+		0.0, draw_bottom_handle ? -handle_half_height : 0.0
+	);
 	
 	QRectF const united(image_adjusted_rect | widget_adjusted_rect);
 	QRectF const intersected(image_adjusted_rect & widget_adjusted_rect);
@@ -129,8 +152,6 @@ ImageView::paintOverImage(QPainter& painter)
 	
 	painter.drawLine(widget_split_line.p1(), widget_split_line.p2());
 	
-	QRectF const visible_widget_rect(getVisibleWidgetRect());
-	
 	m_topHandleRect = m_imgSkewingHandle.rect();
 	m_bottomHandleRect = m_topHandleRect;
 	m_topHandleRect.moveCenter(widget_split_line.p1());
@@ -140,8 +161,12 @@ ImageView::paintOverImage(QPainter& painter)
 		std::swap(m_topHandleRect, m_bottomHandleRect);
 	}
 	
-	painter.drawPixmap(m_topHandleRect.topLeft(), m_imgSkewingHandle);
-	painter.drawPixmap(m_bottomHandleRect.topLeft(), m_imgSkewingHandle);
+	if (draw_top_handle) {
+		painter.drawPixmap(m_topHandleRect.topLeft(), m_imgSkewingHandle);
+	}
+	if (draw_bottom_handle) {
+		painter.drawPixmap(m_bottomHandleRect.topLeft(), m_imgSkewingHandle);
+	}
 	
 	// Restore the world transform as it was.
 	painter.setWorldMatrixEnabled(true);
@@ -160,24 +185,23 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 {
 	if (m_state == DEFAULT_STATE && !isDraggingInProgress()
 	    && event->button() == Qt::LeftButton) {
-		PageLayout const widget_layout(
-			m_pageLayout.transformed(virtualToWidget())
-		);
 		bool const top = m_topHandleRect.contains(event->pos());
-		bool bottom = m_bottomHandleRect.contains(event->pos());
+		bool const bottom = m_bottomHandleRect.contains(event->pos());
 		if (top || bottom) {
-			m_splitLineTouchPoint = projectPointToLine(
-				event->pos(), widget_layout.splitLine()
-			);
-			m_splitLineOtherPoint =
-				(top ? m_bottomHandleRect : m_topHandleRect).center();
+			QRectF const virt_rect(imageToVirt().resultingRect());
+			QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
+			PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
+			QLineF const line(layout.inscribedSplitLine(image_rect));
+			m_splitLineTouchPoint = projectPointToLine(event->pos(), line);
+			m_splitLineOtherPoint = (top == (line.p1().y() <= line.p2().y()))
+				? line.p2() : line.p1();
 			m_initialMousePos = event->pos();
-			m_state = SKEWING_SPLIT_LINE;
+			m_state = top ? DRAGGING_TOP_HANDLE : DRAGGING_BOTTOM_HANDLE;
 			ensureCursorShape(Qt::ClosedHandCursor);
 		} else if (isCursorNearSplitLine(event->pos(),
 				&m_splitLineTouchPoint, &m_splitLineOtherPoint)) {
 			m_initialMousePos = event->pos();
-			m_state = DRAGGING_SPLIT_LINE;
+			m_state = DRAGGING_LINE;
 		}
 	}
 	
@@ -199,6 +223,7 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 	
 	if (event->button() == Qt::LeftButton && m_state != DEFAULT_STATE) {
 		m_state = DEFAULT_STATE;
+		update(); // Because one of the handles may not be drawn when skewing.
 		emit pageLayoutSetLocally(m_pageLayout);
 	}
 }
@@ -239,7 +264,7 @@ ImageView::mouseMoveEvent(QMouseEvent* const event)
 		}
 		
 		QPointF new_other_point(m_splitLineOtherPoint);
-		if (m_state == DRAGGING_SPLIT_LINE) {
+		if (m_state == DRAGGING_LINE) {
 			new_other_point += movement;
 		} else {
 			// Limit the max skew angle.
