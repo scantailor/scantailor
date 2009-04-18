@@ -322,7 +322,7 @@ ImageViewBase::hideEvent(QHideEvent*)
 }
 
 void
-ImageViewBase::handleZooming(QWheelEvent* const event)
+ImageViewBase::handleZooming(QWheelEvent* const event, ZoomFocus const zoom_focus)
 {
 	if (m_isDraggingInProgress) {
 		return;
@@ -334,7 +334,16 @@ ImageViewBase::handleZooming(QWheelEvent* const event)
 		m_zoom = 1.0;
 	}
 	
-	setWidgetFocalPointWithoutMoving(event->pos() + QPointF(0.5, 0.5));
+	QPointF focus_point;
+	switch (zoom_focus) {
+		case ZOOM_FOCUS_CENTER:
+			focus_point = QRectF(rect()).center();
+			break;
+		case ZOOM_FOCUS_CURSOR:
+			focus_point = event->pos() + QPointF(0.5, 0.5);
+			break;
+	}
+	setWidgetFocalPointWithoutMoving(focus_point);
 	
 	updateWidgetTransform();
 	update();

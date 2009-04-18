@@ -100,6 +100,8 @@ public:
 	 */
 	static QImage createDownscaledImage(QImage const& image);
 protected:
+	enum ZoomFocus { ZOOM_FOCUS_CENTER, ZOOM_FOCUS_CURSOR };
+	
 	enum FocalPointMode { CENTER_IF_FITS, DONT_CENTER };
 	
 	/**
@@ -130,7 +132,7 @@ protected:
 	 *
 	 * To be called from subclasses.
 	 */
-	void handleZooming(QWheelEvent* event);
+	void handleZooming(QWheelEvent* event, ZoomFocus = ZOOM_FOCUS_CURSOR);
 	
 	/**
 	 * \brief Possibly starts or stops image dragging.

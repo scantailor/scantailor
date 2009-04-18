@@ -120,7 +120,7 @@ ImageView::paintOverImage(QPainter& painter)
 void
 ImageView::wheelEvent(QWheelEvent* const event)
 {
-	handleZooming(event);
+	handleZooming(event, ZOOM_FOCUS_CENTER);
 }
 
 void
