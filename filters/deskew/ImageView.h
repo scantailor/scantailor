@@ -66,6 +66,8 @@ private:
 	
 	static double const m_maxRotationSin;
 	
+	static int const m_cellSize;
+	
 	QPointF getImageRotationOrigin() const;
 	
 	QRectF getRotationArcSquare() const;

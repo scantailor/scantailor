@@ -23,7 +23,7 @@
 #include <QSizeF>
 #include <QPainter>
 #include <QMouseEvent>
-#include <QPixmapCache>
+#include <QVector>
 #include <Qt>
 #include <math.h>
 
@@ -34,6 +34,7 @@ double const ImageView::m_maxRotationDeg = 45.0;
 double const ImageView::m_maxRotationSin = sin(
 	m_maxRotationDeg * imageproc::constants::DEG2RAD
 );
+int const ImageView::m_cellSize = 20;
 
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
@@ -71,20 +72,41 @@ ImageView::paintOverImage(QPainter& painter)
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHints(QPainter::Antialiasing, false);
 	
-	// Draw the horizontal and vertical line crossing at the center.
-	QPen pen(QColor(0, 0, 255));
+	int const w = width();
+	int const h = height();
+	QPointF const center(getImageRotationOrigin());
+	
+	// Draw the semi-transparent grid.
+	QPen pen(QColor(0, 0, 255, 90));
 	pen.setCosmetic(true);
 	pen.setWidth(1);
 	painter.setPen(pen);
+	QVector<QLineF> lines;
+	for (double y = center.y(); (y -= m_cellSize) > 0.0;) {
+		lines.push_back(QLineF(0.5, y, w - 0.5, y));
+	}
+	for (double y = center.y(); (y += m_cellSize) < h;) {
+		lines.push_back(QLineF(0.5, y, w - 0.5, y));
+	}
+	for (double x = center.x(); (x -= m_cellSize) > 0.0;) {
+		lines.push_back(QLineF(x, 0.5, x, h - 0.5));
+	}
+	for (double x = center.x(); (x += m_cellSize) < w;) {
+		lines.push_back(QLineF(x, 0.5, x, h - 0.5));
+	}
+	painter.drawLines(lines);
+	
+	// Draw the horizontal and vertical line crossing at the center.
+	pen.setColor(QColor(0, 0, 255));
+	painter.setPen(pen);
 	painter.setBrush(Qt::NoBrush);
-	QPointF const center(getImageRotationOrigin());
 	painter.drawLine(
 		QPointF(0.5, center.y()),
-		QPointF(width() - 0.5, center.y())
+		QPointF(w - 0.5, center.y())
 	);
 	painter.drawLine(
 		QPointF(center.x(), 0.5),
-		QPointF(center.x(), height() - 0.5)
+		QPointF(center.x(), h - 0.5)
 	);
 	
 	// Draw the rotation arcs.
