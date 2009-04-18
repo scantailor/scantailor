@@ -103,6 +103,8 @@ ThumbnailBase::paint(QPainter* painter,
 		
 		painter->fillRect(m_boundingRect, QColor(0x00, 0x00, 0x00));
 		painter->fillRect(rect, QColor(0xff, 0xff, 0xff));
+		
+		paintOverImage(*painter, image_to_display, thumb_to_display);
 	} else {
 		QSizeF const orig_image_size(m_imageXform.origRect().size());
 		double const x_pre_scale = orig_image_size.width() / pixmap.width();
@@ -127,6 +129,10 @@ ThumbnailBase::paint(QPainter* painter,
 		PixmapRenderer::drawPixmap(*painter, pixmap);
 		
 		painter->setWorldTransform(thumb_to_display);
+		
+		painter->save();
+		paintOverImage(*painter, image_to_display, thumb_to_display);
+		painter->restore();
 		
 		// Cover parts of the image that should not be visible with background.
 		// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
@@ -179,8 +185,6 @@ ThumbnailBase::paint(QPainter* painter,
 		
 		painter->restore();
 	}
-	
-	paintOverImage(*painter, image_to_display, thumb_to_display);
 }
 
 void
