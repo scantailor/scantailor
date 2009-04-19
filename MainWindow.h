@@ -27,14 +27,12 @@
 #include "FilterResult.h"
 #include "PageSequence.h"
 #include "BeforeOrAfter.h"
-#include "PageId.h"
 #include <QMainWindow>
 #include <QString>
 #include <QPointer>
 #include <QObjectCleanupHandler>
 #include <QSizeF>
 #include <memory>
-#include <set>
 
 class AbstractFilter;
 class ThumbnailPixmapCache;
@@ -224,7 +222,6 @@ private:
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
 	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
 	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;
-	std::set<PageId> m_thisStageProcessedPages;
 	BackgroundTaskPtr m_ptrCurTask;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;
