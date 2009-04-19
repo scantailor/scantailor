@@ -62,7 +62,24 @@ private:
 };
 
 
-class StageListView::RightColDelegate : public QStyledItemDelegate
+class StageListView::LeftColDelegate :
+	public ChangedStateItemDelegate<QStyledItemDelegate>
+{
+public:
+	LeftColDelegate(StageListView* view);
+	
+	virtual void paint(
+		QPainter* painter, QStyleOptionViewItem const& option,
+		QModelIndex const& index) const;
+private:
+	typedef ChangedStateItemDelegate<QStyledItemDelegate> SuperClass;
+	
+	StageListView* m_pView;
+};
+
+
+class StageListView::RightColDelegate :
+	public ChangedStateItemDelegate<QStyledItemDelegate>
 {
 public:
 	RightColDelegate(QObject* parent = 0);
@@ -70,6 +87,8 @@ public:
 	virtual void paint(
 		QPainter* painter, QStyleOptionViewItem const& option,
 		QModelIndex const& index) const;
+private:
+	typedef ChangedStateItemDelegate<QStyledItemDelegate> SuperClass;
 };
 
 
@@ -77,8 +96,8 @@ StageListView::StageListView(QWidget* parent)
 :	QTableView(parent),
 	m_sizeHint(QTableView::sizeHint()),
 	m_pModel(0),
-	m_pFirstColDelegate(new ChangedStateItemDelegate<>(this)),
-	m_pSecondColDelegate(new ChangedStateItemDelegate<RightColDelegate>(this)),
+	m_pFirstColDelegate(new LeftColDelegate(this)),
+	m_pSecondColDelegate(new RightColDelegate(this)),
 	m_curBatchAnimationFrame(0),
 	m_timerId(0),
 	m_batchProcessingPossible(false),
@@ -105,7 +124,7 @@ StageListView::StageListView(QWidget* parent)
 		":/icons/play-small.png",
 		":/icons/play-small-hovered.png",
 		":/icons/play-small-pressed.png",
-		this
+		viewport()
 	);
 	m_pLaunchBtn->setStatusTip(tr("Launch batch processing"));
 	m_pLaunchBtn->hide();
@@ -194,8 +213,9 @@ StageListView::setBatchProcessingInProgress(bool const in_progress)
 		
 		// Some styles (Oxygen) visually separate items in a selected row.
 		// We really don't want that, so we pretend the items are not selected.
-		m_pFirstColDelegate->flagsForceDisabled(QStyle::State_Selected);
-		m_pSecondColDelegate->flagsForceDisabled(QStyle::State_Selected);
+		// Same goes for hovered items.
+		m_pFirstColDelegate->flagsForceDisabled(QStyle::State_Selected|QStyle::State_MouseOver);
+		m_pSecondColDelegate->flagsForceDisabled(QStyle::State_Selected|QStyle::State_MouseOver);
 		
 		initiateBatchAnimationFrameRendering();
 		m_timerId = startTimer(180);
@@ -203,8 +223,8 @@ StageListView::setBatchProcessingInProgress(bool const in_progress)
 		updateRowSpans(); // Separate columns.
 		placeLaunchButton(selectedRow());
 		
-		m_pFirstColDelegate->removeChanges(QStyle::State_Selected);
-		m_pSecondColDelegate->removeChanges(QStyle::State_Selected);
+		m_pFirstColDelegate->removeChanges(QStyle::State_Selected|QStyle::State_MouseOver);
+		m_pSecondColDelegate->removeChanges(QStyle::State_Selected|QStyle::State_MouseOver);
 		
 		if (m_pModel) {
 			m_pModel->disableBatchProcessingAnimation();
@@ -279,8 +299,6 @@ StageListView::removeLaunchButton(int const row)
 	}
 	
 	m_pLaunchBtn->hide();
-	m_pLaunchBtn->setParent(this);
-	setIndexWidget(m_pModel->index(row, 0), 0);
 }
 
 void
@@ -290,15 +308,14 @@ StageListView::placeLaunchButton(int row)
 		return;
 	}
 	
-	std::auto_ptr<QWidget> outer_widget(new QWidget);
-	QHBoxLayout* layout;
-	outer_widget->setLayout((layout = new QHBoxLayout()));
-	layout->setSpacing(0);
-	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addStretch(1);
-	layout->addWidget(m_pLaunchBtn);
+	QModelIndex const idx(m_pModel->index(row, 0));
+	QRect button_geometry(visualRect(idx));
+	
+	// Place it to the right (assuming height is less than width).
+	button_geometry.setLeft(button_geometry.right() + 1 - button_geometry.height());
+	
+	m_pLaunchBtn->setGeometry(button_geometry);
 	m_pLaunchBtn->show();
-	setIndexWidget(m_pModel->index(row, 0), outer_widget.release());
 }
 
 void
@@ -404,10 +421,34 @@ StageListView::Model::data(QModelIndex const& index, int const role) const
 }
 
 
+/*================= StageListView::LeftColDelegate ===================*/
+
+StageListView::LeftColDelegate::LeftColDelegate(StageListView* view)
+:	SuperClass(view),
+	m_pView(view)
+{
+}
+
+void
+StageListView::LeftColDelegate::paint(
+	QPainter* painter, QStyleOptionViewItem const& option,
+	QModelIndex const& index) const
+{
+	SuperClass::paint(painter, option, index);
+	
+	if (index.row() == m_pView->selectedRow() && m_pView->m_pLaunchBtn->isVisible()) {
+		QRect button_geometry(option.rect);
+		// Place it to the right (assuming height is less than width).
+		button_geometry.setLeft(button_geometry.right() + 1 - button_geometry.height());
+		m_pView->m_pLaunchBtn->setGeometry(button_geometry);
+	}
+}
+
+
 /*================= StageListView::RightColDelegate ===================*/
 
 StageListView::RightColDelegate::RightColDelegate(QObject* parent)
-:	QStyledItemDelegate(parent)
+:	SuperClass(parent)
 {
 }
 
@@ -416,7 +457,7 @@ StageListView::RightColDelegate::paint(
 	QPainter* painter, QStyleOptionViewItem const& option,
 	QModelIndex const& index) const
 {
-	QStyledItemDelegate::paint(painter, option, index);
+	SuperClass::paint(painter, option, index);
 	
 	QVariant const var(index.data(Qt::UserRole));
 	if (!var.isNull()) {

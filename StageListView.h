@@ -20,7 +20,6 @@
 #define STAGELISTVIEW_H_
 
 #include "IntrusivePtr.h"
-#include "ChangedStateItemDelegate.h"
 #include <QTableView>
 #include <QPixmap>
 #include <vector>
@@ -54,6 +53,7 @@ protected:
 	virtual void timerEvent(QTimerEvent* event);
 private:
 	class Model;
+	class LeftColDelegate;
 	class RightColDelegate;
 	
 	void removeLaunchButton(int row);
@@ -70,8 +70,8 @@ private:
 	
 	QSize m_sizeHint;
 	Model* m_pModel;
-	ChangedStateItemDelegate<>* m_pFirstColDelegate;
-	ChangedStateItemDelegate<RightColDelegate>* m_pSecondColDelegate;
+	LeftColDelegate* m_pFirstColDelegate;
+	RightColDelegate* m_pSecondColDelegate;
 	QWidget* m_pLaunchBtn;
 	std::vector<QPixmap> m_batchAnimationPixmaps;
 	int m_curBatchAnimationFrame;
