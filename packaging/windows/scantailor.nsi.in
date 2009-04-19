@@ -44,7 +44,6 @@ SetCompressor /SOLID /FINAL lzma
 
 # Installer Pages
 !insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
-!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 
@@ -53,7 +52,7 @@ SetCompressor /SOLID /FINAL lzma
 
 !insertmacro MUI_LANGUAGE "English"
 
-Section "Installer Section"
+Section
   SetOutPath $INSTDIR
   File scantailor.exe
   !if "${MINGWM10_DLL}" != ""
