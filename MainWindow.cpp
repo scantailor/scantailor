@@ -790,6 +790,8 @@ MainWindow::thumbViewScrolled()
 void
 MainWindow::filterSelectionChanged(QItemSelection const& selected)
 {
+	m_thisStageProcessedPages.clear();
+	
 	if (m_ignoreSelectionChanges) {
 		return;
 	}
@@ -830,7 +832,7 @@ MainWindow::startBatchProcessing()
 		return;
 	}
 	
-	// Must be done before settint m_batchProcessing to true.
+	// Must be done before setting m_batchProcessing to true.
 	setImageWidget(m_ptrBatchProcessingWidget.get(), KEEP_OWNERSHIP);
 	
 	m_batchProcessing = true;
@@ -841,16 +843,29 @@ MainWindow::startBatchProcessing()
 	filterList->setBatchProcessingInProgress(true);
 	filterList->setEnabled(false);
 	
-	if (!m_ptrCurTask) {
-		m_ptrPages->setNextPage(getCurrentView());
-		// Don't change the current thumbnail - that's intentional.
-		// In batch processing mode we highlight the page that
-		// was just processed, while processing the next one.
-		// Keep in mind that next one will have a question mark
-		// on it until it's fully processed.
+	// Check if the previous page was processed.
+	// If not, start batch processing from the first page.
+	// Otherwise, start it from either the current page (if it's being
+	// processed) or from the next one.
+	PageInfo const prev_page(m_ptrPages->setPrevPage(getCurrentView()));
+	if (m_thisStageProcessedPages.find(prev_page.id()) == m_thisStageProcessedPages.end()) {
+		PageInfo const first_page(m_ptrPages->setFirstPage(getCurrentView()));
+		m_ptrThumbSequence->setCurrentThumbnail(first_page.id());
+	} else {
+		m_ptrPages->setNextPage(getCurrentView()); // Compensate for setPrevPage() above.
+		if (!m_ptrCurTask) {
+			// If the task for the current page has already finished, then the
+			// current page is already processed, so move to the next one.
+			m_ptrPages->setNextPage(getCurrentView());
+		} else {
+			cancelOngoingTask();
+		}
 	}
 	
-	cancelOngoingTask();
+	// In batch processing mode we highlight the page that
+	// was just processed, while processing the next one.
+	// Keep in mind that next one will have a question mark
+	// on it until it's fully processed.
 	
 	updateMainArea();
 }
@@ -895,6 +910,8 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		return;
 	}
 	
+	m_ptrCurTask.reset(); // We check if a task is in progress in startBatchProcessing().
+	
 	if (!m_batchProcessing) {
 		if (!result->filter()) {
 			// Error loading file.  No special action is necessary.
@@ -918,6 +935,8 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		// question mark on it.
 		PageInfo const cur_page(m_ptrPages->curPage(getCurrentView()));
 		m_ptrThumbSequence->setCurrentThumbnail(cur_page.id());
+		
+		m_thisStageProcessedPages.insert(cur_page.id());
 		
 		int page_num = 0;
 		PageInfo const next_page(
