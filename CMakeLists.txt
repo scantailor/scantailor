@@ -340,12 +340,24 @@ QT4_AUTOMOC(${sources})
 
 SET(win32_resource_file)
 IF(WIN32)
-	SET(win32_resource_file resources/win32/resources.rc)
+	SET(rc_file "${CMAKE_SOURCE_DIR}/resources/win32/resources.rc")
 	FILE(GLOB win32_resources resources/win32/*.ico)
 	SET_SOURCE_FILES_PROPERTIES(
-		"${win32_resource_file}" PROPERTIES
+		"${rc_file}" PROPERTIES
 		OBJECT_DEPENDS ${win32_resources}
 	)
+	IF(MINGW)
+		# CMake doesn't know how to process .rc files with MinGW.
+		SET(win32_resource_file "${CMAKE_BINARY_DIR}/win32_resources.o")
+		ADD_CUSTOM_COMMAND(
+			OUTPUT "${win32_resource_file}"
+			COMMAND windres -i "${rc_file}" -o "${win32_resource_file}"
+			MAIN_DEPENDENCY "${rc_file}"
+			DEPENDS ${win32_resources}
+		)
+	ELSE(MINGW)
+		SET(win32_resource_file "${rc_file}")
+	ENDIF(MINGW)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(
