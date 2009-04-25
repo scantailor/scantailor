@@ -351,7 +351,7 @@ IF(WIN32)
 		SET(win32_resource_file "${CMAKE_BINARY_DIR}/win32_resources.o")
 		ADD_CUSTOM_COMMAND(
 			OUTPUT "${win32_resource_file}"
-			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/win32}"
+			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/win32"
 			COMMAND windres -i "${rc_file}" -o "${win32_resource_file}"
 			MAIN_DEPENDENCY "${rc_file}"
 			DEPENDS ${win32_resources}
