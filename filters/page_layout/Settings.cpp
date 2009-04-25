@@ -353,7 +353,7 @@ Settings::Impl::Impl()
 	m_descHeightOrder(m_items.get<DescHeightTag>()),
 	m_invalidSize(),
 	m_defaultHardMarginsMM(10.0, 5.0, 10.0, 5.0),
-	m_defaultAlignment(Alignment::VCENTER, Alignment::HCENTER)
+	m_defaultAlignment(Alignment::TOP, Alignment::HCENTER)
 {
 }
 
