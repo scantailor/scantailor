@@ -95,6 +95,7 @@
 #include <QDebug>
 #include <algorithm>
 #include <stddef.h>
+#include <math.h>
 #include <assert.h>
 
 MainWindow::MainWindow()
@@ -209,8 +210,8 @@ MainWindow::MainWindow()
 	updateWindowTitle();
 	updateMainArea();
 
-	if (!isMaximized()) {
-		QSettings settings;
+	QSettings settings;
+	if (settings.value("mainWindow/maximized") == false) {
 		QVariant const geom(
 			settings.value("mainWindow/nonMaximizedGeometry")
 		);
@@ -385,16 +386,13 @@ MainWindow::createBatchProcessingWidget()
 void
 MainWindow::setupThumbView()
 {
-	QSize const outer_before(thumbView->size());
-	QSize const inner_before(thumbView->viewport()->size());
-	
-	QSize const inner_after(m_maxLogicalThumbSize.toSize());
-	QSize const outer_after(
-		inner_after.width() + outer_before.width() - inner_before.width(),
-		inner_after.height() + outer_before.height() - inner_before.height()
-	);
-	
-	thumbView->setMinimumSize(outer_after);
+	int const sb = thumbView->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+	int inner_width = thumbView->maximumViewportSize().width() - sb;
+	if (thumbView->style()->styleHint(QStyle::SH_ScrollView_FrameOnlyAroundContents, 0, thumbView)) {
+		inner_width -= thumbView->frameWidth() * 2;
+	}
+	int const delta_x = thumbView->size().width() - inner_width;
+	thumbView->setMinimumWidth((int)ceil(m_maxLogicalThumbSize.width() + delta_x));
 	
 	thumbView->setBackgroundBrush(palette().color(QPalette::Window));
 	m_ptrThumbSequence->attachView(thumbView);
