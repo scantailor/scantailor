@@ -60,7 +60,8 @@ ThumbnailBase::ThumbnailBase(
 :	m_rThumbnailCache(thumbnail_cache),
 	m_maxSize(max_size),
 	m_imageId(image_id),
-	m_imageXform(image_xform)
+	m_imageXform(image_xform),
+	m_extendedClipArea(false)
 {
 	setImageXform(m_imageXform);
 }
@@ -136,27 +137,27 @@ ThumbnailBase::paint(QPainter* painter,
 		// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
 		// to paint the whole widget, which we do here.
 		
-		QPolygonF const image_area(
-			PolygonUtils::round(
-				m_postScaleXform.map(
-					m_imageXform.transform().map(
-						m_imageXform.origRect()
-					)
-				)
-			)
-		);
 		QPolygonF const crop_area(
 			PolygonUtils::round(
 				m_postScaleXform.map(m_imageXform.resultingCropArea())
 			)
 		);
 		
-		QPolygonF const intersected_area(
-			PolygonUtils::round(image_area.intersected(crop_area))
-		);
-		
-		QPainterPath intersected_path;
-		intersected_path.addPolygon(intersected_area);
+		QPainterPath clip_path;
+		if (m_extendedClipArea) {
+			clip_path.addPolygon(crop_area);
+		} else {
+			QPolygonF const image_area(
+				PolygonUtils::round(
+					m_postScaleXform.map(
+						m_imageXform.transform().map(
+							m_imageXform.origRect()
+						)
+					)
+				)
+			);
+			clip_path.addPolygon(PolygonUtils::round(image_area.intersected(crop_area)));
+		}
 		
 		QPainterPath containing_path;
 		containing_path.addRect(m_boundingRect);
@@ -164,7 +165,7 @@ ThumbnailBase::paint(QPainter* painter,
 		QBrush brush;
 		
 		QPalette const palette(QApplication::palette());
-		if (option->state & QStyle::State_Selected) {
+		if (isSelected()) {
 			brush = palette.color(QPalette::Highlight);
 		} else {
 			brush = palette.color(QPalette::Window);
@@ -184,7 +185,7 @@ ThumbnailBase::paint(QPainter* painter,
 		painter->setRenderHint(QPainter::SmoothPixmapTransform);
 		painter->setRenderHint(QPainter::Antialiasing);
 		
-		painter->drawPath(containing_path.subtracted(intersected_path));
+		painter->drawPath(containing_path.subtracted(clip_path));
 	}
 }
 

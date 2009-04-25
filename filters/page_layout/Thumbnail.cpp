@@ -28,6 +28,8 @@
 #include <QPen>
 #include <QBrush>
 #include <QColor>
+#include <QApplication>
+#include <QPalette>
 #include <QDebug>
 
 using namespace imageproc;
@@ -50,6 +52,7 @@ Thumbnail::Thumbnail(
 	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform())
 {
 	recalcBoxesAndPresentationTransform();
+	setExtendedClipArea(true);
 }
 
 void
@@ -77,11 +80,21 @@ Thumbnail::paintOverImage(
 	QPainterPath content_outline;
 	content_outline.addPolygon(PolygonUtils::round(inner_rect));
 	
+	QPainterPath page_outline;
+	page_outline.addPolygon(
+		PolygonUtils::round(
+			orig_to_thumb.map(m_origXform.resultingCropArea())
+		)
+	);
+	
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
-	painter.setPen(Qt::NoPen);
-	painter.setBrush(QColor(0xbb, 0x00, 0xff, 40));
-	painter.drawPath(outer_outline.subtracted(content_outline));
+	// Clear parts of the thumbnail that don't belong to the image
+	// but belong to outer_rect.
+	painter.fillPath(outer_outline.subtracted(page_outline), QApplication::palette().window());
+	
+	// Draw margins.
+	painter.fillPath(outer_outline.subtracted(content_outline), QColor(0xbb, 0x00, 0xff, 40));
 	
 	QPen pen(QColor(0xbe, 0x5b, 0xec));
 	pen.setCosmetic(true);

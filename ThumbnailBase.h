@@ -66,6 +66,16 @@ protected:
 		QPainter& painter, QTransform const& image_to_display,
 		QTransform const& thumb_to_display) {}
 	
+	/**
+	 * By default, the image is clipped by both the crop area (as defined
+	 * by imageXform().resultingCropArea()), and the physical boundaries of
+	 * the image itself.  Basically a point won't be clipped only if it's both
+	 * inside of the crop area and inside the image.
+	 * Extended clipping area only includes the cropping area, so it's possible
+	 * to draw outside of the image but inside the crop area.
+	 */
+	void setExtendedClipArea(bool enabled) { m_extendedClipArea = enabled; }
+	
 	void setImageXform(ImageTransformation const& image_xform);
 	
 	ImageTransformation const& imageXform() const { return m_imageXform; }
@@ -89,6 +99,7 @@ private:
 	QTransform m_postScaleXform;
 	
 	boost::shared_ptr<LoadCompletionHandler> m_ptrCompletionHandler;
+	bool m_extendedClipArea;
 };
 
 #endif
