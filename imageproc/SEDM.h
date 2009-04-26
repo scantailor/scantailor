@@ -151,6 +151,26 @@ public:
 	 * \brief Return a matrix of squared distances in row-major order.
 	 */
 	uint32_t const* data() const { return m_pData; }
+	
+	/**
+	 * \brief Finds peaks on the distance map, altering it in the process.
+	 *
+	 * A peak region is a 4-connected group of cells having the same
+	 * distance value, that doesn't have any neighbors with a higher
+	 * distance value.
+	 *
+	 * Peaks on a Euclidean distance map are also known as ultimate
+	 * eroded points.
+	 *
+	 * The Borders flags used to build this SEDM also affect the peaks
+	 * on it.  If the distance to a particular object was considered,
+	 * that border was considered an object, so a peak may be found
+	 * between this border and another object.
+	 *
+	 * Peaks are returned in a BinaryImage, and the distance
+	 * map is altered in an uspecified way.
+	 */
+	BinaryImage findPeaksDestructive();
 private:
 	static uint32_t distSq(int x1, int x2, uint32_t dy_sq);
 	
@@ -161,6 +181,18 @@ private:
 	void processRows();
 	
 	void processRows(ConnectivityMap& cmap);
+	
+	BinaryImage findPeakCandidatesNonPadded() const;
+	
+	BinaryImage buildEqualMapNonPadded(uint32_t const* src1, uint32_t const* src2) const;
+	
+	void max3x3(uint32_t const* src, uint32_t* dst) const;
+	
+	void max3x1(uint32_t const* src, uint32_t* dst) const;
+	
+	void max1x3(uint32_t const* src, uint32_t* dst) const;
+	
+	void incrementMaskedPadded(BinaryImage const& mask);
 	
 	std::vector<uint32_t> m_data;
 	uint32_t* m_pData;

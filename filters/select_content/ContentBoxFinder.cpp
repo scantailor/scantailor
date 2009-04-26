@@ -720,6 +720,34 @@ ContentBoxFinder::estimateTextMask(
 	imageproc::BinaryImage const& content_blocks,
 	DebugImages* dbg)
 {
+	// We differentiate between a text line and a slightly skewed straight
+	// line (which may have a fill factor similar to that of text) by the
+	// presence of ultimate eroded points.
+	
+	BinaryImage const ueps(
+		SEDM(content, SEDM::DIST_TO_BLACK, SEDM::DIST_TO_NO_BORDERS)
+		.findPeaksDestructive()
+	);
+	if (dbg) {
+		QImage canvas(content_blocks.toQImage().convertToFormat(QImage::Format_ARGB32_Premultiplied));
+		QPainter painter;
+		painter.begin(&canvas);
+		QImage overlay(canvas.size(), canvas.format());
+		overlay.fill(0xff0000ff); // opaque blue
+		overlay.setAlphaChannel(content.inverted().toQImage());
+		painter.drawImage(QPoint(0, 0), overlay);
+		
+		BinaryImage ueps_on_content_blocks(content_blocks);
+		rasterOp<RopAnd<RopSrc, RopDst> >(ueps_on_content_blocks, ueps);
+		
+		overlay.fill(0xffffff00); // opaque yellow
+		overlay.setAlphaChannel(ueps_on_content_blocks.inverted().toQImage());
+		painter.drawImage(QPoint(0, 0), overlay);
+		
+		painter.end();
+		dbg->add(canvas, "ueps");
+	}
+	
 	BinaryImage text_mask(content.size(), WHITE);
 	
 	int const min_text_height = 6;
@@ -893,11 +921,31 @@ ContentBoxFinder::estimateTextMask(
 				continue;
 			}
 			
-			QRect rect(cc.rect());
-			rect.setTop(cc.rect().top() + top);
-			rect.setBottom(cc.rect().top() + bottom);
+			QRect line_rect(cc.rect());
+			line_rect.setTop(cc.rect().top() + top);
+			line_rect.setBottom(cc.rect().top() + bottom);
+			
+			// Check if there are enough ultimate eroded points on the line.
+			int ueps_todo = int(0.4 * line_rect.width() / line_rect.height());
+			if (ueps_todo) {
+				BinaryImage line_ueps(line_rect.size());
+				rasterOp<RopSrc>(line_ueps, line_ueps.rect(), content_blocks, line_rect.topLeft());
+				rasterOp<RopAnd<RopSrc, RopDst> >(line_ueps, line_ueps.rect(), ueps, line_rect.topLeft());
+				ConnCompEraser ueps_eraser(line_ueps, CONN4);
+				ConnComp cc;
+				for (; ueps_todo && !(cc = ueps_eraser.nextConnComp()).isNull(); --ueps_todo) {
+					// Erase components until ueps_todo reaches zero or there are no more components.
+				}
+				if (ueps_todo) {
+					// Not enough ueps were found.
+					//qDebug() << "Not enough UEPs.";
+					continue;
+				}
+			}
+			
+			// Write this block to the text mask.
 			rasterOp<RopOr<RopSrc, RopDst> >(
-				text_mask, rect, cc_img, QPoint(0, top)
+				text_mask, line_rect, cc_img, QPoint(0, top)
 			);
 		}
 	}

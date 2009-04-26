@@ -22,6 +22,9 @@
 #include "SEDM.h"
 #include "BinaryImage.h"
 #include "ConnectivityMap.h"
+#include "Morphology.h"
+#include "SeedFill.h"
+#include "RasterOp.h"
 #include <algorithm>
 #include <string.h>
 #include <math.h>
@@ -165,6 +168,55 @@ SEDM::swap(SEDM& other)
 	std::swap(m_pData, other.m_pData);
 	std::swap(m_size, other.m_size);
 	std::swap(m_stride, other.m_stride);
+}
+
+BinaryImage
+SEDM::findPeaksDestructive()
+{
+	if (m_size.isEmpty()) {
+		return BinaryImage();
+	}
+	
+	BinaryImage peak_candidates(findPeakCandidatesNonPadded());
+	
+	// To check if a peak candidate is really a peak, we have to check
+	// that every cell in its neighborhood has a lower value than that
+	// candidate.  We are working with 3x3 neighborhoods.
+	BinaryImage neighborhood_mask(
+		dilateBrick(
+			peak_candidates, QSize(3, 3),
+			peak_candidates.rect().adjusted(-1, -1, 1, 1)
+		)
+	);
+	rasterOp<RopXor<RopSrc, RopDst> >(
+		neighborhood_mask, neighborhood_mask.rect().adjusted(1, 1, -1, -1),
+		peak_candidates, QPoint(0, 0)
+	);
+	
+	// Cells in the neighborhood of a peak candidate fall into two categories:
+	// 1. The cell has a lower value than the peak candidate.
+	// 2. The cell has the same value as the peak candidate,
+	//    but it has a cell with a greater value in its neighborhood.
+	// The second case indicates that our candidate is not relly a peak.
+	// To test for the second case we are going to increment the values
+	// of the cells in the neighborhood of peak candidates, find the peak
+	// candidates again and analize the differences.
+	
+	incrementMaskedPadded(neighborhood_mask);
+	neighborhood_mask.release();
+	
+	BinaryImage diff(findPeakCandidatesNonPadded());
+	rasterOp<RopXor<RopSrc, RopDst> >(diff, peak_candidates);
+	
+	// If a bin that has changed its state was a part of a peak candidate,
+	// it means a neighboring bin went from equal to a greater value,
+	// which indicates that such candidate is not a peak.
+	BinaryImage const not_peaks(seedFill(diff, peak_candidates, CONN8));
+	diff.release();
+	
+	rasterOp<RopXor<RopSrc, RopDst> >(peak_candidates, not_peaks);
+	
+	return peak_candidates;
 }
 
 inline uint32_t
@@ -357,6 +409,143 @@ SEDM::processRows(ConnectivityMap& cmap)
 				--q;
 			}
 		}
+	}
+}
+
+
+/*====================== Peak finding stuff goes below ====================*/
+
+BinaryImage
+SEDM::findPeakCandidatesNonPadded() const
+{
+	std::vector<unsigned> maxed(m_data.size(), 0);
+	
+	// Every cell becomes the maximum of itself and its neighbors.
+	max3x3(&m_data[0], &maxed[0]);
+	
+	return buildEqualMapNonPadded(&m_data[0], &maxed[0]);
+}
+
+BinaryImage
+SEDM::buildEqualMapNonPadded(uint32_t const* src1, uint32_t const* src2) const
+{
+	int const width = m_size.width();
+	int const height = m_size.height();
+	
+	BinaryImage dst(width, height, WHITE);
+	uint32_t* dst_line = dst.data();
+	int const dst_wpl = dst.wordsPerLine();
+	int const src_stride = m_stride;
+	unsigned const* src1_line = src1 + src_stride + 1;
+	unsigned const* src2_line = src2 + src_stride + 1;
+	uint32_t const msb = uint32_t(1) << 31;
+	
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (std::max(src1_line[x], src2_line[x]) -
+				std::min(src1_line[x], src2_line[x]) == 0) {
+				dst_line[x >> 5] |= msb >> (x & 31);
+			}
+		}
+		dst_line += dst_wpl;
+		src1_line += src_stride;
+		src2_line += src_stride;
+	}
+	
+	return dst;
+}
+
+void
+SEDM::max3x3(uint32_t const* src, uint32_t* dst) const
+{
+	std::vector<uint32_t> tmp(m_data.size(), 0);
+	max3x1(src, &tmp[0]);
+	max1x3(&tmp[0], dst);
+}
+
+void
+SEDM::max3x1(uint32_t const* src, uint32_t* dst) const
+{
+	int const width = m_size.width() + 2;
+	int const height = m_size.height() + 2;
+	
+	uint32_t const* src_line = &src[0];
+	uint32_t* dst_line = &dst[0];
+	
+	for (int y = 0; y < height; ++y) {
+		// First column (no left neighbors).
+		int x = 0;
+		dst_line[x] = std::max(src_line[x], src_line[x + 1]);
+		
+		for (++x; x < width - 1; ++x) {
+			uint32_t const prev = src_line[x - 1];
+			uint32_t const cur = src_line[x];
+			uint32_t const next = src_line[x + 1];
+			dst_line[x] = std::max(prev, std::max(cur, next));
+		}
+		
+		// Last column (no right neighbors).
+		dst_line[x] = std::max(src_line[x], src_line[x - 1]);
+		
+		src_line += width;
+		dst_line += width;
+	}
+}
+
+void
+SEDM::max1x3(uint32_t const* src, uint32_t* dst) const
+{
+	int const width = m_size.width() + 2;
+	int const height = m_size.height() + 2;
+	
+	// First row (no top neighbors).
+	uint32_t const* p_src = &src[0];
+	uint32_t* p_dst = &dst[0];
+	for (int x = 0; x < width; ++x) {
+		*p_dst = std::max(p_src[0], p_src[width]);
+		++p_src;
+		++p_dst;
+	}
+	
+	for (int y = 1; y < height - 1; ++y) {
+		for (int x = 0; x < width; ++x) {
+			uint32_t const prev = p_src[x - width];
+			uint32_t const cur = p_src[x];
+			uint32_t const next = p_src[x + width];
+			p_dst[x] = std::max(prev, std::max(cur, next));
+		}
+		
+		p_src += width;
+		p_dst += width;
+	}
+	
+	// Last row (no bottom neighbors).
+	for (int x = 0; x < width; ++x) {
+		*p_dst = std::max(p_src[0], p_src[-width]);
+		++p_src;
+		++p_dst;
+	}
+}
+
+void
+SEDM::incrementMaskedPadded(BinaryImage const& mask)
+{
+	int const width = m_size.width() + 2;
+	int const height = m_size.height() + 2;
+	
+	uint32_t* data_line = &m_data[0];
+	uint32_t const* mask_line = mask.data();
+	int const mask_wpl = mask.wordsPerLine();
+	
+	uint32_t const msb = uint32_t(1) << 31;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (mask_line[x >> 5] & (msb >> (x & 31))) {
+				++data_line[x];
+			}
+		}
+		data_line += width;
+		mask_line += mask_wpl;
 	}
 }
 
