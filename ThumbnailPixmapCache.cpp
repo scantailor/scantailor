@@ -525,7 +525,7 @@ ThumbnailPixmapCache::Impl::recreateThumbnail(
 	switch (k_it->status) {
 		case Item::LOADED:
 		case Item::LOAD_FAILED:
-			m_itemsByKey.erase(image_id);
+			removeItemLocked(m_items.project<RemoveQueueTag>(k_it));
 			break;
 		case Item::QUEUED:
 			break;
