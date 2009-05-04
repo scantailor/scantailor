@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>DeskewOptionsWidget</name>
     <message>
@@ -49,12 +50,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="197"/>
         <location filename="../FixDpiDialog.cpp" line="605"/>
         <source>All Pages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="629"/>
+        <location filename="../FixDpiDialog.cpp" line="627"/>
         <source>%1 (page %2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -95,17 +97,50 @@
     </message>
 </context>
 <context>
+    <name>FixDpiSinglePageDialog</name>
+    <message>
+        <location filename="../ui/FixDpiSinglePageDialog.ui" line="13"/>
+        <source>Fix DPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/FixDpiSinglePageDialog.ui" line="19"/>
+        <source>DPI for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/FixDpiSinglePageDialog.ui" line="45"/>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/FixDpiSinglePageDialog.ui" line="93"/>
+        <source>x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="37"/>
+        <source>%1 (page %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="148"/>
+        <location filename="../ImageViewBase.cpp" line="124"/>
         <source>Use the mouse wheel to zoom.  When zoomed, dragging is possible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ImageViewBase.cpp" line="125"/>
+        <source>Unrestricted dragging is possible by holding down the Shift key.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>LoadFileTask</name>
     <message>
-        <location filename="../LoadFileTask.cpp" line="137"/>
+        <location filename="../LoadFileTask.cpp" line="134"/>
         <source>The following file could not be loaded:
 %1</source>
         <translation type="unfinished"></translation>
@@ -114,64 +149,119 @@
 <context>
     <name>MainWindow</name>
     <message>
+        <location filename="../MainWindow.cpp" line="435"/>
         <location filename="../ui/MainWindow.ui" line="216"/>
         <source>Save Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="422"/>
+        <location filename="../MainWindow.cpp" line="435"/>
         <source>Save this project?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="955"/>
+        <location filename="../MainWindow.cpp" line="726"/>
+        <source>Insert before ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="729"/>
+        <source>Insert after ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="733"/>
+        <source>Remove from project ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="971"/>
+        <location filename="../MainWindow.cpp" line="1040"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="953"/>
+        <location filename="../MainWindow.cpp" line="1038"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1246"/>
+        <location filename="../MainWindow.cpp" line="1057"/>
+        <location filename="../MainWindow.cpp" line="1066"/>
+        <location filename="../MainWindow.cpp" line="1077"/>
+        <location filename="../MainWindow.cpp" line="1311"/>
+        <location filename="../MainWindow.cpp" line="1342"/>
+        <location filename="../MainWindow.cpp" line="1414"/>
+        <location filename="../MainWindow.cpp" line="1475"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="974"/>
+        <location filename="../MainWindow.cpp" line="1058"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="983"/>
+        <location filename="../MainWindow.cpp" line="1067"/>
         <source>The project file is broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="994"/>
+        <location filename="../MainWindow.cpp" line="1078"/>
         <source>Unable to interpret the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1115"/>
+        <location filename="../MainWindow.cpp" line="1209"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1144"/>
+        <location filename="../MainWindow.cpp" line="1240"/>
         <source>Unnamed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1149"/>
+        <location filename="../MainWindow.cpp" line="1245"/>
         <source>%1 - Scan Tailor %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1248"/>
+        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1343"/>
         <source>Error saving the project file!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1387"/>
+        <source>File to insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1393"/>
+        <source>Images not in project (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1415"/>
+        <source>Error opening the image file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1457"/>
+        <source>%1 (page %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1464"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1476"/>
+        <source>Unable to delete file:
+%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -210,6 +300,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ui/MainWindow.ui" line="229"/>
         <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Next Page</source>
         <translation type="unfinished"></translation>
@@ -220,6 +311,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ui/MainWindow.ui" line="240"/>
         <location filename="../ui/MainWindow.ui" line="267"/>
         <source>Previous Page</source>
         <translation type="unfinished"></translation>
@@ -285,7 +377,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="354"/>
+        <location filename="../MainWindow.cpp" line="370"/>
         <source>Stop batch processing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -364,6 +456,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="40"/>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="56"/>
         <source>...</source>
         <translation type="unfinished"></translation>
@@ -534,6 +627,16 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="93"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="148"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="322"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="345"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="368"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="391"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="414"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="440"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="463"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="486"/>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="509"/>
         <source>...</source>
         <translation type="unfinished"></translation>
@@ -554,6 +657,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="231"/>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="564"/>
         <source>Apply To ...</source>
         <translation type="unfinished"></translation>
@@ -673,32 +777,39 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>ProjectFilesDialog</name>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="316"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="19"/>
         <source>Input Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="335"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="42"/>
         <source>Output Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="507"/>
+        <location filename="../ProjectFilesDialog.cpp" line="515"/>
+        <location filename="../ProjectFilesDialog.cpp" line="524"/>
+        <location filename="../ProjectFilesDialog.cpp" line="546"/>
+        <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <location filename="../ProjectFilesDialog.cpp" line="624"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="508"/>
+        <location filename="../ProjectFilesDialog.cpp" line="507"/>
         <source>No files in project!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="517"/>
+        <location filename="../ProjectFilesDialog.cpp" line="516"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="526"/>
+        <location filename="../ProjectFilesDialog.cpp" line="525"/>
         <source>Input and output directories can&apos;t be the same.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -713,17 +824,17 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="548"/>
+        <location filename="../ProjectFilesDialog.cpp" line="547"/>
         <source>Unable to create output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="557"/>
+        <location filename="../ProjectFilesDialog.cpp" line="556"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="629"/>
+        <location filename="../ProjectFilesDialog.cpp" line="624"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
@@ -735,6 +846,7 @@ You should remove them from the project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ui/ProjectFilesDialog.ui" line="32"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="51"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
@@ -745,6 +857,7 @@ You should remove them from the project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ui/ProjectFilesDialog.ui" line="76"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="158"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
@@ -787,6 +900,24 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>RemoveFileDialog</name>
+    <message>
+        <location filename="../ui/RemoveFileDialog.ui" line="13"/>
+        <source>Remove File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/RemoveFileDialog.ui" line="19"/>
+        <source>Remove %1 from project?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/RemoveFileDialog.ui" line="44"/>
+        <source>Also delete the file from disk</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SelectContentOptionsWidget</name>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="13"/>
@@ -812,7 +943,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>StageListView</name>
     <message>
-        <location filename="../StageListView.cpp" line="223"/>
+        <location filename="../StageListView.cpp" line="129"/>
         <source>Launch batch processing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -820,7 +951,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="556"/>
+        <location filename="../ThumbnailSequence.cpp" line="692"/>
         <source>%1 (page %2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -836,7 +967,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::ImageView</name>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="47"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="48"/>
         <source>Drag this handle to rotate the image.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -844,17 +975,18 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="97"/>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="110"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="99"/>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="98"/>
         <source>Range is required.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="112"/>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="111"/>
         <source>Page %1 (the current page) must be inside the range.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -862,7 +994,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="62"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
         <source>Fix Orientation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -875,22 +1007,24 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="115"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="124"/>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="132"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="117"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="116"/>
         <source>DPI is not set.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="126"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="125"/>
         <source>DPI is too low!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="134"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="133"/>
         <source>DPI is too high!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -961,12 +1095,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::ImageView</name>
     <message>
-        <location filename="../filters/page_split/ImageView.cpp" line="49"/>
+        <location filename="../filters/page_split/ImageView.cpp" line="48"/>
         <source>Drag this handle to skew the line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ImageView.cpp" line="50"/>
+        <location filename="../filters/page_split/ImageView.cpp" line="49"/>
         <source>This line can be dragged.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -974,6 +1108,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::OptionsWidget</name>
     <message>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="113"/>
         <location filename="../filters/page_split/OptionsWidget.cpp" line="220"/>
         <source>This page only</source>
         <translation type="unfinished"></translation>
@@ -992,7 +1127,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="55"/>
+        <location filename="../filters/select_content/Filter.cpp" line="53"/>
         <source>Select Content</source>
         <translation type="unfinished"></translation>
     </message>

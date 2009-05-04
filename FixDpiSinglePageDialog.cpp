@@ -34,7 +34,7 @@ FixDpiSinglePageDialog::FixDpiSinglePageDialog(
 	QString const file_name(QFileInfo(image_id.filePath()).fileName());
 	QString image_name(file_name);
 	if (is_multipage_file) {
-		image_name = tr("%1 (page %1)").arg(file_name).arg(image_id.page() + 1);
+		image_name = tr("%1 (page %2)").arg(file_name).arg(image_id.page() + 1);
 	}
 	ui.text->setText(ui.text->text().arg(image_name));
 	
