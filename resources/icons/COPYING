@@ -6,6 +6,7 @@ Origin: Created by Scan Tailor developers or contributors
 Website: http://scantailor.sourceforge.net/
 License: GNU GPL version 3 or above
 Files:
+../appicon.svg
 aqua-sphere.png
 aque-sphere.svg
 layout-type-auto.png
@@ -18,7 +19,7 @@ right_page_thumb.png
 single_page_uncut.png
 single_page_uncut_selected.png
 two_pages.png
-two_pages_selected.png 
+two_pages_selected.png
 
 
 Origin: The GNU Image Manipulation Project (GIMP)
@@ -48,7 +49,7 @@ object-rotate-right.png
 
 Origin: Tango Desktop Project
 Website: http://tango.freedesktop.org/
-License: Creative Commons Attribution Share-Alike 2.5 License
+License: Public Domain
 Files:
 big-down-arrow.png
 big-left-arrow.png
@@ -61,7 +62,7 @@ user-trash.png
 
 Origin: Mark James
 Website: http://www.famfamfam.com/lab/icons/silk/
-License: Creative Commons Attribution 2.5 License
+License: Creative Commons Attribution 3.0 License
 Files:
 arrow_in.png
 
