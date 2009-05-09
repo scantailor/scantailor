@@ -262,7 +262,7 @@ static void convertAbgrToArgb(uint32 const* src, uint32* dst, int count)
 {
 	for (int i = 0; i < count; ++i) {
 		uint32 const src_word = src[i];
-		uint32_t dst_word = src_word & 0xFF000000; // A
+		uint32 dst_word = src_word & 0xFF000000;   // A
 		dst_word |= (src_word & 0x00FF0000) >> 16; // B
 		dst_word |= src_word & 0x0000FF00;         // G
 		dst_word |= (src_word & 0x000000FF) << 16; // R
