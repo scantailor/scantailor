@@ -65,7 +65,7 @@ Section
   
   # Write uninstall registry records.
   WriteRegStr HKLM "${UNINST_REGKEY}" "DisplayName" "Scan Tailor"
-  WriteRegStr HKLM "${UNINST_REGKEY} "UninstallString" "$INSTDIR\Uninstaller.exe"
+  WriteRegStr HKLM "${UNINST_REGKEY}" "UninstallString" "$INSTDIR\Uninstaller.exe"
   
   # Create menu shortcuts.
   SetShellVarContext all
