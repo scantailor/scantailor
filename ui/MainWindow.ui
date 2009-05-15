@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,156 +10,156 @@
     <height>445</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <property name="styleSheet" >
-   <string notr="true" />
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
-  <widget class="QWidget" name="centralwidget" >
-   <property name="sizePolicy" >
-    <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <property name="cursor" >
+   <property name="cursor">
     <cursorShape>ArrowCursor</cursorShape>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout" >
-    <property name="bottomMargin" >
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item>
-     <widget class="QSplitter" name="splitter" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="orientation" >
+      <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <property name="childrenCollapsible" >
+      <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="QWidget" name="layoutWidget" >
-       <layout class="QVBoxLayout" >
-        <property name="spacing" >
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout">
+        <property name="spacing">
          <number>6</number>
         </property>
         <item>
-         <widget class="StageListView" name="filterList" >
-          <property name="autoScroll" >
+         <widget class="StageListView" name="filterList">
+          <property name="autoScroll">
            <bool>false</bool>
           </property>
-          <property name="editTriggers" >
+          <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
           </property>
-          <property name="tabKeyNavigation" >
+          <property name="tabKeyNavigation">
            <bool>false</bool>
           </property>
-          <property name="showDropIndicator" stdset="0" >
+          <property name="showDropIndicator" stdset="0">
            <bool>false</bool>
           </property>
-          <property name="alternatingRowColors" >
+          <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
-          <property name="selectionMode" >
+          <property name="selectionMode">
            <enum>QAbstractItemView::SingleSelection</enum>
           </property>
-          <property name="selectionBehavior" >
+          <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectRows</enum>
           </property>
-          <property name="textElideMode" >
+          <property name="textElideMode">
            <enum>Qt::ElideNone</enum>
           </property>
-          <property name="showGrid" >
+          <property name="showGrid">
            <bool>false</bool>
           </property>
-          <property name="wordWrap" >
+          <property name="wordWrap">
            <bool>false</bool>
           </property>
-          <property name="cornerButtonEnabled" >
+          <property name="cornerButtonEnabled">
            <bool>false</bool>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="filterOptions" >
-          <property name="frameShape" >
+         <widget class="QFrame" name="filterOptions">
+          <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QFrame" name="imageViewFrame" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+      <widget class="QFrame" name="imageViewFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>1</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
-       <property name="frameShape" >
+       <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
        </property>
-       <property name="frameShadow" >
+       <property name="frameShadow">
         <enum>QFrame::Sunken</enum>
        </property>
       </widget>
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout" >
-      <property name="spacing" >
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
        <number>0</number>
       </property>
       <item>
-       <widget class="QToolButton" name="focusButton" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+       <widget class="QToolButton" name="focusButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="statusTip" >
-         <string>Thumbnail list auto-scrolling.</string>
+        <property name="statusTip">
+         <string>Keep current page in view.</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
-        <property name="icon" >
-         <iconset resource="../resources/resources.qrc" >
-          <normaloff>:/icons/arrow_in.png</normaloff>:/icons/arrow_in.png</iconset>
+        <property name="icon">
+         <iconset resource="../resources/resources.qrc">
+          <normaloff>:/icons/keep-in-view.png</normaloff>:/icons/keep-in-view.png</iconset>
         </property>
-        <property name="checkable" >
+        <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QGraphicsView" name="thumbView" >
-        <property name="maximumSize" >
+       <widget class="QGraphicsView" name="thumbView">
+        <property name="maximumSize">
          <size>
           <width>249</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="statusTip" >
+        <property name="statusTip">
          <string>Use PgUp, PgDown or Q, W to navigate between pages.</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignHCenter|Qt::AlignTop</set>
         </property>
        </widget>
@@ -167,136 +168,136 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar" >
-   <property name="geometry" >
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>25</height>
+     <height>24</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuDebug" >
-    <property name="title" >
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionDebug" />
+    <addaction name="actionDebug"/>
    </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNewProject" />
-    <addaction name="actionOpenProject" />
-    <addaction name="separator" />
-    <addaction name="actionSaveProject" />
-    <addaction name="actionSaveProjectAs" />
-    <addaction name="separator" />
-    <addaction name="actionCloseProject" />
-    <addaction name="separator" />
-    <addaction name="actionQuit" />
+    <addaction name="actionNewProject"/>
+    <addaction name="actionOpenProject"/>
+    <addaction name="separator"/>
+    <addaction name="actionSaveProject"/>
+    <addaction name="actionSaveProjectAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionCloseProject"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
-   <addaction name="menuFile" />
-   <addaction name="menuDebug" />
+   <addaction name="menuFile"/>
+   <addaction name="menuDebug"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar" />
-  <action name="actionDebug" >
-   <property name="checkable" >
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionDebug">
+   <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="checked" >
+   <property name="checked">
     <bool>false</bool>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Debug</string>
    </property>
   </action>
-  <action name="actionSaveProject" >
-   <property name="text" >
+  <action name="actionSaveProject">
+   <property name="text">
     <string>Save Project</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSaveProjectAs" >
-   <property name="text" >
+  <action name="actionSaveProjectAs">
+   <property name="text">
     <string>Save Project As ...</string>
    </property>
   </action>
-  <action name="actionNextPage" >
-   <property name="text" >
+  <action name="actionNextPage">
+   <property name="text">
     <string>Next Page</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>PgDown</string>
    </property>
-   <property name="autoRepeat" >
+   <property name="autoRepeat">
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionPrevPage" >
-   <property name="text" >
+  <action name="actionPrevPage">
+   <property name="text">
     <string>Previous Page</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>PgUp</string>
    </property>
-   <property name="autoRepeat" >
+   <property name="autoRepeat">
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionNewProject" >
-   <property name="text" >
+  <action name="actionNewProject">
+   <property name="text">
     <string>New Project ...</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionOpenProject" >
-   <property name="text" >
+  <action name="actionOpenProject">
+   <property name="text">
     <string>Open Project ...</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionPrevPageQ" >
-   <property name="text" >
+  <action name="actionPrevPageQ">
+   <property name="text">
     <string>Previous Page</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Q</string>
    </property>
-   <property name="autoRepeat" >
+   <property name="autoRepeat">
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionNextPageW" >
-   <property name="text" >
+  <action name="actionNextPageW">
+   <property name="text">
     <string>Next Page</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>W</string>
    </property>
-   <property name="autoRepeat" >
+   <property name="autoRepeat">
     <bool>false</bool>
    </property>
   </action>
-  <action name="actionCloseProject" >
-   <property name="text" >
+  <action name="actionCloseProject">
+   <property name="text">
     <string>Close Project</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="actionQuit" >
-   <property name="text" >
+  <action name="actionQuit">
+   <property name="text">
     <string>Quit</string>
    </property>
-   <property name="shortcut" >
+   <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
   </action>
@@ -309,7 +310,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc" />
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
