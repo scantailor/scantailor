@@ -42,9 +42,9 @@ public:
 	bool operator()(QLineF const& lhs, QLineF const& rhs) {
 		int comp = compare(lhs.p1(), rhs.p1());
 		if (comp != 0) {
-			return comp;
+			return comp < 0;
 		}
-		return compare(lhs.p2(), rhs.p2());
+		return compare(lhs.p2(), rhs.p2()) < 0;
 	}
 private:
 	static int compare(QPointF const& lhs, QPointF const& rhs) {
