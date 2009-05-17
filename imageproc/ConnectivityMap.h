@@ -192,8 +192,8 @@ private:
 	
 	void expandImpl(BinaryImage const* mask);
 	
-	static uint32_t const BACKGROUND = ~uint32_t(0);
-	static uint32_t const UNTAGGED_FG = BACKGROUND - 1;
+	static uint32_t const BACKGROUND;
+	static uint32_t const UNTAGGED_FG;
 	
 	std::vector<uint32_t> m_data;
 	uint32_t* m_pData;

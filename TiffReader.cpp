@@ -360,10 +360,10 @@ TiffReader::readHeader(QIODevice& device)
 	uint16 const version_byte1 = data[3];
 	
 	if (data[0] == 0x4d && data[1] == 0x4d) {
-		uint16_t const version = (version_byte0 << 8) + version_byte1;
+		uint16 const version = (version_byte0 << 8) + version_byte1;
 		return TiffHeader(TiffHeader::TIFF_BIG_ENDIAN, version);
 	} else if (data[0] == 0x49 && data[1] == 0x49) {
-		uint16_t const version = (version_byte1 << 8) + version_byte0;
+		uint16 const version = (version_byte1 << 8) + version_byte0;
 		return TiffHeader(TiffHeader::TIFF_LITTLE_ENDIAN, version);
 	} else {
 		return TiffHeader();

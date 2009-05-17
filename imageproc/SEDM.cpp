@@ -418,7 +418,7 @@ SEDM::processRows(ConnectivityMap& cmap)
 BinaryImage
 SEDM::findPeakCandidatesNonPadded() const
 {
-	std::vector<unsigned> maxed(m_data.size(), 0);
+	std::vector<uint32_t> maxed(m_data.size(), 0);
 	
 	// Every cell becomes the maximum of itself and its neighbors.
 	max3x3(&m_data[0], &maxed[0]);
@@ -436,8 +436,8 @@ SEDM::buildEqualMapNonPadded(uint32_t const* src1, uint32_t const* src2) const
 	uint32_t* dst_line = dst.data();
 	int const dst_wpl = dst.wordsPerLine();
 	int const src_stride = m_stride;
-	unsigned const* src1_line = src1 + src_stride + 1;
-	unsigned const* src2_line = src2 + src_stride + 1;
+	uint32_t const* src1_line = src1 + src_stride + 1;
+	uint32_t const* src2_line = src2 + src_stride + 1;
 	uint32_t const msb = uint32_t(1) << 31;
 	
 	for (int y = 0; y < height; ++y) {

@@ -309,7 +309,7 @@ void spreadInDirection(
 		return;
 	}
 	
-	int const first_phase_steps = (int)sqrt(num_steps);
+	int const first_phase_steps = (int)sqrt((double)num_steps);
 	
 	BinaryImage tmp(tmp_images.retrieveOrCreate(tmp_image_size));
 	
