@@ -9,10 +9,13 @@ This file is in UTF-8 encoding.
    Сайт: http://www.cmake.org
 2. jpeg-6b
    Сайт: http://www.ijg.org/
+   Нам нужен файл jpegsrc.v6b.tar.gz или с похожим именем.
 3. zlib
    Сайт: http://www.zlib.net/
+   Нам нужен файл вида zlib-x.x.x.tar.gz, где x.x.x - номер версии.
 4. libpng
    Сайт: http://www.libpng.org/pub/png/libpng.html
+   Нам нужен файл вида libpng-x.x.x.tar.gz, где x.x.x - номер версии.
 5. libtiff
    Сайт: http://www.remotesensing.org/libtiff/
    Из-за того, что libtiff обновляется редко, а дыры в нем находят часто, лучше
@@ -22,7 +25,7 @@ This file is in UTF-8 encoding.
    в этом документе.  Если вы не собираетесь распространять ваши сборки Scan
    Tailor'а и не собираетесь открывать им файлы из сомнительных источников,
    тогда можете и не патчить libtiff.
-6. Qt 4.x.x (протестировано с Qt 4.4.2)
+6. Qt 4.x.x (протестировано с Qt 4.5.0)
    Cайт: http://trolltech.com/
    Download Qt -> Open Source -> Application Development -> Qt for Windows: C++
    Оттуда скачиваем версию c mingw, а не просто архив с исходниками.  Таким

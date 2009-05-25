@@ -24,7 +24,7 @@ SET(
 	BlackWhiteOptions.cpp BlackWhiteOptions.h
 	ColorGrayscaleOptions.cpp ColorGrayscaleOptions.h
 	RenderParams.cpp RenderParams.h
-	ColorParams.h Scope.h
+	ColorParams.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

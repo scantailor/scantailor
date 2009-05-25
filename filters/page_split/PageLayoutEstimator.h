@@ -20,7 +20,7 @@
 #define PAGE_SPLIT_PAGELAYOUTESTIMATOR_H_
 
 #include "foundation/VirtualFunction.h"
-#include "Rule.h"
+#include "LayoutType.h"
 #include <QLineF>
 #include <deque>
 #include <memory>
@@ -63,23 +63,23 @@ public:
 	 *         requested layout type.
 	 */
 	static PageLayout estimatePageLayout(
-		Rule::LayoutType layout_type, QImage const& input,
+		LayoutType layout_type, QImage const& input,
 		ImageTransformation const& pre_xform,
 		imageproc::BinaryThreshold bw_threshold,
 		DebugImages* dbg = 0);
 private:
 	static std::auto_ptr<PageLayout> tryCutAtFoldingLine(
-		Rule::LayoutType layout_type, QImage const& input,
+		LayoutType layout_type, QImage const& input,
 		ImageTransformation const& pre_xform, DebugImages* dbg);
 		
 	static PageLayout cutAtWhitespace(
-		Rule::LayoutType layout_type, QImage const& input,
+		LayoutType layout_type, QImage const& input,
 		ImageTransformation const& pre_xform,
 		imageproc::BinaryThreshold const bw_threshold,
 		DebugImages* dbg);
 	
 	static PageLayout cutAtWhitespaceDeskewed150(
-		Rule::LayoutType layout_type, int num_pages,
+		LayoutType layout_type, int num_pages,
 		imageproc::BinaryImage const& input,
 		bool left_offcut, bool right_offcut, DebugImages* dbg);
 	
@@ -101,13 +101,13 @@ private:
 	static void removeInsignificantEdgeSpans(std::deque<Span>& spans);
 	
 	static PageLayout processContentSpansSinglePage(
-		Rule::LayoutType layout_type,
+		LayoutType layout_type,
 		std::deque<Span> const& spans,
 		int width, int height,
 		bool left_offcut, bool right_offcut);
 		
 	static PageLayout processContentSpansTwoPages(
-		Rule::LayoutType layout_type,
+		LayoutType layout_type,
 		std::deque<Span> const& spans,
 		int width, int height);
 	

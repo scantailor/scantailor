@@ -20,7 +20,6 @@ SET(
 	Thumbnail.cpp Thumbnail.h
 	ApplyDialog.cpp ApplyDialog.h
 	Alignment.cpp Alignment.h
-	Scope.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

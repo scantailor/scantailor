@@ -20,7 +20,16 @@
 #define FIX_ORIENTATION_APPLYDIALOG_H_
 
 #include "ui_OrientationApplyDialog.h"
+#include "PageId.h"
+#include "PageRange.h"
+#include "PageSequence.h"
+#include "IntrusivePtr.h"
 #include <QDialog>
+#include <vector>
+#include <set>
+
+class PageSelectionAccessor;
+class QButtonGroup;
 
 namespace fix_orientation
 {
@@ -31,22 +40,19 @@ class ApplyDialog : public QDialog, private Ui::OrientationApplyDialog
 {
 	Q_OBJECT
 public:
-	ApplyDialog(QWidget* parent, int num_pages, int cur_page);
+	ApplyDialog(QWidget* parent, IntrusivePtr<PageSequence> const& pages,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~ApplyDialog();
 signals:
-	void accepted(Scope const& scope);
+	void appliedTo(std::set<PageId> const& pages);
 private slots:
-	void thisPageSelected();
-	
-	void everyPageSelected();
-	
-	void everyOtherPageSelected();
-	
 	void onSubmit();
 private:
-	int m_numPages;
-	int m_curPage;
+	PageSequenceSnapshot m_pages;
+	std::set<PageId> m_selectedPages;
+	std::vector<PageRange> m_selectedRanges;
+	QButtonGroup* m_pBtnGroup;
 };
 
 } // namespace fix_orientation

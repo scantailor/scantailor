@@ -150,36 +150,36 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="1057"/>
-        <location filename="../MainWindow.cpp" line="1066"/>
-        <location filename="../MainWindow.cpp" line="1077"/>
-        <location filename="../MainWindow.cpp" line="1311"/>
-        <location filename="../MainWindow.cpp" line="1342"/>
-        <location filename="../MainWindow.cpp" line="1414"/>
-        <location filename="../MainWindow.cpp" line="1475"/>
+        <location filename="../MainWindow.cpp" line="1075"/>
+        <location filename="../MainWindow.cpp" line="1084"/>
+        <location filename="../MainWindow.cpp" line="1095"/>
+        <location filename="../MainWindow.cpp" line="1329"/>
+        <location filename="../MainWindow.cpp" line="1360"/>
+        <location filename="../MainWindow.cpp" line="1432"/>
+        <location filename="../MainWindow.cpp" line="1493"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
-        <location filename="../MainWindow.cpp" line="1343"/>
+        <location filename="../MainWindow.cpp" line="1330"/>
+        <location filename="../MainWindow.cpp" line="1361"/>
         <source>Error saving the project file!</source>
         <translation>Ошибка при сохранении файла!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="435"/>
-        <location filename="../ui/MainWindow.ui" line="216"/>
+        <location filename="../MainWindow.cpp" line="448"/>
+        <location filename="../ui/MainWindow.ui" line="217"/>
         <source>Save Project</source>
         <translation>Сохранить проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="435"/>
+        <location filename="../MainWindow.cpp" line="448"/>
         <source>Save this project?</source>
         <translation>Сохранить этот проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="971"/>
-        <location filename="../MainWindow.cpp" line="1040"/>
+        <location filename="../MainWindow.cpp" line="989"/>
+        <location filename="../MainWindow.cpp" line="1058"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекты Scan Tailor</translation>
     </message>
@@ -190,49 +190,54 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
 Для их определения, прогоните пакетную обработку на этапах &quot;Полезная Область&apos; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1240"/>
+        <location filename="../MainWindow.cpp" line="1258"/>
         <source>Unnamed</source>
         <translation>Без имени</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="19"/>
+        <location filename="../ui/MainWindow.ui" line="20"/>
         <source>MainWindow</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="211"/>
+        <location filename="../ui/MainWindow.ui" line="134"/>
+        <source>Keep current page in view.</source>
+        <translation>Держать текущую страницу в поле зрения.</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="212"/>
         <source>Debug</source>
         <translation>Режим отладки</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="219"/>
+        <location filename="../ui/MainWindow.ui" line="220"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="224"/>
+        <location filename="../ui/MainWindow.ui" line="225"/>
         <source>Save Project As ...</source>
         <translation>Сохранить проект как ...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="229"/>
-        <location filename="../ui/MainWindow.ui" line="278"/>
+        <location filename="../ui/MainWindow.ui" line="230"/>
+        <location filename="../ui/MainWindow.ui" line="279"/>
         <source>Next Page</source>
         <translation>Следующая страница</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="232"/>
+        <location filename="../ui/MainWindow.ui" line="233"/>
         <source>PgDown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="240"/>
-        <location filename="../ui/MainWindow.ui" line="267"/>
+        <location filename="../ui/MainWindow.ui" line="241"/>
+        <location filename="../ui/MainWindow.ui" line="268"/>
         <source>Previous Page</source>
         <translation>Предыдущая страница</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="243"/>
+        <location filename="../ui/MainWindow.ui" line="244"/>
         <source>PgUp</source>
         <translation></translation>
     </message>
@@ -245,12 +250,12 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
         <translation type="obsolete">Остановить пакетную обработку</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="181"/>
+        <location filename="../ui/MainWindow.ui" line="182"/>
         <source>Tools</source>
         <translation>Инструменты</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="187"/>
+        <location filename="../ui/MainWindow.ui" line="188"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
@@ -259,135 +264,135 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
         <translation type="obsolete">Обработка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1209"/>
+        <location filename="../MainWindow.cpp" line="1227"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.  Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1038"/>
+        <location filename="../MainWindow.cpp" line="1056"/>
         <source>Open Project</source>
         <translation>Открыть проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="726"/>
+        <location filename="../MainWindow.cpp" line="744"/>
         <source>Insert before ...</source>
         <translation>Вставить перед ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="729"/>
+        <location filename="../MainWindow.cpp" line="747"/>
         <source>Insert after ...</source>
         <translation>Вставить после ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="733"/>
+        <location filename="../MainWindow.cpp" line="751"/>
         <source>Remove from project ...</source>
         <translation>Удалить из проекта ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1058"/>
+        <location filename="../MainWindow.cpp" line="1076"/>
         <source>Unable to open the project file.</source>
         <translation>Не удалось открыть файл проекта.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1067"/>
+        <location filename="../MainWindow.cpp" line="1085"/>
         <source>The project file is broken.</source>
         <translation>Файл проекта поврежден.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1078"/>
+        <location filename="../MainWindow.cpp" line="1096"/>
         <source>Unable to interpret the project file.</source>
         <translation>Не удалось импортировать проект.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1245"/>
+        <location filename="../MainWindow.cpp" line="1263"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1387"/>
+        <location filename="../MainWindow.cpp" line="1405"/>
         <source>File to insert</source>
         <translation>Вставить файл</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1393"/>
+        <location filename="../MainWindow.cpp" line="1411"/>
         <source>Images not in project (%1)</source>
         <translation>Изображения не в проекте (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1415"/>
+        <location filename="../MainWindow.cpp" line="1433"/>
         <source>Error opening the image file.</source>
         <translation>Ошибка при открытии файла изображения.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1457"/>
+        <location filename="../MainWindow.cpp" line="1475"/>
         <source>%1 (page %2)</source>
         <translation>%1 (страницы %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1464"/>
+        <location filename="../MainWindow.cpp" line="1482"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1476"/>
+        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Unable to delete file:
 %1</source>
         <translation>Невозможно удалить файл:
 %1</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="251"/>
+        <location filename="../ui/MainWindow.ui" line="252"/>
         <source>New Project ...</source>
         <translation>Новый проект ...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="254"/>
+        <location filename="../ui/MainWindow.ui" line="255"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="259"/>
+        <location filename="../ui/MainWindow.ui" line="260"/>
         <source>Open Project ...</source>
         <translation>Открыть проект ...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="262"/>
+        <location filename="../ui/MainWindow.ui" line="263"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="159"/>
+        <location filename="../ui/MainWindow.ui" line="160"/>
         <source>Use PgUp, PgDown or Q, W to navigate between pages.</source>
         <translation>Страницы можно листать с помощью PgUp и PgDown, а также Q и W.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="270"/>
+        <location filename="../ui/MainWindow.ui" line="271"/>
         <source>Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="281"/>
+        <location filename="../ui/MainWindow.ui" line="282"/>
         <source>W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="289"/>
+        <location filename="../ui/MainWindow.ui" line="290"/>
         <source>Close Project</source>
         <translation>Закрыть проект</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="292"/>
+        <location filename="../ui/MainWindow.ui" line="293"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="297"/>
+        <location filename="../ui/MainWindow.ui" line="298"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="300"/>
+        <location filename="../ui/MainWindow.ui" line="301"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
@@ -400,12 +405,11 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Автоматически переходить к выбранной странице.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="133"/>
         <source>Thumbnail list auto-scrolling.</source>
-        <translation>Автопрокрутка ленты предпросмотра.</translation>
+        <translation type="obsolete">Автопрокрутка ленты предпросмотра.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="370"/>
+        <location filename="../MainWindow.cpp" line="383"/>
         <source>Stop batch processing</source>
         <translation>Остановить пакетную обработку</translation>
     </message>
@@ -455,39 +459,67 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>OrientationApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="16"/>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="17"/>
         <source>Fix Orientation</source>
         <translation>Исправление ориентации</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="22"/>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="23"/>
         <source>Apply to</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="43"/>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
         <translation>Только к этой странице (уже применено)</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="53"/>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="39"/>
+        <source>All pages</source>
+        <translation>Ко всем страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="46"/>
+        <source>This page and the following ones</source>
+        <translation>К этой странице и всем последующим</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
+        <source>Every other page</source>
+        <translation>К каждой второй странице</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="101"/>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="206"/>
+        <source>The current page will be included.</source>
+        <translation>Текущая страница будет включена в список.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="125"/>
+        <source>Selected pages</source>
+        <translation>К выбранным страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="155"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation>Используйте Ctrl+Клик / Shift+Клик для выбора группы страниц.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="176"/>
+        <source>Every other selected page</source>
+        <translation>К каждой второй выбранной странице</translation>
+    </message>
+    <message>
         <source>Every page in range</source>
-        <translation>Ко всем страницам в диапазоне</translation>
+        <translation type="obsolete">Ко всем страницам в диапазоне</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="60"/>
         <source>Every other page in range</source>
-        <translation>К каждой второй странице в диапазоне</translation>
+        <translation type="obsolete">К каждой второй странице в диапазоне</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="85"/>
         <source>Range</source>
-        <translation>Диапазон</translation>
-    </message>
-    <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="114"/>
-        <source>-</source>
-        <translation></translation>
+        <translation type="obsolete">Диапазон</translation>
     </message>
 </context>
 <context>
@@ -531,22 +563,41 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Применить режим вывода</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="19"/>
         <source>Scope</source>
-        <translation>Примененить</translation>
+        <translation type="obsolete">Примененить</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="25"/>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
+        <source>Apply to</source>
+        <translation>Применить</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
         <translation>Только к этой странице (уже применено)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="35"/>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="39"/>
         <source>All pages</source>
         <translation>Ко всем страницам</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="13"/>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="46"/>
+        <source>This page and the following ones</source>
+        <translation>К этой странице и всем последующим</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="62"/>
+        <source>Selected pages</source>
+        <translation>К выбранным страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="95"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation>Используйте Ctrl+Клик / Shift+Клик для выбора группы страниц.</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="17"/>
         <source>Apply Mode</source>
         <translation>Применить режим вывода</translation>
     </message>
@@ -554,27 +605,46 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>OutputChangeDpiDialog</name>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="19"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="23"/>
         <source>DPI</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="64"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="68"/>
         <source>Scope</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="70"/>
-        <source>This page only</source>
-        <translation>Только к этой странице</translation>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="74"/>
+        <source>This page only (already applied)</source>
+        <translation>Только к этой странице (уже применено)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="80"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="91"/>
+        <source>This page and the following ones</source>
+        <translation>К этой странице и всем последующим</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="107"/>
+        <source>Selected pages</source>
+        <translation>К выбранным страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="140"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation>Используйте Ctrl+Клик / Shift+Клик для выбора группы страниц.</translation>
+    </message>
+    <message>
+        <source>This page only</source>
+        <translation type="obsolete">Только к этой странице</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="84"/>
         <source>All pages</source>
         <translation>Ко всем страницам</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="13"/>
+        <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
         <source>Apply Output Resolution</source>
         <translation>Применить разрешение вывода</translation>
     </message>
@@ -651,19 +721,38 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>PageLayoutApplyDialog</name>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="16"/>
         <source>Scope</source>
+        <translation type="obsolete">Применить</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="20"/>
+        <source>Apply to</source>
         <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="22"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
         <translation>Только к этой странице (уже применено)</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="32"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="36"/>
         <source>All pages</source>
         <translation>Ко всем страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="43"/>
+        <source>This page and the following ones</source>
+        <translation>К этой странице и всем последующим</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
+        <source>Selected pages</source>
+        <translation>К выбранным страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="92"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation>Используйте Ctrl+Клик / Shift+Клик для выбора группы страниц.</translation>
     </message>
 </context>
 <context>
@@ -779,39 +868,58 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PageSplitModeDialog</name>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="16"/>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="17"/>
         <source>Split Pages</source>
         <translation>Разрезание страниц</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="62"/>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="63"/>
         <source>Mode</source>
         <translation>Тип разреза</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="68"/>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="69"/>
         <source>Auto</source>
         <translation>Автоматически</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="78"/>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="79"/>
         <source>Manual</source>
         <translation>Вручную</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="91"/>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="89"/>
         <source>Scope</source>
-        <translation>Область применения</translation>
+        <translation>Применить</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="97"/>
+        <source>This page only (already applied)</source>
+        <translation type="obsolete">Только к этой странице (уже применено)</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="112"/>
+        <source>This page and the following ones</source>
+        <translation>К этой странице и всем последующим</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="128"/>
+        <source>Selected pages</source>
+        <translation>К выбранным страницам</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="161"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation>Используйте Ctrl+Клик / Shift+Клик для выбора группы страниц.</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="95"/>
         <source>This page only</source>
-        <translation>Только эта страница</translation>
+        <translation>Только к этой странице</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="107"/>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="105"/>
         <source>All pages</source>
-        <translation>Все страницы</translation>
+        <translation>Ко всем страницам</translation>
     </message>
 </context>
 <context>
@@ -1063,7 +1171,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="692"/>
+        <location filename="../ThumbnailSequence.cpp" line="1007"/>
         <source>%1 (page %2)</source>
         <translation>%1 (стр. %2)</translation>
     </message>
@@ -1087,26 +1195,27 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="97"/>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="110"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="obsolete">Ошибка</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="98"/>
         <source>Range is required.</source>
-        <translation>Требуется указать диапазон.</translation>
+        <translation type="obsolete">Требуется указать диапазон.</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="111"/>
         <source>Page %1 (the current page) must be inside the range.</source>
-        <translation>Страница %1 (текущая страница) должна быть внутри диапазона.</translation>
+        <translation type="obsolete">Страница %1 (текущая страница) должна быть внутри диапазона.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="51"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation>Невозможно: выбрано несколько групп страниц.</translation>
     </message>
 </context>
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="65"/>
         <source>Fix Orientation</source>
         <translation>Исправление ориентации</translation>
     </message>
@@ -1114,9 +1223,9 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::ChangeDpiDialog</name>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="115"/>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="124"/>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="132"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="129"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="138"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="146"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -1129,22 +1238,22 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Вертикальный DPI не установлен. </translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="125"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="139"/>
         <source>DPI is too low!</source>
         <translation>DPI слишком низкий!</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="133"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="147"/>
         <source>DPI is too high!</source>
         <translation>DPI слишком высокий!</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="56"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="70"/>
         <source>Custom</source>
         <translation>Особый</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="116"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="130"/>
         <source>DPI is not set.</source>
         <translation>DPI не указан.</translation>
     </message>
@@ -1152,7 +1261,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="53"/>
+        <location filename="../filters/output/Filter.cpp" line="56"/>
         <source>Output</source>
         <translation>Вывод</translation>
     </message>
@@ -1160,7 +1269,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="43"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="48"/>
         <source>Black and White</source>
         <translation>Черно-белый</translation>
     </message>
@@ -1169,12 +1278,12 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Двухтоновый</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="44"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="49"/>
         <source>Color / Grayscale</source>
         <translation>Цветной / Серый</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="45"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="50"/>
         <source>Mixed</source>
         <translation>Смешанный</translation>
     </message>
@@ -1182,7 +1291,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_layout::Filter</name>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="59"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="62"/>
         <source>Page Layout</source>
         <translation>Макет страницы</translation>
     </message>
@@ -1198,12 +1307,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_layout::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="334"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="338"/>
         <source>Apply Margins</source>
         <translation>Применить поля</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="347"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="353"/>
         <source>Apply Alignment</source>
         <translation>Применить выравнивание</translation>
     </message>
@@ -1211,7 +1320,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="57"/>
+        <location filename="../filters/page_split/Filter.cpp" line="62"/>
         <source>Split Pages</source>
         <translation>Разрезка страниц</translation>
     </message>
@@ -1232,18 +1341,23 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="113"/>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="220"/>
         <source>This page only</source>
-        <translation>Только для этой страницы</translation>
+        <translation type="obsolete">Только для этой страницы</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="115"/>
         <source>All pages</source>
-        <translation>Для всех страниц</translation>
+        <translation type="obsolete">Для всех страниц</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="116"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="220"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="313"/>
+        <source>Set manually</source>
+        <translation>Установлено вручную</translation>
     </message>
     <message>
         <location filename="../filters/page_split/OptionsWidget.cpp" line="178"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="310"/>
         <source>Auto detected</source>
         <translation>Определено автоматически</translation>
     </message>

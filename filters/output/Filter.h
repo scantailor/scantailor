@@ -26,6 +26,8 @@
 #include "SafeDeletingQObjectPtr.h"
 
 class PageId;
+class PageSequence;
+class PageSelectionAccessor;
 class ThumbnailPixmapCache;
 class QString;
 
@@ -41,7 +43,8 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter();
+	Filter(IntrusivePtr<PageSequence> const& pages,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	

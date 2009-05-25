@@ -18,13 +18,14 @@
 
 #include "Settings.h"
 #include <QMutexLocker>
+#include <boost/foreach.hpp>
 #include <assert.h>
 
 namespace page_split
 {
 
 Settings::Settings()
-:	m_defaultLayoutType(Rule::AUTO_DETECT)
+:	m_defaultLayoutType(AUTO_LAYOUT_TYPE)
 {
 }
 
@@ -38,10 +39,10 @@ Settings::clear()
 	QMutexLocker locker(&m_mutex);
 	
 	m_perPageRecords.clear();
-	m_defaultLayoutType = Rule::AUTO_DETECT;
+	m_defaultLayoutType = AUTO_LAYOUT_TYPE;
 }
 
-Rule::LayoutType
+LayoutType
 Settings::defaultLayoutType() const
 {
 	QMutexLocker locker(&m_mutex);
@@ -49,7 +50,7 @@ Settings::defaultLayoutType() const
 }
 
 void
-Settings::setLayoutTypeForAllPages(Rule::LayoutType const layout_type)
+Settings::setLayoutTypeForAllPages(LayoutType const layout_type)
 {
 	QMutexLocker locker(&m_mutex);
 	
@@ -64,6 +65,19 @@ Settings::setLayoutTypeForAllPages(Rule::LayoutType const layout_type)
 	}
 	
 	m_defaultLayoutType = layout_type;
+}
+
+void
+Settings::setLayoutTypeFor(LayoutType const layout_type, std::set<PageId> const& pages)
+{
+	QMutexLocker locker(&m_mutex);
+	
+	UpdateAction action;
+	action.setLayoutType(layout_type);
+	
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		updatePageLocked(page_id.imageId(), action);
+	}
 }
 
 Settings::Record
@@ -83,7 +97,12 @@ void
 Settings::updatePage(ImageId const& image_id, UpdateAction const& action)
 {
 	QMutexLocker locker(&m_mutex);
-	
+	updatePageLocked(image_id, action);
+}
+
+void
+Settings::updatePageLocked(ImageId const& image_id, UpdateAction const& action)
+{
 	PerPageRecords::iterator it(m_perPageRecords.lower_bound(image_id));
 	if (it == m_perPageRecords.end() ||
 			m_perPageRecords.key_comp()(image_id, it->first)) {
@@ -181,7 +200,7 @@ Settings::conditionalUpdate(
 
 Settings::BaseRecord::BaseRecord()
 :	m_params(PageLayout(), Dependencies(), MODE_AUTO),
-	m_layoutType(Rule::AUTO_DETECT),
+	m_layoutType(AUTO_LAYOUT_TYPE),
 	m_paramsValid(false),
 	m_layoutTypeValid(false)
 {
@@ -195,7 +214,7 @@ Settings::BaseRecord::setParams(Params const& params)
 }
 
 void
-Settings::BaseRecord::setLayoutType(Rule::LayoutType const layout_type)
+Settings::BaseRecord::setLayoutType(LayoutType const layout_type)
 {
 	m_layoutType = layout_type;
 	m_layoutTypeValid = true;
@@ -203,31 +222,31 @@ Settings::BaseRecord::setLayoutType(Rule::LayoutType const layout_type)
 
 bool
 Settings::BaseRecord::hasLayoutTypeConflict(
-	Rule::LayoutType const default_layout_type) const
+	LayoutType const default_layout_type) const
 {
 	if (!m_paramsValid) {
 		// No data - no conflict.
 		return false;
 	}
 	
-	Rule::LayoutType layout_type = default_layout_type;
+	LayoutType layout_type = default_layout_type;
 	if (m_layoutTypeValid) {
 		layout_type = m_layoutType;
 	}
 	
-	if (layout_type == Rule::AUTO_DETECT) {
+	if (layout_type == AUTO_LAYOUT_TYPE) {
 		// This one is compatible with everything.
 		return false;
 	}
 	
 	switch (m_params.pageLayout().type()) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
-			return layout_type != Rule::SINGLE_PAGE_UNCUT;
+			return layout_type != SINGLE_PAGE_UNCUT;
 		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			return layout_type != Rule::PAGE_PLUS_OFFCUT;
+			return layout_type != PAGE_PLUS_OFFCUT;
 		case PageLayout::TWO_PAGES:
-			return layout_type != Rule::TWO_PAGES;
+			return layout_type != TWO_PAGES;
 	}
 	
 	assert(!"Unreachable");
@@ -237,27 +256,23 @@ Settings::BaseRecord::hasLayoutTypeConflict(
 
 /*========================= Settings::Record ========================*/
 
-Settings::Record::Record(Rule::LayoutType const default_layout_type)
+Settings::Record::Record(LayoutType const default_layout_type)
 :	m_defaultLayoutType(default_layout_type)
 {
 }
 	
 Settings::Record::Record(
 	BaseRecord const& base_record,
-	Rule::LayoutType const default_layout_type)
+	LayoutType const default_layout_type)
 :	BaseRecord(base_record),
 	m_defaultLayoutType(default_layout_type)
 {
 }
 
-Rule
-Settings::Record::rule() const
+LayoutType
+Settings::Record::combinedLayoutType() const
 {
-	if (m_layoutTypeValid) {
-		return Rule(m_layoutType, Rule::THIS_PAGE_ONLY);
-	} else {
-		return Rule(m_defaultLayoutType, Rule::ALL_PAGES);
-	}
+	return m_layoutTypeValid ? m_layoutType : m_defaultLayoutType;
 }
 
 void
@@ -296,7 +311,7 @@ Settings::Record::hasLayoutTypeConflict() const
 /*======================= Settings::UpdateAction ======================*/
 
 void
-Settings::UpdateAction::setLayoutType(Rule::LayoutType const layout_type)
+Settings::UpdateAction::setLayoutType(LayoutType const layout_type)
 {
 	m_layoutType = layout_type;
 	m_layoutTypeAction = SET;

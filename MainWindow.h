@@ -26,6 +26,9 @@
 #include "BackgroundTask.h"
 #include "FilterResult.h"
 #include "PageSequence.h"
+#include "ThumbnailSequence.h"
+#include "PageId.h"
+#include "PageRange.h"
 #include "BeforeOrAfter.h"
 #include <QMainWindow>
 #include <QString>
@@ -33,10 +36,11 @@
 #include <QObjectCleanupHandler>
 #include <QSizeF>
 #include <memory>
+#include <vector>
+#include <set>
 
 class AbstractFilter;
 class ThumbnailPixmapCache;
-class ThumbnailSequence;
 class StageSequence;
 class FilterOptionsWidget;
 class ProcessingIndicationWidget;
@@ -64,6 +68,10 @@ public:
 	MainWindow();
 	
 	virtual ~MainWindow();
+	
+	std::set<PageId> selectedPages() const;
+	
+	std::vector<PageRange> selectedRanges() const;
 protected:
 	virtual void closeEvent(QCloseEvent* event);
 	
@@ -79,9 +87,9 @@ private slots:
 	
 	void goToPage(PageId const& page_id);
 	
-	void pageSelected(
+	void currentPageChanged(
 		PageInfo const& page_info, QRectF const& thumb_rect,
-		bool by_user, bool was_already_selected);
+		ThumbnailSequence::SelectionFlags flags);
 	
 	void contextMenuRequested(
 		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
@@ -153,7 +161,7 @@ private:
 	
 	static bool compareFiles(QString const& fpath1, QString const& fpath2);
 	
-	void resetThumbSequence();
+	void resetThumbSequence(ThumbnailSequence::SelectionAction selection_action);
 	
 	void removeWidgetsFromLayout(QLayout* layout);
 	

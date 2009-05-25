@@ -19,12 +19,43 @@ IF(MINGW)
 	IF(NOT MINGWM10_DLL)
 		MESSAGE(
 			FATAL_ERROR
-			"Could not find mingw10.dll\n"				"It should be in the 'bin' subdirectory of your MinGW installation."
+			"Could not find mingwm10.dll\n"
+			"It should be in the 'bin' subdirectory of your MinGW installation."
 		)
 	ENDIF(NOT MINGWM10_DLL)
 	TO_NATIVE_PATH("${MINGWM10_DLL}" MINGWM10_DLL)
-ELSE(MINGW)
-	SET(MINGWM10_DLL "")
+ELSEIF(MSVC)
+	GET_FILENAME_COMPONENT(make_program_dir "${CMAKE_MAKE_PROGRAM}" PATH)
+	FIND_FILE(
+		VC_REDIST_DIR VC/redist PATHS "${make_program_dir}"
+		PATH_SUFFIXES .. ../.. DOC "VC/redist directory."
+	)
+	IF(VC_REDIST_DIR)
+		# Get rid of .. components in the path.
+		GET_FILENAME_COMPONENT(VC_REDIST_DIR "${VC_REDIST_DIR}" ABSOLUTE)
+		SET(VC_REDIST_DIR "${VC_REDIST_DIR}" CACHE PATH "VC/redist directory." FORCE)
+		
+		# Find CRT redistributables.
+		FILE(GLOB crt_redist_dirs "${VC_REDIST_DIR}/x86/Microsoft.VC*.CRT")
+		IF(crt_redist_dirs)
+			LIST(GET crt_redist_dirs 0 CRT_REDIST_PATH)
+			GET_FILENAME_COMPONENT(CRT_REDIST_DIR "${CRT_REDIST_PATH}" NAME)
+		ENDIF(crt_redist_dirs)
+	ENDIF(VC_REDIST_DIR)
+	
+	IF (NOT CRT_REDIST_PATH)
+		MESSAGE(
+			FATAL_ERROR
+			"Could not find Visual Studio redistributables.\n"
+			"They are typically located in a directory like:\n"
+			"C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\n"
+			"Please set VC_REDIST_DIR accordinally.\n"
+			"Specifically, we are after redist\x86\Microsoft.VC*.CRT"
+		)
+	ENDIF(NOT CRT_REDIST_PATH)
+	
+	TO_NATIVE_PATH("${CRT_REDIST_PATH}" CRT_REDIST_PATH)
+	TO_NATIVE_PATH("${CRT_REDIST_DIR}" CRT_REDIST_DIR)
 ENDIF(MINGW)
 
 SET(LICENSE_FILE "${CMAKE_SOURCE_DIR}/GPL3.txt")
@@ -45,10 +76,18 @@ STRING(
 
 CONFIGURE_FILE(scantailor.nsi.in ${CMAKE_BINARY_DIR}/scantailor.nsi @ONLY)
 
+# SCANTAILOR_EXE may contain a variable reference that's only known
+# at run time, so we pass it to makensis, rather than harcoding it
+# into scantailor.nsi
+GET_TARGET_PROPERTY(SCANTAILOR_EXE scantailor LOCATION)
+TO_NATIVE_PATH("${SCANTAILOR_EXE}" SCANTAILOR_EXE)
+
 ADD_CUSTOM_COMMAND(
 	OUTPUT "${INSTALLER_FILENAME}"
-	COMMAND "${MAKENSIS_EXE}" -V2 scantailor.nsi
+	COMMAND "${MAKENSIS_EXE}" /V2 
+	"/DSCANTAILOR_EXE=\"${SCANTAILOR_EXE}\"" scantailor.nsi
 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 	MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/scantailor.nsi
+	DEPENDS scantailor
 )
 ADD_CUSTOM_TARGET(installer ALL DEPENDS "${INSTALLER_FILENAME}")

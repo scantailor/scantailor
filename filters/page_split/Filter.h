@@ -28,6 +28,7 @@
 class PageId;
 class ImageId;
 class PageSequence;
+class PageSelectionAccessor;
 
 namespace deskew
 {
@@ -48,7 +49,8 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& page_sequence);
+	Filter(IntrusivePtr<PageSequence> const& page_sequence,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,45 +16,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_RULE_H_
-#define PAGE_SPLIT_RULE_H_
-
-#include <QString>
+#include "LayoutType.h"
+#include <assert.h>
 
 namespace page_split
 {
 
-class Rule
+QString layoutTypeToString(LayoutType const layout_type)
 {
-public:
-	enum LayoutType {
-		AUTO_DETECT,
-		SINGLE_PAGE_UNCUT,
-		PAGE_PLUS_OFFCUT,
-		TWO_PAGES
-	};
-	
-	enum Scope { THIS_PAGE_ONLY, ALL_PAGES };
-	
-	Rule() : m_layoutType(AUTO_DETECT), m_scope(ALL_PAGES) {}
-	
-	Rule(LayoutType layout_type, Scope scope)
-	: m_layoutType(layout_type), m_scope(scope) {}
-	
-	LayoutType layoutType() const { return m_layoutType; }
-	
-	Scope scope() const { return m_scope; }
-	
-	QString layoutTypeAsString() const;
-	
-	static QString layoutTypeToString(LayoutType type);
-	
-	static LayoutType layoutTypeFromString(QString const& layout_type);
-private:
-	LayoutType m_layoutType;
-	Scope m_scope;
-};
+	switch (layout_type) {
+		case AUTO_LAYOUT_TYPE:
+			return "auto-detect";
+		case SINGLE_PAGE_UNCUT:
+			return "single-uncut";
+		case PAGE_PLUS_OFFCUT:
+			return "single-cut";
+		case TWO_PAGES:
+			return "two-pages";
+	}
+	assert(!"unreachable");
+	return QString();
+}
+
+LayoutType layoutTypeFromString(QString const& layout_type)
+{
+	if (layout_type == "single-uncut") {
+		return SINGLE_PAGE_UNCUT;
+	} else if (layout_type == "single-cut") {
+		return PAGE_PLUS_OFFCUT;
+	} else if (layout_type == "two-pages") {
+		return TWO_PAGES;
+	} else {
+		return AUTO_LAYOUT_TYPE;
+	}
+}
 
 } // namespace page_split
-
-#endif

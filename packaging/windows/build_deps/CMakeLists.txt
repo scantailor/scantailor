@@ -1,6 +1,16 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-PROJECT(deps)
+PROJECT("Scan Tailor Dependencies")
+
+# Qt's -system-libpng, -system-libjpeg, etc are largely broken with regards
+# to static libraries, so it expects:
+# libpng.lib on MSVC and libpng.lib.a on MinGW.
+SET(CMAKE_STATIC_LIBRARY_PREFIX lib)
+IF(MINGW)
+	SET(CMAKE_STATIC_LIBRARY_SUFFIX .lib.a)
+ELSE(MINGW)
+	SET(CMAKE_STATIC_LIBRARY_SUFFIX .lib)
+ENDIF(MINGW)
 
 INCLUDE(../../../cmake/SetDefaultBuildType.cmake)
 INCLUDE(../../../cmake/SetDefaultGccFlags.cmake)
@@ -101,6 +111,7 @@ LIST_ITEMS_PREPEND(libjpeg_sources "${JPEG_DIR}/")
 CONFIGURE_FILE("${JPEG_DIR}/jconfig.vc" "${JPEG_DIR}/jconfig.h" COPYONLY)
 
 ADD_LIBRARY(jpeg STATIC ${libjpeg_sources})
+
 GET_TARGET_PROPERTY(jpeg_location jpeg LOCATION)
 ADD_CUSTOM_COMMAND(
 	TARGET jpeg POST_BUILD
@@ -119,6 +130,7 @@ SET(
 LIST_ITEMS_PREPEND(zlib_sources "${ZLIB_DIR}/")
 
 ADD_LIBRARY(zlib STATIC ${zlib_sources})
+SET_TARGET_PROPERTIES(zlib PROPERTIES OUTPUT_NAME z)
 GET_TARGET_PROPERTY(zlib_location zlib LOCATION)
 ADD_CUSTOM_COMMAND(
 	TARGET zlib POST_BUILD
@@ -145,14 +157,6 @@ ADD_CUSTOM_COMMAND(
 	TARGET png POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
 	"${png_location}" "${PNG_DIR}/"
-)
-
-# For some reason, Qt (as of 4.4.2) links with -lpng.lib, not just -lpng
-# So, we copy libpng.a to libpng.lib.a
-ADD_CUSTOM_COMMAND(
-	TARGET png POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-	"${png_location}" "${PNG_DIR}/libpng.lib.a"
 )
 
 
@@ -196,8 +200,17 @@ ADD_CUSTOM_COMMAND(
 
 #================================= Boost ================================#
 
+IF(MINGW)
+	SET(boost_toolset gcc)
+ELSEIF(MSVC)
+	SET(boost_toolset msvc)
+ELSE(MINGW)
+	MESSAGE(FATAL_ERROR "Unsupported platform.  MinGW and MSVC are supported.")
+ENDIF(MINGW)
+
 ADD_CUSTOM_TARGET(
-	boost "${BJAM_EXECUTABLE}" --with-test toolset=gcc stage
+	boost "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
+	threading=multi link=static variant=debug,release stage
     WORKING_DIRECTORY "${BOOST_DIR}"
 )
 
@@ -220,36 +233,67 @@ TO_NATIVE_PATH("${ZLIB_DIR}" ZLIB_INCLUDE_DIR)
 TO_NATIVE_PATH("${PNG_DIR}" PNG_INCLUDE_DIR)
 TO_NATIVE_PATH("${QT_DIR}" QT_DIR_NATIVE)
 
+# Find all *.pro files under tools/ and patch those that mention qjpeg
+# but not libjpeg.  Patching is necessary to make those tools compile
+# with static and external libjpeg.
+FILE(GLOB_RECURSE pro_files "${QT_DIR}/tools/*.pro")
+FOREACH(file_pro ${pro_files})
+	FILE(READ "${file_pro}" contents)
+	IF(contents MATCHES qjpeg AND NOT contents MATCHES libjpeg)
+		# Make a backup copy, if not already there.
+		IF(NOT EXISTS "${file_pro}.orig")
+			CONFIGURE_FILE("${file_pro}" "${file_pro}.orig}" COPYONLY)
+		ENDIF(NOT EXISTS "${file_pro}.orig")
+		
+		FILE(APPEND "${file_pro}" "\nwin32 {\n\tLIBS += libjpeg.lib\n}\n")
+	ENDIF(contents MATCHES qjpeg AND NOT contents MATCHES libjpeg)
+ENDFOREACH(file_pro)
 
-SET(qt_build_parts "libs tools")
+SET(qt_maybe_skip_tools)
 IF(EXISTS "${QT_DIR}/bin/designer.exe")
-	# Using a binary build
-	SET(qt_build_parts "libs")
+	# Either the tools have already been built, or they came prepackaged.
+	SET(qt_maybe_skip_tools "-nomake libs")
 ENDIF(EXISTS "${QT_DIR}/bin/designer.exe")
 
-CONFIGURE_FILE("patch_qmake_cache.cmake.in" "${CMAKE_BINARY_DIR}/patch_qmake_cache.cmake" @ONLY) 
-
+IF(MINGW)
+	SET(platform win32-g++)
+	SET(make_command mingw32-make)
+ELSEIF(MSVC)
+	SET(make_command nmake)
+	IF(MSVC60 OR MSVC70)
+		MESSAGE(FATAL_ERROR "This Visual Studio version is too old and is not supported")
+	ELSEIF(MSVC71)
+		SET(platform win32-msvc2003)
+	ELSEIF(MSVC80)
+		SET(platform win32-msvc2005)
+	ELSE(MSVC60 OR MSVC70)
+		#MSVC90 or above
+		SET(platform win32-msvc2008)
+	ENDIF(MSVC60 OR MSVC70)
+ELSE(MINGW)
+	MESSAGE(FATAL_ERROR "Unsupported platform.")
+ENDIF(MINGW)
 
 # Note #1: -system-zlib is broken on Windows (bug: #186774).  So, we build with
 # internal zlib, while libpng is linked with an external zlib.  This works only
 # because both zlib's have the same ABI.
-# Note #2: We build with -no-libtiff because we have our own TIFF loading code.
-# Qt's TIFF loader doesn't support multipage TIFFs or TIFFs with JPEG encoding.
+# Note #2: We build with -no-libtiff because we have our own TIFF loading
+# and saving code.  Qt's TIFF plugin has way too much limitations.
 SET(build_qt_fname "${CMAKE_CURRENT_BINARY_DIR}/build-qt.bat")
 FILE(
 	WRITE "${build_qt_fname}"
 	"cd \"${QT_DIR_NATIVE}\"\n"
-	"configure -release -static -fast -no-gif -system-libpng"
-	" -no-libmng -no-libtiff -system-libjpeg -no-sse -no-sse2"
+	"configure -platform ${platform} -debug-and-release -static -fast"
+	" -no-gif -system-libpng -no-libmng -no-libtiff -system-libjpeg"
 	" -no-openssl -no-qt3support -no-style-plastique -no-style-cleanlooks"
-	" -no-style-motif -no-style-cde -no-phonon -no-webkit -no-sql-sqlite"
+	" -no-style-motif -no-style-cde -no-phonon -no-webkit -no-scripttools"
+	" -nomake examples -nomake demos -nomake docs ${qt_maybe_skip_tools}"
+	" -confirm-license"
 	" -I \"${JPEG_INCLUDE_DIR}\" -I \"${ZLIB_INCLUDE_DIR}\""
 	" -I \"${PNG_INCLUDE_DIR}\" -L \"${JPEG_DIR}\" -L \"${ZLIB_DIR}\""
 	" -L \"${PNG_DIR}\""
 	"\n"
-	"IF %ERRORLEVEL% NEQ 0 GOTO exit\n"
-	"\"${CMAKE_COMMAND}\" -P \"${CMAKE_BINARY_DIR}\\patch_qmake_cache.cmake\"\n"
-	"mingw32-make\n"
+	"${make_command}\n"
 	":exit\n"
 )
 

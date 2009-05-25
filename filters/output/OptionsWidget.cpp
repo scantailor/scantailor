@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
+#include <boost/foreach.hpp>
 #include <QVariant>
 #include <QColorDialog>
 #include <QToolTip>
@@ -34,8 +35,12 @@
 namespace output
 {
 
-OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
+	IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
+	m_ptrPages(pages),
+	m_pageSelectionAccessor(page_selection_accessor),
 	m_ignoreThresholdChanges(0)
 {
 	setupUi(this);
@@ -210,11 +215,13 @@ OptionsWidget::bwThresholdChanged(int const value)
 void
 OptionsWidget::changeDpiButtonClicked()
 {
-	ChangeDpiDialog* dialog = new ChangeDpiDialog(this, m_dpi);
+	ChangeDpiDialog* dialog = new ChangeDpiDialog(
+		this, m_dpi, m_ptrPages, m_pageSelectionAccessor
+	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(accepted(Dpi const&, Scope)),
-		this, SLOT(dpiChanged(Dpi const&, Scope))
+		dialog, SIGNAL(accepted(std::set<PageId> const&, Dpi const&)),
+		this, SLOT(dpiChanged(std::set<PageId> const&, Dpi const&, Scope))
 	);
 	dialog->show();
 }
@@ -222,42 +229,48 @@ OptionsWidget::changeDpiButtonClicked()
 void
 OptionsWidget::applyColorsButtonClicked()
 {
-	ApplyColorsDialog* dialog = new ApplyColorsDialog(this);
+	ApplyColorsDialog* dialog = new ApplyColorsDialog(
+		this, m_ptrPages, m_pageSelectionAccessor
+	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(accepted(Scope)),
-		this, SLOT(applyColorsConfirmed(Scope))
+		dialog, SIGNAL(accepted(std::set<PageId> const&)),
+		this, SLOT(applyColorsConfirmed(std::set<PageId> const&))
 	);
 	dialog->show();
 }
 
 void
-OptionsWidget::dpiChanged(Dpi const& dpi, Scope const scope)
+OptionsWidget::dpiChanged(std::set<PageId> const& pages, Dpi const& dpi)
 {
 	m_dpi = dpi;
 	updateDpiDisplay();
 	
-	if (scope == THIS_PAGE_ONLY) {
-		m_ptrSettings->setDpi(m_pageId, dpi);
-	} else {
+	if (int(pages.size()) == m_ptrPages->numImages()) {
 		m_ptrSettings->setDpiForAllPages(dpi);
+		emit invalidateAllThumbnails();
+	} else {
+		BOOST_FOREACH(PageId const& page_id, pages) {
+			m_ptrSettings->setDpi(page_id, dpi);
+		}
 	}
 	
-	emit reloadRequested(); // This will also update the thumbnail.
-	if (scope == ALL_PAGES) {
-		emit invalidateAllThumbnails();
-	}
+	emit reloadRequested();
 }
 
 void
-OptionsWidget::applyColorsConfirmed(Scope const scope)
+OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 {
-	if (scope == THIS_PAGE_ONLY) {
-		return;
+	if (int(pages.size()) == m_ptrPages->numImages()) {
+		m_ptrSettings->setColorParamsForAllPages(m_colorParams);
+		emit invalidateAllThumbnails();
+	} else {
+		BOOST_FOREACH(PageId const& page_id, pages) {
+			m_ptrSettings->setColorParams(page_id, m_colorParams);
+		}
 	}
 	
-	m_ptrSettings->setColorParamsForAllPages(m_colorParams);
-	emit invalidateAllThumbnails();
+	emit reloadRequested();
 }
 
 void

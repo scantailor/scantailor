@@ -32,6 +32,7 @@
 #include <vector>
 
 class PageSequence;
+class PageSelectionAccessor;
 
 class StageSequence : public RefCountable
 {
@@ -39,7 +40,8 @@ class StageSequence : public RefCountable
 public:
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
 	
-	StageSequence(IntrusivePtr<PageSequence> const& pages);
+	StageSequence(IntrusivePtr<PageSequence> const& pages,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	std::vector<FilterPtr> const& filters() const { return m_filters; }
 	

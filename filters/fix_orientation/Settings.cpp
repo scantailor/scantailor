@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
 */
 
 #include "Settings.h"
-#include "Scope.h"
 #include "PageSequence.h"
 #include "Utils.h"
+#include <boost/foreach.hpp>
 
 namespace fix_orientation
 {
 
-Settings::Settings(
-	IntrusivePtr<PageSequence> const& page_sequence)
-:	m_ptrPages(page_sequence)
+Settings::Settings(IntrusivePtr<PageSequence> const& pages)
+:	m_ptrPages(pages)
 {
 }
 
@@ -42,35 +41,22 @@ Settings::clear()
 }
 
 void
-Settings::applyRule(
+Settings::applyRotation(
 	ImageId const& image_id, OrthogonalRotation const rotation)
 {
 	QMutexLocker locker(&m_mutex);
 	setImageRotationLocked(image_id, rotation);
 }
 
-std::vector<ImageId>
-Settings::applyRule(
-	Scope const& scope, OrthogonalRotation const rotation)
+void
+Settings::applyRotation(
+	std::set<PageId> const& pages, OrthogonalRotation const rotation)
 {
-	PageSequenceSnapshot const snapshot(
-		m_ptrPages->snapshot(PageSequence::IMAGE_VIEW)
-	);
-	int const num_images = snapshot.numPages();
-	
-	std::vector<ImageId> image_ids;
-	
 	QMutexLocker locker(&m_mutex);
 	
-	for (int i = scope.from(); i <= scope.to() && i < num_images; ++i) {
-		if ((scope.origin() - i) % scope.step() == 0) {
-			ImageId const image_id(snapshot.pageAt(i).imageId());
-			image_ids.push_back(image_id);
-			setImageRotationLocked(image_id, rotation);
-		}
+	BOOST_FOREACH(PageId const& page, pages) {
+		setImageRotationLocked(page.imageId(), rotation);
 	}
-	
-	return image_ids;
 }
 
 OrthogonalRotation

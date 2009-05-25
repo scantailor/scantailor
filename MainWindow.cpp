@@ -22,6 +22,7 @@
 #include "RecentProjects.h"
 #include "WorkerThread.h"
 #include "PageSequence.h"
+#include "PageSelectionAccessor.h"
 #include "StageSequence.h"
 #include "ThumbnailSequence.h"
 #include "ImageInfo.h"
@@ -100,7 +101,7 @@
 
 MainWindow::MainWindow()
 :	m_ptrPages(new PageSequence),
-	m_ptrStages(new StageSequence(m_ptrPages)),
+	m_ptrStages(new StageSequence(m_ptrPages, PageSelectionAccessor(this))),
 	m_ptrWorkerThread(new WorkerThread),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
@@ -154,8 +155,8 @@ MainWindow::MainWindow()
 	
 	connect(
 		m_ptrThumbSequence.get(),
-		SIGNAL(pageSelected(PageInfo const&, QRectF const&, bool, bool)),
-		this, SLOT(pageSelected(PageInfo const&, QRectF const&, bool, bool))
+		SIGNAL(newSelectionLeader(PageInfo const&, QRectF const&, ThumbnailSequence::SelectionFlags)),
+		this, SLOT(currentPageChanged(PageInfo const&, QRectF const&, ThumbnailSequence::SelectionFlags))
 	);
 	connect(
 		m_ptrThumbSequence.get(),
@@ -232,6 +233,18 @@ MainWindow::~MainWindow()
 	m_ptrTabbedDebugImages->clear();
 }
 
+std::set<PageId>
+MainWindow::selectedPages() const
+{
+	return m_ptrThumbSequence->selectedItems();
+}
+
+std::vector<PageRange>
+MainWindow::selectedRanges() const
+{
+	return m_ptrThumbSequence->selectedRanges();
+}
+
 void
 MainWindow::cancelOngoingTask()
 {
@@ -256,7 +269,7 @@ MainWindow::switchToNewProject(
 	m_projectFile = project_file_path;
 	
 	// Recreate the stages and load their state.
-	m_ptrStages.reset(new StageSequence(pages));
+	m_ptrStages.reset(new StageSequence(pages, this));
 	if (project_reader) {
 		project_reader->readFilterSettings(
 			m_ptrStages->filters()
@@ -296,7 +309,7 @@ MainWindow::switchToNewProject(
 	} else {
 		m_ptrThumbnailCache = createThumbnailCache();
 	}
-	resetThumbSequence();
+	resetThumbSequence(ThumbnailSequence::RESET_SELECTION);
 	
 	removeFilterOptionsWidget();
 	updateProjectActions();
@@ -479,7 +492,8 @@ MainWindow::compareFiles(QString const& fpath1, QString const& fpath2)
 }
 
 void
-MainWindow::resetThumbSequence()
+MainWindow::resetThumbSequence(
+	ThumbnailSequence::SelectionAction const selection_action)
 {
 	if (m_ptrThumbnailCache.get()) {
 		IntrusivePtr<CompositeCacheDrivenTask> const task(
@@ -496,7 +510,9 @@ MainWindow::resetThumbSequence()
 		);
 	}
 	
-	m_ptrThumbSequence->reset(m_ptrPages->snapshot(getCurrentView()));
+	m_ptrThumbSequence->reset(
+		m_ptrPages->snapshot(getCurrentView()), selection_action
+	);
 	
 	if (!m_ptrThumbnailCache.get()) {
 		// Empty project.
@@ -654,7 +670,7 @@ MainWindow::nextPage()
 	PageInfo const next_page(
 		m_ptrPages->setNextPage(getCurrentView(), &page_num)
 	);
-	m_ptrThumbSequence->setCurrentThumbnail(next_page.id());
+	m_ptrThumbSequence->setSelection(next_page.id());
 	loadImage(next_page, page_num);
 }
 
@@ -669,7 +685,7 @@ MainWindow::prevPage()
 	PageInfo const prev_page(
 		m_ptrPages->setPrevPage(getCurrentView(), &page_num)
 	);
-	m_ptrThumbSequence->setCurrentThumbnail(prev_page.id());
+	m_ptrThumbSequence->setSelection(prev_page.id());
 	loadImage(prev_page, page_num);
 }
 
@@ -679,27 +695,29 @@ MainWindow::goToPage(PageId const& page_id)
 	focusButton->setChecked(true);
 	m_ptrPages->setCurPage(page_id);
 	
-	// This will result in pageSelected() being called
-	// with by_user == false.
-	m_ptrThumbSequence->setCurrentThumbnail(page_id);
+	// This will result in currentPageChanged() being called
+	// with SELECTED_BY_USER flag unset.
+	m_ptrThumbSequence->setSelection(page_id);
 	
 	updateMainArea();
 }
 
 void
-MainWindow::pageSelected(
+MainWindow::currentPageChanged(
 	PageInfo const& page_info, QRectF const& thumb_rect,
-	bool const by_user, bool const was_already_selected)
+	ThumbnailSequence::SelectionFlags const flags)
 {
-	if (by_user || focusButton->isChecked()) {
-		thumbView->ensureVisible(thumb_rect, 0, 0);
+	if ((flags & ThumbnailSequence::SELECTED_BY_USER) || focusButton->isChecked()) {
+		if (!(flags & ThumbnailSequence::AVOID_SCROLLING_TO)) {
+			thumbView->ensureVisible(thumb_rect, 0, 0);
+		}
 	}
 	
-	if (by_user) {
+	if (flags & ThumbnailSequence::SELECTED_BY_USER) {
 		m_ptrPages->setCurPage(page_info.id());
 		if (m_batchProcessing) {
 			stopBatchProcessing();
-		} else {
+		} else if (!(flags & ThumbnailSequence::REDUNDANT_SELECTION)) {
 			updateMainArea();
 		}
 	}
@@ -746,9 +764,9 @@ MainWindow::contextMenuRequested(
 void
 MainWindow::thumbViewFocusToggled(bool const checked)
 {
-	QRectF const rect(m_ptrThumbSequence->currentItemSceneRect());
+	QRectF const rect(m_ptrThumbSequence->selectionLeaderSceneRect());
 	if (rect.isNull()) {
-		// No current item.
+		// No selected items.
 		return;
 	}
 	
@@ -760,9 +778,9 @@ MainWindow::thumbViewFocusToggled(bool const checked)
 void
 MainWindow::thumbViewScrolled()
 {
-	QRectF const rect(m_ptrThumbSequence->currentItemSceneRect());
+	QRectF const rect(m_ptrThumbSequence->selectionLeaderSceneRect());
 	if (rect.isNull()) {
-		// No current item.
+		// No items selected.
 		return;
 	}
 	
@@ -811,7 +829,7 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	}
 	
 	focusButton->setChecked(true); // Should go before resetThumbSequence().
-	resetThumbSequence();
+	resetThumbSequence(ThumbnailSequence::KEEP_SELECTION);
 	updateMainArea();
 }
 
@@ -876,7 +894,7 @@ MainWindow::stopBatchProcessing(MainAreaAction main_area)
 	// before that.
 	int page_num = 0;
 	PageInfo const page(m_ptrPages->curPage(getCurrentView(), &page_num));
-	m_ptrThumbSequence->setCurrentThumbnail(page.id());
+	m_ptrThumbSequence->setSelection(page.id());
 	
 	switch (main_area) {
 		case LOAD_IMAGE:
@@ -919,7 +937,7 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		// thumbnail will always be an unprocessed one, with the
 		// question mark on it.
 		PageInfo const cur_page(m_ptrPages->curPage(getCurrentView()));
-		m_ptrThumbSequence->setCurrentThumbnail(cur_page.id());
+		m_ptrThumbSequence->setSelection(cur_page.id());
 		
 		int page_num = 0;
 		PageInfo const next_page(
@@ -1203,7 +1221,7 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 		PageInfo const first_page(
 			m_ptrPages->setFirstPage(getCurrentView())
 		);
-		m_ptrThumbSequence->setCurrentThumbnail(first_page.id());
+		m_ptrThumbSequence->setSelection(first_page.id());
 		
 		QString const err_text(
 			tr("Output is not yet possible, as the final size"
@@ -1505,7 +1523,7 @@ MainWindow::removeFromProject(ImageId image_id)
 	
 	m_ptrPages->removeImage(image_id);
 	m_ptrThumbSequence->remove(image_id);
-	m_ptrThumbSequence->setCurrentThumbnail(
+	m_ptrThumbSequence->setSelection(
 		m_ptrPages->curPage(getCurrentView()).id()
 	);
 	updateMainArea();

@@ -21,7 +21,7 @@ SET(
 	Settings.cpp Settings.h
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
-	Rule.cpp Rule.h
+	LayoutType.cpp LayoutType.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

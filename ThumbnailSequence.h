@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,10 +20,14 @@
 #define THUMBNAILSEQUENCE_H_
 
 #include "NonCopyable.h"
+#include "FlagOps.h"
 #include "IntrusivePtr.h"
+#include "PageRange.h"
 #include "BeforeOrAfter.h"
 #include <QObject>
 #include <memory>
+#include <vector>
+#include <set>
 
 class QGraphicsItem;
 class QGraphicsView;
@@ -41,6 +45,30 @@ class ThumbnailSequence : public QObject
 	Q_OBJECT
 	DECLARE_NON_COPYABLE(ThumbnailSequence)
 public:
+	enum SelectionAction { KEEP_SELECTION, RESET_SELECTION };
+	
+	enum SelectionFlags {
+		DEFAULT_SELECTION_FLAGS = 0,
+		
+		/** Indicates the item was selected by a user action, rather than programmatically. */
+		SELECTED_BY_USER = 1 << 0,
+		
+		/**
+		 * Indicates that the request to make this item a selection leader was redundant,
+		 * as it's already a selection leader.
+		 */
+		REDUNDANT_SELECTION = 1 << 1,
+		
+		/**
+		 * This flag is set when Ctrl-clicking the current selection leader while other
+		 * selected items exist.  In this case, the leader will become unselected, and
+		 * one of the other selected items will be promoted to a selection leader.
+		 * In these circumstances, scrolling to make the new selection leader visible
+		 * is undesireable.
+		 */
+		AVOID_SCROLLING_TO = 1 << 2
+	};
+	
 	ThumbnailSequence(QSizeF const& max_logical_thumb_size);
 	
 	~ThumbnailSequence();
@@ -49,7 +77,8 @@ public:
 	
 	void attachView(QGraphicsView* view);
 	
-	void reset(PageSequenceSnapshot const& pages);
+	void reset(PageSequenceSnapshot const& pages,
+		SelectionAction const selection_action);
 	
 	void invalidateThumbnail(PageId const& page_id);
 	
@@ -57,7 +86,10 @@ public:
 	
 	void invalidateAllThumbnails();
 	
-	void setCurrentThumbnail(PageId const& page_id);
+	/**
+	 * \brief Makes the item a selection leader, and unselects the other items.
+	 */
+	void setSelection(PageId const& page_id);
 	
 	void insert(PageInfo const& new_page,
 		BeforeOrAfter before_or_after, PageId const& existing);
@@ -65,15 +97,19 @@ public:
 	void remove(ImageId const& image_id);
 	
 	/**
-	 * \brief The bounding rectangle in scene coordinates of the current item.
+	 * \brief The bounding rectangle in scene coordinates of the selection leader.
 	 *
 	 * Returns a null rectangle if no item is currently selected.
 	 */
-	QRectF currentItemSceneRect() const;
+	QRectF selectionLeaderSceneRect() const;
+	
+	std::set<PageId> selectedItems() const;
+	
+	std::vector<PageRange> selectedRanges() const;
 signals:
-	void pageSelected(
+	void newSelectionLeader(
 		PageInfo const& page_info, QRectF const& thumb_rect,
-		bool by_user, bool was_already_selected);
+		ThumbnailSequence::SelectionFlags flags);
 	
 	void contextMenuRequested(
 		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
@@ -83,16 +119,17 @@ private:
 	class PlaceholderThumb;
 	class LabelGroup;
 	class CompositeItem;
-	template<typename Base> class NoSelectionItem;
 	
-	void emitPageSelected(
+	void emitNewSelectionLeader(
 		PageInfo const& page_info, CompositeItem const* composite,
-		bool by_user, bool was_already_selected);
+		SelectionFlags flags);
 		
 	void emitContextMenuRequested(
 		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 	
 	std::auto_ptr<Impl> m_ptrImpl;
 };
+
+DEFINE_FLAG_OPS(ThumbnailSequence::SelectionFlags)
 
 #endif

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,30 +24,29 @@
 #include "IntrusivePtr.h"
 #include "OrthogonalRotation.h"
 #include "ImageId.h"
+#include "PageId.h"
 #include <QMutex>
-#include <vector>
 #include <map>
+#include <set>
 
 class PageSequence;
 
 namespace fix_orientation
 {
 
-class Scope;
-
 class Settings : public RefCountable
 {
 	DECLARE_NON_COPYABLE(Settings)
 public:
-	Settings(IntrusivePtr<PageSequence> const& page_sequence);
+	Settings(IntrusivePtr<PageSequence> const& pages);
 	
 	virtual ~Settings();
 	
 	void clear();
 	
-	void applyRule(ImageId const& image_id, OrthogonalRotation rotation);
+	void applyRotation(ImageId const& image_id, OrthogonalRotation rotation);
 	
-	std::vector<ImageId> applyRule(Scope const& scope, OrthogonalRotation rotation);
+	void applyRotation(std::set<PageId> const& pages, OrthogonalRotation rotation);
 	
 	OrthogonalRotation getRotationFor(ImageId const& image_id) const;
 private:

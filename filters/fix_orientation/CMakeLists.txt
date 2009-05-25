@@ -16,7 +16,6 @@ SET(
 	Settings.cpp Settings.h
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
-	Scope.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

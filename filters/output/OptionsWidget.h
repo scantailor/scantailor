@@ -23,9 +23,12 @@
 #include "FilterOptionsWidget.h"
 #include "IntrusivePtr.h"
 #include "PageId.h"
+#include "PageSelectionAccessor.h"
 #include "ColorParams.h"
-#include "Scope.h"
 #include "Dpi.h"
+#include <set>
+
+class PageSequence;
 
 namespace output
 {
@@ -37,7 +40,9 @@ class OptionsWidget
 {
 	Q_OBJECT
 public:
-	OptionsWidget(IntrusivePtr<Settings> const& settings);
+	OptionsWidget(IntrusivePtr<Settings> const& settings,
+		IntrusivePtr<PageSequence> const& pages,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
@@ -49,9 +54,9 @@ private slots:
 	
 	void applyColorsButtonClicked();
 	
-	void dpiChanged(Dpi const& dpi, Scope scope);
+	void dpiChanged(std::set<PageId> const& pages, Dpi const& dpi);
 	
-	void applyColorsConfirmed(Scope scope);
+	void applyColorsConfirmed(std::set<PageId> const& pages);
 	
 	void colorModeChanged(int idx);
 	
@@ -74,6 +79,8 @@ private:
 	void updateColorsDisplay();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
+	IntrusivePtr<PageSequence> m_ptrPages;
+	PageSelectionAccessor m_pageSelectionAccessor;
 	PageId m_pageId;
 	Dpi m_dpi;
 	ColorParams m_colorParams;

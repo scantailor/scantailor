@@ -71,7 +71,7 @@ IF(NOT JPEG_INCLUDE_DIR)
 ENDIF(NOT JPEG_INCLUDE_DIR)
 
 FIND_LIBRARY(
-	JPEG_LIBRARY jpeg
+	JPEG_LIBRARY NAMES jpeg libjpeg.lib
 	PATHS /usr/local/lib /usr/lib ${jpeg_dirs}
 	DOC "Path to jpeg library."
 )
@@ -91,7 +91,7 @@ IF(NOT ZLIB_INCLUDE_DIR)
 ENDIF(NOT ZLIB_INCLUDE_DIR)
 
 FIND_LIBRARY(
-	ZLIB_LIBRARY NAMES zlib z
+	ZLIB_LIBRARY NAMES z libz.lib
 	PATHS /usr/local/lib /usr/lib ${zlib_dirs}
 	DOC "Path to zlib library."
 )
@@ -111,7 +111,7 @@ IF(NOT PNG_INCLUDE_DIR)
 ENDIF(NOT PNG_INCLUDE_DIR)
 
 FIND_LIBRARY(
-	PNG_LIBRARY png
+	PNG_LIBRARY NAMES png libpng.lib
 	PATHS /usr/local/lib /usr/lib ${png_dirs}
 	DOC "PAth to png library."
 )
@@ -132,7 +132,7 @@ IF(NOT TIFF_INCLUDE_DIR)
 ENDIF(NOT TIFF_INCLUDE_DIR)
 
 FIND_LIBRARY(
-	TIFF_LIBRARY tiff
+	TIFF_LIBRARY tiff libtiff.lib
 	PATHS /usr/local/lib /usr/lib ${tiff_dirs}
 	PATH_SUFFIXES libtiff
 	DOC "Path to tiff library."
@@ -195,6 +195,8 @@ IF(UNIX)
 ELSEIF(MINGW)
 	ADD_DEFINITIONS(-mthreads)
 	LINK_LIBRARIES(-mthreads)
+ELSEIF(WIN32)
+	ADD_DEFINITIONS(-DNOMINMAX)
 ENDIF(UNIX)
 
 CHECK_INCLUDE_FILE(stdint.h HAVE_STDINT_H)
@@ -216,13 +218,20 @@ ENDIF(WIN32)
 INCLUDE_DIRECTORIES(. foundation ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
-
 SET(EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
 IF(WIN32)
-	LINK_DIRECTORIES("${QT_PLUGINS_DIR}/imageformats")
+	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
+	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
+	MARK_AS_ADVANCED(FORCE QJPEG_RELEASE QJPEG_DEBUG)
+	IF(QJPEG_RELEASE AND NOT QJPEG_DEBUG)
+		SET(QJPEG_DEBUG "${QJPEG_RELEASE}")
+	ELSEIF(QJPEG_DEBUG AND NOT QJPEG_RELEASE)
+		SET(QJPEG_RELEASE "${QJPEG_DEBUG}")
+	ENDIF(QJPEG_RELEASE AND NOT QJPEG_DEBUG)
 	LIST(
 		APPEND EXTRA_LIBS
-		${QT_QTMAIN_LIBRARY} qjpeg
+		"${QT_QTMAIN_LIBRARY}" optimized "${QJPEG_RELEASE}"
+		debug "${QJPEG_DEBUG}"
 		winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool
 	)
 ENDIF(WIN32)
@@ -279,6 +288,7 @@ SET(
 	FixDpiSinglePageDialog.cpp FixDpiSinglePageDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
 	MainWindow.cpp MainWindow.h
+	PageSelectionAccessor.cpp PageSelectionAccessor.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
 	PhysicalTransformation.cpp PhysicalTransformation.h
 	ImageTransformation.cpp ImageTransformation.h
@@ -331,6 +341,7 @@ SET(
 	CompositeCacheDrivenTask.h
 	Margins.h
 	ChangedStateItemDelegate.h
+	PageRange.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h

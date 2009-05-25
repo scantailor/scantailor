@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,32 +16,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_ORIENTATION_SCOPE_H_
-#define FIX_ORIENTATION_SCOPE_H_
+#ifndef PAGE_RANGE_H_
+#define PAGE_RANGE_H_
 
-namespace fix_orientation
-{
+#include "PageId.h"
+#include <vector>
 
-class Scope
+class PageRange
 {
 public:
-	Scope(int from, int to, int origin, int step)
-	: m_from(from), m_to(to), m_origin(origin), m_step(step) {}
+	/**
+	 * \brief Ordered list of consecutive pages.
+	 */
+	std::vector<PageId> pages;
 	
-	int from() const { return m_from; }
+	/**
+	 * \brief The index of the first page in the global page sequence.
+	 */
+	int firstPageIdx;
 	
-	int to() const { return m_to; }
-	
-	int origin() const { return m_origin; }
-	
-	int step() const { return m_step; }
-private:
-	int m_from; // zero based, inclusive
-	int m_to; // zero based, exclusive
-	int m_origin; // The page that is in.
-	int m_step; // 1 or 2
+	PageRange() : firstPageIdx(-1) {}
 };
-
-} // namespace fix_orientation
 
 #endif

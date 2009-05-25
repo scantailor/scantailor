@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -232,7 +232,7 @@ void countOffcutPixels(
  * \brief Try to auto-detect a page layout for a single-page configuration.
  *
  * \param layout_type The requested layout type.  The layout type of
- *        Rule::SINGLE_PAGE_UNCUT is not handled here.
+ *        SINGLE_PAGE_UNCUT is not handled here.
  * \param ltr_lines Folding line candidates sorted from left to right.
  * \param image_size The dimentions of the page image.
  * \param hor_shadows A downscaled grayscale image that contains
@@ -241,7 +241,7 @@ void countOffcutPixels(
  * \return The page layout detected or a null auto_ptr.
  */
 std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
-	Rule::LayoutType const layout_type,
+	LayoutType const layout_type,
 	std::vector<QLineF> const& ltr_lines,
 	QRectF const& virtual_image_rect,
 	QImage const& gray_downscaled,
@@ -270,7 +270,7 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	while (left_sum == 0 && right_sum == 0) {
 		// This whole branch (loop) leads to SINGLE_PAGE_UNCUT,
 		// which conflicts with PAGE_PLUS_OFFCUT.
-		if (layout_type == Rule::PAGE_PLUS_OFFCUT) {
+		if (layout_type == PAGE_PLUS_OFFCUT) {
 			break;
 		}
 		
@@ -374,14 +374,12 @@ std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
 	);
 }
 
-int numPages(
-	Rule::LayoutType const layout_type,
-	ImageTransformation const& pre_xform)
+int numPages(LayoutType const layout_type, ImageTransformation const& pre_xform)
 {
 	int num_pages = 0;
 	
 	switch (layout_type) {
-		case Rule::AUTO_DETECT: {
+		case AUTO_LAYOUT_TYPE: {
 			QSize const image_size(
 				pre_xform.origRect().size().toSize()
 			);
@@ -391,11 +389,11 @@ int numPages(
 			);
 			break;
 		}
-		case Rule::SINGLE_PAGE_UNCUT:
-		case Rule::PAGE_PLUS_OFFCUT:
+		case SINGLE_PAGE_UNCUT:
+		case PAGE_PLUS_OFFCUT:
 			num_pages = 1;
 			break;
-		case Rule::TWO_PAGES:
+		case TWO_PAGES:
 			num_pages = 2;
 			break;
 	}
@@ -408,12 +406,12 @@ int numPages(
 
 PageLayout
 PageLayoutEstimator::estimatePageLayout(
-	Rule::LayoutType const layout_type, QImage const& input,
+	LayoutType const layout_type, QImage const& input,
 	ImageTransformation const& pre_xform,
 	BinaryThreshold const bw_threshold,
 	DebugImages* const dbg)
 {
-	if (layout_type == Rule::SINGLE_PAGE_UNCUT) {
+	if (layout_type == SINGLE_PAGE_UNCUT) {
 		return PageLayout(PageLayout::SINGLE_PAGE_UNCUT, QLineF());
 	}
 	
@@ -456,9 +454,9 @@ private:
  * \brief Attempts to find the folding line and cut the image there.
  *
  * \param layout_type The type of a layout to detect.  If set to
- *        something other than Rule::AUTO_DETECT, the returned
+ *        something other than AUTO_LAYOUT_TYPE, the returned
  *        layout will have the same type.  The layout type of
- *        Rule::SINGLE_PAGE_UNCUT is not handled here.
+ *        SINGLE_PAGE_UNCUT is not handled here.
  * \param input The input image.  Will be converted to grayscale unless
  *        it's already grayscale.
  * \param pre_xform The logical transformation applied to the input image.
@@ -469,7 +467,7 @@ private:
  */
 std::auto_ptr<PageLayout>
 PageLayoutEstimator::tryCutAtFoldingLine(
-	Rule::LayoutType const layout_type, QImage const& input,
+	LayoutType const layout_type, QImage const& input,
 	ImageTransformation const& pre_xform, DebugImages* const dbg)
 {
 	int const num_pages = numPages(layout_type, pre_xform);
@@ -544,7 +542,7 @@ PageLayoutEstimator::tryCutAtFoldingLine(
  * \brief Attempts to find a suitable whitespace to draw a splitting line through.
  *
  * \param layout_type The type of a layout to detect.  If set to
- *        something other than Rule::AUTO_DETECT, the returned
+ *        something other than AUTO_LAYOUT_TYPE, the returned
  *        layout will have the same type.
  * \param input The input image.  Will be converted to grayscale unless
  *        it's already grayscale.
@@ -557,7 +555,7 @@ PageLayoutEstimator::tryCutAtFoldingLine(
  */
 PageLayout
 PageLayoutEstimator::cutAtWhitespace(
-	Rule::LayoutType const layout_type, QImage const& input,
+	LayoutType const layout_type, QImage const& input,
 	ImageTransformation const& pre_xform,
 	BinaryThreshold const bw_threshold,
 	DebugImages* const dbg)
@@ -632,7 +630,7 @@ PageLayoutEstimator::cutAtWhitespace(
  * \brief Attempts to find a suitable whitespace to draw a splitting line through.
  *
  * \param layout_type The type of a layout to detect.  If set to
- *        something other than Rule::AUTO_DETECT, the returned
+ *        something other than AUTO_LAYOUT_TYPE, the returned
  *        layout will have the same type.
  * \param num_pages The number of pages (1 or 2) in the layout.
  * \param input The black and white, 150 DPI input image.
@@ -643,7 +641,7 @@ PageLayoutEstimator::cutAtWhitespace(
  */
 PageLayout
 PageLayoutEstimator::cutAtWhitespaceDeskewed150(
-	Rule::LayoutType const layout_type, int const num_pages,
+	LayoutType const layout_type, int const num_pages,
 	BinaryImage const& input,
 	bool const left_offcut, bool const right_offcut,
 	DebugImages* dbg)
@@ -865,16 +863,16 @@ PageLayoutEstimator::removeInsignificantEdgeSpans(std::deque<Span>& spans)
 
 PageLayout
 PageLayoutEstimator::processContentSpansSinglePage(
-	Rule::LayoutType const layout_type,
+	LayoutType const layout_type,
 	std::deque<Span> const& spans, int const width, int const height,
 	bool const left_offcut, bool const right_offcut)
 {
-	assert(layout_type == Rule::AUTO_DETECT
-			|| layout_type == Rule::PAGE_PLUS_OFFCUT);
+	assert(layout_type == AUTO_LAYOUT_TYPE
+			|| layout_type == PAGE_PLUS_OFFCUT);
 	
 	// Just to be able to break from it.
 	while (left_offcut && !right_offcut
-			&& layout_type == Rule::AUTO_DETECT) {
+			&& layout_type == AUTO_LAYOUT_TYPE) {
 		double x;
 		if (spans.empty()) {
 			x = 0.0;
@@ -896,7 +894,7 @@ PageLayoutEstimator::processContentSpansSinglePage(
 	
 	// Just to be able to break from it.
 	while (right_offcut && !left_offcut
-			&& layout_type == Rule::AUTO_DETECT) {
+			&& layout_type == AUTO_LAYOUT_TYPE) {
 		double x;
 		if (spans.empty()) {
 			x = width;
@@ -932,10 +930,10 @@ PageLayoutEstimator::processContentSpansSinglePage(
 
 PageLayout
 PageLayoutEstimator::processContentSpansTwoPages(
-	Rule::LayoutType const layout_type,
+	LayoutType const layout_type,
 	std::deque<Span> const& spans, int const width, int const height)
 {
-	assert(layout_type == Rule::AUTO_DETECT || layout_type == Rule::TWO_PAGES);
+	assert(layout_type == AUTO_LAYOUT_TYPE || layout_type == TWO_PAGES);
 	
 	double x;
 	if (spans.empty()) {

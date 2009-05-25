@@ -21,13 +21,15 @@
 
 #include "ui_PageLayoutOptionsWidget.h"
 #include "FilterOptionsWidget.h"
+#include "PageSelectionAccessor.h"
 #include "IntrusivePtr.h"
 #include "Margins.h"
 #include "Alignment.h"
-#include "Scope.h"
+#include "PageId.h"
 #include <QIcon>
 #include <memory>
 #include <map>
+#include <set>
 
 class QToolButton;
 class PageSequence;
@@ -45,7 +47,8 @@ class OptionsWidget :
 public:
 	OptionsWidget(
 		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& page_sequence);
+		IntrusivePtr<PageSequence> const& pages,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
@@ -95,9 +98,9 @@ private slots:
 	
 	void showApplyAlignmentDialog();
 	
-	void applyMargins(Scope scope);
+	void applyMargins(std::set<PageId> const& pages);
 	
-	void applyAlignment(Scope scope);
+	void applyAlignment(std::set<PageId> const& pages);
 private:
 	typedef std::map<QToolButton*, Alignment> AlignmentByButton;
 	
@@ -108,7 +111,8 @@ private:
 	void enableDisableAlignmentButtons();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPageSequence;
+	IntrusivePtr<PageSequence> m_ptrPages;
+	PageSelectionAccessor m_pageSelectionAccessor;
 	QIcon m_chainIcon;
 	QIcon m_brokenChainIcon;
 	AlignmentByButton m_alignmentByButton;

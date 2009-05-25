@@ -43,11 +43,16 @@ namespace fix_orientation
 {
 
 Filter::Filter(
-	IntrusivePtr<PageSequence> const& page_sequence)
+	IntrusivePtr<PageSequence> const& page_sequence,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(page_sequence),
 	m_ptrSettings(new Settings(page_sequence))
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings, page_sequence));
+	m_ptrOptionsWidget.reset(
+		new OptionsWidget(
+			m_ptrSettings, page_sequence, page_selection_accessor
+		)
+	);
 }
 
 Filter::~Filter()
@@ -75,10 +80,7 @@ Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 		OrthogonalRotation const rotation(
 			m_ptrSettings->getRotationFor(page_id.imageId())
 		);
-		m_ptrOptionsWidget->preUpdateUI(
-			rotation, m_ptrPages->numImages(),
-			m_ptrPages->curImageIdx()
-		);
+		m_ptrOptionsWidget->preUpdateUI(rotation);
 		ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 	}
 }
@@ -135,7 +137,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			)
 		);
 		
-		m_ptrSettings->applyRule(image_id, rotation);
+		m_ptrSettings->applyRotation(image_id, rotation);
 	}
 }
 

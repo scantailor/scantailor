@@ -17,39 +17,41 @@
 */
 
 #include "ApplyDialog.h.moc"
-#include "Scope.h"
-#include <QFontMetrics>
-#include <QIntValidator>
-#include <QMessageBox>
+#include "PageSelectionAccessor.h"
+#include <QButtonGroup>
+#include <QDebug>
 #include <assert.h>
 
 namespace fix_orientation
 {
 
 ApplyDialog::ApplyDialog(
-	QWidget* parent, int num_pages, int cur_page)
+	QWidget* parent, IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
 :	QDialog(parent),
-	m_numPages(num_pages),
-	m_curPage(cur_page)
+	m_pages(pages->snapshot(PageSequence::IMAGE_VIEW)),
+	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_selectedRanges(page_selection_accessor.selectedRanges()),
+	m_pBtnGroup(new QButtonGroup(this))
 {
 	setupUi(this);
+	m_pBtnGroup->addButton(thisPageOnlyRB);
+	m_pBtnGroup->addButton(allPagesRB);
+	m_pBtnGroup->addButton(thisPageAndFollowersRB);
+	m_pBtnGroup->addButton(selectedPagesRB);
+	m_pBtnGroup->addButton(everyOtherRB);
+	m_pBtnGroup->addButton(everyOtherSelectedRB);
 	
-	QFontMetrics fm(rangeFrom->fontMetrics());
-	int const width = fm.width('0') * 5;
-	rangeFrom->setMaximumWidth(width);
-	rangeTo->setMaximumWidth(width);
-	rangeFrom->setMaxLength(4);
-	rangeTo->setMaxLength(4);
-	QIntValidator* fromValidator = new QIntValidator(rangeFrom);
-	rangeFrom->setValidator(fromValidator);
-	QIntValidator* toValidator = new QIntValidator(rangeTo);
-	rangeTo->setValidator(toValidator);
-	thisPageSelected();
+	if (m_selectedPages.size() <= 1) {
+		selectedPagesWidget->setEnabled(false);
+		everyOtherSelectedWidget->setEnabled(false);
+		everyOtherSelectedHint->setText(selectedPagesHint->text());
+	} else if (m_selectedRanges.size() > 1) {
+		everyOtherSelectedWidget->setEnabled(false);
+		everyOtherSelectedHint->setText(tr("Can't do: more that one group is selected."));
+	}
 	
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
-	connect(thisPage, SIGNAL(pressed()), this, SLOT(thisPageSelected()));
-	connect(everyPage, SIGNAL(pressed()), this, SLOT(everyPageSelected()));
-	connect(everyOtherPage, SIGNAL(pressed()), this, SLOT(everyOtherPageSelected()));
 }
 
 ApplyDialog::~ApplyDialog()
@@ -57,70 +59,43 @@ ApplyDialog::~ApplyDialog()
 }
 
 void
-ApplyDialog::thisPageSelected()
-{
-	rangeFrom->setEnabled(false);
-	rangeTo->setEnabled(false);
-	
-	QString const cur_page_str(QString::number(m_curPage + 1));
-	rangeFrom->setText(cur_page_str);
-	rangeTo->setText(cur_page_str);
-}
-
-void
-ApplyDialog::everyPageSelected()
-{
-	rangeFrom->setEnabled(true);
-	rangeTo->setEnabled(true);
-	
-	QString const cur_page_str(QString::number(m_curPage + 1));
-	rangeFrom->setText(cur_page_str);
-	rangeTo->setText(QString::number(m_numPages));
-}
-
-void
-ApplyDialog::everyOtherPageSelected()
-{
-	rangeFrom->setEnabled(true);
-	rangeTo->setEnabled(true);
-	
-	QString const cur_page_str(QString::number(m_curPage + 1));
-	rangeFrom->setText(cur_page_str);
-	rangeTo->setText(QString::number(m_numPages));
-}
-
-void
 ApplyDialog::onSubmit()
 {
-	if (rangeFrom->text().isEmpty() || rangeTo->text().isEmpty()) {
-		QMessageBox::warning(
-			this, tr("Error"),
-			tr("Range is required.")
-		);
-		return;
-	}
+	int const cur_page = m_pages.curPageIdx();
+	int const num_pages = m_pages.numPages();
 	
-	int const from = rangeFrom->text().toInt() - 1;
-	int const to = rangeTo->text().toInt();
-	int const step = everyOtherPage->isChecked() ? 2 : 1;
+	std::set<PageId> pages;
 	
-	if (everyPage->isChecked() || everyOtherPage->isChecked()) {	
-		if (m_curPage < from || m_curPage > to) {
-			QMessageBox::warning(
-				this, tr("Error"),
-				tr("Page %1 (the current page) must be inside the range.")
-				.arg(m_curPage + 1)
-			);
-			return;
+	// thisPageOnlyRB is intentionally not handled.
+	if (allPagesRB->isChecked()) {
+		for (int i = 0; i < num_pages; ++i) {
+			pages.insert(m_pages.pageAt(i).id());
 		}
-	} else {
-		assert(thisPage->isChecked());
+	} else if (thisPageAndFollowersRB->isChecked()) {
+		for (int i = cur_page; i < num_pages; ++i) {
+			pages.insert(m_pages.pageAt(i).id());
+		}
+	} else if (selectedPagesRB->isChecked()) {
+		emit appliedTo(m_selectedPages);
+		accept();
+		return;
+	} else if (everyOtherRB->isChecked()) {
+		for (int i = cur_page & 1; i < num_pages; i += 2) {
+			pages.insert(m_pages.pageAt(i).id());
+		}
+	} else if (everyOtherSelectedRB->isChecked()) {
+		assert(m_selectedRanges.size() == 1);
+		PageRange const& range = m_selectedRanges.front();
+		int i = (cur_page - range.firstPageIdx) & 1;
+		int const limit = range.pages.size();
+		for (; i < limit; i += 2) {
+			pages.insert(range.pages[i]);
+		}
 	}
 	
-	emit accepted(Scope(from, to, m_curPage, step));
+	emit appliedTo(pages);
 	
-	// We assume the default connection from accepted() to accept()
-	// was removed.
+	// We assume the default connection from accept() to accepted() was removed.
 	accept();
 }
 

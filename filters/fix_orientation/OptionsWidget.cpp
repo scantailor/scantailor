@@ -19,7 +19,6 @@
 #include "OptionsWidget.h.moc"
 #include "Filter.h"
 #include "ApplyDialog.h"
-#include "Scope.h"
 #include "Settings.h"
 #include "PageSequence.h"
 #include "ImageId.h"
@@ -33,11 +32,11 @@ namespace fix_orientation
 
 OptionsWidget::OptionsWidget(
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& page_sequence)
+	IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
-	m_ptrPageSequence(page_sequence),
-	m_numPages(0),
-	m_curPage(0)
+	m_ptrPages(pages),
+	m_pageSelectionAccessor(page_selection_accessor)
 {
 	setupUi(this);
 	
@@ -52,11 +51,8 @@ OptionsWidget::~OptionsWidget()
 }
 
 void
-OptionsWidget::preUpdateUI(
-	OrthogonalRotation const rotation, int const num_pages, int const cur_page)
+OptionsWidget::preUpdateUI(OrthogonalRotation const rotation)
 {
-	m_numPages = num_pages;
-	m_curPage = cur_page;
 	m_rotation = rotation;
 	setRotationPixmap();
 }
@@ -92,24 +88,32 @@ OptionsWidget::resetRotation()
 void
 OptionsWidget::showApplyToDialog()
 {
-	ApplyDialog* dialog = new ApplyDialog(this, m_numPages, m_curPage);
+	ApplyDialog* dialog = new ApplyDialog(
+		this, m_ptrPages, m_pageSelectionAccessor
+	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(accepted(Scope const&)),
-		this, SLOT(scopeSet(Scope const&))
+		dialog, SIGNAL(appliedTo(std::set<PageId> const&)),
+		this, SLOT(appliedTo(std::set<PageId> const&))
 	);
 	dialog->show();
 }
 
 void
-OptionsWidget::scopeSet(Scope const& scope)
+OptionsWidget::appliedTo(std::set<PageId> const& pages)
 {
-	std::vector<ImageId> const image_ids(
-		m_ptrSettings->applyRule(scope, m_rotation)
-	);
+	if (pages.empty()) {
+		return;
+	}
 	
-	BOOST_FOREACH(ImageId const& image_id, image_ids) {
-		emit invalidateThumbnail(PageId(image_id));
+	m_ptrSettings->applyRotation(pages, m_rotation);
+	
+	if (int(pages.size()) > m_ptrPages->numImages() / 2) {
+		emit invalidateAllThumbnails();
+	} else {
+		BOOST_FOREACH(PageId const& page_id, pages) {
+			emit invalidateThumbnail(page_id);
+		}
 	}
 }
 
@@ -123,8 +127,8 @@ OptionsWidget::setRotation(OrthogonalRotation const rotation)
 	m_rotation = rotation;
 	setRotationPixmap();
 	
-	ImageId const image_id(m_ptrPageSequence->curImage());
-	m_ptrSettings->applyRule(image_id, rotation);
+	ImageId const image_id(m_ptrPages->curImage());
+	m_ptrSettings->applyRotation(image_id, rotation);
 	
 	emit rotated(rotation);
 	emit invalidateThumbnail(PageId(image_id));

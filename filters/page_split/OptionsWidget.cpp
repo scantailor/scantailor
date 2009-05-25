@@ -21,10 +21,12 @@
 #include "SplitModeDialog.h"
 #include "Settings.h"
 #include "Params.h"
+#include "LayoutType.h"
 #include "PageId.h"
 #include "PageSequence.h"
 #include "ScopedIncDec.h"
 #include <QPixmap>
+#include <boost/foreach.hpp>
 #include <assert.h>
 
 namespace page_split
@@ -32,9 +34,11 @@ namespace page_split
 
 OptionsWidget::OptionsWidget(
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& page_sequence)
+	IntrusivePtr<PageSequence> const& page_sequence,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
 	m_ptrPages(page_sequence),
+	m_pageSelectionAccessor(page_selection_accessor),
 	m_ignoreAutoManualToggle(0),
 	m_ignoreLayoutTypeToggle(0)
 {
@@ -82,10 +86,10 @@ OptionsWidget::preUpdateUI(ImageId const& image_id)
 	
 	m_imageId = image_id;
 	Settings::Record const record(m_ptrSettings->getPageRecord(image_id));
-	Rule const rule(record.rule());
+	LayoutType const layout_type(record.combinedLayoutType());
 	
-	switch (rule.layoutType()) {
-		case Rule::AUTO_DETECT:
+	switch (layout_type) {
+		case AUTO_LAYOUT_TYPE:
 			// Uncheck all buttons.  Can only be done
 			// by playing with exclusiveness.
 			twoPagesBtn->setChecked(true);
@@ -93,27 +97,23 @@ OptionsWidget::preUpdateUI(ImageId const& image_id)
 			twoPagesBtn->setChecked(false);
 			twoPagesBtn->setAutoExclusive(true);
 			break;
-		case Rule::SINGLE_PAGE_UNCUT:
+		case SINGLE_PAGE_UNCUT:
 			singlePageUncutBtn->setChecked(true);
 			break;
-		case Rule::PAGE_PLUS_OFFCUT:
+		case PAGE_PLUS_OFFCUT:
 			pagePlusOffcutBtn->setChecked(true);
 			break;
-		case Rule::TWO_PAGES:
+		case TWO_PAGES:
 			twoPagesBtn->setChecked(true);
 			break;
 	}
 	
-	if (rule.layoutType() == Rule::AUTO_DETECT) {
+	if (layout_type == AUTO_LAYOUT_TYPE) {
 		changeBtn->setEnabled(false);
 		scopeLabel->setText("?");
 	} else {
 		changeBtn->setEnabled(true);
-		if (rule.scope() == Rule::THIS_PAGE_ONLY) {
-			scopeLabel->setText(tr("This page only"));
-		} else {
-			scopeLabel->setText(tr("All pages"));
-		}
+		scopeLabel->setText(tr("Set manually"));
 	}
 	
 	// Uncheck both the Auto and Manual buttons.
@@ -200,38 +200,38 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 		return;
 	}
 	
-	Rule::LayoutType rlt;
+	LayoutType lt;
 	int logical_pages = 1;
 	
 	QObject* button = sender();
 	if (button == singlePageUncutBtn) {
-		rlt = Rule::SINGLE_PAGE_UNCUT;
+		lt = SINGLE_PAGE_UNCUT;
 	} else if (button == pagePlusOffcutBtn) {
-		rlt = Rule::PAGE_PLUS_OFFCUT;
+		lt = PAGE_PLUS_OFFCUT;
 	} else {
 		assert(button == twoPagesBtn);
-		rlt = Rule::TWO_PAGES;
+		lt = TWO_PAGES;
 		logical_pages = 2;
 	}
 	
 	Settings::UpdateAction update;
-	update.setLayoutType(rlt);
+	update.setLayoutType(lt);
 	
-	scopeLabel->setText(tr("This page only"));
+	scopeLabel->setText(tr("Set manually"));
 	
 	m_ptrPages->setLogicalPagesInImage(m_imageId, logical_pages);
 	
-	if (rlt == Rule::PAGE_PLUS_OFFCUT ||
-			(rlt != Rule::SINGLE_PAGE_UNCUT &&
+	if (lt == PAGE_PLUS_OFFCUT ||
+			(lt != SINGLE_PAGE_UNCUT &&
 			m_uiData.splitLineMode() == MODE_AUTO)) {
 		m_ptrSettings->updatePage(m_imageId, update);
 		emit reloadRequested();
 	} else {
 		PageLayout::Type plt;
-		if (rlt == Rule::SINGLE_PAGE_UNCUT) {
+		if (lt == SINGLE_PAGE_UNCUT) {
 			plt = PageLayout::SINGLE_PAGE_UNCUT;
 		} else {
-			assert(rlt == Rule::TWO_PAGES);
+			assert(lt == TWO_PAGES);
 			plt = PageLayout::TWO_PAGES;
 		}
 		
@@ -262,48 +262,56 @@ OptionsWidget::showChangeDialog()
 	}
 	
 	SplitModeDialog* dialog = new SplitModeDialog(
-		this, record.rule(), params->pageLayout().type(),
-		params->splitLineMode() == MODE_AUTO
+		this, m_ptrPages, m_pageSelectionAccessor, record.combinedLayoutType(),
+		params->pageLayout().type(), params->splitLineMode() == MODE_AUTO
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(accepted(Rule const&)),
-		this, SLOT(ruleSet(Rule const&))
+		dialog, SIGNAL(accepted(std::set<PageId> const&, LayoutType)),
+		this, SLOT(layoutTypeSet(std::set<PageId> const&, LayoutType))
 	);
 	dialog->show();
 }
 
 void
-OptionsWidget::ruleSet(Rule const& rule)
+OptionsWidget::layoutTypeSet(std::set<PageId> const& pages, LayoutType const layout_type)
 {
-	if (rule.scope() == Rule::THIS_PAGE_ONLY) {
-		Settings::UpdateAction update;
-		update.setLayoutType(rule.layoutType());
-		m_ptrSettings->updatePage(m_imageId, update);
-		switch (rule.layoutType()) {
-			case Rule::SINGLE_PAGE_UNCUT:
-			case Rule::PAGE_PLUS_OFFCUT:
-				m_ptrPages->setLogicalPagesInImage(m_imageId, 1);
-				break;
-			case Rule::TWO_PAGES:
-				m_ptrPages->setLogicalPagesInImage(m_imageId, 2);
-				break;
-			default:;
+	if (pages.empty()) {
+		return;
+	}
+	
+	int const logical_pages = (layout_type == TWO_PAGES) ? 2 : 1;
+
+	if (int(pages.size()) == m_ptrPages->numImages()) {
+		m_ptrSettings->setLayoutTypeForAllPages(layout_type);
+		if (layout_type != AUTO_LAYOUT_TYPE) {
+			m_ptrPages->setLogicalPagesInAllImages(logical_pages);
 		}
 	} else {
-		m_ptrSettings->setLayoutTypeForAllPages(rule.layoutType());
-		switch (rule.layoutType()) {
-			case Rule::SINGLE_PAGE_UNCUT:
-			case Rule::PAGE_PLUS_OFFCUT:
-				m_ptrPages->setLogicalPagesInAllImages(1);
-				break;
-			case Rule::TWO_PAGES:
-				m_ptrPages->setLogicalPagesInAllImages(2);
-				break;
-			default:;
+		m_ptrSettings->setLayoutTypeFor(layout_type, pages);
+		if (layout_type != AUTO_LAYOUT_TYPE) {
+			BOOST_FOREACH(PageId const& page_id, pages) {
+				m_ptrPages->setLogicalPagesInImage(
+					page_id.imageId(), logical_pages
+				);
+			}
 		}
 	}
-	emit reloadRequested();
+	
+	if (int(pages.size()) > m_ptrPages->numImages() / 2) {
+		emit invalidateAllThumbnails();
+	} else {
+		BOOST_FOREACH(PageId const& page_id, pages) {
+			emit invalidateThumbnail(page_id);
+		}
+	}
+	
+	if (layout_type == AUTO_LAYOUT_TYPE) {
+		scopeLabel->setText(tr("Auto detected"));
+		emit reloadRequested();
+	} else {
+		scopeLabel->setText(tr("Set manually"));
+	}
 }
 
 void

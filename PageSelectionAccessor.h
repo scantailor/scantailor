@@ -16,14 +16,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_SCOPE_H_
-#define PAGE_LAYOUT_SCOPE_H_
+#ifndef PAGE_SELECTION_ACCESSOR_H_
+#define PAGE_SELECTION_ACCESSOR_H_
 
-namespace page_layout
+#include "PageId.h"
+#include "PageRange.h"
+#include <QPointer>
+#include <set>
+#include <vector>
+
+class MainWindow;
+
+class PageSelectionAccessor
 {
-
-enum Scope { THIS_PAGE, ALL_PAGES };
-
-} // namespace page_layout
+public:
+	PageSelectionAccessor(MainWindow* main_window);
+	
+	PageSelectionAccessor(PageSelectionAccessor const& other);
+	
+	PageSelectionAccessor& operator=(PageSelectionAccessor const& rhs);
+	
+	std::set<PageId> selectedPages() const;
+	
+	std::vector<PageRange> selectedRanges() const;
+private:
+	QPointer<MainWindow> m_ptrMainWindow;
+};
 
 #endif

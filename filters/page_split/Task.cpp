@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "Filter.h"
 #include "OptionsWidget.h"
 #include "Settings.h"
-#include "Rule.h"
+#include "LayoutType.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "PageLayoutEstimator.h"
@@ -115,7 +115,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		if (!params || !params->dependencies().matches(deps)) {
 			PageLayout const layout(
 				PageLayoutEstimator::estimatePageLayout(
-					record.rule().layoutType(),
+					record.combinedLayoutType(),
 					data.grayImage(), data.xform(),
 					data.bwThreshold(), m_ptrDbg.get()
 				)
@@ -148,7 +148,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	PageLayout const& layout = record.params()->pageLayout();
 	ui_data.setLayoutTypeAutoDetected(
-		record.rule().layoutType() == Rule::AUTO_DETECT
+		record.combinedLayoutType() == AUTO_LAYOUT_TYPE
 	);
 	ui_data.setPageLayout(layout);
 	ui_data.setSplitLineMode(record.params()->splitLineMode());

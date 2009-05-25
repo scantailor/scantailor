@@ -2,6 +2,8 @@
 !define VERSION_QUAD "@VERSION_QUAD@"
 !define LICENSE_FILE "@LICENSE_FILE@"
 !define MINGWM10_DLL "@MINGWM10_DLL@"
+!define CRT_REDIST_PATH "@CRT_REDIST_PATH@"
+!define CRT_REDIST_DIR "@CRT_REDIST_DIR@"
 !define INSTALLER_FILENAME "@INSTALLER_FILENAME@"
 !define UNINST_REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scan Tailor"
 
@@ -31,11 +33,12 @@ SetCompressor /SOLID /FINAL lzma
 
 !if "${VERSION_QUAD}" != ""
   VIAddVersionKey "ProductName" "Scan Tailor"
+  VIAddVersionKey "ProductVersion" "${VERSION}"
   VIAddVersionKey "Comments" "Interactive post-processing tool for scanned pages."
   VIAddVersionKey "CompanyName" "Joseph Artsimovich"
-  #VIAddVersionKey "LegalTrademarks" "Test Application is a trademark of Fake company"
-  VIAddVersionKey "LegalCopyright" "ï¿½ Joseph Artsimovich"
-  VIAddVersionKey "FileDescription" ""
+  VIAddVersionKey "LegalTrademarks" ""
+  VIAddVersionKey "LegalCopyright" "© Joseph Artsimovich et al."
+  VIAddVersionKey "FileDescription" "Post-processing tool for scanned pages."
   VIAddVersionKey "FileVersion" "${VERSION}"
   VIProductVersion "${VERSION_QUAD}"
 !endif
@@ -54,9 +57,12 @@ SetCompressor /SOLID /FINAL lzma
 
 Section
   SetOutPath $INSTDIR
-  File scantailor.exe
+  File "${SCANTAILOR_EXE}"
   !if "${MINGWM10_DLL}" != ""
     File "${MINGWM10_DLL}"
+  !endif
+  !if "${CRT_REDIST_PATH}" != ""
+	File /r "${CRT_REDIST_PATH}"
   !endif
   SetOutPath "$INSTDIR\translations"
   File *.qm
@@ -92,13 +98,16 @@ Section "Uninstall"
   ${unregisterExtension} ".ScanTailor" "Scan Tailor Project"
   
   # Remove program files.
-  Delete $INSTDIR\scantailor.exe
-  Delete $INSTDIR\mingwm10.dll
-  Delete $INSTDIR\Uninstaller.exe
+  Delete "$INSTDIR\scantailor.exe"
+  Delete "$INSTDIR\mingwm10.dll"
+  Delete "$INSTDIR\Uninstaller.exe"
+  !if "${CRT_REDIST_DIR}" != ""
+	RMDir /r "$INSTDIR\${CRT_REDIST_DIR}"
+  !endif
   
   # Remove translations.
-  Delete $INSTDIR\translations\*.qm
-  RMDir $INSTDIR\translations
+  Delete "$INSTDIR\translations\*.qm"
+  RMDir "$INSTDIR\translations"
   
   # Remove the installation directory.
   RMDir "$INSTDIR"

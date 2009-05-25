@@ -37,9 +37,11 @@ namespace page_layout
 
 OptionsWidget::OptionsWidget(
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& page_sequence)
+	IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
-	m_ptrPageSequence(page_sequence),
+	m_ptrPages(pages),
+	m_pageSelectionAccessor(page_selection_accessor),
 	m_mmToUnit(1.0),
 	m_unitToMM(1.0),
 	m_ignoreMarginChanges(0),
@@ -329,12 +331,14 @@ OptionsWidget::goToTallestPage()
 void
 OptionsWidget::showApplyMarginsDialog()
 {
-	ApplyDialog* dialog = new ApplyDialog(this);
+	ApplyDialog* dialog = new ApplyDialog(
+		this, m_ptrPages, m_pageSelectionAccessor
+	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowTitle(tr("Apply Margins"));
 	connect(
-		dialog, SIGNAL(accepted(Scope)),
-		this, SLOT(applyMargins(Scope))
+		dialog, SIGNAL(accepted(std::set<PageId> const&)),
+		this, SLOT(applyMargins(std::set<PageId> const&))
 	);
 	dialog->show();
 }
@@ -342,30 +346,26 @@ OptionsWidget::showApplyMarginsDialog()
 void
 OptionsWidget::showApplyAlignmentDialog()
 {
-	ApplyDialog* dialog = new ApplyDialog(this);
+	ApplyDialog* dialog = new ApplyDialog(
+		this, m_ptrPages, m_pageSelectionAccessor
+	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowTitle(tr("Apply Alignment"));
 	connect(
-		dialog, SIGNAL(accepted(Scope)),
-		this, SLOT(applyAlignment(Scope))
+		dialog, SIGNAL(accepted(std::set<PageId> const&)),
+		this, SLOT(applyAlignment(std::set<PageId> const&))
 	);
 	dialog->show();
 }
 
 void
-OptionsWidget::applyMargins(Scope const scope)
+OptionsWidget::applyMargins(std::set<PageId> const& pages)
 {
-	if (scope == THIS_PAGE) {
-		return; // It's already applied to this page.
+	if (pages.empty()) {
+		return;
 	}
 	
-	PageSequenceSnapshot const snapshot(
-		m_ptrPageSequence->snapshot(PageSequence::PAGE_VIEW)
-	);
-	size_t const num_pages = snapshot.numPages();
-	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info = snapshot.pageAt(i);
-		PageId const& page_id = page_info.id();
+	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setHardMarginsMM(page_id, m_marginsMM);
 	}
 	
@@ -374,19 +374,13 @@ OptionsWidget::applyMargins(Scope const scope)
 }
 
 void
-OptionsWidget::applyAlignment(Scope const scope)
+OptionsWidget::applyAlignment(std::set<PageId> const& pages)
 {
-	if (scope == THIS_PAGE) {
-		return; // It's already applied to this page.
+	if (pages.empty()) {
+		return;
 	}
 	
-	PageSequenceSnapshot const snapshot(
-		m_ptrPageSequence->snapshot(PageSequence::PAGE_VIEW)
-	);
-	size_t const num_pages = snapshot.numPages();
-	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info = snapshot.pageAt(i);
-		PageId const& page_id = page_info.id();
+	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setPageAlignment(page_id, m_alignment);
 	}
 	

@@ -28,6 +28,7 @@
 class PageId;
 class ImageId;
 class PageSequence;
+class PageSelectionAccessor;
 class QString;
 class QDomDocument;
 class QDomElement;
@@ -54,7 +55,8 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& page_sequence);
+	Filter(IntrusivePtr<PageSequence> const& page_sequence,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	

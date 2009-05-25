@@ -17,7 +17,9 @@
 */
 
 #include "ChangeDpiDialog.h.moc"
+#include "PageSelectionAccessor.h"
 #include "Dpi.h"
+#include <QButtonGroup>
 #include <QVariant>
 #include <QIntValidator>
 #include <QMessageBox>
@@ -29,10 +31,22 @@
 namespace output
 {
 
-ChangeDpiDialog::ChangeDpiDialog(QWidget* parent, Dpi const& dpi)
-:	QDialog(parent)
+ChangeDpiDialog::ChangeDpiDialog(QWidget* parent, Dpi const& dpi,
+	IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
+:	QDialog(parent),
+	m_pages(pages->snapshot(PageSequence::PAGE_VIEW)),
+	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_pScopeGroup(new QButtonGroup(this))
 {
 	setupUi(this);
+	m_pScopeGroup->addButton(thisPageRB);
+	m_pScopeGroup->addButton(allPagesRB);
+	m_pScopeGroup->addButton(thisPageAndFollowersRB);
+	m_pScopeGroup->addButton(selectedPagesRB);
+	if (m_selectedPages.size() <= 1) {
+		selectedPagesWidget->setEnabled(false);
+	}
 	
 	dpiSelector->setValidator(new QIntValidator(dpiSelector));
 	
@@ -135,9 +149,27 @@ ChangeDpiDialog::onSubmit()
 		return;
 	}
 	
-	Scope const scope = allPagesRB->isChecked() ? ALL_PAGES : THIS_PAGE_ONLY;
+	int const num_pages = m_pages.numPages();
+	int const cur_page = m_pages.curPageIdx();
 	
-	emit accepted(Dpi(dpi, dpi), scope);
+	std::set<PageId> pages;
+	
+	// thisPageRB is intentionally not handled.
+	if (allPagesRB->isChecked()) {
+		for (int i = 0; i < num_pages; ++i) {
+			pages.insert(m_pages.pageAt(i).id());
+		}
+	} else if (thisPageAndFollowersRB->isChecked()) {
+		for (int i = cur_page; i < num_pages; ++i) {
+			pages.insert(m_pages.pageAt(i).id());
+		}
+	} else if (selectedPagesRB->isChecked()) {
+		emit accepted(m_selectedPages, Dpi(dpi, dpi));
+		accept();
+		return;
+	}
+	
+	emit accepted(pages, Dpi(dpi, dpi));
 	
 	// We assume the default connection from accepted() to accept()
 	// was removed.

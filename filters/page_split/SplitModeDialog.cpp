@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,36 +17,43 @@
 */
 
 #include "SplitModeDialog.h.moc"
+#include "PageSelectionAccessor.h"
 #include <QPixmap>
+#include <QButtonGroup>
 #include <assert.h>
 
 namespace page_split
 {
 
 SplitModeDialog::SplitModeDialog(
-	QWidget* const parent, Rule const& rule,
+	QWidget* const parent,
+	IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor,
+	LayoutType const layout_type,
 	PageLayout::Type const auto_detected_layout_type,
 	bool const auto_detected_layout_type_valid)
 :	QDialog(parent),
-	m_layoutType(rule.layoutType()),
+	m_pages(pages->snapshot(PageSequence::IMAGE_VIEW)),
+	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_pScopeGroup(new QButtonGroup(this)),
+	m_layoutType(layout_type),
 	m_autoDetectedLayoutType(auto_detected_layout_type),
 	m_autoDetectedLayoutTypeValid(auto_detected_layout_type_valid)
 {
 	setupUi(this);
+	m_pScopeGroup->addButton(thisPageRB);
+	m_pScopeGroup->addButton(allPagesRB);
+	m_pScopeGroup->addButton(thisPageAndFollowersRB);
+	m_pScopeGroup->addButton(selectedPagesRB);
+	if (m_selectedPages.size() <= 1) {
+		selectedPagesWidget->setEnabled(false);
+	}
+	
 	layoutTypeLabel->setPixmap(QPixmap(iconFor(m_layoutType)));
-	if (m_layoutType == Rule::AUTO_DETECT) {
+	if (m_layoutType == AUTO_LAYOUT_TYPE) {
 		modeAuto->setChecked(true);
 	} else {
 		modeManual->setChecked(true);
-	}
-	
-	switch (rule.scope()) {
-		case Rule::THIS_PAGE_ONLY:
-			scopeThisPage->setChecked(true);
-			break;
-		case Rule::ALL_PAGES:
-			scopeAllPages->setChecked(true);
-			break;
 	}
 	
 	connect(modeAuto, SIGNAL(pressed()), this, SLOT(autoDetectionSelected()));
@@ -74,65 +81,81 @@ SplitModeDialog::manualModeSelected()
 void
 SplitModeDialog::onSubmit()
 {
-	Rule::LayoutType layout_type = Rule::AUTO_DETECT;
+	LayoutType layout_type = AUTO_LAYOUT_TYPE;
 	if (modeManual->isChecked()) {
 		layout_type = combinedLayoutType();
 	}
 	
-	Rule::Scope scope = Rule::THIS_PAGE_ONLY;
-	if (scopeAllPages->isChecked()) {
-		scope = Rule::ALL_PAGES;
+	int const num_pages = m_pages.numPages();
+	int const cur_page = m_pages.curPageIdx();
+	
+	std::set<PageId> pages;
+	
+	if (thisPageRB) {
+		pages.insert(m_pages.curPage().id());
+	} else if (allPagesRB->isChecked()) {
+		for (int i = 0; i < num_pages; ++i) {
+			pages.insert(m_pages.pageAt(i).id());
+		}
+	} else if (thisPageAndFollowersRB->isChecked()) {
+		for (int i = cur_page; i < num_pages; ++i) {
+			pages.insert(m_pages.pageAt(i).id());
+		}
+	} else if (selectedPagesRB->isChecked()) {
+		emit accepted(m_selectedPages, layout_type);
+		accept();
+		return;
 	}
 	
-	emit accepted(Rule(layout_type, scope));
+	emit accepted(pages, layout_type);
 	
 	// We assume the default connection from accepted() to accept()
 	// was removed.
 	accept();
 }
 
-Rule::LayoutType
+LayoutType
 SplitModeDialog::combinedLayoutType() const
 {
-	if (m_layoutType != Rule::AUTO_DETECT) {
+	if (m_layoutType != AUTO_LAYOUT_TYPE) {
 		return m_layoutType;
 	}
 	
 	if (!m_autoDetectedLayoutTypeValid) {
-		return Rule::AUTO_DETECT;
+		return AUTO_LAYOUT_TYPE;
 	}
 	
 	switch (m_autoDetectedLayoutType) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
-			return Rule::SINGLE_PAGE_UNCUT;
+			return SINGLE_PAGE_UNCUT;
 		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-			return Rule::PAGE_PLUS_OFFCUT;
+			return PAGE_PLUS_OFFCUT;
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			return Rule::PAGE_PLUS_OFFCUT;
+			return PAGE_PLUS_OFFCUT;
 		case PageLayout::TWO_PAGES:
-			return Rule::TWO_PAGES;
+			return TWO_PAGES;
 	}
 	
 	assert(!"Unreachable");
-	return Rule::AUTO_DETECT;
+	return AUTO_LAYOUT_TYPE;
 }
 
 char const*
-SplitModeDialog::iconFor(Rule::LayoutType const layout_type)
+SplitModeDialog::iconFor(LayoutType const layout_type)
 {
 	char const* resource = "";
 	
 	switch (layout_type) {
-		case Rule::AUTO_DETECT:
+		case AUTO_LAYOUT_TYPE:
 			resource = ":/icons/layout_type_auto.png";
 			break;
-		case Rule::SINGLE_PAGE_UNCUT:
+		case SINGLE_PAGE_UNCUT:
 			resource = ":/icons/single_page_uncut_selected.png";
 			break;
-		case Rule::PAGE_PLUS_OFFCUT:
+		case PAGE_PLUS_OFFCUT:
 			resource = ":/icons/right_page_plus_offcut_selected.png";
 			break;
-		case Rule::TWO_PAGES:
+		case TWO_PAGES:
 			resource = ":/icons/two_pages_selected.png";
 			break;
 	}

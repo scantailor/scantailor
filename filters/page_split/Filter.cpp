@@ -26,7 +26,7 @@
 #include "ProjectWriter.h"
 #include "PageId.h"
 #include "ImageId.h"
-#include "Rule.h"
+#include "LayoutType.h"
 #include "Params.h"
 #include "CacheDrivenTask.h"
 #include <boost/lambda/lambda.hpp>
@@ -40,11 +40,16 @@
 namespace page_split
 {
 
-Filter::Filter(IntrusivePtr<PageSequence> const& page_sequence)
+Filter::Filter(IntrusivePtr<PageSequence> const& page_sequence,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(page_sequence),
 	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings, m_ptrPages));
+	m_ptrOptionsWidget.reset(
+		new OptionsWidget(
+			m_ptrSettings, m_ptrPages, page_selection_accessor
+		)
+	);
 }
 
 Filter::~Filter()
@@ -79,7 +84,7 @@ Filter::saveSettings(
 	QDomElement filter_el(doc.createElement("page-split"));
 	filter_el.setAttribute(
 		"defaultLayoutType",
-		Rule::layoutTypeToString(m_ptrSettings->defaultLayoutType())
+		layoutTypeToString(m_ptrSettings->defaultLayoutType())
 	);
 	
 	writer.enumImages(
@@ -103,7 +108,7 @@ Filter::loadSettings(
 		filter_el.attribute("defaultLayoutType")
 	);
 	m_ptrSettings->setLayoutTypeForAllPages(
-		Rule::layoutTypeFromString(default_layout_type)
+		layoutTypeFromString(default_layout_type)
 	);
 	
 	QString const image_tag_name("image");
@@ -132,9 +137,7 @@ Filter::loadSettings(
 		
 		QString const layout_type(el.attribute("layoutType"));
 		if (!layout_type.isEmpty()) {
-			update.setLayoutType(
-				Rule::layoutTypeFromString(layout_type)
-			);
+			update.setLayoutType(layoutTypeFromString(layout_type));
 		}
 		
 		QDomElement params_el(el.namedItem("params").toElement());
@@ -155,9 +158,9 @@ Filter::writeImageSettings(
 	
 	QDomElement image_el(doc.createElement("image"));
 	image_el.setAttribute("id", numeric_id);
-	if (Rule::LayoutType const* layout_type = record.layoutType()) {
+	if (LayoutType const* layout_type = record.layoutType()) {
 		image_el.setAttribute(
-			"layoutType", Rule::layoutTypeToString(*layout_type)
+			"layoutType", layoutTypeToString(*layout_type)
 		);
 	}
 	

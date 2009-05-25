@@ -7,10 +7,15 @@ latest stable version.
    Homepage: http://www.cmake.org
 2. jpeg-6b
    Homepage: http://www.ijg.org/
+   The file we need will be named jpegsrc.v6b.tar.gz or similarly.
 3. zlib
    Homepage: http://www.zlib.net/
+   We need a file named like zlib-x.x.x.tar.gz, where x.x.x represents
+   the version number.
 4. libpng
    Homepage: http://www.libpng.org/pub/png/libpng.html
+   We need a file named like libpng-x.x.x.tar.gz, where x.x.x represents
+   the version number.
 5. libtiff
    Homepage: http://www.remotesensing.org/libtiff/
    Because libtiff is updated rarely, but vulnerabilities in it are found often,
@@ -20,7 +25,7 @@ latest stable version.
    The process of applying this patch is described later in this document.
    If you aren't going to distribute your Scan Tailor build and aren't going
    to open files from untrusted sources, then you don't really need patching it.
-6. Qt 4.x.x (tested with 4.4.2)
+6. Qt 4.x.x (tested with 4.5.0)
    Homepage: http://trolltech.com/
    Download Qt -> Open Source -> Application Development -> Qt for Windows: C++
    From there download the mingw version rather than the source-only version.

@@ -37,10 +37,13 @@
 namespace output
 {
 
-Filter::Filter()
+Filter::Filter(IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
+	m_ptrOptionsWidget.reset(
+		new OptionsWidget(m_ptrSettings, pages, page_selection_accessor)
+	);
 }
 
 Filter::~Filter()

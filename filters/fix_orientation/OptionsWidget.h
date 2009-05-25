@@ -23,13 +23,13 @@
 #include "FilterOptionsWidget.h"
 #include "OrthogonalRotation.h"
 #include "IntrusivePtr.h"
+#include "PageSelectionAccessor.h"
 
 class PageSequence;
 
 namespace fix_orientation
 {
 
-class Scope;
 class Settings;
 
 class OptionsWidget :
@@ -38,11 +38,12 @@ class OptionsWidget :
 	Q_OBJECT
 public:
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& page_sequence);
+		IntrusivePtr<PageSequence> const& pages,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
-	void preUpdateUI(OrthogonalRotation rotation, int num_pages, int cur_page);
+	void preUpdateUI(OrthogonalRotation rotation);
 	
 	void postUpdateUI(OrthogonalRotation rotation);
 signals:
@@ -56,17 +57,16 @@ private slots:
 	
 	void showApplyToDialog();
 	
-	void scopeSet(Scope const& scope);
+	void appliedTo(std::set<PageId> const& pages);
 private:
 	void setRotation(OrthogonalRotation rotation);
 	
 	void setRotationPixmap();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPageSequence;
+	IntrusivePtr<PageSequence> m_ptrPages;
+	PageSelectionAccessor m_pageSelectionAccessor;
 	OrthogonalRotation m_rotation;
-	int m_numPages;
-	int m_curPage;
 };
 
 } // namespace fix_orientation

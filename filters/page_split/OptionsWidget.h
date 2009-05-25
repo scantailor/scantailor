@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,12 +22,15 @@
 #include "ui_PageSplitOptionsWidget.h"
 #include "FilterOptionsWidget.h"
 #include "IntrusivePtr.h"
-#include "Rule.h"
+#include "LayoutType.h"
 #include "PageLayout.h"
 #include "ImageId.h"
+#include "PageId.h"
+#include "PageSelectionAccessor.h"
 #include "Dependencies.h"
 #include "AutoManualMode.h"
 #include <QIcon>
+#include <set>
 
 class ImageId;
 class PageSequence;
@@ -74,7 +77,8 @@ public:
 	
 	
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& page_sequence);
+		IntrusivePtr<PageSequence> const& page_sequence,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
@@ -90,7 +94,7 @@ private slots:
 	
 	void showChangeDialog();
 	
-	void ruleSet(Rule const& rule);
+	void layoutTypeSet(std::set<PageId> const& pages, LayoutType layout_type);
 	
 	void splitLineModeChanged(bool auto_mode);
 	
@@ -100,6 +104,7 @@ private:
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	IntrusivePtr<PageSequence> m_ptrPages;
+	PageSelectionAccessor m_pageSelectionAccessor;
 	ImageId m_imageId;
 	UiData m_uiData;
 	QIcon m_flipLeftToRightIcon;

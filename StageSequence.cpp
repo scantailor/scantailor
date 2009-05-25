@@ -20,13 +20,14 @@
 #include "PageSequence.h"
 #include <boost/foreach.hpp>
 
-StageSequence::StageSequence(IntrusivePtr<PageSequence> const& pages)
-:	m_ptrFixOrientationFilter(new fix_orientation::Filter(pages)),
-	m_ptrPageSplitFilter(new page_split::Filter(pages)),
+StageSequence::StageSequence(IntrusivePtr<PageSequence> const& pages,
+	PageSelectionAccessor const& page_selection_accessor)
+:	m_ptrFixOrientationFilter(new fix_orientation::Filter(pages, page_selection_accessor)),
+	m_ptrPageSplitFilter(new page_split::Filter(pages, page_selection_accessor)),
 	m_ptrDeskewFilter(new deskew::Filter()),
 	m_ptrSelectContentFilter(new select_content::Filter()),
-	m_ptrPageLayoutFilter(new page_layout::Filter(pages)),
-	m_ptrOutputFilter(new output::Filter())
+	m_ptrPageLayoutFilter(new page_layout::Filter(pages, page_selection_accessor)),
+	m_ptrOutputFilter(new output::Filter(pages, page_selection_accessor))
 {
 	m_fixOrientationFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrFixOrientationFilter);

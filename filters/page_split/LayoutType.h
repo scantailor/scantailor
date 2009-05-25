@@ -16,47 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Rule.h"
-#include <assert.h>
+#ifndef PAGE_SPLIT_LAYOUT_TYPE_H_
+#define PAGE_SPLIT_LAYOUT_TYPE_H_
+
+#include <QString>
 
 namespace page_split
 {
 
-QString
-Rule::layoutTypeAsString() const
-{
-	return layoutTypeToString(m_layoutType);
-}
+enum LayoutType {
+	AUTO_LAYOUT_TYPE,
+	SINGLE_PAGE_UNCUT,
+	PAGE_PLUS_OFFCUT,
+	TWO_PAGES
+};
 
-QString
-Rule::layoutTypeToString(LayoutType const layout_type)
-{
-	switch (layout_type) {
-		case AUTO_DETECT:
-			return "auto-detect";
-		case SINGLE_PAGE_UNCUT:
-			return "single-uncut";
-		case PAGE_PLUS_OFFCUT:
-			return "single-cut";
-		case TWO_PAGES:
-			return "two-pages";
-	}
-	assert(!"unreachable");
-	return QString();
-}
+QString layoutTypeToString(LayoutType type);
 
-Rule::LayoutType
-Rule::layoutTypeFromString(QString const& layout_type)
-{
-	if (layout_type == "single-uncut") {
-		return SINGLE_PAGE_UNCUT;
-	} else if (layout_type == "single-cut") {
-		return PAGE_PLUS_OFFCUT;
-	} else if (layout_type == "two-pages") {
-		return TWO_PAGES;
-	} else {
-		return AUTO_DETECT;
-	}
-}
+LayoutType layoutTypeFromString(QString const& layout_type);
 
 } // namespace page_split
+
+#endif

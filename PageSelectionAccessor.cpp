@@ -16,14 +16,43 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_SCOPE_H_
-#define OUTPUT_SCOPE_H_
+#include "PageSelectionAccessor.h"
+#include "MainWindow.h"
 
-namespace output
+PageSelectionAccessor::PageSelectionAccessor(MainWindow* main_window)
+:	m_ptrMainWindow(main_window)
 {
+}
 
-enum Scope { THIS_PAGE_ONLY, ALL_PAGES };
+PageSelectionAccessor::PageSelectionAccessor(PageSelectionAccessor const& other)
+:	m_ptrMainWindow(other.m_ptrMainWindow)
+{
+}
 
-} // namespace output
+PageSelectionAccessor&
+PageSelectionAccessor::operator=(PageSelectionAccessor const& rhs)
+{
+	m_ptrMainWindow = rhs.m_ptrMainWindow;
+	return *this;
+}
 
-#endif
+std::set<PageId>
+PageSelectionAccessor::selectedPages() const
+{
+	if (m_ptrMainWindow) {
+		return m_ptrMainWindow->selectedPages();
+	}
+	
+	return std::set<PageId>();
+}
+
+std::vector<PageRange>
+PageSelectionAccessor::selectedRanges() const
+{
+	if (m_ptrMainWindow) {
+		return m_ptrMainWindow->selectedRanges();
+	}
+	
+	return std::vector<PageRange>();
+}
+

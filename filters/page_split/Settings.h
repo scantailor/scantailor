@@ -21,12 +21,14 @@
 
 #include "RefCountable.h"
 #include "NonCopyable.h"
-#include "Rule.h"
+#include "LayoutType.h"
 #include "Params.h"
 #include "ImageId.h"
+#include "PageId.h"
 #include <QMutex>
 #include <memory>
 #include <map>
+#include <set>
 
 namespace page_split
 {
@@ -42,7 +44,7 @@ private:
 	public:
 		BaseRecord();
 		
-		Rule::LayoutType const* layoutType() const {
+		LayoutType const* layoutType() const {
 			return m_layoutTypeValid ? &m_layoutType : 0;
 		}
 		
@@ -55,30 +57,30 @@ private:
 		 *        information.
 		 */
 		bool isNull() const {
-			return !(m_paramsValid || m_layoutTypeValid); 
+			return !(m_paramsValid || m_layoutTypeValid);
 		}
 	protected:
 		void setParams(Params const& params);
 		
-		void setLayoutType(Rule::LayoutType layout_type);
+		void setLayoutType(LayoutType layout_type);
 		
 		void clearParams() { m_paramsValid = false; }
 		
 		void clearLayoutType() { m_layoutTypeValid = false; }
 		
 		/**
-		 * \brief Checks if the layout type that comes from Rule
-		 *        conflicts with the one that comes from PageLayout.
+		 * \brief Checks if the layout type conflicts with PageLayout
+		 *        that is part of Params.
 		 *
 		 * \param default_layout_type The layout type for pages
-		 *        that don't specific layout type assigned.
+		 *        that don't have specific layout type assigned.
 		 * \return true if there is a conflict, false otherwise.
 		 */
 		bool hasLayoutTypeConflict(
-			Rule::LayoutType default_layout_type) const;
+			LayoutType default_layout_type) const;
 		
 		Params m_params;
-		Rule::LayoutType m_layoutType;
+		LayoutType m_layoutType;
 		bool m_paramsValid;
 		bool m_layoutTypeValid;
 	};
@@ -89,18 +91,18 @@ public:
 	{
 		// Member-wise copying is OK.
 	public:
-		Record(Rule::LayoutType default_layout_type);
+		Record(LayoutType default_layout_type);
 		
 		Record(BaseRecord const& base_record,
-			Rule::LayoutType default_layout_type);
+			LayoutType default_layout_type);
 		
-		Rule rule() const;
+		LayoutType combinedLayoutType() const;
 		
 		void update(UpdateAction const& action);
 		
 		bool hasLayoutTypeConflict() const;
 	private:
-		Rule::LayoutType m_defaultLayoutType;
+		LayoutType m_defaultLayoutType;
 	};
 	
 	
@@ -110,11 +112,11 @@ public:
 	public:
 		UpdateAction() :
 		m_params(PageLayout(), Dependencies(), MODE_AUTO),
-		m_layoutType(Rule::AUTO_DETECT),
+		m_layoutType(AUTO_LAYOUT_TYPE),
 		m_paramsAction(DONT_TOUCH),
 		m_layoutTypeAction(DONT_TOUCH) {}
 		
-		void setLayoutType(Rule::LayoutType layout_type);
+		void setLayoutType(LayoutType layout_type);
 		
 		void clearLayoutType();
 		
@@ -125,7 +127,7 @@ public:
 		enum Action { DONT_TOUCH, SET, CLEAR };
 		
 		Params m_params;
-		Rule::LayoutType m_layoutType;
+		LayoutType m_layoutType;
 		Action m_paramsAction;
 		Action m_layoutTypeAction;
 	};
@@ -140,13 +142,19 @@ public:
 	 */
 	void clear();
 	
-	Rule::LayoutType defaultLayoutType() const;
+	LayoutType defaultLayoutType() const;
 	
 	/**
 	 * Sets layout type for all pages, removing other page
 	 * parameters where they conflict with the new layout type.
 	 */
-	void setLayoutTypeForAllPages(Rule::LayoutType layout_type);
+	void setLayoutTypeForAllPages(LayoutType layout_type);
+	
+	/**
+	 * Sets layout type for specified pages, removing other page
+	 * parameters where they conflict with the new layout type.
+	 */
+	void setLayoutTypeFor(LayoutType layout_type, std::set<PageId> const& pages);
 	
 	/**
 	 * \brief Returns all data related to a page as a single object.
@@ -176,9 +184,11 @@ public:
 private:
 	typedef std::map<ImageId, BaseRecord> PerPageRecords;
 	
+	void updatePageLocked(ImageId const& image_id, UpdateAction const& action);
+	
 	mutable QMutex m_mutex;
 	PerPageRecords m_perPageRecords;
-	Rule::LayoutType m_defaultLayoutType;
+	LayoutType m_defaultLayoutType;
 };
 
 } // namespace page_split
