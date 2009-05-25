@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ PolynomialLine::PolynomialLine(
 	QSize const dimensions(degree + 1, num_values);
 	std::vector<double> equations;
 	std::vector<double> data_points;
-	data_points.reserve(dimensions.height());
+	data_points.resize(dimensions.height());
 	m_coeffs.resize(dimensions.width());
 	
 	prepareEquations(equations, degree, num_values);
