@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -72,7 +72,14 @@ Thumbnail::paintOverImage(
 	painter.setWorldTransform(thumb_to_display);
 	
 	QRectF const inner_rect(orig_to_thumb.mapRect(m_adaptedContentRect));
-	QRectF const outer_rect(orig_to_thumb.mapRect(m_outerRect));
+	
+	// We extend the outer rectangle because otherwise we may get white
+	// thin lines near the edges due to rounding errors and the lack
+	// of subpixel accuracy.  Doing that is actually OK, because what
+	// we paint will be clipped anyway.
+	QRectF const outer_rect(
+		orig_to_thumb.mapRect(m_outerRect).adjusted(-1.0, -1.0, 1.0, 1.0)
+	);
 	
 	QPainterPath outer_outline;
 	outer_outline.addPolygon(PolygonUtils::round(outer_rect));

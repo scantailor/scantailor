@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "imageproc/PolygonUtils.h"
 #include <boost/weak_ptr.hpp>
 #include <QPixmap>
+#include <QPixmapCache>
 #include <QPainter>
 #include <QColor>
 #include <QPen>
@@ -35,7 +36,9 @@
 #include <QStyle>
 #include <QApplication>
 #include <QPointF>
+#include <Qt>
 #include <QDebug>
+#include <math.h>
 
 using namespace imageproc;
 
@@ -106,87 +109,117 @@ ThumbnailBase::paint(QPainter* painter,
 		painter->fillRect(rect, QColor(0xff, 0xff, 0xff));
 		
 		paintOverImage(*painter, image_to_display, thumb_to_display);
-	} else {
-		QSizeF const orig_image_size(m_imageXform.origRect().size());
-		double const x_pre_scale = orig_image_size.width() / pixmap.width();
-		double const y_pre_scale = orig_image_size.height() / pixmap.height();
-		QTransform pre_scale_xform;
-		pre_scale_xform.scale(x_pre_scale, y_pre_scale);
-		
-		QTransform const pixmap_to_thumb(
-			pre_scale_xform * m_imageXform.transform() * m_postScaleXform
-		);
-		
-		painter->save();
-		
-		painter->setWorldTransform(pixmap_to_thumb * thumb_to_display);
-		painter->setRenderHint(QPainter::SmoothPixmapTransform);
-		painter->setRenderHint(QPainter::Antialiasing);
-		
-		QPainterPath clip_region;
-		clip_region.addPolygon(pixmap_to_thumb.inverted().map(m_boundingRect));
-		painter->setClipPath(clip_region);
-		
-		PixmapRenderer::drawPixmap(*painter, pixmap);
-		
-		painter->restore();
-		
-		paintOverImage(*painter, image_to_display, thumb_to_display);
-		
-		// Cover parts of the image that should not be visible with background.
-		// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
-		// to paint the whole widget, which we do here.
-		
-		QPolygonF const crop_area(
+		return;
+	}
+	
+	
+	QSizeF const orig_image_size(m_imageXform.origRect().size());
+	double const x_pre_scale = orig_image_size.width() / pixmap.width();
+	double const y_pre_scale = orig_image_size.height() / pixmap.height();
+	QTransform pre_scale_xform;
+	pre_scale_xform.scale(x_pre_scale, y_pre_scale);
+	
+	QTransform const pixmap_to_thumb(
+		pre_scale_xform * m_imageXform.transform() * m_postScaleXform
+	);
+	
+	// The polygon to draw into in original image coordinates.
+	QPolygonF image_poly(PolygonUtils::round(m_imageXform.resultingCropArea()));
+	if (!m_extendedClipArea) {
+		image_poly = image_poly.intersected(
 			PolygonUtils::round(
-				m_postScaleXform.map(m_imageXform.resultingCropArea())
+				m_imageXform.transform().map(m_imageXform.origRect())
 			)
 		);
-		
-		QPainterPath clip_path;
-		if (m_extendedClipArea) {
-			clip_path.addPolygon(crop_area);
-		} else {
-			QPolygonF const image_area(
-				PolygonUtils::round(
-					m_postScaleXform.map(
-						m_imageXform.transform().map(
-							m_imageXform.origRect()
-						)
-					)
-				)
-			);
-			clip_path.addPolygon(PolygonUtils::round(image_area.intersected(crop_area)));
-		}
-		
-		QPainterPath containing_path;
-		containing_path.addRect(m_boundingRect);
-		
-		QBrush brush;
-		
-		QPalette const palette(QApplication::palette());
-		if (isSelected()) {
-			brush = palette.color(QPalette::Highlight);
-		} else {
-			brush = palette.color(QPalette::Window);
-		}
-		
-		QPen pen(brush, 1.0);
-		pen.setCosmetic(true);
-		
-		// By using a pen with the same color as the brush, we essentially
-		// expanding the area we are going to draw.  It's necessary because
-		// XRender doesn't provide subpixel accuracy.
-		
-		painter->setPen(pen);
-		painter->setBrush(brush);
-		
-		painter->setWorldTransform(thumb_to_display);
-		painter->setRenderHint(QPainter::SmoothPixmapTransform);
-		painter->setRenderHint(QPainter::Antialiasing);
-		
-		painter->drawPath(containing_path.subtracted(clip_path));
 	}
+	
+	// The polygon to draw into in display coordinates.
+	QPolygonF display_poly(image_to_display.map(image_poly));
+	
+	QRectF display_rect(display_poly.boundingRect());
+	display_rect.setTop(floor(display_rect.top()));
+	display_rect.setLeft(floor(display_rect.left()));
+	display_rect.setBottom(ceil(display_rect.bottom()));
+	display_rect.setRight(ceil(display_rect.right()));
+		
+	QPixmap temp_pixmap;
+	QString const cache_key(QString::fromAscii("ThumbnailBase::temp_pixmap"));
+	if (!QPixmapCache::find(cache_key, temp_pixmap)
+			|| temp_pixmap.width() < display_rect.width()
+			|| temp_pixmap.height() < display_rect.width()) {
+		int w = (int)display_rect.width();
+		int h = (int)display_rect.height();
+		
+		// Add some extra, to avoid rectreating the pixmap too often.
+		w += w / 10;
+		h += h / 10;
+		
+		temp_pixmap = QPixmap(w, h);
+		
+		if (!temp_pixmap.hasAlphaChannel()) {
+			// This actually forces the alpha channel to be created.
+			temp_pixmap.fill(Qt::transparent);
+		}
+		
+		QPixmapCache::insert(cache_key, temp_pixmap);
+	}
+	
+	QPainter temp_painter;
+	temp_painter.begin(&temp_pixmap);
+	
+	QTransform temp_adjustment;
+	temp_adjustment.translate(-display_rect.left(), -display_rect.top());
+	
+	temp_painter.setWorldTransform(
+		pixmap_to_thumb * thumb_to_display * temp_adjustment
+	);
+	
+	// Turn off alpha compositing.
+	temp_painter.setCompositionMode(QPainter::CompositionMode_Source);
+	
+	temp_painter.setRenderHint(QPainter::SmoothPixmapTransform);
+	temp_painter.setRenderHint(QPainter::Antialiasing);
+	
+	PixmapRenderer::drawPixmap(temp_painter, pixmap);
+	
+	// Turn alpha compositing on again.
+	temp_painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+	
+	// Setup the painter for drawing in thumbnail coordinates,
+	// as required for paintOverImage().
+	temp_painter.setWorldTransform(thumb_to_display * temp_adjustment);
+	
+	temp_painter.save();
+	paintOverImage(
+		temp_painter, image_to_display * temp_adjustment,
+		thumb_to_display * temp_adjustment
+	);
+	temp_painter.restore();
+	
+	temp_painter.setPen(Qt::NoPen);
+	temp_painter.setBrush(Qt::white);
+	temp_painter.setWorldTransform(temp_adjustment);
+#ifndef Q_WS_X11
+	// That's how it's supposed to be.
+	temp_painter.setCompositionMode(QPainter::CompositionMode_Clear);
+#else
+	// QPainter::CompositionMode_Clear doesn't work for arbitrarily shaped
+	// objects on X11, as well as CompositionMode_Source with a transparent
+	// brush.  Fortunately, CompositionMode_DestinationOut with a non-transparent
+	// brush does actually work.
+	temp_painter.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+#endif
+	temp_painter.drawPolygon(
+		QPolygonF(display_rect).subtracted(PolygonUtils::round(display_poly))
+	);
+	
+	temp_painter.end();
+	
+	painter->setWorldTransform(QTransform());
+	painter->setClipRect(display_rect);
+	painter->setRenderHint(QPainter::SmoothPixmapTransform, false);
+	painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+	painter->drawPixmap(display_rect.topLeft(), temp_pixmap);
 }
 
 void
