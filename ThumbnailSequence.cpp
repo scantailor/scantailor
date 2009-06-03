@@ -464,6 +464,7 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages,
 			ItemsById::iterator id_it(m_itemsById.find(pages.curPage().id()));
 			if (id_it != m_itemsById.end()) {
 				m_pSelectionLeader = &*id_it;
+				moveToSelected(m_pSelectionLeader);
 			}
 		}
 	}
