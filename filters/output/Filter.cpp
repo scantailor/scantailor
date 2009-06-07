@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "PageId.h"
 #include "Settings.h"
 #include "Params.h"
+#include "OutputParams.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
@@ -33,6 +34,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QDomElement>
+#include <memory>
 
 namespace output
 {
@@ -98,6 +100,11 @@ Filter::writePageSettings(
 	page_el.setAttribute("id", numeric_id);
 	page_el.appendChild(params.toXml(doc, "params"));
 	
+	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(page_id));
+	if (output_params.get()) {
+		page_el.appendChild(output_params->toXml(doc, "output-params"));
+	}
+	
 	filter_el.appendChild(page_el);
 }
 
@@ -133,12 +140,16 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 		}
 		
 		QDomElement const params_el(el.namedItem("params").toElement());
-		if (params_el.isNull()) {
-			continue;
+		if (!params_el.isNull()) {
+			Params const params(params_el);
+			m_ptrSettings->setParams(page_id, params);
 		}
 		
-		Params const params(params_el);
-		m_ptrSettings->setParams(page_id, params);
+		QDomElement const output_params_el(el.namedItem("output-params").toElement());
+		if (!output_params_el.isNull()) {
+			OutputParams const output_params(output_params_el);
+			m_ptrSettings->setOutputParams(page_id, output_params);
+		}
 	}
 }
 

@@ -16,46 +16,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XMLUNMARSHALLER_H_
-#define XMLUNMARSHALLER_H_
+#ifndef OUTPUT_OUTPUT_PARAMS_H_
+#define OUTPUT_OUTPUT_PARAMS_H_
 
-class QString;
+#include "OutputImageParams.h"
+#include "OutputFileParams.h"
+
+class QDomDocument;
 class QDomElement;
-class QSize;
-class QSizeF;
-class Dpi;
-class OrthogonalRotation;
-class Margins;
-class QPointF;
-class QLineF;
-class QRect;
-class QRectF;
-class QPolygonF;
 
-class XmlUnmarshaller
+namespace output
+{
+
+class OutputParams
 {
 public:
-	static QString string(QDomElement const& el);
+	OutputParams(OutputImageParams const& image_params,
+		OutputFileParams const& file_params);
 	
-	static QSize size(QDomElement const& el);
+	explicit OutputParams(QDomElement const& el);
 	
-	static QSizeF sizeF(QDomElement const& el);
+	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
-	static Dpi dpi(QDomElement const& el);
+	OutputImageParams const& imageParams() const { return m_imageParams; }
 	
-	static OrthogonalRotation rotation(QDomElement const& el);
-	
-	static Margins margins(QDomElement const& el);
-	
-	static QPointF pointF(QDomElement const& el);
-	
-	static QLineF lineF(QDomElement const& el);
-	
-	static QRect rect(QDomElement const& el);
-	
-	static QRectF rectF(QDomElement const& el);
-	
-	static QPolygonF polygonF(QDomElement const& el);
+	OutputFileParams const& fileParams() const { return m_fileParams; }
+private:
+	OutputImageParams m_imageParams;
+	OutputFileParams m_fileParams;
 };
+
+} // namespace output
 
 #endif

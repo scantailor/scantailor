@@ -22,6 +22,7 @@
 #include "imageproc/Connectivity.h"
 #include "Dpi.h"
 #include "ColorParams.h"
+#include <QSize>
 #include <QRect>
 #include <QTransform>
 #include <QColor>
@@ -54,6 +55,13 @@ public:
 	
 	QImage process(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;
+	
+	QSize outputImageSize() const;
+	
+	/**
+	 * \brief Returns the content rectangle in output image coordinates.
+	 */
+	QRect outputContentRect() const;
 private:
 	QImage processAsIs(FilterData const& input,
 		TaskStatus const& status, DebugImages* dbg = 0) const;

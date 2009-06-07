@@ -112,6 +112,18 @@ OutputGenerator::process(FilterData const& input,
 	return image;
 }
 
+QSize
+OutputGenerator::outputImageSize() const
+{
+	return m_cropRect.size();
+}
+
+QRect
+OutputGenerator::outputContentRect() const
+{
+	return QRect(m_contentRect.topLeft() - m_cropRect.topLeft(), m_contentRect.size());
+}
+
 QImage
 OutputGenerator::processAsIs(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const

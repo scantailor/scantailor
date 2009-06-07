@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@
 #include "PageId.h"
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "OutputParams.h"
 #include <QMutex>
 #include <map>
+#include <memory>
 
 namespace output
 {
@@ -57,9 +59,16 @@ public:
 	void setDpi(PageId const& page_id, Dpi const& dpi);
 	
 	void setDpiForAllPages(Dpi const& dpi);
+	
+	std::auto_ptr<OutputParams> getOutputParams(PageId const& page_id) const;
+	
+	void removeOutputParams(PageId const& page_id);
+	
+	void setOutputParams(PageId const& page_id, OutputParams const& params);
 private:
 	typedef std::map<PageId, Dpi> PerPageDpi;
 	typedef std::map<PageId, ColorParams> PerPageColorParams;
+	typedef std::map<PageId, OutputParams> PerPageOutputParams;
 	
 	Dpi getDpiLocked(PageId const& page_id) const;
 	
@@ -73,6 +82,7 @@ private:
 	mutable QMutex m_mutex;
 	PerPageDpi m_perPageDpi;
 	PerPageColorParams m_perPageColorParams;
+	PerPageOutputParams m_perPageOutputParams;
 	Dpi m_defaultDpi;
 	ColorParams m_defaultColorParams;
 };

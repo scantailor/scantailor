@@ -142,4 +142,31 @@ Settings::setDpiForAllPages(Dpi const& dpi)
 	m_perPageDpi.clear();
 }
 
+std::auto_ptr<OutputParams>
+Settings::getOutputParams(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	PerPageOutputParams::const_iterator const it(m_perPageOutputParams.find(page_id));
+	if (it != m_perPageOutputParams.end()) {
+		return std::auto_ptr<OutputParams>(new OutputParams(it->second));
+	} else {
+		return std::auto_ptr<OutputParams>();
+	}
+}
+
+void
+Settings::removeOutputParams(PageId const& page_id)
+{
+	QMutexLocker const locker(&m_mutex);
+	m_perPageOutputParams.erase(page_id);
+}
+
+void
+Settings::setOutputParams(PageId const& page_id, OutputParams const& params)
+{
+	QMutexLocker const locker(&m_mutex);
+	Utils::mapSetValue(m_perPageOutputParams, page_id, params);
+}
+
 } // namespace output

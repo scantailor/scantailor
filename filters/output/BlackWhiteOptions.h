@@ -42,6 +42,10 @@ public:
 	bool despeckle() const { return m_despeckle; }
 	
 	void setDespeckle(bool enabled) { m_despeckle = enabled; }
+	
+	bool operator==(BlackWhiteOptions const& other) const;
+	
+	bool operator!=(BlackWhiteOptions const& other) const;
 private:
 	int m_thresholdAdjustment;
 	bool m_despeckle;

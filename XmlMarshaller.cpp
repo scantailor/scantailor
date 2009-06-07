@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,10 +23,19 @@
 #include "Utils.h"
 #include <QPointF>
 #include <QLineF>
+#include <QRect>
 #include <QRectF>
 #include <QPolygonF>
 #include <QSize>
 #include <QString>
+
+QDomElement
+XmlMarshaller::string(QString const& str, QString const& name)
+{
+	QDomElement el(m_doc.createElement(name));
+	el.appendChild(m_doc.createTextNode(str));
+	return el;
+}
 
 QDomElement
 XmlMarshaller::size(QSize const& size, QString const& name)
@@ -93,6 +102,18 @@ XmlMarshaller::lineF(QLineF const& line, QString const& name)
 	el.appendChild(pointF(line.p2(), "p2"));
 	return el;
 }
+
+QDomElement
+XmlMarshaller::rect(QRect const& rect, QString const& name)
+{
+	QDomElement el(m_doc.createElement(name));
+	el.setAttribute("x", QString::number(rect.x()));
+	el.setAttribute("y", QString::number(rect.y()));
+	el.setAttribute("width", QString::number(rect.width()));
+	el.setAttribute("height", QString::number(rect.height()));
+	return el;
+}
+
 
 QDomElement
 XmlMarshaller::rectF(QRectF const& rect, QString const& name)

@@ -16,47 +16,41 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ColorGrayscaleOptions.h"
+#include "OutputFileParams.h"
 #include <QDomDocument>
 #include <QDomElement>
-#include <QString>
+#include <QFileInfo>
+#include <QDateTime>
 
 namespace output
 {
 
-ColorGrayscaleOptions::ColorGrayscaleOptions(QDomElement const& el)
-:	m_whiteMargins(el.attribute("whiteMargins") == "1"),
-	m_normalizeIllumination(el.attribute("normalizeIllumination") == "1")
+OutputFileParams::OutputFileParams(
+	QFileInfo const& file_info)
+:	m_size(file_info.size()),
+	m_mtime(file_info.lastModified().toTime_t())
+{
+}
+
+OutputFileParams::OutputFileParams(QDomElement const& el)
+:	m_size((qint64)el.attribute("size").toLongLong()),
+	m_mtime((time_t)el.attribute("mtime").toLongLong())
 {
 }
 
 QDomElement
-ColorGrayscaleOptions::toXml(QDomDocument& doc, QString const& name) const
+OutputFileParams::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
-	el.setAttribute("whiteMargins", m_whiteMargins ? "1" : "0");
-	el.setAttribute("normalizeIllumination", m_normalizeIllumination ? "1" : "0");
+	el.setAttribute("size", QString::number(m_size));
+	el.setAttribute("mtime", QString::number(m_mtime));
 	return el;
 }
 
 bool
-ColorGrayscaleOptions::operator==(ColorGrayscaleOptions const& other) const
+OutputFileParams::matches(OutputFileParams const& other) const
 {
-	if (m_whiteMargins != other.m_whiteMargins) {
-		return false;
-	}
-	
-	if (m_normalizeIllumination != other.m_normalizeIllumination) {
-		return false;
-	}
-	
-	return true;
-}
-
-bool
-ColorGrayscaleOptions::operator!=(ColorGrayscaleOptions const& other) const
-{
-	return !(*this == other);
+	return m_size == other.m_size && m_mtime == other.m_mtime;
 }
 
 } // namespace output

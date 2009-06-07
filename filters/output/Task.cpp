@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "ColorParams.h"
+#include "OutputParams.h"
+#include "OutputImageParams.h"
+#include "OutputFileParams.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
@@ -33,9 +36,11 @@
 #include "DebugImages.h"
 #include "OutputGenerator.h"
 #include "TiffWriter.h"
+#include "TiffReader.h"
 #include <QImage>
 #include <QString>
 #include <QObject>
+#include <QFile>
 #include <QFileInfo>
 #include <QDebug>
 
@@ -93,20 +98,76 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	ColorParams const params(m_ptrSettings->getColorParams(m_pageId));
+	ColorParams const color_params(m_ptrSettings->getColorParams(m_pageId));
 	Dpi const output_dpi(m_ptrSettings->getDpi(m_pageId));
-	
-	OutputGenerator const generator(
-		output_dpi, params, data.xform(),
-		content_rect_phys, page_rect_phys
-	);
-
-	QImage const q_img(generator.process(data, status, m_ptrDbg.get()));
 	QString const out_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
 	
-	TiffWriter::writeImage(out_path, q_img);
+	OutputGenerator const generator(
+		output_dpi, color_params, data.xform(),
+		content_rect_phys, page_rect_phys
+	);
 	
-	m_rThumbnailCache.recreateThumbnail(ImageId(out_path), q_img);
+	OutputImageParams const new_output_image_params(
+		generator.outputImageSize(), generator.outputContentRect(),
+		data.xform(), output_dpi, color_params
+	);
+	
+	bool regenerate_file = false;
+	do { // Just to be able to break from it.
+		
+		std::auto_ptr<OutputParams> stored_output_params(
+			m_ptrSettings->getOutputParams(m_pageId)
+		);
+		
+		if (!stored_output_params.get()) {
+			regenerate_file = true;
+			break;
+		}
+		
+		if (!stored_output_params->imageParams().matches(new_output_image_params)) {
+			regenerate_file = true;
+			break;
+		}
+		
+		QFileInfo existing_file_info(out_path);
+		if (!existing_file_info.exists()) {
+			regenerate_file = true;
+			break;
+		}
+		
+		if (!stored_output_params->fileParams().matches(OutputFileParams(existing_file_info))) {
+			regenerate_file = true;
+			break;
+		}
+	
+	} while (false);
+	
+	QImage q_img;
+	
+	if (!regenerate_file) {
+		QFile file(out_path);
+		if (file.open(QIODevice::ReadOnly)) {
+			q_img = TiffReader::readImage(file);
+		}
+		regenerate_file = q_img.isNull();
+	}
+	
+	if (regenerate_file) {
+		q_img = generator.process(data, status, m_ptrDbg.get());
+		
+		if (!TiffWriter::writeImage(out_path, q_img)) {
+			m_ptrSettings->removeOutputParams(m_pageId);
+		} else {
+			QFileInfo const new_file_info(out_path);
+			OutputFileParams const new_file_params(new_file_info);
+			m_ptrSettings->setOutputParams(
+				m_pageId,
+				OutputParams(new_output_image_params, new_file_params)
+			);
+		}
+		
+		m_rThumbnailCache.recreateThumbnail(ImageId(out_path), q_img);
+	}
 	
 	return FilterResultPtr(
 		new UiUpdater(

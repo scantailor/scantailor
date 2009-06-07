@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,13 +20,21 @@
 #include "Dpi.h"
 #include "OrthogonalRotation.h"
 #include "Margins.h"
+#include <QString>
 #include <QSize>
 #include <QSizeF>
 #include <QPointF>
 #include <QLineF>
+#include <QRect>
 #include <QRectF>
 #include <QPolygonF>
 #include <QDomElement>
+
+QString
+XmlUnmarshaller::string(QDomElement const& el)
+{
+	return el.text(); // FIXME: this needs unescaping, but Qt doesn't provide such functionality
+}
 
 QSize
 XmlUnmarshaller::size(QDomElement const& el)
@@ -91,6 +99,16 @@ XmlUnmarshaller::lineF(QDomElement const& el)
 	QPointF const p1(pointF(el.namedItem("p1").toElement()));
 	QPointF const p2(pointF(el.namedItem("p2").toElement()));
 	return QLineF(p1, p2);
+}
+
+QRect
+XmlUnmarshaller::rect(QDomElement const& el)
+{
+	int const x = el.attribute("x").toInt();
+	int const y = el.attribute("y").toInt();
+	int const width = el.attribute("width").toInt();
+	int const height = el.attribute("height").toInt();
+	return QRect(x, y, width, height);
 }
 
 QRectF

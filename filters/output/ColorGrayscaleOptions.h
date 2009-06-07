@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,10 @@ public:
 	bool normalizeIllumination() const { return m_normalizeIllumination; }
 	
 	void setNormalizeIllumination(bool val) { m_normalizeIllumination = val; }
+	
+	bool operator==(ColorGrayscaleOptions const& other) const;
+	
+	bool operator!=(ColorGrayscaleOptions const& other) const;
 private:
 	bool m_whiteMargins;
 	bool m_normalizeIllumination;

@@ -16,47 +16,33 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ColorGrayscaleOptions.h"
+#include "OutputParams.h"
 #include <QDomDocument>
 #include <QDomElement>
-#include <QString>
 
 namespace output
 {
 
-ColorGrayscaleOptions::ColorGrayscaleOptions(QDomElement const& el)
-:	m_whiteMargins(el.attribute("whiteMargins") == "1"),
-	m_normalizeIllumination(el.attribute("normalizeIllumination") == "1")
+OutputParams::OutputParams(
+	OutputImageParams const& image_params, OutputFileParams const& file_params)
+:	m_imageParams(image_params),
+	m_fileParams(file_params)
+{
+}
+
+OutputParams::OutputParams(QDomElement const& el)
+:	m_imageParams(el.namedItem("image").toElement()),
+	m_fileParams(el.namedItem("file").toElement())
 {
 }
 
 QDomElement
-ColorGrayscaleOptions::toXml(QDomDocument& doc, QString const& name) const
+OutputParams::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
-	el.setAttribute("whiteMargins", m_whiteMargins ? "1" : "0");
-	el.setAttribute("normalizeIllumination", m_normalizeIllumination ? "1" : "0");
+	el.appendChild(m_imageParams.toXml(doc, "image"));
+	el.appendChild(m_fileParams.toXml(doc, "file"));
 	return el;
-}
-
-bool
-ColorGrayscaleOptions::operator==(ColorGrayscaleOptions const& other) const
-{
-	if (m_whiteMargins != other.m_whiteMargins) {
-		return false;
-	}
-	
-	if (m_normalizeIllumination != other.m_normalizeIllumination) {
-		return false;
-	}
-	
-	return true;
-}
-
-bool
-ColorGrayscaleOptions::operator!=(ColorGrayscaleOptions const& other) const
-{
-	return !(*this == other);
 }
 
 } // namespace output

@@ -40,4 +40,24 @@ BlackWhiteOptions::toXml(QDomDocument& doc, QString const& name) const
 	return el;
 }
 
+bool
+BlackWhiteOptions::operator==(BlackWhiteOptions const& other) const
+{
+	if (m_thresholdAdjustment != other.m_thresholdAdjustment) {
+		return false;
+	}
+	
+	if (m_despeckle != other.m_despeckle) {
+		return false;
+	}
+	
+	return true;
+}
+
+bool
+BlackWhiteOptions::operator!=(BlackWhiteOptions const& other) const
+{
+	return !(*this == other);
+}
+
 } // namespace output
