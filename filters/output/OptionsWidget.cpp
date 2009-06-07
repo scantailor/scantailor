@@ -221,7 +221,7 @@ OptionsWidget::changeDpiButtonClicked()
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
 		dialog, SIGNAL(accepted(std::set<PageId> const&, Dpi const&)),
-		this, SLOT(dpiChanged(std::set<PageId> const&, Dpi const&, Scope))
+		this, SLOT(dpiChanged(std::set<PageId> const&, Dpi const&))
 	);
 	dialog->show();
 }
