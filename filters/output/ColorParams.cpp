@@ -32,7 +32,7 @@ ColorParams::ColorParams(QDomElement const& el)
 }
 
 QDomElement
-ColorParams::ColorParams::toXml(QDomDocument& doc, QString const& name) const
+ColorParams::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("colorMode", formatColorMode(m_colorMode));
