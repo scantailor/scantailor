@@ -35,6 +35,7 @@
 #include <QVectorIterator>
 #include <QMessageBox>
 #include <QTimerEvent>
+#include <QSettings>
 #include <QBrush>
 #include <QColor>
 #include <QDebug>
@@ -306,9 +307,19 @@ ProjectFilesDialog::sanitizePath(QString const& path)
 void
 ProjectFilesDialog::inpDirBrowse()
 {
+	QSettings settings;
+	
 	QString initial_dir(inpDirLine->text());
 	if (initial_dir.isEmpty() || !QDir(initial_dir).exists()) {
+		initial_dir = settings.value("lastInputDir").toString();
+	}
+	if (initial_dir.isEmpty() || !QDir(initial_dir).exists()) {
 		initial_dir = QDir::home().absolutePath();
+	} else {
+		QDir dir(initial_dir);
+		if (dir.cdUp()) {
+			initial_dir = dir.absolutePath();
+		}
 	}
 	
 	QString const dir(
@@ -319,6 +330,7 @@ ProjectFilesDialog::inpDirBrowse()
 	
 	if (!dir.isEmpty()) {
 		setInputDir(dir);
+		settings.setValue("lastInputDir", dir);
 	}
 }
 
