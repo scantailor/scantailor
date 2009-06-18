@@ -853,64 +853,64 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>ProjectFilesDialog</name>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="316"/>
+        <location filename="../ProjectFilesDialog.cpp" line="327"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="19"/>
         <source>Input Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="335"/>
+        <location filename="../ProjectFilesDialog.cpp" line="347"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="42"/>
         <source>Output Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="507"/>
-        <location filename="../ProjectFilesDialog.cpp" line="515"/>
-        <location filename="../ProjectFilesDialog.cpp" line="524"/>
-        <location filename="../ProjectFilesDialog.cpp" line="546"/>
-        <location filename="../ProjectFilesDialog.cpp" line="555"/>
-        <location filename="../ProjectFilesDialog.cpp" line="624"/>
+        <location filename="../ProjectFilesDialog.cpp" line="519"/>
+        <location filename="../ProjectFilesDialog.cpp" line="527"/>
+        <location filename="../ProjectFilesDialog.cpp" line="536"/>
+        <location filename="../ProjectFilesDialog.cpp" line="558"/>
+        <location filename="../ProjectFilesDialog.cpp" line="567"/>
+        <location filename="../ProjectFilesDialog.cpp" line="636"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="507"/>
+        <location filename="../ProjectFilesDialog.cpp" line="519"/>
         <source>No files in project!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="516"/>
+        <location filename="../ProjectFilesDialog.cpp" line="528"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="525"/>
+        <location filename="../ProjectFilesDialog.cpp" line="537"/>
         <source>Input and output directories can&apos;t be the same.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="535"/>
+        <location filename="../ProjectFilesDialog.cpp" line="547"/>
         <source>Create Directory?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="536"/>
+        <location filename="../ProjectFilesDialog.cpp" line="548"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="547"/>
+        <location filename="../ProjectFilesDialog.cpp" line="559"/>
         <source>Unable to create output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="556"/>
+        <location filename="../ProjectFilesDialog.cpp" line="568"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="624"/>
+        <location filename="../ProjectFilesDialog.cpp" line="636"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
@@ -1027,7 +1027,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1007"/>
+        <location filename="../ThumbnailSequence.cpp" line="1008"/>
         <source>%1 (page %2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1097,7 +1097,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="56"/>
+        <location filename="../filters/output/Filter.cpp" line="58"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>

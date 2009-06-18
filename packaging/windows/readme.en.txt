@@ -1,5 +1,24 @@
 This document describes building the Windows version of Scan Tailor.
 
+Both Visual C++ (part of Visual Studio) and MinGW compilers are supported.
+Theoretically, any version of Visual C++ starting from Visual C++ 2003 should
+work.  In practice, Visual C++ 2008 Express Edition is known to work and no
+others were tested.  As for MinGW, the version shipped with Qt is known
+to work.
+The official builds are built with Visual C++ with the main reason being
+the built-in crash reporter only supporting Visual C++ under Windows.
+For unofficial builds the crash reporter is useless and should not be enabled,
+because only the person who built the particular version will have symbolic
+data used to transform the crash report to a human readable form.
+Generally, it's easier to build Scan Tailor using MinGW, but it's easier to
+develop it using Visual C++.
+
+Initially this document was only covering MinGW, while bits related to
+Visual C++ were added later and marked with [VC++].
+
+
+                                Downloading Prerequisites
+
 First, download the following software.  Unless stated otherwise, take the
 latest stable version.
 
@@ -32,8 +51,14 @@ latest stable version.
    By doing so you will get the correct version of MinGW installed, and you'll
    save some time compiling it.  Note that you will have to rebuild Qt libraries
    anyway, but at least you won't have to rebuild the programs that come with
-   Qt.  Still, the source-only Qt plus a manual MinGW installation is supported,
-   but this document assumes you are using the mingw version.
+   Qt.  Still, the source-only Qt is supported, though in that case you would
+   have to download and install MinGW manually.
+   [VC++]
+   You would need the Visual C++ itself, which you can download from here:
+   http://www.microsoft.com/Express/vc/
+   You can take either source or the binary versions of Qt, including the one
+   for MinGW one, which should still save you some compiling time.  The build
+   was tested with the source version of Qt.
 7. Boost (tested with 1.38.0) and Boost Jam (tested with 3.1.17)
    Homepage: http://boost.org/
    For Boost, you can download any of the files, provided you know how to unpack it.
@@ -59,7 +84,9 @@ latest stable version.
      | scantailor-0.9.0
      | tiff-3.8.2
      | zlib-1.2.3
-
+   
+   If you took a Qt version without an installer, unpack it here as well.
+   
    If you don't know how to unpack .tar.gz files, I suggest this tool:
    http://www.7-zip.org/
 
@@ -67,11 +94,15 @@ latest stable version.
      | scantailor-build
      | scantailor-deps-build
 
-4. Install Qt and tell it to download and install MinGW.
+4. If you took Qt with installer, install it now, telling it to download
+   and install MinGW as well.  Otherwise, download the MinGW installer from
+   http://mingw.sourceforge.net/ and install MinGW.
 
 5. Install CMake.
 
-6. Now we need to make sure CMake sees the MinGW bin directory in PATH.
+6. [VC++] Just skip this step.
+   
+   Now we need to make sure CMake sees the MinGW bin directory in PATH.
    There are two alternative ways to achieve that:
    1.  Go to Control Panel (-> Performance and Maintenance) -> System
        -> Advanced -> Environment Variables and add something like
@@ -95,6 +126,8 @@ latest stable version.
    If everything went right, the "Generate" button will become clickable.
    Click it.  Sometimes it's necessary to click "Configure" more than once
    before "Generate" becomes clickable.
+   [VC++]
+   Select your version of Visual C++ (Visual Studio) instead of "MinGW Makefiles"
 
 7. Launch the Qt Command Promt from the Start menu.
    Enter the following there:

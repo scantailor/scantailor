@@ -1,3 +1,4 @@
+# SCANTAILOR_EXE and CRASHREPORTER_EXE are passed as parameters.
 !define VERSION "@VERSION@"
 !define VERSION_QUAD "@VERSION_QUAD@"
 !define LICENSE_FILE "@LICENSE_FILE@"
@@ -37,7 +38,7 @@ SetCompressor /SOLID /FINAL lzma
   VIAddVersionKey "Comments" "Interactive post-processing tool for scanned pages."
   VIAddVersionKey "CompanyName" "Joseph Artsimovich"
   VIAddVersionKey "LegalTrademarks" ""
-  VIAddVersionKey "LegalCopyright" "© Joseph Artsimovich et al."
+  VIAddVersionKey "LegalCopyright" "ï¿½ Joseph Artsimovich et al."
   VIAddVersionKey "FileDescription" "Post-processing tool for scanned pages."
   VIAddVersionKey "FileVersion" "${VERSION}"
   VIProductVersion "${VERSION_QUAD}"
@@ -60,6 +61,9 @@ Section
   File "${SCANTAILOR_EXE}"
   !if "${MINGWM10_DLL}" != ""
     File "${MINGWM10_DLL}"
+  !endif
+  !if "${CRASHREPORTER_EXE}" != ""
+    File "${CRASHREPORTER_EXE}"
   !endif
   !if "${CRT_REDIST_PATH}" != ""
 	File /r "${CRT_REDIST_PATH}"
@@ -100,6 +104,7 @@ Section "Uninstall"
   # Remove program files.
   Delete "$INSTDIR\scantailor.exe"
   Delete "$INSTDIR\mingwm10.dll"
+  Delete "$INSTDIR\CrashReporter.exe"
   Delete "$INSTDIR\Uninstaller.exe"
   !if "${CRT_REDIST_DIR}" != ""
 	RMDir /r "$INSTDIR\${CRT_REDIST_DIR}"

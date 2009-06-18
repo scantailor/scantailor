@@ -76,18 +76,22 @@ STRING(
 
 CONFIGURE_FILE(scantailor.nsi.in ${CMAKE_BINARY_DIR}/scantailor.nsi @ONLY)
 
-# SCANTAILOR_EXE may contain a variable reference that's only known
-# at run time, so we pass it to makensis, rather than harcoding it
-# into scantailor.nsi
 GET_TARGET_PROPERTY(SCANTAILOR_EXE scantailor LOCATION)
 TO_NATIVE_PATH("${SCANTAILOR_EXE}" SCANTAILOR_EXE)
 
+GET_TARGET_PROPERTY(CRASHREPORTER_EXE CrashReporter LOCATION)
+TO_NATIVE_PATH("${CRASHREPORTER_EXE}" CRASHREPORTER_EXE)
+
+# SCANTAILOR_EXE and CRASHREPORTER_EXE may contain variable references
+# that are only known at run time, so we pass them to makensis, rather
+# than harcoding them into scantailor.nsi
 ADD_CUSTOM_COMMAND(
 	OUTPUT "${INSTALLER_FILENAME}"
 	COMMAND "${MAKENSIS_EXE}" /V2 
-	"/DSCANTAILOR_EXE=\"${SCANTAILOR_EXE}\"" scantailor.nsi
+	"/DSCANTAILOR_EXE=\"${SCANTAILOR_EXE}\""
+	"/DCRASHREPORTER_EXE=\"${CRASHREPORTER_EXE}\"" scantailor.nsi
 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 	MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/scantailor.nsi
-	DEPENDS scantailor
+	DEPENDS scantailor ${QM_FILES}
 )
 ADD_CUSTOM_TARGET(installer ALL DEPENDS "${INSTALLER_FILENAME}")

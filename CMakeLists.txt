@@ -7,6 +7,10 @@ ENDIF(COMMAND cmake_policy)
 
 PROJECT("Scan Tailor")
 
+# This forces Visual Studio 2008 SP1 to actually link to the versions of the
+# libraries it ships with!  It's harmless on other platforms.
+ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+
 ENABLE_TESTING()
 
 # A hack to force cmake to be re-run when the VERSION file changes.
@@ -236,6 +240,13 @@ IF(WIN32)
 	)
 ENDIF(WIN32)
 
+# Crash reporter, only Windows + MSVC supported for now.
+# Must go before generating config.h, as ENABLE_CRASH_REPORTER
+# goes in there.
+IF(MSVC)
+	OPTION(ENABLE_CRASH_REPORTER "Enable crash reporter (only for official builds)" OFF)
+ENDIF(MSVC)
+
 # Prepare config.h
 IF(WIN32)
 	SET(TRANSLATIONS_DIR_REL "translations")
@@ -247,6 +258,8 @@ SET(TRANSLATIONS_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${TRANSLATIONS_DIR_REL}")
 CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
 CONFIGURE_FILE(version.h.in ${CMAKE_BINARY_DIR}/version.h @ONLY)
 
+# crash_reporter is included unconditionally to collect translation sources from there.
+ADD_SUBDIRECTORY(crash_reporter)
 ADD_SUBDIRECTORY(foundation)
 ADD_SUBDIRECTORY(imageproc)
 ADD_SUBDIRECTORY(tests)
@@ -383,11 +396,52 @@ TARGET_LINK_LIBRARIES(
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
+GET_TARGET_PROPERTY(scantailor_executable scantailor LOCATION)
 
-MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET _sources_ _ts_files_)
-	SET(_sources)
-	SET(_ts_files)
-	FOREACH(_file ${ARGV})
+IF(ENABLE_CRASH_REPORTER)
+	FIND_PATH(
+		SYMBOLS_PATH . PATHS "${outer_dir}/symbols" NO_DEFAULT_PATH
+		DOC "The directory to write symbol information into."
+	)
+	IF(NOT SYMBOLS_PATH)
+		MESSAGE(FATAL_ERROR "SYMBOLS_PATH directory is not set.")
+	ENDIF(NOT SYMBOLS_PATH)
+
+	# We can't build it, because it requires ATL, which is not part
+	# of the Visual Studio Express Edition, so we rely on a pre-built
+	# version which can be found in the Mozilla repository.
+	FIND_PROGRAM(
+		DUMP_SYMS_EXECUTABLE dump_syms PATHS "${outer_dir}"
+		DOC "Path to dump_syms.exe, which can be found in Mozilla repository."
+	)
+	IF(NOT DUMP_SYMS_EXECUTABLE)
+		MESSAGE(
+			FATAL_ERROR "dump_syms.exe wasn't found.  Specify its location manually by setting the DUMP_SYMS_EXECUTABLE variable.  dump_syms.exe may be found in the Mozilla repository."
+		)
+	ENDIF(NOT DUMP_SYMS_EXECUTABLE)
+	
+	INCLUDE_DIRECTORIES(crash_reporter crash_reporter/google-breakpad)
+	TARGET_LINK_LIBRARIES(scantailor crash_handler)
+	
+	ADD_CUSTOM_COMMAND(
+		TARGET scantailor POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" ARGS -E echo "Dumping symbols..."
+        COMMAND "${DUMP_SYMS_EXECUTABLE}" ARGS "${scantailor_executable}" ">" "temp.sym"
+		COMMAND "${CMAKE_COMMAND}" ARGS -P "${CMAKE_SOURCE_DIR}/cmake/move_sym_file.cmake"
+		WORKING_DIRECTORY "${SYMBOLS_PATH}"
+	)
+ENDIF(ENABLE_CRASH_REPORTER)
+
+ADD_CUSTOM_TARGET(update_translations)
+SET_TARGET_PROPERTIES(
+	update_translations
+    PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
+)
+
+MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET _subtarget) #, sources, ts_files
+	SET(_sources "")
+	SET(_ts_files "")
+	FOREACH(_file ${ARGN})
 		GET_FILENAME_COMPONENT(_abs "${_file}" ABSOLUTE)
 		GET_FILENAME_COMPONENT(_ext "${_file}" EXT)
 		IF(_ext STREQUAL .ts)
@@ -398,25 +452,40 @@ MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET _sources_ _ts_files_)
 	ENDFOREACH(_file)
 	
 	ADD_CUSTOM_TARGET(
-		update_translations
+		"update_translations_${_subtarget}"
 		COMMAND "${QT_LUPDATE_EXECUTABLE}"
 		${_sources} -ts ${_ts_files}
 		DEPENDS ${_sources}
 	)
+	SET_TARGET_PROPERTIES(
+		"update_translations_${_subtarget}"
+        PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
+	)
+	ADD_DEPENDENCIES(update_translations "update_translations_${_subtarget}")
 ENDMACRO(CREATE_UPDATE_TRANSLATIONS_TARGET)
 
 # Translations
 FILE(GLOB abs_sources ABSOLUTE ${sources})
 FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})
 SET(TRANSLATION_SOURCES ${TRANSLATION_SOURCES} ${abs_sources} ${abs_ui_files})
-FILE(GLOB TRANSLATION_FILES translations/*.ts)
+FILE(GLOB TRANSLATION_FILES translations/scantailor_*.ts)
+FILE(GLOB CR_TRANSLATION_FILES translations/crashreporter_*.ts)
 
-CREATE_UPDATE_TRANSLATIONS_TARGET(${TRANSLATION_SOURCES} ${TRANSLATION_FILES})
+CREATE_UPDATE_TRANSLATIONS_TARGET(
+	scantailor ${TRANSLATION_SOURCES} ${TRANSLATION_FILES}
+)
+CREATE_UPDATE_TRANSLATIONS_TARGET(
+	crashreporter ${CR_TRANSLATION_SOURCES} ${CR_TRANSLATION_FILES}
+)
 
-# Remove untranslated.ts from TRANSLATION_FILES, as we don't want
-# untranslated.qm to be built.
+SET(ts_files ${TRANSLATION_FILES})
+IF(ENABLE_CRASH_REPORTER)
+	LIST(APPEND ts_files ${CR_TRANSLATION_FILES})
+ENDIF(ENABLE_CRASH_REPORTER)
+
+# Don't build *.qm files from *untranslated.ts
 SET(FILTERED_TRANSLATION_FILES)
-FOREACH(ts_file ${TRANSLATION_FILES})
+FOREACH(ts_file ${ts_files})
 	IF ("${ts_file}" MATCHES ".*untranslated.ts")
 		# Just skip it.
 	ELSE("${ts_file}" MATCHES ".*untranslated.ts")

@@ -2,6 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT("Scan Tailor Dependencies")
 
+# This forces Visual Studio 2008 SP1 to actually link to the versions of the
+# libraries it ships with!  It's harmless on other platforms.
+ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+
 # Qt's -system-libpng, -system-libjpeg, etc are largely broken with regards
 # to static libraries, so it expects:
 # libpng.lib on MSVC and libpng.lib.a on MinGW.
@@ -210,15 +214,17 @@ ENDIF(MINGW)
 
 ADD_CUSTOM_TARGET(
 	boost "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
-	threading=multi link=static variant=debug,release stage
-    WORKING_DIRECTORY "${BOOST_DIR}"
+	threading=multi link=static variant=debug,release
+	define=-D_BIND_TO_CURRENT_VCLIBS_VERSION=1
+	stage
+	WORKING_DIRECTORY "${BOOST_DIR}"
 )
 
 
 #=================================== Qt ===================================#
 
-# Backward compatibility.  We used to patch projects.pro, now we patch
-# .qmake.cache instead.
+# Backward compatibility.  We used to patch projects.pro, but now we achieve
+# the same result by other means.
 IF(EXISTS "${QT_DIR}/projects.pro.orig")
 	CONFIGURE_FILE(
 		"${QT_DIR}/projects.pro.orig"
@@ -242,12 +248,29 @@ FOREACH(file_pro ${pro_files})
 	IF(contents MATCHES qjpeg AND NOT contents MATCHES libjpeg)
 		# Make a backup copy, if not already there.
 		IF(NOT EXISTS "${file_pro}.orig")
-			CONFIGURE_FILE("${file_pro}" "${file_pro}.orig}" COPYONLY)
+			CONFIGURE_FILE("${file_pro}" "${file_pro}.orig" COPYONLY)
 		ENDIF(NOT EXISTS "${file_pro}.orig")
 		
 		FILE(APPEND "${file_pro}" "\nwin32 {\n\tLIBS += libjpeg.lib\n}\n")
 	ENDIF(contents MATCHES qjpeg AND NOT contents MATCHES libjpeg)
 ENDFOREACH(file_pro)
+
+# Find all *.conf files under mkspecs that mention -Zc:wchar_t- and remove
+# that minus at the end.  That's necessary to make Qt compatible with other
+# libraries that use wchar_t stuff.
+FILE(GLOB_RECURSE conf_files "${QT_DIR}/mkspecs/*.conf")
+FOREACH(file_conf ${conf_files})
+	FILE(READ "${file_conf}" contents)
+	STRING(REGEX REPLACE "-Zc:wchar_t-" "-Zc:wchar_t" new_contents "${contents}")
+	IF(NOT "${contents}" STREQUAL "${new_contents}")
+		# Make a backup copy, if not already there.
+		IF(NOT EXISTS "${file_conf}.orig")
+			CONFIGURE_FILE("${file_conf}" "${file_conf}.orig" COPYONLY)
+		ENDIF(NOT EXISTS "${file_conf}.orig")
+		
+		FILE(WRITE "${file_conf}" "${new_contents}")
+	ENDIF(NOT "${contents}" STREQUAL "${new_contents}")
+ENDFOREACH(file_conf)
 
 SET(qt_maybe_skip_tools)
 IF(EXISTS "${QT_DIR}/bin/designer.exe")
@@ -292,6 +315,7 @@ FILE(
 	" -I \"${JPEG_INCLUDE_DIR}\" -I \"${ZLIB_INCLUDE_DIR}\""
 	" -I \"${PNG_INCLUDE_DIR}\" -L \"${JPEG_DIR}\" -L \"${ZLIB_DIR}\""
 	" -L \"${PNG_DIR}\""
+	" -D _BIND_TO_CURRENT_VCLIBS_VERSION=1"
 	"\n"
 	"${make_command}\n"
 	":exit\n"
