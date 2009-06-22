@@ -71,7 +71,7 @@
       <item>
        <widget class="QRadioButton" name="thisPageRB">
         <property name="text">
-         <string>This page only (already applied)</string>
+         <string>This page only</string>
         </property>
         <property name="checked">
          <bool>true</bool>

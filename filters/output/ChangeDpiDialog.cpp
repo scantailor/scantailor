@@ -154,8 +154,9 @@ ChangeDpiDialog::onSubmit()
 	
 	std::set<PageId> pages;
 	
-	// thisPageRB is intentionally not handled.
-	if (allPagesRB->isChecked()) {
+	if (thisPageRB->isChecked()) {
+		pages.insert(m_pages.curPage().id());
+	} else if (allPagesRB->isChecked()) {
 		for (int i = 0; i < num_pages; ++i) {
 			pages.insert(m_pages.pageAt(i).id());
 		}
