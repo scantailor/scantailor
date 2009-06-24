@@ -81,7 +81,8 @@ Section
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Scan Tailor"
   CreateShortcut "$SMPROGRAMS\Scan Tailor\Scan Tailor.lnk" "$INSTDIR\scantailor.exe"
-  
+  CreateShortcut "$SMPROGRAMS\Scan Tailor\Uninstall.lnk" "$INSTDIR\Uninstaller.exe"  
+
   # Register the ".ScanTailor" file extension.
   ${registerExtension} "$INSTDIR\scantailor.exe" ".ScanTailor" \
   "Scan Tailor Project" "$INSTDIR\scantailor.exe,0"
