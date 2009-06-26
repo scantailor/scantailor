@@ -39,6 +39,7 @@
 #include "ThumbnailFactory.h"
 #include "ContentBoxPropagator.h"
 #include "ProjectCreationContext.h"
+#include "ProjectOpeningContext.h"
 #include "SkinnedButton.h"
 #include "ProcessingIndicationWidget.h"
 #include "ImageMetadataLoader.h"
@@ -1066,13 +1067,15 @@ MainWindow::openProject()
 	openProject(project_file);
 }
 
+#include "FixDpiDialog.h"
+
 void
 MainWindow::openProject(QString const& project_file)
 {
 	QFile file(project_file);
 	if (!file.open(QIODevice::ReadOnly)) {
 		QMessageBox::warning(
-			0, tr("Error"),
+			this, tr("Error"),
 			tr("Unable to open the project file.")
 		);
 		return;
@@ -1081,7 +1084,7 @@ MainWindow::openProject(QString const& project_file)
 	QDomDocument doc;
 	if (!doc.setContent(&file)) {
 		QMessageBox::warning(
-			0, tr("Error"),
+			this, tr("Error"),
 			tr("The project file is broken.")
 		);
 		return;
@@ -1089,29 +1092,29 @@ MainWindow::openProject(QString const& project_file)
 	
 	file.close();
 	
-	ProjectReader reader(doc);
-	if (!reader.success()) {
-		QMessageBox::warning(
-			0, tr("Error"),
-			tr("Unable to interpret the project file.")
-		);
-		return;
-	}
-	
+	ProjectOpeningContext* context = new ProjectOpeningContext(this, project_file, doc);
+	connect(context, SIGNAL(done(ProjectOpeningContext*)), SLOT(projectOpened(ProjectOpeningContext*)));
+	context->proceed();
+}
+
+void
+MainWindow::projectOpened(ProjectOpeningContext* context)
+{
 	RecentProjects rp;
 	rp.read();
-	rp.setMostRecent(project_file);
+	rp.setMostRecent(context->projectFile());
 	rp.write();
 	
 	QSettings settings;
 	settings.setValue(
 		"project/lastDir",
-		QFileInfo(project_file).absolutePath()
+		QFileInfo(context->projectFile()).absolutePath()
 	);
 	
 	switchToNewProject(
-		reader.pages(), reader.outputDirectory(),
-		project_file, &reader
+		context->projectReader()->pages(),
+		context->projectReader()->outputDirectory(),
+		context->projectFile(), context->projectReader()
 	);
 }
 
@@ -1438,10 +1441,10 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	bool const is_multipage_file = metadata_list.size() > 1;
 	ImageMetadata& metadata = metadata_list.front();
 	
-	if (metadata.dpi().isNull()) {
+	if (!metadata.isDpiOK()) {
 		std::auto_ptr<FixDpiSinglePageDialog> dpi_dialog(
 			new FixDpiSinglePageDialog(
-				image_id, metadata.dpi(), is_multipage_file, this
+				image_id, metadata, is_multipage_file, this
 			)
 		);
 		if (dpi_dialog->exec() != QDialog::Accepted) {

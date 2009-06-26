@@ -103,6 +103,17 @@ public:
 		BeforeOrAfter before_or_after, ImageId const& existing);
 	
 	void removeImage(ImageId const& image_id);
+	
+	/**
+	 * \brief Check if all DPIs are OK, in terms of ImageMetadata::isDpiOK()
+	 *
+	 * \return true if all DPIs are OK, false if not.
+	 */
+	bool validateDpis() const;
+	
+	std::vector<ImageFileInfo> toImageFileInfo() const;
+	
+	void updateMetadataFrom(std::vector<ImageFileInfo> const& files);
 signals:
 	void modified();
 private:

@@ -22,14 +22,19 @@
 #include <QIntValidator>
 #include <QVariant>
 #include <QFileInfo>
+#include <QColor>
 
 FixDpiSinglePageDialog::FixDpiSinglePageDialog(
-	ImageId const& image_id, Dpi const& dpi,
+	ImageId const& image_id, ImageMetadata const& image_metadata,
 	bool is_multipage_file, QWidget* parent)
 :	QDialog(parent),
-	m_dpi(dpi)
+	m_metadata(image_metadata)
 {
 	ui.setupUi(this);
+	
+	m_normalPalette = ui.xDpi->palette();
+	m_errorPalette = m_normalPalette;
+	m_errorPalette.setColor(QPalette::Text, Qt::red);
 	
 	QString const file_name(QFileInfo(image_id.filePath()).fileName());
 	QString image_name(file_name);
@@ -39,7 +44,7 @@ FixDpiSinglePageDialog::FixDpiSinglePageDialog(
 	ui.text->setText(ui.text->text().arg(image_name));
 	
 	m_pOkBtn = ui.buttonBox->button(QDialogButtonBox::Ok);
-	m_pOkBtn->setEnabled(isDpiOK());
+	m_pOkBtn->setEnabled(m_metadata.isDpiOK());
 	
 	ui.dpiCombo->addItem("300 x 300", QSize(300, 300));
 	ui.dpiCombo->addItem("400 x 400", QSize(400, 400));
@@ -47,12 +52,18 @@ FixDpiSinglePageDialog::FixDpiSinglePageDialog(
 	
 	ui.xDpi->setMaxLength(4);
 	ui.yDpi->setMaxLength(4);
-	QIntValidator* xDpiValidator = new QIntValidator(ui.xDpi);
-	xDpiValidator->setBottom(100);
-	ui.xDpi->setValidator(xDpiValidator);
-	QIntValidator* yDpiValidator = new QIntValidator(ui.yDpi);
-	yDpiValidator->setBottom(100);
-	ui.yDpi->setValidator(yDpiValidator);
+	ui.xDpi->setValidator(new QIntValidator(ui.xDpi));
+	ui.yDpi->setValidator(new QIntValidator(ui.yDpi));
+	
+	if (m_metadata.dpi().horizontal() > 1) {
+		ui.xDpi->setText(QString::number(m_metadata.dpi().horizontal()));
+	}
+	
+	if (m_metadata.dpi().vertical() > 1) {
+		ui.yDpi->setText(QString::number(m_metadata.dpi().vertical()));
+	}
+	
+	dpiValueChanged();
 	
 	connect(
 		ui.dpiCombo, SIGNAL(activated(int)),
@@ -73,27 +84,31 @@ FixDpiSinglePageDialog::dpiComboChangedByUser(int idx)
 {
 	QVariant const data(ui.dpiCombo->itemData(idx));
 	if (data.isValid()) {
-		m_dpi = Dpi(data.toSize());
-		ui.xDpi->setText(QString::number(m_dpi.horizontal()));
-		ui.yDpi->setText(QString::number(m_dpi.vertical()));
+		m_metadata.setDpi(Dpi(data.toSize()));
+		ui.xDpi->setText(QString::number(m_metadata.dpi().horizontal()));
+		ui.yDpi->setText(QString::number(m_metadata.dpi().vertical()));
+		decorateDpiInputField(ui.xDpi, m_metadata.horizontalDpiStatus());
+		decorateDpiInputField(ui.yDpi, m_metadata.verticalDpiStatus());
 	}
 	
-	m_pOkBtn->setEnabled(isDpiOK());
+	m_pOkBtn->setEnabled(m_metadata.isDpiOK());
 }
 
 void
 FixDpiSinglePageDialog::dpiValueChanged()
 {
-	bool x_ok = true, y_ok = true;
-	m_dpi = Dpi(ui.xDpi->text().toInt(&x_ok), ui.yDpi->text().toInt(&y_ok));
-	m_pOkBtn->setEnabled(isDpiOK());
+	m_metadata.setDpi(Dpi(ui.xDpi->text().toInt(), ui.yDpi->text().toInt()));
+	decorateDpiInputField(ui.xDpi, m_metadata.horizontalDpiStatus());
+	decorateDpiInputField(ui.yDpi, m_metadata.verticalDpiStatus());
+	bool const ok = m_metadata.isDpiOK();
+	m_pOkBtn->setEnabled(ok);
 	
-	if (x_ok && y_ok) {
+	if (ok) {
 		int const count = ui.dpiCombo->count();
 		for (int i = 0; i < count; ++i) {
 			QVariant const data(ui.dpiCombo->itemData(i));
 			if (data.isValid()) {
-				if (m_dpi.toSize() == data.toSize()) {
+				if (m_metadata.dpi().toSize() == data.toSize()) {
 					ui.dpiCombo->setCurrentIndex(i);
 					return;
 				}
@@ -104,14 +119,25 @@ FixDpiSinglePageDialog::dpiValueChanged()
 	ui.dpiCombo->setCurrentIndex(0);
 }
 
-bool
-FixDpiSinglePageDialog::isDpiOK() const
+void
+FixDpiSinglePageDialog::decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpi_status) const
 {
-	return isDpiOK(m_dpi.horizontal()) && isDpiOK(m_dpi.vertical());
-}
+	if (dpi_status == ImageMetadata::DPI_OK) {
+		field->setPalette(m_normalPalette);
+	} else {
+		field->setPalette(m_errorPalette);
+	}
 
-bool
-FixDpiSinglePageDialog::isDpiOK(int dpi)
-{
-	return dpi >= 100 && dpi <= 1600;
+	switch (dpi_status) {
+		case ImageMetadata::DPI_OK:
+		case ImageMetadata::DPI_UNDEFINED:
+			field->setToolTip(QString());
+			break;
+		case ImageMetadata::DPI_TOO_SMALL:
+			field->setToolTip(tr("DPI is too small. Even if it's correct, you are not going to get acceptable results with it."));
+			break;
+		case ImageMetadata::DPI_TOO_SMALL_FOR_THIS_PIXEL_SIZE:
+			field->setToolTip(tr("DPI is too small for this pixel size. Such combination would probably lead to out of memory errors."));
+			break;
+	}
 }

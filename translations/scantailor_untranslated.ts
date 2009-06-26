@@ -45,18 +45,28 @@
 <context>
     <name>FixDpiDialog</name>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="196"/>
+        <location filename="../FixDpiDialog.cpp" line="240"/>
         <source>Need Fixing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="197"/>
-        <location filename="../FixDpiDialog.cpp" line="605"/>
+        <location filename="../FixDpiDialog.cpp" line="241"/>
+        <location filename="../FixDpiDialog.cpp" line="703"/>
         <source>All Pages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="627"/>
+        <location filename="../FixDpiDialog.cpp" line="475"/>
+        <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FixDpiDialog.cpp" line="478"/>
+        <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FixDpiDialog.cpp" line="729"/>
         <source>%1 (page %2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -119,8 +129,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="37"/>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="42"/>
         <source>%1 (page %2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="137"/>
+        <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="140"/>
+        <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -149,117 +169,111 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="448"/>
+        <location filename="../MainWindow.cpp" line="449"/>
         <location filename="../ui/MainWindow.ui" line="217"/>
         <source>Save Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="448"/>
+        <location filename="../MainWindow.cpp" line="449"/>
         <source>Save this project?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="744"/>
+        <location filename="../MainWindow.cpp" line="745"/>
         <source>Insert before ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="747"/>
+        <location filename="../MainWindow.cpp" line="748"/>
         <source>Insert after ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="751"/>
+        <location filename="../MainWindow.cpp" line="752"/>
         <source>Remove from project ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="989"/>
-        <location filename="../MainWindow.cpp" line="1058"/>
+        <location filename="../MainWindow.cpp" line="990"/>
+        <location filename="../MainWindow.cpp" line="1059"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1056"/>
+        <location filename="../MainWindow.cpp" line="1057"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1075"/>
-        <location filename="../MainWindow.cpp" line="1084"/>
-        <location filename="../MainWindow.cpp" line="1095"/>
-        <location filename="../MainWindow.cpp" line="1329"/>
-        <location filename="../MainWindow.cpp" line="1360"/>
-        <location filename="../MainWindow.cpp" line="1432"/>
-        <location filename="../MainWindow.cpp" line="1493"/>
+        <location filename="../MainWindow.cpp" line="1078"/>
+        <location filename="../MainWindow.cpp" line="1087"/>
+        <location filename="../MainWindow.cpp" line="1332"/>
+        <location filename="../MainWindow.cpp" line="1363"/>
+        <location filename="../MainWindow.cpp" line="1435"/>
+        <location filename="../MainWindow.cpp" line="1496"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1076"/>
+        <location filename="../MainWindow.cpp" line="1079"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1085"/>
+        <location filename="../MainWindow.cpp" line="1088"/>
         <source>The project file is broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1096"/>
-        <source>Unable to interpret the project file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1227"/>
+        <location filename="../MainWindow.cpp" line="1230"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1258"/>
+        <location filename="../MainWindow.cpp" line="1261"/>
         <source>Unnamed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1263"/>
+        <location filename="../MainWindow.cpp" line="1266"/>
         <source>%1 - Scan Tailor %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1330"/>
-        <location filename="../MainWindow.cpp" line="1361"/>
+        <location filename="../MainWindow.cpp" line="1333"/>
+        <location filename="../MainWindow.cpp" line="1364"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1405"/>
+        <location filename="../MainWindow.cpp" line="1408"/>
         <source>File to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1411"/>
+        <location filename="../MainWindow.cpp" line="1414"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1433"/>
+        <location filename="../MainWindow.cpp" line="1436"/>
         <source>Error opening the image file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1475"/>
+        <location filename="../MainWindow.cpp" line="1478"/>
         <source>%1 (page %2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1482"/>
+        <location filename="../MainWindow.cpp" line="1485"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1494"/>
+        <location filename="../MainWindow.cpp" line="1497"/>
         <source>Unable to delete file:
 %1</source>
         <translation type="unfinished"></translation>
@@ -377,7 +391,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="383"/>
+        <location filename="../MainWindow.cpp" line="384"/>
         <source>Stop batch processing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -550,7 +564,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="74"/>
-        <source>This page only (already applied)</source>
+        <source>This page only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -853,93 +867,93 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>ProjectFilesDialog</name>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="327"/>
-        <location filename="../ui/ProjectFilesDialog.ui" line="19"/>
+        <location filename="../ProjectFilesDialog.cpp" line="333"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
         <source>Input Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="347"/>
-        <location filename="../ui/ProjectFilesDialog.ui" line="42"/>
+        <location filename="../ProjectFilesDialog.cpp" line="353"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="43"/>
         <source>Output Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="519"/>
-        <location filename="../ProjectFilesDialog.cpp" line="527"/>
-        <location filename="../ProjectFilesDialog.cpp" line="536"/>
-        <location filename="../ProjectFilesDialog.cpp" line="558"/>
-        <location filename="../ProjectFilesDialog.cpp" line="567"/>
-        <location filename="../ProjectFilesDialog.cpp" line="636"/>
+        <location filename="../ProjectFilesDialog.cpp" line="525"/>
+        <location filename="../ProjectFilesDialog.cpp" line="533"/>
+        <location filename="../ProjectFilesDialog.cpp" line="542"/>
+        <location filename="../ProjectFilesDialog.cpp" line="564"/>
+        <location filename="../ProjectFilesDialog.cpp" line="573"/>
+        <location filename="../ProjectFilesDialog.cpp" line="642"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="519"/>
+        <location filename="../ProjectFilesDialog.cpp" line="525"/>
         <source>No files in project!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="528"/>
+        <location filename="../ProjectFilesDialog.cpp" line="534"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="537"/>
+        <location filename="../ProjectFilesDialog.cpp" line="543"/>
         <source>Input and output directories can&apos;t be the same.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="547"/>
+        <location filename="../ProjectFilesDialog.cpp" line="553"/>
         <source>Create Directory?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="548"/>
+        <location filename="../ProjectFilesDialog.cpp" line="554"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="559"/>
+        <location filename="../ProjectFilesDialog.cpp" line="565"/>
         <source>Unable to create output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="568"/>
+        <location filename="../ProjectFilesDialog.cpp" line="574"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="636"/>
+        <location filename="../ProjectFilesDialog.cpp" line="642"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="13"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="14"/>
         <source>Project Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="32"/>
-        <location filename="../ui/ProjectFilesDialog.ui" line="51"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="33"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="52"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="63"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="64"/>
         <source>Files Not In Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="76"/>
-        <location filename="../ui/ProjectFilesDialog.ui" line="158"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="77"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="159"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="101"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="102"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -947,12 +961,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="107"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="108"/>
         <source>&gt;&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="114"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="115"/>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -960,18 +974,36 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="120"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="121"/>
         <source>&lt;&lt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="142"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="143"/>
         <source>Files In Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/ProjectFilesDialog.ui" line="170"/>
+        <location filename="../ui/ProjectFilesDialog.ui" line="171"/>
         <source>Right to left layout (for Hebrew and Arabic)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ProjectFilesDialog.ui" line="178"/>
+        <source>Fix DPIs, even if they look OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ProjectOpeningContext</name>
+    <message>
+        <location filename="../ProjectOpeningContext.cpp" line="50"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ProjectOpeningContext.cpp" line="51"/>
+        <source>Unable to interpret the project file.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ProjectFilesDialog</class>
- <widget class="QDialog" name="ProjectFilesDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="ProjectFilesDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,26 +10,26 @@
     <height>506</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Project Files</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Input Directory</string>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QHBoxLayout">
       <item>
-       <widget class="QLineEdit" name="inpDirLine" >
-        <property name="enabled" >
+       <widget class="QLineEdit" name="inpDirLine">
+        <property name="enabled">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="inpDirBrowseBtn" >
-        <property name="text" >
+       <widget class="QPushButton" name="inpDirBrowseBtn">
+        <property name="text">
          <string>Browse</string>
         </property>
        </widget>
@@ -37,17 +38,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Output Directory</string>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QHBoxLayout">
       <item>
-       <widget class="QLineEdit" name="outDirLine" />
+       <widget class="QLineEdit" name="outDirLine"/>
       </item>
       <item>
-       <widget class="QPushButton" name="outDirBrowseBtn" >
-        <property name="text" >
+       <widget class="QPushButton" name="outDirBrowseBtn">
+        <property name="text">
          <string>Browse</string>
         </property>
        </widget>
@@ -56,23 +57,23 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QGroupBox" name="groupBox_3" >
-       <property name="title" >
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
         <string>Files Not In Project</string>
        </property>
-       <layout class="QVBoxLayout" >
+       <layout class="QVBoxLayout">
         <item>
-         <widget class="QListView" name="offProjectList" >
-          <property name="selectionMode" >
+         <widget class="QListView" name="offProjectList">
+          <property name="selectionMode">
            <enum>QAbstractItemView::ExtendedSelection</enum>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="offProjectSelectAllBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="offProjectSelectAllBtn">
+          <property name="text">
            <string>Select All</string>
           </property>
          </widget>
@@ -81,13 +82,13 @@
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" >
+      <layout class="QVBoxLayout">
        <item>
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -96,37 +97,37 @@
         </spacer>
        </item>
        <item>
-        <widget class="QToolButton" name="addToProjectBtn" >
-         <property name="toolTip" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+        <widget class="QToolButton" name="addToProjectBtn">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Add selected files to project.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Add selected files to project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
-          <string>>></string>
+         <property name="text">
+          <string>&gt;&gt;</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="removeFromProjectBtn" >
-         <property name="toolTip" >
-          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+        <widget class="QToolButton" name="removeFromProjectBtn">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Remove selected files from project.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Remove selected files from project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&lt;&lt;</string>
          </property>
         </widget>
        </item>
        <item>
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -137,24 +138,24 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_4" >
-       <property name="title" >
+      <widget class="QGroupBox" name="groupBox_4">
+       <property name="title">
         <string>Files In Project</string>
        </property>
-       <layout class="QVBoxLayout" >
+       <layout class="QVBoxLayout">
         <item>
-         <widget class="QListView" name="inProjectList" >
-          <property name="enabled" >
+         <widget class="QListView" name="inProjectList">
+          <property name="enabled">
            <bool>true</bool>
           </property>
-          <property name="selectionMode" >
+          <property name="selectionMode">
            <enum>QAbstractItemView::ExtendedSelection</enum>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="inProjectSelectAllBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="inProjectSelectAllBtn">
+          <property name="text">
            <string>Select All</string>
           </property>
          </widget>
@@ -165,28 +166,35 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="rtlLayoutCB" >
-     <property name="text" >
+    <widget class="QCheckBox" name="rtlLayoutCB">
+     <property name="text">
       <string>Right to left layout (for Hebrew and Arabic)</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QProgressBar" name="progressBar" >
-     <property name="value" >
+    <widget class="QCheckBox" name="forceFixDpi">
+     <property name="text">
+      <string>Fix DPIs, even if they look OK</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
       <number>0</number>
      </property>
-     <property name="textVisible" >
+     <property name="textVisible">
       <bool>false</bool>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
@@ -201,11 +209,11 @@ p, li { white-space: pre-wrap; }
    <receiver>ProjectFilesDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>295</x>
      <y>463</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>
@@ -217,11 +225,11 @@ p, li { white-space: pre-wrap; }
    <receiver>offProjectList</receiver>
    <slot>selectAll()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>74</x>
      <y>381</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>86</x>
      <y>318</y>
     </hint>
@@ -233,11 +241,11 @@ p, li { white-space: pre-wrap; }
    <receiver>inProjectList</receiver>
    <slot>selectAll()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>386</x>
      <y>380</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>382</x>
      <y>304</y>
     </hint>

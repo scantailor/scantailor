@@ -52,6 +52,7 @@ class ProjectReader;
 class DebugImages;
 class ContentBoxPropagator;
 class ProjectCreationContext;
+class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
 class QLineF;
 class QRectF;
@@ -125,6 +126,8 @@ private slots:
 	void newProjectCreated(ProjectCreationContext* context);
 	
 	void openProject();
+	
+	void projectOpened(ProjectOpeningContext* context);
 	
 	void closeProject();
 private:

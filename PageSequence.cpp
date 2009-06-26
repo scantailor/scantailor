@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,15 @@
 #include "ImageInfo.h"
 #include "OrthogonalRotation.h"
 #include <boost/foreach.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
+#include <boost/multi_index/member.hpp>
 #include <QMutexLocker>
+#include <QFileInfo>
 #include <QSize>
 #include <QDebug>
+#include <map>
 #include <algorithm>
 #include <stddef.h>
 #include <assert.h>
@@ -412,6 +418,85 @@ PageSequence::removeImage(ImageId const& image_id)
 	
 	if (was_modified) {
 		emit modified();
+	}
+}
+
+bool
+PageSequence::validateDpis() const
+{
+	QMutexLocker locker(&m_mutex);
+	
+	BOOST_FOREACH(ImageDesc const& image, m_images) {
+		if (!image.metadata.isDpiOK()) {
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+namespace
+{
+
+struct File
+{
+	QString fileName;
+	mutable std::vector<ImageMetadata> metadata;
+	
+	File(QString const& fname) : fileName(fname) {}
+	
+	operator ImageFileInfo() const { return ImageFileInfo(fileName, metadata); }
+};
+
+} // anonymous namespace
+
+std::vector<ImageFileInfo>
+PageSequence::toImageFileInfo() const
+{
+	using namespace boost::multi_index;
+	
+	multi_index_container<
+		File,
+		indexed_by<
+			ordered_unique<member<File, QString, &File::fileName> >,
+			sequenced<>
+		>
+	> files;
+	
+	{
+		QMutexLocker locker(&m_mutex);
+		
+		BOOST_FOREACH(ImageDesc const& image, m_images) {
+			File const file(image.id.filePath());
+			files.insert(file).first->metadata.push_back(image.metadata);
+		}
+	}
+	
+	return std::vector<ImageFileInfo>(files.get<1>().begin(), files.get<1>().end());
+}
+
+void
+PageSequence::updateMetadataFrom(std::vector<ImageFileInfo> const& files)
+{
+	typedef std::map<ImageId, ImageMetadata> MetadataMap;
+	MetadataMap metadata_map;
+	
+	BOOST_FOREACH(ImageFileInfo const& file, files) {
+		QString const file_path(file.fileInfo().absoluteFilePath());
+		int page = 0;
+		BOOST_FOREACH(ImageMetadata const& metadata, file.imageInfo()) {
+			metadata_map[ImageId(file_path, page)] = metadata;
+			++page;
+		}
+	}
+	
+	QMutexLocker locker(&m_mutex);
+	
+	BOOST_FOREACH(ImageDesc& image, m_images) {
+		MetadataMap::const_iterator const it(metadata_map.find(image.id));
+		if (it != metadata_map.end()) {
+			image.metadata = it->second;
+		}
 	}
 }
 

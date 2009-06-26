@@ -21,6 +21,8 @@
 
 #include "ui_FixDpiSinglePageDialog.h"
 #include "Dpi.h"
+#include "ImageMetadata.h"
+#include <QPalette>
 
 class QPushButton;
 class ImageId;
@@ -30,21 +32,21 @@ class FixDpiSinglePageDialog : public QDialog
 	Q_OBJECT
 public:
 	FixDpiSinglePageDialog(
-		ImageId const& image_id, Dpi const& dpi,
+		ImageId const& image_id, ImageMetadata const& image_metadata,
 		bool is_multipage_file, QWidget* parent = 0);
 	
-	Dpi const& dpi() const { return m_dpi; }
+	Dpi const& dpi() const { return m_metadata.dpi(); }
 private slots:
 	void dpiComboChangedByUser(int idx);
 	
 	void dpiValueChanged();
 private:
-	bool isDpiOK() const;
-	
-	static bool isDpiOK(int dpi);
+	void decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpi_status) const;
 	
 	Ui::FixDpiSinglePageDialog ui;
-	Dpi m_dpi;
+	ImageMetadata m_metadata;
+	QPalette m_normalPalette;
+	QPalette m_errorPalette;
 	QPushButton* m_pOkBtn;
 };
 

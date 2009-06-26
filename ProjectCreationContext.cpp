@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,14 +45,14 @@ namespace
 {
 
 template<typename T>
-bool haveUndefinedDpi(T const& container)
+bool allDpisOK(T const& container)
 {
 	using namespace boost::lambda;
 	
 	return std::find_if(
 		container.begin(), container.end(),
-		bind(&ImageFileInfo::haveUndefinedDpi, _1)
-	) != container.end();
+		!bind(&ImageFileInfo::isDpiOK, _1)
+	) == container.end();
 }
 
 } // anonymous namespace
@@ -67,7 +67,7 @@ ProjectCreationContext::projectFilesSubmitted()
 		m_layoutDirection = Qt::RightToLeft;
 	}
 	
-	if (!haveUndefinedDpi(m_files)) {
+	if (!m_ptrProjectFilesDialog->isDpiFixingForced() && allDpisOK(m_files)) {
 		emit done(this);
 	} else {
 		showFixDpiDialog();

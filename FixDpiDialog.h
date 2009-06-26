@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,10 +21,13 @@
 
 #include "ui_FixDpiDialog.h"
 #include "ImageFileInfo.h"
+#include "ImageMetadata.h"
 #include "Dpi.h"
 #include <QDialog>
 #include <QString>
 #include <QItemSelection>
+#include <QPalette>
+#include <QSize>
 #include <vector>
 #include <memory>
 
@@ -55,20 +58,27 @@ private:
 	class TreeModel;
 	class FilterModel;
 	
+	enum Scope { ALL, NOT_OK };
+	
 	void enableDisableOkButton();
 	
 	void updateDpiFromSelection(QItemSelection const& selection);
 	
 	void resetDpiForm();
 	
-	void setDpiForm(Dpi dpi);
+	void setDpiForm(ImageMetadata const& metadata);
 	
 	void updateDpiCombo();
+	
+	void decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpi_status) const;
 	
 	std::auto_ptr<TreeModel> m_ptrPages;
 	std::auto_ptr<FilterModel> m_ptrUndefinedDpiPages;
 	QString m_xDpiInitialValue;
 	QString m_yDpiInitialValue;
+	QSize m_selectedItemPixelSize;
+	QPalette m_normalPalette;
+	QPalette m_errorPalette;
 };
 
 #endif

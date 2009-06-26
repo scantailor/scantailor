@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ public:
 	
 	std::vector<ImageMetadata> const& imageInfo() const { return m_imageInfo; }
 	
-	bool haveUndefinedDpi() const;
+	bool isDpiOK() const;
 private:
 	QFileInfo m_fileInfo;
 	std::vector<ImageMetadata> m_imageInfo;

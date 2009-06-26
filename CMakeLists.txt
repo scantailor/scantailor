@@ -300,6 +300,7 @@ SET(
 	FixDpiDialog.cpp FixDpiDialog.h
 	FixDpiSinglePageDialog.cpp FixDpiSinglePageDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
+	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	MainWindow.cpp MainWindow.h
 	PageSelectionAccessor.cpp PageSelectionAccessor.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
