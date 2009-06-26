@@ -92,7 +92,7 @@ private:
 /**
  * This comparator puts objects that are not OK to the front.
  */
-bool FixDpiDialog::DpiCounts::MetadataComparator::MetadataComparator::operator()(
+bool FixDpiDialog::DpiCounts::MetadataComparator::operator()(
 	ImageMetadata const& lhs, ImageMetadata const& rhs) const
 {
 	bool const lhs_ok = lhs.isDpiOK();
