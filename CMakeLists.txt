@@ -433,36 +433,37 @@ IF(ENABLE_CRASH_REPORTER)
 	)
 ENDIF(ENABLE_CRASH_REPORTER)
 
-ADD_CUSTOM_TARGET(update_translations)
-SET_TARGET_PROPERTIES(
-	update_translations
-    PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
-)
-
-MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET _subtarget) #, sources, ts_files
-	SET(_sources "")
-	SET(_ts_files "")
+SET(update_translations_subtargets)
+MACRO(UPDATE_TRANSLATIONS _subtarget) #, sources, ts_files
+	SET(_sources_str "")
+	SET(_translations_str "")
 	FOREACH(_file ${ARGN})
 		GET_FILENAME_COMPONENT(_abs "${_file}" ABSOLUTE)
 		GET_FILENAME_COMPONENT(_ext "${_file}" EXT)
 		IF(_ext STREQUAL .ts)
-			LIST(APPEND _ts_files "${_abs}")
+			SET(_translations_str "${_translations_str} \"${_abs}\"")
 		ELSE(_ext STREQUAL .ts)
-			LIST(APPEND _sources "${_abs}")
+			SET(_sources_str "${_sources_str} \"${_abs}\"")
 		ENDIF(_ext STREQUAL .ts)
 	ENDFOREACH(_file)
 	
-	ADD_CUSTOM_TARGET(
-		"update_translations_${_subtarget}"
-		COMMAND "${QT_LUPDATE_EXECUTABLE}"
-		${_sources} -ts ${_ts_files}
-		DEPENDS ${_sources}
+	FILE(
+		WRITE "${CMAKE_BINARY_DIR}/update_translations_${_subtarget}.pro"
+		"SOURCES = ${_sources_str}\nTRANSLATIONS = ${_translations_str}"
 	)
-	SET_TARGET_PROPERTIES(
-		"update_translations_${_subtarget}"
-        PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD 1
-	)
-	ADD_DEPENDENCIES(update_translations "update_translations_${_subtarget}")
+	
+	LIST(APPEND update_translations_subtarget ${_subtarget})
+ENDMACRO(UPDATE_TRANSLATIONS)
+
+MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET)
+	SET(_commands)
+	FOREACH(_subtarget ${update_translations_subtarget})
+		LIST(
+			APPEND _commands COMMAND "${QT_LUPDATE_EXECUTABLE}"
+			"${CMAKE_BINARY_DIR}/update_translations_${_subtarget}.pro"
+		)
+	ENDFOREACH(_subtarget)
+	ADD_CUSTOM_TARGET(update_translations ${_commands})
 ENDMACRO(CREATE_UPDATE_TRANSLATIONS_TARGET)
 
 # Translations
@@ -472,12 +473,9 @@ SET(TRANSLATION_SOURCES ${TRANSLATION_SOURCES} ${abs_sources} ${abs_ui_files})
 FILE(GLOB TRANSLATION_FILES translations/scantailor_*.ts)
 FILE(GLOB CR_TRANSLATION_FILES translations/crashreporter_*.ts)
 
-CREATE_UPDATE_TRANSLATIONS_TARGET(
-	scantailor ${TRANSLATION_SOURCES} ${TRANSLATION_FILES}
-)
-CREATE_UPDATE_TRANSLATIONS_TARGET(
-	crashreporter ${CR_TRANSLATION_SOURCES} ${CR_TRANSLATION_FILES}
-)
+UPDATE_TRANSLATIONS(scantailor ${TRANSLATION_SOURCES} ${TRANSLATION_FILES})
+UPDATE_TRANSLATIONS(crashreporter ${CR_TRANSLATION_SOURCES} ${CR_TRANSLATION_FILES})
+CREATE_UPDATE_TRANSLATIONS_TARGET()
 
 SET(ts_files ${TRANSLATION_FILES})
 IF(ENABLE_CRASH_REPORTER)
