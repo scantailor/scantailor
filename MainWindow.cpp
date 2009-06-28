@@ -70,15 +70,18 @@
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#include <QApplication>
 #include <QLineF>
 #include <QWidget>
 #include <QDialog>
 #include <QCloseEvent>
 #include <QStackedLayout>
 #include <QGridLayout>
+#include <QVBoxLayout>
 #include <QLayoutItem>
 #include <QScrollBar>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QFileInfo>
 #include <QFile>
 #include <QDir>
@@ -94,6 +97,7 @@
 #include <QSortFilterProxyModel>
 #include <QFileSystemModel>
 #include <QFileInfo>
+#include <Qt>
 #include <QDebug>
 #include <algorithm>
 #include <stddef.h>
@@ -114,7 +118,7 @@ MainWindow::MainWindow()
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
-	m_ptrBatchProcessingWidget = createBatchProcessingWidget();
+	createBatchProcessingWidget();
 	m_ptrProcessingIndicationWidget.reset(new ProcessingIndicationWidget);
 	
 	filterList->setStages(m_ptrStages);
@@ -368,33 +372,39 @@ MainWindow::showNewOpenProjectPanel()
 	filterList->setBatchProcessingPossible(false);
 }
 
-std::auto_ptr<QWidget>
+void
 MainWindow::createBatchProcessingWidget()
 {
-	std::auto_ptr<QWidget> outer_widget(new QWidget);
-	QGridLayout* layout = new QGridLayout(outer_widget.get());
-	outer_widget->setLayout(layout);
+	m_ptrBatchProcessingWidget.reset(new QWidget);
+	QGridLayout* layout = new QGridLayout(m_ptrBatchProcessingWidget.get());
+	m_ptrBatchProcessingWidget->setLayout(layout);
 	
-	SkinnedButton* btn = new SkinnedButton(
+	SkinnedButton* stop_btn = new SkinnedButton(
 		":/icons/stop-big.png",
 		":/icons/stop-big-hovered.png",
 		":/icons/stop-big-pressed.png",
-		outer_widget.get()
+		m_ptrBatchProcessingWidget.get()
 	);
-	btn->setStatusTip(tr("Stop batch processing"));
+	stop_btn->setStatusTip(tr("Stop batch processing"));
 	
-	layout->addWidget(btn, 1, 1);
+	QWidget* lower_panel = new QWidget(m_ptrBatchProcessingWidget.get());
+	QVBoxLayout* lower_layout = new QVBoxLayout(lower_panel);
+	lower_panel->setLayout(lower_layout);
+	
+	lower_layout->addSpacing(30);
+	m_pBeepOnBatchProcessingCompletion = new QCheckBox(
+		tr("Beep when finished"), lower_panel
+	);
+	lower_layout->addWidget(m_pBeepOnBatchProcessingCompletion);
+	
+	layout->addWidget(stop_btn, 1, 1, Qt::AlignCenter);
+	layout->addWidget(lower_panel, 2, 0, 1, 3, Qt::AlignHCenter|Qt::AlignTop);
 	layout->setColumnStretch(0, 1);
 	layout->setColumnStretch(2, 1);
 	layout->setRowStretch(0, 1);
 	layout->setRowStretch(2, 1);
 	
-	connect(
-		btn, SIGNAL(clicked()),
-		this, SLOT(stopBatchProcessing())
-	);
-	
-	return outer_widget;
+	connect(stop_btn, SIGNAL(clicked()), SLOT(stopBatchProcessing()));
 }
 
 void
@@ -948,6 +958,10 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		if (next_page.id() == cur_page.id()) {
 			m_ptrPages->setFirstPage(getCurrentView());
 			stopBatchProcessing(); // This will call loadImage().
+			QApplication::alert(this); // Flash the taskbar entry.
+			if (m_pBeepOnBatchProcessingCompletion->isChecked()) {
+				QApplication::beep();
+			}
 		} else {
 			loadImage(next_page, page_num);
 		}

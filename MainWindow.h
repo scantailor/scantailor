@@ -57,6 +57,7 @@ class CompositeCacheDrivenTask;
 class QLineF;
 class QRectF;
 class QLayout;
+class QCheckBox;
 
 class MainWindow :
 	public QMainWindow,
@@ -216,7 +217,7 @@ private:
 	IntrusivePtr<CompositeCacheDrivenTask>
 	createCompositeCacheDrivenTask(int last_filter_idx);
 	
-	std::auto_ptr<QWidget> createBatchProcessingWidget();
+	void createBatchProcessingWidget();
 	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<PageSequence> m_ptrPages;
@@ -233,6 +234,7 @@ private:
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
 	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
 	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;
+	QCheckBox* m_pBeepOnBatchProcessingCompletion;
 	BackgroundTaskPtr m_ptrCurTask;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;
@@ -241,6 +243,7 @@ private:
 	bool m_debug;
 	bool m_batchProcessing;
 	bool m_closing;
+	bool m_beepOnBatchProcessingCompletion;
 };
 
 #endif
