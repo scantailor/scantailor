@@ -47,11 +47,17 @@
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="63"/>
-        <source>If you have additional information, for example you know how to reproduce the crash, please provide it here.</source>
-        <translation>Если у вас есть дополнительная информация, например если вы знаете, как воспроизвести падение - пишите ее сюда.</translation>
+        <source>If you have additional information, for example you know how to reproduce the crash, please provide it here.
+English or Russian please.</source>
+        <translation>Если у вас есть дополнительная информация, например если вы знаете, как воспроизвести падение - пишите ее сюда.
+Писать можно по-русски или по-английски.</translation>
     </message>
     <message>
-        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="70"/>
+        <source>If you have additional information, for example you know how to reproduce the crash, please provide it here.</source>
+        <translation type="obsolete">Если у вас есть дополнительная информация, например если вы знаете, как воспроизвести падение - пишите ее сюда.</translation>
+    </message>
+    <message>
+        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="71"/>
         <source>If you are willing to provide further assistance to developers to help fix this problem, please provide your email address.</source>
         <translation>Если вы согласны оказать дополнительное содействие разработчикам в поиске этой проблемы, укажите свой адрес электронной почты.</translation>
     </message>
@@ -60,7 +66,7 @@
         <translation type="obsolete">Если вы согласны оказать дополнительное содействие разработчикам в поиске этой проблемы, укажите свой адрес электронной почты.</translation>
     </message>
     <message>
-        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="80"/>
+        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="81"/>
         <source>Email [optional]</source>
         <translation>Email [не обязательно]</translation>
     </message>

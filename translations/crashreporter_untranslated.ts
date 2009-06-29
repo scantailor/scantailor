@@ -47,16 +47,17 @@
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="63"/>
-        <source>If you have additional information, for example you know how to reproduce the crash, please provide it here.</source>
+        <source>If you have additional information, for example you know how to reproduce the crash, please provide it here.
+English or Russian please.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="70"/>
+        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="71"/>
         <source>If you are willing to provide further assistance to developers to help fix this problem, please provide your email address.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="80"/>
+        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="81"/>
         <source>Email [optional]</source>
         <translation type="unfinished"></translation>
     </message>

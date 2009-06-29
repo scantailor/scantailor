@@ -60,7 +60,8 @@
       <item>
        <widget class="QPlainTextEdit" name="additionalInfo">
         <property name="plainText">
-         <string>If you have additional information, for example you know how to reproduce the crash, please provide it here.</string>
+         <string>If you have additional information, for example you know how to reproduce the crash, please provide it here.
+English or Russian please.</string>
         </property>
        </widget>
       </item>
