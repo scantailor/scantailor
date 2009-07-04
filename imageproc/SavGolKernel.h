@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #ifndef IMAGEPROC_SAVGOL_KERNEL_H_
 #define IMAGEPROC_SAVGOL_KERNEL_H_
 
+#include "AlignedArray.h"
 #include <vector>
 #include <stddef.h>
 
@@ -41,9 +42,9 @@ public:
 	
 	int height() const { return m_height; }
 	
-	double const* data() const { return &m_kernel[0]; }
+	float const* data() const { return m_kernel.data(); }
 	
-	double operator[](size_t idx) const { return m_kernel[idx]; }
+	float operator[](size_t idx) const { return m_kernel[idx]; }
 private:
 	struct Rotation
 	{
@@ -82,9 +83,9 @@ private:
 	std::vector<Rotation> m_rotations;
 	
 	/**
-	 * The convolution kernel of size m_numDataPoints.
+	 * 16-byte aligned convolution kernel of size m_numDataPoints.
 	 */
-	std::vector<double> m_kernel;
+	AlignedArray<float, 4> m_kernel;
 	
 	/**
 	 * The degree of the polynomial in horizontal direction.

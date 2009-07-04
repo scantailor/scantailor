@@ -19,6 +19,7 @@
 #include "SavGolFilter.h"
 #include "SavGolKernel.h"
 #include "Grayscale.h"
+#include "AlignedArray.h"
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -54,8 +55,8 @@ inline void
 Kernel::convolve(uint8_t* dst, uint8_t const* src_top_left, int src_bpl) const
 {
 	uint8_t const* p_src = src_top_left;
-	double const* p_kernel = data();
-	double sum = 0.5; // For rounding purposes.
+	float const* p_kernel = data();
+	float sum = 0.5; // For rounding purposes.
 	
 	int const w = width();
 	int const h = height();
@@ -165,6 +166,8 @@ QImage savGolFilterGrayToGray(
 	}
 	
 	// Central area.
+#if 0
+	// Simple but slow implementation.
 	kernel.recalcForOrigin(k_center);
 	src_line = src_data - k_left;
 	dst_line = dst_data + dst_bpl * k_top;
@@ -175,6 +178,58 @@ QImage savGolFilterGrayToGray(
 		src_line += src_bpl;
 		dst_line += dst_bpl;
 	}
+#else
+	// Take advantage of Savitzky-Golay filter being separable.
+	SavGolKernel const hor_kernel(
+		QSize(window_size.width(), 1),
+		QPoint(k_center.x(), 0), hor_degree, 0
+	);
+	SavGolKernel const vert_kernel(
+		QSize(1, window_size.height()),
+		QPoint(0, k_center.y()), 0, vert_degree
+	);
+	
+	// Allocate a 16-byte aligned temporary storage.
+	// That may help the compiler to emit efficient SSE code.
+	int const temp_stride = (width - kw + 3) & ~3;
+	AlignedArray<float, 4> temp_array(temp_stride * height);
+	
+	// Horizontal pass.
+	src_line = src_data - kw;
+	float* temp_line = temp_array.data() - kw;
+	for (int y = 0; y < height; ++y) {
+		for (int i = kw; i < width; ++i) {
+			float sum = 0.0f;
+			
+			uint8_t const* src = src_line + i;
+			for (int j = 0; j < kw; ++j) {
+				sum += src[j] * hor_kernel[j];
+			}
+			temp_line[i] = sum;
+		}
+		temp_line += temp_stride;
+		src_line += src_bpl;
+	}
+	
+	// Vertical pass.
+	dst_line = dst_data + k_top * dst_bpl + k_left - kw;
+	temp_line = temp_array.data() - kw;
+	for (int y = k_top; y < height - k_bottom; ++y) {
+		for (int i = kw; i < width; ++i) {
+			float sum = 0.0f;
+			
+			float* tmp = temp_line + i;
+			for (int j = 0; j < kh; ++j, tmp += temp_stride) {
+				sum += *tmp * vert_kernel[j];
+			}
+			int const val = static_cast<int>(sum);
+			dst_line[i] = static_cast<uint8_t>(qBound(0, val, 255));
+		}
+		
+		temp_line += temp_stride;
+		dst_line += dst_bpl;
+	}
+#endif
 
 	// Left area between two corners.
 	k_origin.setX(0);

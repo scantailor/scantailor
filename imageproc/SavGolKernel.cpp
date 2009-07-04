@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ SavGolKernel::SavGolKernel(
 	// Allocate memory.
 	m_dataPoints.resize(m_numDataPoints, 0.0);
 	m_coeffs.resize(m_numTerms);
-	m_kernel.resize(m_numDataPoints);
+	AlignedArray<float, 4>(m_numDataPoints).swap(m_kernel);
 	
 	// Prepare equations.
 	m_equations.reserve(m_numTerms * m_numDataPoints);
@@ -198,7 +198,7 @@ SavGolKernel::recalcForOrigin(QPoint const& origin)
 				}
 				pow1 *= y;
 			}
-			m_kernel[ki] = sum;
+			m_kernel[ki] = (float)sum;
 			++ki;
 		}
 	}
