@@ -311,7 +311,7 @@ FILE(
 	" -no-openssl -no-qt3support -no-style-plastique -no-style-cleanlooks"
 	" -no-style-motif -no-style-cde -no-phonon -no-webkit -no-scripttools"
 	" -nomake examples -nomake demos -nomake docs ${qt_maybe_skip_tools}"
-	" -confirm-license"
+	" -opensource -confirm-license -no-ltcg"
 	" -I \"${JPEG_INCLUDE_DIR}\" -I \"${ZLIB_INCLUDE_DIR}\""
 	" -I \"${PNG_INCLUDE_DIR}\" -L \"${JPEG_DIR}\" -L \"${ZLIB_DIR}\""
 	" -L \"${PNG_DIR}\""
