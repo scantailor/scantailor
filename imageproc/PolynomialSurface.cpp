@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 
 #include "PolynomialSurface.h"
 #include "LeastSquaresFit.h"
+#include "AlignedArray.h"
 #include "BinaryImage.h"
 #include "Grayscale.h"
 #include "BitOps.h"
 #include <QImage>
 #include <QDebug>
+#include <boost/foreach.hpp>
 #include <stdexcept>
 #include <algorithm>
 #include <math.h>
@@ -139,29 +141,49 @@ PolynomialSurface::render(QSize const& size) const
 	int const height = size.height();
 	unsigned char* line = image.bits();
 	int const bpl = image.bytesPerLine();
-	
+	int const num_coeffs = m_coeffs.size();
 	
 	// Pretend that both x and y positions of pixels
-	// lie in range of [1, 2].
+	// lie in range of [0, 1].
 	double const xscale = calcScale(width);
 	double const yscale = calcScale(height);
 	
-	for (int y = 0; y < height; ++y, line += bpl) {
-		double const y_adjusted = 1.0 + y * yscale;
-		for (int x = 0; x < width; ++x) {
-			double const x_adjusted = 1.0 + x * xscale;
-			int pos = 0;
-			double sum = 0.5; // for rounding purposes
-			double pow1 = 1.0;
-			for (int i = 0; i <= m_vertDegree; ++i) {
-				double pow2 = pow1;
-				for (int j = 0; j <= m_horDegree; ++j, ++pos) {
-					sum += m_coeffs[pos] * pow2;
-					pow2 *= x_adjusted;
-				}
-				pow1 *= y_adjusted;
+	AlignedArray<float, 4> vert_matrix(num_coeffs * height);
+	float* out = &vert_matrix[0];
+	for (int y = 0; y < height; ++y) {
+		double const y_adjusted = y * yscale;
+		double pow = 1.0;
+		int pos = 0;
+		for (int i = 0; i <= m_vertDegree; ++i) {
+			for (int j = 0; j <= m_horDegree; ++j, ++pos, ++out) {
+				*out = static_cast<float>(m_coeffs[pos] * pow);
 			}
-			int const isum = (int)sum;
+			pow *= y_adjusted;
+		}
+	}
+	
+	AlignedArray<float, 4> hor_matrix(num_coeffs * width);
+	out = &hor_matrix[0];
+	for (int x = 0; x < width; ++x) {
+		double const x_adjusted = x * xscale;
+		for (int i = 0; i <= m_vertDegree; ++i) {
+			double pow = 1.0;
+			for (int j = 0; j <= m_horDegree; ++j, ++out) {
+				*out = static_cast<float>(pow);
+				pow *= x_adjusted;
+			}
+		}
+	}
+	
+	float const* vert_line = &vert_matrix[0];
+	for (int y = 0; y < height; ++y, line += bpl, vert_line += num_coeffs) {
+		float const* hor_line = &hor_matrix[0];
+		for (int x = 0; x < width; ++x, hor_line += num_coeffs) {
+			float sum = 0.5f / 255.0f; // for rounding purposes.
+			for (int i = 0; i < num_coeffs; ++i) {
+				sum += hor_line[i] * vert_line[i];
+			}
+			int const isum = (int)(sum * 255.0);
 			line[x] = static_cast<unsigned char>(qBound(0, isum, 255));
 		}
 	}
@@ -212,17 +234,17 @@ PolynomialSurface::prepareEquationsAndDataPoints(
 	int const bpl = image.bytesPerLine();
 	
 	// Pretend that both x and y positions of pixels
-	// lie in range of [1, 2].
+	// lie in range of [0, 1].
 	double const xscale = calcScale(width);
 	double const yscale = calcScale(height);
 	
 	for (int y = 0; y < height; ++y, line += bpl) {
-		double const y_adjusted = 1.0 + yscale * y;
+		double const y_adjusted = yscale * y;
 		
 		for (int x = 0; x < width; ++x) {
-			double const x_adjusted = 1.0 + xscale * x;
+			double const x_adjusted = xscale * x;
 			
-			data_points.push_back(line[x]);
+			data_points.push_back((1.0 / 255.0) * line[x]);
 			
 			double pow1 = 1.0;
 			for (int i = 0; i <= m_vertDegree; ++i) {
@@ -258,7 +280,7 @@ PolynomialSurface::prepareEquationsAndDataPoints(
 	int const last_word_mask = ~uint32_t(0) << (31 - ((width - 1) & 31));
 	
 	for (int y = 0; y < height; ++y) {
-		double const y_adjusted = 1.0 + y * yscale;
+		double const y_adjusted = y * yscale;
 		int idx = 0;
 		
 		// Full words.
@@ -303,9 +325,9 @@ PolynomialSurface::processMaskWord(
 			assert(word & mask);
 		}
 		
-		data_points.push_back(image_line[x]);
+		data_points.push_back((1.0 / 255.0) * image_line[x]);
 		
-		double const x_adjusted = 1.0 + xscale * x;
+		double const x_adjusted = xscale * x;
 		double pow1 = 1.0;
 		for (int i = 0; i <= m_vertDegree; ++i) {
 			double pow2 = pow1;
