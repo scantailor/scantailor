@@ -45,6 +45,7 @@
 #include "imageproc/SavGolFilter.h"
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
+#include "imageproc/PolygonRasterizer.h"
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -231,8 +232,8 @@ void combineMixed(
 QImage
 OutputGenerator::normalizeIlluminationGray(
 	TaskStatus const& status,
-	QImage const& input, QTransform const& xform,
-	QRect const& target_rect, DebugImages* const dbg)
+	QImage const& input, QPolygonF const& area_to_consider,
+	QTransform const& xform, QRect const& target_rect, DebugImages* const dbg)
 {
 	QImage to_be_normalized(
 		transformToGray(
@@ -246,9 +247,13 @@ OutputGenerator::normalizeIlluminationGray(
 	
 	status.throwIfCancelled();
 	
+	QPolygonF transformed_consideration_area(xform.map(area_to_consider));
+	transformed_consideration_area.translate(-target_rect.topLeft());
+	
 	PolynomialSurface const bg_ps(
 		estimateBackground(
-			to_be_normalized, status, dbg
+			to_be_normalized, transformed_consideration_area,
+			status, dbg
 		)
 	);
 	
@@ -381,10 +386,23 @@ OutputGenerator::processImpl(FilterData const& input,
 	
 	QImage maybe_normalized;
 	
+	// Crop area in original image coordinates.
+	QPolygonF const orig_image_crop_area(
+		input.xform().transformBack().map(
+			input.xform().resultingCropArea()
+		)
+	);
+	
+	// Crop area in maybe_normalized image coordinates.
+	QPolygonF normalize_illumination_crop_area(
+		m_toUncropped.map(orig_image_crop_area)
+	);
+	normalize_illumination_crop_area.translate(-normalize_illumination_rect.topLeft());
+	
 	if (render_params.normalizeIllumination()) {
 		maybe_normalized = normalizeIlluminationGray(
-			status, input.grayImage(), m_toUncropped,
-			normalize_illumination_rect, dbg
+			status, input.grayImage(), orig_image_crop_area,
+			m_toUncropped, normalize_illumination_rect, dbg
 		);
 	} else {
 		maybe_normalized = transform(
@@ -413,10 +431,13 @@ OutputGenerator::processImpl(FilterData const& input,
 		BinaryImage dst(m_cropRect.size().expandedTo(QSize(1, 1)), WHITE);
 		
 		if (!m_contentRect.isEmpty()) {
-			BinaryImage bw_content(binarize(maybe_smoothed, m_dpi));
+			BinaryImage bw_content(
+				binarize(maybe_smoothed, normalize_illumination_crop_area)
+			);
 			if (dbg) {
-				dbg->add(bw_content, "bw_content");
+				dbg->add(bw_content, "binarized_and_cropped");
 			}
+			
 			status.throwIfCancelled();
 			
 			if (render_params.despeckle()) {
@@ -694,15 +715,33 @@ OutputGenerator::smoothToGrayscale(QImage const& src, Dpi const& dpi)
 }
 
 BinaryImage
-OutputGenerator::binarize(QImage const& image, Dpi const& image_dpi) const
+OutputGenerator::binarize(QImage const& image, QPolygonF const& crop_area) const
 {
-	BinaryThreshold bw_thresh(
-		BinaryThreshold::otsuThreshold(image)
-	);
+	QPainterPath path;
+	path.addPolygon(crop_area);
+	bool const need_crop = !path.contains(image.rect());
+	
+	BinaryThreshold bw_thresh(128);
+	
+	if (!need_crop) {
+		bw_thresh = BinaryThreshold::otsuThreshold(image);
+	} else {
+		BinaryImage mask(image.size(), BLACK);
+		PolygonRasterizer::fillExcept(mask, WHITE, crop_area, Qt::WindingFill);
+		GrayscaleHistogram hist(image, mask);
+		bw_thresh = BinaryThreshold::otsuThreshold(hist);
+	}
+	
 	int const adjusted_thresh = bw_thresh +
 		m_colorParams.blackWhiteOptions().thresholdAdjustment();
 	bw_thresh = BinaryThreshold(qBound(0, adjusted_thresh, 255));
-	return BinaryImage(image, bw_thresh);
+	
+	BinaryImage binarized(image, bw_thresh);
+	if (need_crop) {
+		PolygonRasterizer::fillExcept(binarized, WHITE, crop_area, Qt::WindingFill);
+	}
+	
+	return binarized;
 }
 
 /**

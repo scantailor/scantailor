@@ -29,9 +29,13 @@
 #include "imageproc/Connectivity.h"
 #include "imageproc/PolynomialLine.h"
 #include "imageproc/PolynomialSurface.h"
+#include "imageproc/PolygonRasterizer.h"
 #include <QImage>
 #include <QColor>
 #include <QSize>
+#include <QPolygonF>
+#include <QTransform>
+#include <Qt>
 #include <vector>
 #include <algorithm>
 #include <stdint.h>
@@ -74,7 +78,8 @@ static void seedFillTopBottomInPlace(QImage& image)
 }
 
 imageproc::PolynomialSurface estimateBackground(
-	QImage const& input, TaskStatus const& status, DebugImages* dbg)
+	QImage const& input, QPolygonF const& area_to_consider,
+	TaskStatus const& status, DebugImages* dbg)
 {
 	QSize reduced_size(input.size());
 	reduced_size.scale(300, 300, Qt::KeepAspectRatio);
@@ -97,6 +102,22 @@ imageproc::PolynomialSurface estimateBackground(
 	int const bg_bpl = background.bytesPerLine();
 	
 	BinaryImage mask(background.size(), BLACK);
+	
+	if (!area_to_consider.isEmpty()) {
+		QTransform xform;
+		xform.scale(
+			(double)reduced_size.width() / input.width(),
+			(double)reduced_size.height() / input.height()
+		);
+		PolygonRasterizer::fillExcept(
+			mask, WHITE, xform.map(area_to_consider), Qt::WindingFill
+		);
+	}
+	
+	if (dbg) {
+		dbg->add(mask, "area_to_consider");
+	}
+	
 	uint32_t* mask_data = mask.data();
 	int mask_wpl = mask.wordsPerLine();
 	

@@ -75,8 +75,8 @@ private:
 	
 	static QImage normalizeIlluminationGray(
 		TaskStatus const& status,
-		QImage const& input, QTransform const& xform,
-		QRect const& target_rect, DebugImages* dbg);
+		QImage const& input, QPolygonF const& area_to_consider,
+		QTransform const& xform, QRect const& target_rect, DebugImages* dbg);
 	
 	static QImage detectPictures(
 		QImage const& input_300dpi, TaskStatus const& status,
@@ -88,7 +88,7 @@ private:
 		DebugImages* const dbg) const;
 	
 	imageproc::BinaryImage binarize(
-		QImage const& image, Dpi const& image_dpi) const;
+		QImage const& image, QPolygonF const& crop_area) const;
 	
 	static QImage smoothToGrayscale(QImage const& src, Dpi const& dpi);
 	
