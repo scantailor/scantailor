@@ -189,16 +189,18 @@ QImage savGolFilterGrayToGray(
 		QPoint(0, k_center.y()), 0, vert_degree
 	);
 	
+	int const shift = kw - 1;
+	
 	// Allocate a 16-byte aligned temporary storage.
 	// That may help the compiler to emit efficient SSE code.
-	int const temp_stride = (width - kw + 3) & ~3;
+	int const temp_stride = (width - shift + 3) & ~3;
 	AlignedArray<float, 4> temp_array(temp_stride * height);
 	
 	// Horizontal pass.
-	src_line = src_data - kw;
-	float* temp_line = temp_array.data() - kw;
+	src_line = src_data - shift;
+	float* temp_line = temp_array.data() - shift;
 	for (int y = 0; y < height; ++y) {
-		for (int i = kw; i < width; ++i) {
+		for (int i = shift; i < width; ++i) {
 			float sum = 0.0f;
 			
 			uint8_t const* src = src_line + i;
@@ -212,10 +214,10 @@ QImage savGolFilterGrayToGray(
 	}
 	
 	// Vertical pass.
-	dst_line = dst_data + k_top * dst_bpl + k_left - kw;
-	temp_line = temp_array.data() - kw;
+	dst_line = dst_data + k_top * dst_bpl + k_left - shift;
+	temp_line = temp_array.data() - shift;
 	for (int y = k_top; y < height - k_bottom; ++y) {
-		for (int i = kw; i < width; ++i) {
+		for (int i = shift; i < width; ++i) {
 			float sum = 0.0f;
 			
 			float* tmp = temp_line + i;
