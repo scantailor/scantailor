@@ -27,19 +27,20 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
+#include <boost/foreach.hpp>
 #include <stddef.h>
 #include <assert.h>
 
 ProjectWriter::ProjectWriter(
 	QString const& out_dir, IntrusivePtr<PageSequence> const& page_sequence)
 :	m_outDir(out_dir),
-	m_pages(page_sequence->snapshot(PageSequence::PAGE_VIEW)),
+	m_pageSequence(page_sequence->snapshot(PageSequence::PAGE_VIEW)),
 	m_layoutDirection(page_sequence->layoutDirection())
 {
 	int next_id = 1;
-	size_t const num_pages = m_pages.numPages();
+	size_t const num_pages = m_pageSequence.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page = m_pages.pageAt(i);
+		PageInfo const& page = m_pageSequence.pageAt(i);
 		PageId const& page_id = page.id();
 		ImageId const& image_id = page_id.imageId();
 		QString const& file_path = image_id.filePath();
@@ -48,21 +49,19 @@ ProjectWriter::ProjectWriter(
 		
 		m_metadataByImage[image_id] = page.metadata();
 		
-		if (m_dirIds.insert(DirectoryIds::value_type(dir_path, next_id)).second) {
+		if (m_dirs.insert(Directory(dir_path, next_id)).second) {
 			++next_id;
 		}
 		
-		FileData const file_data(next_id, page.isMultiPageFile());
-		if (m_fileIds.insert(FileIds::value_type(file_path, file_data)).second) {
+		if (m_files.insert(File(file_path, next_id, page.isMultiPageFile())).second) {
 			++next_id;
 		}
 		
-		ImageData const img_data(next_id, page.imageSubPages());
-		if (m_imageIds.insert(ImageIds::value_type(image_id, img_data)).second) {
+		if (m_images.insert(Image(image_id, next_id, page.imageSubPages())).second) {
 			++next_id;
 		}
 		
-		if (m_pageIds.insert(PageIds::value_type(page_id, next_id)).second) {
+		if (m_pages.insert(Page(page_id, next_id)).second) {
 			++next_id;
 		}
 	}
@@ -112,12 +111,10 @@ ProjectWriter::processDirectories(QDomDocument& doc) const
 {
 	QDomElement dirs_el(doc.createElement("directories"));
 	
-	DirectoryIds::const_iterator it(m_dirIds.begin());
-	DirectoryIds::const_iterator const end(m_dirIds.end());
-	for (; it != end; ++it) {
+	BOOST_FOREACH(Directory const& dir, m_dirs.get<Sequenced>()) {
 		QDomElement dir_el(doc.createElement("directory"));
-		dir_el.setAttribute("id", it->second);
-		dir_el.setAttribute("path", it->first);
+		dir_el.setAttribute("id", dir.numericId);
+		dir_el.setAttribute("path", dir.path);
 		dirs_el.appendChild(dir_el);
 	}
 	
@@ -129,18 +126,14 @@ ProjectWriter::processFiles(QDomDocument& doc) const
 {
 	QDomElement files_el(doc.createElement("files"));
 	
-	FileIds::const_iterator it(m_fileIds.begin());
-	FileIds::const_iterator const end(m_fileIds.end());
-	for (; it != end; ++it) {
-		QString const& file_path = it->first;
-		FileData const& file_data = it->second;
-		QFileInfo const file_info(file_path);
+	BOOST_FOREACH(File const& file, m_files.get<Sequenced>()) {
+		QFileInfo const file_info(file.path);
 		QString const& dir_path = file_info.absolutePath();
 		QDomElement file_el(doc.createElement("file"));
-		file_el.setAttribute("id", file_data.id);
+		file_el.setAttribute("id", file.numericId);
 		file_el.setAttribute("dirId", dirId(dir_path));
 		file_el.setAttribute("name", file_info.fileName());
-		file_el.setAttribute("multiPage", file_data.multiPageFile ? "1" : "0");
+		file_el.setAttribute("multiPage", file.multiPageFile ? "1" : "0");
 		files_el.appendChild(file_el);
 	}
 	
@@ -152,16 +145,13 @@ ProjectWriter::processImages(QDomDocument& doc) const
 {
 	QDomElement images_el(doc.createElement("images"));
 	
-	ImageIds::const_iterator it(m_imageIds.begin());
-	ImageIds::const_iterator const end(m_imageIds.end());
-	for (; it != end; ++it) {
-		ImageId const& image_id = it->first;
+	BOOST_FOREACH(Image const& image, m_images.get<Sequenced>()) {
 		QDomElement image_el(doc.createElement("image"));
-		image_el.setAttribute("id", it->second.id);
-		image_el.setAttribute("subPages", it->second.numSubPages);
-		image_el.setAttribute("fileId", fileId(image_id.filePath()));
-		image_el.setAttribute("fileImage", image_id.page());
-		writeImageMetadata(doc, image_el, image_id);
+		image_el.setAttribute("id", image.numericId);
+		image_el.setAttribute("subPages", image.numSubPages);
+		image_el.setAttribute("fileId", fileId(image.id.filePath()));
+		image_el.setAttribute("fileImage", image.id.page());
+		writeImageMetadata(doc, image_el, image.id);
 		images_el.appendChild(image_el);
 	}
 	
@@ -192,10 +182,10 @@ ProjectWriter::processPages(QDomDocument& doc) const
 {
 	QDomElement pages_el(doc.createElement("pages"));
 	
-	size_t const cur_page = m_pages.curPageIdx();
-	size_t const num_pages = m_pages.numPages();
+	size_t const cur_page = m_pageSequence.curPageIdx();
+	size_t const num_pages = m_pageSequence.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page = m_pages.pageAt(i);
+		PageInfo const& page = m_pageSequence.pageAt(i);
 		PageId const& page_id = page.id();
 		QDomElement page_el(doc.createElement("page"));
 		page_el.setAttribute("id", pageId(page_id));
@@ -213,51 +203,47 @@ ProjectWriter::processPages(QDomDocument& doc) const
 int
 ProjectWriter::dirId(QString const& dir_path) const
 {
-	DirectoryIds::const_iterator it(m_dirIds.find(dir_path));
-	assert(it != m_dirIds.end());
-	return it->second;
+	Directories::const_iterator const it(m_dirs.find(dir_path));
+	assert(it != m_dirs.end());
+	return it->numericId;
 }
 
 int
 ProjectWriter::fileId(QString const& file_path) const
 {
-	FileIds::const_iterator it(m_fileIds.find(file_path));
-	assert(it != m_fileIds.end());
-	return it->second.id;
+	Files::const_iterator const it(m_files.find(file_path));
+	assert(it != m_files.end());
+	return it->numericId;
 }
 
 int
 ProjectWriter::imageId(ImageId const& image_id) const
 {
-	ImageIds::const_iterator it(m_imageIds.find(image_id));
-	assert(it != m_imageIds.end());
-	return it->second.id;
+	Images::const_iterator const it(m_images.find(image_id));
+	assert(it != m_images.end());
+	return it->numericId;
 }
 
 int
 ProjectWriter::pageId(PageId const& page_id) const
 {
-	PageIds::const_iterator it(m_pageIds.find(page_id));
-	assert(it != m_pageIds.end());
-	return it->second;
+	Pages::const_iterator const it(m_pages.find(page_id));
+	assert(it != m_pages.end());
+	return it->numericId;
 }
 
 void
 ProjectWriter::enumImagesImpl(VirtualFunction2<void, ImageId const&, int>& out) const
 {
-	ImageIds::const_iterator it(m_imageIds.begin());
-	ImageIds::const_iterator const end(m_imageIds.end());
-	for (; it != end; ++it) {
-		out(it->first, it->second.id);
+	BOOST_FOREACH(Image const& image, m_images.get<Sequenced>()) {
+		out(image.id, image.numericId);
 	}
 }
 
 void
 ProjectWriter::enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) const
 {
-	PageIds::const_iterator it(m_pageIds.begin());
-	PageIds::const_iterator const end(m_pageIds.end());
-	for (; it != end; ++it) {
-		out(it->first, it->second);
+	BOOST_FOREACH(Page const& page, m_pages.get<Sequenced>()) {
+		out(page.id, page.numericId);
 	}
 }

@@ -24,6 +24,10 @@
 #include "ImageId.h"
 #include "PageId.h"
 #include "VirtualFunction.h"
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
 #include <QString>
 #include <Qt>
 #include <vector>
@@ -57,29 +61,87 @@ public:
 	template<typename OutFunc>
 	void enumPages(OutFunc out) const;
 private:
-	struct FileData
+	struct Directory
 	{
-		int id;
+		QString path;
+		int numericId;
+		
+		Directory(QString const& path, int numeric_id)
+		: path(path), numericId(numeric_id) {}
+	};
+	
+	struct File
+	{
+		QString path;
+		int numericId;
 		bool multiPageFile;
 		
-		FileData(int id, bool multi_page)
-		: id(id), multiPageFile(multi_page) {}
+		File(QString const& path, int numeric_id, bool multi_page)
+		: path(path), numericId(numeric_id), multiPageFile(multi_page) {}
 	};
 	
-	struct ImageData
+	struct Image
 	{
-		int id;
+		ImageId id;
+		int numericId;
 		int numSubPages;
 		
-		ImageData(int id, int num_sub_pages)
-		: id(id), numSubPages(num_sub_pages) {}
+		Image(ImageId const& id, int numeric_id, int num_sub_pages)
+		: id(id), numericId(numeric_id), numSubPages(num_sub_pages) {}
 	};
 	
-	typedef std::map<QString, int> DirectoryIds;
-	typedef std::map<QString, FileData> FileIds;
-	typedef std::map<ImageId, ImageData> ImageIds;
-	typedef std::map<PageId, int> PageIds;
+	struct Page
+	{
+		PageId id;
+		int numericId;
+		
+		Page(PageId const& id, int numeric_id)
+		: id(id), numericId(numeric_id) {}
+	};
+	
+	class Sequenced;
+	
 	typedef std::map<ImageId, ImageMetadata> MetadataByImage;
+	
+	typedef boost::multi_index::multi_index_container<
+		Directory,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<
+				boost::multi_index::member<Directory, QString, &Directory::path>
+			>,
+			boost::multi_index::sequenced<boost::multi_index::tag<Sequenced> >
+		>
+	> Directories;
+	
+	typedef boost::multi_index::multi_index_container<
+		File,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<
+				boost::multi_index::member<File, QString, &File::path>
+			>,
+			boost::multi_index::sequenced<boost::multi_index::tag<Sequenced> >
+		>
+	> Files;
+	
+	typedef boost::multi_index::multi_index_container<
+		Image,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<
+				boost::multi_index::member<Image, ImageId, &Image::id>
+			>,
+			boost::multi_index::sequenced<boost::multi_index::tag<Sequenced> >
+		>
+	> Images;
+	
+	typedef boost::multi_index::multi_index_container<
+		Page,
+		boost::multi_index::indexed_by<
+			boost::multi_index::ordered_unique<
+				boost::multi_index::member<Page, PageId, &Page::id>
+			>,
+			boost::multi_index::sequenced<boost::multi_index::tag<Sequenced> >
+		>
+	> Pages;
 	
 	QDomElement processDirectories(QDomDocument& doc) const;
 	
@@ -106,11 +168,11 @@ private:
 	void enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) const;
 	
 	QString m_outDir;
-	PageSequenceSnapshot m_pages;
-	DirectoryIds m_dirIds; // directory -> numeric id
-	FileIds m_fileIds; // file path -> numeric id
-	ImageIds m_imageIds; // image id -> numeric id
-	PageIds m_pageIds; // page id -> numeric id
+	PageSequenceSnapshot m_pageSequence;
+	Directories m_dirs;
+	Files m_files;
+	Images m_images;
+	Pages m_pages;
 	MetadataByImage m_metadataByImage;
 	Qt::LayoutDirection m_layoutDirection;
 };
