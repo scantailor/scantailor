@@ -100,6 +100,7 @@
 #include <Qt>
 #include <QDebug>
 #include <algorithm>
+#include <vector>
 #include <stddef.h>
 #include <math.h>
 #include <assert.h>
@@ -1538,6 +1539,10 @@ MainWindow::removeFromProject(ImageId image_id)
 	// directly from m_ptrPages, and so will be invalidated
 	// by m_ptrPages->removeImage().
 	
+	std::vector<PageId> pages;
+	pages.push_back(PageId(image_id, PageId::SINGLE_PAGE));
+	
+	m_ptrStages->pagesRemoved(pages);
 	m_ptrPages->removeImage(image_id);
 	m_ptrThumbSequence->remove(image_id);
 	m_ptrThumbSequence->setSelection(

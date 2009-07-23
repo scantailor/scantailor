@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include <memory>
+#include <vector>
 
 class PageId;
 class Margins;
@@ -48,6 +49,11 @@ public:
 	 * \brief Removes all stored data.
 	 */
 	void clear();
+	
+	/**
+	 * \brief Removes data associated with specified pages.
+	 */
+	void removePages(std::vector<PageId> const& pages);
 	
 	/**
 	 * \brief Check that we have all the essential parameters for every

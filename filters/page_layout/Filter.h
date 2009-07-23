@@ -59,6 +59,8 @@ public:
 	
 	virtual PageSequence::View getView() const;
 	
+	virtual void pagesRemoved(std::vector<PageId> const& pages);
+	
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
 	virtual QDomElement saveSettings(

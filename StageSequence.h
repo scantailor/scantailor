@@ -31,6 +31,7 @@
 #include "filters/output/Filter.h"
 #include <vector>
 
+class PageId;
 class PageSequence;
 class PageSelectionAccessor;
 
@@ -42,6 +43,8 @@ public:
 	
 	StageSequence(IntrusivePtr<PageSequence> const& pages,
 		PageSelectionAccessor const& page_selection_accessor);
+	
+	void pagesRemoved(std::vector<PageId> const& pages);
 	
 	std::vector<FilterPtr> const& filters() const { return m_filters; }
 	

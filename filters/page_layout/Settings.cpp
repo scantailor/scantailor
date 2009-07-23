@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <QSizeF>
 #include <QMutex>
 #include <QMutexLocker>
+#include <boost/foreach.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
@@ -111,6 +112,8 @@ public:
 	~Impl();
 	
 	void clear();
+	
+	void removePages(std::vector<PageId> const& pages);
 	
 	bool checkEverythingDefined(
 		PageSequenceSnapshot const& pages, PageId const* ignore) const;
@@ -212,6 +215,12 @@ void
 Settings::clear()
 {
 	return m_ptrImpl->clear();
+}
+
+void
+Settings::removePages(std::vector<PageId> const& pages)
+{
+	return m_ptrImpl->removePages(pages);
 }
 
 bool
@@ -366,6 +375,16 @@ Settings::Impl::clear()
 {
 	QMutexLocker const locker(&m_mutex);
 	m_items.clear();
+}
+
+void
+Settings::Impl::removePages(std::vector<PageId> const& pages)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	BOOST_FOREACH(PageId const& page, pages) {
+		m_items.erase(page);
+	}
 }
 
 bool
