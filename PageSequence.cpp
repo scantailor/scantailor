@@ -168,6 +168,8 @@ PageSequence::snapshot(View const view) const
 		}
 	}
 	
+	assert((pages.empty() && cur_page == 0) || cur_page < (int)pages.size());
+	
 	PageSequenceSnapshot snapshot(view);
 	pages.swap(snapshot.m_pages);
 	snapshot.m_curPageIdx = cur_page;
@@ -791,7 +793,7 @@ PageSequence::removeImageImpl(ImageId const& image_id, bool& modified)
 			// Last one.
 			// Set the last sub-page of the previous image as the current page.
 			--m_curImage;
-			m_curLogicalPage -= m_curSubPage - 1;
+			m_curLogicalPage -= m_curSubPage + 1;
 			m_curSubPage = m_images[m_curImage].numLogicalPages - 1;
 		}
 	} else if (logical_pages_seen < m_curLogicalPage) {
