@@ -129,7 +129,23 @@ latest stable version.
    [VC++]
    Select your version of Visual C++ (Visual Studio) instead of "MinGW Makefiles"
 
-7. Launch the Qt Command Promt from the Start menu.
+7. We will be building Scan Tailor's dependencies here.  This step is the
+   longest one (may take a few hours), but fortunately it only has to be done
+   once.  When building newer versions of Scan Tailor, you won't need to
+   redo this step.
+   
+   [VC++]
+   Go to C:\build\scantailor-deps-build and open file
+   "Scan Tailor Dependencies.sln".  It will open in Visual Studio.  Select
+   The desired build type (Release, Debug, MinSizeRel, RelWithDebInfo)
+   and do Build -> Build Solution.  If you don't know which build type
+   to choose, go with Release.
+   
+   Make sure the building process finishes without errors.  Warnings may
+   be ignored.
+   
+   [MinGW]
+   Launch the Qt Command Promt from the Start menu.
    Enter the following there:
 
    C:
@@ -138,9 +154,6 @@ latest stable version.
 
    The "2> log.txt" part will write errors to a file rather than to the command
    prompt window.  That's useful for figuring out what went wrong.
-
-   The last step will take a lot of time - a couple of hours or even more.
-   Note that it will ask you to accept the Qt license after a few minutes.
 
    When this step completes, check the log.txt file to make sure nothing
    went wrong.  You would have errors at the end of that file in that case.
@@ -156,8 +169,20 @@ latest stable version.
    If everything went right, the "Generate" button will become clickable.
    Click it.  Sometimes it's necessary to click "Configure" more than once
    before "Generate" becomes clickable.
+   [VC++]
+   Select your version of Visual C++ (Visual Studio) instead of "MinGW Makefiles"
 
-9. Back to the Qt Command Promt, give the following commands:
+9. Now we are going to build Scan Tailor itself.  On subsequent build of the
+   same (possiblity modified) version, you can start right from this step.
+   For building a different version, start from step 8.
+   
+   [VC++]
+   Go to C:\build\scantailor-build and open file "Scan Tailor.sln".
+   It will open in Visual Studio.  Select the same build type as on step 7,
+   then do Build -> Build Solution.
+   
+   [MinGW]
+   Back to the Qt Command Promt, give the following commands:
 
    C:
    cd C:\build\scantailor-build
@@ -200,13 +225,20 @@ Here are the instructions:
    Source directory: C:\build\scantailor-0.9.0\packaging\windows\patch_libtiff
    Binary directory: C:\build\tiff-patch-dir
 
-  Click "Configure".  Select the project type "MinGW Makefiles".  If any
+   Click "Configure".  Select the project type "MinGW Makefiles".  If any
    paths were not found, enter them manually, then click "Configure" again.
    If everything went right, the "Generate" button will become clickable.
    Click it.  Sometimes it's necessary to click "Configure" more than once
    before "Generate" becomes clickable.
+   [VC++]
+   Select your version of Visual C++ (Visual Studio) instead of "MinGW Makefiles"
 
-5. Do the following from the Qt Command Prompt:
+5. [VC++]
+   Go to C:\build\tiff-patch-dir and open file "patch_libtiff.sln".
+   It will open in Visual Studio.  From there, do Build -> Build Solution.
+
+   [MinGW]
+   Do the following from the Qt Command Prompt:
 
    C:
    cd C:\build
