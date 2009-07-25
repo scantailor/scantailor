@@ -215,7 +215,7 @@ ENDIF(MINGW)
 ADD_CUSTOM_TARGET(
 	boost "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
 	threading=multi link=static variant=debug,release
-	define=-D_BIND_TO_CURRENT_VCLIBS_VERSION=1
+	define=_BIND_TO_CURRENT_VCLIBS_VERSION=1
 	stage
 	WORKING_DIRECTORY "${BOOST_DIR}"
 )
