@@ -39,6 +39,7 @@ class QImage;
 namespace imageproc
 {
 	class BinaryImage;
+	class BinaryThreshold;
 }
 
 namespace output
@@ -87,8 +88,15 @@ private:
 		QRect const& source_rect, QRect const& source_sub_rect,
 		DebugImages* const dbg) const;
 	
+	imageproc::BinaryThreshold adjustThreshold(
+		imageproc::BinaryThreshold threshold) const;
+	
 	imageproc::BinaryImage binarize(
-		QImage const& image, QPolygonF const& crop_area) const;
+		QImage const& image, imageproc::BinaryImage const& mask) const;
+	
+	imageproc::BinaryImage binarize(
+		QImage const& image, QPolygonF const& crop_area,
+		imageproc::BinaryImage const* mask = 0) const;
 	
 	static QImage smoothToGrayscale(QImage const& src, Dpi const& dpi);
 	

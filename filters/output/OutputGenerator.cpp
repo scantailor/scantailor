@@ -483,9 +483,10 @@ OutputGenerator::processImpl(FilterData const& input,
 	
 	BinaryImage bw_mask;
 	if (render_params.mixedOutput()) {
-		// This should go before the block with
-		// adjustBrightnessGrayscale(), it may convert
+		// This block should go before the block with
+		// adjustBrightnessGrayscale(), which may convert
 		// maybe_normalized from grayscale to color mode.
+		
 		bw_mask = estimateBinarizationMask(
 			status, toGrayscale(maybe_normalized),
 			normalize_illumination_rect,
@@ -519,23 +520,12 @@ OutputGenerator::processImpl(FilterData const& input,
 	}
 	
 	if (render_params.mixedOutput()) {
-		GrayscaleHistogram const hist(maybe_smoothed, bw_mask);
-		maybe_smoothed = QImage(); // Save memory.
-		
-		status.throwIfCancelled();
-		
-		BinaryThreshold bw_thresh(
-			BinaryThreshold::otsuThreshold(hist)
+		BinaryImage bw_content(
+			binarize(maybe_smoothed, normalize_illumination_crop_area, &bw_mask)
 		);
-		int const adjusted_thresh = bw_thresh +
-			m_colorParams.blackWhiteOptions().thresholdAdjustment();
-		bw_thresh = BinaryThreshold(qBound(0, adjusted_thresh, 255));
-		
-		status.throwIfCancelled();
-		
-		BinaryImage bw_content(maybe_normalized, bw_thresh);
+		maybe_smoothed = QImage(); // Save memory.
 		if (dbg) {
-			dbg->add(bw_content, "bw_content");
+			dbg->add(bw_content, "binarized_and_cropped");
 		}
 		
 		status.throwIfCancelled();
@@ -714,34 +704,48 @@ OutputGenerator::smoothToGrayscale(QImage const& src, Dpi const& dpi)
 	return savGolFilter(src, QSize(window, window), degree, degree);
 }
 
+BinaryThreshold
+OutputGenerator::adjustThreshold(BinaryThreshold threshold) const
+{
+	int const adjusted = threshold +
+		m_colorParams.blackWhiteOptions().thresholdAdjustment();
+	return BinaryThreshold(qBound(0, adjusted, 255));
+}
+
 BinaryImage
-OutputGenerator::binarize(QImage const& image, QPolygonF const& crop_area) const
+OutputGenerator::binarize(QImage const& image, BinaryImage const& mask) const
+{
+	GrayscaleHistogram hist(image, mask);
+	BinaryThreshold const bw_thresh(BinaryThreshold::otsuThreshold(hist));
+	BinaryImage binarized(image, adjustThreshold(bw_thresh));
+	
+	// Fill masked out areas with white.
+	rasterOp<RopAnd<RopSrc, RopDst> >(binarized, mask);
+	
+	return binarized;
+}
+
+BinaryImage
+OutputGenerator::binarize(QImage const& image,
+	QPolygonF const& crop_area, BinaryImage const* mask) const
 {
 	QPainterPath path;
 	path.addPolygon(crop_area);
-	bool const need_crop = !path.contains(image.rect());
 	
-	BinaryThreshold bw_thresh(128);
-	
-	if (!need_crop) {
-		bw_thresh = BinaryThreshold::otsuThreshold(image);
+	if (path.contains(image.rect())) {
+		BinaryThreshold const bw_thresh(BinaryThreshold::otsuThreshold(image));
+		return BinaryImage(image, adjustThreshold(bw_thresh));
 	} else {
-		BinaryImage mask(image.size(), BLACK);
-		PolygonRasterizer::fillExcept(mask, WHITE, crop_area, Qt::WindingFill);
-		GrayscaleHistogram hist(image, mask);
-		bw_thresh = BinaryThreshold::otsuThreshold(hist);
+		BinaryImage modified_mask(image.size(), BLACK);
+		PolygonRasterizer::fillExcept(modified_mask, WHITE, crop_area, Qt::WindingFill);
+		modified_mask = erodeBrick(modified_mask, QSize(3, 3), WHITE);
+		
+		if (mask) {
+			rasterOp<RopAnd<RopSrc, RopDst> >(modified_mask, *mask);
+		}
+		
+		return binarize(image, modified_mask);
 	}
-	
-	int const adjusted_thresh = bw_thresh +
-		m_colorParams.blackWhiteOptions().thresholdAdjustment();
-	bw_thresh = BinaryThreshold(qBound(0, adjusted_thresh, 255));
-	
-	BinaryImage binarized(image, bw_thresh);
-	if (need_crop) {
-		PolygonRasterizer::fillExcept(binarized, WHITE, crop_area, Qt::WindingFill);
-	}
-	
-	return binarized;
 }
 
 /**
