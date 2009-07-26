@@ -63,7 +63,7 @@ ImageMetadata::dpiStatus(int pixel_size, int dpi)
 	}
 	
 	double const mm = INCH2MM * pixel_size / dpi;
-	if (mm > 400) {
+	if (mm > 500) {
 		// This may indicate we are working with very large printed materials,
 		// but most likely it indicates the DPI is wrong (too low).
 		// DPIs that are too low may easily cause crashes due to out of memory
