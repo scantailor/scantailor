@@ -889,7 +889,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../ProjectFilesDialog.cpp" line="542"/>
         <location filename="../ProjectFilesDialog.cpp" line="564"/>
         <location filename="../ProjectFilesDialog.cpp" line="573"/>
-        <location filename="../ProjectFilesDialog.cpp" line="642"/>
+        <location filename="../ProjectFilesDialog.cpp" line="646"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -929,7 +929,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="642"/>
+        <location filename="../ProjectFilesDialog.cpp" line="646"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>

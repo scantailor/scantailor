@@ -1008,7 +1008,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../ProjectFilesDialog.cpp" line="542"/>
         <location filename="../ProjectFilesDialog.cpp" line="564"/>
         <location filename="../ProjectFilesDialog.cpp" line="573"/>
-        <location filename="../ProjectFilesDialog.cpp" line="642"/>
+        <location filename="../ProjectFilesDialog.cpp" line="646"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -1048,7 +1048,7 @@ p, li { white-space: pre-wrap; }
         <translation>Директория вывода не задана или не существует.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="642"/>
+        <location filename="../ProjectFilesDialog.cpp" line="646"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
