@@ -593,6 +593,8 @@ ProjectFilesDialog::startLoadingMetadata()
 	removeFromProjectBtn->setEnabled(false);
 	offProjectSelectAllBtn->setEnabled(false);
 	inProjectSelectAllBtn->setEnabled(false);
+	rtlLayoutCB->setEnabled(false);
+	forceFixDpi->setEnabled(false);
 	buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 	offProjectList->clearSelection();
 	inProjectList->clearSelection();
@@ -634,6 +636,8 @@ ProjectFilesDialog::finishLoadingMetadata()
 	removeFromProjectBtn->setEnabled(true);
 	offProjectSelectAllBtn->setEnabled(true);
 	inProjectSelectAllBtn->setEnabled(true);
+	rtlLayoutCB->setEnabled(true);
+	forceFixDpi->setEnabled(true);
 	buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 	
 	if (m_metadataLoadFailed) {
