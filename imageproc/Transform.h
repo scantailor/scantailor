@@ -38,6 +38,13 @@ namespace imageproc
  * \param dst_rect The area in source image coordinates to return
  *        as a destination image.
  * \param background_color Used to fill areas not represented in the source image.
+ * \param weak_background If set to true, \p background_color is only taken
+ *        into account if a target pixel maps to an area completely outside of
+ *        the source image.  That is, if at least one source image pixel
+ *        influences a particular target pixel, then any background pixels
+ *        that may also influence that target pixel are ignored.\n
+ *        If set to false, source image pixels and background pixels are
+ *        treated equally.
  * \param min_mapping_area Defines the minimum rectangle in the source image
  *        that maps to a destination pixel.  This can be used to control
  *        smoothing.
@@ -49,6 +56,7 @@ namespace imageproc
 QImage transform(
 	QImage const& src, QTransform const& xform,
 	QRect const& dst_rect, QColor const& background_color,
+	bool weak_background = false,
 	QSizeF const& min_mapping_area = QSizeF(0.9, 0.9));
 
 /**
@@ -61,6 +69,7 @@ QImage transform(
 QImage transformToGray(
 	QImage const& src, QTransform const& xform,
 	QRect const& dst_rect, QColor const& background_color,
+	bool weak_background = false,
 	QSizeF const& min_mapping_area = QSizeF(0.9, 0.9));
 
 } // namespace imageproc

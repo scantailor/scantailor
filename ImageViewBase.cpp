@@ -847,7 +847,7 @@ ImageViewBase::HqTransformTask::operator()()
 	QImage hq_image(
 		transform(
 			m_image, m_xform, target_rect,
-			Qt::white, QSizeF(0.0, 0.0)
+			Qt::white, true, QSizeF(0.0, 0.0)
 		)
 	);
 #if defined(Q_WS_X11)

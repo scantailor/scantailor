@@ -57,10 +57,13 @@ VertLineFinder::findLines(
 	QImage const gray100(
 		transformToGray(
 			image, xform_100dpi.transform(),
-			xform_100dpi.resultingRect().toRect(), black,
+			xform_100dpi.resultingRect().toRect(), black, true,
 			QSizeF(5.0, 5.0)
 		)
 	);
+	if (dbg) {
+		dbg->add(gray100, "gray100");
+	}
 	
 	if (gray_downscaled) {
 		*gray_downscaled = gray100;

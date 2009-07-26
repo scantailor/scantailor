@@ -160,7 +160,7 @@ template<typename StorageUnit, typename Mixer>
 static void transformGeneric(
 	QImage const& src, QImage& dst, QTransform const& xform,
 	QRect const& dst_rect, StorageUnit const background_color,
-	QSizeF const& min_mapping_area)
+	bool const weak_background, QSizeF const& min_mapping_area)
 {
 	int const sw = src.width();
 	int const sh = src.height();
@@ -183,8 +183,6 @@ static void transformGeneric(
 	QSizeF const src32_unit_size(calcSrcUnitSize(inv_xform, min_mapping_area));
 	int const src32_unit_w = std::max<int>(1, qRound(src32_unit_size.width()));
 	int const src32_unit_h = std::max<int>(1, qRound(src32_unit_size.height()));
-	
-	//unsigned const background_gray_level = qGray(background_color.rgb());
 	
 	for (int dy = 0; dy < dh; ++dy, dst_line += dst_units_per_line) {
 		double const f_dy_center = dy + 0.5;
@@ -264,7 +262,11 @@ static void transformGeneric(
 			assert(src_right >= src_left);
 			
 			Mixer mixer;
-			mixer.add(background_color, background_area);
+			if (weak_background) {
+				background_area = 0;
+			} else {
+				mixer.add(background_color, background_area);
+			}
 			
 			unsigned const left_fraction = 32 - (src32_left & 31);
 			unsigned const top_fraction = 32 - (src32_top & 31);
@@ -371,7 +373,7 @@ static void transformGeneric(
 			}
 			
 			unsigned const total_area = src_area + background_area;
-			dst_line[dx] = mixer.result(total_area);
+			dst_line[dx] = mixer.result(total_area - background_area);
 		}
 	}
 }
@@ -381,7 +383,7 @@ static void transformGeneric(
 QImage transform(
 	QImage const& src, QTransform const& xform,
 	QRect const& dst_rect, QColor const& background_color,
-	QSizeF const& min_mapping_area)
+	bool const weak_background, QSizeF const& min_mapping_area)
 {
 	if (src.isNull() || dst_rect.isEmpty()) {
 		return QImage();
@@ -400,7 +402,8 @@ QImage transform(
 		dst.setColorTable(createGrayscalePalette());
 		transformGeneric<uint8_t, Gray>(
 			toGrayscale(src), dst, xform, dst_rect,
-			qGray(background_color.rgb()), min_mapping_area
+			qGray(background_color.rgb()),
+			weak_background, min_mapping_area
 		);
 		return dst;
 	} else {
@@ -409,7 +412,7 @@ QImage transform(
 			transformGeneric<uint32_t, ARGB32>(
 				src.convertToFormat(QImage::Format_ARGB32),
 				dst, xform, dst_rect, background_color.rgba(),
-				min_mapping_area
+				weak_background, min_mapping_area
 			);
 			return dst;
 		} else {
@@ -417,7 +420,7 @@ QImage transform(
 			transformGeneric<uint32_t, RGB32>(
 				src.convertToFormat(QImage::Format_RGB32),
 				dst, xform, dst_rect, background_color.rgb(),
-				min_mapping_area
+				weak_background, min_mapping_area
 			);
 			return dst;
 		}
@@ -427,7 +430,7 @@ QImage transform(
 QImage transformToGray(
 	QImage const& src, QTransform const& xform,
 	QRect const& dst_rect, QColor const& background_color,
-	QSizeF const& min_mapping_area)
+	bool const weak_background, QSizeF const& min_mapping_area)
 {
 	if (src.isNull() || dst_rect.isEmpty()) {
 		return QImage();
@@ -446,7 +449,8 @@ QImage transformToGray(
 	
 	transformGeneric<uint8_t, Gray>(
 		toGrayscale(src), dst, xform, dst_rect,
-		qGray(background_color.rgb()), min_mapping_area
+		qGray(background_color.rgb()),
+		weak_background, min_mapping_area
 	);
 	
 	return dst;
