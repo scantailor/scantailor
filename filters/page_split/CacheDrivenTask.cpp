@@ -47,15 +47,19 @@ CacheDrivenTask::process(
 	AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform)
 {
-	OrthogonalRotation const pre_rotation(xform.preRotation());
-	Dependencies const deps(page_info.metadata().size(), pre_rotation);
-	
 	Settings::Record const record(
 		m_ptrSettings->getPageRecord(page_info.imageId())
 	);
+	
+	OrthogonalRotation const pre_rotation(xform.preRotation());
+	Dependencies const deps(
+		page_info.metadata().size(), pre_rotation,
+		record.combinedLayoutType()
+	);
+	
 	Params const* params = record.params();
 	
-	if (!params || !params->dependencies().matches(deps)) {
+	if (!params || !deps.compatibleWith(*params)) {
 		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(

@@ -101,18 +101,21 @@ Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
 	
+	Settings::Record record(m_ptrSettings->getPageRecord(m_imageId));
+	
 	OrthogonalRotation const pre_rotation(data.xform().preRotation());
-	Dependencies const deps(data.origImage().size(), pre_rotation);
+	Dependencies const deps(
+		data.origImage().size(), pre_rotation,
+		record.combinedLayoutType()
+	);
 	
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
-	
-	Settings::Record record(m_ptrSettings->getPageRecord(m_imageId));
-	
+		
 	for (;;) {
 		Params const* const params = record.params();
 		
-		if (!params || !params->dependencies().matches(deps)) {
+		if (!params || !deps.compatibleWith(*params)) {
 			PageLayout const layout(
 				PageLayoutEstimator::estimatePageLayout(
 					record.combinedLayoutType(),

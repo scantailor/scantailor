@@ -20,6 +20,7 @@
 #define PAGE_SPLIT_DEPENDENCIES_H_
 
 #include "OrthogonalRotation.h"
+#include "LayoutType.h"
 #include <QSize>
 
 class QString;
@@ -28,6 +29,8 @@ class QDomElement;
 
 namespace page_split
 {
+
+class Params;
 
 /**
  * \brief Dependencies of a page parameters.
@@ -42,9 +45,10 @@ public:
 	
 	Dependencies(QDomElement const& el);
 	
-	Dependencies(QSize const& image_size, OrthogonalRotation rotation);
+	Dependencies(QSize const& image_size,
+		OrthogonalRotation rotation, LayoutType layout_type);
 	
-	bool matches(Dependencies const& other) const;
+	bool compatibleWith(Params const& params) const;
 	
 	bool isNull() const { return m_imageSize.isNull(); }
 	
@@ -52,6 +56,7 @@ public:
 private:
 	QSize m_imageSize;
 	OrthogonalRotation m_rotation;
+	LayoutType m_layoutType;
 };
 
 } // namespace page_split
