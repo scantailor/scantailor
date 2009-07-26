@@ -73,10 +73,20 @@ VertLineFinder::findLines(
 				* xform_100dpi.transform();
 	}
 	
+#if 0
 	QImage preprocessed(removeDarkVertBorders(gray100));
 	if (dbg) {
 		dbg->add(preprocessed, "preprocessed");
 	}
+#else
+	// It looks like preprocessing causes more problems than it solves.
+	// It can reduce the visibility of a folding line to a level where
+	// it can't be detected, while it can't always fulfill its purpose of
+	// removing vertical edges of a book.  Because of that, other methods
+	// of dealing with them were developed, which makes preprocessing
+	// obsolete.
+	QImage preprocessed(gray100);
+#endif
 	
 	QImage h_gradient(morphGradientDetectDarkSide(preprocessed, QSize(11, 1)));
 	QImage v_gradient(morphGradientDetectDarkSide(preprocessed, QSize(1, 11)));
