@@ -4,23 +4,28 @@
 #include <QString>
 #include <QByteArray>
 #include <QDataStream>
-#include <QHttpHeader>
 
 class MultipartFormData
 {
 public:
 	MultipartFormData();
 	
+	/**
+	 * \brief Returns the content type that needs to be set for HTTP requests.
+	 */
+	QString contentType() const;
+
 	void addParameter(QString const& name, QString const& value);
 	
 	void addFile(QString const& name, QString const& filename, QByteArray const& data);
 	
 	/**
-	 * \brief Set the necessary headers and return the body data.
+	 * \brief Marks the end of parameters and returns the serialized
+	 *        representation of the form.
 	 *
-	 * This is a destructive function and no other functions may be called after it.
+	 * Once called, no other data may be added to the form.
 	 */
-	QByteArray finalize(QHttpHeader& headers);
+	QByteArray finalize();
 private:
 	static void generateBoundary(QByteArray& boundary);
 	

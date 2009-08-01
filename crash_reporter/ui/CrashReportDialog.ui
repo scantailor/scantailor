@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Scan Tailor crashed.  That's usually caused by errors in the software.  You can help us find and fix this problem by submitting this crash report.</string>
+      <string>Scan Tailor crashed.  That's usually caused by errors in the software.  You can help us find and fix the problem by submitting this crash report.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

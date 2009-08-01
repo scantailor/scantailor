@@ -27,15 +27,24 @@
 #include <QApplication>
 #include <QLocale>
 #include <QPushButton>
-#include <QHttp>
-#include <QHttpRequestHeader>
-#include <QHttpResponseHeader>
-#include <QBuffer>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QNetworkProxyFactory>
 #include <QDebug>
 #include <Qt>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QDomNodeList>
+
+class CrashReportDialog::SystemProxyFactory : public QNetworkProxyFactory
+{
+public:
+	virtual QList<QNetworkProxy> queryProxy(
+			QNetworkProxyQuery const& query = QNetworkProxyQuery()) {
+		return systemProxyForQuery(query);
+	}
+};
 
 CrashReportDialog::CrashReportDialog(
 	QString const& dir, QString const& id, QWidget* parent)
@@ -44,14 +53,13 @@ CrashReportDialog::CrashReportDialog(
 	m_normalPalette(QApplication::palette()),
 	m_errorPalette(m_normalPalette),
 	m_successPalette(m_normalPalette),
-	m_pDispatcherHttp(new QHttp(this)),
-	m_pSubmitHttp(new QHttp(this)),
-	m_pDispatcherResponseBuf(new QBuffer(this)),
+	m_pDispatcher(new QNetworkAccessManager(this)),
+	m_pSubmitter(new QNetworkAccessManager(this)),
 	m_disregardAdditionalInfo(true),
 	m_disregardEmail(true)
 {
-	m_pDispatcherResponseBuf->setBuffer(&m_dispatcherResponse);
-	m_pDispatcherResponseBuf->open(QIODevice::ReadWrite);
+	m_pDispatcher->setProxyFactory(new SystemProxyFactory);
+	m_pSubmitter->setProxyFactory(new SystemProxyFactory);
 
 	ui.setupUi(this);
 	ui.statusLabel->setText(" ");
@@ -83,8 +91,6 @@ CrashReportDialog::CrashReportDialog(
 	ui.email->installEventFilter(this);
 
 	connect(ui.buttonBox, SIGNAL(accepted()), SLOT(onSubmit()));
-	connect(m_pDispatcherHttp, SIGNAL(done(bool)), SLOT(dispatcherResult(bool)));
-	connect(m_pSubmitHttp, SIGNAL(done(bool)), SLOT(submitResult(bool)));
 }
 
 CrashReportDialog::~CrashReportDialog()
@@ -100,36 +106,41 @@ CrashReportDialog::onSubmit()
 	ui.infoGroup->setEnabled(false);
 	ui.buttonBox->setEnabled(false);
 
-	QUrl url;
+	QUrl url("http://scantailor.sourceforge.net/crash_dispatcher/");
 	url.addQueryItem("version", VERSION);
 	url.addQueryItem("locale", QLocale::system().name());
 	
-	m_pDispatcherResponseBuf->open(QIODevice::ReadWrite);
-	
-	m_pDispatcherHttp->setHost("scantailor.sourceforge.net");
-	m_pDispatcherHttp->get(
-		"/crash_dispatcher/?"+QString(url.encodedQuery()),
-		m_pDispatcherResponseBuf
+	m_pDispatcher->get(QNetworkRequest(url));
+	connect(
+		m_pDispatcher, SIGNAL(finished(QNetworkReply*)),
+		SLOT(dispatchDone(QNetworkReply*))
 	);
 }
 
 void
-CrashReportDialog::dispatcherResult(bool err)
+CrashReportDialog::dispatchDone(QNetworkReply* reply)
 {
+	reply->deleteLater();
 	ui.infoGroup->setEnabled(true);
 	ui.buttonBox->setEnabled(true);
 
-	QDomDocument doc;
-	QHttpResponseHeader const header(m_pDispatcherHttp->lastResponse());
-
-	if (err || header.statusCode() != 200) {
-		ui.statusLabel->setText(tr("Sending failed"));
+	if (reply->error() != QNetworkReply::NoError) {
+		ui.statusLabel->setText(reply->errorString());
+		ui.statusLabel->setPalette(m_errorPalette);
+		return;
+	}
+	
+	int const status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+	if (status != 200) {
+		ui.statusLabel->setText(tr("Unexpected response (code %1) from dispatcher").arg(status));
 		ui.statusLabel->setPalette(m_errorPalette);
 		return;
 	}
 
+	QDomDocument doc;
+
 	QString errmsg;
-	if (!doc.setContent(m_dispatcherResponse, true, &errmsg)) {
+	if (!doc.setContent(reply->readAll(), true, &errmsg)) {
 		ui.statusLabel->setText(errmsg);
 		ui.statusLabel->setPalette(m_errorPalette);
 		return;
@@ -146,7 +157,7 @@ CrashReportDialog::dispatcherResult(bool err)
 
 	QDomElement forward_el(doc_el.namedItem("forward").toElement());
 	if (forward_el.isNull()) {
-		ui.statusLabel->setText(tr("Sending failed"));
+		ui.statusLabel->setText(tr("Unexpected response from dispatcher"));
 		ui.statusLabel->setPalette(m_errorPalette);
 		return;
 	}
@@ -175,40 +186,43 @@ CrashReportDialog::dispatcherResult(bool err)
 		}
 	}
 
-	m_pSubmitHttp->setHost(url.host());
-	
-	QString const request_path(
-		QString::fromUtf8(url.toEncoded(QUrl::RemoveScheme|QUrl::RemoveAuthority))
-	);
-	
-	QHttpRequestHeader hdr("POST", request_path);
-	hdr.setValue("Host", url.encodedHost());
-	hdr.setValue("User-Agent", "Scan Tailor crash reporter");
-	hdr.setValue("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+	QNetworkRequest request(url);
+	request.setHeader(QNetworkRequest::ContentTypeHeader, form_data.contentType());
+	request.setRawHeader("User-Agent", "Scan Tailor crash reporter");
+	request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
-	QByteArray const body(form_data.finalize(hdr));
-	
-	m_pSubmitHttp->request(hdr, body);
+	m_pSubmitter->post(request, form_data.finalize());
+	connect(
+		m_pSubmitter, SIGNAL(finished(QNetworkReply*)),
+		SLOT(submissionDone(QNetworkReply*))
+	);
 
 	ui.infoGroup->setEnabled(false);
 	ui.buttonBox->setEnabled(false);
 }
 
 void
-CrashReportDialog::submitResult(bool err)
+CrashReportDialog::submissionDone(QNetworkReply* reply)
 {
+	reply->deleteLater();
 	ui.infoGroup->setEnabled(true);
 	ui.buttonBox->setEnabled(true);
-
-	QDomDocument doc;
-	QHttpResponseHeader const header(m_pSubmitHttp->lastResponse());
-
-	if (err || header.statusCode() != 200) {
-		ui.statusLabel->setText(tr("Sending failed"));
+	
+	if (reply->error() != QNetworkReply::NoError) {
+		ui.statusLabel->setText(reply->errorString());
 		ui.statusLabel->setPalette(m_errorPalette);
 		return;
 	}
-
+	
+	int const status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+	if (status != 200) {
+		ui.statusLabel->setText(
+			tr("Unexpected response (code %1) from the receiving side").arg(status)
+		);
+		ui.statusLabel->setPalette(m_errorPalette);
+		return;
+	}
+	
 	ui.statusLabel->setText(tr("Successfully sent"));
 	ui.statusLabel->setPalette(m_successPalette);
 	ui.infoGroup->setEnabled(false);

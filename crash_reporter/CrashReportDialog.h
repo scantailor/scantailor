@@ -27,8 +27,8 @@
 #include <QFileInfo>
 #include <QPalette>
 
-class QHttp;
-class QBuffer;
+class QNetworkAccessManager;
+class QNetworkReply;
 
 class CrashReportDialog : public QDialog
 {
@@ -42,10 +42,12 @@ protected:
 private slots:
 	void onSubmit();
 
-	void dispatcherResult(bool err);
+	void dispatchDone(QNetworkReply* reply);
 
-	void submitResult(bool err);
+	void submissionDone(QNetworkReply* reply);
 private:
+	class SystemProxyFactory;
+
 	static QString formatFileSize(qint64 size);
 
 	QString prepareDetails() const;
@@ -55,10 +57,8 @@ private:
 	QPalette m_normalPalette;
 	QPalette m_errorPalette;
 	QPalette m_successPalette;
-	QHttp* m_pDispatcherHttp;
-	QHttp* m_pSubmitHttp;
-	QByteArray m_dispatcherResponse;
-	QBuffer* m_pDispatcherResponseBuf;
+	QNetworkAccessManager* m_pDispatcher;
+	QNetworkAccessManager* m_pSubmitter;
 	bool m_disregardAdditionalInfo;
 	bool m_disregardEmail;
 };

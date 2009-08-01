@@ -6,6 +6,12 @@ MultipartFormData::MultipartFormData()
 	generateBoundary(m_boundary);
 }
 
+QString
+MultipartFormData::contentType() const
+{
+	return "multipart/form-data; boundary="+QString::fromAscii(m_boundary);
+}
+
 void
 MultipartFormData::addParameter(QString const& name, QString const& value)
 {
@@ -39,17 +45,11 @@ MultipartFormData::addFile(QString const& name,
 }
 
 QByteArray
-MultipartFormData::finalize(QHttpHeader& headers)
+MultipartFormData::finalize()
 {
-	headers.setContentType(
-		"multipart/form-data; boundary="
-		+QString::fromAscii(m_boundary)
-	);
-	
 	m_body.append("--");
 	m_body.append(m_boundary);
 	m_body.append("--\r\n");
-
 	return m_body;
 }
 
