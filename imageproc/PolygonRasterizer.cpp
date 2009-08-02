@@ -378,6 +378,11 @@ PolygonRasterizer::Rasterizer::fillBinary(
 				y, EdgeOrderY()
 			)
 		);
+		
+		if (range.first == range.second) {
+			continue;
+		}
+		
 		std::copy(
 			range.first, range.second,
 			std::back_inserter(edges_for_line)
@@ -432,6 +437,11 @@ PolygonRasterizer::Rasterizer::fillGrayscale(
 				y, EdgeOrderY()
 			)
 		);
+		
+		if (range.first == range.second) {
+			continue;
+		}
+		
 		std::copy(
 			range.first, range.second,
 			std::back_inserter(edges_for_line)
