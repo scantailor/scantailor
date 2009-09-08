@@ -16,40 +16,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "BasicImageView.h.moc"
-#include "ImageTransformation.h"
-#include "Dpm.h"
-#include "Dpi.h"
+#ifndef ZONE_H_
+#define ZONE_H_
 
-BasicImageView::BasicImageView(QImage const& image)
-:	ImageViewBase(image, QImage(), QTransform(), QRectF(image.rect()))
-{
-}
+#include <QPolygonF>
 
-BasicImageView::~BasicImageView()
-{
-}
+class QDomDocument;
+class QDomElement;
+class QString;
 
-void
-BasicImageView::wheelEvent(QWheelEvent* const event)
+class Zone
 {
-	handleZooming(event);
-}
+public:
+	Zone(QPolygonF const& shape) : m_shape(shape) {}
+	
+	Zone(QDomElement const& el);
 
-void
-BasicImageView::mousePressEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
+	virtual ~Zone() {}
+	
+	virtual QDomElement toXml(QDomDocument& doc, QString const& name) const;
+	
+	bool isValid() const;
+	
+	QPolygonF const& shape() const { return m_shape; }
+private:
+	QPolygonF m_shape;
+};
 
-void
-BasicImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-BasicImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
+#endif

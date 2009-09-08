@@ -16,40 +16,42 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "BasicImageView.h.moc"
-#include "ImageTransformation.h"
-#include "Dpm.h"
-#include "Dpi.h"
+#include "Zone.h"
+#include "XmlMarshaller.h"
+#include "XmlUnmarshaller.h"
+#include <QDomDocument>
+#include <QDomElement>
+#include <QString>
 
-BasicImageView::BasicImageView(QImage const& image)
-:	ImageViewBase(image, QImage(), QTransform(), QRectF(image.rect()))
+Zone::Zone(QDomElement const& el)
+:	m_shape(XmlUnmarshaller::polygonF(el.namedItem("shape").toElement()))
 {
 }
 
-BasicImageView::~BasicImageView()
+QDomElement
+Zone::toXml(QDomDocument& doc, QString const& name) const
 {
+	XmlMarshaller marshaller(doc);
+
+	QDomElement el(doc.createElement(name));
+	el.appendChild(marshaller.polygonF(m_shape, "shape"));
+	return el;
 }
 
-void
-BasicImageView::wheelEvent(QWheelEvent* const event)
+bool
+Zone::isValid() const
 {
-	handleZooming(event);
-}
-
-void
-BasicImageView::mousePressEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-BasicImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-BasicImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
+	switch (m_shape.size()) {
+		case 0:
+		case 1:
+		case 2:
+			return false;
+		case 3:
+			if (m_shape.front() == m_shape.back()) {
+				return false;
+			}
+			// fall through
+		default:
+			return true;
+	}
 }

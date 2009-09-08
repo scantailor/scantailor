@@ -17,18 +17,12 @@
 */
 
 #include "ImageView.h.moc"
-#include "ImageTransformation.h"
-#include "Dpm.h"
-#include "Dpi.h"
 
 namespace output
 {
 
 ImageView::ImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(
-		image, downscaled_image,
-		ImageTransformation(image.rect(), Dpm(image))
-	)
+:	ImageViewBase(image, downscaled_image, QTransform(), QRectF(image.rect()))
 {
 }
 

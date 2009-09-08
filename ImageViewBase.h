@@ -19,7 +19,6 @@
 #ifndef IMAGEVIEWBASE_H_
 #define IMAGEVIEWBASE_H_
 
-#include "ImageTransformation.h"
 #include "Margins.h"
 #include "IntrusivePtr.h"
 #include <QTimer>
@@ -68,7 +67,8 @@ public:
 	 *        to speed up real-time rendering of high-resolution
 	 *        images.  Note that the delayed high quality transform
 	 *        operates on the original image, not the downscaled one.
-	 * \param pre_transform A logical transformation applied on \p image.
+	 * \param image_to_virt Virtual image transformation.
+	 * \param virt_display_area The area of the virtual image to be displayed.
 	 * \param margins Reserve extra space near the widget borders.
 	 *        The units are widget pixels.  This reserved area may
 	 *        still be covered by parts of the image that are outside
@@ -76,7 +76,7 @@ public:
 	 */
 	ImageViewBase(
 		QImage const& image, QImage const& downscaled_image,
-		ImageTransformation const& pre_transform,
+		QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 		Margins const& margins = Margins());
 	
 	virtual ~ImageViewBase();
@@ -142,8 +142,16 @@ protected:
 	 */
 	void handleImageDragging(QMouseEvent* event);
 	
-	ImageTransformation const& imageToVirt() const { return m_imageToVirt; }
+	QPolygonF const& virtualDisplayArea() const { return m_virtualDisplayArea; }
+
+	QRectF const virtualDisplayRect() const {
+		return m_virtualDisplayArea.boundingRect();
+	}
+
+	QTransform const& imageToVirtual() const { return m_imageToVirtual; }
 	
+	QTransform const& virtualToImage() const { return m_virtualToImage; }
+
 	QTransform const& virtualToWidget() const { return m_virtualToWidget; }
 	
 	QTransform const& widgetToVirtual() const { return m_widgetToVirtual; }
@@ -196,20 +204,23 @@ protected:
 	 * \brief Updates image-to-virtual and recalculates
 	 *        virtual-to-widget transformations.
 	 */
-	void updateTransform(ImageTransformation const& image_to_virt);
+	void updateTransform(
+		QTransform const& image_to_virt,
+		QPolygonF const& virt_display_area);
 	
 	/**
 	 * \brief Same as updateTransform(), but adjusts the focal point
 	 *        to improve screen space usage.
 	 */
 	void updateTransformAndFixFocalPoint(
-		ImageTransformation const& image_to_virt, FocalPointMode mode);
+		QTransform const& image_to_virt,
+		QPolygonF const& virt_display_area, FocalPointMode mode);
 	
 	/**
 	 * \brief Same as updateTransform(), but preserves the visual image scale.
 	 */
 	void updateTransformPreservingScale(
-		ImageTransformation const& image_to_virt);
+		QTransform const& image_to_virt, QPolygonF const& virt_display_area);
 	
 	/**
 	 * \brief A faster version of setCursor().
@@ -236,6 +247,8 @@ protected:
 	 * Subclasses may reimplement this method.
 	 */
 	virtual QString defaultStatusTip() const;
+
+	static BackgroundExecutor& backgroundExecutor();
 private slots:
 	void initiateBuildingHqVersion();
 private:
@@ -256,12 +269,12 @@ private:
 	
 	void setWidgetFocalPointWithoutMoving(QPointF new_widget_fp);
 	
+	bool validateHqPixmap() const;
+
+	void scheduleHqVersionRebuild();
+
 	void hqVersionBuilt(QPoint const& origin, QImage const& image);
-	
-	void validateHqPixmap();
-	
-	static BackgroundExecutor& backgroundExecutor();
-	
+
 	QString m_defaultStatusTip;
 	
 	QString m_unrestrictedDragStatusTip;
@@ -299,11 +312,16 @@ private:
 	 * It's used to detect if m_hqPixmap needs to be rebuild.
 	 */
 	QTransform m_hqXform;
+
+	/**
+	 * Used to check if we need to extend the delay before building m_hqPixmap.
+	 */
+	QTransform m_potentialHqXform;
 	
 	/**
 	 * The ID (QImage::cacheKey()) of the image that was used
 	 * to build m_hqPixmap.  It's used to detect if m_hqPixmap
-	 * needs to be rebuild.
+	 * needs to be rebuilt.
 	 */
 	qint64 m_hqSourceId;
 	
@@ -311,18 +329,27 @@ private:
 	 * The pending (if any) high quality transformation task.
 	 */
 	IntrusivePtr<HqTransformTask> m_ptrHqTransformTask;
-	
+
 	/**
 	 * Transformation from m_pixmap coordinates to m_image coordinates.
 	 */
 	QTransform m_pixmapToImage;
 	
 	/**
-	 * A set of logical transformations on m_image, to translate
-	 * from image to virtual image coordinates and back.
+	 * The area of the image (in virtual coordinates) to display.
 	 */
-	ImageTransformation m_imageToVirt;
+	QPolygonF m_virtualDisplayArea;
+
+	/**
+	 * A transformation from original to virtual image coordinates.
+	 */
+	QTransform m_imageToVirtual;
 	
+	/**
+	 * A transformation from virtual to original image coordinates.
+	 */
+	QTransform m_virtualToImage;
+
 	/**
 	 * Transformation from virtual image coordinates to widget coordinates.
 	 */

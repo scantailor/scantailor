@@ -27,6 +27,7 @@
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
+#include "PictureZoneList.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -98,6 +99,8 @@ Filter::writePageSettings(
 	
 	QDomElement page_el(doc.createElement("page"));
 	page_el.setAttribute("id", numeric_id);
+
+	page_el.appendChild(m_ptrSettings->zonesForPage(page_id).toXml(doc, "zones"));
 	page_el.appendChild(params.toXml(doc, "params"));
 	
 	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(page_id));
@@ -139,6 +142,11 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		
+		PictureZoneList const zones(el.namedItem("zones").toElement());
+		if (!zones.empty()) {
+			m_ptrSettings->setZones(page_id, zones);
+		}
+
 		QDomElement const params_el(el.namedItem("params").toElement());
 		if (!params_el.isNull()) {
 			Params const params(params_el);

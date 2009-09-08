@@ -20,6 +20,7 @@
 #define DESKEW_IMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "ImageTransformation.h"
 #include <QPolygonF>
 #include <QPoint>
 #include <QPointF>
@@ -29,7 +30,6 @@
 #include <utility>
 
 class QRect;
-class ImageTransformation;
 
 namespace deskew
 {
@@ -75,6 +75,8 @@ private:
 	std::pair<QPointF, QPointF> getRotationHandles(
 		QRectF const& arc_square) const;
 	
+	ImageTransformation m_xform;
+
 	QPixmap m_imgRotationHandle;
 	
 	QRectF m_leftRotationHandle;

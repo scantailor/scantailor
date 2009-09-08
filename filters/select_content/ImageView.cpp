@@ -36,7 +36,7 @@ namespace select_content
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, QRectF const& content_rect)
-:	ImageViewBase(image, downscaled_image, xform),
+:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
 	m_pNoContentMenu(new QMenu(this)),
 	m_pHaveContentMenu(new QMenu(this)),
 	m_contentRect(content_rect),
@@ -233,7 +233,7 @@ ImageView::createContentBox()
 		return;
 	}
 	
-	QRectF const virtual_rect(imageToVirt().resultingRect());
+	QRectF const virtual_rect(virtualDisplayRect());
 	QRectF content_rect(0, 0, virtual_rect.width() * 0.7, virtual_rect.height() * 0.7);
 	content_rect.moveCenter(virtual_rect.center());
 	m_contentRect = content_rect;

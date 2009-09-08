@@ -40,7 +40,7 @@ double const ImageView::m_maxSkewAngleCtg(1.0 / tan(65 * imageproc::constants::D
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout)
-:	ImageViewBase(image, downscaled_image, xform),
+:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
 	m_imgSkewingHandle(":/icons/aqua-sphere.png"),
 	m_pageLayout(layout),
 	m_state(DEFAULT_STATE)
@@ -69,7 +69,7 @@ ImageView::paintOverImage(QPainter& painter)
 	painter.setRenderHints(QPainter::Antialiasing, false);
 	
 	painter.setPen(Qt::NoPen);
-	QRectF const virt_rect(imageToVirt().resultingRect());
+	QRectF const virt_rect(virtualDisplayRect());
 	
 	switch (m_pageLayout.type()) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
@@ -187,7 +187,7 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 		bool const top = m_topHandleRect.contains(event->pos());
 		bool const bottom = m_bottomHandleRect.contains(event->pos());
 		if (top || bottom) {
-			QRectF const virt_rect(imageToVirt().resultingRect());
+			QRectF const virt_rect(virtualDisplayRect());
 			QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
 			PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
 			QLineF const line(layout.inscribedSplitLine(image_rect));

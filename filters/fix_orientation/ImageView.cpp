@@ -25,7 +25,8 @@ namespace fix_orientation
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform)
-:	ImageViewBase(image, downscaled_image, xform)
+:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+	m_xform(xform)
 {
 }
 
@@ -36,13 +37,14 @@ ImageView::~ImageView()
 void
 ImageView::setPreRotation(OrthogonalRotation const rotation)
 {
-	if (imageToVirt().preRotation() == rotation) {
+	if (m_xform.preRotation() == rotation) {
 		return;
 	}
 	
-	ImageTransformation new_xform(imageToVirt());
-	new_xform.setPreRotation(rotation);
-	updateTransform(new_xform); // should call update()
+	m_xform.setPreRotation(rotation);
+
+	// This should call update() by itself.
+	updateTransform(m_xform.transform(), m_xform.resultingCropArea());
 }
 
 void

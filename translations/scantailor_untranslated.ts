@@ -1070,6 +1070,29 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ZonePropertiesDialog</name>
+    <message>
+        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="14"/>
+        <source>Zone Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="20"/>
+        <source>Subtract from all layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="27"/>
+        <source>Add to auto layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="34"/>
+        <source>Subtract from auto layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>deskew::Filter</name>
     <message>
         <location filename="../filters/deskew/Filter.cpp" line="52"/>
@@ -1080,7 +1103,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::ImageView</name>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="48"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="49"/>
         <source>Drag this handle to rotate the image.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1134,7 +1157,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="58"/>
+        <location filename="../filters/output/Filter.cpp" line="59"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1142,18 +1165,59 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="48"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="50"/>
         <source>Black and White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="49"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="51"/>
         <source>Color / Grayscale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="50"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="52"/>
         <source>Mixed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>output::PictureZoneEditor::ContextMenuHandler</name>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1327"/>
+        <source>Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1333"/>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1399"/>
+        <source>Delete confirmation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1399"/>
+        <source>Really delete this zone?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>output::Task::UiUpdater</name>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="264"/>
+        <source>Picture zones are only available in Mixed mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="278"/>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="279"/>
+        <source>Picture Zones</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1168,7 +1232,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_layout::ImageView</name>
     <message>
-        <location filename="../filters/page_layout/ImageView.cpp" line="68"/>
+        <location filename="../filters/page_layout/ImageView.cpp" line="69"/>
         <source>Resize margins by dragging any of the solid lines.</source>
         <translation type="unfinished"></translation>
     </message>

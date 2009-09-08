@@ -169,4 +169,24 @@ Settings::setOutputParams(PageId const& page_id, OutputParams const& params)
 	Utils::mapSetValue(m_perPageOutputParams, page_id, params);
 }
 
+PictureZoneList
+Settings::zonesForPage(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+
+	PerPageZones::const_iterator const it(m_perPageZones.find(page_id));
+	if (it != m_perPageZones.end()) {
+		return it->second;
+	} else {
+		return PictureZoneList();
+	}
+}
+
+void
+Settings::setZones(PageId const& page_id, PictureZoneList const& zones)
+{
+	QMutexLocker const locker(&m_mutex);
+	Utils::mapSetValue(m_perPageZones, page_id, zones);
+}
+
 } // namespace output

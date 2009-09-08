@@ -28,8 +28,10 @@
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
+#include "PictureZoneEditor.h"
 #include "ImageId.h"
 #include "Dpi.h"
+#include "Dpm.h"
 #include "Utils.h"
 #include "ImageTransformation.h"
 #include "ThumbnailPixmapCache.h"
@@ -37,11 +39,15 @@
 #include "OutputGenerator.h"
 #include "TiffWriter.h"
 #include "TiffReader.h"
+#include "ErrorWidget.h"
+#include "imageproc/BinaryImage.h"
 #include <QImage>
 #include <QString>
 #include <QObject>
 #include <QFile>
 #include <QFileInfo>
+#include <QTabWidget>
+#include <QCoreApplication>
 #include <QDebug>
 
 using namespace imageproc;
@@ -51,20 +57,34 @@ namespace output
 
 class Task::UiUpdater : public FilterResult
 {
+	Q_DECLARE_TR_FUNCTIONS(output::Task)
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
+		IntrusivePtr<Settings> const& settings,
 		std::auto_ptr<DebugImages> dbg_img,
-		PageId const& page_id, QImage const& image, bool batch);
+		QTransform const& image_to_virt,
+		QPolygonF const& virt_display_area,
+		PageId const& page_id,
+		QImage const& orig_image,
+		QImage const& output_image,
+		BinaryImage const& picture_mask,
+		bool batch);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
+	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<DebugImages> m_ptrDbg;
+	QTransform m_imageToVirt;
+	QPolygonF m_virtDisplayArea;
 	PageId m_pageId;
-	QImage m_image;
-	QImage m_downscaledImage;
+	QImage m_origImage;
+	QImage m_downscaledOrigImage;
+	QImage m_outputImage;
+	QImage m_downscaledOutputImage;
+	BinaryImage m_pictureMask;
 	bool m_batchProcessing;
 };
 
@@ -111,6 +131,8 @@ Task::process(
 		generator.outputImageSize(), generator.outputContentRect(),
 		data.xform(), output_dpi, color_params
 	);
+
+	PictureZoneList const new_zones(m_ptrSettings->zonesForPage(m_pageId));
 	
 	bool regenerate_file = false;
 	do { // Just to be able to break from it.
@@ -128,6 +150,11 @@ Task::process(
 			regenerate_file = true;
 			break;
 		}
+
+		if (stored_output_params->zones() != new_zones) {
+			regenerate_file = true;
+			break;
+		}
 		
 		QFileInfo existing_file_info(out_path);
 		if (!existing_file_info.exists()) {
@@ -142,37 +169,43 @@ Task::process(
 	
 	} while (false);
 	
-	QImage q_img;
+	QImage out_img;
 	
 	if (!regenerate_file) {
 		QFile file(out_path);
 		if (file.open(QIODevice::ReadOnly)) {
-			q_img = TiffReader::readImage(file);
+			out_img = TiffReader::readImage(file);
 		}
-		regenerate_file = q_img.isNull();
+		regenerate_file = out_img.isNull();
 	}
 	
+	BinaryImage auto_picture_mask;
+
 	if (regenerate_file) {
-		q_img = generator.process(data, status, m_ptrDbg.get());
+		out_img = generator.process(
+			status, data, new_zones, &auto_picture_mask, m_ptrDbg.get()
+		);
 		
-		if (!TiffWriter::writeImage(out_path, q_img)) {
+		if (!TiffWriter::writeImage(out_path, out_img)) {
 			m_ptrSettings->removeOutputParams(m_pageId);
 		} else {
 			QFileInfo const new_file_info(out_path);
 			OutputFileParams const new_file_params(new_file_info);
 			m_ptrSettings->setOutputParams(
 				m_pageId,
-				OutputParams(new_output_image_params, new_file_params)
+				OutputParams(new_output_image_params, new_file_params, new_zones)
 			);
 		}
 		
-		m_rThumbnailCache.recreateThumbnail(ImageId(out_path), q_img);
+		m_rThumbnailCache.recreateThumbnail(ImageId(out_path), out_img);
 	}
 	
 	return FilterResultPtr(
 		new UiUpdater(
-			m_ptrFilter, m_ptrDbg, m_pageId,
-			q_img, m_batchProcessing
+			m_ptrFilter, m_ptrSettings, m_ptrDbg, generator.toOutput(),
+			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
+			m_pageId, data.origImage(), out_img, auto_picture_mask,
+			m_batchProcessing
 		)
 	);
 }
@@ -182,13 +215,26 @@ Task::process(
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<Settings> const& settings,
 	std::auto_ptr<DebugImages> dbg_img,
-	PageId const& page_id, QImage const& image, bool const batch)
+	QTransform const& image_to_virt,
+	QPolygonF const& virt_display_area,
+	PageId const& page_id,
+	QImage const& orig_image,
+	QImage const& output_image,
+	BinaryImage const& picture_mask,
+	bool const batch)
 :	m_ptrFilter(filter),
+	m_ptrSettings(settings),
 	m_ptrDbg(dbg_img),
+	m_imageToVirt(image_to_virt),
+	m_virtDisplayArea(virt_display_area),
 	m_pageId(page_id),
-	m_image(image),
-	m_downscaledImage(ImageView::createDownscaledImage(image)),
+	m_origImage(orig_image),
+	m_downscaledOrigImage(ImageView::createDownscaledImage(orig_image)),
+	m_outputImage(output_image),
+	m_downscaledOutputImage(ImageView::createDownscaledImage(output_image)),
+	m_pictureMask(picture_mask),
 	m_batchProcessing(batch)
 {
 }
@@ -207,9 +253,37 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	if (m_batchProcessing) {
 		return;
 	}
-	
-	ImageView* view = new ImageView(m_image, m_downscaledImage);
-	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
+
+	std::auto_ptr<QWidget> image_view(
+		new ImageView(m_outputImage, m_downscaledOutputImage)
+	);
+
+	std::auto_ptr<QWidget> zone_editor;
+	if (m_pictureMask.isNull()) {
+		zone_editor.reset(
+			new ErrorWidget(tr("Picture zones are only available in Mixed mode."))
+		);
+	} else {
+		zone_editor.reset(
+			new PictureZoneEditor(
+				m_origImage, m_downscaledOrigImage, m_pictureMask,
+				m_imageToVirt, m_virtDisplayArea,
+				m_pageId, m_ptrSettings
+			)
+		);
+	}
+
+	std::auto_ptr<QTabWidget> tab_widget(new QTabWidget);
+	tab_widget->setTabPosition(QTabWidget::East);
+	tab_widget->addTab(image_view.release(), tr("Output"));
+	tab_widget->addTab(zone_editor.release(), tr("Picture Zones"));
+
+	QObject::connect(
+		tab_widget.get(), SIGNAL(currentChanged(int)),
+		opt_widget, SLOT(reloadIfZonesChanged())
+	);
+
+	ui->setImageWidget(tab_widget.release(), ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 }
 
 } // namespace output

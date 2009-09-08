@@ -25,6 +25,7 @@
 #include "Dpi.h"
 #include "ColorParams.h"
 #include "OutputParams.h"
+#include "PictureZoneList.h"
 #include <QMutex>
 #include <map>
 #include <memory>
@@ -65,10 +66,15 @@ public:
 	void removeOutputParams(PageId const& page_id);
 	
 	void setOutputParams(PageId const& page_id, OutputParams const& params);
+
+	PictureZoneList zonesForPage(PageId const& page_id) const;
+
+	void setZones(PageId const& page_id, PictureZoneList const& zones);
 private:
 	typedef std::map<PageId, Dpi> PerPageDpi;
 	typedef std::map<PageId, ColorParams> PerPageColorParams;
 	typedef std::map<PageId, OutputParams> PerPageOutputParams;
+	typedef std::map<PageId, PictureZoneList> PerPageZones;
 	
 	Dpi getDpiLocked(PageId const& page_id) const;
 	
@@ -83,6 +89,7 @@ private:
 	PerPageDpi m_perPageDpi;
 	PerPageColorParams m_perPageColorParams;
 	PerPageOutputParams m_perPageOutputParams;
+	PerPageZones m_perPageZones;
 	Dpi m_defaultDpi;
 	ColorParams m_defaultColorParams;
 };

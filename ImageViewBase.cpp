@@ -119,12 +119,14 @@ private:
 
 ImageViewBase::ImageViewBase(
 	QImage const& image, QImage const& downscaled_image,
-	ImageTransformation const& pre_transform,
+	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	Margins const& margins)
 :	m_defaultStatusTip(tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")),
 	m_unrestrictedDragStatusTip(tr("Unrestricted dragging is possible by holding down the Shift key.")),
 	m_image(image),
-	m_imageToVirt(pre_transform),
+	m_virtualDisplayArea(virt_display_area),
+	m_imageToVirtual(image_to_virt),
+	m_virtualToImage(image_to_virt.inverted()),
 	m_margins(margins),
 	m_zoom(1.0),
 	m_currentCursorShape(Qt::ArrowCursor),
@@ -143,9 +145,7 @@ ImageViewBase::ImageViewBase(
 	);
 	
 	m_widgetFocalPoint = centeredWidgetFocalPoint();
-	m_pixmapFocalPoint = m_imageToVirt.transformBack().map(
-		m_imageToVirt.resultingRect().center()
-	);
+	m_pixmapFocalPoint = m_virtualToImage.map(virtualDisplayRect().center());
 	
 	ensureStatusTip(defaultStatusTip());
 	
@@ -226,23 +226,16 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	// On X11 SmoothPixmapTransform is too slow.
 	painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
 #endif
-	
-	validateHqPixmap();
-	if (!m_hqPixmap.isNull()) {
+
+	if (validateHqPixmap()) {
 		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);
 	} else {
+		scheduleHqVersionRebuild();
+
 		painter.setWorldTransform(
-			m_pixmapToImage * m_imageToVirt.transform()
-			* m_virtualToWidget
+			m_pixmapToImage * m_imageToVirtual * m_virtualToWidget
 		);
 		PixmapRenderer::drawPixmap(painter, m_pixmap);
-		
-		// If m_ptrHqTransformTask is not null after validateHqPixmap(),
-		// that means the right version is being built.
-		if (!m_ptrHqTransformTask && m_hqTransformEnabled) {
-			// Schedule construction of a high quality version.
-			m_timer.start();
-		}
 	}
 	
 	painter.setRenderHints(QPainter::Antialiasing, true);
@@ -255,16 +248,12 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	QPolygonF const image_area(
 		PolygonUtils::round(
 			m_virtualToWidget.map(
-				m_imageToVirt.transform().map(
-					m_imageToVirt.origRect()
-				)
+				m_imageToVirtual.map(QRectF(m_image.rect()))
 			)
 		)
 	);
 	QPolygonF const crop_area(
-		PolygonUtils::round(
-			m_virtualToWidget.map(m_imageToVirt.resultingCropArea())
-		)
+		PolygonUtils::round(m_virtualToWidget.map(m_virtualDisplayArea))
 	);
 	
 	QPolygonF const intersected_area(
@@ -392,8 +381,7 @@ ImageViewBase::handleImageDragging(QMouseEvent* const event)
 bool
 ImageViewBase::isDraggingPossible() const
 {
-	QRectF const image_rect(m_imageToVirt.resultingRect());
-	QRectF const widget_rect(m_virtualToWidget.mapRect(image_rect));
+	QRectF const widget_rect(m_virtualToWidget.mapRect(virtualDisplayRect()));
 	if (widget_rect.top() <= -1.0) {
 		return true;
 	}
@@ -426,8 +414,7 @@ ImageViewBase::marginsRect() const
 QRectF
 ImageViewBase::getVisibleWidgetRect() const
 {
-	QRectF const image_rect(m_imageToVirt.resultingRect());
-	QRectF const widget_rect(m_virtualToWidget.mapRect(image_rect));
+	QRectF const widget_rect(m_virtualToWidget.mapRect(virtualDisplayRect()));
 	return widget_rect.intersected(marginsRect());
 }
 
@@ -452,29 +439,37 @@ ImageViewBase::resetZoom()
 }
 
 void
-ImageViewBase::updateTransform(ImageTransformation const& image_to_virt)
+ImageViewBase::updateTransform(
+	QTransform const& image_to_virt, QPolygonF const& virt_display_area)
 {
 	TempFocalPointAdjuster const temp_fp(*this);
 	
-	m_imageToVirt = image_to_virt;
+	m_imageToVirtual = image_to_virt;
+	m_virtualToImage = image_to_virt.inverted();
+	m_virtualDisplayArea = virt_display_area;
+
 	updateWidgetTransform();
 	update();
 }
 
 void
 ImageViewBase::updateTransformAndFixFocalPoint(
-	ImageTransformation const& image_to_virt, FocalPointMode const mode)
+	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
+	FocalPointMode const mode)
 {
 	TempFocalPointAdjuster const temp_fp(*this);
 	
-	m_imageToVirt = image_to_virt;
+	m_imageToVirtual = image_to_virt;
+	m_virtualToImage = image_to_virt.inverted();
+	m_virtualDisplayArea = virt_display_area;
+
 	updateWidgetTransformAndFixFocalPoint(mode);
 	update();
 }
 
 void
 ImageViewBase::updateTransformPreservingScale(
-	ImageTransformation const& image_to_virt)
+	QTransform const& image_to_virt, QPolygonF const& virt_display_area)
 {
 	TempFocalPointAdjuster const temp_fp(*this);
 	
@@ -482,14 +477,17 @@ ImageViewBase::updateTransformPreservingScale(
 	QLineF const image_line(0.0, 0.0, 1.0, 1.0);
 	
 	QLineF const widget_line_before(
-		m_virtualToWidget.map(m_imageToVirt.transform().map(image_line))
+		(m_imageToVirtual * m_virtualToWidget).map(image_line)
 	);
 	
-	m_imageToVirt = image_to_virt;
+	m_imageToVirtual = image_to_virt;
+	m_virtualToImage = image_to_virt.inverted();
+	m_virtualDisplayArea = virt_display_area;
+
 	updateWidgetTransform();
 	
 	QLineF const widget_line_after(
-		m_virtualToWidget.map(m_imageToVirt.transform().map(image_line))
+		(m_imageToVirtual * m_virtualToWidget).map(image_line)
 	);
 	
 	m_zoom *= widget_line_before.length() / widget_line_after.length();
@@ -545,12 +543,8 @@ ImageViewBase::defaultStatusTip() const
 void
 ImageViewBase::updateWidgetTransform()
 {
-	QRectF const virt_rect(m_imageToVirt.resultingRect());
-	QPointF const virt_origin(
-		m_imageToVirt.transform().map(
-			m_pixmapFocalPoint
-		)
-	);
+	QRectF const virt_rect(virtualDisplayRect());
+	QPointF const virt_origin(m_imageToVirtual.map(m_pixmapFocalPoint));
 	QPointF const widget_origin(m_widgetFocalPoint);
 	
 	QSizeF zoom1_widget_size(virt_rect.size());
@@ -618,9 +612,7 @@ ImageViewBase::getIdealWidgetFocalPoint(FocalPointMode const mode) const
 	QRectF const display_area(marginsRect());
 	
 	// The virtual image rectangle in widget coordinates.
-	QRectF const image_area(
-		m_virtualToWidget.mapRect(m_imageToVirt.resultingRect())
-	);
+	QRectF const image_area(m_virtualToWidget.mapRect(virtualDisplayRect()));
 	
 	// Unused display space from each side.
 	double const left_margin = image_area.left() - display_area.left();
@@ -746,19 +738,66 @@ void
 ImageViewBase::setWidgetFocalPointWithoutMoving(QPointF const new_widget_fp)
 {
 	m_widgetFocalPoint = new_widget_fp;
-	m_pixmapFocalPoint = m_imageToVirt.transformBack().map(
+	m_pixmapFocalPoint = m_virtualToImage.map(
 		m_widgetToVirtual.map(m_widgetFocalPoint)
 	);
+}
+
+/**
+ * Returns true if m_hqPixmap is valid and up to date.
+ */
+bool
+ImageViewBase::validateHqPixmap() const
+{
+	if (!m_hqTransformEnabled) {
+		return false;
+	}
+
+	if (m_hqPixmap.isNull()) {
+		return false;
+	}
+
+	if (m_hqSourceId != m_image.cacheKey()) {
+		return false;
+	}
+
+	if (m_hqXform != m_imageToVirtual * m_virtualToWidget) {
+		return false;
+	}
+
+	return true;
+}
+
+void
+ImageViewBase::scheduleHqVersionRebuild()
+{
+	QTransform const xform(m_imageToVirtual * m_virtualToWidget);
+
+	if (!m_timer.isActive() || m_potentialHqXform != xform) {
+		if (m_ptrHqTransformTask.get()) {
+			m_ptrHqTransformTask->cancel();
+			m_ptrHqTransformTask.reset();
+		}
+		m_potentialHqXform = xform;
+		m_timer.start();
+	}
 }
 
 void
 ImageViewBase::initiateBuildingHqVersion()
 {
-	if (!m_hqTransformEnabled) {
+	if (validateHqPixmap()) {
 		return;
 	}
-	
-	QTransform const xform(m_imageToVirt.transform() * m_virtualToWidget);
+
+	m_hqPixmap = QPixmap();
+
+	if (m_ptrHqTransformTask.get()) {
+		m_ptrHqTransformTask->cancel();
+		m_ptrHqTransformTask.reset();
+	}
+
+	QTransform const xform(m_imageToVirtual * m_virtualToWidget);
 	IntrusivePtr<HqTransformTask> const task(
 		new HqTransformTask(this, m_image, xform, size())
 	);
@@ -785,27 +824,6 @@ ImageViewBase::hqVersionBuilt(
 	m_hqPixmapPos = origin;
 	m_ptrHqTransformTask.reset();
 	update();
-}
-
-/**
- * Resets m_hqPixmap and cancels the transformation task if
- * the high-quality pixmap was built (or is being built) with
- * a transformation other than the current one or from the
- * source image other than the current one, or if high-quality
- * transformations are currently disabled.
- */
-void
-ImageViewBase::validateHqPixmap()
-{
-	if (!m_hqTransformEnabled ||
-			m_hqXform != m_imageToVirt.transform() * m_virtualToWidget
-			|| m_hqSourceId != m_image.cacheKey()) {
-		m_hqPixmap = QPixmap();
-		if (m_ptrHqTransformTask.get()) {
-			m_ptrHqTransformTask->cancel();
-			m_ptrHqTransformTask.reset();
-		}
-	}
 }
 
 BackgroundExecutor&

@@ -20,6 +20,7 @@
 #include "ChangeDpiDialog.h"
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
+#include "PictureZoneList.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include <boost/foreach.hpp>
@@ -31,6 +32,7 @@
 #include <QPoint>
 #include <QSize>
 #include <Qt>
+#include <QDebug>
 
 namespace output
 {
@@ -118,6 +120,20 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 void
 OptionsWidget::postUpdateUI()
 {
+}
+
+void
+OptionsWidget::reloadIfZonesChanged()
+{
+	PictureZoneList saved_zones;
+	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(m_pageId));
+	if (output_params.get()) {
+		saved_zones = output_params->zones();
+	}
+
+	if (saved_zones != m_ptrSettings->zonesForPage(m_pageId)) {
+		emit reloadRequested();
+	}
 }
 
 void

@@ -24,15 +24,18 @@ namespace output
 {
 
 OutputParams::OutputParams(
-	OutputImageParams const& image_params, OutputFileParams const& file_params)
+	OutputImageParams const& image_params,
+	OutputFileParams const& file_params, PictureZoneList const& zones)
 :	m_imageParams(image_params),
-	m_fileParams(file_params)
+	m_fileParams(file_params),
+	m_zones(zones)
 {
 }
 
 OutputParams::OutputParams(QDomElement const& el)
 :	m_imageParams(el.namedItem("image").toElement()),
-	m_fileParams(el.namedItem("file").toElement())
+	m_fileParams(el.namedItem("file").toElement()),
+	m_zones(el.namedItem("zones").toElement())
 {
 }
 
@@ -42,6 +45,7 @@ OutputParams::toXml(QDomDocument& doc, QString const& name) const
 	QDomElement el(doc.createElement(name));
 	el.appendChild(m_imageParams.toXml(doc, "image"));
 	el.appendChild(m_fileParams.toXml(doc, "file"));
+	el.appendChild(m_zones.toXml(doc, "zones"));
 	return el;
 }
 

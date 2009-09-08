@@ -271,6 +271,8 @@ SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
 ADD_SUBDIRECTORY(ui)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}") # for ui files
 
+ADD_CUSTOM_TARGET(toplevel_ui_sources DEPENDS ${ui_sources})
+
 ADD_SUBDIRECTORY(filters/fix_orientation)
 ADD_SUBDIRECTORY(filters/page_split)
 ADD_SUBDIRECTORY(filters/deskew)
@@ -347,6 +349,7 @@ SET(
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
 	Utils.cpp Utils.h
+	Zone.cpp Zone.h
 	AutoManualMode.h
 	AbstractCommand.h
 	AbstractFilter.h

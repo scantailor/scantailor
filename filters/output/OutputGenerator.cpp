@@ -25,6 +25,7 @@
 #include "EstimateBackground.h"
 #include "Despeckle.h"
 #include "RenderParams.h"
+#include "PictureZoneList.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include "imageproc/BinaryImage.h"
@@ -46,6 +47,7 @@
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
 #include "imageproc/PolygonRasterizer.h"
+#include <boost/foreach.hpp>
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -98,11 +100,23 @@ OutputGenerator::OutputGenerator(
 	m_fullPageRect |= m_contentRect;
 }
 
-QImage
-OutputGenerator::process(FilterData const& input,
-	TaskStatus const& status, DebugImages* const dbg) const
+QTransform
+OutputGenerator::toOutput() const
 {
-	QImage image(processImpl(input, status, dbg));
+	QTransform xform(m_toUncropped);
+
+	QPointF const delta(-m_cropRect.topLeft());
+	xform *= QTransform().translate(delta.x(), delta.y());
+
+	return xform;
+}
+
+QImage
+OutputGenerator::process(
+	TaskStatus const& status, FilterData const& input, PictureZoneList const& zones,
+	imageproc::BinaryImage* auto_picture_mask, DebugImages* const dbg) const
+{
+	QImage image(processImpl(status, input, zones, auto_picture_mask, dbg));
 	assert(!image.isNull());
 	
 	// Set the correct DPI.
@@ -344,9 +358,39 @@ OutputGenerator::estimateBinarizationMask(
 	return BinaryImage(picture_areas, threshold);
 }
 
+void
+OutputGenerator::modifyBinarizationMask(
+	imageproc::BinaryImage& bw_mask,
+	QRect const& mask_rect, PictureZoneList const& zones) const
+{
+	QTransform xform(m_toUncropped * QTransform().translate(-mask_rect.x(), -mask_rect.y()));
+
+	// Pass 1: ERASER1
+	BOOST_FOREACH(PictureZone const& zone, zones) {
+		if (zone.type() == PictureZone::ERASER1) {
+			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(zone.shape()), Qt::WindingFill);
+		}
+	}
+
+	// Pass 2: PAINTER2
+	BOOST_FOREACH(PictureZone const& zone, zones) {
+		if (zone.type() == PictureZone::PAINTER2) {
+			PolygonRasterizer::fill(bw_mask, WHITE, xform.map(zone.shape()), Qt::WindingFill);
+		}
+	}
+
+	// Pass 1: ERASER3
+	BOOST_FOREACH(PictureZone const& zone, zones) {
+		if (zone.type() == PictureZone::ERASER3) {
+			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(zone.shape()), Qt::WindingFill);
+		}
+	}
+}
+
 QImage
-OutputGenerator::processImpl(FilterData const& input,
-	TaskStatus const& status, DebugImages* const dbg) const
+OutputGenerator::processImpl(
+	TaskStatus const& status, FilterData const& input, PictureZoneList const& zones,
+	imageproc::BinaryImage* auto_picture_mask, DebugImages* const dbg) const
 {
 	RenderParams const render_params(m_colorParams);
 	
@@ -467,20 +511,11 @@ OutputGenerator::processImpl(FilterData const& input,
 			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_pos);
 		}
 		
-		QImage bitonal(dst.toQImage());
-		
-		dst.release(); // Save memory.
-#if 0
-		if (m_colorParams.colorMode() == ColorParams::BITONAL) {
-			colorizeBitonal(
-				bitonal, m_colorParams.lightColor(),
-				m_colorParams.darkColor()
-			);
-		}
-#endif
-		return bitonal;
+		return dst.toQImage();
 	}
 	
+	QSize const target_size(m_cropRect.size().expandedTo(QSize(1, 1)));
+
 	BinaryImage bw_mask;
 	if (render_params.mixedOutput()) {
 		// This block should go before the block with
@@ -496,7 +531,25 @@ OutputGenerator::processImpl(FilterData const& input,
 			dbg->add(bw_mask, "bw_mask");
 		}
 		
+		if (auto_picture_mask) {
+			if (auto_picture_mask->size() != target_size) {
+				BinaryImage(target_size).swap(*auto_picture_mask);
+			}
+			auto_picture_mask->fill(BLACK);
+
+			if (!m_contentRect.isEmpty()) {
+				QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+				QPoint const src_pos(m_contentRect.topLeft() - small_margins_rect.topLeft());
+				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_pos);
+			}
+		}
+
 		status.throwIfCancelled();
+
+		modifyBinarizationMask(bw_mask, small_margins_rect, zones);
+		if (dbg) {
+			dbg->add(bw_mask, "bw_mask with zones");
+		}
 	}
 	
 	if (render_params.normalizeIllumination()
@@ -562,17 +615,14 @@ OutputGenerator::processImpl(FilterData const& input,
 	
 	status.throwIfCancelled();
 	
-	QImage dst(
-		m_cropRect.size().expandedTo(QSize(1, 1)),
-		maybe_normalized.format()
-	);
+	QImage dst(target_size, maybe_normalized.format());
 	if (maybe_normalized.format() == QImage::Format_Indexed8) {
 		dst.setColorTable(createGrayscalePalette());
 		dst.fill(0xff); // White.
 	} else {
 		dst.fill(0xffffffff); // Opaque white.
 	}
-	
+
 	if (!m_contentRect.isEmpty()) {
 		QRect src_rect(m_contentRect);
 		src_rect.moveTopLeft(

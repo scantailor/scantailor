@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,39 +16,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_ORIENTATION_IMAGEVIEW_H_
-#define FIX_ORIENTATION_IMAGEVIEW_H_
+#ifndef ZONES_ZONEPROPERTIESDIALOG_H_
+#define ZONES_ZONEPROPERTIESDIALOG_H_
 
-#include "ImageViewBase.h"
-#include "OrthogonalRotation.h"
-#include "ImageTransformation.h"
+#include "ui_ZonePropertiesDialog.h"
+#include "PictureZone.h"
+#include <QDialog>
 
-namespace fix_orientation
+namespace output
 {
 
-class ImageView : public ImageViewBase
+class ZonePropertiesDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ImageView(
-		QImage const& image, QImage const& downscaled_image,
-		ImageTransformation const& xform);
-	
-	virtual ~ImageView();
-public slots:
-	void setPreRotation(OrthogonalRotation rotation);
-protected:
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
+	ZonePropertiesDialog(int spline_idx, PictureZone::Type type, QWidget* parent = 0);
+signals:
+	void typeChanged(int spline_idx, PictureZone::Type type);
+private slots:
+	void itemToggled(bool selected);
 private:
-	ImageTransformation m_xform;
+	Ui::ZonePropertiesDialog ui;
+	int m_splineIdx;
 };
 
-} // namespace fix_orientation
+} // namespace output
 
 #endif

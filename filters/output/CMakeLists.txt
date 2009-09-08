@@ -28,11 +28,16 @@ SET(
 	OutputImageParams.cpp OutputImageParams.h
 	OutputFileParams.cpp OutputFileParams.h
 	OutputParams.cpp OutputParams.h
+	PictureZone.cpp PictureZone.h
+	PictureZoneList.cpp PictureZoneList.h
+	PictureZoneEditor.cpp PictureZoneEditor.h
+	ZonePropertiesDialog.cpp ZonePropertiesDialog.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
 
 ADD_LIBRARY(output STATIC ${sources} ${ui_sources})
+ADD_DEPENDENCIES(output toplevel_ui_sources)
 
 FILE(GLOB abs_sources ABSOLUTE ${sources})
 FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})

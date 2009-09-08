@@ -49,7 +49,8 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform,
 	QRectF const& adapted_content_rect, OptionsWidget const& opt_widget)
-:	ImageViewBase(image, downscaled_image, xform, Margins(5.0, 5.0, 5.0, 5.0)),
+:	ImageViewBase(image, downscaled_image, xform.transform(),
+				  xform.resultingCropArea(), Margins(5.0, 5.0, 5.0, 5.0)),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_origXform(xform),
@@ -158,7 +159,7 @@ ImageView::paintOverImage(QPainter& painter)
 {
 	// Pretend we are drawing in m_origXform coordinates.
 	painter.setWorldTransform(
-		m_origXform.transformBack() * imageToVirt().transform()
+		m_origXform.transformBack() * imageToVirtual()
 		* painter.worldTransform()
 	);
 	
@@ -211,12 +212,11 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 
 	if (event->button() == Qt::LeftButton) {
 		QTransform const orig_to_widget(
-			m_origXform.transformBack() * imageToVirt().transform()
+			m_origXform.transformBack() * imageToVirtual()
 			* virtualToWidget()
 		);
 		QTransform const widget_to_orig(
-			widgetToVirtual() * imageToVirt().transformBack()
-			* m_origXform.transform()
+			widgetToVirtual() * virtualToImage() * m_origXform.transform()
 		);
 		m_beforeResizing.middleWidgetRect = orig_to_widget.mapRect(
 			m_middleRect
@@ -508,7 +508,10 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 		)
 	);
 	
-	updateTransformAndFixFocalPoint(new_xform, CENTER_IF_FITS);
+	updateTransformAndFixFocalPoint(
+		new_xform.transform(), new_xform.resultingCropArea(),
+		CENTER_IF_FITS
+	);
 	m_middleRect = middle_rect;
 	m_outerRect = outer_rect;
 }
@@ -531,10 +534,12 @@ ImageView::updatePresentationTransform(FitMode const fit_mode)
 	);
 	
 	if (fit_mode == DONT_FIT) {
-		updateTransformPreservingScale(new_xform);
+		updateTransformPreservingScale(new_xform.transform(), new_xform.resultingCropArea());
 	} else {
 		resetZoom();
-		updateTransformAndFixFocalPoint(new_xform, CENTER_IF_FITS);
+		updateTransformAndFixFocalPoint(
+			new_xform.transform(), new_xform.resultingCropArea(), CENTER_IF_FITS
+		);
 	}
 }
 
@@ -551,8 +556,7 @@ int
 ImageView::cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const
 {
 	QTransform const orig_to_widget(
-		m_origXform.transformBack() * imageToVirt().transform()
-		* virtualToWidget()
+		m_origXform.transformBack() * imageToVirtual() * virtualToWidget()
 	);
 	QRect const rect(orig_to_widget.mapRect(orig_rect).toRect());
 	int const adj = 5;

@@ -49,6 +49,8 @@ public:
 	void preUpdateUI(PageId const& page_id);
 	
 	void postUpdateUI();
+public slots:
+	void reloadIfZonesChanged();
 private slots:
 	void changeDpiButtonClicked();
 	
