@@ -1069,8 +1069,7 @@ MainWindow::openProject()
 	
 	QString const project_file(
 		QFileDialog::getOpenFileName(
-			0, tr("Open Project"),
-			project_dir,
+			this, tr("Open Project"), project_dir,
 			tr("Scan Tailor Projects")+" (*.ScanTailor)"
 		)
 	);
