@@ -476,7 +476,7 @@ ThumbnailPixmapCache::Impl::ensureThumbnailExists(
 	
 	AtomicFileOverwriter overwriter;
 	QIODevice* iodev = overwriter.startWriting(thumb_file_path);
-	if (thumbnail.save(iodev, "PNG")) {
+	if (iodev && thumbnail.save(iodev, "PNG")) {
 		overwriter.commit();
 	}
 }
@@ -505,7 +505,7 @@ ThumbnailPixmapCache::Impl::recreateThumbnail(
 	// Note that we may be called from multiple threads at the same time.
 	AtomicFileOverwriter overwriter;
 	QIODevice* iodev = overwriter.startWriting(thumb_file_path);
-	if (thumbnail.save(iodev, "PNG")) {
+	if (iodev && thumbnail.save(iodev, "PNG")) {
 		thumb_written = overwriter.commit();
 	} else {
 		overwriter.abort();

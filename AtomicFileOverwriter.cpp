@@ -39,7 +39,7 @@ AtomicFileOverwriter::startWriting(QString const& file_path)
 	m_ptrTempFile.reset(new QTemporaryFile(file_path));
 	m_ptrTempFile->setAutoRemove(false);
 	if (!m_ptrTempFile->open()) {
-		m_ptrTempFile->reset();
+		m_ptrTempFile.reset();
 	}
 	
 	return m_ptrTempFile.get();

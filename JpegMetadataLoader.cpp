@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -223,9 +223,13 @@ JpegMetadataLoader::loadMetadata(
 	QIODevice& io_device,
 	VirtualFunction1<void, ImageMetadata const&>& out)
 {
+	if (!io_device.isReadable()) {
+		return GENERIC_ERROR;
+	}
+
 	static unsigned char const jpeg_signature[] = { 0xff, 0xd8, 0xff };
 	static int const sig_size = sizeof(jpeg_signature);
-	
+
 	unsigned char signature[sig_size];
 	if (io_device.peek((char*)signature, sig_size) != sig_size) {
 		return FORMAT_NOT_RECOGNIZED;
