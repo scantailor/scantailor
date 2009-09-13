@@ -38,13 +38,14 @@
 #include "DebugImages.h"
 #include "OutputGenerator.h"
 #include "TiffWriter.h"
-#include "TiffReader.h"
+#include "ImageLoader.h"
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
 #include <QImage>
 #include <QString>
 #include <QObject>
 #include <QFile>
+#include <QDir>
 #include <QFileInfo>
 #include <QTabWidget>
 #include <QCoreApplication>
@@ -120,7 +121,15 @@ Task::process(
 	
 	ColorParams const color_params(m_ptrSettings->getColorParams(m_pageId));
 	Dpi const output_dpi(m_ptrSettings->getDpi(m_pageId));
-	QString const out_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
+	QString const out_file_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
+	QFileInfo const out_file_info(out_file_path);
+	QString const automask_dir(Utils::automaskDir(m_outDir));
+	QString const automask_file_path(
+		QDir(automask_dir).absoluteFilePath(out_file_info.fileName())
+	);
+	QFileInfo automask_file_info(automask_file_path);
+	bool const need_automask = color_params.colorMode() == ColorParams::MIXED
+							   && !m_batchProcessing;
 	
 	OutputGenerator const generator(
 		output_dpi, color_params, data.xform(),
@@ -134,7 +143,7 @@ Task::process(
 
 	PictureZoneList const new_zones(m_ptrSettings->zonesForPage(m_pageId));
 	
-	bool regenerate_file = false;
+	bool need_reprocess = false;
 	do { // Just to be able to break from it.
 		
 		std::auto_ptr<OutputParams> stored_output_params(
@@ -142,69 +151,92 @@ Task::process(
 		);
 		
 		if (!stored_output_params.get()) {
-			regenerate_file = true;
+			need_reprocess = true;
 			break;
 		}
 		
-		if (!stored_output_params->imageParams().matches(new_output_image_params)) {
-			regenerate_file = true;
+		if (!stored_output_params->outputImageParams().matches(new_output_image_params)) {
+			need_reprocess = true;
 			break;
 		}
 
 		if (stored_output_params->zones() != new_zones) {
-			regenerate_file = true;
+			need_reprocess = true;
 			break;
 		}
 		
-		QFileInfo existing_file_info(out_path);
-		if (!existing_file_info.exists()) {
-			regenerate_file = true;
+		if (!out_file_info.exists()) {
+			need_reprocess = true;
 			break;
 		}
 		
-		if (!stored_output_params->fileParams().matches(OutputFileParams(existing_file_info))) {
-			regenerate_file = true;
+		if (!stored_output_params->outputFileParams().matches(OutputFileParams(out_file_info))) {
+			need_reprocess = true;
 			break;
+		}
+
+		if (need_automask) {
+			if (!automask_file_info.exists()) {
+				need_reprocess = true;
+				break;
+			}
+
+			if (!stored_output_params->automaskFileParams().matches(OutputFileParams(automask_file_info))) {
+				need_reprocess = true;
+				break;
+			}
 		}
 	
 	} while (false);
 	
 	QImage out_img;
+	BinaryImage automask_img;
 	
-	if (!regenerate_file) {
-		QFile file(out_path);
-		if (file.open(QIODevice::ReadOnly)) {
-			out_img = TiffReader::readImage(file);
+	if (!need_reprocess) {
+		QFile out_file(out_file_path);
+		if (out_file.open(QIODevice::ReadOnly)) {
+			out_img = ImageLoader::load(out_file, 0);
 		}
-		regenerate_file = out_img.isNull();
-	}
-	
-	BinaryImage auto_picture_mask;
+		need_reprocess = out_img.isNull();
 
-	if (regenerate_file) {
+		if (need_automask && !need_reprocess) {
+			QFile automask_file(automask_file_path);
+			if (automask_file.open(QIODevice::ReadOnly)) {
+				automask_img = BinaryImage(ImageLoader::load(automask_file, 0));
+			}
+			need_reprocess = automask_img.isNull() || automask_img.size() != out_img.size();
+		}
+	}
+
+	if (need_reprocess) {
 		out_img = generator.process(
-			status, data, new_zones, &auto_picture_mask, m_ptrDbg.get()
+			status, data, new_zones,
+			need_automask ? &automask_img : 0, m_ptrDbg.get()
 		);
 		
-		if (!TiffWriter::writeImage(out_path, out_img)) {
+		if (!TiffWriter::writeImage(out_file_path, out_img) || !QDir().mkpath(automask_dir) ||
+				!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
 			m_ptrSettings->removeOutputParams(m_pageId);
 		} else {
-			QFileInfo const new_file_info(out_path);
-			OutputFileParams const new_file_params(new_file_info);
+			OutputFileParams const new_output_file_params(out_file_info);
+			OutputFileParams const new_automask_file_params(automask_file_info);
 			m_ptrSettings->setOutputParams(
 				m_pageId,
-				OutputParams(new_output_image_params, new_file_params, new_zones)
+				OutputParams(
+					new_output_image_params,
+					new_output_file_params, new_automask_file_params, new_zones
+				)
 			);
 		}
 		
-		m_rThumbnailCache.recreateThumbnail(ImageId(out_path), out_img);
+		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);
 	}
 	
 	return FilterResultPtr(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_ptrDbg, generator.toOutput(),
 			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
-			m_pageId, data.origImage(), out_img, auto_picture_mask,
+			m_pageId, data.origImage(), out_img, automask_img,
 			m_batchProcessing
 		)
 	);

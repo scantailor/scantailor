@@ -81,6 +81,8 @@ public:
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	
+	virtual void transformChanged();
+
 	virtual void wheelEvent(QWheelEvent* event);
 	
 	virtual void mousePressEvent(QMouseEvent* event);
@@ -124,8 +126,8 @@ private:
 		virtual QPointF const point() const = 0;
 		
 		virtual void setPoint(QPointF const& pt) = 0;
-		
-		virtual bool removeIfPossible();
+
+		virtual void remove();
 		
 		bool hasAtLeastSiblings(int num);
 		
@@ -156,7 +158,7 @@ private:
 		
 		virtual void setPoint(QPointF const& pt);
 		
-		virtual bool removeIfPossible();
+		virtual void remove();
 		
 		Vertex::Ptr firstVertex() const;
 		
@@ -289,8 +291,12 @@ private:
 		
 		virtual ~State() {}
 		
+		virtual void activated() {}
+
 		virtual void paint(QPainter& painter) {}
 		
+		virtual void transformChanged() {}
+
 		virtual void mousePressEvent(QMouseEvent* event) {}
 	
 		virtual void mouseReleaseEvent(QMouseEvent* event) {}
@@ -317,6 +323,10 @@ private:
 	public:
 		DefaultState(PictureZoneEditor& owner);
 		
+		virtual void activated() { update(); }
+
+		virtual void transformChanged() { update(); }
+
 		virtual void paint(QPainter& painter);
 		
 		virtual void mousePressEvent(QMouseEvent* event);
@@ -326,9 +336,9 @@ private:
 		virtual void mouseMoveEvent(QMouseEvent* event);
 		
 		virtual void contextMenuEvent(QContextMenuEvent* event);
-		
-		void update();
 	private:
+		void update();
+
 		BasicVisualizer m_visualizer;
 		QPointF m_screenMousePos;
 		Spline::Ptr m_ptrHighlightedSpline;

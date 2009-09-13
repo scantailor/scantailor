@@ -117,6 +117,19 @@ private:
 };
 
 
+class ImageViewBase::TransformChangeWatcher
+{
+public:
+	TransformChangeWatcher(ImageViewBase& owner);
+
+	~TransformChangeWatcher();
+private:
+	ImageViewBase& m_rOwner;
+	QTransform m_imageToVirtual;
+	QTransform m_virtualToWidget;
+};
+
+
 ImageViewBase::ImageViewBase(
 	QImage const& image, QImage const& downscaled_image,
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
@@ -129,6 +142,7 @@ ImageViewBase::ImageViewBase(
 	m_virtualToImage(image_to_virt.inverted()),
 	m_margins(margins),
 	m_zoom(1.0),
+	m_transformChangeWatchersActive(0),
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_isDraggingInProgress(false),
 	m_hqTransformEnabled(true)
@@ -442,8 +456,9 @@ void
 ImageViewBase::updateTransform(
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area)
 {
+	TransformChangeWatcher const watcher(*this);
 	TempFocalPointAdjuster const temp_fp(*this);
-	
+
 	m_imageToVirtual = image_to_virt;
 	m_virtualToImage = image_to_virt.inverted();
 	m_virtualDisplayArea = virt_display_area;
@@ -457,6 +472,7 @@ ImageViewBase::updateTransformAndFixFocalPoint(
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	FocalPointMode const mode)
 {
+	TransformChangeWatcher const watcher(*this);
 	TempFocalPointAdjuster const temp_fp(*this);
 	
 	m_imageToVirtual = image_to_virt;
@@ -471,6 +487,7 @@ void
 ImageViewBase::updateTransformPreservingScale(
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area)
 {
+	TransformChangeWatcher const watcher(*this);
 	TempFocalPointAdjuster const temp_fp(*this);
 	
 	// An arbitrary line in image coordinates.
@@ -543,6 +560,8 @@ ImageViewBase::defaultStatusTip() const
 void
 ImageViewBase::updateWidgetTransform()
 {
+	TransformChangeWatcher const watcher(*this);
+
 	QRectF const virt_rect(virtualDisplayRect());
 	QPointF const virt_origin(m_imageToVirtual.map(m_pixmapFocalPoint));
 	QPointF const widget_origin(m_widgetFocalPoint);
@@ -553,16 +572,12 @@ ImageViewBase::updateWidgetTransform()
 	double const zoom1_x = zoom1_widget_size.width() / virt_rect.width();
 	double const zoom1_y = zoom1_widget_size.height() / virt_rect.height();
 	
-	QTransform t1;
-	t1.translate(-virt_origin.x(), -virt_origin.y());
-	
-	QTransform t2;
-	t2.scale(zoom1_x * m_zoom, zoom1_y * m_zoom);
-	
-	QTransform t3;
-	t3.translate(widget_origin.x(), widget_origin.y());
-	
-	m_virtualToWidget = t1 * t2 * t3;
+	QTransform xform;
+	xform.translate(-virt_origin.x(), -virt_origin.y());
+	xform *= QTransform().scale(zoom1_x * m_zoom, zoom1_y * m_zoom);
+	xform *= QTransform().translate(widget_origin.x(), widget_origin.y());
+
+	m_virtualToWidget = xform;
 	m_widgetToVirtual = m_virtualToWidget.inverted();
 }
 
@@ -575,6 +590,8 @@ ImageViewBase::updateWidgetTransform()
 void
 ImageViewBase::updateWidgetTransformAndFixFocalPoint(FocalPointMode const mode)
 {
+	TransformChangeWatcher const watcher(*this);
+
 	// This must go before getIdealWidgetFocalPoint(), as it
 	// recalculates m_virtualToWidget, that is used by
 	// getIdealWidgetFocalPoint().
@@ -923,4 +940,25 @@ ImageViewBase::TempFocalPointAdjuster::TempFocalPointAdjuster(
 ImageViewBase::TempFocalPointAdjuster::~TempFocalPointAdjuster()
 {
 	m_rObj.setWidgetFocalPointWithoutMoving(m_origWidgetFP);
+}
+
+
+/*================== ImageViewBase::TransformChangeWatcher ================*/
+
+ImageViewBase::TransformChangeWatcher::TransformChangeWatcher(ImageViewBase& owner)
+:	m_rOwner(owner),
+	m_imageToVirtual(owner.m_imageToVirtual),
+	m_virtualToWidget(owner.m_virtualToWidget)
+{
+	++m_rOwner.m_transformChangeWatchersActive;
+}
+
+ImageViewBase::TransformChangeWatcher::~TransformChangeWatcher()
+{
+	if (--m_rOwner.m_transformChangeWatchersActive == 0) {
+		if (m_imageToVirtual != m_rOwner.m_imageToVirtual ||
+				m_virtualToWidget != m_rOwner.m_virtualToWidget) {
+			m_rOwner.transformChanged();
+		}
+	}
 }

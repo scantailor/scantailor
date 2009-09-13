@@ -112,6 +112,11 @@ protected:
 	virtual void paintEvent(QPaintEvent* event);
 	
 	virtual void paintOverImage(QPainter& painter);
+
+	/**
+	 * \brief Called when any of the transformations change.
+	 */
+	virtual void transformChanged() {}
 	
 	/**
 	 * \brief Handle widget resizing.
@@ -254,7 +259,8 @@ private slots:
 private:
 	class HqTransformTask;
 	class TempFocalPointAdjuster;
-	
+	class TransformChangeWatcher;
+
 	void updateWidgetTransform();
 	
 	void updateWidgetTransformAndFixFocalPoint(FocalPointMode mode);
@@ -393,6 +399,8 @@ private:
 	 */
 	double m_zoom;
 	
+	int m_transformChangeWatchersActive;
+
 	/**
 	 * The current cursor shape, cached to improve performance.
 	 */

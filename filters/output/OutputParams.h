@@ -32,21 +32,26 @@ namespace output
 class OutputParams
 {
 public:
-	OutputParams(OutputImageParams const& image_params,
-		OutputFileParams const& file_params, PictureZoneList const& zones);
+	OutputParams(OutputImageParams const& output_image_params,
+		OutputFileParams const& output_file_params,
+		OutputFileParams const& automask_file_params,
+		PictureZoneList const& zones);
 	
 	explicit OutputParams(QDomElement const& el);
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
-	OutputImageParams const& imageParams() const { return m_imageParams; }
+	OutputImageParams const& outputImageParams() const { return m_outputImageParams; }
 	
-	OutputFileParams const& fileParams() const { return m_fileParams; }
+	OutputFileParams const& outputFileParams() const { return m_outputFileParams; }
+
+	OutputFileParams const& automaskFileParams() const { return m_automaskFileParams; }
 
 	PictureZoneList const& zones() const { return m_zones; }
 private:
-	OutputImageParams m_imageParams;
-	OutputFileParams m_fileParams;
+	OutputImageParams m_outputImageParams;
+	OutputFileParams m_outputFileParams;
+	OutputFileParams m_automaskFileParams;
 	PictureZoneList m_zones;
 };
 

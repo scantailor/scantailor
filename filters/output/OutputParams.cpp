@@ -24,17 +24,21 @@ namespace output
 {
 
 OutputParams::OutputParams(
-	OutputImageParams const& image_params,
-	OutputFileParams const& file_params, PictureZoneList const& zones)
-:	m_imageParams(image_params),
-	m_fileParams(file_params),
+	OutputImageParams const& output_image_params,
+	OutputFileParams const& output_file_params,
+	OutputFileParams const& automask_file_params,
+	PictureZoneList const& zones)
+:	m_outputImageParams(output_image_params),
+	m_outputFileParams(output_file_params),
+	m_automaskFileParams(automask_file_params),
 	m_zones(zones)
 {
 }
 
 OutputParams::OutputParams(QDomElement const& el)
-:	m_imageParams(el.namedItem("image").toElement()),
-	m_fileParams(el.namedItem("file").toElement()),
+:	m_outputImageParams(el.namedItem("image").toElement()),
+	m_outputFileParams(el.namedItem("file").toElement()),
+	m_automaskFileParams(el.namedItem("automask").toElement()),
 	m_zones(el.namedItem("zones").toElement())
 {
 }
@@ -43,8 +47,9 @@ QDomElement
 OutputParams::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
-	el.appendChild(m_imageParams.toXml(doc, "image"));
-	el.appendChild(m_fileParams.toXml(doc, "file"));
+	el.appendChild(m_outputImageParams.toXml(doc, "image"));
+	el.appendChild(m_outputFileParams.toXml(doc, "file"));
+	el.appendChild(m_automaskFileParams.toXml(doc, "automask"));
 	el.appendChild(m_zones.toXml(doc, "zones"));
 	return el;
 }

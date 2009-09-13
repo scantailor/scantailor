@@ -22,6 +22,7 @@
 #include <QString>
 #include <QTransform>
 #include <QFileInfo>
+#include <QDir>
 
 namespace output
 {
@@ -47,6 +48,12 @@ Utils::outFilePath(
 	);
 	
 	return out_path;
+}
+
+QString
+Utils::automaskDir(QString const& out_dir)
+{
+	return QDir(out_dir).absoluteFilePath("cache/automask");
 }
 
 QTransform

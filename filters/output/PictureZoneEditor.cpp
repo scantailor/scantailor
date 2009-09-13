@@ -139,7 +139,7 @@ PictureZoneEditor::PictureZoneEditor(
 			spline->appendVertex(pt);
 		}
 		if (zone.shape().isClosed()) {
-			spline->lastVertex()->removeIfPossible();
+			spline->lastVertex()->remove();
 		}
 		spline->setBridged(true);
 		m_splines.push_back(spline);
@@ -185,6 +185,14 @@ PictureZoneEditor::paintOverImage(QPainter& painter)
 
 	BOOST_FOREACH(State& state, m_handlerList) {
 		state.paint(painter);
+	}
+}
+
+void
+PictureZoneEditor::transformChanged()
+{
+	BOOST_FOREACH(State& state, m_handlerList) {
+		state.transformChanged();
 	}
 }
 
@@ -473,18 +481,13 @@ PictureZoneEditor::Vertex::Vertex(Vertex* prev, Vertex* next)
 {
 }
 
-bool
-PictureZoneEditor::Vertex::removeIfPossible()
+void
+PictureZoneEditor::Vertex::remove()
 {
-	if (!hasAtLeastSiblings(3)) {
-		return false;
-	}
-	
 	m_pPrev->m_ptrNext = m_ptrNext;
 	m_ptrNext->m_pPrev = m_pPrev;
 	m_pPrev = 0;
 	m_ptrNext.reset();
-	return true;
 }
 
 bool
@@ -571,11 +574,10 @@ PictureZoneEditor::SentinelVertex::setPoint(QPointF const& pt)
 	assert(0);
 }
 
-bool
-PictureZoneEditor::SentinelVertex::removeIfPossible()
+void
+PictureZoneEditor::SentinelVertex::remove()
 {
 	assert(0);
-	return false;
 }
 
 PictureZoneEditor::Vertex::Ptr
@@ -763,14 +765,22 @@ PictureZoneEditor::HandlerList::iterator
 PictureZoneEditor::State::handlerPushFront(State* handler)
 {
 	handler->unlink();
-	return m_rOwner.m_handlerList.insert(m_rOwner.m_handlerList.begin(), *handler);
+	HandlerList::iterator const it(
+		m_rOwner.m_handlerList.insert(m_rOwner.m_handlerList.begin(), *handler)
+	);
+	it->activated();
+	return it;
 }
 
 PictureZoneEditor::HandlerList::iterator
 PictureZoneEditor::State::handlerPushBack(State* handler)
 {
 	handler->unlink();
-	return m_rOwner.m_handlerList.insert(m_rOwner.m_handlerList.end(), *handler);
+	HandlerList::iterator const it(
+		m_rOwner.m_handlerList.insert(m_rOwner.m_handlerList.end(), *handler)
+	);
+	it->activated();
+	return it;
 }
 
 QPointF
@@ -1096,12 +1106,16 @@ PictureZoneEditor::SplineCreationState::mouseReleaseEvent(QMouseEvent* event)
 		m_ptrSpline->setBridged(true);
 		m_rOwner.addSpline(m_ptrSpline);
 		
-		DefaultState* default_state = new DefaultState(m_rOwner);
-		handlerPushFront(default_state);
+		handlerPushFront(new DefaultState(m_rOwner));
 		delete this;
-		
-		default_state->update();
 		m_rOwner.update();
+	} else if (m_nextVertexImagePos == m_ptrSpline->lastVertex()->point()) {
+		m_ptrSpline->lastVertex()->remove();
+		if (!m_ptrSpline->firstVertex()) {
+			handlerPushFront(new DefaultState(m_rOwner));
+			delete this;
+			m_rOwner.update();
+		}
 	} else {
 		double sqd = sqdist(screen_mouse_pos, m_ptrSpline->lastVertex()->point());
 		if (sqd > SQUARED_PROXIMITY_THRESHOLD) {
@@ -1207,18 +1221,17 @@ PictureZoneEditor::VertexDragHandler::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept(); // Prevent it reaching the DragHandler.
 	
-	QTransform const to_screen(toScreen());
-	
 	if (event->button() == Qt::LeftButton) {
 		if (m_ptrVertex->point() == m_ptrVertex->next(Vertex::LOOP)->point() ||
 				m_ptrVertex->point() == m_ptrVertex->prev(Vertex::LOOP)->point()) {
-			m_ptrVertex->removeIfPossible();
+			if (m_ptrVertex->hasAtLeastSiblings(3)) {
+				m_ptrVertex->remove();
+			}
 		}
-		
+
 		m_rOwner.commitZones();
-		
+
 		handlerPushFront(new DefaultState(m_rOwner));
-		// TODO: update default state.
 		delete this;
 	}
 }
@@ -1425,7 +1438,6 @@ PictureZoneEditor::ContextMenuHandler::switchToDefaultState()
 {
 	if (m_dontSwitchToDefaultState == 0 && is_linked()) {
 		handlerPushFront(new DefaultState(m_rOwner));
-		// TODO: update default state.
 		unlink();
 		deleteLater();
 		m_rOwner.update();
