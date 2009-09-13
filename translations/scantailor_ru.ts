@@ -147,12 +147,12 @@
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="124"/>
+        <location filename="../ImageViewBase.cpp" line="137"/>
         <source>Use the mouse wheel to zoom.  When zoomed, dragging is possible.</source>
         <translation>Используйте колесо мыши для увеличения.  В увеличенном виде доступно перетаскивание.</translation>
     </message>
     <message>
-        <location filename="../ImageViewBase.cpp" line="125"/>
+        <location filename="../ImageViewBase.cpp" line="138"/>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
         <translation>Удерживая кнопку Shift, можно перетаскивать без ограничений.</translation>
     </message>
@@ -169,18 +169,18 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="1093"/>
-        <location filename="../MainWindow.cpp" line="1102"/>
-        <location filename="../MainWindow.cpp" line="1347"/>
-        <location filename="../MainWindow.cpp" line="1378"/>
-        <location filename="../MainWindow.cpp" line="1450"/>
-        <location filename="../MainWindow.cpp" line="1511"/>
+        <location filename="../MainWindow.cpp" line="1092"/>
+        <location filename="../MainWindow.cpp" line="1101"/>
+        <location filename="../MainWindow.cpp" line="1346"/>
+        <location filename="../MainWindow.cpp" line="1377"/>
+        <location filename="../MainWindow.cpp" line="1449"/>
+        <location filename="../MainWindow.cpp" line="1510"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1348"/>
-        <location filename="../MainWindow.cpp" line="1379"/>
+        <location filename="../MainWindow.cpp" line="1347"/>
+        <location filename="../MainWindow.cpp" line="1378"/>
         <source>Error saving the project file!</source>
         <translation>Ошибка при сохранении файла!</translation>
     </message>
@@ -197,7 +197,7 @@
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1005"/>
-        <location filename="../MainWindow.cpp" line="1074"/>
+        <location filename="../MainWindow.cpp" line="1073"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекты Scan Tailor</translation>
     </message>
@@ -208,7 +208,7 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
 Для их определения, прогоните пакетную обработку на этапах &quot;Полезная Область&apos; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1276"/>
+        <location filename="../MainWindow.cpp" line="1275"/>
         <source>Unnamed</source>
         <translation>Без имени</translation>
     </message>
@@ -282,7 +282,7 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
         <translation type="obsolete">Обработка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1245"/>
+        <location filename="../MainWindow.cpp" line="1244"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.  Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
@@ -313,12 +313,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Удалить из проекта ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1094"/>
+        <location filename="../MainWindow.cpp" line="1093"/>
         <source>Unable to open the project file.</source>
         <translation>Не удалось открыть файл проекта.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1103"/>
+        <location filename="../MainWindow.cpp" line="1102"/>
         <source>The project file is broken.</source>
         <translation>Файл проекта поврежден.</translation>
     </message>
@@ -327,37 +327,37 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Не удалось импортировать проект.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1281"/>
+        <location filename="../MainWindow.cpp" line="1280"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1423"/>
+        <location filename="../MainWindow.cpp" line="1422"/>
         <source>File to insert</source>
         <translation>Вставить файл</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1429"/>
+        <location filename="../MainWindow.cpp" line="1428"/>
         <source>Images not in project (%1)</source>
         <translation>Изображения не в проекте (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1451"/>
+        <location filename="../MainWindow.cpp" line="1450"/>
         <source>Error opening the image file.</source>
         <translation>Ошибка при открытии файла изображения.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1493"/>
+        <location filename="../MainWindow.cpp" line="1492"/>
         <source>%1 (page %2)</source>
         <translation>%1 (страницы %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1500"/>
+        <location filename="../MainWindow.cpp" line="1499"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1512"/>
+        <location filename="../MainWindow.cpp" line="1511"/>
         <source>Unable to delete file:
 %1</source>
         <translation>Невозможно удалить файл:
@@ -1343,40 +1343,89 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::PictureZoneEditor::ContextMenuHandler</name>
     <message>
-        <location filename="../filters/output/PictureZoneEditor.cpp" line="1327"/>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1435"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../filters/output/PictureZoneEditor.cpp" line="1333"/>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1441"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../filters/output/PictureZoneEditor.cpp" line="1399"/>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1514"/>
         <source>Delete confirmation</source>
         <translation>Подтверждение удаления</translation>
     </message>
     <message>
-        <location filename="../filters/output/PictureZoneEditor.cpp" line="1399"/>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1514"/>
         <source>Really delete this zone?</source>
         <translation>Действительно удалить эту зону?</translation>
     </message>
 </context>
 <context>
+    <name>output::PictureZoneEditor::DefaultState</name>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1034"/>
+        <source>Drag the vertex.</source>
+        <translation>Вершину можно перетаскивать.</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1037"/>
+        <source>Click to create a new vertex here.</source>
+        <translation>Кликните для создания новой вершины.</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1039"/>
+        <source>Right click to edit zone properties.</source>
+        <translation>Правый клик для редактирования свойств зоны.</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1041"/>
+        <source>Click to start creating a new picture zone.</source>
+        <translation>Кликните чтобы начать создание новой зоны.</translation>
+    </message>
+</context>
+<context>
+    <name>output::PictureZoneEditor::SplineCreationState</name>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1222"/>
+        <source>Finish the zone by connecting its start and end points.</source>
+        <translation>Закончите зону, соединив начало с концом.</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1224"/>
+        <source>At least 3 edges are required. ESC to discard this zone.</source>
+        <translation>Нужно как минимум 3 ребра.  ESC для отмены создания зоны.</translation>
+    </message>
+</context>
+<context>
+    <name>output::PictureZoneEditor::VertexDragHandler</name>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1361"/>
+        <source>Merge these two vertices.</source>
+        <translation>Объединить эти две вершины.</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/PictureZoneEditor.cpp" line="1363"/>
+        <source>Move the vertex to one of its neighbors to merge them.</source>
+        <translation>Придвиньте вершину к одной из соседних вершин, чтобы объеденить их.</translation>
+    </message>
+</context>
+<context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="264"/>
+        <location filename="../filters/output/Task.cpp" line="296"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоны картинок доступны только в режиме &quot;Смешанный&quot;.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="278"/>
+        <location filename="../filters/output/Task.cpp" line="310"/>
         <source>Output</source>
         <translation>Вывод</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="279"/>
+        <location filename="../filters/output/Task.cpp" line="311"/>
         <source>Picture Zones</source>
         <translation>Зоны картинок</translation>
     </message>

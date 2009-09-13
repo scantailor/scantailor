@@ -254,6 +254,8 @@ protected:
 	virtual QString defaultStatusTip() const;
 
 	static BackgroundExecutor& backgroundExecutor();
+
+	virtual void enterEvent(QEvent* event);
 private slots:
 	void initiateBuildingHqVersion();
 private:

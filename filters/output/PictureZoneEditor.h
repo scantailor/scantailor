@@ -83,6 +83,10 @@ protected:
 	
 	virtual void transformChanged();
 
+	virtual void keyPressEvent(QKeyEvent* event);
+
+	virtual void keyReleaseEvent(QKeyEvent* event);
+
 	virtual void wheelEvent(QWheelEvent* event);
 	
 	virtual void mousePressEvent(QMouseEvent* event);
@@ -297,6 +301,10 @@ private:
 		
 		virtual void transformChanged() {}
 
+		virtual void keyPressEvent(QKeyEvent* event) {}
+
+		virtual void keyReleaseEvent(QKeyEvent* event) {}
+
 		virtual void mousePressEvent(QMouseEvent* event) {}
 	
 		virtual void mouseReleaseEvent(QMouseEvent* event) {}
@@ -313,6 +321,8 @@ private:
 		
 		QTransform fromScreen() const { return m_rOwner.fromScreen(); }
 		
+		void ensureStatusTip(QString const& tip) { m_rOwner.ensureStatusTip(tip); }
+
 		QPointF screenMousePos() const;
 		
 		PictureZoneEditor& m_rOwner;
@@ -323,7 +333,7 @@ private:
 	public:
 		DefaultState(PictureZoneEditor& owner);
 		
-		virtual void activated() { update(); }
+		virtual void activated();
 
 		virtual void transformChanged() { update(); }
 
@@ -351,7 +361,7 @@ private:
 	{
 	public:
 		DragHandler(PictureZoneEditor& owner);
-		
+
 		virtual void mousePressEvent(QMouseEvent* event);
 		
 		virtual void mouseReleaseEvent(QMouseEvent* event);
@@ -364,12 +374,18 @@ private:
 	public:
 		SplineCreationState(PictureZoneEditor& owner, QPointF const& first_image_point);
 		
+		virtual void activated();
+
 		virtual void paint(QPainter& painter);
 		
+		virtual void keyPressEvent(QKeyEvent* event);
+
 		virtual void mouseReleaseEvent(QMouseEvent* event);
 		
 		virtual void mouseMoveEvent(QMouseEvent* event);
 	private:
+		void updateStatusTip();
+
 		BasicVisualizer m_visualizer;
 		PictureSpline::Ptr m_ptrSpline;
 		QPointF m_nextVertexImagePos;
@@ -380,6 +396,8 @@ private:
 	public:
 		VertexDragHandler(PictureZoneEditor& owner, Spline::Ptr const& spline, Vertex::Ptr const& vertex);
 		
+		virtual void activated();
+
 		virtual void paint(QPainter& painter);
 		
 		virtual void mousePressEvent(QMouseEvent* event);
@@ -416,6 +434,8 @@ private:
 			QColor m_color;
 		};
 		
+		virtual void activated();
+
 		virtual void paint(QPainter& painter);
 		
 		virtual void menuAboutToHide();

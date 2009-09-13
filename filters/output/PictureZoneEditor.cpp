@@ -197,6 +197,34 @@ PictureZoneEditor::transformChanged()
 }
 
 void
+PictureZoneEditor::keyPressEvent(QKeyEvent* const event)
+{
+	event->setAccepted(false);
+
+	HandlerList::iterator it(m_handlerList.begin());
+	while (it != m_handlerList.end()) {
+		(it++)->keyPressEvent(event);
+		if (event->isAccepted()) {
+			break;
+		}
+	}
+}
+
+void
+PictureZoneEditor::keyReleaseEvent(QKeyEvent* const event)
+{
+	event->setAccepted(false);
+
+	HandlerList::iterator it(m_handlerList.begin());
+	while (it != m_handlerList.end()) {
+		(it++)->keyReleaseEvent(event);
+		if (event->isAccepted()) {
+			break;
+		}
+	}
+}
+
+void
 PictureZoneEditor::wheelEvent(QWheelEvent* const event)
 {
 	handleZooming(event);
@@ -798,6 +826,12 @@ PictureZoneEditor::DefaultState::DefaultState(PictureZoneEditor& owner)
 }
 
 void
+PictureZoneEditor::DefaultState::activated()
+{
+	update();
+}
+
+void
 PictureZoneEditor::DefaultState::paint(QPainter& painter)
 {
 	QTransform const to_screen(toScreen());
@@ -940,6 +974,7 @@ void
 PictureZoneEditor::DefaultState::update()
 {
 	QTransform const to_screen(toScreen());
+	QPointF const image_mouse_pos(fromScreen().map(screenMousePos()));
 	
 	m_ptrHighlightedSpline.reset();
 	Spline::Ptr highlighted_vertex_spline;
@@ -950,9 +985,18 @@ PictureZoneEditor::DefaultState::update()
 	
 	m_highlightedEdge = Edge();
 	double highlighted_edge_sqdist = std::numeric_limits<double>::max();
-	
+
+	bool has_zone_under_mouse = false;
+
 	BOOST_FOREACH(Spline::Ptr const& spline, m_rOwner.m_splines) {
 		for (Spline::EdgeIterator it(*spline); it.hasNext(); ) {
+			if (!has_zone_under_mouse) {
+				QPainterPath path;
+				path.setFillRule(Qt::WindingFill);
+				path.addPolygon(spline->toPolygon());
+				has_zone_under_mouse = path.contains(image_mouse_pos);
+			}
+
 			Edge const edge(it.next());
 			QLineF const line(to_screen.map(edge.toLine()));
 			
@@ -987,8 +1031,14 @@ PictureZoneEditor::DefaultState::update()
 		// Vertex selection takes preference over edge selection.
 		m_highlightedEdge = Edge();
 		m_ptrHighlightedSpline = highlighted_vertex_spline;
+		ensureStatusTip(tr("Drag the vertex."));
 	} else if (highlighted_edge_spline) {
 		m_ptrHighlightedSpline = highlighted_edge_spline;
+		ensureStatusTip(tr("Click to create a new vertex here."));
+	} else if (has_zone_under_mouse) {
+		ensureStatusTip(tr("Right click to edit zone properties."));
+	} else {
+		ensureStatusTip(tr("Click to start creating a new picture zone."));
 	}
 }
 
@@ -1045,6 +1095,13 @@ PictureZoneEditor::SplineCreationState::SplineCreationState(
 }
 
 void
+PictureZoneEditor::SplineCreationState::activated()
+{
+	updateStatusTip();
+	m_rOwner.update();
+}
+
+void
 PictureZoneEditor::SplineCreationState::paint(QPainter& painter)
 {
 	QTransform const to_screen(toScreen());
@@ -1095,6 +1152,16 @@ PictureZoneEditor::SplineCreationState::paint(QPainter& painter)
 }
 
 void
+PictureZoneEditor::SplineCreationState::keyPressEvent(QKeyEvent* event)
+{
+	if (event->key() == Qt::Key_Escape) {
+		event->accept();
+		handlerPushFront(new DefaultState(m_rOwner));
+		delete this;
+	}
+}
+
+void
 PictureZoneEditor::SplineCreationState::mouseReleaseEvent(QMouseEvent* event)
 {
 	QTransform const to_screen(toScreen());
@@ -1120,6 +1187,7 @@ PictureZoneEditor::SplineCreationState::mouseReleaseEvent(QMouseEvent* event)
 		double sqd = sqdist(screen_mouse_pos, m_ptrSpline->lastVertex()->point());
 		if (sqd > SQUARED_PROXIMITY_THRESHOLD) {
 			m_ptrSpline->appendVertex(image_mouse_pos);
+			updateStatusTip();
 		}
 	}
 }
@@ -1140,10 +1208,21 @@ PictureZoneEditor::SplineCreationState::mouseMoveEvent(QMouseEvent* event)
 		QPointF const first(to_screen.map(m_ptrSpline->firstVertex()->point()));
 		if (sqdist(first, screen_mouse_pos) <= SQUARED_PROXIMITY_THRESHOLD) {
 			m_nextVertexImagePos = m_ptrSpline->firstVertex()->point();
+			updateStatusTip();
 		}
 	}
 	
 	m_rOwner.update();
+}
+
+void
+PictureZoneEditor::SplineCreationState::updateStatusTip()
+{
+	if (m_ptrSpline->hasAtLeastEdges(2)) {
+		ensureStatusTip(tr("Finish the zone by connecting its start and end points."));
+	} else {
+		ensureStatusTip(tr("At least 3 edges are required. ESC to discard this zone."));
+	}
 }
 
 
@@ -1157,6 +1236,13 @@ PictureZoneEditor::VertexDragHandler::VertexDragHandler(
 	m_dragOffset(toScreen().map(vertex->point()) - screenMousePos())
 {
 	update();
+}
+
+void
+PictureZoneEditor::VertexDragHandler::activated()
+{
+	update();
+	m_rOwner.update();
 }
 
 void
@@ -1249,23 +1335,32 @@ PictureZoneEditor::VertexDragHandler::mouseMoveEvent(QMouseEvent* event)
 void
 PictureZoneEditor::VertexDragHandler::update()
 {
-	if (!m_ptrVertex->hasAtLeastSiblings(3)) {
-		return;
+	bool can_merge = false;
+
+	if (m_ptrVertex->hasAtLeastSiblings(3)) {
+		QTransform const to_screen(toScreen());
+		QPointF const origin(to_screen.map(m_ptrVertex->point()));
+
+		QPointF const prev(m_ptrVertex->prev(Vertex::LOOP)->point());
+		double const sqdist_to_prev = sqdist(origin, to_screen.map(prev));
+
+		QPointF const next(m_ptrVertex->next(Vertex::LOOP)->point());
+		double const sqdist_to_next= sqdist(origin, to_screen.map(next));
+
+
+		if (sqdist_to_prev <= SQUARED_PROXIMITY_THRESHOLD && sqdist_to_prev < sqdist_to_next) {
+			m_ptrVertex->setPoint(prev);
+			can_merge = true;
+		} else if (sqdist_to_next <= SQUARED_PROXIMITY_THRESHOLD) {
+			m_ptrVertex->setPoint(next);
+			can_merge = true;
+		}
 	}
-	
-	QTransform const to_screen(toScreen());
-	QPointF const origin(to_screen.map(m_ptrVertex->point()));
-	
-	QPointF const prev(m_ptrVertex->prev(Vertex::LOOP)->point());
-	double const sqdist_to_prev = sqdist(origin, to_screen.map(prev));
-	
-	QPointF const next(m_ptrVertex->next(Vertex::LOOP)->point());
-	double const sqdist_to_next= sqdist(origin, to_screen.map(next));
-	
-	if (sqdist_to_prev <= SQUARED_PROXIMITY_THRESHOLD && sqdist_to_prev < sqdist_to_next) {
-		m_ptrVertex->setPoint(prev);
-	} else if (sqdist_to_next <= SQUARED_PROXIMITY_THRESHOLD) {
-		m_ptrVertex->setPoint(next);
+
+	if (can_merge) {
+		ensureStatusTip(tr("Merge these two vertices."));
+	} else {
+		ensureStatusTip(tr("Move the vertex to one of its neighbors to merge them."));
 	}
 }
 
@@ -1356,6 +1451,13 @@ PictureZoneEditor::ContextMenuHandler::ContextMenuHandler(
 	
 	highlightItem(m_splineIndexes.back());
 	m_ptrMenu->popup(mouse_pos);
+}
+
+void
+PictureZoneEditor::ContextMenuHandler::activated()
+{
+	m_rOwner.update();
+	ensureStatusTip(QString());
 }
 
 void

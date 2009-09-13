@@ -147,6 +147,8 @@ ImageViewBase::ImageViewBase(
 	m_isDraggingInProgress(false),
 	m_hqTransformEnabled(true)
 {
+	setFocusPolicy(Qt::WheelFocus);
+
 	if (downscaled_image.isNull()) {
 		m_pixmap = QPixmap::fromImage(createDownscaledImage(image));
 	} else {
@@ -358,13 +360,6 @@ void
 ImageViewBase::handleImageDragging(QMouseEvent* const event)
 {
 	switch (event->type()) {
-		case QEvent::MouseButtonPress:
-			if (!m_isDraggingInProgress && event->button() == Qt::LeftButton) {
-				m_lastMousePos = event->pos();
-				m_isDraggingInProgress = true;
-				ensureStatusTip(m_unrestrictedDragStatusTip);
-			}
-			break;
 		case QEvent::MouseButtonRelease:
 			if (m_isDraggingInProgress && event->button() == Qt::LeftButton) {
 				m_isDraggingInProgress= false;
@@ -372,21 +367,27 @@ ImageViewBase::handleImageDragging(QMouseEvent* const event)
 			}
 			break;
 		case QEvent::MouseMove:
-			if (m_isDraggingInProgress) {
-				QPoint movement(event->pos());
-				movement -= m_lastMousePos;
-				m_lastMousePos = event->pos();
-				
-				QPointF adjusted_fp(m_widgetFocalPoint);
-				adjusted_fp += movement;
-				
-				if (event->modifiers() & Qt::ShiftModifier) {
-					setNewWidgetFP(adjusted_fp);
+			if (event->buttons() & Qt::LeftButton) {
+				if (!m_isDraggingInProgress) {
+					m_lastMousePos = event->pos();
+					m_isDraggingInProgress = true;
+					ensureStatusTip(m_unrestrictedDragStatusTip);
 				} else {
-					adjustAndSetNewWidgetFP(adjusted_fp);
+					QPoint movement(event->pos());
+					movement -= m_lastMousePos;
+					m_lastMousePos = event->pos();
+
+					QPointF adjusted_fp(m_widgetFocalPoint);
+					adjusted_fp += movement;
+
+					if (event->modifiers() & Qt::ShiftModifier) {
+						setNewWidgetFP(adjusted_fp);
+					} else {
+						adjustAndSetNewWidgetFP(adjusted_fp);
+					}
+
+					update();
 				}
-				
-				update();
 			}
 		default:;
 	}
@@ -539,8 +540,9 @@ ImageViewBase::ensureStatusTip(QString const& status_tip)
 		// Note that setStatusTip() alone is not enough,
 		// as it's only taken into account when the mouse
 		// enters the widget.
-		QStatusTipEvent tip_event(status_tip);
-		QApplication::sendEvent(this, &tip_event);
+		// Also note that we use postEvent() rather than sendEvent(),
+		// because sendEvent() may immediately process other events.
+		QApplication::postEvent(this, new QStatusTipEvent(status_tip));
 	}
 }
 
@@ -548,6 +550,12 @@ QString
 ImageViewBase::defaultStatusTip() const
 {
 	return m_defaultStatusTip;
+}
+
+void
+ImageViewBase::enterEvent(QEvent* event)
+{
+	setFocus(Qt::MouseFocusReason);
 }
 
 /**
