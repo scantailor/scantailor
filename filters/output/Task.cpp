@@ -218,8 +218,10 @@ Task::process(
 				!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
 			m_ptrSettings->removeOutputParams(m_pageId);
 		} else {
-			OutputFileParams const new_output_file_params(out_file_info);
-			OutputFileParams const new_automask_file_params(automask_file_info);
+			// Note that we can't reuse out_file_info and automask_file_info,
+			// as we've just written a new versions of these files.
+			OutputFileParams const new_output_file_params((QFileInfo(out_file_path)));
+			OutputFileParams const new_automask_file_params((QFileInfo(automask_file_path)));
 			m_ptrSettings->setOutputParams(
 				m_pageId,
 				OutputParams(
