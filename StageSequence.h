@@ -44,8 +44,6 @@ public:
 	StageSequence(IntrusivePtr<PageSequence> const& pages,
 		PageSelectionAccessor const& page_selection_accessor);
 	
-	void pagesRemoved(std::vector<PageId> const& pages);
-	
 	std::vector<FilterPtr> const& filters() const { return m_filters; }
 	
 	int count() const { return m_filters.size(); }

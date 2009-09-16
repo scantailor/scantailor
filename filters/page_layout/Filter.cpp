@@ -45,7 +45,8 @@ namespace page_layout
 
 Filter::Filter(IntrusivePtr<PageSequence> const& pages,
 	PageSelectionAccessor const& page_selection_accessor)
-:	m_ptrSettings(new Settings)
+:	m_ptrPages(pages),
+	m_ptrSettings(new Settings)
 {
 	m_ptrOptionsWidget.reset(
 		new OptionsWidget(m_ptrSettings, pages, page_selection_accessor)
@@ -69,9 +70,9 @@ Filter::getView() const
 }
 
 void
-Filter::pagesRemoved(std::vector<PageId> const& pages)
+Filter::selected()
 {
-	m_ptrSettings->removePages(pages);
+	m_ptrSettings->removePagesMissingFrom(m_ptrPages->snapshot(getView()));
 }
 
 void

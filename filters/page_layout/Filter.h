@@ -58,9 +58,9 @@ public:
 	virtual QString getName() const;
 	
 	virtual PageSequence::View getView() const;
-	
-	virtual void pagesRemoved(std::vector<PageId> const& pages);
-	
+
+	virtual void selected();
+
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
 	virtual QDomElement saveSettings(
@@ -92,6 +92,7 @@ private:
 		QDomDocument& doc, QDomElement& filter_el,
 		PageId const& page_id, int numeric_id) const;
 	
+	IntrusivePtr<PageSequence> m_ptrPages;
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
 };

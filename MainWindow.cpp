@@ -832,6 +832,8 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	m_curFilter = selected.front().top();
 	bool const now_below_select_content = isBelowSelectContent(m_curFilter);
 	
+	m_ptrStages->filterAt(m_curFilter)->selected();
+
 	if (!was_below_select_content && now_below_select_content) {
 		// IMPORTANT: this needs to go before resetting thumbnails,
 		// because it may affect them.
@@ -1541,7 +1543,6 @@ MainWindow::removeFromProject(ImageId image_id)
 	std::vector<PageId> pages;
 	pages.push_back(PageId(image_id, PageId::SINGLE_PAGE));
 	
-	m_ptrStages->pagesRemoved(pages);
 	m_ptrPages->removeImage(image_id);
 	m_ptrThumbSequence->remove(image_id);
 	m_ptrThumbSequence->setSelection(

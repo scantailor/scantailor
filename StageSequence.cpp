@@ -48,14 +48,6 @@ StageSequence::StageSequence(IntrusivePtr<PageSequence> const& pages,
 	m_filters.push_back(m_ptrOutputFilter);
 }
 
-void
-StageSequence::pagesRemoved(std::vector<PageId> const& pages)
-{
-	BOOST_FOREACH(FilterPtr const& filter, m_filters) {
-		filter->pagesRemoved(pages);
-	}
-}
-
 int
 StageSequence::findFilter(FilterPtr const& filter) const
 {

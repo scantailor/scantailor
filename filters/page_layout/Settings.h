@@ -22,7 +22,6 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include <memory>
-#include <vector>
 
 class PageId;
 class Margins;
@@ -44,17 +43,17 @@ public:
 	Settings();
 	
 	virtual ~Settings();
-	
+
 	/**
 	 * \brief Removes all stored data.
 	 */
 	void clear();
 	
 	/**
-	 * \brief Removes data associated with specified pages.
+	 * \brief Removes all stored data for pages that are not in the provided list.
 	 */
-	void removePages(std::vector<PageId> const& pages);
-	
+	void removePagesMissingFrom(PageSequenceSnapshot const& pages);
+
 	/**
 	 * \brief Check that we have all the essential parameters for every
 	 *        page in the list.

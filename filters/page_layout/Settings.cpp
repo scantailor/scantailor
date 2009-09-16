@@ -28,11 +28,13 @@
 #include <boost/foreach.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/composite_key.hpp>
 #include <algorithm>
 #include <functional> // for std::greater<>
+#include <vector>
 #include <stddef.h>
 
 using namespace ::boost;
@@ -113,7 +115,7 @@ public:
 	
 	void clear();
 	
-	void removePages(std::vector<PageId> const& pages);
+	void removePagesMissingFrom(PageSequenceSnapshot const& pages);
 	
 	bool checkEverythingDefined(
 		PageSequenceSnapshot const& pages, PageId const* ignore) const;
@@ -151,6 +153,7 @@ public:
 	
 	PageId findTallestPage() const;
 private:
+	class SequencedTag;
 	class DescWidthTag;
 	class DescHeightTag;
 	
@@ -158,6 +161,7 @@ private:
 		Item,
 		indexed_by<
 			ordered_unique<member<Item, PageId, &Item::pageId> >,
+			sequenced<tag<SequencedTag> >,
 			ordered_non_unique<
 				tag<DescWidthTag>,
 				// ORDER BY alignedWithOthers DESC, hardWidthMM DESC
@@ -187,11 +191,13 @@ private:
 		>
 	> Container;
 	
+	typedef Container::index<SequencedTag>::type UnorderedItems;
 	typedef Container::index<DescWidthTag>::type DescWidthOrder;
 	typedef Container::index<DescHeightTag>::type DescHeightOrder;
 	
 	mutable QMutex m_mutex;
 	Container m_items;
+	UnorderedItems& m_unorderedItems;
 	DescWidthOrder& m_descWidthOrder;
 	DescHeightOrder& m_descHeightOrder;
 	QSizeF const m_invalidSize;
@@ -218,9 +224,9 @@ Settings::clear()
 }
 
 void
-Settings::removePages(std::vector<PageId> const& pages)
+Settings::removePagesMissingFrom(PageSequenceSnapshot const& pages)
 {
-	return m_ptrImpl->removePages(pages);
+	m_ptrImpl->removePagesMissingFrom(pages);
 }
 
 bool
@@ -358,6 +364,7 @@ Settings::Item::influenceHardHeightMM() const
 
 Settings::Impl::Impl()
 :	m_items(),
+	m_unorderedItems(m_items.get<SequencedTag>()),
 	m_descWidthOrder(m_items.get<DescWidthTag>()),
 	m_descHeightOrder(m_items.get<DescHeightTag>()),
 	m_invalidSize(),
@@ -378,12 +385,26 @@ Settings::Impl::clear()
 }
 
 void
-Settings::Impl::removePages(std::vector<PageId> const& pages)
+Settings::Impl::removePagesMissingFrom(PageSequenceSnapshot const& pages)
 {
 	QMutexLocker const locker(&m_mutex);
-	
-	BOOST_FOREACH(PageId const& page, pages) {
-		m_items.erase(page);
+
+	std::vector<PageId> sorted_pages;
+	size_t const num_pages = pages.numPages();
+	sorted_pages.reserve(num_pages);
+	for (size_t i = 0; i < num_pages; ++i) {
+		sorted_pages.push_back(pages.pageAt(i).id());
+	}
+	std::sort(sorted_pages.begin(), sorted_pages.end());
+
+	UnorderedItems::const_iterator it(m_unorderedItems.begin());
+	UnorderedItems::const_iterator const end(m_unorderedItems.end());
+	while (it != end) {
+		if (std::binary_search(sorted_pages.begin(), sorted_pages.end(), it->pageId)) {
+			++it;
+		} else {
+			m_unorderedItems.erase(it++);
+		}
 	}
 }
 

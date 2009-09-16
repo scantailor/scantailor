@@ -40,8 +40,8 @@ public:
 	
 	virtual PageSequence::View getView() const = 0;
 	
-	virtual void pagesRemoved(std::vector<PageId> const& pages) {}
-	
+	virtual void selected() {}
+
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id) = 0;
 	
 	virtual QDomElement saveSettings(
