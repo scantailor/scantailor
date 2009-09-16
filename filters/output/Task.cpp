@@ -209,26 +209,32 @@ Task::process(
 	}
 
 	if (need_reprocess) {
+		// Even in batch processing mode we should still write automask, because it
+		// will be needed when we view the results back in interactive mode.
+		bool const write_automask = (color_params.colorMode() == ColorParams::MIXED);
+
 		out_img = generator.process(
-			status, data, new_zones,
-			need_automask ? &automask_img : 0, m_ptrDbg.get()
+			status, data, new_zones, write_automask ? &automask_img : 0, m_ptrDbg.get()
 		);
 		
-		if (!TiffWriter::writeImage(out_file_path, out_img) || !QDir().mkpath(automask_dir) ||
-				!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
+		// Note that automask should be generated and written even if need_automask is false.
+		// That's because
+
+		if (!TiffWriter::writeImage(out_file_path, out_img) ||
+				(write_automask && (!QDir().mkpath(automask_dir) ||
+				!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())))) {
 			m_ptrSettings->removeOutputParams(m_pageId);
 		} else {
 			// Note that we can't reuse out_file_info and automask_file_info,
 			// as we've just written a new versions of these files.
-			OutputFileParams const new_output_file_params((QFileInfo(out_file_path)));
-			OutputFileParams const new_automask_file_params((QFileInfo(automask_file_path)));
-			m_ptrSettings->setOutputParams(
-				m_pageId,
-				OutputParams(
-					new_output_image_params,
-					new_output_file_params, new_automask_file_params, new_zones
-				)
+			OutputParams const out_params(
+				new_output_image_params,
+				OutputFileParams(QFileInfo(out_file_path)), write_automask ?
+				OutputFileParams(QFileInfo(automask_file_path)) : OutputFileParams(),
+				new_zones
 			);
+
+			m_ptrSettings->setOutputParams(m_pageId, out_params);
 		}
 		
 		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);

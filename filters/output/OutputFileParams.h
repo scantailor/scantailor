@@ -35,11 +35,15 @@ namespace output
 class OutputFileParams
 {
 public:
+	OutputFileParams();
+
 	explicit OutputFileParams(QFileInfo const& file_info);
 	
 	explicit OutputFileParams(QDomElement const& el);
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
+
+	bool const isValid() const { return m_size >= 0; }
 	
 	/**
 	 * \brief Returns true if it's likely we have two identical files.
