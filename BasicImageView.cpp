@@ -22,34 +22,14 @@
 #include "Dpi.h"
 
 BasicImageView::BasicImageView(QImage const& image)
-:	ImageViewBase(image, QImage(), QTransform(), QRectF(image.rect()))
+:	ImageViewBase(image, QImage(), QTransform(), QRectF(image.rect())),
+	m_dragHandler(*this),
+	m_zoomHandler(*this)
 {
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 }
 
 BasicImageView::~BasicImageView()
 {
-}
-
-void
-BasicImageView::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
-}
-
-void
-BasicImageView::mousePressEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-BasicImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-BasicImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
 }

@@ -18,37 +18,45 @@
 
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
-#include "imageproc/Constants.h"
-#include "Utils.h"
-#include <QRect>
-#include <QRectF>
-#include <QLineF>
-#include <QMouseEvent>
+#include "Proximity.h"
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
-#include <Qt>
-#include <QDebug>
-#include <algorithm>
-#include <math.h>
+#include <QColor>
+#include <QtGlobal>
 
 namespace page_split
 {
-
-double const ImageView::m_maxSkewAngleCtg(1.0 / tan(65 * imageproc::constants::DEG2RAD));
 
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
-	m_imgSkewingHandle(":/icons/aqua-sphere.png"),
-	m_pageLayout(layout),
-	m_state(DEFAULT_STATE)
+	TaggedDraggablePixmap<1>(QPixmap(":/icons/aqua-sphere.png"), 1),
+	TaggedDraggablePixmap<2>(QPixmap(":/icons/aqua-sphere.png"), 1),
+	m_handle1DragHandler(topHandle()),
+	m_handle2DragHandler(bottomHandle()),
+	m_lineDragHandler(static_cast<SplitLineObject&>(*this)),
+	m_dragHandler(*this),
+	m_zoomHandler(*this),
+	m_virtLayout(layout)
 {
-	m_dragHandleStatusTip = tr("Drag this handle to skew the line.");
-	m_dragLineStatusTip = tr("This line can be dragged.");
-	
 	setMouseTracking(true);
+
+	m_lineDragHandler.setProximityCursor(Qt::SplitHCursor);
+	m_lineDragHandler.setInteractionCursor(Qt::SplitHCursor);
+
+	QString const tip(tr("Drag the line or the handles."));
+	m_handle1DragHandler.setProximityStatusTip(tip);
+	m_handle2DragHandler.setProximityStatusTip(tip);
+	m_lineDragHandler.setProximityStatusTip(tip);
+
+	rootInteractionHandler().makeLastFollower(*this);
+	rootInteractionHandler().makeLastFollower(m_handle1DragHandler);
+	rootInteractionHandler().makeLastFollower(m_handle2DragHandler);
+	rootInteractionHandler().makeLastFollower(m_lineDragHandler);
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 }
 
 ImageView::~ImageView()
@@ -58,20 +66,19 @@ ImageView::~ImageView()
 void
 ImageView::pageLayoutSetExternally(PageLayout const& layout)
 {
-	m_pageLayout = layout;
-	m_state = DEFAULT_STATE;
+	m_virtLayout = layout;
 	update();
 }
 
 void
-ImageView::paintOverImage(QPainter& painter)
+ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 {
 	painter.setRenderHints(QPainter::Antialiasing, false);
-	
+
 	painter.setPen(Qt::NoPen);
 	QRectF const virt_rect(virtualDisplayRect());
-	
-	switch (m_pageLayout.type()) {
+
+	switch (m_virtLayout.type()) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			painter.setBrush(QColor(0, 0, 255, 50));
 			painter.drawRect(virt_rect);
@@ -80,346 +87,188 @@ ImageView::paintOverImage(QPainter& painter)
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
 			painter.setBrush(QColor(0, 0, 255, 50));
 			painter.drawPolygon(
-				m_pageLayout.singlePageOutline(virt_rect)
+				m_virtLayout.singlePageOutline(virt_rect)
 			);
 			break;
 		case PageLayout::TWO_PAGES:
 			painter.setBrush(QColor(0, 0, 255, 50));
 			painter.drawPolygon(
-				m_pageLayout.leftPageOutline(virt_rect)
+				m_virtLayout.leftPageOutline(virt_rect)
 			);
 			painter.setBrush(QColor(255, 0, 0, 50));
 			painter.drawPolygon(
-				m_pageLayout.rightPageOutline(virt_rect)
+				m_virtLayout.rightPageOutline(virt_rect)
 			);
 			break;
 	}
-	
-	PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
-	QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
-	
-	double const handle_half_height = 0.5 * m_imgSkewingHandle.height();
-	
-	bool draw_top_handle = true;
-	bool draw_bottom_handle = true;
-	
-	// There is one case where we don't want to draw one of the
-	// handles: it's when skewing a line in a zoomed image.
-	// The reason is that the handle opposite to the one we are
-	// dragging, is not the rotation origin in this case.
-	if (m_state == DRAGGING_TOP_HANDLE) {
-		QLineF const image_split_line(layout.inscribedSplitLine(image_rect));
-		double const bottom_y = std::max(image_split_line.p1().y(), image_split_line.p2().y());
-		draw_bottom_handle = bottom_y - handle_half_height < height();
-	} else if (m_state == DRAGGING_BOTTOM_HANDLE) {
-		QLineF const image_split_line(layout.inscribedSplitLine(image_rect));
-		double const top_y = std::min(image_split_line.p1().y(), image_split_line.p2().y());
-		draw_top_handle = top_y + handle_half_height > 0.0;
-	}
-	
-	QRectF image_adjusted_rect(image_rect);
-	image_adjusted_rect.adjust(
-		0.0, draw_top_handle ? handle_half_height : 0.0,
-		0.0, draw_bottom_handle ? -handle_half_height : 0.0
-	);
-	
-	QRectF widget_adjusted_rect(this->rect());
-	widget_adjusted_rect.adjust(
-		0.0, draw_top_handle ? handle_half_height : 0.0,
-		0.0, draw_bottom_handle ? -handle_half_height : 0.0
-	);
-	
-	QRectF const united(image_adjusted_rect | widget_adjusted_rect);
-	QRectF const intersected(image_adjusted_rect & widget_adjusted_rect);
-	
-	QRectF resulting_rect;
-	resulting_rect.setLeft(united.left());
-	resulting_rect.setRight(united.right());
-	resulting_rect.setTop(intersected.top());
-	resulting_rect.setBottom(intersected.bottom());
-	
-	QLineF const widget_split_line(layout.inscribedSplitLine(resulting_rect));
-	
+
 	painter.setRenderHints(QPainter::Antialiasing, true);
-	painter.setWorldMatrixEnabled(false);
-	
+	painter.setWorldTransform(QTransform());
+
 	QPen pen(QColor(0, 0, 255));
 	pen.setCosmetic(true);
 	pen.setWidth(2);
 	painter.setPen(pen);
 	painter.setBrush(Qt::NoBrush);
-	
-	painter.drawLine(widget_split_line.p1(), widget_split_line.p2());
-	
-	m_topHandleRect = m_imgSkewingHandle.rect();
-	m_bottomHandleRect = m_topHandleRect;
-	m_topHandleRect.moveCenter(widget_split_line.p1());
-	m_bottomHandleRect.moveCenter(widget_split_line.p2());
-	
-	if (m_topHandleRect.top() > m_bottomHandleRect.top()) {
-		std::swap(m_topHandleRect, m_bottomHandleRect);
-	}
-	
-	if (draw_top_handle) {
-		painter.drawPixmap(m_topHandleRect.topLeft(), m_imgSkewingHandle);
-	}
-	if (draw_bottom_handle) {
-		painter.drawPixmap(m_bottomHandleRect.topLeft(), m_imgSkewingHandle);
-	}
-	
-	// Restore the world transform as it was.
-	painter.setWorldMatrixEnabled(true);
+
+	painter.drawLine(widgetSplitLine(interaction));
 }
 
 void
-ImageView::wheelEvent(QWheelEvent* const event)
+ImageView::onDragFinished()
 {
-	if (m_state == DEFAULT_STATE) {
-		handleZooming(event);
-	}
+	// When a handle is being dragged, the other handle is displayed not
+	// at the edge of the widget widget but at the edge of the image.
+	// That means we have to redraw once dragging is over.
+	// BTW, the only reason for displaying handles at widget's edges
+	// is to make them visible and accessible for dragging.
+	update();
+	emit pageLayoutSetLocally(m_virtLayout);
 }
 
-void
-ImageView::mousePressEvent(QMouseEvent* const event)
+DraggablePixmap&
+ImageView::topHandle()
 {
-	if (m_state == DEFAULT_STATE && !isDraggingInProgress()
-	    && event->button() == Qt::LeftButton) {
-		bool const top = m_topHandleRect.contains(event->pos());
-		bool const bottom = m_bottomHandleRect.contains(event->pos());
-		if (top || bottom) {
-			QRectF const virt_rect(virtualDisplayRect());
-			QRectF const image_rect(virtualToWidget().mapRect(virt_rect));
-			PageLayout const layout(m_pageLayout.transformed(virtualToWidget()));
-			QLineF const line(layout.inscribedSplitLine(image_rect));
-			m_splitLineTouchPoint = projectPointToLine(event->pos(), line);
-			m_splitLineOtherPoint = (top == (line.p1().y() <= line.p2().y()))
-				? line.p2() : line.p1();
-			m_initialMousePos = event->pos();
-			m_state = top ? DRAGGING_TOP_HANDLE : DRAGGING_BOTTOM_HANDLE;
-			ensureCursorShape(Qt::ClosedHandCursor);
-		} else if (isCursorNearSplitLine(event->pos(),
-				&m_splitLineTouchPoint, &m_splitLineOtherPoint)) {
-			m_initialMousePos = event->pos();
-			m_state = DRAGGING_LINE;
-		}
-	}
-	
-	if (m_state == DEFAULT_STATE) {
-		handleImageDragging(event);
-	} else {
-		m_touchPointRange = getVisibleWidgetRect();
-		extendToContain(m_touchPointRange, m_splitLineTouchPoint);
-	}
+	return static_cast<TaggedDraggablePixmap<1>&>(*this);
 }
 
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
+DraggablePixmap const&
+ImageView::topHandle() const
 {
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
-	if (event->button() == Qt::LeftButton && m_state != DEFAULT_STATE) {
-		m_state = DEFAULT_STATE;
-		update(); // Because one of the handles may not be drawn when skewing.
-		emit pageLayoutSetLocally(m_pageLayout);
-	}
+	return static_cast<TaggedDraggablePixmap<1> const&>(*this);
 }
 
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
+DraggablePixmap&
+ImageView::bottomHandle()
 {
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
-	if (m_state == DEFAULT_STATE) {
-		if (m_topHandleRect.contains(event->pos()) ||
-				m_bottomHandleRect.contains(event->pos())) {
-			ensureStatusTip(m_dragHandleStatusTip);
-			if (event->buttons() & Qt::LeftButton) {
-				ensureCursorShape(Qt::ClosedHandCursor);
-			} else {
-				ensureCursorShape(Qt::OpenHandCursor);
-			}
-		} else if (isCursorNearSplitLine(event->pos())) {
-			ensureStatusTip(m_dragLineStatusTip);
-			ensureCursorShape(Qt::SplitHCursor);
-		} else {
-			ensureStatusTip(defaultStatusTip());
-			ensureCursorShape(Qt::ArrowCursor);
-		}
-	} else {
-		QPointF movement(event->pos() - m_initialMousePos);
-		movement.setY(0);
-		
-		QPointF new_touch_point(m_splitLineTouchPoint + movement);
-		
-		if (!m_touchPointRange.contains(new_touch_point)) {
-			forcePointIntoRect(new_touch_point, m_touchPointRange);
-			movement = new_touch_point - m_splitLineTouchPoint;
-		}
-		
-		QPointF new_other_point(m_splitLineOtherPoint);
-		if (m_state == DRAGGING_LINE) {
-			new_other_point += movement;
-		} else {
-			// Limit the max skew angle.
-			double xdiff = new_touch_point.x() - new_other_point.x();
-			double ydiff = new_touch_point.y() - new_other_point.y();
-			if (xdiff == 0.0 && ydiff == 0.0) {
-				new_touch_point = m_splitLineTouchPoint;
-			} else if (fabs(xdiff) > fabs(ydiff) * m_maxSkewAngleCtg) {
-				double const xsign = xdiff >= 0.0 ? 1.0 : -1.0;
-				double const ysign = (m_splitLineTouchPoint.y() -
-					m_splitLineOtherPoint.y()) >= 0.0 ? 1.0 : -1.0;
-				xdiff = m_maxSkewAngleCtg * xsign;
-				ydiff = ysign;
-				new_touch_point.setX(new_other_point.x() + xdiff);
-				new_touch_point.setY(new_other_point.y() + ydiff);
-			}
-		}
-		
-		QLineF const new_split_line(new_touch_point, new_other_point);
-		
-		// Page layout in widget coordinates.
-		PageLayout widget_layout(m_pageLayout.type(), new_split_line);
-		m_pageLayout = widget_layout.transformed(widgetToVirtual());
-		update();
-	}
+	return static_cast<TaggedDraggablePixmap<2>&>(*this);
 }
 
-void
-ImageView::hideEvent(QHideEvent* const event)
+DraggablePixmap const&
+ImageView::bottomHandle() const
 {
-	ImageViewBase::hideEvent(event);
-	State const old_state = m_state;
-	m_state = DEFAULT_STATE;
-	ensureCursorShape(Qt::ArrowCursor);
-	if (old_state != DEFAULT_STATE) {
-		emit pageLayoutSetLocally(m_pageLayout);
-	}
+	return static_cast<TaggedDraggablePixmap<2> const&>(*this);
 }
 
-/**
- * Extend the rectangle to contain the point.
- * Edges are considered to be inside the rectangle.
- */
-void
-ImageView::extendToContain(QRectF& rect, QPointF const& point)
+PageLayout
+ImageView::widgetLayout() const
 {
-	if (point.x() < rect.left()) {
-		rect.setLeft(point.x());
-	} else if (point.x() > rect.right()) {
-		rect.setRight(point.x());
-	}
-	if (point.y() < rect.top()) {
-		rect.setTop(point.y());
-	} else if (point.y() > rect.bottom()) {
-		rect.setBottom(point.y());
-	}
+	return m_virtLayout.transformed(virtualToWidget());
 }
 
-/**
- * If the point is outside of the rectangle, move it inside.
- * Edges are considered to be inside the rectangle.
- */
-void
-ImageView::forcePointIntoRect(QPointF& point, QRectF const& rect)
+QLineF
+ImageView::widgetSplitLine(InteractionState const& interaction) const
 {
-	if (point.x() < rect.left()) {
-		point.setX(rect.left());
-	} else if (point.x() > rect.right()) {
-		point.setX(rect.right());
+	QLineF line(widgetLayout().inscribedSplitLine(widgetValidArea()));
+
+	if (m_handle2DragHandler.interactionInProgress(interaction)) {
+		line.setP1(virtualToWidget().map(virtualSplitLine().p1()));
+	} else if (m_handle1DragHandler.interactionInProgress(interaction)) {
+		line.setP2(virtualToWidget().map(virtualSplitLine().p2()));
 	}
-	if (point.y() < rect.top()) {
-		point.setY(rect.top());
-	} else if (point.y() > rect.bottom()) {
-		point.setY(rect.bottom());
-	}
+
+	return line;
 }
 
-double
-ImageView::distanceSquared(QPointF const p1, QPointF const p2)
+QLineF
+ImageView::virtualSplitLine() const
 {
-	double const dx = p1.x() - p2.x();
-	double const dy = p1.y() - p2.y();
-	return dx * dx + dy * dy;
+	QRectF virt_rect(virtualDisplayRect());
+	QRectF widget_rect(virtualToWidget().mapRect(virt_rect));
+
+	double const delta = topHandle().handleRadius();
+	widget_rect.adjust(delta, delta, -delta, -delta);
+	virt_rect = widgetToVirtual().mapRect(widget_rect);
+
+	return m_virtLayout.inscribedSplitLine(virt_rect);
+}
+
+QRectF
+ImageView::widgetValidArea() const
+{
+	double const delta = topHandle().handleRadius();
+	return getVisibleWidgetRect().adjusted(delta, delta, -delta, -delta);
 }
 
 QPointF
-ImageView::projectPointToLine(QPointF const& point, QLineF const& line)
+ImageView::pixmapPosition(
+	int const id, InteractionState const& interaction) const
 {
-	// A line orthogonal to the given line and going
-	// through the given point.
-	QLineF orth_line(line.normalVector());
-	orth_line.translate(-orth_line.p1());
-	orth_line.translate(point);
-	
-	// Their intersection.
-	QPointF intersection;
-	orth_line.intersect(line, &intersection);
-	
-	return intersection;
+	QLineF const line(widgetSplitLine(interaction));
+	return id == 1 ? line.p1() : line.p2();
 }
 
-/**
- * Checks if the cursor is near the split line, and if so, optionally
- * sets \p touchpoint to be the point on the split line near the cursor,
- * and \p far_end to be one of split line's endpoints, the one further away
- * from \p touchpoint.\n
- * \p touchpoint and \p far_end are returned in widget coordinates.
- */
 bool
-ImageView::isCursorNearSplitLine(
-	QPointF const& cursor_pos, QPointF* touchpoint, QPointF* far_end) const
+ImageView::isPixmapToBeDrawn(int, InteractionState const&) const
 {
-#if 0
-	if (m_pageLayout.isNull()) {
-		return false;
+	return m_virtLayout.type() != PageLayout::SINGLE_PAGE_UNCUT;
+}
+
+void
+ImageView::pixmapMoveRequest(int id, QPointF const& widget_pos)
+{
+	QRectF const valid_area(widgetValidArea());
+	QPointF const bound_widget_pos(
+		qBound(valid_area.left(), widget_pos.x(), valid_area.right()),
+		widget_pos.y()
+	);
+
+	double const x = widgetToVirtual().map(bound_widget_pos).x();
+
+	QLineF virt_line(virtualSplitLine());
+	if (id == 1) {
+		virt_line.setP1(QPointF(x, virt_line.p1().y()));
+	} else {
+		virt_line.setP2(QPointF(x, virt_line.p2().y()));
 	}
-#else
-	if (m_pageLayout.type() == PageLayout::SINGLE_PAGE_UNCUT) {
-		// No split line in this mode.
-		return false;
+
+	m_virtLayout = PageLayout(m_virtLayout.type(), virt_line);
+	update();
+}
+
+Proximity
+ImageView::lineProximity(
+	QPointF const& widget_mouse_pos, InteractionState const& interaction) const
+{
+	return Proximity::pointAndLineSegment(widget_mouse_pos, widgetSplitLine(interaction));
+}
+
+QPointF
+ImageView::linePosition(InteractionState const& interaction) const
+{
+	return widgetSplitLine(interaction).p1();
+}
+
+void
+ImageView::lineMoveRequest(QPointF const& widget_pos)
+{
+	QLineF line(widgetLayout().splitLine());
+
+	// Make the line pass through widget_pos.
+	line.translate(-line.p1());
+	line.translate(widget_pos);
+
+	// Intersect with top and bottom.
+	QPointF p_top;
+	QPointF p_bottom;
+	QRectF const valid_area(widgetValidArea());
+	line.intersect(QLineF(valid_area.topLeft(), valid_area.topRight()), &p_top);
+	line.intersect(QLineF(valid_area.bottomLeft(), valid_area.bottomRight()), &p_bottom);
+
+	// Limit movement.
+	double const min_x = qMin(p_top.x(), p_bottom.x());
+	double const max_x = qMax(p_top.x(), p_bottom.x());
+	double const left = valid_area.left() - min_x;
+	double const right = max_x - valid_area.right();
+	if (left > right && left > 0.0) {
+		line.translate(left, 0.0);
+	} else if (right > 0.0) {
+		line.translate(-right, 0.0);
 	}
-#endif
-	
-	double const max_distance = 5.0; // screen pixels
-	double const max_distance_sq = max_distance * max_distance;
-	
-	// Page layout in widget coordinates.
-	PageLayout const widget_layout(m_pageLayout.transformed(virtualToWidget()));
-	
-	// Projection of cursor_pos to the split line.
-	QPointF const projection(projectPointToLine(cursor_pos, widget_layout.splitLine()));
-	
-	if (distanceSquared(cursor_pos, projection) <= max_distance_sq) {
-		QRectF const visible_dst_rect(getVisibleWidgetRect());
-		QRectF bounds(visible_dst_rect);
-		bounds.adjust(-max_distance, -max_distance, max_distance, max_distance);
-		if (bounds.contains(cursor_pos)) {
-			if (touchpoint) {
-				*touchpoint = projection;
-			}
-			if (far_end) {
-				QLineF const bounded_line(
-					widget_layout.inscribedSplitLine(visible_dst_rect)
-				);
-				if (distanceSquared(projection, bounded_line.p1()) >
-				    distanceSquared(projection, bounded_line.p2())) {
-					*far_end = bounded_line.p1();
-				} else {
-					*far_end = bounded_line.p2();
-				}
-			}
-			return true;
-		}
-	}
-	
-	return false;
+
+	PageLayout const new_widget_layout(m_virtLayout.type(), line);
+	m_virtLayout = new_widget_layout.transformed(widgetToVirtual());
+	update();
 }
 
 } // namespace page_split

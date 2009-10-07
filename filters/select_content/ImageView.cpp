@@ -37,13 +37,15 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, QRectF const& content_rect)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+	m_zoomHandler(*this),
 	m_pNoContentMenu(new QMenu(this)),
 	m_pHaveContentMenu(new QMenu(this)),
 	m_contentRect(content_rect),
 	m_resizingMask(0)
 {
 	setMouseTracking(true);
-	
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+
 	m_defaultStatusTip = tr("Use the context menu to enable / disable the content box.");
 	m_resizeStatusTip = tr("Drag lines or corners to resize the content box.");
 	ensureStatusTip(defaultStatusTip());
@@ -80,19 +82,9 @@ ImageView::paintOverImage(QPainter& painter)
 }
 
 void
-ImageView::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
-}
-
-void
 ImageView::mousePressEvent(QMouseEvent* const event)
 {
 	int const mask = cursorLocationMask(event->pos());
-	if (!mask || isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
 
 	if (event->button() == Qt::LeftButton) {
 		m_widgetRectBeforeResizing = virtualToWidget().mapRect(m_contentRect);
@@ -104,11 +96,6 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 void
 ImageView::mouseReleaseEvent(QMouseEvent* const event)
 {
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
 	if (event->button() == Qt::LeftButton && m_resizingMask != 0) {
 		m_resizingMask = 0;
 		emit manualContentRectSet(m_contentRect);
@@ -118,11 +105,6 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 void
 ImageView::mouseMoveEvent(QMouseEvent* const event)
 {
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
 	if (m_resizingMask == 0) { // not resizing
 		int const mask = cursorLocationMask(event->pos());
 		int const ver = mask & (TOP_EDGE|BOTTOM_EDGE);
@@ -229,9 +211,6 @@ ImageView::createContentBox()
 	if (m_resizingMask) {
 		return;
 	}
-	if (isDraggingInProgress()) {
-		return;
-	}
 	
 	QRectF const virtual_rect(virtualDisplayRect());
 	QRectF content_rect(0, 0, virtual_rect.width() * 0.7, virtual_rect.height() * 0.7);
@@ -248,9 +227,6 @@ ImageView::removeContentBox()
 		return;
 	}
 	if (m_resizingMask) {
-		return;
-	}
-	if (isDraggingInProgress()) {
 		return;
 	}
 	

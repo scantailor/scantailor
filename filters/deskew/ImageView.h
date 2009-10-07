@@ -21,6 +21,10 @@
 
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
+#include "ObjectDragHandler.h"
+#include "DraggablePixmap.h"
 #include <QPolygonF>
 #include <QPoint>
 #include <QPointF>
@@ -34,7 +38,11 @@ class QRect;
 namespace deskew
 {
 
-class ImageView : public ImageViewBase
+class ImageView :
+	public ImageViewBase,
+	private InteractionHandler,
+	private TaggedDraggablePixmap<1>, // Left handle
+	private TaggedDraggablePixmap<2>  // Right handle
 {
 	Q_OBJECT
 public:
@@ -48,46 +56,40 @@ signals:
 public slots:
 	void manualDeskewAngleSetExternally(double degrees);
 protected:
-	virtual void paintOverImage(QPainter& painter);
-	
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
-	
-	virtual void hideEvent(QHideEvent* event);
-private:
-	enum State { DEFAULT_STATE, DRAGGING_LEFT_HANDLE, DRAGGING_RIGHT_HANDLE };
-	
-	static double const m_maxRotationDeg;
-	
-	static double const m_maxRotationSin;
-	
-	static int const m_cellSize;
-	
-	QPointF getImageRotationOrigin() const;
-	
-	QRectF getRotationArcSquare() const;
-	
-	std::pair<QPointF, QPointF> getRotationHandles(
-		QRectF const& arc_square) const;
-	
-	ImageTransformation m_xform;
+	virtual void onPaint(
+		QPainter& painter, InteractionState const& interaction);
 
-	QPixmap m_imgRotationHandle;
-	
-	QRectF m_leftRotationHandle;
-	
-	QRectF m_rightRotationHandle;
-	
-	QString m_dragHandleStatusTip;
-	
-	double m_mouseVertOffset;
-	
-	State m_state;
+	virtual bool isPixmapToBeDrawn(int id, InteractionState const& interaction) const;
+
+	virtual QPointF pixmapPosition(int id, InteractionState const& interaction) const;
+
+	virtual void pixmapMoveRequest(int id, QPointF const& widget_pos);
+
+	virtual void onDragFinished();
+private:
+	DraggablePixmap& leftHandle();
+
+	DraggablePixmap const& leftHandle() const;
+
+	DraggablePixmap& rightHandle();
+
+	DraggablePixmap const& rightHandle() const;
+
+	QPointF getImageRotationOrigin() const;
+
+	QRectF getRotationArcSquare() const;
+
+	std::pair<QPointF, QPointF> getRotationHandles(QRectF const& arc_square) const;
+
+	static int const m_cellSize;
+	static double const m_maxRotationDeg;
+	static double const m_maxRotationSin;
+
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
+	ObjectDragHandler m_handle1DragHandler; // Left handle.
+	ObjectDragHandler m_handle2DragHandler; // Right handle.
+	ImageTransformation m_xform;
 };
 
 } // namespace deskew

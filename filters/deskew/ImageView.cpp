@@ -41,14 +41,29 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
-	m_xform(xform),
-	m_imgRotationHandle(":/icons/aqua-sphere.png"),
-	m_mouseVertOffset(0.0),
-	m_state(DEFAULT_STATE)
+	TaggedDraggablePixmap<1>(QPixmap(":/icons/aqua-sphere.png"), 1),
+	TaggedDraggablePixmap<2>(QPixmap(":/icons/aqua-sphere.png"), 1),
+	m_dragHandler(*this),
+	m_zoomHandler(*this),
+	m_handle1DragHandler(leftHandle()),
+	m_handle2DragHandler(rightHandle()),
+	m_xform(xform)
 {
-	m_dragHandleStatusTip = tr("Drag this handle to rotate the image.");
-	
 	setMouseTracking(true);
+
+	rootInteractionHandler().makeLastFollower(*this);
+	rootInteractionHandler().makeLastFollower(m_handle1DragHandler);
+	rootInteractionHandler().makeLastFollower(m_handle2DragHandler);
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+	m_zoomHandler.setFocus(ZoomHandler::CENTER);
+
+	leftHandle().setHitAreaRadius(15.0);
+	rightHandle().setHitAreaRadius(15.0);
+
+	QString const tip(tr("Drag this handle to rotate the image."));
+	m_handle1DragHandler.setProximityStatusTip(tip);
+	m_handle2DragHandler.setProximityStatusTip(tip);
 }
 
 ImageView::~ImageView()
@@ -67,15 +82,15 @@ ImageView::manualDeskewAngleSetExternally(double const degrees)
 }
 
 void
-ImageView::paintOverImage(QPainter& painter)
+ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 {
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHints(QPainter::Antialiasing, false);
-	
+
 	int const w = width();
 	int const h = height();
 	QPointF const center(getImageRotationOrigin());
-	
+
 	// Draw the semi-transparent grid.
 	QPen pen(QColor(0, 0, 255, 90));
 	pen.setCosmetic(true);
@@ -95,7 +110,7 @@ ImageView::paintOverImage(QPainter& painter)
 		lines.push_back(QLineF(x, 0.5, x, h - 0.5));
 	}
 	painter.drawLines(lines);
-	
+
 	// Draw the horizontal and vertical line crossing at the center.
 	pen.setColor(QColor(0, 0, 255));
 	painter.setPen(pen);
@@ -108,11 +123,11 @@ ImageView::paintOverImage(QPainter& painter)
 		QPointF(center.x(), 0.5),
 		QPointF(center.x(), h - 0.5)
 	);
-	
+
 	// Draw the rotation arcs.
 	// Those will look like this (  )
 	QRectF const arc_square(getRotationArcSquare());
-	
+
 	painter.setRenderHints(QPainter::Antialiasing, true);
 	pen.setWidthF(1.5);
 	painter.setPen(pen);
@@ -127,114 +142,73 @@ ImageView::paintOverImage(QPainter& painter)
 		qRound(16 * (180 - m_maxRotationDeg)),
 		qRound(16 * 2 * m_maxRotationDeg)
 	);
-	
-	// Draw rotation handles.
-	std::pair<QPointF, QPointF> const handles(getRotationHandles(arc_square));
-	QRectF handle_rect(m_imgRotationHandle.rect());
-	handle_rect.moveCenter(handles.first);
-	m_leftRotationHandle = handle_rect;
-	painter.drawPixmap(handle_rect.topLeft(), m_imgRotationHandle);
-	handle_rect.moveCenter(handles.second);
-	m_rightRotationHandle = handle_rect;
-	painter.drawPixmap(handle_rect.topLeft(), m_imgRotationHandle);
 }
 
-void
-ImageView::wheelEvent(QWheelEvent* const event)
+bool
+ImageView::isPixmapToBeDrawn(int, InteractionState const&) const
 {
-	handleZooming(event, ZOOM_FOCUS_CENTER);
+	return true;
 }
 
-void
-ImageView::mousePressEvent(QMouseEvent* const event)
+QPointF
+ImageView::pixmapPosition(int id, InteractionState const&) const
 {
-	if (m_state == DEFAULT_STATE && !isDraggingInProgress()) {
-		if (m_leftRotationHandle.contains(event->pos())) {
-			std::pair<QPointF, QPointF> const handles(
-				getRotationHandles(getRotationArcSquare())
-			);
-			m_mouseVertOffset = event->y() - handles.first.y();
-			m_state = DRAGGING_LEFT_HANDLE;
-			ensureCursorShape(Qt::ClosedHandCursor);
-		} else if (m_rightRotationHandle.contains(event->pos())) {
-			std::pair<QPointF, QPointF> const handles(
-				getRotationHandles(getRotationArcSquare())
-			);
-			m_mouseVertOffset = event->y() - handles.second.y();
-			m_state = DRAGGING_RIGHT_HANDLE;
-			ensureCursorShape(Qt::ClosedHandCursor);
-		}
-	}
-	
-	if (m_state == DEFAULT_STATE) {
-		handleImageDragging(event);
-	}
-}
-
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
-	if (event->button() == Qt::LeftButton && m_state != DEFAULT_STATE) {
-		m_state = DEFAULT_STATE;
-		emit manualDeskewAngleSet(m_xform.postRotation());
-	}
-}
-
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
-	if (m_state == DEFAULT_STATE) {
-		if (m_leftRotationHandle.contains(event->pos()) ||
-				m_rightRotationHandle.contains(event->pos())) {
-			ensureStatusTip(m_dragHandleStatusTip);
-			if (event->buttons() & Qt::LeftButton) {
-				ensureCursorShape(Qt::ClosedHandCursor);
-			} else {
-				ensureCursorShape(Qt::OpenHandCursor);
-			}
-		} else {
-			ensureStatusTip(defaultStatusTip());
-			ensureCursorShape(Qt::ArrowCursor);
-		}
+	std::pair<QPointF, QPointF> const handles(getRotationHandles(getRotationArcSquare()));
+	if (id == 1) {
+		return handles.first;
 	} else {
-		QRectF const arc_square(getRotationArcSquare());
-		double const arc_radius = 0.5 * arc_square.width();
-		double const abs_y = event->y() - m_mouseVertOffset;
-		double rel_y = abs_y - arc_square.center().y();
-		rel_y = qBound(-arc_radius, rel_y, arc_radius);
-		
-		double angle_rad = asin(rel_y / arc_radius);
-		if (m_state == DRAGGING_LEFT_HANDLE) {
-			angle_rad = -angle_rad;
-		}
-		double angle_deg = angle_rad * imageproc::constants::RAD2DEG;
-		angle_deg = qBound(-m_maxRotationDeg, angle_deg, m_maxRotationDeg);
-		
-		m_xform.setPostRotation(angle_deg);
-		updateTransformPreservingScale(m_xform.transform(), m_xform.resultingCropArea());
+		return handles.second;
 	}
 }
 
 void
-ImageView::hideEvent(QHideEvent* const event)
+ImageView::pixmapMoveRequest(int id, QPointF const& widget_pos)
 {
-	ImageViewBase::hideEvent(event);
-	State const old_state = m_state;
-	m_state = DEFAULT_STATE;
-	ensureCursorShape(Qt::ArrowCursor);
-	if (old_state != DEFAULT_STATE) {
-		emit manualDeskewAngleSet(m_xform.postRotation());
+	QRectF const arc_square(getRotationArcSquare());
+	double const arc_radius = 0.5 * arc_square.width();
+	double const abs_y = widget_pos.y();
+	double rel_y = abs_y - arc_square.center().y();
+	rel_y = qBound(-arc_radius, rel_y, arc_radius);
+
+	double angle_rad = asin(rel_y / arc_radius);
+	if (id == 1) {
+		angle_rad = -angle_rad;
 	}
+	double angle_deg = angle_rad * imageproc::constants::RAD2DEG;
+	angle_deg = qBound(-m_maxRotationDeg, angle_deg, m_maxRotationDeg);
+
+	m_xform.setPostRotation(angle_deg);
+	updateTransformPreservingScale(m_xform.transform(), m_xform.resultingCropArea());
+}
+
+void
+ImageView::onDragFinished()
+{
+	emit manualDeskewAngleSet(m_xform.postRotation());
+}
+
+DraggablePixmap&
+ImageView::leftHandle()
+{
+	return static_cast<TaggedDraggablePixmap<1>&>(*this);
+}
+
+DraggablePixmap const&
+ImageView::leftHandle() const
+{
+	return static_cast<TaggedDraggablePixmap<1> const&>(*this);
+}
+
+DraggablePixmap&
+ImageView::rightHandle()
+{
+	return static_cast<TaggedDraggablePixmap<2>&>(*this);
+}
+
+DraggablePixmap const&
+ImageView::rightHandle() const
+{
+	return static_cast<TaggedDraggablePixmap<2> const&>(*this);
 }
 
 /**
@@ -256,19 +230,19 @@ ImageView::getImageRotationOrigin() const
 QRectF
 ImageView::getRotationArcSquare() const
 {
-	double const h_margin = 0.5 * m_imgRotationHandle.width();
-	double const v_margin = 0.5 * m_imgRotationHandle.height();
-	
+	double const h_margin = leftHandle().handleRadius();
+	double const v_margin = h_margin;
+
 	QRectF reduced_screen_rect(rect());
 	reduced_screen_rect.adjust(h_margin, v_margin, -h_margin, -v_margin);
-	
+
 	QSizeF arc_size(1.0, m_maxRotationSin);
 	arc_size.scale(reduced_screen_rect.size(), Qt::KeepAspectRatio);
 	arc_size.setHeight(arc_size.width());
-	
+
 	QRectF arc_square(QPointF(0, 0), arc_size);
 	arc_square.moveCenter(reduced_screen_rect.center());
-	
+
 	return arc_square;
 }
 

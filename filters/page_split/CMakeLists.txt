@@ -9,6 +9,7 @@ ADD_SUBDIRECTORY(ui)
 
 SET(
 	sources
+	SplitLineObject.h
 	ImageView.cpp ImageView.h
 	Thumbnail.cpp Thumbnail.h
 	Params.cpp Params.h

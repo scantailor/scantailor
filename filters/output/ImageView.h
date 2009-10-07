@@ -20,6 +20,8 @@
 #define OUTPUT_IMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
 #include <QColor>
 
 class ImageTransformation;
@@ -34,14 +36,9 @@ public:
 	ImageView(QImage const& image, QImage const& downscaled_image);
 	
 	virtual ~ImageView();
-protected:
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
+private:
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
 };
 
 } // namespace output

@@ -70,8 +70,6 @@ public slots:
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	
-	virtual void wheelEvent(QWheelEvent* event);
-	
 	virtual void mousePressEvent(QMouseEvent* event);
 	
 	virtual void mouseReleaseEvent(QMouseEvent* event);

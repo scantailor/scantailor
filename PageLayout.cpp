@@ -103,30 +103,6 @@ PageLayout::numSubPages() const
 QLineF
 PageLayout::inscribedSplitLine(QRectF const& rect) const
 {
-#if 0 // QPolygon::intersected() is buggy in Qt < 4.3.3
-	if (m_splitLine.isNull()) {
-		return QLineF();
-	}
-	
-	QLineF const top_line(rect.topLeft(), rect.topRight());
-	QLineF const bottom_line(rect.bottomLeft(), rect.bottomRight());
-	
-	QPointF p1, p2;
-	m_splitLine.intersect(top_line, &p1);
-	m_splitLine.intersect(bottom_line, &p2);
-	
-	QPolygonF poly;
-	poly.push_back(p1);
-	poly.push_back(p2);
-	
-	QPolygonF const intersected(poly.intersected(rect));
-	
-	if (intersected.size() < 2) {
-		return QLineF();
-	}
-	
-	return QLineF(intersected[0], intersected[1]);
-#else
 	QLineF line(m_splitLine);
 	if (fabs(line.p2().x() - line.p1().x()) <
 	    fabs(line.p2().y() - line.p1().y())) {
@@ -137,7 +113,6 @@ PageLayout::inscribedSplitLine(QRectF const& rect) const
 		line = clipTopBottom(line, rect.top(), rect.bottom());
 	}
 	return line;
-#endif
 }
 
 QPolygonF
@@ -309,8 +284,10 @@ PageLayout::clipLeftRight(QLineF const& line, double x_left, double x_right)
 {
 	QPointF p_left(line.p1());
 	QPointF p_right(line.p2());
+	bool swap = false;
 	if (p_left.x() > p_right.x()) {
 		std::swap(p_left, p_right);
+		swap = true;
 	} else if (p_left.x() == p_right.x()) {
 		// This will prevent division by zero and also catch null lines.
 		return line;
@@ -335,6 +312,10 @@ PageLayout::clipLeftRight(QLineF const& line, double x_left, double x_right)
 		p_right.setX(x_right);
 	}
 	
+	if (swap) {
+		std::swap(p_left, p_right);
+	}
+
 	return QLineF(p_left, p_right);
 }
 
@@ -343,8 +324,10 @@ PageLayout::clipTopBottom(QLineF const& line, double y_top, double y_bottom)
 {
 	QPointF p_top(line.p1());
 	QPointF p_bottom(line.p2());
+	bool swap = false;
 	if (p_top.y() > p_bottom.y()) {
 		std::swap(p_top, p_bottom);
+		swap = true;
 	} else if (p_top.y() == p_bottom.y()) {
 		// This will prevent division by zero and also catch null lines.
 		return line;
@@ -369,6 +352,10 @@ PageLayout::clipTopBottom(QLineF const& line, double y_top, double y_bottom)
 		p_bottom.setY(y_bottom);
 	}
 	
+	if (swap) {
+		std::swap(p_top, p_bottom);
+	}
+
 	return QLineF(p_top, p_bottom);
 }
 

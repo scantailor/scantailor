@@ -22,36 +22,16 @@ namespace output
 {
 
 ImageView::ImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(image, downscaled_image, QTransform(), QRectF(image.rect()))
+:	ImageViewBase(image, downscaled_image, QTransform(), QRectF(image.rect())),
+	m_dragHandler(*this),
+	m_zoomHandler(*this)
 {
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 }
 
 ImageView::~ImageView()
 {
-}
-
-void
-ImageView::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
-}
-
-void
-ImageView::mousePressEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
 }
 
 } // namespace output

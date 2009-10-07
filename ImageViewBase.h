@@ -21,6 +21,8 @@
 
 #include "Margins.h"
 #include "IntrusivePtr.h"
+#include "InteractionHandler.h"
+#include "InteractionState.h"
 #include <QTimer>
 #include <QWidget>
 #include <QPixmap>
@@ -56,6 +58,8 @@ class ImageViewBase : public QWidget
 {
 	Q_OBJECT
 public:
+	enum FocalPointMode { CENTER_IF_FITS, DONT_CENTER };
+
 	/**
 	 * \brief ImageViewBase constructor.
 	 *
@@ -99,11 +103,109 @@ public:
 	 * \return The image downscaled by an unspecified degree.
 	 */
 	static QImage createDownscaledImage(QImage const& image);
+
+	InteractionHandler& rootInteractionHandler() { return m_rootInteractionHandler; }
+
+	InteractionState& interactionState() { return m_interactionState; }
+
+	QTransform const& imageToVirtual() const { return m_imageToVirtual; }
+
+	QTransform const& virtualToImage() const { return m_virtualToImage; }
+
+	QTransform const& virtualToWidget() const { return m_virtualToWidget; }
+
+	QTransform const& widgetToVirtual() const { return m_widgetToVirtual; }
+
+	QPolygonF const& virtualDisplayArea() const { return m_virtualDisplayArea; }
+
+	QRectF const virtualDisplayRect() const {
+		return m_virtualDisplayArea.boundingRect();
+	}
+
+	/**
+	 * Get the bounding box of the image as it appears on the screen,
+	 * in widget coordinates.
+	 */
+	QRectF getVisibleWidgetRect() const;
+
+	/**
+	 * \brief A better version of setStatusTip().
+	 *
+	 * Unlike setStatusTip(), this method will display the tooltip
+	 * immediately, not when the mouse enters the widget next time.
+	 */
+	void ensureStatusTip(QString const& status_tip);
+
+	/**
+	 * \brief Get the focal point in widget coordinates.
+	 *
+	 * The typical usage pattern for this function is:
+	 * \code
+	 * QPointF fp(obj.getWidgetFocalPoint());
+	 * obj.setWidgetFocalPoint(fp + delta);
+	 * \endcode
+	 * As a result, the image will be moved by delta widget pixels.
+	 */
+	QPointF getWidgetFocalPoint() const { return m_widgetFocalPoint; }
+
+	/**
+	 * \brief Set the focal point in widget coordinates.
+	 *
+	 * This one may be used for unrestricted dragging (with Shift button).
+	 *
+	 * \see getWidgetFocalPoint()
+	 */
+	void setWidgetFocalPoint(QPointF const& widget_fp);
+
+	/**
+	 * \brief Set the focal point in widget coordinates, after adjustring
+	 *        it to avoid wasting of widget space.
+	 *
+	 * This one may be used for resticted dragging (the default one in ST).
+	 *
+	 * \see getWidgetFocalPoint()
+	 * \see setWidgetFocalPoint()
+	 */
+	void adjustAndSetWidgetFocalPoint(QPointF const& widget_fp);
+
+	/**
+	 * \brief Sets the widget focal point and recalculates the pixmap focal
+	 *        focal point so that the image is not moved on screen.
+	 */
+	void setWidgetFocalPointWithoutMoving(QPointF new_widget_fp);
+
+	/**
+	 * \brief Updates image-to-virtual and recalculates
+	 *        virtual-to-widget transformations.
+	 */
+	void updateTransform(
+		QTransform const& image_to_virt,
+		QPolygonF const& virt_display_area);
+
+	/**
+	 * \brief Same as updateTransform(), but adjusts the focal point
+	 *        to improve screen space usage.
+	 */
+	void updateTransformAndFixFocalPoint(
+		QTransform const& image_to_virt,
+		QPolygonF const& virt_display_area, FocalPointMode mode);
+
+	/**
+	 * \brief Same as updateTransform(), but preserves the visual image scale.
+	 */
+	void updateTransformPreservingScale(
+		QTransform const& image_to_virt, QPolygonF const& virt_display_area);
+
+	/**
+	 * \brief Sets the zoom level.
+	 *
+	 * Zoom level 1.0 means such a zoom that makes the image fit the widget.
+	 * Zooming will take into account the current widget and pixmap focal
+	 * points.  To zoom to a specific point, for example the mouse position,
+	 * call setWidgetFocalPointWithoutMoving() first.
+	 */
+	void zoom(double zoom);
 protected:
-	enum ZoomFocus { ZOOM_FOCUS_CENTER, ZOOM_FOCUS_CURSOR };
-	
-	enum FocalPointMode { CENTER_IF_FITS, DONT_CENTER };
-	
 	/**
 	 * \brief Repaint the widget.
 	 *
@@ -126,43 +228,13 @@ protected:
 	virtual void resizeEvent(QResizeEvent* event);
 	
 	/**
-	 * \brief Cancels ongoing image dragging.
-	 *
-	 * \note If overriden, call this version first!
-	 */
-	virtual void hideEvent(QHideEvent* event);
-	
-	/**
-	 * \brief Performs image zooming.
-	 *
-	 * To be called from subclasses.
-	 */
-	void handleZooming(QWheelEvent* event, ZoomFocus = ZOOM_FOCUS_CURSOR);
-	
-	/**
 	 * \brief Possibly starts or stops image dragging.
 	 *
 	 * To be called from subclasses on the following events:
 	 * MouseButtonPress, MouseButtonRelease, MouseMove.
 	 */
 	void handleImageDragging(QMouseEvent* event);
-	
-	QPolygonF const& virtualDisplayArea() const { return m_virtualDisplayArea; }
 
-	QRectF const virtualDisplayRect() const {
-		return m_virtualDisplayArea.boundingRect();
-	}
-
-	QTransform const& imageToVirtual() const { return m_imageToVirtual; }
-	
-	QTransform const& virtualToImage() const { return m_virtualToImage; }
-
-	QTransform const& virtualToWidget() const { return m_virtualToWidget; }
-	
-	QTransform const& widgetToVirtual() const { return m_widgetToVirtual; }
-	
-	bool isDraggingInProgress() const { return m_isDraggingInProgress; }
-	
 	/**
 	 * Returns true if any part of the image is off-screen.
 	 */
@@ -172,60 +244,6 @@ protected:
 	 * Returns the widget area reduced by margins.
 	 */
 	QRectF marginsRect() const;
-	
-	/**
-	 * Get the bounding box of the image as it appears on the screen,
-	 * in widget coordinates.
-	 */
-	QRectF getVisibleWidgetRect() const;
-	
-	/**
-	 * \brief Get the focal point in widget coordinates.
-	 *
-	 * The typical usage pattern for this function is:
-	 * \code
-	 * QPointF fp(obj.getWidgetFocalPoint());
-	 * obj.setWidgetFocalPoint(fp + delta);
-	 * \endcode
-	 * As a result, the image will be moved by delta widget pixels.
-	 */
-	QPointF getWidgetFocalPoint() const { return m_widgetFocalPoint; }
-	
-	/**
-	 * \brief Set the focal point in widget coordinates.
-	 *
-	 * \see getWidgetFocalPoint()
-	 */
-	void setWidgetFocalPoint(QPointF const& widget_fp);
-	
-	/**
-	 * \brief Resets the zoom to the default value.
-	 *
-	 * The default zoom is such that the image can fit into the widget.
-	 */
-	void resetZoom();
-	
-	/**
-	 * \brief Updates image-to-virtual and recalculates
-	 *        virtual-to-widget transformations.
-	 */
-	void updateTransform(
-		QTransform const& image_to_virt,
-		QPolygonF const& virt_display_area);
-	
-	/**
-	 * \brief Same as updateTransform(), but adjusts the focal point
-	 *        to improve screen space usage.
-	 */
-	void updateTransformAndFixFocalPoint(
-		QTransform const& image_to_virt,
-		QPolygonF const& virt_display_area, FocalPointMode mode);
-	
-	/**
-	 * \brief Same as updateTransform(), but preserves the visual image scale.
-	 */
-	void updateTransformPreservingScale(
-		QTransform const& image_to_virt, QPolygonF const& virt_display_area);
 	
 	/**
 	 * \brief A faster version of setCursor().
@@ -238,14 +256,6 @@ protected:
 	void ensureCursorShape(Qt::CursorShape cursor_shape);
 	
 	/**
-	 * \brief A better version of setStatusTip().
-	 *
-	 * Unlike setStatusTip(), this method will display the tooltip
-	 * immediately, not when the mouse enters the widget next time.
-	 */
-	void ensureStatusTip(QString const& status_tip);
-	
-	/**
 	 * \brief Returns the status tip to be associated with this widget
 	 *        in its default state.
 	 *
@@ -256,6 +266,20 @@ protected:
 	static BackgroundExecutor& backgroundExecutor();
 
 	virtual void enterEvent(QEvent* event);
+
+	virtual void keyPressEvent(QKeyEvent* event);
+
+	virtual void keyReleaseEvent(QKeyEvent* event);
+
+	virtual void mousePressEvent(QMouseEvent* event);
+
+	virtual void mouseReleaseEvent(QMouseEvent* event);
+
+	virtual void mouseMoveEvent(QMouseEvent* event);
+
+	virtual void wheelEvent(QWheelEvent* event);
+
+	virtual void contextMenuEvent(QContextMenuEvent* event);
 private slots:
 	void initiateBuildingHqVersion();
 private:
@@ -269,13 +293,11 @@ private:
 	
 	QPointF getIdealWidgetFocalPoint(FocalPointMode mode) const;
 	
-	void setNewWidgetFP(QPointF widget_fp);
+	void setNewWidgetFP(QPointF widget_fp, bool update = false);
 	
-	void adjustAndSetNewWidgetFP(QPointF proposed_widget_fp);
+	void adjustAndSetNewWidgetFP(QPointF proposed_widget_fp, bool update = false);
 	
 	QPointF centeredWidgetFocalPoint() const;
-	
-	void setWidgetFocalPointWithoutMoving(QPointF new_widget_fp);
 	
 	bool validateHqPixmap() const;
 
@@ -283,10 +305,20 @@ private:
 
 	void hqVersionBuilt(QPoint const& origin, QImage const& image);
 
+	void updateStatusTipAndCursor();
+
+	void updateStatusTip();
+
+	void updateCursor();
+
 	QString m_defaultStatusTip;
 	
 	QString m_unrestrictedDragStatusTip;
 	
+	InteractionHandler m_rootInteractionHandler;
+
+	InteractionState m_interactionState;
+
 	/**
 	 * The client-side image.  Used to build a high-quality version
 	 * for delayed rendering.
@@ -407,8 +439,6 @@ private:
 	 * The current cursor shape, cached to improve performance.
 	 */
 	Qt::CursorShape m_currentCursorShape;
-	
-	bool m_isDraggingInProgress;
 	
 	bool m_hqTransformEnabled;
 };

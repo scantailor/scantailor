@@ -7,6 +7,7 @@ SET(
 	SafeDeletingQObjectPtr.h
 	ScopedIncDec.h ScopedDecInc.h
 	Span.h VirtualFunction.h FlagOps.h
+	Proximity.cpp Proximity.h
 	PerformanceTimer.cpp PerformanceTimer.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

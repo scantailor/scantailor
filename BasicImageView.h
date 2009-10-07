@@ -20,6 +20,8 @@
 #define BASICIMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
 
 class BasicImageView : public ImageViewBase
 {
@@ -28,14 +30,9 @@ public:
 	BasicImageView(QImage const& image);
 	
 	virtual ~BasicImageView();
-protected:
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
+private:
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
 };
 
 #endif

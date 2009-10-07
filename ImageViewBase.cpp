@@ -144,7 +144,6 @@ ImageViewBase::ImageViewBase(
 	m_zoom(1.0),
 	m_transformChangeWatchersActive(0),
 	m_currentCursorShape(Qt::ArrowCursor),
-	m_isDraggingInProgress(false),
 	m_hqTransformEnabled(true)
 {
 	setFocusPolicy(Qt::WheelFocus);
@@ -298,6 +297,17 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	
 	painter.setWorldTransform(m_virtualToWidget);
 	paintOverImage(painter);
+
+	// TODO: only if transformation changed since last proximityUpdate
+	m_interactionState.resetProximity();
+	if (!m_interactionState.captured()) {
+		m_rootInteractionHandler.proximityUpdate(
+			QPointF(0.5, 0.5) + mapFromGlobal(QCursor::pos()), m_interactionState
+		);
+		updateStatusTipAndCursor();
+	}
+
+	m_rootInteractionHandler.paint(painter, m_interactionState);
 }
 
 void
@@ -323,71 +333,35 @@ ImageViewBase::resizeEvent(QResizeEvent* event)
 }
 
 void
-ImageViewBase::hideEvent(QHideEvent*)
-{
-	m_isDraggingInProgress = false;
-}
-
-void
-ImageViewBase::handleZooming(QWheelEvent* const event, ZoomFocus const zoom_focus)
-{
-	if (m_isDraggingInProgress) {
-		return;
-	}
-	
-	double const degrees = event->delta() / 8.0;
-	m_zoom *= pow(2.0, degrees / 60.0); // 2 times zoom for every 60 degrees
-	if (m_zoom < 1.0) {
-		m_zoom = 1.0;
-	}
-	
-	QPointF focus_point;
-	switch (zoom_focus) {
-		case ZOOM_FOCUS_CENTER:
-			focus_point = QRectF(rect()).center();
-			break;
-		case ZOOM_FOCUS_CURSOR:
-			focus_point = event->pos() + QPointF(0.5, 0.5);
-			break;
-	}
-	setWidgetFocalPointWithoutMoving(focus_point);
-	
-	updateWidgetTransform();
-	update();
-}
-
-void
 ImageViewBase::handleImageDragging(QMouseEvent* const event)
 {
 	switch (event->type()) {
+		case QEvent::MouseButtonPress:
+			if (event->button() == Qt::LeftButton) {
+				m_lastMousePos = event->pos();
+			}
+			break;
 		case QEvent::MouseButtonRelease:
-			if (m_isDraggingInProgress && event->button() == Qt::LeftButton) {
-				m_isDraggingInProgress= false;
+			if (event->button() == Qt::LeftButton) {
 				ensureStatusTip(defaultStatusTip());
 			}
 			break;
 		case QEvent::MouseMove:
 			if (event->buttons() & Qt::LeftButton) {
-				if (!m_isDraggingInProgress) {
-					m_lastMousePos = event->pos();
-					m_isDraggingInProgress = true;
-					ensureStatusTip(m_unrestrictedDragStatusTip);
+				QPoint movement(event->pos());
+				movement -= m_lastMousePos;
+				m_lastMousePos = event->pos();
+
+				QPointF adjusted_fp(m_widgetFocalPoint);
+				adjusted_fp += movement;
+
+				if (event->modifiers() & Qt::ShiftModifier) {
+					setNewWidgetFP(adjusted_fp);
 				} else {
-					QPoint movement(event->pos());
-					movement -= m_lastMousePos;
-					m_lastMousePos = event->pos();
-
-					QPointF adjusted_fp(m_widgetFocalPoint);
-					adjusted_fp += movement;
-
-					if (event->modifiers() & Qt::ShiftModifier) {
-						setNewWidgetFP(adjusted_fp);
-					} else {
-						adjustAndSetNewWidgetFP(adjusted_fp);
-					}
-
-					update();
+					adjustAndSetNewWidgetFP(adjusted_fp);
 				}
+
+				update();
 			}
 		default:;
 	}
@@ -436,18 +410,20 @@ ImageViewBase::getVisibleWidgetRect() const
 void
 ImageViewBase::setWidgetFocalPoint(QPointF const& widget_fp)
 {
-	if (widget_fp != m_widgetFocalPoint) {
-		m_widgetFocalPoint = widget_fp;
-		updateWidgetTransform();
-		update();
-	}
+	setNewWidgetFP(widget_fp, /*update =*/true);
 }
 
 void
-ImageViewBase::resetZoom()
+ImageViewBase::adjustAndSetWidgetFocalPoint(QPointF const& widget_fp)
 {
-	if (m_zoom != 1.0) {
-		m_zoom = 1.0;
+	adjustAndSetNewWidgetFP(widget_fp, /*update=*/true);
+}
+
+void
+ImageViewBase::zoom(double zoom)
+{
+	if (m_zoom != zoom) {
+		m_zoom = zoom;
 		updateWidgetTransform();
 		update();
 	}
@@ -556,6 +532,76 @@ void
 ImageViewBase::enterEvent(QEvent* event)
 {
 	setFocus(Qt::MouseFocusReason);
+}
+
+void
+ImageViewBase::keyPressEvent(QKeyEvent* event)
+{
+	m_rootInteractionHandler.keyPressEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
+}
+
+void
+ImageViewBase::keyReleaseEvent(QKeyEvent* event)
+{
+	m_rootInteractionHandler.keyReleaseEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
+}
+
+void
+ImageViewBase::mousePressEvent(QMouseEvent* event)
+{
+	m_interactionState.resetProximity();
+	if (!m_interactionState.captured()) {
+		m_rootInteractionHandler.proximityUpdate(
+			QPointF(0.5, 0.5) + event->pos(), m_interactionState
+		);
+	}
+
+	m_rootInteractionHandler.mousePressEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
+}
+
+void
+ImageViewBase::mouseReleaseEvent(QMouseEvent* event)
+{
+	m_interactionState.resetProximity();
+	if (!m_interactionState.captured()) {
+		m_rootInteractionHandler.proximityUpdate(
+			QPointF(0.5, 0.5) + event->pos(), m_interactionState
+		);
+	}
+
+	m_rootInteractionHandler.mouseReleaseEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
+}
+
+void
+ImageViewBase::mouseMoveEvent(QMouseEvent* event)
+{
+	m_interactionState.resetProximity();
+	if (!m_interactionState.captured()) {
+		m_rootInteractionHandler.proximityUpdate(
+			QPointF(0.5, 0.5) + event->pos(), m_interactionState
+		);
+	}
+
+	m_rootInteractionHandler.mouseMoveEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
+}
+
+void
+ImageViewBase::wheelEvent(QWheelEvent* event)
+{
+	m_rootInteractionHandler.wheelEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
+}
+
+void
+ImageViewBase::contextMenuEvent(QContextMenuEvent* event)
+{
+	m_rootInteractionHandler.contextMenuEvent(event, m_interactionState);
+	updateStatusTipAndCursor();
 }
 
 /**
@@ -685,11 +731,14 @@ ImageViewBase::getIdealWidgetFocalPoint(FocalPointMode const mode) const
 }
 
 void
-ImageViewBase::setNewWidgetFP(QPointF const widget_fp)
+ImageViewBase::setNewWidgetFP(QPointF const widget_fp, bool const update)
 {
 	if (widget_fp != m_widgetFocalPoint) {
 		m_widgetFocalPoint = widget_fp;
 		updateWidgetTransform();
+		if (update) {
+			this->update();
+		}
 	}
 }
 
@@ -703,7 +752,8 @@ ImageViewBase::setNewWidgetFP(QPointF const widget_fp)
  * \param proposed_widget_fp The proposed value for m_widgetFocalPoint.
  */
 void
-ImageViewBase::adjustAndSetNewWidgetFP(QPointF const proposed_widget_fp)
+ImageViewBase::adjustAndSetNewWidgetFP(
+	QPointF const proposed_widget_fp, bool const update)
 {
 	// We first apply the proposed focal point, and only then
 	// calculate the ideal one.  That's done because
@@ -712,7 +762,7 @@ ImageViewBase::adjustAndSetNewWidgetFP(QPointF const proposed_widget_fp)
 	// We don't want the ideal focal point to be equal to the current
 	// one, as that would disallow any movements.
 	QPointF const old_widget_fp(m_widgetFocalPoint);
-	setNewWidgetFP(proposed_widget_fp);
+	setNewWidgetFP(proposed_widget_fp, update);
 	
 	QPointF const ideal_widget_fp(getIdealWidgetFocalPoint(CENTER_IF_FITS));
 	
@@ -743,6 +793,9 @@ ImageViewBase::adjustAndSetNewWidgetFP(QPointF const proposed_widget_fp)
 	if (adjusted_widget_fp != m_widgetFocalPoint) {
 		m_widgetFocalPoint = adjusted_widget_fp;
 		updateWidgetTransform();
+		if (update) {
+			this->update();
+		}
 	}
 }
 
@@ -755,10 +808,6 @@ ImageViewBase::centeredWidgetFocalPoint() const
 	return marginsRect().center();
 }
 
-/**
- * Sets m_widgetFocalPoint and recalculates m_pixmapFocalPoints
- * so that the image is not moved.
- */
 void
 ImageViewBase::setWidgetFocalPointWithoutMoving(QPointF const new_widget_fp)
 {
@@ -849,6 +898,26 @@ ImageViewBase::hqVersionBuilt(
 	m_hqPixmapPos = origin;
 	m_ptrHqTransformTask.reset();
 	update();
+}
+
+void
+ImageViewBase::updateStatusTipAndCursor()
+{
+	updateStatusTip();
+	updateCursor();
+}
+
+void
+ImageViewBase::updateStatusTip()
+{
+	ensureStatusTip(m_interactionState.statusTip());
+}
+
+void
+ImageViewBase::updateCursor()
+{
+	// TODO: if possible, check if this cursor is already active.
+	setCursor(m_interactionState.cursor());
 }
 
 BackgroundExecutor&

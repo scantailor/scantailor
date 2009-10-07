@@ -27,6 +27,7 @@
 #include "PageId.h"
 #include "PictureZone.h"
 #include "imageproc/BinaryImage.h"
+#include "ZoomHandler.h"
 #include <QTransform>
 #include <QPointF>
 #include <QLineF>
@@ -86,8 +87,6 @@ protected:
 	virtual void keyPressEvent(QKeyEvent* event);
 
 	virtual void keyReleaseEvent(QKeyEvent* event);
-
-	virtual void wheelEvent(QWheelEvent* event);
 	
 	virtual void mousePressEvent(QMouseEvent* event);
 	
@@ -481,7 +480,9 @@ private:
 	static void visualizeVertex(QPainter& painter, QPointF const& pt, QColor const& color);
 	
 	static QPointF screenPos(QMouseEvent* event);
-	
+
+	ZoomHandler m_zoomHandler;
+
 	imageproc::BinaryImage m_origPictureMask;
 	QPixmap m_screenPictureMask;
 	QPoint m_screenPictureMaskOrigin;

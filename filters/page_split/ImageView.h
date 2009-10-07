@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,20 +20,24 @@
 #define PAGE_SPLIT_IMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
+#include "ObjectDragHandler.h"
+#include "DraggablePixmap.h"
+#include "SplitLineObject.h"
 #include "PageLayout.h"
-#include <QPoint>
-#include <QPointF>
-#include <QRectF>
-#include <QString>
 
-class QRect;
-class QMenu;
 class ImageTransformation;
 
 namespace page_split
 {
 
-class ImageView : public ImageViewBase
+class ImageView :
+	public ImageViewBase,
+	private InteractionHandler,
+	private TaggedDraggablePixmap<1>,
+	private TaggedDraggablePixmap<2>,
+	private SplitLineObject
 {
 	Q_OBJECT
 public:
@@ -46,97 +50,68 @@ signals:
 public slots:
 	void pageLayoutSetExternally(PageLayout const& layout);
 protected:
-	virtual void paintOverImage(QPainter& painter);
-	
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
-	
-	virtual void hideEvent(QHideEvent* event);
+	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
+
+	virtual void onDragFinished();
 private:
-	enum State {
-		DEFAULT_STATE,
-		DRAGGING_LINE,
-		DRAGGING_TOP_HANDLE,
-		DRAGGING_BOTTOM_HANDLE
-	};
-	
-	static void extendToContain(QRectF& rect, QPointF const& point);
-	
-	static void forcePointIntoRect(QPointF& point, QRectF const& rect);
-	
-	static double distanceSquared(QPointF const p1, QPointF const p2);
-	
-	static QPointF projectPointToLine(QPointF const& point, QLineF const& line);
-	
-	bool isCursorNearSplitLine(
-		QPointF const& cursor_pos,
-		QPointF* touchpoint = 0, QPointF* far_end = 0) const;
-	
+	DraggablePixmap& topHandle();
+
+	DraggablePixmap const& topHandle() const;
+
+	DraggablePixmap& bottomHandle();
+
+	DraggablePixmap const& bottomHandle() const;
+
 	/**
-	 * Cotangent representing the maximum skew angle of the split line,
-	 * so that the following assertion is true:
-	 * \code
-	 * fabs(xdiff / ydiff) <= m_maxSkewAngleCtg
-	 * \endcode
-	 * Note that a vertical split line is considered to have a zero skew,
-	 * which is why we have xdiff / ydiff and not the other way around.
+	 * \return Page layout in widget coordinates.
 	 */
-	static double const m_maxSkewAngleCtg;
-	
-	QPixmap m_imgSkewingHandle;
-	
-	QString m_dragHandleStatusTip;
-	
-	QString m_dragLineStatusTip;
-	
+	PageLayout widgetLayout() const;
+
+	/**
+	 * \return Split line in widget coordinates.
+	 *
+	 * Depending on the current interaction state, the line segment
+	 * may end either shortly before the widget boundaries, or shortly
+	 * before the image boundaries.
+	 */
+	QLineF widgetSplitLine(InteractionState const& interaction) const;
+
+	/**
+	 * \return Split line in virtual image coordinates.
+	 *
+	 * Unlike widgetSplitLine(), this one always ends shortly before
+	 * the image boundaries.
+	 */
+	QLineF virtualSplitLine() const;
+
+	/**
+	 * \return Valid area for split line endpoints in widget coordinates.
+	 */
+	QRectF widgetValidArea() const;
+
+	virtual bool isPixmapToBeDrawn(int id, InteractionState const& interaction) const;
+
+	virtual QPointF pixmapPosition(int id, InteractionState const& interaction) const;
+
+	virtual void pixmapMoveRequest(int id, QPointF const& widget_pos);
+
+	virtual Proximity lineProximity(
+		QPointF const& widget_mouse_pos, InteractionState const& interaction) const;
+
+	virtual QPointF linePosition(InteractionState const& interaction) const;
+
+	virtual void lineMoveRequest(QPointF const& widget_pos);
+
+	ObjectDragHandler m_handle1DragHandler;
+	ObjectDragHandler m_handle2DragHandler;
+	ObjectDragHandler m_lineDragHandler;
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
+
 	/**
 	 * Page layout in virtual image coordinates.
 	 */
-	PageLayout m_pageLayout;
-	
-	/**
-	 * The dragging point when skewing or moving the split line.
-	 * This point belongs to the line (in widget coordinates),
-	 * but is not updated while the line is being moved or skewed.
-	 */
-	QPointF m_splitLineTouchPoint;
-	
-	/**
-	 * Like m_splitLineTouchPoint, this one belongs to the split line.
-	 * In case of skewing the split line, this point is the rotation origin.
-	 * Just like m_splitLineTouchPoint, this point is not updated in the
-	 * process of moving / skewing.
-	 */
-	QPointF m_splitLineOtherPoint;
-	
-	/**
-	 * When dragging or skewing the split line, this limits the range
-	 * of allowed m_splitLineTouchPoint values.
-	 */
-	QRectF m_touchPointRange;
-	
-	/**
-	 * The mouse cursor position (in widget coordinates) when dragging
-	 * or skewing the split line was initiated.
-	 */
-	QPoint m_initialMousePos;
-	
-	/**
-	 * The rectangle (in widget coordinates) of the top dragging handle.
-	 */
-	QRectF m_topHandleRect;
-	
-	/**
-	 * The rectangle (in widget coordinates) of the bottom dragging handle.
-	 */
-	QRectF m_bottomHandleRect;
-	
-	State m_state;
+	PageLayout m_virtLayout;
 };
 
 } // namespace page_split

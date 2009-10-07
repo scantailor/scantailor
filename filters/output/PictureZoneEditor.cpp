@@ -115,12 +115,15 @@ PictureZoneEditor::PictureZoneEditor(
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	PageId const& page_id, IntrusivePtr<Settings> const& settings)
 :	ImageViewBase(image, downscaled_image, image_to_virt, virt_display_area),
+	m_zoomHandler(*this),
 	m_origPictureMask(picture_mask),
 	m_pictureMaskAnimationPhase(270),
 	m_pageId(page_id),
 	m_ptrSettings(settings)
 {
 	setMouseTracking(true);
+
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 
 	m_handlerList.push_back(*new DefaultState(*this));
 	m_handlerList.push_back(*new DragHandler(*this));
@@ -222,12 +225,6 @@ PictureZoneEditor::keyReleaseEvent(QKeyEvent* const event)
 			break;
 		}
 	}
-}
-
-void
-PictureZoneEditor::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
 }
 
 void

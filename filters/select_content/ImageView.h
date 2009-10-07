@@ -20,6 +20,7 @@
 #define SELECT_CONTENT_IMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "ZoomHandler.h"
 #include <QRectF>
 #include <QString>
 
@@ -47,8 +48,6 @@ signals:
 protected:
 	virtual void paintOverImage(QPainter& painter);
 	
-	virtual void wheelEvent(QWheelEvent* event);
-	
 	virtual void mousePressEvent(QMouseEvent* event);
 	
 	virtual void mouseReleaseEvent(QMouseEvent* event);
@@ -73,6 +72,8 @@ private:
 	
 	void forceInsideImage(QRectF& widget_rect) const;
 	
+	ZoomHandler m_zoomHandler;
+
 	QString m_defaultStatusTip;
 	
 	QString m_resizeStatusTip;

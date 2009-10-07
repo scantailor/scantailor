@@ -87,6 +87,10 @@ public:
 	 * \brief Get a split line inscribed into a rectangle.
 	 * \return A line where both ends touch enges of a rectangle,
 	 *         or null line, if it doesn't pass through the rectangle.
+	 *
+	 * This function guarantees the returned line's endpoints correspond
+	 * to the stored line's endpoints.  In other words, the line is
+	 * not flipped.
 	 */
 	QLineF inscribedSplitLine(QRectF const& rect) const;
 	

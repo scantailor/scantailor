@@ -22,6 +22,8 @@
 #include "ImageViewBase.h"
 #include "OrthogonalRotation.h"
 #include "ImageTransformation.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
 
 namespace fix_orientation
 {
@@ -37,15 +39,9 @@ public:
 	virtual ~ImageView();
 public slots:
 	void setPreRotation(OrthogonalRotation rotation);
-protected:
-	virtual void wheelEvent(QWheelEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
 private:
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
 	ImageTransformation m_xform;
 };
 

@@ -209,8 +209,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	}
 	
 	ImageView* view = new ImageView(
-		m_image, m_downscaledImage,
-		m_xform, m_uiData.pageLayout()
+		m_image, m_downscaledImage, m_xform, m_uiData.pageLayout()
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	

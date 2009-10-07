@@ -195,20 +195,10 @@ ImageView::paintOverImage(QPainter& painter)
 }
 
 void
-ImageView::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
-}
-
-void
 ImageView::mousePressEvent(QMouseEvent* const event)
 {
 	int const middle_mask = cursorLocationMask(event->pos(), m_middleRect);
 	int const inner_mask = cursorLocationMask(event->pos(), m_innerRect);
-	if (!(inner_mask | middle_mask) || isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
 
 	if (event->button() == Qt::LeftButton) {
 		QTransform const orig_to_widget(
@@ -243,11 +233,6 @@ ImageView::mousePressEvent(QMouseEvent* const event)
 void
 ImageView::mouseReleaseEvent(QMouseEvent* const event)
 {
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
 	if (event->button() == Qt::LeftButton
 			&& (m_innerResizingMask | m_middleResizingMask)) {
 		m_innerResizingMask = 0;
@@ -272,11 +257,6 @@ ImageView::mouseReleaseEvent(QMouseEvent* const event)
 void
 ImageView::mouseMoveEvent(QMouseEvent* const event)
 {
-	if (isDraggingInProgress()) {
-		handleImageDragging(event);
-		return;
-	}
-	
 	if (m_innerResizingMask | m_middleResizingMask) {
 		QPoint const delta(event->pos() - m_beforeResizing.mousePos);
 		if (m_innerResizingMask) {
@@ -536,7 +516,7 @@ ImageView::updatePresentationTransform(FitMode const fit_mode)
 	if (fit_mode == DONT_FIT) {
 		updateTransformPreservingScale(new_xform.transform(), new_xform.resultingCropArea());
 	} else {
-		resetZoom();
+		zoom(1.0);
 		updateTransformAndFixFocalPoint(
 			new_xform.transform(), new_xform.resultingCropArea(), CENTER_IF_FITS
 		);

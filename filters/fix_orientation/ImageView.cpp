@@ -26,8 +26,12 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+	m_dragHandler(*this),
+	m_zoomHandler(*this),
 	m_xform(xform)
 {
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 }
 
 ImageView::~ImageView()
@@ -45,30 +49,6 @@ ImageView::setPreRotation(OrthogonalRotation const rotation)
 
 	// This should call update() by itself.
 	updateTransform(m_xform.transform(), m_xform.resultingCropArea());
-}
-
-void
-ImageView::wheelEvent(QWheelEvent* const event)
-{
-	handleZooming(event);
-}
-
-void
-ImageView::mousePressEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
-}
-
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	handleImageDragging(event);
 }
 
 } // namespace fix_orientation
