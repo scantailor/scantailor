@@ -23,9 +23,10 @@
 #include "DragHandler.h"
 #include "ZoomHandler.h"
 #include "ObjectDragHandler.h"
-#include "DraggablePixmap.h"
+#include "DraggablePoint.h"
 #include "SplitLineObject.h"
 #include "PageLayout.h"
+#include <QPixmap>
 
 class ImageTransformation;
 
@@ -35,11 +36,14 @@ namespace page_split
 class ImageView :
 	public ImageViewBase,
 	private InteractionHandler,
-	private TaggedDraggablePixmap<1>,
-	private TaggedDraggablePixmap<2>,
+	private TaggedDraggablePoint<1>,
+	private TaggedDraggablePoint<2>,
 	private SplitLineObject
 {
 	Q_OBJECT
+private:
+	typedef TaggedDraggablePoint<1> TopHandle;
+	typedef TaggedDraggablePoint<2> BottomHandle;
 public:
 	ImageView(QImage const& image, QImage const& downscaled_image,
 		ImageTransformation const& xform, PageLayout const& layout);
@@ -54,14 +58,6 @@ protected:
 
 	virtual void onDragFinished();
 private:
-	DraggablePixmap& topHandle();
-
-	DraggablePixmap const& topHandle() const;
-
-	DraggablePixmap& bottomHandle();
-
-	DraggablePixmap const& bottomHandle() const;
-
 	/**
 	 * \return Page layout in widget coordinates.
 	 */
@@ -89,11 +85,9 @@ private:
 	 */
 	QRectF widgetValidArea() const;
 
-	virtual bool isPixmapToBeDrawn(int id, InteractionState const& interaction) const;
+	virtual QPointF pointPosition(int id, InteractionState const& interaction) const;
 
-	virtual QPointF pixmapPosition(int id, InteractionState const& interaction) const;
-
-	virtual void pixmapMoveRequest(int id, QPointF const& widget_pos);
+	virtual void pointMoveRequest(int id, QPointF const& widget_pos);
 
 	virtual Proximity lineProximity(
 		QPointF const& widget_mouse_pos, InteractionState const& interaction) const;
@@ -107,6 +101,8 @@ private:
 	ObjectDragHandler m_lineDragHandler;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
+
+	QPixmap m_handlePixmap;
 
 	/**
 	 * Page layout in virtual image coordinates.

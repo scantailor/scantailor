@@ -22,6 +22,8 @@
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
 #include "PhysicalTransformation.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
 #include "Alignment.h"
 #include "IntrusivePtr.h"
 #include "PageId.h"
@@ -138,6 +140,9 @@ private:
 	
 	QString m_defaultStatusTip;
 	
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
+
 	IntrusivePtr<Settings> m_ptrSettings;
 	
 	PageId const m_pageId;

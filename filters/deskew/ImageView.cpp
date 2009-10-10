@@ -41,12 +41,11 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
-	TaggedDraggablePixmap<1>(QPixmap(":/icons/aqua-sphere.png"), 1),
-	TaggedDraggablePixmap<2>(QPixmap(":/icons/aqua-sphere.png"), 1),
+	m_handlePixmap(":/icons/aqua-sphere.png"),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
-	m_handle1DragHandler(leftHandle()),
-	m_handle2DragHandler(rightHandle()),
+	m_handle1DragHandler(static_cast<LeftHandle&>(*this)),
+	m_handle2DragHandler(static_cast<RightHandle&>(*this)),
 	m_xform(xform)
 {
 	setMouseTracking(true);
@@ -58,8 +57,8 @@ ImageView::ImageView(
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 	m_zoomHandler.setFocus(ZoomHandler::CENTER);
 
-	leftHandle().setHitAreaRadius(15.0);
-	rightHandle().setHitAreaRadius(15.0);
+	static_cast<LeftHandle*>(this)->setHitRadius(15.0);
+	static_cast<RightHandle*>(this)->setHitRadius(15.0);
 
 	QString const tip(tr("Drag this handle to rotate the image."));
 	m_handle1DragHandler.setProximityStatusTip(tip);
@@ -142,19 +141,23 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 		qRound(16 * (180 - m_maxRotationDeg)),
 		qRound(16 * 2 * m_maxRotationDeg)
 	);
-}
 
-bool
-ImageView::isPixmapToBeDrawn(int, InteractionState const&) const
-{
-	return true;
+	std::pair<QPointF, QPointF> const handles(
+		getRotationHandles(arc_square)
+	);
+
+	QRectF rect(m_handlePixmap.rect());
+	rect.moveCenter(handles.first);
+	painter.drawPixmap(rect.topLeft(), m_handlePixmap);
+	rect.moveCenter(handles.second);
+	painter.drawPixmap(rect.topLeft(), m_handlePixmap);
 }
 
 QPointF
-ImageView::pixmapPosition(int id, InteractionState const&) const
+ImageView::pointPosition(int id, InteractionState const&) const
 {
 	std::pair<QPointF, QPointF> const handles(getRotationHandles(getRotationArcSquare()));
-	if (id == 1) {
+	if (id == LeftHandle::Tag) {
 		return handles.first;
 	} else {
 		return handles.second;
@@ -162,7 +165,7 @@ ImageView::pixmapPosition(int id, InteractionState const&) const
 }
 
 void
-ImageView::pixmapMoveRequest(int id, QPointF const& widget_pos)
+ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
 {
 	QRectF const arc_square(getRotationArcSquare());
 	double const arc_radius = 0.5 * arc_square.width();
@@ -187,30 +190,6 @@ ImageView::onDragFinished()
 	emit manualDeskewAngleSet(m_xform.postRotation());
 }
 
-DraggablePixmap&
-ImageView::leftHandle()
-{
-	return static_cast<TaggedDraggablePixmap<1>&>(*this);
-}
-
-DraggablePixmap const&
-ImageView::leftHandle() const
-{
-	return static_cast<TaggedDraggablePixmap<1> const&>(*this);
-}
-
-DraggablePixmap&
-ImageView::rightHandle()
-{
-	return static_cast<TaggedDraggablePixmap<2>&>(*this);
-}
-
-DraggablePixmap const&
-ImageView::rightHandle() const
-{
-	return static_cast<TaggedDraggablePixmap<2> const&>(*this);
-}
-
 /**
  * Get the point at the center of the widget, in widget coordinates.
  * The point may be adjusted to to ensure it's at the center of a pixel.
@@ -230,8 +209,8 @@ ImageView::getImageRotationOrigin() const
 QRectF
 ImageView::getRotationArcSquare() const
 {
-	double const h_margin = leftHandle().handleRadius();
-	double const v_margin = h_margin;
+	double const h_margin = 0.5 * m_handlePixmap.width();
+	double const v_margin = 0.5 * m_handlePixmap.height();
 
 	QRectF reduced_screen_rect(rect());
 	reduced_screen_rect.adjust(h_margin, v_margin, -h_margin, -v_margin);

@@ -37,6 +37,7 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, QRectF const& content_rect)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_pNoContentMenu(new QMenu(this)),
 	m_pHaveContentMenu(new QMenu(this)),

@@ -19,6 +19,7 @@
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
 #include "Proximity.h"
+#include <algorithm>
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
@@ -32,16 +33,19 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
-	TaggedDraggablePixmap<1>(QPixmap(":/icons/aqua-sphere.png"), 1),
-	TaggedDraggablePixmap<2>(QPixmap(":/icons/aqua-sphere.png"), 1),
-	m_handle1DragHandler(topHandle()),
-	m_handle2DragHandler(bottomHandle()),
+	m_handle1DragHandler(static_cast<TopHandle&>(*this)),
+	m_handle2DragHandler(static_cast<BottomHandle&>(*this)),
 	m_lineDragHandler(static_cast<SplitLineObject&>(*this)),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
+	m_handlePixmap(":/icons/aqua-sphere.png"),
 	m_virtLayout(layout)
 {
 	setMouseTracking(true);
+
+	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
+	static_cast<TopHandle*>(this)->setHitRadius(hit_radius);
+	static_cast<BottomHandle*>(this)->setHitRadius(hit_radius);
 
 	m_lineDragHandler.setProximityCursor(Qt::SplitHCursor);
 	m_lineDragHandler.setInteractionCursor(Qt::SplitHCursor);
@@ -111,7 +115,18 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setPen(pen);
 	painter.setBrush(Qt::NoBrush);
 
-	painter.drawLine(widgetSplitLine(interaction));
+	QLineF const line(widgetSplitLine(interaction));
+	painter.drawLine(line);
+
+	if (m_virtLayout.type() != PageLayout::SINGLE_PAGE_UNCUT) {
+		QRectF rect(m_handlePixmap.rect());
+
+		rect.moveCenter(line.p1());
+		painter.drawPixmap(rect.topLeft(), m_handlePixmap);
+
+		rect.moveCenter(line.p2());
+		painter.drawPixmap(rect.topLeft(), m_handlePixmap);
+	}
 }
 
 void
@@ -124,30 +139,6 @@ ImageView::onDragFinished()
 	// is to make them visible and accessible for dragging.
 	update();
 	emit pageLayoutSetLocally(m_virtLayout);
-}
-
-DraggablePixmap&
-ImageView::topHandle()
-{
-	return static_cast<TaggedDraggablePixmap<1>&>(*this);
-}
-
-DraggablePixmap const&
-ImageView::topHandle() const
-{
-	return static_cast<TaggedDraggablePixmap<1> const&>(*this);
-}
-
-DraggablePixmap&
-ImageView::bottomHandle()
-{
-	return static_cast<TaggedDraggablePixmap<2>&>(*this);
-}
-
-DraggablePixmap const&
-ImageView::bottomHandle() const
-{
-	return static_cast<TaggedDraggablePixmap<2> const&>(*this);
 }
 
 PageLayout
@@ -176,7 +167,7 @@ ImageView::virtualSplitLine() const
 	QRectF virt_rect(virtualDisplayRect());
 	QRectF widget_rect(virtualToWidget().mapRect(virt_rect));
 
-	double const delta = topHandle().handleRadius();
+	double const delta = 0.5 * m_handlePixmap.width();
 	widget_rect.adjust(delta, delta, -delta, -delta);
 	virt_rect = widgetToVirtual().mapRect(widget_rect);
 
@@ -186,26 +177,20 @@ ImageView::virtualSplitLine() const
 QRectF
 ImageView::widgetValidArea() const
 {
-	double const delta = topHandle().handleRadius();
+	double const delta = 0.5 * m_handlePixmap.width();
 	return getVisibleWidgetRect().adjusted(delta, delta, -delta, -delta);
 }
 
 QPointF
-ImageView::pixmapPosition(
+ImageView::pointPosition(
 	int const id, InteractionState const& interaction) const
 {
 	QLineF const line(widgetSplitLine(interaction));
-	return id == 1 ? line.p1() : line.p2();
-}
-
-bool
-ImageView::isPixmapToBeDrawn(int, InteractionState const&) const
-{
-	return m_virtLayout.type() != PageLayout::SINGLE_PAGE_UNCUT;
+	return id == TopHandle::Tag ? line.p1() : line.p2();
 }
 
 void
-ImageView::pixmapMoveRequest(int id, QPointF const& widget_pos)
+ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
 {
 	QRectF const valid_area(widgetValidArea());
 	QPointF const bound_widget_pos(

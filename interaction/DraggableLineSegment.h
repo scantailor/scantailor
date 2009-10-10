@@ -16,29 +16,19 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DRAGGABLE_PIXMAP_H_
-#define DRAGGABLE_PIXMAP_H_
+#ifndef DRAGGABLE_LINE_SEGMENT_H_
+#define DRAGGABLE_LINE_SEGMENT_H_
 
 #include "DraggableObject.h"
 #include <QPointF>
-#include <QPixmap>
+#include <QLineF>
 
 class ImageViewBase;
 
-class DraggablePixmap : public DraggableObject
+class DraggableLineSegment : public DraggableObject
 {
 public:
-	DraggablePixmap(int id, QPixmap const& pixmap, int proximity_priority);
-
-	double handleRadius() const { return 0.5 * m_pixmap.width(); }
-
-	double hitAreaRadius() const { return m_hitAreaRadius; }
-
-	void setHitAreaRadius(double radius) { m_hitAreaRadius = radius; }
-
-	virtual void paint(QPainter& painter, InteractionState const& interaction);
-
-	virtual Proximity proximityThreshold(InteractionState const& interaction) const;
+	DraggableLineSegment(int id, int proximity_priority = 0);
 
 	virtual int proximityPriority() const;
 
@@ -49,25 +39,25 @@ public:
 
 	virtual void moveRequest(QPointF const& widget_pos);
 protected:
-	virtual bool isPixmapToBeDrawn(int id, InteractionState const& interaction) const = 0;
+	virtual QLineF lineSegment(int id, InteractionState const& interaction) const = 0;
 
-	virtual QPointF pixmapPosition(int id, InteractionState const& interaction) const = 0;
+	virtual QPointF lineSegmentPosition(int id, InteractionState const& interaction) const = 0;
 
-	virtual void pixmapMoveRequest(int id, QPointF const& widget_pos) = 0;
+	virtual void lineSegmentMoveRequest(int id, QPointF const& widget_pos) = 0;
 private:
-	QPixmap m_pixmap;
-	double m_hitAreaRadius;
 	int m_id;
 	int m_proximityPriority;
 };
 
 
-template<int Tag>
-class TaggedDraggablePixmap : public DraggablePixmap
+template<int T>
+class TaggedDraggableLineSegment : public DraggableLineSegment
 {
 public:
-	TaggedDraggablePixmap(QPixmap const& pixmap, int proximity_priority)
-			: DraggablePixmap(Tag, pixmap, proximity_priority) {}
+	enum { Tag = T };
+
+	TaggedDraggableLineSegment(int proximity_priority = 0)
+			: DraggableLineSegment(T, proximity_priority) {}
 };
 
 #endif

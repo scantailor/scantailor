@@ -51,6 +51,8 @@ ImageView::ImageView(
 	QRectF const& adapted_content_rect, OptionsWidget const& opt_widget)
 :	ImageViewBase(image, downscaled_image, xform.transform(),
 				  xform.resultingCropArea(), Margins(5.0, 5.0, 5.0, 5.0)),
+	m_dragHandler(*this),
+	m_zoomHandler(*this),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
 	m_origXform(xform),
@@ -71,6 +73,9 @@ ImageView::ImageView(
 	
 	setMouseTracking(true);
 	
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+
 	recalcBoxesAndFit(opt_widget.marginsMM());
 }
 

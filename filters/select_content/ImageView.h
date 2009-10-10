@@ -20,6 +20,7 @@
 #define SELECT_CONTENT_IMAGEVIEW_H_
 
 #include "ImageViewBase.h"
+#include "DragHandler.h"
 #include "ZoomHandler.h"
 #include <QRectF>
 #include <QString>
@@ -72,6 +73,7 @@ private:
 	
 	void forceInsideImage(QRectF& widget_rect) const;
 	
+	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 
 	QString m_defaultStatusTip;

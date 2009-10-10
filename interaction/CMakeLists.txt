@@ -3,7 +3,8 @@ PROJECT(interaction)
 SET(
 	sources
 	DraggableObject.h
-	DraggablePixmap.cpp DraggablePixmap.h
+	DraggablePoint.cpp DraggablePoint.h
+	DraggableLineSegment.cpp DraggableLineSegment.h
 	ObjectDragHandler.cpp ObjectDragHandler.h
 	InteractionHandler.cpp InteractionHandler.h
 	InteractionState.cpp InteractionState.h

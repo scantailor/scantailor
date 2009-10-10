@@ -24,7 +24,7 @@
 #include "DragHandler.h"
 #include "ZoomHandler.h"
 #include "ObjectDragHandler.h"
-#include "DraggablePixmap.h"
+#include "DraggablePoint.h"
 #include <QPolygonF>
 #include <QPoint>
 #include <QPointF>
@@ -41,10 +41,13 @@ namespace deskew
 class ImageView :
 	public ImageViewBase,
 	private InteractionHandler,
-	private TaggedDraggablePixmap<1>, // Left handle
-	private TaggedDraggablePixmap<2>  // Right handle
+	private TaggedDraggablePoint<1>,
+	private TaggedDraggablePoint<2>
 {
 	Q_OBJECT
+private:
+	typedef TaggedDraggablePoint<1> LeftHandle;
+	typedef TaggedDraggablePoint<2> RightHandle;
 public:
 	ImageView(
 		QImage const& image, QImage const& downscaled_image,
@@ -59,22 +62,12 @@ protected:
 	virtual void onPaint(
 		QPainter& painter, InteractionState const& interaction);
 
-	virtual bool isPixmapToBeDrawn(int id, InteractionState const& interaction) const;
+	virtual QPointF pointPosition(int id, InteractionState const& interaction) const;
 
-	virtual QPointF pixmapPosition(int id, InteractionState const& interaction) const;
-
-	virtual void pixmapMoveRequest(int id, QPointF const& widget_pos);
+	virtual void pointMoveRequest(int id, QPointF const& widget_pos);
 
 	virtual void onDragFinished();
 private:
-	DraggablePixmap& leftHandle();
-
-	DraggablePixmap const& leftHandle() const;
-
-	DraggablePixmap& rightHandle();
-
-	DraggablePixmap const& rightHandle() const;
-
 	QPointF getImageRotationOrigin() const;
 
 	QRectF getRotationArcSquare() const;
@@ -85,6 +78,7 @@ private:
 	static double const m_maxRotationDeg;
 	static double const m_maxRotationSin;
 
+	QPixmap m_handlePixmap;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 	ObjectDragHandler m_handle1DragHandler; // Left handle.

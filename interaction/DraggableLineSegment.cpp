@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "DraggablePixmap.h"
+#include "DraggableLineSegment.h"
 #include "Proximity.h"
 #include "ImageViewBase.h"
 #include <QPainter>
@@ -24,55 +24,34 @@
 #include <QRectF>
 #include <algorithm>
 
-DraggablePixmap::DraggablePixmap(int id, QPixmap const& pixmap, int proximity_priority)
-:	m_pixmap(pixmap),
-	m_hitAreaRadius(0.25 * (pixmap.width() + pixmap.height())),
-	m_id(id),
+DraggableLineSegment::DraggableLineSegment(int id, int proximity_priority)
+:	m_id(id),
 	m_proximityPriority(proximity_priority)
 {
 }
 
-void
-DraggablePixmap::paint(QPainter& painter, InteractionState const& interaction)
-{
-	if (!isPixmapToBeDrawn(m_id, interaction)) {
-		return;
-	}
-
-	painter.setTransform(QTransform());
-
-	QRectF rect(m_pixmap.rect());
-	rect.moveCenter(position(interaction));
-	painter.drawPixmap(rect.topLeft(), m_pixmap);
-}
-
-Proximity
-DraggablePixmap::proximityThreshold(InteractionState const&) const
-{
-	return Proximity::fromDist(m_hitAreaRadius);
-}
-
 int
-DraggablePixmap::proximityPriority() const
+DraggableLineSegment::proximityPriority() const
 {
 	return m_proximityPriority;
 }
 
 Proximity
-DraggablePixmap::proximity(
+DraggableLineSegment::proximity(
 	QPointF const& widget_mouse_pos, InteractionState const& interaction)
 {
-	return Proximity(position(interaction), widget_mouse_pos);
+	QLineF const line(lineSegment(m_id, interaction));
+	return Proximity::pointAndLineSegment(widget_mouse_pos, line);
 }
 
 QPointF
-DraggablePixmap::position(InteractionState const& interaction) const
+DraggableLineSegment::position(InteractionState const& interaction) const
 {
-	return pixmapPosition(m_id, interaction);
+	return lineSegmentPosition(m_id, interaction);
 }
 
 void
-DraggablePixmap::moveRequest(QPointF const& widget_pos)
+DraggableLineSegment::moveRequest(QPointF const& widget_pos)
 {
-	pixmapMoveRequest(m_id, widget_pos);
+	lineSegmentMoveRequest(m_id, widget_pos);
 }
