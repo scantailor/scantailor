@@ -39,9 +39,10 @@ GET_FILENAME_COMPONENT(outer_dir "${PROJECT_SOURCE_DIR}/.." ABSOLUTE)
 IF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
 	FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
 	FILE(GLOB qt_dirs2 "C:/Qt/4.*.*")
+	FILE(GLOB qt_dirs3 "C:/Qt/20*/qt")
 	FIND_PROGRAM(
 		QT_QMAKE_EXECUTABLE qmake
-		PATHS dummy_dir ${qt_dirs} ${qt_dirs2}
+		PATHS dummy_dir ${qt_dirs} ${qt_dirs2} ${qt_dirs3}
 		PATH_SUFFIXES bin
 	)
 ENDIF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
@@ -421,7 +422,7 @@ IF(ENABLE_CRASH_REPORTER)
 	)
 	IF(NOT DUMP_SYMS_EXECUTABLE)
 		MESSAGE(
-			FATAL_ERROR "dump_syms.exe wasn't found.  Specify its location manually by setting the DUMP_SYMS_EXECUTABLE variable.  dump_syms.exe may be found in the Mozilla repository."
+			FATAL_ERROR "dump_syms.exe wasn't found.  Specify its location manually by setting the DUMP_SYMS_EXECUTABLE variable.  dump_syms.exe may be found in the Mozilla repository under /toolkit/crashreporter/tools/win32"
 		)
 	ENDIF(NOT DUMP_SYMS_EXECUTABLE)
 	

@@ -26,7 +26,7 @@ latest stable version.
    Homepage: http://www.cmake.org
 2. jpeg-6b
    Homepage: http://www.ijg.org/
-   The file we need will be named jpegsrc.v6b.tar.gz or similarly.
+   The file we need will be named jpegsrc.v7.tar.gz or similarly.
 3. zlib
    Homepage: http://www.zlib.net/
    We need a file named like zlib-x.x.x.tar.gz, where x.x.x represents
@@ -45,26 +45,19 @@ latest stable version.
    If you aren't going to distribute your Scan Tailor build and aren't going
    to open files from untrusted sources, then you don't really need patching it.
 6. Qt 4.x.x (tested with 4.5.0)
-   Homepage: http://trolltech.com/
-   Download Qt -> Open Source -> Application Development -> Qt for Windows: C++
-   From there download the mingw version rather than the source-only version.
-   By doing so you will get the correct version of MinGW installed, and you'll
-   save some time compiling it.  Note that you will have to rebuild Qt libraries
-   anyway, but at least you won't have to rebuild the programs that come with
-   Qt.  Still, the source-only Qt is supported, though in that case you would
-   have to download and install MinGW manually.
-   [VC++]
-   You would need the Visual C++ itself, which you can download from here:
-   http://www.microsoft.com/Express/vc/
-   You can take either source or the binary versions of Qt, including the one
-   for MinGW one, which should still save you some compiling time.  The build
-   was tested with the source version of Qt.
+   Homepage: http://qt.nokia.com/
+   From there: Download -> LGPL / Free -> Download Qt SDK for Windows
+   If you are going to use Visual Studio, you may turn off the "MinGW"
+   option in the installer.
 7. Boost (tested with 1.38.0) and Boost Jam (tested with 3.1.17)
    Homepage: http://boost.org/
    For Boost, you can download any of the files, provided you know how to unpack it.
    For Boost Jam, take the file with "ntx86" suffix.
 8. NSIS 2.x (tested with 2.42)
    Homepage: http://nsis.sourceforge.net/
+9. [VC++]
+   You would need the Visual C++ itself, which you can download from here:
+   http://www.microsoft.com/Express/vc/
 
 
 

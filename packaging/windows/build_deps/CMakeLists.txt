@@ -31,6 +31,7 @@ FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
 FILE(GLOB qt_dirs2 "C:/Qt/4.*.*")
+FILE(GLOB qt_dirs3 "C:/Qt/20*/qt")
 FILE(GLOB boost_dirs "${outer_dir}/boost_1_[0-9]*_[0-9]*")
 FILE(GLOB boost_jam_dirs "${outer_dir}/boost-jam-*")
 
@@ -51,7 +52,7 @@ FIND_PATH(
 	DOC "Path to top-level tiff source directory."
 )
 FIND_PATH(
-	QT_DIR projects.pro PATHS ${qt_dirs} ${qt_dirs2}
+	QT_DIR projects.pro PATHS ${qt_dirs} ${qt_dirs2} ${qt_dirs3}
 	DOC "Path to top-level Qt source directory."
 )
 FIND_PATH(
@@ -101,13 +102,13 @@ ENDIF(NOT EXISTS "${JPEG_DIR}/jmorecfg.h.orig")
 
 SET(
 	libjpeg_sources
-	jcapimin.c jcapistd.c jccoefct.c jccolor.c jcdctmgr.c jchuff.c
-	jcinit.c jcmainct.c jcmarker.c jcmaster.c jcomapi.c jcparam.c
-	jcphuff.c jcprepct.c jcsample.c jctrans.c jdapimin.c jdapistd.c
-	jdatadst.c jdatasrc.c jdcoefct.c jdcolor.c jddctmgr.c jdhuff.c
-	jdinput.c jdmainct.c jdmarker.c jdmaster.c jdmerge.c jdphuff.c
-	jdpostct.c jdsample.c jdtrans.c jerror.c jfdctflt.c jfdctfst.c
-	jfdctint.c jidctflt.c jidctfst.c jidctint.c jidctred.c jquant1.c
+	jaricom.c jcapimin.c jcapistd.c jcarith.c jccoefct.c jccolor.c
+	jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c jcmaster.c
+	jcomapi.c jcparam.c jcprepct.c jcsample.c jctrans.c jdapimin.c
+	jdapistd.c jdarith.c jdatadst.c jdatasrc.c jdcoefct.c jdcolor.c
+	jddctmgr.c jdhuff.c jdinput.c jdmainct.c jdmarker.c jdmaster.c
+	jdmerge.c jdpostct.c jdsample.c jdtrans.c jerror.c jfdctflt.c
+	jfdctfst.c jfdctint.c jidctflt.c jidctfst.c jidctint.c jquant1.c
 	jquant2.c jutils.c jmemmgr.c jmemnobs.c
 )
 LIST_ITEMS_PREPEND(libjpeg_sources "${JPEG_DIR}/")
@@ -186,10 +187,19 @@ SET(
 )
 LIST_ITEMS_PREPEND(libtiff_sources "${TIFF_DIR}/libtiff/")
 
+SET(tiff_vc_config "${TIFF_DIR}/libtiff/tif_config.vc.h")
+IF(EXISTS "${TIFF_DIR}/libtiff/tif_config.h.vc")
+	SET(tiff_vc_config "${TIFF_DIR}/libtiff/tif_config.h.vc")
+ENDIF(EXISTS "${TIFF_DIR}/libtiff/tif_config.h.vc")
 CONFIGURE_FILE(
-	"${TIFF_DIR}/libtiff/tif_config.h.vc"
-	"${TIFF_DIR}/libtiff/tif_config.h" COPYONLY
+	"${tiff_vc_config}" "${TIFF_DIR}/libtiff/tif_config.h" @COPYONLY
 )
+IF(EXISTS "${TIFF_DIR}/libtiff/tiffconf.vc.h")
+	CONFIGURE_FILE(
+		"${TIFF_DIR}/libtiff/tiffconf.vc.h"
+		"${TIFF_DIR}/libtiff/tiffconf.h" @COPYONLY
+`	)
+ENDIF(EXISTS "${TIFF_DIR}/libtiff/tiffconf.vc.h")
 
 ADD_DEFINITIONS(${tiff_definitions})
 ADD_LIBRARY(tiff STATIC ${libtiff_sources})
@@ -250,7 +260,7 @@ FOREACH(file_pro ${pro_files})
 		IF(NOT EXISTS "${file_pro}.orig")
 			CONFIGURE_FILE("${file_pro}" "${file_pro}.orig" COPYONLY)
 		ENDIF(NOT EXISTS "${file_pro}.orig")
-		
+
 		FILE(APPEND "${file_pro}" "\nwin32 {\n\tLIBS += libjpeg.lib\n}\n")
 	ENDIF(contents MATCHES qjpeg AND NOT contents MATCHES libjpeg)
 ENDFOREACH(file_pro)
@@ -267,7 +277,7 @@ FOREACH(file_conf ${conf_files})
 		IF(NOT EXISTS "${file_conf}.orig")
 			CONFIGURE_FILE("${file_conf}" "${file_conf}.orig" COPYONLY)
 		ENDIF(NOT EXISTS "${file_conf}.orig")
-		
+
 		FILE(WRITE "${file_conf}" "${new_contents}")
 	ENDIF(NOT "${contents}" STREQUAL "${new_contents}")
 ENDFOREACH(file_conf)
@@ -275,7 +285,7 @@ ENDFOREACH(file_conf)
 SET(qt_maybe_skip_tools)
 IF(EXISTS "${QT_DIR}/bin/designer.exe")
 	# Either the tools have already been built, or they came prepackaged.
-	SET(qt_maybe_skip_tools "-nomake libs")
+	SET(qt_maybe_skip_tools "-nomake tools")
 ENDIF(EXISTS "${QT_DIR}/bin/designer.exe")
 
 IF(MINGW)
