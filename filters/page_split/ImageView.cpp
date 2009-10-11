@@ -33,9 +33,9 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout)
 :	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
-	m_handle1DragHandler(static_cast<TopHandle&>(*this)),
-	m_handle2DragHandler(static_cast<BottomHandle&>(*this)),
-	m_lineDragHandler(static_cast<SplitLineObject&>(*this)),
+	m_handle1DragHandler(static_cast<DraggablePoint*>(this)),
+	m_handle2DragHandler(static_cast<DraggablePoint*>(this)),
+	m_lineDragHandler(static_cast<DraggableLineSegment*>(this)),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_handlePixmap(":/icons/aqua-sphere.png"),
@@ -44,8 +44,7 @@ ImageView::ImageView(
 	setMouseTracking(true);
 
 	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
-	static_cast<TopHandle*>(this)->setHitRadius(hit_radius);
-	static_cast<BottomHandle*>(this)->setHitRadius(hit_radius);
+	static_cast<DraggablePoint*>(this)->setHitRadius(hit_radius);
 
 	m_lineDragHandler.setProximityCursor(Qt::SplitHCursor);
 	m_lineDragHandler.setInteractionCursor(Qt::SplitHCursor);
@@ -130,7 +129,7 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 }
 
 void
-ImageView::onDragFinished()
+ImageView::dragFinished(ObjectDragHandler const*)
 {
 	// When a handle is being dragged, the other handle is displayed not
 	// at the edge of the widget widget but at the edge of the image.
@@ -183,14 +182,16 @@ ImageView::widgetValidArea() const
 
 QPointF
 ImageView::pointPosition(
-	int const id, InteractionState const& interaction) const
+	ObjectDragHandler const* handler, InteractionState const& interaction) const
 {
 	QLineF const line(widgetSplitLine(interaction));
-	return id == TopHandle::Tag ? line.p1() : line.p2();
+	return handler == &m_handle1DragHandler ? line.p1() : line.p2();
 }
 
 void
-ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
+ImageView::pointMoveRequest(
+	ObjectDragHandler const* handler, QPointF const& widget_pos,
+	InteractionState const&)
 {
 	QRectF const valid_area(widgetValidArea());
 	QPointF const bound_widget_pos(
@@ -201,7 +202,7 @@ ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
 	double const x = widgetToVirtual().map(bound_widget_pos).x();
 
 	QLineF virt_line(virtualSplitLine());
-	if (id == 1) {
+	if (handler == &m_handle1DragHandler) {
 		virt_line.setP1(QPointF(x, virt_line.p1().y()));
 	} else {
 		virt_line.setP2(QPointF(x, virt_line.p2().y()));
@@ -211,21 +212,23 @@ ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
 	update();
 }
 
-Proximity
-ImageView::lineProximity(
-	QPointF const& widget_mouse_pos, InteractionState const& interaction) const
+QLineF
+ImageView::lineSegment(
+	ObjectDragHandler const*, InteractionState const& interaction) const
 {
-	return Proximity::pointAndLineSegment(widget_mouse_pos, widgetSplitLine(interaction));
+	return widgetSplitLine(interaction);
 }
 
 QPointF
-ImageView::linePosition(InteractionState const& interaction) const
+ImageView::lineSegmentPosition(
+	ObjectDragHandler const* handler, InteractionState const& interaction) const
 {
 	return widgetSplitLine(interaction).p1();
 }
 
 void
-ImageView::lineMoveRequest(QPointF const& widget_pos)
+ImageView::lineSegmentMoveRequest(
+	ObjectDragHandler const*, QPointF const& widget_pos, InteractionState const&)
 {
 	QLineF line(widgetLayout().splitLine());
 

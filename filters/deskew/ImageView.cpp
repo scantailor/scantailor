@@ -44,8 +44,8 @@ ImageView::ImageView(
 	m_handlePixmap(":/icons/aqua-sphere.png"),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
-	m_handle1DragHandler(static_cast<LeftHandle&>(*this)),
-	m_handle2DragHandler(static_cast<RightHandle&>(*this)),
+	m_handle1DragHandler(static_cast<DraggablePoint*>(this)),
+	m_handle2DragHandler(static_cast<DraggablePoint*>(this)),
 	m_xform(xform)
 {
 	setMouseTracking(true);
@@ -57,8 +57,7 @@ ImageView::ImageView(
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 	m_zoomHandler.setFocus(ZoomHandler::CENTER);
 
-	static_cast<LeftHandle*>(this)->setHitRadius(15.0);
-	static_cast<RightHandle*>(this)->setHitRadius(15.0);
+	static_cast<DraggablePoint*>(this)->setHitRadius(15.0);
 
 	QString const tip(tr("Drag this handle to rotate the image."));
 	m_handle1DragHandler.setProximityStatusTip(tip);
@@ -154,10 +153,10 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 }
 
 QPointF
-ImageView::pointPosition(int id, InteractionState const&) const
+ImageView::pointPosition(ObjectDragHandler const* handler, InteractionState const&) const
 {
 	std::pair<QPointF, QPointF> const handles(getRotationHandles(getRotationArcSquare()));
-	if (id == LeftHandle::Tag) {
+	if (handler == &m_handle1DragHandler) {
 		return handles.first;
 	} else {
 		return handles.second;
@@ -165,7 +164,9 @@ ImageView::pointPosition(int id, InteractionState const&) const
 }
 
 void
-ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
+ImageView::pointMoveRequest(
+	ObjectDragHandler const* handler, QPointF const& widget_pos,
+	InteractionState const&)
 {
 	QRectF const arc_square(getRotationArcSquare());
 	double const arc_radius = 0.5 * arc_square.width();
@@ -174,7 +175,7 @@ ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
 	rel_y = qBound(-arc_radius, rel_y, arc_radius);
 
 	double angle_rad = asin(rel_y / arc_radius);
-	if (id == 1) {
+	if (handler == &m_handle1DragHandler) {
 		angle_rad = -angle_rad;
 	}
 	double angle_deg = angle_rad * imageproc::constants::RAD2DEG;
@@ -185,7 +186,7 @@ ImageView::pointMoveRequest(int id, QPointF const& widget_pos)
 }
 
 void
-ImageView::onDragFinished()
+ImageView::dragFinished(ObjectDragHandler const*)
 {
 	emit manualDeskewAngleSet(m_xform.postRotation());
 }

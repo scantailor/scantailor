@@ -22,6 +22,7 @@
 #include "ImageViewBase.h"
 #include "DragHandler.h"
 #include "ZoomHandler.h"
+#include "BoxResizeHandler.h"
 #include <QRectF>
 #include <QString>
 
@@ -31,7 +32,7 @@ class QMenu;
 namespace select_content
 {
 
-class ImageView : public ImageViewBase
+class ImageView : public ImageViewBase, private BoxResizeHandler
 {
 	Q_OBJECT
 public:
@@ -47,38 +48,28 @@ public:
 signals:
 	void manualContentRectSet(QRectF const& content_rect);
 protected:
-	virtual void paintOverImage(QPainter& painter);
+	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 	
-	virtual void mousePressEvent(QMouseEvent* event);
+	void onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction);
 	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
-	
-	virtual void hideEvent(QHideEvent* event);
-	
-	virtual void contextMenuEvent(QContextMenuEvent* event);
-	
-	virtual QString defaultStatusTip() const;
+	virtual QRectF boxPosition(
+		BoxResizeHandler const* handler,
+		InteractionState const& interaction) const;
+
+	virtual void boxResizeRequest(
+		BoxResizeHandler const* handler, QRectF const& rect,
+		InteractionState const& interaction);
+
+	virtual void boxResizeFinished(BoxResizeHandler const* handler);
 private slots:
 	void createContentBox();
 	
 	void removeContentBox();
 private:
-	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
-	
-	int cursorLocationMask(QPoint const& cursor_pos) const;
-	
-	void forceMinWidthAndHeight(QRectF& widget_rect) const;
-	
-	void forceInsideImage(QRectF& widget_rect) const;
+	QRectF forceInsideImage(QRectF widget_rect) const;
 	
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
-
-	QString m_defaultStatusTip;
-	
-	QString m_resizeStatusTip;
 	
 	/**
 	 * The context menu to be shown if there is no content box.
@@ -94,22 +85,6 @@ private:
 	 * Content box in virtual image coordinates.
 	 */
 	QRectF m_contentRect;
-	
-	/**
-	 * Content box in widget coordinates in the beginning of resizing.
-	 */
-	QRectF m_widgetRectBeforeResizing;
-	
-	/**
-	 * Cursor position in the beginning of resizing.
-	 */
-	QPoint m_cursorPosBeforeResizing;
-	
-	/**
-	 * A bitwise OR of *_EDGE values.  If non-zero, that means
-	 * a resizing operation is in progress.
-	 */
-	int m_resizingMask;
 };
 
 } // namespace select_content

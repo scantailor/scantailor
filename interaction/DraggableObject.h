@@ -22,6 +22,7 @@
 #include "InteractionState.h"
 #include "Proximity.h"
 
+class ObjectDragHandler;
 class QPointF;
 class QPainter;
 
@@ -36,7 +37,8 @@ public:
 	 * \return The maximum distance from the object (in widget coordinates) that
 	 *         still allows to initiate a dragging operation.
 	 */
-	virtual Proximity proximityThreshold(InteractionState const& interaction) const {
+	virtual Proximity proximityThreshold(
+			ObjectDragHandler const*, InteractionState const& interaction) const {
 		return interaction.proximityThreshold();
 	}
 
@@ -45,19 +47,21 @@ public:
 	 * a closer one.  Consider for example a line segment with handles at its endpoints.
 	 * In this example, you would assign higher priority to those handles.
 	 */
-	virtual int proximityPriority() const { return 0; }
+	virtual int proximityPriority(ObjectDragHandler const* handler) const { return 0; }
 
 	/**
 	 * \return The proximity from the mouse position in widget coordinates to
 	 *         any draggable part of the object.
 	 */
 	virtual Proximity proximity(
+		ObjectDragHandler const* handler,
 		QPointF const& widget_mouse_pos, InteractionState const& interaction) = 0;
 
 	/**
 	 * \return The current position of the object in widget coordinates.
 	 */
-	virtual QPointF position(InteractionState const& interaction) const = 0;
+	virtual QPointF position(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
 
 	/**
 	 * \brief Handles a request to move to a particular position in widget coordinates.
@@ -66,12 +70,14 @@ public:
 	 * object to the requested position, or it may leave it where it is,
 	 * or it may move it to a different position.
 	 */
-	virtual void moveRequest(QPointF const& widget_pos) = 0;
+	virtual void moveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction) = 0;
 
 	/**
-	 * \brief Called when dragging is finished, that is when the mouse button is releases.
+	 * \brief Called when dragging is finished, that is when the mouse button is released.
 	 */
-	virtual void onDragFinished() {}
+	virtual void dragFinished(ObjectDragHandler const* handler) = 0;
 };
 
 #endif

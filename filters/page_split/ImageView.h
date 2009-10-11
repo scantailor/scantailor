@@ -24,7 +24,7 @@
 #include "ZoomHandler.h"
 #include "ObjectDragHandler.h"
 #include "DraggablePoint.h"
-#include "SplitLineObject.h"
+#include "DraggableLineSegment.h"
 #include "PageLayout.h"
 #include <QPixmap>
 
@@ -36,14 +36,10 @@ namespace page_split
 class ImageView :
 	public ImageViewBase,
 	private InteractionHandler,
-	private TaggedDraggablePoint<1>,
-	private TaggedDraggablePoint<2>,
-	private SplitLineObject
+	private DraggablePoint,
+	private DraggableLineSegment
 {
 	Q_OBJECT
-private:
-	typedef TaggedDraggablePoint<1> TopHandle;
-	typedef TaggedDraggablePoint<2> BottomHandle;
 public:
 	ImageView(QImage const& image, QImage const& downscaled_image,
 		ImageTransformation const& xform, PageLayout const& layout);
@@ -56,7 +52,24 @@ public slots:
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 
-	virtual void onDragFinished();
+	virtual QPointF pointPosition(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
+
+	virtual void pointMoveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction);
+
+	virtual QLineF lineSegment(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
+
+	virtual QPointF lineSegmentPosition(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
+
+	virtual void lineSegmentMoveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction);
+
+	virtual void dragFinished(ObjectDragHandler const* handler);
 private:
 	/**
 	 * \return Page layout in widget coordinates.
@@ -84,17 +97,6 @@ private:
 	 * \return Valid area for split line endpoints in widget coordinates.
 	 */
 	QRectF widgetValidArea() const;
-
-	virtual QPointF pointPosition(int id, InteractionState const& interaction) const;
-
-	virtual void pointMoveRequest(int id, QPointF const& widget_pos);
-
-	virtual Proximity lineProximity(
-		QPointF const& widget_mouse_pos, InteractionState const& interaction) const;
-
-	virtual QPointF linePosition(InteractionState const& interaction) const;
-
-	virtual void lineMoveRequest(QPointF const& widget_pos);
 
 	ObjectDragHandler m_handle1DragHandler;
 	ObjectDragHandler m_handle2DragHandler;

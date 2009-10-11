@@ -29,6 +29,7 @@
 #include <QColor>
 #include <QDebug>
 #include <Qt>
+#include <algorithm>
 
 namespace select_content
 {
@@ -41,15 +42,21 @@ ImageView::ImageView(
 	m_zoomHandler(*this),
 	m_pNoContentMenu(new QMenu(this)),
 	m_pHaveContentMenu(new QMenu(this)),
-	m_contentRect(content_rect),
-	m_resizingMask(0)
+	m_contentRect(content_rect)
 {
 	setMouseTracking(true);
+
+	setMinBoxSize(QSizeF(15, 15));
+	rootInteractionHandler().makeLastFollower(static_cast<BoxResizeHandler&>(*this));
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 
-	m_defaultStatusTip = tr("Use the context menu to enable / disable the content box.");
-	m_resizeStatusTip = tr("Drag lines or corners to resize the content box.");
-	ensureStatusTip(defaultStatusTip());
+	interactionState().setDefaultStatusTip(
+		tr("Use the context menu to enable / disable the content box.")
+	);
+	static_cast<BoxResizeHandler*>(this)->setProximityStatusTip(
+		tr("Drag lines or corners to resize the content box.")
+	);
 	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
 	QAction* remove = m_pHaveContentMenu->addAction(tr("Remove Content Box"));
@@ -62,7 +69,7 @@ ImageView::~ImageView()
 }
 
 void
-ImageView::paintOverImage(QPainter& painter)
+ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 {
 	if (m_contentRect.isNull()) {
 		return;
@@ -83,112 +90,12 @@ ImageView::paintOverImage(QPainter& painter)
 }
 
 void
-ImageView::mousePressEvent(QMouseEvent* const event)
+ImageView::onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction)
 {
-	int const mask = cursorLocationMask(event->pos());
-
-	if (event->button() == Qt::LeftButton) {
-		m_widgetRectBeforeResizing = virtualToWidget().mapRect(m_contentRect);
-		m_cursorPosBeforeResizing = event->pos();
-		m_resizingMask = mask;
-	}
-}
-
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	if (event->button() == Qt::LeftButton && m_resizingMask != 0) {
-		m_resizingMask = 0;
-		emit manualContentRectSet(m_contentRect);
-	}
-}
-
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
-{
-	if (m_resizingMask == 0) { // not resizing
-		int const mask = cursorLocationMask(event->pos());
-		int const ver = mask & (TOP_EDGE|BOTTOM_EDGE);
-		int const hor = mask & (LEFT_EDGE|RIGHT_EDGE);
-		if (ver || hor) {
-			ensureStatusTip(m_resizeStatusTip);
-		} else {
-			ensureStatusTip(m_defaultStatusTip);
-		}
-		if (!ver && !hor) {
-			ensureCursorShape(Qt::ArrowCursor);
-		} else if (ver && !hor) {
-			ensureCursorShape(Qt::SizeVerCursor);
-		} else if (hor && !ver) {
-			ensureCursorShape(Qt::SizeHorCursor);
-		} else {
-			int const top_left = LEFT_EDGE|TOP_EDGE;
-			int const bottom_right = RIGHT_EDGE|BOTTOM_EDGE;
-			if ((mask & top_left) == top_left ||
-			    (mask & bottom_right) == bottom_right) {
-				ensureCursorShape(Qt::SizeFDiagCursor);
-			} else {
-				ensureCursorShape(Qt::SizeBDiagCursor);
-			}
-		}
-	} else {
-		QPoint const delta(event->pos() - m_cursorPosBeforeResizing);
-		QRectF widget_rect(m_widgetRectBeforeResizing);
-		int left_adjust = 0;
-		int right_adjust = 0;
-		int top_adjust = 0;
-		int bottom_adjust = 0;
-		
-		if (m_resizingMask & LEFT_EDGE) {
-			left_adjust = delta.x();
-		}
-		if (m_resizingMask & RIGHT_EDGE) {
-			right_adjust = delta.x();
-		}
-		if (m_resizingMask & TOP_EDGE) {
-			top_adjust = delta.y();
-		}
-		if (m_resizingMask & BOTTOM_EDGE) {
-			bottom_adjust = delta.y();
-		}
-		widget_rect.adjust(
-			left_adjust, top_adjust, right_adjust, bottom_adjust
-		);
-		
-		forceMinWidthAndHeight(widget_rect);
-		forceInsideImage(widget_rect);
-		
-		QRectF const new_content_rect(
-			virtualToWidget().inverted().mapRect(widget_rect)
-		);
-		if (new_content_rect != m_contentRect) {
-			m_contentRect = new_content_rect;
-			update();
-		}
-	}
-}
-
-void
-ImageView::hideEvent(QHideEvent* const event)
-{
-	ImageViewBase::hideEvent(event);
-	int const old_resizing_mask = m_resizingMask;
-	m_resizingMask = 0;
-	ensureCursorShape(Qt::ArrowCursor);
-	if (old_resizing_mask) {
-		emit manualContentRectSet(m_contentRect);
-	}
-}
-
-void
-ImageView::contextMenuEvent(QContextMenuEvent* const event)
-{
-	if (m_resizingMask != 0) {
+	if (interaction.captured()) {
 		// No context menus during resizing.
 		return;
 	}
-	
-	event->accept();
 	
 	if (m_contentRect.isEmpty()) {
 		m_pNoContentMenu->popup(event->globalPos());
@@ -197,10 +104,24 @@ ImageView::contextMenuEvent(QContextMenuEvent* const event)
 	}
 }
 
-QString
-ImageView::defaultStatusTip() const
+QRectF
+ImageView::boxPosition(BoxResizeHandler const*, InteractionState const&) const
 {
-	return m_defaultStatusTip;
+	return virtualToWidget().mapRect(m_contentRect);
+}
+
+void
+ImageView::boxResizeRequest(
+	BoxResizeHandler const*, QRectF const& rect, InteractionState const&)
+{
+	m_contentRect = widgetToVirtual().mapRect(forceInsideImage(rect));
+	update();
+}
+
+void
+ImageView::boxResizeFinished(BoxResizeHandler const* handler)
+{
+	emit manualContentRectSet(m_contentRect);
 }
 
 void
@@ -209,7 +130,7 @@ ImageView::createContentBox()
 	if (!m_contentRect.isEmpty()) {
 		return;
 	}
-	if (m_resizingMask) {
+	if (interactionState().captured()) {
 		return;
 	}
 	
@@ -227,7 +148,7 @@ ImageView::removeContentBox()
 	if (m_contentRect.isEmpty()) {
 		return;
 	}
-	if (m_resizingMask) {
+	if (interactionState().captured()) {
 		return;
 	}
 	
@@ -236,82 +157,31 @@ ImageView::removeContentBox()
 	emit manualContentRectSet(m_contentRect);
 }
 
-int
-ImageView::cursorLocationMask(QPoint const& cursor_pos) const
+QRectF
+ImageView::forceInsideImage(QRectF widget_rect) const
 {
-	QRect const rect(virtualToWidget().mapRect(m_contentRect).toRect());
-	int const adj = 5;
-	int mask = 0;
-	
-	QRect top_edge_rect(rect.topLeft(), QSize(rect.width(), 1));
-	top_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (top_edge_rect.contains(cursor_pos)) {
-		mask |= TOP_EDGE;
-	}
-	
-	QRect bottom_edge_rect(rect.bottomLeft(), QSize(rect.width(), 1));
-	bottom_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (bottom_edge_rect.contains(cursor_pos)) {
-		mask |= BOTTOM_EDGE;
-	}
-	
-	QRect left_edge_rect(rect.topLeft(), QSize(1, rect.height()));
-	left_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (left_edge_rect.contains(cursor_pos)) {
-		mask |= LEFT_EDGE;
-	}
-	
-	QRect right_edge_rect(rect.topRight(), QSize(1, rect.height()));
-	right_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (right_edge_rect.contains(cursor_pos)) {
-		mask |= RIGHT_EDGE;
-	}
-	
-	return mask;
-}
-
-void
-ImageView::forceMinWidthAndHeight(QRectF& widget_rect) const
-{
-	double const min_width = 15;
-	double const min_height = 15;
-	
-	if (widget_rect.width() < min_width) {
-		if (m_resizingMask & LEFT_EDGE) {
-			widget_rect.setLeft(widget_rect.right() - min_width);
-		} else if (m_resizingMask & RIGHT_EDGE) {
-			widget_rect.setRight(widget_rect.left() + min_width);
-		}
-	}
-	if (widget_rect.height() < min_height) {
-		if (m_resizingMask & TOP_EDGE) {
-			widget_rect.setTop(widget_rect.bottom() - min_height);
-		} else if (m_resizingMask & BOTTOM_EDGE) {
-			widget_rect.setBottom(widget_rect.top() + min_height);
-		}
-	}
-}
-
-void
-ImageView::forceInsideImage(QRectF& widget_rect) const
-{
+	double const minw(minBoxSize().width());
+	double const minh(minBoxSize().height());
 	QRectF const image_rect(getVisibleWidgetRect());
-	if ((m_resizingMask & LEFT_EDGE) &&
-			widget_rect.left() < image_rect.left()) {
+
+	if (widget_rect.left() < image_rect.left()) {
 		widget_rect.setLeft(image_rect.left());
+		widget_rect.setRight(std::max(widget_rect.right(), widget_rect.left() + minw));
 	}
-	if ((m_resizingMask & RIGHT_EDGE) &&
-			widget_rect.right() > image_rect.right()) {
+	if (widget_rect.right() > image_rect.right()) {
 		widget_rect.setRight(image_rect.right());
+		widget_rect.setLeft(std::min(widget_rect.left(), widget_rect.right() - minw));
 	}
-	if ((m_resizingMask & TOP_EDGE) &&
-			widget_rect.top() < image_rect.top()) {
+	if (widget_rect.top() < image_rect.top()) {
 		widget_rect.setTop(image_rect.top());
+		widget_rect.setBottom(std::max(widget_rect.bottom(), widget_rect.top() + minh));
 	}
-	if ((m_resizingMask & BOTTOM_EDGE) &&
-			widget_rect.bottom() > image_rect.bottom()) {
+	if (widget_rect.bottom() > image_rect.bottom()) {
 		widget_rect.setBottom(image_rect.bottom());
+		widget_rect.setTop(std::min(widget_rect.top(), widget_rect.bottom() - minh));
 	}
+
+	return widget_rect;
 }
 
 } // namespace select_content

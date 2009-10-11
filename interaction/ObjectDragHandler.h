@@ -33,7 +33,9 @@ class ObjectDragHandler : public InteractionHandler
 {
 	DECLARE_NON_COPYABLE(ObjectDragHandler)
 public:
-	ObjectDragHandler(DraggableObject& obj);
+	ObjectDragHandler(DraggableObject* obj = 0);
+
+	void setObject(DraggableObject* obj) { m_pObj = obj; }
 
 	void setProximityCursor(QCursor const& cursor);
 
@@ -62,7 +64,7 @@ protected:
 	virtual void onMouseMoveEvent(
 		QMouseEvent* event, InteractionState& interaction);
 private:
-	DraggableObject& m_rObj;
+	DraggableObject* m_pObj;
 	InteractionState::Captor m_interaction;
 	QPointF m_dragOffset;
 };

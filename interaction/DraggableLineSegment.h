@@ -23,41 +23,37 @@
 #include <QPointF>
 #include <QLineF>
 
-class ImageViewBase;
+class ObjectDragHandler;
 
 class DraggableLineSegment : public DraggableObject
 {
 public:
-	DraggableLineSegment(int id, int proximity_priority = 0);
+	DraggableLineSegment(int proximity_priority = 0);
 
-	virtual int proximityPriority() const;
+	virtual int proximityPriority(ObjectDragHandler const* handler) const;
 
 	virtual Proximity proximity(
-		QPointF const& widget_mouse_pos, InteractionState const& interaction);
+		ObjectDragHandler const* handler, QPointF const& widget_mouse_pos,
+		InteractionState const& interaction);
 
-	virtual QPointF position(InteractionState const& interaction) const;
+	virtual QPointF position(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
 
-	virtual void moveRequest(QPointF const& widget_pos);
+	virtual void moveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction);
 protected:
-	virtual QLineF lineSegment(int id, InteractionState const& interaction) const = 0;
+	virtual QLineF lineSegment(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
 
-	virtual QPointF lineSegmentPosition(int id, InteractionState const& interaction) const = 0;
+	virtual QPointF lineSegmentPosition(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
 
-	virtual void lineSegmentMoveRequest(int id, QPointF const& widget_pos) = 0;
+	virtual void lineSegmentMoveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction) = 0;
 private:
-	int m_id;
 	int m_proximityPriority;
-};
-
-
-template<int T>
-class TaggedDraggableLineSegment : public DraggableLineSegment
-{
-public:
-	enum { Tag = T };
-
-	TaggedDraggableLineSegment(int proximity_priority = 0)
-			: DraggableLineSegment(T, proximity_priority) {}
 };
 
 #endif

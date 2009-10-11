@@ -41,13 +41,9 @@ namespace deskew
 class ImageView :
 	public ImageViewBase,
 	private InteractionHandler,
-	private TaggedDraggablePoint<1>,
-	private TaggedDraggablePoint<2>
+	private DraggablePoint
 {
 	Q_OBJECT
-private:
-	typedef TaggedDraggablePoint<1> LeftHandle;
-	typedef TaggedDraggablePoint<2> RightHandle;
 public:
 	ImageView(
 		QImage const& image, QImage const& downscaled_image,
@@ -62,11 +58,14 @@ protected:
 	virtual void onPaint(
 		QPainter& painter, InteractionState const& interaction);
 
-	virtual QPointF pointPosition(int id, InteractionState const& interaction) const;
+	virtual QPointF pointPosition(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
 
-	virtual void pointMoveRequest(int id, QPointF const& widget_pos);
+	virtual void pointMoveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction);
 
-	virtual void onDragFinished();
+	virtual void dragFinished(ObjectDragHandler const* handler);
 private:
 	QPointF getImageRotationOrigin() const;
 

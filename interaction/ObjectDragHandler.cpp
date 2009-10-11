@@ -21,8 +21,8 @@
 #include <QCursor>
 #include <Qt>
 
-ObjectDragHandler::ObjectDragHandler(DraggableObject& obj)
-:	m_rObj(obj)
+ObjectDragHandler::ObjectDragHandler(DraggableObject* obj)
+:	m_pObj(obj)
 {
 	setProximityCursor(Qt::OpenHandCursor);
 	setInteractionCursor(Qt::ClosedHandCursor);
@@ -69,7 +69,7 @@ void
 ObjectDragHandler::onPaint(
 	QPainter& painter, InteractionState const& interaction)
 {
-	m_rObj.paint(painter, interaction);
+	m_pObj->paint(painter, interaction);
 }
 
 void
@@ -77,8 +77,8 @@ ObjectDragHandler::onProximityUpdate(
 	QPointF const& screen_mouse_pos, InteractionState& interaction)
 {
 	interaction.updateProximity(
-		m_interaction, m_rObj.proximity(screen_mouse_pos, interaction),
-		m_rObj.proximityPriority(), m_rObj.proximityThreshold(interaction)
+		m_interaction, m_pObj->proximity(this, screen_mouse_pos, interaction),
+		m_pObj->proximityPriority(this), m_pObj->proximityThreshold(this, interaction)
 	);
 }
 
@@ -93,7 +93,7 @@ ObjectDragHandler::onMousePressEvent(
 	if (interaction.proximityLeader(m_interaction)) {
 		QPointF const screen_mouse_pos(QPointF(0.5, 0.5) + event->pos());
 		interaction.capture(m_interaction);
-		m_dragOffset = m_rObj.position(interaction) - screen_mouse_pos;
+		m_dragOffset = m_pObj->position(this, interaction) - screen_mouse_pos;
 	}
 }
 
@@ -103,7 +103,7 @@ ObjectDragHandler::onMouseReleaseEvent(
 {
 	if (event->button() == Qt::LeftButton) {
 		m_interaction.release();
-		m_rObj.onDragFinished();
+		m_pObj->dragFinished(this);
 	}
 }
 
@@ -113,6 +113,6 @@ ObjectDragHandler::onMouseMoveEvent(
 {
 	if (interaction.capturedBy(m_interaction)) {
 		QPointF const screen_mouse_pos(QPointF(0.5, 0.5) + event->pos());
-		m_rObj.moveRequest(screen_mouse_pos + m_dragOffset);
+		m_pObj->moveRequest(this, screen_mouse_pos + m_dragOffset, interaction);
 	}
 }

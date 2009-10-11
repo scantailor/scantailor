@@ -22,12 +22,12 @@
 #include "DraggableObject.h"
 #include <QPointF>
 
-class ImageViewBase;
+class ObjectDragHandler;
 
 class DraggablePoint : public DraggableObject
 {
 public:
-	DraggablePoint(int id, int proximity_priority = 1);
+	DraggablePoint(int proximity_priority = 1);
 
 	/**
 	 * Returns the hit area radius, with zero indicating the global
@@ -37,35 +37,31 @@ public:
 
 	void setHitRadius(double radius) { m_hitAreaRadius = radius; }
 
-	virtual Proximity proximityThreshold(InteractionState const& interaction) const;
+	virtual Proximity proximityThreshold(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
 
-	virtual int proximityPriority() const;
+	virtual int proximityPriority(ObjectDragHandler const* handler) const;
 
 	virtual Proximity proximity(
-		QPointF const& widget_mouse_pos, InteractionState const& interaction);
+		ObjectDragHandler const* handler, QPointF const& widget_mouse_pos,
+		InteractionState const& interaction);
 
-	virtual QPointF position(InteractionState const& interaction) const;
+	virtual QPointF position(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const;
 
-	virtual void moveRequest(QPointF const& widget_pos);
+	virtual void moveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction);
 protected:
-	virtual QPointF pointPosition(int id, InteractionState const& interaction) const = 0;
+	virtual QPointF pointPosition(
+		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
 
-	virtual void pointMoveRequest(int id, QPointF const& widget_pos) = 0;
+	virtual void pointMoveRequest(
+		ObjectDragHandler const* handler, QPointF const& widget_pos,
+		InteractionState const& interaction) = 0;
 private:
 	double m_hitAreaRadius;
-	int m_id;
 	int m_proximityPriority;
-};
-
-
-template<int T>
-class TaggedDraggablePoint : public DraggablePoint
-{
-public:
-	enum { Tag = T };
-
-	TaggedDraggablePoint(int proximity_priority = 1)
-			: DraggablePoint(T, proximity_priority) {}
 };
 
 #endif
