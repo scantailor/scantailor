@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
 IF(COMMAND cmake_policy)
 	# Suppress warnings.
 	cmake_policy(SET CMP0003 NEW)
-ENDIF(COMMAND cmake_policy) 
+ENDIF(COMMAND cmake_policy)
 
 PROJECT("Scan Tailor")
 
@@ -132,7 +132,7 @@ IF(NOT TIFF_INCLUDE_DIR)
 	MESSAGE(
 		FATAL_ERROR
 		"Could not find libtiff headers.\n"
- 		"You may need to install a package named libtiff4-dev or similarly."
+		"You may need to install a package named libtiff4-dev or similarly."
 	)
 ENDIF(NOT TIFF_INCLUDE_DIR)
 
@@ -183,9 +183,9 @@ IF(UNIX)
 			"libxrender-dev or libXrender-dev or similarly."
 		)
 	ENDIF(NOT X11_INCLUDE_PATH)
-	
+
 	INCLUDE_DIRECTORIES("${X11_INCLUDE_PATH}")
-	
+
 	FindPthreads()
 	IF(PTHREADS_FOUND)
 		ADD_DEFINITIONS(${PTHREADS_CFLAGS})
@@ -217,13 +217,13 @@ ADD_DEFINITIONS(
 )
 
 IF(WIN32)
- 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
+	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
 INCLUDE_DIRECTORIES(. foundation interaction ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
-SET(EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
+SET(EXTRA_LIBS)
 IF(WIN32)
 	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
 	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
@@ -240,6 +240,9 @@ IF(WIN32)
 		winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool
 	)
 ENDIF(WIN32)
+# ${JPEG_LIBRARY} must go after qjpeg plugin, because otherwise the GNU linker
+# won't resolve symbols qjpeg needs from it.
+LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
 
 # Crash reporter, only Windows + MSVC supported for now.
 # Must go before generating config.h, as ENABLE_CRASH_REPORTER
@@ -425,14 +428,14 @@ IF(ENABLE_CRASH_REPORTER)
 			FATAL_ERROR "dump_syms.exe wasn't found.  Specify its location manually by setting the DUMP_SYMS_EXECUTABLE variable.  dump_syms.exe may be found in the Mozilla repository under /toolkit/crashreporter/tools/win32"
 		)
 	ENDIF(NOT DUMP_SYMS_EXECUTABLE)
-	
+
 	INCLUDE_DIRECTORIES(crash_reporter crash_reporter/google-breakpad)
 	TARGET_LINK_LIBRARIES(scantailor crash_handler)
-	
+
 	ADD_CUSTOM_COMMAND(
 		TARGET scantailor POST_BUILD
 		COMMAND "${CMAKE_COMMAND}" ARGS -E echo "Dumping symbols..."
-        COMMAND "${DUMP_SYMS_EXECUTABLE}" ARGS "${scantailor_executable}" ">" "temp.sym"
+		COMMAND "${DUMP_SYMS_EXECUTABLE}" ARGS "${scantailor_executable}" ">" "temp.sym"
 		COMMAND "${CMAKE_COMMAND}" ARGS -P "${CMAKE_SOURCE_DIR}/cmake/move_sym_file.cmake"
 		WORKING_DIRECTORY "${SYMBOLS_PATH}"
 	)
@@ -451,12 +454,12 @@ MACRO(UPDATE_TRANSLATIONS _subtarget) #, sources, ts_files
 			SET(_sources_str "${_sources_str} \"${_abs}\"")
 		ENDIF(_ext STREQUAL .ts)
 	ENDFOREACH(_file)
-	
+
 	FILE(
 		WRITE "${CMAKE_BINARY_DIR}/update_translations_${_subtarget}.pro"
 		"SOURCES = ${_sources_str}\nTRANSLATIONS = ${_translations_str}"
 	)
-	
+
 	LIST(APPEND update_translations_subtarget ${_subtarget})
 ENDMACRO(UPDATE_TRANSLATIONS)
 
