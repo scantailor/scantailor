@@ -30,7 +30,7 @@ class DragHandler : public InteractionHandler
 {
 	Q_DECLARE_TR_FUNCTIONS(DragHandler)
 public:
-	DragHandler(ImageViewBase& image_view) : m_rImageView(image_view) {}
+	DragHandler(ImageViewBase& image_view);
 
 	bool isActive() const;
 protected:
@@ -41,7 +41,7 @@ protected:
 	virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 private:
 	ImageViewBase& m_rImageView;
-	InteractionState::Captor m_interactionCaptor;
+	InteractionState::Captor m_interaction;
 	QPoint m_lastMousePos;
 };
 

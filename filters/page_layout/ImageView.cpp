@@ -33,10 +33,11 @@
 #include <QBrush>
 #include <QPen>
 #include <QColor>
-#include <QDebug>
-#include <QMouseEvent>
 #include <Qt>
+#include <boost/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <algorithm>
+#include <math.h>
 #include <assert.h>
 
 using namespace imageproc;
@@ -55,24 +56,118 @@ ImageView::ImageView(
 	m_zoomHandler(*this),
 	m_ptrSettings(settings),
 	m_pageId(page_id),
-	m_origXform(xform),
 	m_physXform(xform.origDpi()),
-	m_origToMM(m_origXform.transformBack() * m_physXform.pixelsToMM()),
-	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform()),
 	m_innerRect(adapted_content_rect),
 	m_aggregateHardSizeMM(settings->getAggregateHardSizeMM()),
 	m_committedAggregateHardSizeMM(m_aggregateHardSizeMM),
 	m_alignment(opt_widget.alignment()),
-	m_innerResizingMask(0),
-	m_middleResizingMask(0),
 	m_leftRightLinked(opt_widget.leftRightLinked()),
 	m_topBottomLinked(opt_widget.topBottomLinked())
 {
-	m_defaultStatusTip = tr("Resize margins by dragging any of the solid lines.");
-	ensureStatusTip(defaultStatusTip());
-	
 	setMouseTracking(true);
 	
+	interactionState().setDefaultStatusTip(
+		tr("Resize margins by dragging any of the solid lines.")
+	);
+
+	// Setup interaction stuff.
+	static int const masks_by_edge[] = { TOP, RIGHT, BOTTOM, LEFT };
+	static int const masks_by_corner[] = { TOP|LEFT, TOP|RIGHT, BOTTOM|RIGHT, BOTTOM|LEFT };
+	for (int i = 0; i < 4; ++i) {
+		// Proximity priority - inner rect higher than middle, corners higher than edges.
+		m_innerCorners[i].setProximityPriorityCallback(
+			boost::lambda::constant(4)
+		);
+		m_innerEdges[i].setProximityPriorityCallback(
+			boost::lambda::constant(3)
+		);
+		m_middleCorners[i].setProximityPriorityCallback(
+			boost::lambda::constant(2)
+		);
+		m_middleEdges[i].setProximityPriorityCallback(
+			boost::lambda::constant(1)
+		);
+
+		// Proximity.
+		m_innerCorners[i].setProximityCallback(
+			boost::bind(&ImageView::cornerProximity, this, masks_by_corner[i], &m_innerRect, _1)
+		);
+		m_middleCorners[i].setProximityCallback(
+			boost::bind(&ImageView::cornerProximity, this, masks_by_corner[i], &m_middleRect, _1)
+		);
+		m_innerEdges[i].setProximityCallback(
+			boost::bind(&ImageView::edgeProximity, this, masks_by_edge[i], &m_innerRect, _1)
+		);
+		m_middleEdges[i].setProximityCallback(
+			boost::bind(&ImageView::edgeProximity, this, masks_by_edge[i], &m_middleRect, _1)
+		);
+
+		// Drag initiation.
+		m_innerCorners[i].setDragInitiatedCallback(
+			boost::bind(&ImageView::dragInitiated, this, _1)
+		);
+		m_middleCorners[i].setDragInitiatedCallback(
+			boost::bind(&ImageView::dragInitiated, this, _1)
+		);
+		m_innerEdges[i].setDragInitiatedCallback(
+			boost::bind(&ImageView::dragInitiated, this, _1)
+		);
+		m_middleEdges[i].setDragInitiatedCallback(
+			boost::bind(&ImageView::dragInitiated, this, _1)
+		);
+
+		// Drag continuation.
+		m_innerCorners[i].setDragContinuationCallback(
+			boost::bind(&ImageView::innerRectDragContinuation, this, masks_by_corner[i], _1)
+		);
+		m_middleCorners[i].setDragContinuationCallback(
+			boost::bind(&ImageView::middleRectDragContinuation, this, masks_by_corner[i], _1)
+		);
+		m_innerEdges[i].setDragContinuationCallback(
+			boost::bind(&ImageView::innerRectDragContinuation, this, masks_by_edge[i], _1)
+		);
+		m_middleEdges[i].setDragContinuationCallback(
+			boost::bind(&ImageView::middleRectDragContinuation, this, masks_by_edge[i], _1)
+		);
+
+		// Drag finishing.
+		m_innerCorners[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
+		);
+		m_middleCorners[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
+		);
+		m_innerEdges[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
+		);
+		m_middleEdges[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
+		);
+
+		m_innerCornerHandlers[i].setObject(&m_innerCorners[i]);
+		m_middleCornerHandlers[i].setObject(&m_middleCorners[i]);
+		m_innerEdgeHandlers[i].setObject(&m_innerEdges[i]);
+		m_middleEdgeHandlers[i].setObject(&m_middleEdges[i]);
+
+		Qt::CursorShape corner_cursor = (i & 1) ? Qt::SizeBDiagCursor : Qt::SizeFDiagCursor;
+		m_innerCornerHandlers[i].setProximityCursor(corner_cursor);
+		m_innerCornerHandlers[i].setInteractionCursor(corner_cursor);
+		m_middleCornerHandlers[i].setProximityCursor(corner_cursor);
+		m_middleCornerHandlers[i].setInteractionCursor(corner_cursor);
+
+		Qt::CursorShape edge_cursor = (i & 1) ? Qt::SizeHorCursor : Qt::SizeVerCursor;
+		m_innerEdgeHandlers[i].setProximityCursor(edge_cursor);
+		m_innerEdgeHandlers[i].setInteractionCursor(edge_cursor);
+		m_middleEdgeHandlers[i].setProximityCursor(edge_cursor);
+		m_middleEdgeHandlers[i].setInteractionCursor(edge_cursor);
+
+		makeLastFollower(m_innerCornerHandlers[i]);
+		makeLastFollower(m_innerEdgeHandlers[i]);
+		makeLastFollower(m_middleCornerHandlers[i]);
+		makeLastFollower(m_middleEdgeHandlers[i]);
+	}
+
+	rootInteractionHandler().makeLastFollower(*this);
 	rootInteractionHandler().makeLastFollower(m_dragHandler);
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 
@@ -160,14 +255,8 @@ ImageView::aggregateHardSizeChanged()
 }
 
 void
-ImageView::paintOverImage(QPainter& painter)
-{
-	// Pretend we are drawing in m_origXform coordinates.
-	painter.setWorldTransform(
-		m_origXform.transformBack() * imageToVirtual()
-		* painter.worldTransform()
-	);
-	
+ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
+{	
 	QPainterPath outer_outline;
 	outer_outline.addPolygon(
 		PolygonUtils::round(
@@ -199,215 +288,157 @@ ImageView::paintOverImage(QPainter& painter)
 	}
 }
 
-void
-ImageView::mousePressEvent(QMouseEvent* const event)
+Proximity
+ImageView::cornerProximity(
+	int const edge_mask, QRectF const* box, QPointF const& mouse_pos) const
 {
-	int const middle_mask = cursorLocationMask(event->pos(), m_middleRect);
-	int const inner_mask = cursorLocationMask(event->pos(), m_innerRect);
+	QRectF const r(virtualToWidget().mapRect(*box));
+	QPointF pt;
 
-	if (event->button() == Qt::LeftButton) {
-		QTransform const orig_to_widget(
-			m_origXform.transformBack() * imageToVirtual()
-			* virtualToWidget()
-		);
-		QTransform const widget_to_orig(
-			widgetToVirtual() * virtualToImage() * m_origXform.transform()
-		);
-		m_beforeResizing.middleWidgetRect = orig_to_widget.mapRect(
-			m_middleRect
-		);
-		m_beforeResizing.origToWidget = orig_to_widget;
-		m_beforeResizing.widgetToOrig = widget_to_orig;
-		m_beforeResizing.mousePos = event->pos();
-		m_beforeResizing.focalPoint = getWidgetFocalPoint();
-		
-		// We make sure that only one of inner mask and middle mask
-		// is non-zero.  Note that inner mask takes precedence, as
-		// a middle edge may be unmovable if it's on the edge of the
-		// widget and very close to an inner edge.
-		if (inner_mask) {
-			m_innerResizingMask = inner_mask;
-			m_middleResizingMask = 0;
-		} else {
-			m_middleResizingMask = middle_mask;
-			m_innerResizingMask = 0;
-		}
+	if (edge_mask & TOP) {
+		pt.setY(r.top());
+	} else if (edge_mask & BOTTOM) {
+		pt.setY(r.bottom());
 	}
-}
 
-void
-ImageView::mouseReleaseEvent(QMouseEvent* const event)
-{
-	if (event->button() == Qt::LeftButton
-			&& (m_innerResizingMask | m_middleResizingMask)) {
-		m_innerResizingMask = 0;
-		m_middleResizingMask = 0;
-		
-		AggregateSizeChanged const agg_size_changed(
-			commitHardMargins(calcHardMarginsMM())
-		);
-		
-		recalcOuterRect();
-		
-		if (QRectF(rect()).contains(m_beforeResizing.middleWidgetRect)) {
-			updatePresentationTransform(FIT);
-		} else {
-			updatePresentationTransform(DONT_FIT);
-		}
-		
-		invalidateThumbnails(agg_size_changed);
+	if (edge_mask & LEFT) {
+		pt.setX(r.left());
+	} else if (edge_mask & RIGHT) {
+		pt.setX(r.right());
 	}
+
+	return Proximity(pt, mouse_pos);
 }
 
-void
-ImageView::mouseMoveEvent(QMouseEvent* const event)
+Proximity
+ImageView::edgeProximity(
+	int const edge_mask, QRectF const* box, QPointF const& mouse_pos) const
 {
-	if (m_innerResizingMask | m_middleResizingMask) {
-		QPoint const delta(event->pos() - m_beforeResizing.mousePos);
-		if (m_innerResizingMask) {
-			resizeInnerRect(delta);
-		} else {
-			resizeMiddleRect(delta);
-		}
-	} else {
-		int const middle_mask = cursorLocationMask(
-			event->pos(), m_middleRect
-		);
-		int const inner_mask = cursorLocationMask(
-			event->pos(), m_innerRect
-		);
-		int const mask = inner_mask ? inner_mask : middle_mask;
-		int const ver = mask & (TOP_EDGE|BOTTOM_EDGE);
-		int const hor = mask & (LEFT_EDGE|RIGHT_EDGE);
-		if (!ver && !hor) {
-			ensureCursorShape(Qt::ArrowCursor);
-		} else if (ver && !hor) {
-			ensureCursorShape(Qt::SizeVerCursor);
-		} else if (hor && !ver) {
-			ensureCursorShape(Qt::SizeHorCursor);
-		} else {
-			int const top_left = LEFT_EDGE|TOP_EDGE;
-			int const bottom_right = RIGHT_EDGE|BOTTOM_EDGE;
-			if ((mask & top_left) == top_left ||
-			    (mask & bottom_right) == bottom_right) {
-				ensureCursorShape(Qt::SizeFDiagCursor);
-			} else {
-				ensureCursorShape(Qt::SizeBDiagCursor);
-			}
-		}
+	QRectF const r(virtualToWidget().mapRect(*box));
+	QLineF line;
+
+	switch (edge_mask) {
+		case TOP:
+			line.setP1(r.topLeft());
+			line.setP2(r.topRight());
+			break;
+		case BOTTOM:
+			line.setP1(r.bottomLeft());
+			line.setP2(r.bottomRight());
+			break;
+		case LEFT:
+			line.setP1(r.topLeft());
+			line.setP2(r.bottomLeft());
+			break;
+		case RIGHT:
+			line.setP1(r.topRight());
+			line.setP2(r.bottomRight());
+			break;
+		default:
+			assert(!"Unreachable");
 	}
+
+	return Proximity::pointAndLineSegment(mouse_pos, line);
 }
 
 void
-ImageView::hideEvent(QHideEvent* const event)
+ImageView::dragInitiated(QPointF const& mouse_pos)
 {
-	ImageViewBase::hideEvent(event);
-	int const old_resizing_mask = m_innerResizingMask | m_middleResizingMask;
-	m_innerResizingMask = 0;
-	m_middleResizingMask = 0;
-	ensureCursorShape(Qt::ArrowCursor);
-	if (old_resizing_mask) {
-		Margins const margins_mm(calcHardMarginsMM());
-		
-		AggregateSizeChanged const agg_size_changed(
-			commitHardMargins(margins_mm)
-		);
-		
-		recalcBoxesAndFit(margins_mm);
-		emit marginsSetLocally(margins_mm);
-		
-		invalidateThumbnails(agg_size_changed);
-	}
-}
-
-QString
-ImageView::defaultStatusTip() const
-{
-	return m_defaultStatusTip;
+	m_beforeResizing.middleWidgetRect = virtualToWidget().mapRect(m_middleRect);
+	m_beforeResizing.virtToWidget = virtualToWidget();
+	m_beforeResizing.widgetToVirt = widgetToVirtual();
+	m_beforeResizing.mousePos = mouse_pos;
+	m_beforeResizing.focalPoint = getWidgetFocalPoint();
 }
 
 void
-ImageView::resizeInnerRect(QPoint const delta)
+ImageView::innerRectDragContinuation(int edge_mask, QPointF const& mouse_pos)
 {
-	int left_adjust = 0;
-	int right_adjust = 0;
-	int top_adjust = 0;
-	int bottom_adjust = 0;
-	
-	if (m_innerResizingMask & LEFT_EDGE) {
+	// What really happens when we resize the inner box is resizing
+	// the middle box in the opposite direction and moving the scene
+	// on screen so that the object being dragged is still under mouse.
+
+	QPointF const delta(mouse_pos - m_beforeResizing.mousePos);
+	qreal left_adjust = 0;
+	qreal right_adjust = 0;
+	qreal top_adjust = 0;
+	qreal bottom_adjust = 0;
+
+	if (edge_mask & LEFT) {
 		left_adjust = delta.x();
 		if (m_leftRightLinked) {
 			right_adjust = -left_adjust;
 		}
-	} else if (m_innerResizingMask & RIGHT_EDGE) {
+	} else if (edge_mask & RIGHT) {
 		right_adjust = delta.x();
 		if (m_leftRightLinked) {
 			left_adjust = -right_adjust;
 		}
 	}
-	if (m_innerResizingMask & TOP_EDGE) {
+	if (edge_mask & TOP) {
 		top_adjust = delta.y();
 		if (m_topBottomLinked) {
 			bottom_adjust = -top_adjust;
 		}
-	} else if (m_innerResizingMask & BOTTOM_EDGE) {
+	} else if (edge_mask & BOTTOM) {
 		bottom_adjust = delta.y();
 		if (m_topBottomLinked) {
 			top_adjust = -bottom_adjust;
 		}
 	}
-	
+
 	QRectF widget_rect(m_beforeResizing.middleWidgetRect);
 	widget_rect.adjust(-left_adjust, -top_adjust, -right_adjust, -bottom_adjust);
-	
-	m_middleRect = m_beforeResizing.widgetToOrig.mapRect(widget_rect);
+
+	m_middleRect = m_beforeResizing.widgetToVirt.mapRect(widget_rect);
 	forceNonNegativeHardMargins(m_middleRect);
-	widget_rect = m_beforeResizing.origToWidget.mapRect(m_middleRect);
-	
-	double effective_dx = 0;
-	double effective_dy = 0;
-	
+	widget_rect = m_beforeResizing.virtToWidget.mapRect(m_middleRect);
+
+	qreal effective_dx = 0;
+	qreal effective_dy = 0;
+
 	QRectF const& old_widget_rect = m_beforeResizing.middleWidgetRect;
-	if (m_innerResizingMask & LEFT_EDGE) {
+	if (edge_mask & LEFT) {
 		effective_dx = old_widget_rect.left() - widget_rect.left();
-	} else if (m_innerResizingMask & RIGHT_EDGE) {
+	} else if (edge_mask & RIGHT) {
 		effective_dx = old_widget_rect.right() - widget_rect.right();
 	}
-	if (m_innerResizingMask & TOP_EDGE) {
+	if (edge_mask & TOP) {
 		effective_dy = old_widget_rect.top() - widget_rect.top();
-	} else if (m_innerResizingMask & BOTTOM_EDGE) {
+	} else if (edge_mask & BOTTOM) {
 		effective_dy = old_widget_rect.bottom()- widget_rect.bottom();
 	}
-	
+
 	// Updating the focal point is what makes the image move
 	// as we drag an inner edge.
 	QPointF fp(m_beforeResizing.focalPoint);
 	fp += QPointF(effective_dx, effective_dy);
 	setWidgetFocalPoint(fp);
-	
+
 	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
 		m_pageId, origRectToSizeMM(m_middleRect), m_alignment
 	);
-	
+
 	recalcOuterRect();
-	
+
 	updatePresentationTransform(DONT_FIT);
-	
+
 	emit marginsSetLocally(calcHardMarginsMM());
 }
 
 void
-ImageView::resizeMiddleRect(QPoint const delta)
+ImageView::middleRectDragContinuation(int const edge_mask, QPointF const& mouse_pos)
 {
-	double left_adjust = 0.0;
-	double right_adjust = 0.0;
-	double top_adjust = 0.0;
-	double bottom_adjust = 0.0;
-	
+	QPointF const delta(mouse_pos - m_beforeResizing.mousePos);
+	qreal left_adjust = 0;
+	qreal right_adjust = 0;
+	qreal top_adjust = 0;
+	qreal bottom_adjust = 0;
+
 	QRectF const bounds(marginsRect());
 	QRectF const old_middle_rect(m_beforeResizing.middleWidgetRect);
-	
-	if (m_middleResizingMask & LEFT_EDGE) {
+
+	if (edge_mask & LEFT) {
 		left_adjust = delta.x();
 		if (old_middle_rect.left() + left_adjust < bounds.left()) {
 			left_adjust = bounds.left() - old_middle_rect.left();
@@ -415,7 +446,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 		if (m_leftRightLinked) {
 			right_adjust = -left_adjust;
 		}
-	} else if (m_middleResizingMask & RIGHT_EDGE) {
+	} else if (edge_mask & RIGHT) {
 		right_adjust = delta.x();
 		if (old_middle_rect.right() + right_adjust > bounds.right()) {
 			right_adjust = bounds.right() - old_middle_rect.right();
@@ -424,7 +455,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 			left_adjust = -right_adjust;
 		}
 	}
-	if (m_middleResizingMask & TOP_EDGE) {
+	if (edge_mask & TOP) {
 		top_adjust = delta.y();
 		if (old_middle_rect.top() + top_adjust < bounds.top()) {
 			top_adjust = bounds.top() - old_middle_rect.top();
@@ -432,7 +463,7 @@ ImageView::resizeMiddleRect(QPoint const delta)
 		if (m_topBottomLinked) {
 			bottom_adjust = -top_adjust;
 		}
-	} else if (m_middleResizingMask & BOTTOM_EDGE) {
+	} else if (edge_mask & BOTTOM) {
 		bottom_adjust = delta.y();
 		if (old_middle_rect.bottom() + bottom_adjust > bounds.bottom()) {
 			bottom_adjust = bounds.bottom() - old_middle_rect.bottom();
@@ -441,37 +472,56 @@ ImageView::resizeMiddleRect(QPoint const delta)
 			top_adjust = -bottom_adjust;
 		}
 	}
-	
+
 	{
 		QRectF widget_rect(old_middle_rect);
 		widget_rect.adjust(left_adjust, top_adjust, right_adjust, bottom_adjust);
-		
-		m_middleRect = m_beforeResizing.widgetToOrig.mapRect(widget_rect);
+
+		m_middleRect = m_beforeResizing.widgetToVirt.mapRect(widget_rect);
 		forceNonNegativeHardMargins(m_middleRect); // invalidates widget_rect
 	}
-	
+
 	m_aggregateHardSizeMM = m_ptrSettings->getAggregateHardSizeMM(
 		m_pageId, origRectToSizeMM(m_middleRect), m_alignment
 	);
-	
+
 	recalcOuterRect();
-	
+
 	updatePresentationTransform(DONT_FIT);
-	
+
 	emit marginsSetLocally(calcHardMarginsMM());
+}
+
+void
+ImageView::dragFinished()
+{
+	AggregateSizeChanged const agg_size_changed(
+		commitHardMargins(calcHardMarginsMM())
+	);
+
+	if (QRectF(rect()).contains(m_beforeResizing.middleWidgetRect)) {
+		updatePresentationTransform(FIT);
+	} else {
+		updatePresentationTransform(DONT_FIT);
+	}
+
+	invalidateThumbnails(agg_size_changed);
 }
 
 /**
  * Updates m_middleRect and m_outerRect based on \p margins_mm,
- * m_aggregateHardSizeMM and m_alignment, updates the presentation transform.
+ * m_aggregateHardSizeMM and m_alignment, updates the displayed area.
  */
 void
 ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 {
-	QPolygonF poly_mm(m_origToMM.map(m_innerRect));
+	QTransform const virt_to_mm(virtualToImage() * m_physXform.pixelsToMM());
+	QTransform const mm_to_virt(m_physXform.mmToPixels() * imageToVirtual());
+
+	QPolygonF poly_mm(virt_to_mm.map(m_innerRect));
 	Utils::extendPolyRectWithMargins(poly_mm, margins_mm);
 
-	QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
+	QRectF const middle_rect(mm_to_virt.map(poly_mm).boundingRect());
 	
 	QSizeF const hard_size_mm(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
@@ -485,93 +535,30 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 
-	QRectF const outer_rect(m_mmToOrig.map(poly_mm).boundingRect());
-	
-	ImageTransformation const new_xform(
-		Utils::calcPresentationTransform(
-			m_origXform, m_physXform.mmToPixels().map(poly_mm)
-		)
-	);
-	
-	updateTransformAndFixFocalPoint(
-		new_xform.transform(), new_xform.resultingCropArea(),
-		CENTER_IF_FITS
-	);
+	QRectF const outer_rect(mm_to_virt.map(poly_mm).boundingRect());
+	updateTransformAndFixFocalPoint(imageToVirtual(), outer_rect, CENTER_IF_FITS);
+
 	m_middleRect = middle_rect;
 	m_outerRect = outer_rect;
 }
 
 /**
- * Updates the presentation transform in such a way that ImageViewBase
- * sees the image extended / clipped by m_outerRect.
- * Additionally, if \p fit_mode is set to FIT, ensures that the whole area
- * defined by m_outerRect is visible.
+ * Updates the virtual image area to be displayed by ImageViewBase,
+ * optionally ensuring that this area completely fits into the view.
+ *
+ * \note virtualToImage() and imageToVirtual() are not affected by this.
  */
 void
 ImageView::updatePresentationTransform(FitMode const fit_mode)
 {
-	QPolygonF const poly_phys(
-		m_origXform.transformBack().map(m_outerRect)
-	);
-	
-	ImageTransformation const new_xform(
-		Utils::calcPresentationTransform(m_origXform, poly_phys)
-	);
-	
 	if (fit_mode == DONT_FIT) {
-		updateTransformPreservingScale(new_xform.transform(), new_xform.resultingCropArea());
+		updateTransformPreservingScale(imageToVirtual(), m_outerRect);
 	} else {
 		zoom(1.0);
 		updateTransformAndFixFocalPoint(
-			new_xform.transform(), new_xform.resultingCropArea(), CENTER_IF_FITS
+			imageToVirtual(), m_outerRect, CENTER_IF_FITS
 		);
 	}
-}
-
-/**
- * \brief Checks if mouse pointer is near the edges of a rectangle.
- *
- * \param cursor_pos The mouse pointer position in widget coordinates.
- * \param orig_rect The rectangle for edge proximity testing, in m_origXform
- *        coordinates.
- * \return A bitwise OR of *_EDGE values, corresponding to the proximity of
- *         the \p cursor_pos to a particular edge of \p orig_rect.
- */
-int
-ImageView::cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const
-{
-	QTransform const orig_to_widget(
-		m_origXform.transformBack() * imageToVirtual() * virtualToWidget()
-	);
-	QRect const rect(orig_to_widget.mapRect(orig_rect).toRect());
-	int const adj = 5;
-	int mask = 0;
-	
-	QRect top_edge_rect(rect.topLeft(), QSize(rect.width(), 1));
-	top_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (top_edge_rect.contains(cursor_pos)) {
-		mask |= TOP_EDGE;
-	}
-	
-	QRect bottom_edge_rect(rect.bottomLeft(), QSize(rect.width(), 1));
-	bottom_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (bottom_edge_rect.contains(cursor_pos)) {
-		mask |= BOTTOM_EDGE;
-	}
-	
-	QRect left_edge_rect(rect.topLeft(), QSize(1, rect.height()));
-	left_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (left_edge_rect.contains(cursor_pos)) {
-		mask |= LEFT_EDGE;
-	}
-	
-	QRect right_edge_rect(rect.topRight(), QSize(1, rect.height()));
-	right_edge_rect.adjust(-adj, -adj, adj, adj);
-	if (right_edge_rect.contains(cursor_pos)) {
-		mask |= RIGHT_EDGE;
-	}
-	
-	return mask;
 }
 
 void
@@ -619,11 +606,13 @@ ImageView::calcHardMarginsMM() const
 		QPointF(m_middleRect.right(), center.y())
 	);
 	
+	QTransform const virt_to_mm(virtualToImage() * m_physXform.pixelsToMM());
+
 	Margins margins;
-	margins.setTop(m_origToMM.map(top_margin_line).length());
-	margins.setBottom(m_origToMM.map(bottom_margin_line).length());
-	margins.setLeft(m_origToMM.map(left_margin_line).length());
-	margins.setRight(m_origToMM.map(right_margin_line).length());
+	margins.setTop(virt_to_mm.map(top_margin_line).length());
+	margins.setBottom(virt_to_mm.map(bottom_margin_line).length());
+	margins.setLeft(virt_to_mm.map(left_margin_line).length());
+	margins.setRight(virt_to_mm.map(right_margin_line).length());
 	
 	return margins;
 }
@@ -635,7 +624,10 @@ ImageView::calcHardMarginsMM() const
 void
 ImageView::recalcOuterRect()
 {
-	QPolygonF poly_mm(m_origToMM.map(m_middleRect));
+	QTransform const virt_to_mm(virtualToImage() * m_physXform.pixelsToMM());
+	QTransform const mm_to_virt(m_physXform.mmToPixels() * imageToVirtual());
+
+	QPolygonF poly_mm(virt_to_mm.map(m_middleRect));
 	
 	QSizeF const hard_size_mm(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
@@ -649,18 +641,20 @@ ImageView::recalcOuterRect()
 	
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 	
-	m_outerRect = m_mmToOrig.map(poly_mm).boundingRect();
+	m_outerRect = mm_to_virt.map(poly_mm).boundingRect();
 }
 
 QSizeF
 ImageView::origRectToSizeMM(QRectF const& rect) const
 {
+	QTransform const virt_to_mm(virtualToImage() * m_physXform.pixelsToMM());
+
 	QLineF const hor_line(rect.topLeft(), rect.topRight());
 	QLineF const vert_line(rect.topLeft(), rect.bottomLeft());
 	
 	QSizeF const size_mm(
-		m_origToMM.map(hor_line).length(),
-		m_origToMM.map(vert_line).length()
+		virt_to_mm.map(hor_line).length(),
+		virt_to_mm.map(vert_line).length()
 	);
 	
 	return size_mm;

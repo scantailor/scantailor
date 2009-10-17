@@ -22,8 +22,11 @@
 #include "ImageViewBase.h"
 #include "DragHandler.h"
 #include "ZoomHandler.h"
-#include "BoxResizeHandler.h"
+#include "DraggablePoint.h"
+#include "DraggableLineSegment.h"
+#include "ObjectDragHandler.h"
 #include <QRectF>
+#include <QSizeF>
 #include <QString>
 
 class ImageTransformation;
@@ -32,7 +35,9 @@ class QMenu;
 namespace select_content
 {
 
-class ImageView : public ImageViewBase, private BoxResizeHandler
+class ImageView :
+	public ImageViewBase,
+	private InteractionHandler
 {
 	Q_OBJECT
 public:
@@ -47,27 +52,35 @@ public:
 	virtual ~ImageView();
 signals:
 	void manualContentRectSet(QRectF const& content_rect);
-protected:
-	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
-	
-	void onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction);
-	
-	virtual QRectF boxPosition(
-		BoxResizeHandler const* handler,
-		InteractionState const& interaction) const;
-
-	virtual void boxResizeRequest(
-		BoxResizeHandler const* handler, QRectF const& rect,
-		InteractionState const& interaction);
-
-	virtual void boxResizeFinished(BoxResizeHandler const* handler);
 private slots:
 	void createContentBox();
 	
 	void removeContentBox();
 private:
-	QRectF forceInsideImage(QRectF widget_rect) const;
+	enum Edge { LEFT = 1, RIGHT = 2, TOP = 4, BOTTOM = 8 };
+
+	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
+
+	void onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction);
+
+	QPointF cornerPosition(int edge_mask) const;
+
+	void cornerMoveRequest(int edge_mask, QPointF const& pos);
+
+	QLineF edgePosition(int edge) const;
+
+	void edgeMoveRequest(int edge, QLineF const& line);
+
+	void dragFinished();
+
+	void forceInsideImage(QRectF& widget_rect, int edge_mask) const;
 	
+	DraggablePoint m_corners[4];
+	ObjectDragHandler m_cornerHandlers[4];
+
+	DraggableLineSegment m_edges[4];
+	ObjectDragHandler m_edgeHandlers[4];
+
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 	
@@ -85,6 +98,8 @@ private:
 	 * Content box in virtual image coordinates.
 	 */
 	QRectF m_contentRect;
+
+	QSizeF m_minBoxSize;
 };
 
 } // namespace select_content

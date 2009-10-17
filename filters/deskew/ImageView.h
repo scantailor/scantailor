@@ -40,8 +40,7 @@ namespace deskew
 
 class ImageView :
 	public ImageViewBase,
-	private InteractionHandler,
-	private DraggablePoint
+	private InteractionHandler
 {
 	Q_OBJECT
 public:
@@ -57,16 +56,13 @@ public slots:
 protected:
 	virtual void onPaint(
 		QPainter& painter, InteractionState const& interaction);
-
-	virtual QPointF pointPosition(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
-
-	virtual void pointMoveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction);
-
-	virtual void dragFinished(ObjectDragHandler const* handler);
 private:
+	QPointF handlePosition(int idx) const;
+
+	void handleMoveRequest(int idx, QPointF const& pos);
+
+	virtual void dragFinished();
+
 	QPointF getImageRotationOrigin() const;
 
 	QRectF getRotationArcSquare() const;
@@ -78,10 +74,10 @@ private:
 	static double const m_maxRotationSin;
 
 	QPixmap m_handlePixmap;
+	DraggablePoint m_handles[2];
+	ObjectDragHandler m_handleInteractors[2];
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
-	ObjectDragHandler m_handle1DragHandler; // Left handle.
-	ObjectDragHandler m_handle2DragHandler; // Right handle.
 	ImageTransformation m_xform;
 };
 

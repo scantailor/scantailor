@@ -20,15 +20,14 @@
 #include "Proximity.h"
 #include "ImageViewBase.h"
 
-DraggablePoint::DraggablePoint(int proximity_priority)
+DraggablePoint::DraggablePoint()
 :	m_hitAreaRadius(),
-	m_proximityPriority(proximity_priority)
+	m_proximityPriority(1)
 {
 }
 
 Proximity
-DraggablePoint::proximityThreshold(
-	ObjectDragHandler const*, InteractionState const& state) const
+DraggablePoint::proximityThreshold(InteractionState const& state) const
 {
 	if (m_hitAreaRadius == 0.0) {
 		return state.proximityThreshold();
@@ -38,30 +37,26 @@ DraggablePoint::proximityThreshold(
 }
 
 int
-DraggablePoint::proximityPriority(ObjectDragHandler const*) const
+DraggablePoint::proximityPriority() const
 {
 	return m_proximityPriority;
 }
 
 Proximity
-DraggablePoint::proximity(
-	ObjectDragHandler const* handler, QPointF const& widget_mouse_pos,
-	InteractionState const& interaction)
+DraggablePoint::proximity(QPointF const& mouse_pos)
 {
-	return Proximity(pointPosition(handler, interaction), widget_mouse_pos);
-}
-
-QPointF
-DraggablePoint::position(
-	ObjectDragHandler const* handler, InteractionState const& interaction) const
-{
-	return pointPosition(handler, interaction);
+	return Proximity(pointPosition(), mouse_pos);
 }
 
 void
-DraggablePoint::moveRequest(
-	ObjectDragHandler const* handler, QPointF const& widget_pos,
-	InteractionState const& interaction)
+DraggablePoint::dragInitiated(QPointF const& mouse_pos)
 {
-	pointMoveRequest(handler, widget_pos, interaction);
+	m_initialPointPos = pointPosition();
+	m_initialMousePos = mouse_pos;
+}
+
+void
+DraggablePoint::dragContinuation(QPointF const& mouse_pos)
+{
+	pointMoveRequest(m_initialMousePos + (mouse_pos - m_initialMousePos));
 }

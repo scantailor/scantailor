@@ -26,6 +26,7 @@
 #include <QVector>
 #include <QLineF>
 #include <Qt>
+#include <boost/bind.hpp>
 #include <math.h>
 
 namespace deskew
@@ -44,24 +45,35 @@ ImageView::ImageView(
 	m_handlePixmap(":/icons/aqua-sphere.png"),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
-	m_handle1DragHandler(static_cast<DraggablePoint*>(this)),
-	m_handle2DragHandler(static_cast<DraggablePoint*>(this)),
 	m_xform(xform)
 {
 	setMouseTracking(true);
 
-	rootInteractionHandler().makeLastFollower(*this);
-	rootInteractionHandler().makeLastFollower(m_handle1DragHandler);
-	rootInteractionHandler().makeLastFollower(m_handle2DragHandler);
-	rootInteractionHandler().makeLastFollower(m_dragHandler);
-	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+	QString const tip(tr("Drag this handle to rotate the image."));
+	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
+	for (int i = 0; i < 2; ++i) {
+		m_handles[i].setHitRadius(hit_radius);
+		m_handles[i].setPositionCallback(
+			boost::bind(&ImageView::handlePosition, this, i)
+		);
+		m_handles[i].setMoveRequestCallback(
+			boost::bind(&ImageView::handleMoveRequest, this, i, _1)
+		);
+		m_handles[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
+		);
+
+		m_handleInteractors[i].setProximityStatusTip(tip);
+		m_handleInteractors[i].setObject(&m_handles[i]);
+
+		makeLastFollower(m_handleInteractors[i]);
+	}
+
 	m_zoomHandler.setFocus(ZoomHandler::CENTER);
 
-	static_cast<DraggablePoint*>(this)->setHitRadius(15.0);
-
-	QString const tip(tr("Drag this handle to rotate the image."));
-	m_handle1DragHandler.setProximityStatusTip(tip);
-	m_handle2DragHandler.setProximityStatusTip(tip);
+	rootInteractionHandler().makeLastFollower(*this);
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 }
 
 ImageView::~ImageView()
@@ -153,10 +165,10 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 }
 
 QPointF
-ImageView::pointPosition(ObjectDragHandler const* handler, InteractionState const&) const
+ImageView::handlePosition(int idx) const
 {
 	std::pair<QPointF, QPointF> const handles(getRotationHandles(getRotationArcSquare()));
-	if (handler == &m_handle1DragHandler) {
+	if (idx == 0) {
 		return handles.first;
 	} else {
 		return handles.second;
@@ -164,18 +176,16 @@ ImageView::pointPosition(ObjectDragHandler const* handler, InteractionState cons
 }
 
 void
-ImageView::pointMoveRequest(
-	ObjectDragHandler const* handler, QPointF const& widget_pos,
-	InteractionState const&)
+ImageView::handleMoveRequest(int idx, QPointF const& pos)
 {
 	QRectF const arc_square(getRotationArcSquare());
 	double const arc_radius = 0.5 * arc_square.width();
-	double const abs_y = widget_pos.y();
+	double const abs_y = pos.y();
 	double rel_y = abs_y - arc_square.center().y();
 	rel_y = qBound(-arc_radius, rel_y, arc_radius);
 
 	double angle_rad = asin(rel_y / arc_radius);
-	if (handler == &m_handle1DragHandler) {
+	if (idx == 0) {
 		angle_rad = -angle_rad;
 	}
 	double angle_deg = angle_rad * imageproc::constants::RAD2DEG;
@@ -186,7 +196,7 @@ ImageView::pointMoveRequest(
 }
 
 void
-ImageView::dragFinished(ObjectDragHandler const*)
+ImageView::dragFinished()
 {
 	emit manualDeskewAngleSet(m_xform.postRotation());
 }

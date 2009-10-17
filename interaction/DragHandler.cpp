@@ -23,10 +23,18 @@
 #include <QPoint>
 #include <Qt>
 
+DragHandler::DragHandler(ImageViewBase& image_view)
+:	m_rImageView(image_view)
+{
+	m_interaction.setInteractionStatusTip(
+		tr("Unrestricted dragging is possible by holding down the Shift key.")
+	);
+}
+
 bool
 DragHandler::isActive() const
 {
-	return m_rImageView.interactionState().capturedBy(m_interactionCaptor);
+	return m_rImageView.interactionState().capturedBy(m_interaction);
 }
 
 void
@@ -38,18 +46,17 @@ DragHandler::onMousePressEvent(QMouseEvent* event, InteractionState& interaction
 void
 DragHandler::onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	m_interactionCaptor.release();
+	m_interaction.release();
 }
 
 void
 DragHandler::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
 	if (!interaction.captured() && (event->buttons() & Qt::LeftButton)) {
-		interaction.capture(m_interactionCaptor);
-		m_rImageView.ensureStatusTip(tr("Unrestricted dragging is possible by holding down the Shift key."));
+		interaction.capture(m_interaction);
 	}
 
-	if (interaction.capturedBy(m_interactionCaptor)) {
+	if (interaction.capturedBy(m_interaction)) {
 		QPoint movement(event->pos());
 		movement -= m_lastMousePos;
 		m_lastMousePos = event->pos();

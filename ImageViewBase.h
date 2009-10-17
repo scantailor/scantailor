@@ -108,6 +108,8 @@ public:
 
 	InteractionState& interactionState() { return m_interactionState; }
 
+	InteractionState const& interactionState() const { return m_interactionState; }
+
 	QTransform const& imageToVirtual() const { return m_imageToVirtual; }
 
 	QTransform const& virtualToImage() const { return m_virtualToImage; }
@@ -212,8 +214,6 @@ protected:
 	 * \note Don't override this one.  Override paintOverImage() instead.
 	 */
 	virtual void paintEvent(QPaintEvent* event);
-	
-	virtual void paintOverImage(QPainter& painter);
 
 	/**
 	 * \brief Called when any of the transformations change.
@@ -226,19 +226,6 @@ protected:
 	 * \note If overriden, call this version first!
 	 */
 	virtual void resizeEvent(QResizeEvent* event);
-	
-	/**
-	 * \brief Possibly starts or stops image dragging.
-	 *
-	 * To be called from subclasses on the following events:
-	 * MouseButtonPress, MouseButtonRelease, MouseMove.
-	 */
-	void handleImageDragging(QMouseEvent* event);
-
-	/**
-	 * Returns true if any part of the image is off-screen.
-	 */
-	bool isDraggingPossible() const;
 	
 	/**
 	 * Returns the widget area reduced by margins.
@@ -254,14 +241,6 @@ protected:
 	 *       and unsetCursor().
 	 */
 	void ensureCursorShape(Qt::CursorShape cursor_shape);
-	
-	/**
-	 * \brief Returns the status tip to be associated with this widget
-	 *        in its default state.
-	 *
-	 * Subclasses may reimplement this method.
-	 */
-	virtual QString defaultStatusTip() const;
 
 	static BackgroundExecutor& backgroundExecutor();
 
@@ -310,10 +289,6 @@ private:
 	void updateStatusTip();
 
 	void updateCursor();
-
-	QString m_defaultStatusTip;
-	
-	QString m_unrestrictedDragStatusTip;
 	
 	InteractionHandler m_rootInteractionHandler;
 

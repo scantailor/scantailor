@@ -22,37 +22,53 @@
 #include "DraggableObject.h"
 #include <QPointF>
 #include <QLineF>
+#include <boost/function.hpp>
 
 class ObjectDragHandler;
 
 class DraggableLineSegment : public DraggableObject
 {
 public:
-	DraggableLineSegment(int proximity_priority = 0);
+	typedef boost::function<
+		QLineF ()
+	> PositionCallback;
 
-	virtual int proximityPriority(ObjectDragHandler const* handler) const;
+	typedef boost::function<
+		void (QLineF const& line)
+	> MoveRequestCallback;
 
-	virtual Proximity proximity(
-		ObjectDragHandler const* handler, QPointF const& widget_mouse_pos,
-		InteractionState const& interaction);
+	DraggableLineSegment();
 
-	virtual QPointF position(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
+	void setProximityPriority(int priority) { m_proximityPriority = priority; }
 
-	virtual void moveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction);
+	virtual int proximityPriority() const;
+
+	virtual Proximity proximity(QPointF const& mouse_pos);
+
+	virtual void dragInitiated(QPointF const& mouse_pos);
+
+	virtual void dragContinuation(QPointF const& mouse_pos);
+
+	void setPositionCallback(PositionCallback const& callback) {
+		m_positionCallback = callback;
+	}
+
+	void setMoveRequestCallback(MoveRequestCallback const& callback) {
+		m_moveRequestCallback = callback;
+	}
 protected:
-	virtual QLineF lineSegment(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
+	virtual QLineF lineSegmentPosition() const {
+		return m_positionCallback();
+	}
 
-	virtual QPointF lineSegmentPosition(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
-
-	virtual void lineSegmentMoveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction) = 0;
+	virtual void lineSegmentMoveRequest(QLineF const& line) {
+		m_moveRequestCallback(line);
+	}
 private:
+	PositionCallback m_positionCallback;
+	MoveRequestCallback m_moveRequestCallback;
+	QPointF m_initialMousePos;
+	QLineF m_initialLinePos;
 	int m_proximityPriority;
 };
 

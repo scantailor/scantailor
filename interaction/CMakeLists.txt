@@ -6,7 +6,6 @@ SET(
 	DraggablePoint.cpp DraggablePoint.h
 	DraggableLineSegment.cpp DraggableLineSegment.h
 	ObjectDragHandler.cpp ObjectDragHandler.h
-	BoxResizeHandler.cpp BoxResizeHandler.h
 	InteractionHandler.cpp InteractionHandler.h
 	InteractionState.cpp InteractionState.h
 	DragHandler.cpp DragHandler.h

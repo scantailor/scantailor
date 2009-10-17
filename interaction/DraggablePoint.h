@@ -21,13 +21,20 @@
 
 #include "DraggableObject.h"
 #include <QPointF>
-
-class ObjectDragHandler;
+#include <boost/function.hpp>
 
 class DraggablePoint : public DraggableObject
 {
 public:
-	DraggablePoint(int proximity_priority = 1);
+	typedef boost::function<
+		QPointF ()
+	> PositionCallback;
+
+	typedef boost::function<
+		void (QPointF const&)
+	> MoveRequestCallback;
+
+	DraggablePoint();
 
 	/**
 	 * Returns the hit area radius, with zero indicating the global
@@ -37,29 +44,38 @@ public:
 
 	void setHitRadius(double radius) { m_hitAreaRadius = radius; }
 
-	virtual Proximity proximityThreshold(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
+	virtual Proximity proximityThreshold(InteractionState const& interaction) const;
 
-	virtual int proximityPriority(ObjectDragHandler const* handler) const;
+	void setProximityPriority(int priority) { m_proximityPriority = priority; }
 
-	virtual Proximity proximity(
-		ObjectDragHandler const* handler, QPointF const& widget_mouse_pos,
-		InteractionState const& interaction);
+	virtual int proximityPriority() const;
 
-	virtual QPointF position(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
+	virtual Proximity proximity(QPointF const& mouse_pos);
 
-	virtual void moveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction);
+	virtual void dragInitiated(QPointF const& mouse_pos);
+
+	virtual void dragContinuation(QPointF const& mouse_pos);
+
+	void setPositionCallback(PositionCallback const& callback) {
+		m_positionCallback = callback;
+	}
+
+	void setMoveRequestCallback(MoveRequestCallback const& callback) {
+		m_moveRequestCallback = callback;
+	}
 protected:
-	virtual QPointF pointPosition(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const = 0;
+	virtual QPointF pointPosition() const {
+		return m_positionCallback();
+	}
 
-	virtual void pointMoveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction) = 0;
+	virtual void pointMoveRequest(QPointF const& widget_pos) {
+		m_moveRequestCallback(widget_pos);
+	}
 private:
+	PositionCallback m_positionCallback;
+	MoveRequestCallback m_moveRequestCallback;
+	QPointF m_initialPointPos;
+	QPointF m_initialMousePos;
 	double m_hitAreaRadius;
 	int m_proximityPriority;
 };

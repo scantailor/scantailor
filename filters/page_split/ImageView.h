@@ -29,15 +29,16 @@
 #include <QPixmap>
 
 class ImageTransformation;
+class QPointF;
+class QRectF;
+class QLineF;
 
 namespace page_split
 {
 
 class ImageView :
 	public ImageViewBase,
-	private InteractionHandler,
-	private DraggablePoint,
-	private DraggableLineSegment
+	private InteractionHandler
 {
 	Q_OBJECT
 public:
@@ -51,26 +52,17 @@ public slots:
 	void pageLayoutSetExternally(PageLayout const& layout);
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
-
-	virtual QPointF pointPosition(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
-
-	virtual void pointMoveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction);
-
-	virtual QLineF lineSegment(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
-
-	virtual QPointF lineSegmentPosition(
-		ObjectDragHandler const* handler, InteractionState const& interaction) const;
-
-	virtual void lineSegmentMoveRequest(
-		ObjectDragHandler const* handler, QPointF const& widget_pos,
-		InteractionState const& interaction);
-
-	virtual void dragFinished(ObjectDragHandler const* handler);
 private:
+	QPointF handlePosition(int id) const;
+
+	void handleMoveRequest(int id, QPointF const& pos);
+
+	QLineF linePosition() const;
+
+	void lineMoveRequest(QLineF line);
+
+	void dragFinished();
+
 	/**
 	 * \return Page layout in widget coordinates.
 	 */
@@ -83,7 +75,7 @@ private:
 	 * may end either shortly before the widget boundaries, or shortly
 	 * before the image boundaries.
 	 */
-	QLineF widgetSplitLine(InteractionState const& interaction) const;
+	QLineF widgetSplitLine() const;
 
 	/**
 	 * \return Split line in virtual image coordinates.
@@ -94,13 +86,17 @@ private:
 	QLineF virtualSplitLine() const;
 
 	/**
-	 * \return Valid area for split line endpoints in widget coordinates.
+	 * Same as ImageViewBase::getVisibleWidgetRect(), except reduced
+	 * vertically to accomodate the height of line endpoint handles.
 	 */
-	QRectF widgetValidArea() const;
+	QRectF reducedWidgetArea() const;
 
-	ObjectDragHandler m_handle1DragHandler;
-	ObjectDragHandler m_handle2DragHandler;
-	ObjectDragHandler m_lineDragHandler;
+	static QLineF customInscribedSplitLine(QLineF const& line, QRectF const& rect);
+
+	DraggablePoint m_handles[2];
+	ObjectDragHandler m_handleInteractors[2];
+	DraggableLineSegment m_lineSegment;
+	ObjectDragHandler m_lineInteractor;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 

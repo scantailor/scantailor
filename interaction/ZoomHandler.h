@@ -41,7 +41,7 @@ protected:
 	virtual void onWheelEvent(QWheelEvent* event, InteractionState& interaction);
 private:
 	ImageViewBase& m_rImageView;
-	InteractionState::Captor m_interactionCaptor;
+	InteractionState::Captor m_interaction;
 	double m_zoom;
 	Focus m_focus;
 };

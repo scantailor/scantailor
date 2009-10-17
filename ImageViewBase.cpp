@@ -134,9 +134,7 @@ ImageViewBase::ImageViewBase(
 	QImage const& image, QImage const& downscaled_image,
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	Margins const& margins)
-:	m_defaultStatusTip(tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")),
-	m_unrestrictedDragStatusTip(tr("Unrestricted dragging is possible by holding down the Shift key.")),
-	m_image(image),
+:	m_image(image),
 	m_virtualDisplayArea(virt_display_area),
 	m_imageToVirtual(image_to_virt),
 	m_virtualToImage(image_to_virt.inverted()),
@@ -146,6 +144,11 @@ ImageViewBase::ImageViewBase(
 	m_currentCursorShape(Qt::ArrowCursor),
 	m_hqTransformEnabled(true)
 {
+	interactionState().setDefaultStatusTip(
+		tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")
+	);
+	ensureStatusTip(interactionState().statusTip());
+
 	setFocusPolicy(Qt::WheelFocus);
 
 	if (downscaled_image.isNull()) {
@@ -161,8 +164,6 @@ ImageViewBase::ImageViewBase(
 	
 	m_widgetFocalPoint = centeredWidgetFocalPoint();
 	m_pixmapFocalPoint = m_virtualToImage.map(virtualDisplayRect().center());
-	
-	ensureStatusTip(defaultStatusTip());
 	
 	m_timer.setSingleShot(true);
 	m_timer.setInterval(150); // msec
@@ -296,9 +297,7 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	painter.restore();
 	
 	painter.setWorldTransform(m_virtualToWidget);
-	paintOverImage(painter);
 
-	// TODO: only if transformation changed since last proximityUpdate
 	m_interactionState.resetProximity();
 	if (!m_interactionState.captured()) {
 		m_rootInteractionHandler.proximityUpdate(
@@ -308,11 +307,6 @@ ImageViewBase::paintEvent(QPaintEvent* const event)
 	}
 
 	m_rootInteractionHandler.paint(painter, m_interactionState);
-}
-
-void
-ImageViewBase::paintOverImage(QPainter& painter)
-{
 }
 
 void
@@ -330,60 +324,6 @@ ImageViewBase::resizeEvent(QResizeEvent* event)
 	}
 	
 	updateWidgetTransform();
-}
-
-void
-ImageViewBase::handleImageDragging(QMouseEvent* const event)
-{
-	switch (event->type()) {
-		case QEvent::MouseButtonPress:
-			if (event->button() == Qt::LeftButton) {
-				m_lastMousePos = event->pos();
-			}
-			break;
-		case QEvent::MouseButtonRelease:
-			if (event->button() == Qt::LeftButton) {
-				ensureStatusTip(defaultStatusTip());
-			}
-			break;
-		case QEvent::MouseMove:
-			if (event->buttons() & Qt::LeftButton) {
-				QPoint movement(event->pos());
-				movement -= m_lastMousePos;
-				m_lastMousePos = event->pos();
-
-				QPointF adjusted_fp(m_widgetFocalPoint);
-				adjusted_fp += movement;
-
-				if (event->modifiers() & Qt::ShiftModifier) {
-					setNewWidgetFP(adjusted_fp);
-				} else {
-					adjustAndSetNewWidgetFP(adjusted_fp);
-				}
-
-				update();
-			}
-		default:;
-	}
-}
-
-bool
-ImageViewBase::isDraggingPossible() const
-{
-	QRectF const widget_rect(m_virtualToWidget.mapRect(virtualDisplayRect()));
-	if (widget_rect.top() <= -1.0) {
-		return true;
-	}
-	if (widget_rect.left() <= -1.0) {
-		return true;
-	}
-	if (widget_rect.bottom() >= height() + 1) {
-		return true;
-	}
-	if (widget_rect.right() >= width() + 1) {
-		return true;
-	}
-	return false;
 }
 
 QRectF
@@ -520,12 +460,6 @@ ImageViewBase::ensureStatusTip(QString const& status_tip)
 		// because sendEvent() may immediately process other events.
 		QApplication::postEvent(this, new QStatusTipEvent(status_tip));
 	}
-}
-
-QString
-ImageViewBase::defaultStatusTip() const
-{
-	return m_defaultStatusTip;
 }
 
 void

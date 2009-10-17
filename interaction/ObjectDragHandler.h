@@ -66,7 +66,6 @@ protected:
 private:
 	DraggableObject* m_pObj;
 	InteractionState::Captor m_interaction;
-	QPointF m_dragOffset;
 };
 
 #endif

@@ -22,8 +22,11 @@
 #include "ImageViewBase.h"
 #include "ImageTransformation.h"
 #include "PhysicalTransformation.h"
+#include "InteractionHandler.h"
 #include "DragHandler.h"
 #include "ZoomHandler.h"
+#include "DraggableObject.h"
+#include "ObjectDragHandler.h"
 #include "Alignment.h"
 #include "IntrusivePtr.h"
 #include "PageId.h"
@@ -41,7 +44,9 @@ namespace page_layout
 class OptionsWidget;
 class Settings;
 
-class ImageView : public ImageViewBase
+class ImageView :
+	public ImageViewBase,
+	private InteractionHandler
 {
 	Q_OBJECT
 public:
@@ -69,35 +74,22 @@ public slots:
 	void alignmentChanged(Alignment const& alignment);
 	
 	void aggregateHardSizeChanged();
-protected:
-	virtual void paintOverImage(QPainter& painter);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
-	
-	virtual void hideEvent(QHideEvent* event);
-	
-	virtual QString defaultStatusTip() const;
 private:
-	enum { TOP_EDGE = 1, BOTTOM_EDGE = 2, LEFT_EDGE = 4, RIGHT_EDGE = 8 };
+	enum Edge { LEFT = 1, RIGHT = 2, TOP = 4, BOTTOM = 8 };
 	enum FitMode { FIT, DONT_FIT };
 	enum AggregateSizeChanged { AGGREGATE_SIZE_UNCHANGED, AGGREGATE_SIZE_CHANGED };
 	
 	struct StateBeforeResizing
 	{
 		/**
-		 * Transformation from m_origXform coordinates to widget
-		 * coordinates.
+		 * Transformation from virtual image coordinates to widget coordinates.
 		 */
-		QTransform origToWidget;
+		QTransform virtToWidget;
 		
 		/**
-		 * Transformation from widget coordinates to m_origXform coordinates
+		 * Transformation from widget coordinates to virtual image coordinates.
 		 */
-		QTransform widgetToOrig;
+		QTransform widgetToVirt;
 		
 		/**
 		 * m_middleRect in widget coordinates.
@@ -107,24 +99,32 @@ private:
 		/**
 		 * Mouse pointer position in widget coordinates.
 		 */
-		QPoint mousePos;
+		QPointF mousePos;
 		
 		/**
-		 * The point in image that is to be centered on the screen
-		 * in physical image coordinates.
+		 * The point in image that is to be centered on the screen,
+		 * in pixel image coordinates.
 		 */
 		QPointF focalPoint;
 	};
 	
-	void resizeInnerRect(QPoint delta);
-	
-	void resizeMiddleRect(QPoint delta);
+	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
+
+	Proximity cornerProximity(int edge_mask, QRectF const* box, QPointF const& mouse_pos) const;
+
+	Proximity edgeProximity(int edge_mask, QRectF const* box, QPointF const& mouse_pos) const;
+
+	void dragInitiated(QPointF const& mouse_pos);
+
+	void innerRectDragContinuation(int edge_mask, QPointF const& mouse_pos);
+
+	void middleRectDragContinuation(int edge_mask, QPointF const& mouse_pos);
+
+	void dragFinished();
 	
 	void recalcBoxesAndFit(Margins const& margins_mm);
 	
 	void updatePresentationTransform(FitMode fit_mode);
-	
-	int cursorLocationMask(QPoint const& cursor_pos, QRectF const& orig_rect) const;
 	
 	void forceNonNegativeHardMargins(QRectF& middle_rect) const;
 	
@@ -138,8 +138,16 @@ private:
 	
 	void invalidateThumbnails(AggregateSizeChanged agg_size_changed);
 	
-	QString m_defaultStatusTip;
-	
+	DraggableObject m_innerCorners[4];
+	ObjectDragHandler m_innerCornerHandlers[4];
+	DraggableObject m_innerEdges[4];
+	ObjectDragHandler m_innerEdgeHandlers[4];
+
+	DraggableObject m_middleCorners[4];
+	ObjectDragHandler m_middleCornerHandlers[4];
+	DraggableObject m_middleEdges[4];
+	ObjectDragHandler m_middleEdgeHandlers[4];
+
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 
@@ -148,39 +156,19 @@ private:
 	PageId const m_pageId;
 	
 	/**
-	 * \brief Image transformation, as provided by the previous filter.
-	 *
-	 * We pass another transformation to ImageViewBase, which we call
-	 * "presentation transformation" in order to be able to display margins
-	 * that may be outside the image area.  The presentation transformation
-	 * is accessible via physToVirt().
-	 */
-	ImageTransformation const m_origXform;
-	
-	/**
-	 * Transformation between the original image coordinates and millimeters,
+	 * Transformation between the pixel image coordinates and millimeters,
 	 * assuming that point (0, 0) in pixel coordinates corresponds to point
 	 * (0, 0) in millimeter coordinates.
 	 */
 	PhysicalTransformation const m_physXform;
 	
 	/**
-	 * Transformation from m_origXform coordinates to millimeter coordinates.
-	 */
-	QTransform const m_origToMM;
-	
-	/**
-	 * Transformation from millimeter coordinates to m_origXform coordinates.
-	 */
-	QTransform const m_mmToOrig;
-	
-	/**
-	 * Content box in m_origXform coordinates.
+	 * Content box in virtual image coordinates.
 	 */
 	QRectF const m_innerRect;
 	
 	/**
-	 * \brief Content box + hard margins in m_origXform coordinates.
+	 * \brief Content box + hard margins in virtual image coordinates.
 	 *
 	 * Hard margins are margins that will be there no matter what.
 	 * Soft margins are those added to extend the page to match its
@@ -189,7 +177,7 @@ private:
 	QRectF m_middleRect;
 	
 	/**
-	 * \brief Content box + hard + soft margins in m_origXform coordinates.
+	 * \brief Content box + hard + soft margins in virtual image coordinates.
 	 *
 	 * Hard margins are margins that will be there no matter what.
 	 * Soft margins are those added to extend the page to match its
@@ -224,22 +212,6 @@ private:
 	 * Some data saved at the beginning of a resizing operation.
 	 */
 	StateBeforeResizing m_beforeResizing;
-	
-	/**
-	 * A bitwise OR of *_EDGE values.  If non-zero, it means
-	 * we are currently dragging one or two edges of the inner rectangle.
-	 * \note Both m_innerResizingMask and m_middleResizingMask can't
-	 * be non-zero at the same time.
-	 */
-	int m_innerResizingMask;
-	
-	/**
-	 * A bitwise OR of *_EDGE values.  If non-zero, it means
-	 * we are currently dragging one or two edges of the middle rectangle.
-	 * \note Both m_innerResizingMask and m_outerResizingMask can't
-	 * be non-zero at the same time.
-	 */
-	int m_middleResizingMask;
 	
 	bool m_leftRightLinked;
 	

@@ -24,37 +24,33 @@
 #include <QRectF>
 #include <algorithm>
 
-DraggableLineSegment::DraggableLineSegment(int proximity_priority)
-:	m_proximityPriority(proximity_priority)
+DraggableLineSegment::DraggableLineSegment()
+:	m_proximityPriority(0)
 {
 }
 
 int
-DraggableLineSegment::proximityPriority(ObjectDragHandler const*) const
+DraggableLineSegment::proximityPriority() const
 {
 	return m_proximityPriority;
 }
 
 Proximity
-DraggableLineSegment::proximity(
-	ObjectDragHandler const* handler, QPointF const& widget_mouse_pos,
-	InteractionState const& interaction)
+DraggableLineSegment::proximity(QPointF const& mouse_pos)
 {
-	QLineF const line(lineSegment(handler, interaction));
-	return Proximity::pointAndLineSegment(widget_mouse_pos, line);
-}
-
-QPointF
-DraggableLineSegment::position(
-	ObjectDragHandler const* handler, InteractionState const& interaction) const
-{
-	return lineSegmentPosition(handler, interaction);
+	return Proximity::pointAndLineSegment(mouse_pos, lineSegmentPosition());
 }
 
 void
-DraggableLineSegment::moveRequest(
-	ObjectDragHandler const* handler, QPointF const& widget_pos,
-	InteractionState const& interaction)
+DraggableLineSegment::dragInitiated(QPointF const& mouse_pos)
 {
-	lineSegmentMoveRequest(handler, widget_pos, interaction);
+	m_initialMousePos = mouse_pos;
+	m_initialLinePos = lineSegmentPosition();
 }
+
+void
+DraggableLineSegment::dragContinuation(QPointF const& mouse_pos)
+{
+	lineSegmentMoveRequest(m_initialLinePos.translated(mouse_pos - m_initialMousePos));
+}
+

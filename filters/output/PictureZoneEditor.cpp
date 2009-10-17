@@ -1050,7 +1050,7 @@ PictureZoneEditor::DragHandler::DragHandler(PictureZoneEditor& owner)
 void
 PictureZoneEditor::DragHandler::mousePressEvent(QMouseEvent* event)
 {
-	m_rOwner.handleImageDragging(event);
+	//m_rOwner.handleImageDragging(event);
 	
 	if (event->button() == Qt::LeftButton) {
 		event->accept();
@@ -1060,7 +1060,7 @@ PictureZoneEditor::DragHandler::mousePressEvent(QMouseEvent* event)
 void
 PictureZoneEditor::DragHandler::mouseReleaseEvent(QMouseEvent* event)
 {
-	m_rOwner.handleImageDragging(event);
+	//m_rOwner.handleImageDragging(event);
 	
 	if (event->button() == Qt::LeftButton) {
 		event->accept();
@@ -1071,7 +1071,7 @@ PictureZoneEditor::DragHandler::mouseReleaseEvent(QMouseEvent* event)
 void
 PictureZoneEditor::DragHandler::mouseMoveEvent(QMouseEvent* event)
 {
-	m_rOwner.handleImageDragging(event);
+	//m_rOwner.handleImageDragging(event);
 	
 	if (event->buttons() & Qt::LeftButton) {
 		event->accept();
