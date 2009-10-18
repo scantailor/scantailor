@@ -18,6 +18,7 @@
 
 #include "PictureZoneEditor.h.moc"
 #include "PictureZoneList.h"
+#include "ZoneDefaultInteraction.h"
 #include "ZonePropertiesDialog.h"
 #include "Settings.h"
 #include "NonCopyable.h"
@@ -115,6 +116,7 @@ PictureZoneEditor::PictureZoneEditor(
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	PageId const& page_id, IntrusivePtr<Settings> const& settings)
 :	ImageViewBase(image, downscaled_image, image_to_virt, virt_display_area),
+	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_origPictureMask(picture_mask),
 	m_pictureMaskAnimationPhase(270),
@@ -123,6 +125,10 @@ PictureZoneEditor::PictureZoneEditor(
 {
 	setMouseTracking(true);
 
+	makeLastFollower(*new ZoneDefaultInteraction(*this, m_splineList));
+
+	rootInteractionHandler().makeLastFollower(*this);
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
 
 	m_handlerList.push_back(*new DefaultState(*this));
@@ -157,7 +163,7 @@ PictureZoneEditor::~PictureZoneEditor()
 }
 
 void
-PictureZoneEditor::paintOverImage(QPainter& painter)
+PictureZoneEditor::onPaint(QPainter& painter, InteractionState const& interaction)
 {
 	painter.setWorldTransform(QTransform());
 	painter.setRenderHint(QPainter::Antialiasing);
@@ -185,12 +191,8 @@ PictureZoneEditor::paintOverImage(QPainter& painter)
 			m_pictureMaskAnimateTimer.start();
 		}
 	}
-
-	BOOST_FOREACH(State& state, m_handlerList) {
-		state.paint(painter);
-	}
 }
-
+#if 0
 void
 PictureZoneEditor::transformChanged()
 {
@@ -282,6 +284,7 @@ PictureZoneEditor::contextMenuEvent(QContextMenuEvent* const event)
 		}
 	}
 }
+#endif
 
 void
 PictureZoneEditor::advancePictureMaskAnimation()

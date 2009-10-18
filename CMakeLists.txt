@@ -220,7 +220,7 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(. foundation interaction ${QT_INCLUDES})
+INCLUDE_DIRECTORIES(. foundation interaction zones ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
 SET(EXTRA_LIBS)
@@ -267,6 +267,7 @@ ADD_SUBDIRECTORY(crash_reporter)
 ADD_SUBDIRECTORY(foundation)
 ADD_SUBDIRECTORY(imageproc)
 ADD_SUBDIRECTORY(interaction)
+ADD_SUBDIRECTORY(zones)
 ADD_SUBDIRECTORY(tests)
 
 FILE(GLOB ui_files "ui/*.ui")
@@ -401,7 +402,7 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output
-	interaction imageproc foundation
+	interaction zones imageproc foundation
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)

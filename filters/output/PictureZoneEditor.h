@@ -26,8 +26,11 @@
 #include "IntrusivePtr.h"
 #include "PageId.h"
 #include "PictureZone.h"
-#include "imageproc/BinaryImage.h"
+#include "Spline.h"
 #include "ZoomHandler.h"
+#include "InteractionState.h"
+#include "imageproc/BinaryImage.h"
+#include "DragHandler.h"
 #include <QTransform>
 #include <QPointF>
 #include <QLineF>
@@ -43,6 +46,7 @@
 #include <stddef.h>
 
 class ImageTransformation;
+class InteractionState;
 class QPainter;
 class QPixmap;
 class QMenu;
@@ -68,7 +72,7 @@ private slots:
 };
 
 
-class PictureZoneEditor : public ImageViewBase
+class PictureZoneEditor : public ImageViewBase, private InteractionHandler
 {
 	Q_OBJECT
 public:
@@ -80,21 +84,7 @@ public:
 	
 	virtual ~PictureZoneEditor();
 protected:
-	virtual void paintOverImage(QPainter& painter);
-	
-	virtual void transformChanged();
-
-	virtual void keyPressEvent(QKeyEvent* event);
-
-	virtual void keyReleaseEvent(QKeyEvent* event);
-	
-	virtual void mousePressEvent(QMouseEvent* event);
-	
-	virtual void mouseReleaseEvent(QMouseEvent* event);
-	
-	virtual void mouseMoveEvent(QMouseEvent* event);
-	
-	virtual void contextMenuEvent(QContextMenuEvent* event);
+	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private slots:
 	void advancePictureMaskAnimation();
 
@@ -481,6 +471,9 @@ private:
 	
 	static QPointF screenPos(QMouseEvent* event);
 
+	std::vector< ::Spline::Ptr> m_splineList;
+
+	::DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 
 	imageproc::BinaryImage m_origPictureMask;

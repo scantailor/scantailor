@@ -59,6 +59,10 @@ public:
 
 	void contextMenuEvent(QContextMenuEvent* event, InteractionState& interaction);
 
+	void makePeerPreceeder(InteractionHandler& handler);
+
+	void makePeerFollower(InteractionHandler& handler);
+
 	void makeFirstPreceeder(InteractionHandler& handler);
 
 	void makeLastPreceeder(InteractionHandler& handler);

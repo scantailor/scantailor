@@ -118,6 +118,21 @@ InteractionHandler::contextMenuEvent(
 }
 
 void
+InteractionHandler::makePeerPreceeder(InteractionHandler& handler)
+{
+	handler.unlink();
+	HandlerList::node_algorithms::link_before(this, &handler);
+}
+
+void
+InteractionHandler::makePeerFollower(InteractionHandler& handler)
+{
+	using namespace boost::intrusive;
+	handler.unlink();
+	HandlerList::node_algorithms::link_after(this, &handler);
+}
+
+void
 InteractionHandler::makeFirstPreceeder(InteractionHandler& handler)
 {
 	handler.unlink();
