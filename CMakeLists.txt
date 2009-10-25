@@ -515,6 +515,7 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "scantailor-${VERSION}")
 SET(
 	CPACK_SOURCE_IGNORE_FILES
 	"/\\\\.svn/"
+	"/\\\\.git/"
 	"~$"
 	"\\\\.pcs$"
 	"TODO.txt"
