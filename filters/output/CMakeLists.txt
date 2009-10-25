@@ -29,6 +29,7 @@ SET(
 	OutputFileParams.cpp OutputFileParams.h
 	OutputParams.cpp OutputParams.h
 	PictureLayerProperty.cpp PictureLayerProperty.h
+	PictureZoneComparator.cpp PictureZoneComparator.h
 	PictureZoneEditor.cpp PictureZoneEditor.h
 	ZonePropFactory.cpp ZonePropFactory.h
 	ZonePropertiesDialog.cpp ZonePropertiesDialog.h

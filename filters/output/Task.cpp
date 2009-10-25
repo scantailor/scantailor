@@ -28,6 +28,7 @@
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
+#include "PictureZoneComparator.h"
 #include "PictureZoneEditor.h"
 #include "ImageId.h"
 #include "Dpi.h"
@@ -159,11 +160,11 @@ Task::process(
 			need_reprocess = true;
 			break;
 		}
-#warning "FIXME: implement zone comparison"
-//		if (stored_output_params->zones() != new_zones) {
-//			need_reprocess = true;
-//			break;
-//		}
+
+		if (!PictureZoneComparator::equal(stored_output_params->zones(), new_zones)) {
+			need_reprocess = true;
+			break;
+		}
 		
 		if (!out_file_info.exists()) {
 			need_reprocess = true;

@@ -295,13 +295,17 @@ PictureZoneEditor::paintOverPictureMask(QPainter& painter)
 void
 PictureZoneEditor::showPropertiesDialog(EditableZoneSet::Zone const& zone)
 {
-	IntrusivePtr<PropertySet> old_properties(zone.properties()->deepCopy());
+	PropertySet saved_properties;
+	zone.properties()->swap(saved_properties);
+	*zone.properties() = saved_properties;
+
 	ZonePropertiesDialog dialog(zone.properties(), this);
 	connect(&dialog, SIGNAL(updated()), SLOT(update()));
+
 	if (dialog.exec() == QDialog::Accepted) {
 		m_zones.commit();
 	} else {
-		m_zones.setProperties(zone.spline(), old_properties);
+		zone.properties()->swap(saved_properties);
 	}
 }
 
@@ -311,7 +315,7 @@ PictureZoneEditor::commitZones()
 	ZoneSet zones;
 
 	BOOST_FOREACH(EditableZoneSet::Zone const& zone, m_zones) {
-		zones.add(Zone(SerializableSpline(zone.spline()->toPolygon()), *zone.properties()));
+		zones.add(Zone(*zone.spline(), *zone.properties()));
 	}
 	
 	m_ptrSettings->setZones(m_pageId, zones);

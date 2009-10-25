@@ -34,6 +34,12 @@ EditableSpline::EditableSpline(SerializableSpline const& spline)
 	BOOST_FOREACH(QPointF const& pt, spline.toPolygon()) {
 		appendVertex(pt);
 	}
+
+	SplineVertex::Ptr last_vertex(lastVertex());
+	if (last_vertex.get() && firstVertex()->point() == last_vertex->point()) {
+		last_vertex->remove();
+	}
+
 	setBridged(true);
 }
 

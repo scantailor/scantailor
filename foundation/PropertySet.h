@@ -19,7 +19,6 @@
 #ifndef PROPERTY_SET_H_
 #define PROPERTY_SET_H_
 
-#include "NonCopyable.h"
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
 #include "Property.h"
@@ -32,15 +31,24 @@ class QString;
 
 class PropertySet : public RefCountable
 {
-	DECLARE_NON_COPYABLE(PropertySet)
 public:
 	PropertySet() {}
 
+	/**
+	 * \brief Makes a deep copy of another property set.
+	 */
+	PropertySet(PropertySet const& other);
+
 	PropertySet(QDomElement const& el, PropertyFactory const& factory);
 
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
+	/**
+	 * \brief Makes a deep copy of another property set.
+	 */
+	PropertySet& operator=(PropertySet const& other);
 
-	IntrusivePtr<PropertySet> deepCopy() const;
+	void swap(PropertySet& other);
+
+	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
 	/**
 	 * Returns a property stored in this set, if one having a suitable
@@ -135,6 +143,11 @@ PropertySet::locateOrCreate()
 		m_props.push_back(obj);
 	}
 	return obj;
+}
+
+inline void swap(PropertySet& o1, PropertySet& o2)
+{
+	o1.swap(o2);
 }
 
 #endif

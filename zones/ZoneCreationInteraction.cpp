@@ -29,12 +29,14 @@
 #include <QLinearGradient>
 #include <Qt>
 #include <QLineF>
+#include <QDebug>
 #include <boost/lambda/lambda.hpp>
 
 ZoneCreationInteraction::ZoneCreationInteraction(
 	ZoneInteractionContext& context, InteractionState& interaction)
 :	m_rContext(context),
 	m_dragHandler(context.imageView(), boost::lambda::constant(true)),
+	m_dragWatcher(m_dragHandler),
 	m_zoomHandler(context.imageView(), boost::lambda::constant(true)),
 	m_ptrSpline(new EditableSpline)
 {
@@ -44,8 +46,10 @@ ZoneCreationInteraction::ZoneCreationInteraction(
 	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 	m_nextVertexImagePos = from_screen.map(screen_mouse_pos);
 
-	makeLastPreceeder(m_dragHandler);
-	makeLastPreceeder(m_zoomHandler);
+	makeLastFollower(m_dragHandler);
+	m_dragHandler.makeFirstFollower(m_dragWatcher);
+
+	makeLastFollower(m_zoomHandler);
 
 	interaction.capture(m_interaction);
 	m_ptrSpline->appendVertex(m_nextVertexImagePos);
@@ -128,6 +132,10 @@ ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionStat
 		return;
 	}
 
+	if (m_dragWatcher.haveSignificantDrag()) {
+		return;
+	}
+
 	QTransform const to_screen(m_rContext.imageView().imageToWidget());
 	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 	QPointF const screen_mouse_pos(event->pos() + QPointF(0.5, 0.5));
@@ -199,4 +207,44 @@ ZoneCreationInteraction::updateStatusTip()
 	}
 
 	m_interaction.setInteractionStatusTip(tip);
+}
+
+
+/*============================= DragWatcher ========================*/
+
+ZoneCreationInteraction::DragWatcher::DragWatcher(DragHandler& drag_handler)
+:	m_rDragHandler(drag_handler),
+	m_dragInProgress(false)
+{
+}
+
+bool
+ZoneCreationInteraction::DragWatcher::haveSignificantDrag() const
+{
+	return m_dragInProgress && QDateTime::currentDateTime() > m_dragStartTime.addMSecs(400);
+}
+
+void
+ZoneCreationInteraction::DragWatcher::onMousePressEvent(QMouseEvent* event, InteractionState&)
+{
+	updateState();
+}
+
+void
+ZoneCreationInteraction::DragWatcher::onMouseMoveEvent(QMouseEvent* event, InteractionState&)
+{
+	updateState();
+}
+
+void
+ZoneCreationInteraction::DragWatcher::updateState()
+{
+	if (m_rDragHandler.isActive()) {
+		if (!m_dragInProgress) {
+			m_dragStartTime = QDateTime::currentDateTime();
+		}
+		m_dragInProgress = true;
+	} else {
+		m_dragInProgress = false;
+	}
 }

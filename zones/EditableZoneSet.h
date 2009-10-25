@@ -88,8 +88,6 @@ public:
 
 	void removeZone(EditableSpline::Ptr const& spline);
 
-	void setProperties(EditableSpline::Ptr const& spline, IntrusivePtr<PropertySet> const& props);
-
 	void commit();
 
 	IntrusivePtr<PropertySet> propertiesFor(EditableSpline::Ptr const& spline);
@@ -99,7 +97,7 @@ signals:
 	void committed();
 private:
 	Map m_splineMap;
-	IntrusivePtr<PropertySet> m_ptrDefaultProps;
+	PropertySet m_defaultProps;
 };
 
 #endif

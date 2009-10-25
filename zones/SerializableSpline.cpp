@@ -17,6 +17,8 @@
 */
 
 #include "SerializableSpline.h"
+#include "EditableSpline.h"
+#include "SplineVertex.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
 #include <QDomDocument>
@@ -24,6 +26,14 @@
 #include <QString>
 #include <QPointF>
 #include <boost/foreach.hpp>
+
+SerializableSpline::SerializableSpline(EditableSpline const& spline)
+{
+	SplineVertex::Ptr vertex(spline.firstVertex());
+	for (; vertex; vertex = vertex->next(SplineVertex::NO_LOOP)) {
+		m_points.push_back(vertex->point());
+	}
+}
 
 SerializableSpline::SerializableSpline(QDomElement const& el)
 {
@@ -38,7 +48,7 @@ SerializableSpline::SerializableSpline(QDomElement const& el)
 			continue;
 		}
 
-		m_poly.append(XmlUnmarshaller::pointF(node.toElement()));
+		m_points.push_back(XmlUnmarshaller::pointF(node.toElement()));
 	}
 }
 
@@ -49,7 +59,7 @@ SerializableSpline::toXml(QDomDocument& doc, QString const& name) const
 
 	QString const point_str("point");
 	XmlMarshaller marshaller(doc);
-	BOOST_FOREACH(QPointF const& pt, m_poly) {
+	BOOST_FOREACH(QPointF const& pt, m_points) {
 		el.appendChild(marshaller.pointF(pt, point_str));
 	}
 

@@ -23,13 +23,13 @@
 
 Zone::Zone(SerializableSpline const& spline, PropertySet const& props)
 :	m_spline(spline),
-	m_ptrProps(props.deepCopy())
+	m_props(props)
 {
 }
 
 Zone::Zone(QDomElement const& el, PropertyFactory const& prop_factory)
 :	m_spline(el.namedItem("spline").toElement()),
-	m_ptrProps(new PropertySet(el.namedItem("properties").toElement(), prop_factory))
+	m_props(el.namedItem("properties").toElement(), prop_factory)
 {
 }
 
@@ -38,7 +38,7 @@ Zone::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
 	el.appendChild(m_spline.toXml(doc, "spline"));
-	el.appendChild(m_ptrProps->toXml(doc, "properties"));
+	el.appendChild(m_props.toXml(doc, "properties"));
 	return el;
 }
 

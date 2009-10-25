@@ -21,6 +21,7 @@
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
 #include "ZoneSet.h"
+#include "PictureZoneComparator.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include <boost/foreach.hpp>
@@ -131,10 +132,9 @@ OptionsWidget::reloadIfZonesChanged()
 		saved_zones = output_params->zones();
 	}
 
-#warning "FIXME: implement zone comparison"
-	//if (saved_zones != m_ptrSettings->zonesForPage(m_pageId)) {
-	//	emit reloadRequested();
-	//}
+	if (!PictureZoneComparator::equal(saved_zones, m_ptrSettings->zonesForPage(m_pageId))) {
+		emit reloadRequested();
+	}
 }
 
 void

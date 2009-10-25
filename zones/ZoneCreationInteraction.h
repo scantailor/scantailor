@@ -26,6 +26,7 @@
 #include "BasicSplineVisualizer.h"
 #include "EditableSpline.h"
 #include <QPointF>
+#include <QDateTime>
 #include <QCoreApplication>
 
 class ZoneInteractionContext;
@@ -47,10 +48,29 @@ protected:
 
 	virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 private:
+	class DragWatcher : public InteractionHandler
+	{
+	public:
+		DragWatcher(DragHandler& drag_handler);
+
+		bool haveSignificantDrag() const;
+	protected:
+		virtual void onMousePressEvent(QMouseEvent* event, InteractionState& interaction);
+
+		virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
+	private:
+		void updateState();
+
+		DragHandler& m_rDragHandler;
+		QDateTime m_dragStartTime;
+		bool m_dragInProgress;
+	};
+
 	void updateStatusTip();
 
 	ZoneInteractionContext& m_rContext;
 	DragHandler m_dragHandler;
+	DragWatcher m_dragWatcher; // Must go after m_dragHandler.
 	ZoomHandler m_zoomHandler;
 	BasicSplineVisualizer m_visualizer;
 	InteractionState::Captor m_interaction;

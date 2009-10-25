@@ -40,14 +40,14 @@ public:
 
 	SerializableSpline const& spline() const { return m_spline; }
 	
-	PropertySet& properties() { return *m_ptrProps; }
+	PropertySet& properties() { return m_props; }
 
-	PropertySet const& properties() const { return *m_ptrProps; }
+	PropertySet const& properties() const { return m_props; }
 
 	bool isValid() const;
 private:
 	SerializableSpline m_spline;
-	IntrusivePtr<PropertySet> m_ptrProps;
+	PropertySet m_props;
 };
 
 #endif

@@ -44,6 +44,28 @@ PropertySet::PropertySet(QDomElement const& el, PropertyFactory const& factory)
 	}
 }
 
+PropertySet::PropertySet(PropertySet const& other)
+{
+	m_props.reserve(other.m_props.size());
+
+	BOOST_FOREACH(IntrusivePtr<Property> const& prop, other.m_props) {
+		m_props.push_back(prop->clone());
+	}
+}
+
+PropertySet&
+PropertySet::operator=(PropertySet const& other)
+{
+	PropertySet(other).swap(*this);
+	return *this;
+}
+
+void
+PropertySet::swap(PropertySet& other)
+{
+	m_props.swap(other.m_props);
+}
+
 QDomElement
 PropertySet::toXml(QDomDocument& doc, QString const& name) const
 {
@@ -55,17 +77,4 @@ PropertySet::toXml(QDomDocument& doc, QString const& name) const
 	}
 
 	return props_el;
-}
-
-IntrusivePtr<PropertySet>
-PropertySet::deepCopy() const
-{
-	IntrusivePtr<PropertySet> dst(new PropertySet);
-	dst->m_props.reserve(m_props.size());
-
-	BOOST_FOREACH(IntrusivePtr<Property> const& prop, m_props) {
-		dst->m_props.push_back(prop->clone());
-	}
-
-	return dst;
 }

@@ -20,41 +20,33 @@
 #include "EditableZoneSet.h.moc"
 
 EditableZoneSet::EditableZoneSet()
-:	m_ptrDefaultProps(new PropertySet)
 {
 }
 
 void
 EditableZoneSet::setDefaultProperties(PropertySet const& props)
 {
-	m_ptrDefaultProps = props.deepCopy();
+	m_defaultProps = props;
 }
 
 void
 EditableZoneSet::addZone(EditableSpline::Ptr const& spline)
 {
-	m_splineMap.insert(Map::value_type(spline, m_ptrDefaultProps->deepCopy()));
+	IntrusivePtr<PropertySet> new_props(new PropertySet(m_defaultProps));
+	m_splineMap.insert(Map::value_type(spline, new_props));
 }
 
 void
 EditableZoneSet::addZone(EditableSpline::Ptr const& spline, PropertySet const& props)
 {
-	m_splineMap.insert(Map::value_type(spline, props.deepCopy()));
+	IntrusivePtr<PropertySet> new_props(new PropertySet(props));
+	m_splineMap.insert(Map::value_type(spline, new_props));
 }
 
 void
 EditableZoneSet::removeZone(EditableSpline::Ptr const& spline)
 {
 	m_splineMap.erase(spline);
-}
-
-void
-EditableZoneSet::setProperties(EditableSpline::Ptr const& spline, IntrusivePtr<PropertySet> const& props)
-{
-	Map::iterator it(m_splineMap.find(spline));
-	if (it != m_splineMap.end()) {
-		it->second = props;
-	}
 }
 
 void
