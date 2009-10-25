@@ -16,24 +16,37 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Spline.h"
+#include "EditableSpline.h"
+#include "SerializableSpline.h"
 #include "SplineSegment.h"
+#include <QDomNode>
+#include <QDomElement>
+#include <QString>
+#include <boost/foreach.hpp>
 #include <assert.h>
 
-Spline::Spline()
+EditableSpline::EditableSpline()
 {
 }
 
+EditableSpline::EditableSpline(SerializableSpline const& spline)
+{
+	BOOST_FOREACH(QPointF const& pt, spline.toPolygon()) {
+		appendVertex(pt);
+	}
+	setBridged(true);
+}
+
 void
-Spline::appendVertex(QPointF const& pt)
+EditableSpline::appendVertex(QPointF const& pt)
 {
 	m_sentinel.insertBefore(pt);
 }
 
 bool
-Spline::hasAtLeastSegments(int num) const
+EditableSpline::hasAtLeastSegments(int num) const
 {
-	for (SegmentIterator it((Spline&)*this); num > 0 && it.hasNext(); it.next()) {
+	for (SegmentIterator it((EditableSpline&)*this); num > 0 && it.hasNext(); it.next()) {
 		--num;
 	}
 
@@ -41,7 +54,7 @@ Spline::hasAtLeastSegments(int num) const
 }
 
 QPolygonF
-Spline::toPolygon() const
+EditableSpline::toPolygon() const
 {
 	QPolygonF poly;
 
@@ -62,13 +75,13 @@ Spline::toPolygon() const
 /*======================== Spline::SegmentIterator =======================*/
 
 bool
-Spline::SegmentIterator::hasNext() const
+EditableSpline::SegmentIterator::hasNext() const
 {
 	return m_ptrNextVertex && m_ptrNextVertex->next(SplineVertex::LOOP_IF_BRIDGED);
 }
 
 SplineSegment
-Spline::SegmentIterator::next()
+EditableSpline::SegmentIterator::next()
 {
 	assert(hasNext());
 

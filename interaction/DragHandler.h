@@ -19,10 +19,13 @@
 #ifndef DRAG_HANDLER_H_
 #define DRAG_HANDLER_H_
 
+#define BOOST_SIGNALS_NAMESPACE signal
+
 #include "InteractionHandler.h"
 #include "InteractionState.h"
 #include <QPoint>
 #include <QCoreApplication>
+#include <boost/function.hpp>
 
 class ImageViewBase;
 
@@ -32,6 +35,9 @@ class DragHandler : public InteractionHandler
 public:
 	DragHandler(ImageViewBase& image_view);
 
+	DragHandler(ImageViewBase& image_view,
+		boost::function<bool(InteractionState const&)> const& explicit_interaction_permitter);
+
 	bool isActive() const;
 protected:
 	virtual void onMousePressEvent(QMouseEvent* event, InteractionState& interaction);
@@ -40,9 +46,12 @@ protected:
 
 	virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 private:
+	void init();
+
 	ImageViewBase& m_rImageView;
 	InteractionState::Captor m_interaction;
 	QPoint m_lastMousePos;
+	boost::function<bool(InteractionState const&)> m_interactionPermitter;
 };
 
 #endif

@@ -24,6 +24,7 @@
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
+#include "ZonePropFactory.h"
 
 class PageId;
 class PageSequence;
@@ -77,6 +78,7 @@ private:
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
+	ZonePropFactory m_zonePropFactory;
 };
 
 } // namespace output

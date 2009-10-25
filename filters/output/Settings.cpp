@@ -169,7 +169,7 @@ Settings::setOutputParams(PageId const& page_id, OutputParams const& params)
 	Utils::mapSetValue(m_perPageOutputParams, page_id, params);
 }
 
-PictureZoneList
+ZoneSet
 Settings::zonesForPage(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
@@ -178,12 +178,12 @@ Settings::zonesForPage(PageId const& page_id) const
 	if (it != m_perPageZones.end()) {
 		return it->second;
 	} else {
-		return PictureZoneList();
+		return ZoneSet();
 	}
 }
 
 void
-Settings::setZones(PageId const& page_id, PictureZoneList const& zones)
+Settings::setZones(PageId const& page_id, ZoneSet const& zones)
 {
 	QMutexLocker const locker(&m_mutex);
 	Utils::mapSetValue(m_perPageZones, page_id, zones);

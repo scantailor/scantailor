@@ -97,6 +97,8 @@ protected:
 
 	virtual void onContextMenuEvent(
 		QContextMenuEvent* event, InteractionState& interaction) {}
+
+	static bool defaultInteractionPermitter(InteractionState const& interaction);
 private:
 	typedef boost::intrusive::list<
 		InteractionHandler, boost::intrusive::constant_time_size<false>

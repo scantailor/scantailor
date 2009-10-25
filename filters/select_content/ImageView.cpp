@@ -64,6 +64,9 @@ ImageView::ImageView(
 		m_corners[i].setMoveRequestCallback(
 			boost::bind(&ImageView::cornerMoveRequest, this, masks_by_corner[i], _1)
 		);
+		m_corners[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
+		);
 		m_cornerHandlers[i].setObject(&m_corners[i]);
 		m_cornerHandlers[i].setProximityStatusTip(drag_tip);
 		Qt::CursorShape cursor = (i & 1) ? Qt::SizeBDiagCursor : Qt::SizeFDiagCursor;
@@ -80,6 +83,9 @@ ImageView::ImageView(
 		);
 		m_edges[i].setMoveRequestCallback(
 			boost::bind(&ImageView::edgeMoveRequest, this, masks_by_edge[i], _1)
+		);
+		m_edges[i].setDragFinishedCallback(
+			boost::bind(&ImageView::dragFinished, this)
 		);
 		m_edgeHandlers[i].setObject(&m_edges[i]);
 		m_edgeHandlers[i].setProximityStatusTip(drag_tip);
@@ -237,6 +243,12 @@ void
 ImageView::edgeMoveRequest(int const edge, QLineF const& line)
 {
 	cornerMoveRequest(edge, line.p1());
+}
+
+void
+ImageView::dragFinished()
+{
+	emit manualContentRectSet(m_contentRect);
 }
 
 void

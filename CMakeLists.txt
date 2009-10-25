@@ -355,7 +355,6 @@ SET(
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
 	Utils.cpp Utils.h
-	Zone.cpp Zone.h
 	AutoManualMode.h
 	AbstractCommand.h
 	AbstractFilter.h

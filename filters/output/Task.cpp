@@ -141,7 +141,7 @@ Task::process(
 		data.xform(), output_dpi, color_params
 	);
 
-	PictureZoneList const new_zones(m_ptrSettings->zonesForPage(m_pageId));
+	ZoneSet const new_zones(m_ptrSettings->zonesForPage(m_pageId));
 	
 	bool need_reprocess = false;
 	do { // Just to be able to break from it.
@@ -159,11 +159,11 @@ Task::process(
 			need_reprocess = true;
 			break;
 		}
-
-		if (stored_output_params->zones() != new_zones) {
-			need_reprocess = true;
-			break;
-		}
+#warning "FIXME: implement zone comparison"
+//		if (stored_output_params->zones() != new_zones) {
+//			need_reprocess = true;
+//			break;
+//		}
 		
 		if (!out_file_info.exists()) {
 			need_reprocess = true;

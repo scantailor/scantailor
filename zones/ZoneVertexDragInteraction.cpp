@@ -17,8 +17,10 @@
 */
 
 #include "ZoneVertexDragInteraction.h"
-#include "ZoneDefaultInteraction.h"
+#include "ZoneInteractionContext.h"
+#include "EditableZoneSet.h"
 #include "ImageViewBase.h"
+#include <QTransform>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPen>
@@ -27,19 +29,17 @@
 #include <QLineF>
 #include <boost/foreach.hpp>
 
-namespace output
-{
-
 ZoneVertexDragInteraction::ZoneVertexDragInteraction(
-	ImageViewBase& image_view, std::vector<Spline::Ptr>& splines,
-	Spline::Ptr const& spline, SplineVertex::Ptr const& vertex,
-	InteractionState& interaction, QPointF const& screen_mouse_pos)
-:	m_rImageView(image_view),
-	m_rSplines(splines),
+	ZoneInteractionContext& context, InteractionState& interaction,
+	EditableSpline::Ptr const& spline, SplineVertex::Ptr const& vertex)
+:	m_rContext(context),
 	m_ptrSpline(spline),
 	m_ptrVertex(vertex)
 {
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
+	QPointF const screen_mouse_pos(
+		m_rContext.imageView().mapFromGlobal(QCursor::pos()) + QPointF(0.5, 0.5)
+	);
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
 	m_dragOffset = to_screen.map(vertex->point()) - screen_mouse_pos;
 
 	interaction.capture(m_interaction);
@@ -52,9 +52,11 @@ ZoneVertexDragInteraction::onPaint(QPainter& painter, InteractionState const& in
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
 
-	BOOST_FOREACH(Spline::Ptr const& spline, m_rSplines) {
+	BOOST_FOREACH(EditableZoneSet::Zone const& zone, m_rContext.zones()) {
+		EditableSpline::Ptr const& spline = zone.spline();
+
 		if (spline != m_ptrSpline) {
 			// Draw the whole spline in solid color.
 			m_visualizer.drawSpline(painter, to_screen, spline);
@@ -107,10 +109,6 @@ void
 ZoneVertexDragInteraction::onMouseReleaseEvent(
 	QMouseEvent* event, InteractionState& interaction)
 {
-	if (!interaction.capturedBy(m_interaction)) {
-		return;
-	}
-
 	if (event->button() == Qt::LeftButton) {
 		if (m_ptrVertex->point() == m_ptrVertex->next(SplineVertex::LOOP)->point() ||
 				m_ptrVertex->point() == m_ptrVertex->prev(SplineVertex::LOOP)->point()) {
@@ -119,10 +117,8 @@ ZoneVertexDragInteraction::onMouseReleaseEvent(
 			}
 		}
 
-		// FIXME
-		//m_rOwner.commitZones();
-
-		makePeerPreceeder(*new ZoneDefaultInteraction(m_rImageView, m_rSplines));
+		m_rContext.zones().commit();
+		makePeerPreceeder(*m_rContext.createDefaultInteraction());
 		delete this;
 	}
 }
@@ -130,14 +126,10 @@ ZoneVertexDragInteraction::onMouseReleaseEvent(
 void
 ZoneVertexDragInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	if (!interaction.capturedBy(m_interaction)) {
-		return;
-	}
-
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
+	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 	m_ptrVertex->setPoint(from_screen.map(event->pos() + QPointF(0.5, 0.5) + m_dragOffset));
 	checkProximity(interaction);
-	m_rImageView.update();
+	m_rContext.imageView().update();
 }
 
 void
@@ -146,7 +138,7 @@ ZoneVertexDragInteraction::checkProximity(InteractionState const& interaction)
 	bool can_merge = false;
 
 	if (m_ptrVertex->hasAtLeastSiblings(3)) {
-		QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
+		QTransform const to_screen(m_rContext.imageView().imageToWidget());
 		QPointF const origin(to_screen.map(m_ptrVertex->point()));
 
 		QPointF const prev(m_ptrVertex->prev(SplineVertex::LOOP)->point());
@@ -170,5 +162,3 @@ ZoneVertexDragInteraction::checkProximity(InteractionState const& interaction)
 		m_interaction.setInteractionStatusTip(tr("Move the vertex to one of its neighbors to merge them."));
 	}
 }
-
-} // namespace output

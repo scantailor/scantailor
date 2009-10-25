@@ -16,28 +16,28 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_ZONE_DEFAULT_INTERACTION_H_
-#define OUTPUT_ZONE_DEFAULT_INTERACTION_H_
+#ifndef ZONE_DEFAULT_INTERACTION_H_
+#define ZONE_DEFAULT_INTERACTION_H_
 
 #include "InteractionHandler.h"
 #include "InteractionState.h"
 #include "BasicSplineVisualizer.h"
-#include "Spline.h"
+#include "EditableSpline.h"
 #include "SplineVertex.h"
 #include "SplineSegment.h"
 #include <QPointF>
-#include <vector>
+#include <QCoreApplication>
 
-class ImageViewBase;
-
-namespace output
-{
+class ZoneInteractionContext;
 
 class ZoneDefaultInteraction : public InteractionHandler
 {
+	Q_DECLARE_TR_FUNCTIONS(ZoneDefaultInteraction)
 public:
-	ZoneDefaultInteraction(ImageViewBase& image_view, std::vector<Spline::Ptr>& splines);
+	ZoneDefaultInteraction(ZoneInteractionContext& context);
 protected:
+	ZoneInteractionContext& context() { return m_rContext; }
+
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 
 	virtual void onProximityUpdate(QPointF const& mouse_pos, InteractionState& interaction);
@@ -50,23 +50,21 @@ protected:
 
 	virtual void onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction);
 private:
-	ImageViewBase& m_rImageView;
-	std::vector<Spline::Ptr>& m_rSplines;
+	ZoneInteractionContext& m_rContext;
 	BasicSplineVisualizer m_visualizer;
 	InteractionState::Captor m_vertexProximity;
 	InteractionState::Captor m_segmentProximity;
+	InteractionState::Captor m_zoneAreaProximity;
 	QPointF m_screenMousePos;
 
 	// These are valid if m_vertexProximity is the proximity leader.
 	SplineVertex::Ptr m_ptrNearestVertex;
-	Spline::Ptr m_ptrNearestVertexSpline;
+	EditableSpline::Ptr m_ptrNearestVertexSpline;
 
 	// These are valid if m_segmentProximity is the proximity leader.
 	SplineSegment m_nearestSegment;
-	Spline::Ptr m_ptrNearestSegmentSpline;
+	EditableSpline::Ptr m_ptrNearestSegmentSpline;
 	QPointF m_screenPointOnSegment;
 };
-
-} // namespace output
 
 #endif

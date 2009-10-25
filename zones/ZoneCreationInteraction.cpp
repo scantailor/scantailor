@@ -17,8 +17,11 @@
 */
 
 #include "ZoneCreationInteraction.h"
-#include "ZoneDefaultInteraction.h"
+#include "ZoneInteractionContext.h"
+#include "EditableZoneSet.h"
 #include "ImageViewBase.h"
+#include <QCursor>
+#include <QTransform>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPainter>
@@ -26,22 +29,28 @@
 #include <QLinearGradient>
 #include <Qt>
 #include <QLineF>
-
-namespace output
-{
+#include <boost/lambda/lambda.hpp>
 
 ZoneCreationInteraction::ZoneCreationInteraction(
-	ImageViewBase& image_view, std::vector<Spline::Ptr>& splines,
-	InteractionState& interaction, QPointF const& first_image_point)
-:	m_rImageView(image_view),
-	m_rSplines(splines),
-	m_ptrSpline(new Spline)
+	ZoneInteractionContext& context, InteractionState& interaction)
+:	m_rContext(context),
+	m_dragHandler(context.imageView(), boost::lambda::constant(true)),
+	m_zoomHandler(context.imageView(), boost::lambda::constant(true)),
+	m_ptrSpline(new EditableSpline)
 {
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
-	m_nextVertexImagePos = from_screen.map(first_image_point);
+	QPointF const screen_mouse_pos(
+		m_rContext.imageView().mapFromGlobal(QCursor::pos()) + QPointF(0.5, 0.5)
+	);
+	QTransform const from_screen(m_rContext.imageView().widgetToImage());
+	m_nextVertexImagePos = from_screen.map(screen_mouse_pos);
+
+	makeLastPreceeder(m_dragHandler);
+	makeLastPreceeder(m_zoomHandler);
 
 	interaction.capture(m_interaction);
 	m_ptrSpline->appendVertex(m_nextVertexImagePos);
+
+	updateStatusTip();
 }
 
 void
@@ -50,10 +59,10 @@ ZoneCreationInteraction::onPaint(QPainter& painter, InteractionState const& inte
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
+	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 
-	m_visualizer.drawSplines(painter, to_screen, m_rSplines);
+	m_visualizer.drawSplines(painter, to_screen, m_rContext.zones());
 
 	QPen solid_line_pen(m_visualizer.solidColor());
 	solid_line_pen.setCosmetic(true);
@@ -70,7 +79,7 @@ ZoneCreationInteraction::onPaint(QPainter& painter, InteractionState const& inte
 	painter.setPen(solid_line_pen);
 	painter.setBrush(Qt::NoBrush);
 
-	for (Spline::SegmentIterator it(*m_ptrSpline); it.hasNext(); ) {
+	for (EditableSpline::SegmentIterator it(*m_ptrSpline); it.hasNext(); ) {
 		SplineSegment const segment(it.next());
 		QLineF const line(to_screen.map(segment.toLine()));
 
@@ -104,55 +113,59 @@ ZoneCreationInteraction::onPaint(QPainter& painter, InteractionState const& inte
 void
 ZoneCreationInteraction::onKeyPressEvent(QKeyEvent* event, InteractionState& interaction)
 {
-	if (!interaction.capturedBy(m_interaction)) {
-		return;
-	}
-
 	if (event->key() == Qt::Key_Escape) {
-		makePeerPreceeder(*new ZoneDefaultInteraction(m_rImageView, m_rSplines));
-		m_rImageView.update();
+		makePeerPreceeder(*m_rContext.createDefaultInteraction());
+		m_rContext.imageView().update();
 		delete this;
+		event->accept();
 	}
 }
 
 void
 ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
+	if (event->button() != Qt::LeftButton) {
+		return;
+	}
+
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
+	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 	QPointF const screen_mouse_pos(event->pos() + QPointF(0.5, 0.5));
 	QPointF const image_mouse_pos(from_screen.map(screen_mouse_pos));
 
 	if (m_nextVertexImagePos == m_ptrSpline->firstVertex()->point()) {
 		m_ptrSpline->setBridged(true);
-		m_rSplines.push_back(m_ptrSpline);
-		// TODO: commit splines
+		m_rContext.zones().addZone(m_ptrSpline);
+		m_rContext.zones().commit();
 
-		makePeerPreceeder(*new ZoneDefaultInteraction(m_rImageView, m_rSplines));
-		m_rImageView.update();
+		makePeerPreceeder(*m_rContext.createDefaultInteraction());
+		m_rContext.imageView().update();
 		delete this;
-	} else if (m_nextVertexImagePos == m_ptrSpline->lastVertex()->point()) {
+	} else if (m_ptrSpline->hasAtLeastSegments(2) &&
+			   m_nextVertexImagePos == m_ptrSpline->lastVertex()->point()) {
 		m_ptrSpline->lastVertex()->remove();
 		if (!m_ptrSpline->firstVertex()) {
-			makePeerPreceeder(*new ZoneDefaultInteraction(m_rImageView, m_rSplines));
-			m_rImageView.update();
+			makePeerPreceeder(*m_rContext.createDefaultInteraction());
+			m_rContext.imageView().update();
 			delete this;
 		}
 	} else {
 		Proximity const prox(screen_mouse_pos, m_ptrSpline->lastVertex()->point());
 		if (prox > interaction.proximityThreshold()) {
 			m_ptrSpline->appendVertex(image_mouse_pos);
-			//updateStatusTip();
+			updateStatusTip();
 		}
 	}
+
+	event->accept();
 }
 
 void
 ZoneCreationInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
 	QPointF const screen_mouse_pos(event->pos() + QPointF(0.5, 0.5));
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
+	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 
 	m_nextVertexImagePos = from_screen.map(screen_mouse_pos);
 
@@ -163,11 +176,27 @@ ZoneCreationInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& 
 		QPointF const first(to_screen.map(m_ptrSpline->firstVertex()->point()));
 		if (Proximity(first, screen_mouse_pos) <= interaction.proximityThreshold()) {
 			m_nextVertexImagePos = m_ptrSpline->firstVertex()->point();
-			//updateStatusTip();
+			updateStatusTip();
 		}
 	}
 
-	m_rImageView.update();
+	m_rContext.imageView().update();
 }
 
-} // namespace output
+void
+ZoneCreationInteraction::updateStatusTip()
+{
+	QString tip;
+
+	if (m_ptrSpline->hasAtLeastSegments(2)) {
+		if (m_nextVertexImagePos == m_ptrSpline->firstVertex()->point()) {
+			tip = tr("Click to finish this zone.  ESC to cancel.");
+		} else {
+			tip = tr("Connect first and last points to finish this zone.  ESC to cancel.");
+		}
+	} else {
+		tip = tr("You need at least 3 points to finish this zone.  ESC to cancel.");
+	}
+
+	m_interaction.setInteractionStatusTip(tip);
+}

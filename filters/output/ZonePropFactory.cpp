@@ -16,47 +16,15 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "PictureZoneList.h"
-#include <QDomDocument>
-#include <QDomElement>
-#include <QString>
-#include <boost/foreach.hpp>
+#include "ZonePropFactory.h"
+#include "PictureLayerProperty.h"
 
 namespace output
 {
 
-PictureZoneList::PictureZoneList(QDomElement const& el)
+ZonePropFactory::ZonePropFactory()
 {
-	QString const zone_tag_name("zone");
-	QDomNode node(el.firstChild());
-	for (; !node.isNull(); node = node.nextSibling()) {
-		if (!node.isElement()) {
-			continue;
-		}
-		if (node.nodeName() != zone_tag_name) {
-			continue;
-		}
-
-		PictureZone const zone(node.toElement());
-		if (zone.isValid()) {
-			push_back(zone);
-		}
-	}
-}
-
-QDomElement
-PictureZoneList::toXml(QDomDocument& doc, QString const& name) const
-{
-	if (empty()) {
-		return QDomElement();
-	}
-
-	QDomElement el(doc.createElement(name));
-	BOOST_FOREACH(PictureZone const& zone, *this) {
-		el.appendChild(zone.toXml(doc, "zone"));
-	}
-	return el;
+	PictureLayerProperty::registerIn(*this);
 }
 
 } // namespace output
-

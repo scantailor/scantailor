@@ -1,5 +1,4 @@
 /*
-
 	Scan Tailor - Interactive post-processing tool for scanned pages.
 	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
@@ -17,47 +16,30 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SPLINE_H_
-#define SPLINE_H_
+#ifndef PROPERTY_FACTORY_H_
+#define PROPERTY_FACTORY_H_
 
-#include "RefCountable.h"
+#include "Property.h"
 #include "IntrusivePtr.h"
-#include "SplineVertex.h"
-#include "SplineSegment.h"
-#include <QPolygonF>
+#include <QString>
+#include <map>
 
-class Spline : public RefCountable
+class QDomElement;
+
+class PropertyFactory
 {
+	// Member-wise copying is OK.
 public:
-	typedef IntrusivePtr<Spline> Ptr;
+	virtual ~PropertyFactory() {}
 
-	class SegmentIterator
-	{
-	public:
-		SegmentIterator(Spline& spline) : m_ptrNextVertex(spline.firstVertex()) {}
+	typedef IntrusivePtr<Property> (*PropertyConstructor)(QDomElement const& el);
 
-		bool hasNext() const;
+	void registerProperty(QString const& property, PropertyConstructor constructor);
 
-		SplineSegment next();
-	private:
-		SplineVertex::Ptr m_ptrNextVertex;
-	};
-
-	Spline();
-
-	void appendVertex(QPointF const& pt);
-
-	SplineVertex::Ptr firstVertex() const { return m_sentinel.firstVertex(); }
-
-	SplineVertex::Ptr lastVertex() const{ return m_sentinel.lastVertex(); }
-
-	bool hasAtLeastSegments(int num) const;
-
-	void setBridged(bool bridged) { m_sentinel.setBridged(true); }
-
-	QPolygonF toPolygon() const;
+	IntrusivePtr<Property> construct(QDomElement const& el) const;
 private:
-	SentinelSplineVertex m_sentinel;
+	typedef std::map<QString, PropertyConstructor> Registry;
+	Registry m_registry;
 };
 
 #endif

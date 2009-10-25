@@ -19,6 +19,10 @@
 #include "InteractionHandler.h"
 #include "InteractionState.h"
 #include <QPainter>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QContextMenuEvent>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/construct.hpp>
 #include <boost/lambda/bind.hpp>
@@ -29,6 +33,12 @@
 	HandlerList::iterator const end(list.end()); \
 	while (it != end) {                          \
 		(it++)->call;                            \
+	}                                            \
+}
+
+#define RETURN_IF_ACCEPTED(event) {              \
+	if (event->isAccepted()) {                   \
+		return;                                  \
 	}                                            \
 }
 
@@ -64,6 +74,7 @@ void
 InteractionHandler::keyPressEvent(QKeyEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, keyPressEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onKeyPressEvent(event, interaction);
 	DISPATCH(m_followers, keyPressEvent(event, interaction));
 }
@@ -72,6 +83,7 @@ void
 InteractionHandler::keyReleaseEvent(QKeyEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, keyReleaseEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onKeyReleaseEvent(event, interaction);
 	DISPATCH(m_followers, keyReleaseEvent(event, interaction));
 }
@@ -80,6 +92,7 @@ void
 InteractionHandler::mousePressEvent(QMouseEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, mousePressEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onMousePressEvent(event, interaction);
 	DISPATCH(m_followers, mousePressEvent(event, interaction));
 }
@@ -88,6 +101,7 @@ void
 InteractionHandler::mouseReleaseEvent(QMouseEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, mouseReleaseEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onMouseReleaseEvent(event, interaction);
 	DISPATCH(m_followers, mouseReleaseEvent(event, interaction));
 }
@@ -96,6 +110,7 @@ void
 InteractionHandler::mouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, mouseMoveEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onMouseMoveEvent(event, interaction);
 	DISPATCH(m_followers, mouseMoveEvent(event, interaction));
 }
@@ -104,6 +119,7 @@ void
 InteractionHandler::wheelEvent(QWheelEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, wheelEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onWheelEvent(event, interaction);
 	DISPATCH(m_followers, wheelEvent(event, interaction));
 }
@@ -113,6 +129,7 @@ InteractionHandler::contextMenuEvent(
 	QContextMenuEvent* event, InteractionState& interaction)
 {
 	DISPATCH(m_preceeders, contextMenuEvent(event, interaction));
+	RETURN_IF_ACCEPTED(event);
 	onContextMenuEvent(event, interaction);
 	DISPATCH(m_followers, contextMenuEvent(event, interaction));
 }
@@ -158,4 +175,10 @@ InteractionHandler::makeLastFollower(InteractionHandler& handler)
 {
 	handler.unlink();
 	m_followers.push_back(handler);
+}
+
+bool
+InteractionHandler::defaultInteractionPermitter(InteractionState const& interaction)
+{
+	return !interaction.captured();
 }

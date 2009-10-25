@@ -21,10 +21,11 @@
 
 #include "OutputImageParams.h"
 #include "OutputFileParams.h"
-#include "PictureZoneList.h"
+#include "ZoneSet.h"
 
 class QDomDocument;
 class QDomElement;
+class QString;
 
 namespace output
 {
@@ -35,7 +36,7 @@ public:
 	OutputParams(OutputImageParams const& output_image_params,
 		OutputFileParams const& output_file_params,
 		OutputFileParams const& automask_file_params,
-		PictureZoneList const& zones);
+		ZoneSet const& zones);
 	
 	explicit OutputParams(QDomElement const& el);
 	
@@ -47,12 +48,12 @@ public:
 
 	OutputFileParams const& automaskFileParams() const { return m_automaskFileParams; }
 
-	PictureZoneList const& zones() const { return m_zones; }
+	ZoneSet const& zones() const { return m_zones; }
 private:
 	OutputImageParams m_outputImageParams;
 	OutputFileParams m_outputFileParams;
 	OutputFileParams m_automaskFileParams;
-	PictureZoneList m_zones;
+	ZoneSet m_zones;
 };
 
 } // namespace output

@@ -8,6 +8,9 @@ SET(
 	ScopedIncDec.h ScopedDecInc.h
 	Span.h VirtualFunction.h FlagOps.h
 	Proximity.cpp Proximity.h
+	Property.h
+	PropertyFactory.cpp PropertyFactory.h
+	PropertySet.cpp PropertySet.h
 	PerformanceTimer.cpp PerformanceTimer.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

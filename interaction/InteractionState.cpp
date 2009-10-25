@@ -17,6 +17,7 @@
 */
 
 #include "InteractionState.h"
+#include <limits>
 
 InteractionState::Captor&
 InteractionState::Captor::operator=(Captor& other)
@@ -34,7 +35,7 @@ InteractionState::Captor::operator=(CopyHelper other)
 
 InteractionState::InteractionState()
 :	m_proximityThreshold(Proximity::fromDist(10.0)),
-	m_bestProximityPriority(0)
+	m_bestProximityPriority(std::numeric_limits<int>::min())
 {
 }
 
@@ -56,7 +57,7 @@ InteractionState::resetProximity()
 {
 	m_proximityLeader.clear();
 	m_bestProximity = Proximity();
-	m_bestProximityPriority = 0;
+	m_bestProximityPriority = std::numeric_limits<int>::min();
 }
 
 void

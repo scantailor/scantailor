@@ -19,11 +19,11 @@
 #ifndef BASIC_SPLINE_VISUALIZER_H_
 #define BASIC_SPLINE_VISUALIZER_H_
 
-#include "Spline.h"
+#include "EditableSpline.h"
 #include <QPen>
 #include <QColor>
-#include <vector>
 
+class EditableZoneSet;
 class QPainter;
 class QTransform;
 
@@ -41,12 +41,12 @@ public:
 	void drawVertex(QPainter& painter, QPointF const& pt, QColor const& color);
 
 	void drawSplines(QPainter& painter, QTransform const& to_screen,
-					 std::vector<Spline::Ptr> const& splines);
+					 EditableZoneSet const& zones);
 
 	virtual void drawSpline(QPainter& painter, QTransform const& to_screen,
-							Spline::Ptr const& spline);
+							EditableSpline::Ptr const& spline);
 
-	virtual void prepareForSpline(QPainter& painter, Spline::Ptr const& spline);
+	virtual void prepareForSpline(QPainter& painter, EditableSpline::Ptr const& spline);
 protected:
 	QRgb m_solidColor;
 	QRgb m_highlightBrightColor;

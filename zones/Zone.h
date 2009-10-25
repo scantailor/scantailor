@@ -19,28 +19,35 @@
 #ifndef ZONE_H_
 #define ZONE_H_
 
-#include <QPolygonF>
+#include "SerializableSpline.h"
+#include "IntrusivePtr.h"
+#include "PropertySet.h"
 
+class PropertyFactory;
 class QDomDocument;
 class QDomElement;
 class QString;
 
 class Zone
 {
+	// Member-wise copying is OK, but that will produce a partly shallow copy.
 public:
-	Zone(QPolygonF const& shape) : m_shape(shape) {}
+	Zone(SerializableSpline const& spline, PropertySet const& props = PropertySet());
 	
-	Zone(QDomElement const& el);
+	Zone(QDomElement const& el, PropertyFactory const& prop_factory);
+	
+	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
-	virtual ~Zone() {}
+	SerializableSpline const& spline() const { return m_spline; }
 	
-	virtual QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
+	PropertySet& properties() { return *m_ptrProps; }
+
+	PropertySet const& properties() const { return *m_ptrProps; }
+
 	bool isValid() const;
-	
-	QPolygonF const& shape() const { return m_shape; }
 private:
-	QPolygonF m_shape;
+	SerializableSpline m_spline;
+	IntrusivePtr<PropertySet> m_ptrProps;
 };
 
 #endif

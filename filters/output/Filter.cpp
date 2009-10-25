@@ -27,7 +27,6 @@
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
-#include "PictureZoneList.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -142,7 +141,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		
-		PictureZoneList const zones(el.namedItem("zones").toElement());
+		ZoneSet const zones(el.namedItem("zones").toElement(), m_zonePropFactory);
 		if (!zones.empty()) {
 			m_ptrSettings->setZones(page_id, zones);
 		}

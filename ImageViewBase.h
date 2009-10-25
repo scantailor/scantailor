@@ -118,6 +118,10 @@ public:
 
 	QTransform const& widgetToVirtual() const { return m_widgetToVirtual; }
 
+	QTransform imageToWidget() const { return m_imageToVirtual * m_virtualToWidget; }
+
+	QTransform widgetToImage() const { return m_widgetToVirtual * m_virtualToImage; }
+
 	QPolygonF const& virtualDisplayArea() const { return m_virtualDisplayArea; }
 
 	QRectF const virtualDisplayRect() const {

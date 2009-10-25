@@ -471,14 +471,18 @@ ImageViewBase::enterEvent(QEvent* event)
 void
 ImageViewBase::keyPressEvent(QKeyEvent* event)
 {
+	event->setAccepted(false);
 	m_rootInteractionHandler.keyPressEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 
 void
 ImageViewBase::keyReleaseEvent(QKeyEvent* event)
 {
+	event->setAccepted(false);
 	m_rootInteractionHandler.keyReleaseEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 
@@ -492,7 +496,9 @@ ImageViewBase::mousePressEvent(QMouseEvent* event)
 		);
 	}
 
+	event->setAccepted(false);
 	m_rootInteractionHandler.mousePressEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 
@@ -506,7 +512,9 @@ ImageViewBase::mouseReleaseEvent(QMouseEvent* event)
 		);
 	}
 
+	event->setAccepted(false);
 	m_rootInteractionHandler.mouseReleaseEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 
@@ -520,21 +528,27 @@ ImageViewBase::mouseMoveEvent(QMouseEvent* event)
 		);
 	}
 
+	event->setAccepted(false);
 	m_rootInteractionHandler.mouseMoveEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 
 void
 ImageViewBase::wheelEvent(QWheelEvent* event)
 {
+	event->setAccepted(false);
 	m_rootInteractionHandler.wheelEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 
 void
 ImageViewBase::contextMenuEvent(QContextMenuEvent* event)
 {
+	event->setAccepted(false);
 	m_rootInteractionHandler.contextMenuEvent(event, m_interactionState);
+	event->setAccepted(true);
 	updateStatusTipAndCursor();
 }
 

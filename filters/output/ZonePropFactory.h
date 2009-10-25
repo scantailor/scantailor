@@ -16,42 +16,18 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_PICTURE_ZONE_H_
-#define OUTPUT_PICTURE_ZONE_H_
+#ifndef OUTPUT_ZONE_PROP_FACTORY_H_
+#define OUTPUT_ZONE_PROP_FACTORY_H_
 
-#include "Zone.h"
+#include "PropertyFactory.h"
 
 namespace output
 {
 
-class PictureZone : public Zone
+class ZonePropFactory : public PropertyFactory
 {
 public:
-	enum Type { NO_OP, ERASER1, PAINTER2, ERASER3 };
-
-	PictureZone(QPolygonF const& shape, Type type);
-
-	PictureZone(QDomElement const& el);
-
-	virtual QDomElement toXml(QDomDocument& doc, QString const& name) const;
-
-	Type type() const { return m_type; }
-
-	void setType(Type type) { m_type = type; }
-
-	bool operator==(PictureZone const& other) const {
-		return shape() == other.shape() && m_type == other.m_type;
-	}
-
-	bool operator!=(PictureZone const& other) const {
-		return !(*this == other);
-	}
-private:
-	static QString typeToString(Type type);
-
-	static Type typeFromString(QString const& str);
-
-	Type m_type;
+	ZonePropFactory();
 };
 
 } // namespace output

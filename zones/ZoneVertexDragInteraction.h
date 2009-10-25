@@ -16,44 +16,40 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_ZONE_CREATION_INTERACTION_H_
-#define OUTPUT_ZONE_CREATION_INTERACTION_H_
+#ifndef ZONE_VERTEX_DRAG_INTERACTION_H_
+#define ZONE_VERTEX_DRAG_INTERACTION_H_
 
+#include "BasicSplineVisualizer.h"
+#include "EditableSpline.h"
 #include "InteractionHandler.h"
 #include "InteractionState.h"
-#include "BasicSplineVisualizer.h"
-#include "Spline.h"
 #include <QPointF>
-#include <vector>
+#include <QCoreApplication>
 
-class ImageViewBase;
+class ZoneInteractionContext;
 
-namespace output
+class ZoneVertexDragInteraction : public InteractionHandler
 {
-
-class ZoneCreationInteraction : public InteractionHandler
-{
+	Q_DECLARE_TR_FUNCTIONS(ZoneVertexDragInteraction)
 public:
-	ZoneCreationInteraction(
-		ImageViewBase& image_view, std::vector<Spline::Ptr>& splines,
-		InteractionState& interaction, QPointF const& first_image_point);
+	ZoneVertexDragInteraction(
+		ZoneInteractionContext& context, InteractionState& interaction,
+		EditableSpline::Ptr const& spline, SplineVertex::Ptr const& vertex);
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
-
-	virtual void onKeyPressEvent(QKeyEvent* event, InteractionState& interaction);
 
 	virtual void onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction);
 
 	virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 private:
-	ImageViewBase& m_rImageView;
-	std::vector<Spline::Ptr>& m_rSplines;
-	BasicSplineVisualizer m_visualizer;
-	InteractionState::Captor m_interaction;
-	Spline::Ptr m_ptrSpline;
-	QPointF m_nextVertexImagePos;
-};
+	void checkProximity(InteractionState const& interaction);
 
-} // namespace output
+	ZoneInteractionContext& m_rContext;
+	EditableSpline::Ptr m_ptrSpline;
+	SplineVertex::Ptr m_ptrVertex;
+	InteractionState::Captor m_interaction;
+	BasicSplineVisualizer m_visualizer;
+	QPointF m_dragOffset;
+};
 
 #endif

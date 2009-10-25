@@ -25,6 +25,8 @@
 #include "EstimateBackground.h"
 #include "Despeckle.h"
 #include "RenderParams.h"
+#include "ZoneSet.h"
+#include "PictureLayerProperty.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include "imageproc/BinaryImage.h"
@@ -363,28 +365,32 @@ OutputGenerator::modifyBinarizationMask(
 	QRect const& mask_rect, ZoneSet const& zones) const
 {
 	QTransform xform(m_toUncropped * QTransform().translate(-mask_rect.x(), -mask_rect.y()));
-#if 0
+
+	typedef PictureLayerProperty PLP;
+
 	// Pass 1: ERASER1
-	BOOST_FOREACH(PictureZone const& zone, zones) {
-		if (zone.type() == PictureZone::ERASER1) {
-			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(zone.shape()), Qt::WindingFill);
+	BOOST_FOREACH(Zone const& zone, zones.list()) {
+		if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER1) {
+			QPolygonF const poly(zone.spline().toPolygon());
+			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(poly), Qt::WindingFill);
 		}
 	}
 
 	// Pass 2: PAINTER2
-	BOOST_FOREACH(PictureZone const& zone, zones) {
-		if (zone.type() == PictureZone::PAINTER2) {
-			PolygonRasterizer::fill(bw_mask, WHITE, xform.map(zone.shape()), Qt::WindingFill);
+	BOOST_FOREACH(Zone const& zone, zones.list()) {
+		if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::PAINTER2) {
+			QPolygonF const poly(zone.spline().toPolygon());
+			PolygonRasterizer::fill(bw_mask, WHITE, xform.map(poly), Qt::WindingFill);
 		}
 	}
 
 	// Pass 1: ERASER3
-	BOOST_FOREACH(PictureZone const& zone, zones) {
-		if (zone.type() == PictureZone::ERASER3) {
-			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(zone.shape()), Qt::WindingFill);
+	BOOST_FOREACH(Zone const& zone, zones.list()) {
+		if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER3) {
+			QPolygonF const poly(zone.spline().toPolygon());
+			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(poly), Qt::WindingFill);
 		}
 	}
-#endif
 }
 
 QImage

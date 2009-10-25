@@ -17,6 +17,7 @@
 */
 
 #include "OutputParams.h"
+#include "ZonePropFactory.h"
 #include <QDomDocument>
 #include <QDomElement>
 
@@ -27,7 +28,7 @@ OutputParams::OutputParams(
 	OutputImageParams const& output_image_params,
 	OutputFileParams const& output_file_params,
 	OutputFileParams const& automask_file_params,
-	PictureZoneList const& zones)
+	ZoneSet const& zones)
 :	m_outputImageParams(output_image_params),
 	m_outputFileParams(output_file_params),
 	m_automaskFileParams(automask_file_params),
@@ -39,7 +40,7 @@ OutputParams::OutputParams(QDomElement const& el)
 :	m_outputImageParams(el.namedItem("image").toElement()),
 	m_outputFileParams(el.namedItem("file").toElement()),
 	m_automaskFileParams(el.namedItem("automask").toElement()),
-	m_zones(el.namedItem("zones").toElement())
+	m_zones(el.namedItem("zones").toElement(), ZonePropFactory())
 {
 }
 

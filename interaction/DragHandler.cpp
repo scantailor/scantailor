@@ -24,7 +24,23 @@
 #include <Qt>
 
 DragHandler::DragHandler(ImageViewBase& image_view)
-:	m_rImageView(image_view)
+:	m_rImageView(image_view),
+	m_interactionPermitter(&InteractionHandler::defaultInteractionPermitter)
+{
+	init();
+}
+
+DragHandler::DragHandler(
+	ImageViewBase& image_view,
+	boost::function<bool(InteractionState const&)> const& explicit_interaction_permitter)
+:	m_rImageView(image_view),
+	m_interactionPermitter(explicit_interaction_permitter)
+{
+	init();
+}
+
+void
+DragHandler::init()
 {
 	m_interaction.setInteractionStatusTip(
 		tr("Unrestricted dragging is possible by holding down the Shift key.")
@@ -46,13 +62,17 @@ DragHandler::onMousePressEvent(QMouseEvent* event, InteractionState& interaction
 void
 DragHandler::onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	m_interaction.release();
+	if (interaction.capturedBy(m_interaction)) {
+		m_interaction.release();
+		event->accept();
+	}
 }
 
 void
 DragHandler::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	if (!interaction.captured() && (event->buttons() & Qt::LeftButton)) {
+	if ((event->buttons() & Qt::LeftButton) && !interaction.capturedBy(m_interaction)
+			&& m_interactionPermitter(interaction)) {
 		interaction.capture(m_interaction);
 	}
 

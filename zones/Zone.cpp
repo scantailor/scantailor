@@ -17,37 +17,43 @@
 */
 
 #include "Zone.h"
-#include "XmlMarshaller.h"
-#include "XmlUnmarshaller.h"
 #include <QDomDocument>
 #include <QDomElement>
 #include <QString>
 
-Zone::Zone(QDomElement const& el)
-:	m_shape(XmlUnmarshaller::polygonF(el.namedItem("shape").toElement()))
+Zone::Zone(SerializableSpline const& spline, PropertySet const& props)
+:	m_spline(spline),
+	m_ptrProps(props.deepCopy())
+{
+}
+
+Zone::Zone(QDomElement const& el, PropertyFactory const& prop_factory)
+:	m_spline(el.namedItem("spline").toElement()),
+	m_ptrProps(new PropertySet(el.namedItem("properties").toElement(), prop_factory))
 {
 }
 
 QDomElement
 Zone::toXml(QDomDocument& doc, QString const& name) const
 {
-	XmlMarshaller marshaller(doc);
-
 	QDomElement el(doc.createElement(name));
-	el.appendChild(marshaller.polygonF(m_shape, "shape"));
+	el.appendChild(m_spline.toXml(doc, "spline"));
+	el.appendChild(m_ptrProps->toXml(doc, "properties"));
 	return el;
 }
 
 bool
 Zone::isValid() const
 {
-	switch (m_shape.size()) {
+	QPolygonF const& shape = m_spline.toPolygon();
+
+	switch (shape.size()) {
 		case 0:
 		case 1:
 		case 2:
 			return false;
 		case 3:
-			if (m_shape.front() == m_shape.back()) {
+			if (shape.front() == shape.back()) {
 				return false;
 			}
 			// fall through

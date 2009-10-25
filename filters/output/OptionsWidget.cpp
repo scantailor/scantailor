@@ -20,7 +20,7 @@
 #include "ChangeDpiDialog.h"
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
-#include "PictureZoneList.h"
+#include "ZoneSet.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include <boost/foreach.hpp>
@@ -125,15 +125,16 @@ OptionsWidget::postUpdateUI()
 void
 OptionsWidget::reloadIfZonesChanged()
 {
-	PictureZoneList saved_zones;
+	ZoneSet saved_zones;
 	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(m_pageId));
 	if (output_params.get()) {
 		saved_zones = output_params->zones();
 	}
 
-	if (saved_zones != m_ptrSettings->zonesForPage(m_pageId)) {
-		emit reloadRequested();
-	}
+#warning "FIXME: implement zone comparison"
+	//if (saved_zones != m_ptrSettings->zonesForPage(m_pageId)) {
+	//	emit reloadRequested();
+	//}
 }
 
 void

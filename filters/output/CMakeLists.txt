@@ -28,12 +28,9 @@ SET(
 	OutputImageParams.cpp OutputImageParams.h
 	OutputFileParams.cpp OutputFileParams.h
 	OutputParams.cpp OutputParams.h
-	ZoneDefaultInteraction.cpp ZoneDefaultInteraction.h
-	ZoneCreationInteraction.cpp ZoneCreationInteraction.h
-	ZoneVertexDragInteraction.cpp ZoneVertexDragInteraction.h
-	PictureZone.cpp PictureZone.h
-	PictureZoneList.cpp PictureZoneList.h
+	PictureLayerProperty.cpp PictureLayerProperty.h
 	PictureZoneEditor.cpp PictureZoneEditor.h
+	ZonePropFactory.cpp ZonePropFactory.h
 	ZonePropertiesDialog.cpp ZonePropertiesDialog.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

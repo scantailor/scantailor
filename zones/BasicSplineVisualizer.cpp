@@ -17,6 +17,7 @@
 */
 
 #include "BasicSplineVisualizer.h"
+#include "EditableZoneSet.h"
 #include <QPainter>
 #include <QBrush>
 #include <Qt>
@@ -35,16 +36,16 @@ BasicSplineVisualizer::BasicSplineVisualizer()
 void
 BasicSplineVisualizer::drawSplines(
 	QPainter& painter, QTransform const& to_screen,
-	std::vector<Spline::Ptr> const& splines)
+	EditableZoneSet const& zones)
 {
-	BOOST_FOREACH(Spline::Ptr const& spline, splines) {
-		drawSpline(painter, to_screen, spline);
+	BOOST_FOREACH(EditableZoneSet::Zone const& zone, zones) {
+		drawSpline(painter, to_screen, zone.spline());
 	}
 }
 
 void
 BasicSplineVisualizer::drawSpline(
-	QPainter& painter, QTransform const& to_screen, Spline::Ptr const& spline)
+	QPainter& painter, QTransform const& to_screen, EditableSpline::Ptr const& spline)
 {
 	prepareForSpline(painter, spline);
 	painter.drawPolygon(to_screen.map(spline->toPolygon()), Qt::WindingFill);
@@ -63,7 +64,7 @@ BasicSplineVisualizer::drawVertex(QPainter& painter, QPointF const& pt, QColor c
 
 void
 BasicSplineVisualizer::prepareForSpline(
-	QPainter& painter, Spline::Ptr const&)
+	QPainter& painter, EditableSpline::Ptr const&)
 {
 	painter.setPen(m_pen);
 	painter.setBrush(Qt::NoBrush);

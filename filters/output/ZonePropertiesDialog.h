@@ -20,7 +20,8 @@
 #define ZONES_ZONEPROPERTIESDIALOG_H_
 
 #include "ui_ZonePropertiesDialog.h"
-#include "PictureZone.h"
+#include "PropertySet.h"
+#include "IntrusivePtr.h"
 #include <QDialog>
 
 namespace output
@@ -30,14 +31,14 @@ class ZonePropertiesDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ZonePropertiesDialog(int spline_idx, PictureZone::Type type, QWidget* parent = 0);
+	ZonePropertiesDialog(IntrusivePtr<PropertySet> const& props, QWidget* parent = 0);
 signals:
-	void typeChanged(int spline_idx, PictureZone::Type type);
+	void updated();
 private slots:
 	void itemToggled(bool selected);
 private:
 	Ui::ZonePropertiesDialog ui;
-	int m_splineIdx;
+	IntrusivePtr<PropertySet> m_ptrProps;
 };
 
 } // namespace output

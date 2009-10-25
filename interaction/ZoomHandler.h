@@ -23,6 +23,7 @@
 #include "InteractionState.h"
 #include <QPoint>
 #include <QCoreApplication>
+#include <boost/function.hpp>
 
 class ImageViewBase;
 
@@ -34,6 +35,9 @@ public:
 
 	ZoomHandler(ImageViewBase& image_view);
 
+	ZoomHandler(ImageViewBase& image_view,
+		boost::function<bool(InteractionState const&)> const& explicit_interaction_permitter);
+
 	Focus focus() const { return m_focus; }
 
 	void setFocus(Focus focus) { m_focus = focus; }
@@ -41,6 +45,7 @@ protected:
 	virtual void onWheelEvent(QWheelEvent* event, InteractionState& interaction);
 private:
 	ImageViewBase& m_rImageView;
+	boost::function<bool(InteractionState const&)> m_interactionPermitter;
 	InteractionState::Captor m_interaction;
 	double m_zoom;
 	Focus m_focus;

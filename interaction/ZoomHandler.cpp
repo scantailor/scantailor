@@ -25,15 +25,27 @@
 
 ZoomHandler::ZoomHandler(ImageViewBase& image_view)
 :	m_rImageView(image_view),
+	m_interactionPermitter(&InteractionHandler::defaultInteractionPermitter),
 	m_zoom(1.0),
 	m_focus(CURSOR)
 {
 }
 
+ZoomHandler::ZoomHandler(
+	ImageViewBase& image_view,
+	boost::function<bool(InteractionState const&)> const& explicit_interaction_permitter)
+:	m_rImageView(image_view),
+	m_interactionPermitter(explicit_interaction_permitter),
+	m_zoom(1.0),
+	m_focus(CURSOR)
+{
+
+}
+
 void
 ZoomHandler::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
-{
-	if (interaction.captured()) {
+{	
+	if (!m_interactionPermitter(interaction)) {
 		return;
 	}
 

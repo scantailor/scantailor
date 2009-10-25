@@ -17,8 +17,8 @@
 */
 
 #include "ZoneDefaultInteraction.h"
-#include "ZoneCreationInteraction.h"
-#include "ZoneVertexDragInteraction.h"
+#include "ZoneInteractionContext.h"
+#include "EditableZoneSet.h"
 #include "ImageViewBase.h"
 #include <QTransform>
 #include <QPolygon>
@@ -31,16 +31,18 @@
 #include <Qt>
 #include <QMouseEvent>
 #include <boost/foreach.hpp>
+#include <vector>
 #include <assert.h>
 
-namespace output
+ZoneDefaultInteraction::ZoneDefaultInteraction(ZoneInteractionContext& context)
+:	m_rContext(context)
 {
-
-ZoneDefaultInteraction::ZoneDefaultInteraction(
-	ImageViewBase& image_view, std::vector<Spline::Ptr>& splines)
-:	m_rImageView(image_view),
-	m_rSplines(splines)
-{
+	m_vertexProximity.setProximityStatusTip(tr("Drag the vertex."));
+	m_segmentProximity.setProximityStatusTip(tr("Click to create a new vertex here."));
+	m_zoneAreaProximity.setProximityStatusTip(tr("Right click to edit zone properties."));
+	m_rContext.imageView().interactionState().setDefaultStatusTip(
+		tr("Click to start creating a new picture zone.")
+	);
 }
 
 void
@@ -49,9 +51,10 @@ ZoneDefaultInteraction::onPaint(QPainter& painter, InteractionState const& inter
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
 
-	BOOST_FOREACH(Spline::Ptr const& spline, m_rSplines) {
+	BOOST_FOREACH(EditableZoneSet::Zone const& zone, m_rContext.zones()) {
+		EditableSpline::Ptr const& spline = zone.spline();
 		m_visualizer.prepareForSpline(painter, spline);
 		QPolygonF points;
 
@@ -111,7 +114,7 @@ ZoneDefaultInteraction::onPaint(QPainter& painter, InteractionState const& inter
 		painter.drawLine(line);
 
 		m_visualizer.drawVertex(painter, m_screenPointOnSegment, m_visualizer.highlightBrightColor());
-	} else {
+	} else if (!interaction.captured()) {
 		m_visualizer.drawVertex(painter, m_screenMousePos, m_visualizer.solidColor());
 	}
 }
@@ -121,8 +124,8 @@ ZoneDefaultInteraction::onProximityUpdate(QPointF const& mouse_pos, InteractionS
 {
 	m_screenMousePos = mouse_pos;
 
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
+	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 	QPointF const image_mouse_pos(from_screen.map(mouse_pos));
 
 	m_ptrNearestVertex.reset();
@@ -135,7 +138,9 @@ ZoneDefaultInteraction::onProximityUpdate(QPointF const& mouse_pos, InteractionS
 
 	bool has_zone_under_mouse = false;
 
-	BOOST_FOREACH(Spline::Ptr const& spline, m_rSplines) {
+	BOOST_FOREACH(EditableZoneSet::Zone const& zone, m_rContext.zones()) {
+		EditableSpline::Ptr const& spline = zone.spline();
+
 		if (!has_zone_under_mouse) {
 			QPainterPath path;
 			path.setFillRule(Qt::WindingFill);
@@ -156,7 +161,7 @@ ZoneDefaultInteraction::onProximityUpdate(QPointF const& mouse_pos, InteractionS
 		}
 
 		// Process segments.
-		for (Spline::SegmentIterator it(*spline); it.hasNext(); ) {
+		for (EditableSpline::SegmentIterator it(*spline); it.hasNext(); ) {
 			SplineSegment const segment(it.next());
 			QLineF const line(to_screen.map(segment.toLine()));
 			QPointF point_on_segment;
@@ -172,21 +177,11 @@ ZoneDefaultInteraction::onProximityUpdate(QPointF const& mouse_pos, InteractionS
 
 	interaction.updateProximity(m_vertexProximity, best_vertex_proximity, 1);
 	interaction.updateProximity(m_segmentProximity, best_segment_proximity, 0);
-#if 0
-	if (m_ptrHighlightedVertex) {
-		// Vertex selection takes preference over edge selection.
-		m_highlightedEdge = Edge();
-		m_ptrHighlightedSpline = highlighted_vertex_spline;
-		ensureStatusTip(tr("Drag the vertex."));
-	} else if (highlighted_edge_spline) {
-		m_ptrHighlightedSpline = highlighted_edge_spline;
-		ensureStatusTip(tr("Click to create a new vertex here."));
-	} else if (has_zone_under_mouse) {
-		ensureStatusTip(tr("Right click to edit zone properties."));
-	} else {
-		ensureStatusTip(tr("Click to start creating a new picture zone."));
+
+	if (has_zone_under_mouse) {
+		Proximity const zone_area_proximity(std::min(best_vertex_proximity, best_segment_proximity));
+		interaction.updateProximity(m_zoneAreaProximity, zone_area_proximity, -1, zone_area_proximity);
 	}
-#endif
 }
 
 void
@@ -201,16 +196,22 @@ ZoneDefaultInteraction::onMousePressEvent(QMouseEvent* event, InteractionState& 
 
 	if (interaction.proximityLeader(m_vertexProximity)) {
 		makePeerPreceeder(
-			*new ZoneVertexDragInteraction(
-				m_rImageView, m_rSplines, m_ptrNearestVertexSpline,
-				m_ptrNearestVertex, interaction, event->pos() + QPointF(0.5, 0.5)
+			*m_rContext.createVertexDragInteraction(
+				interaction, m_ptrNearestVertexSpline, m_ptrNearestVertex
 			)
 		);
 		delete this;
+		event->accept();
 	} else if (interaction.proximityLeader(m_segmentProximity)) {
-		//Vertex::Ptr vertex(m_highlightedEdge.splitAt(fromScreen().map(m_screenPointOnEdge)));
-		//handlerPushFront(new VertexDragHandler(m_rOwner, m_ptrHighlightedSpline, vertex))->mousePressEvent(event);
-		//delete this;
+		QTransform const from_screen(m_rContext.imageView().widgetToImage());
+		SplineVertex::Ptr vertex(m_nearestSegment.splitAt(from_screen.map(m_screenPointOnSegment)));
+		makePeerPreceeder(
+			*m_rContext.createVertexDragInteraction(
+				interaction, m_ptrNearestSegmentSpline, vertex
+			)
+		);
+		delete this;
+		event->accept();
 	}
 }
 
@@ -224,49 +225,30 @@ ZoneDefaultInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionState
 		return;
 	}
 
-	makePeerFollower(
-		*new ZoneCreationInteraction(
-			m_rImageView, m_rSplines, interaction, event->pos() + QPointF(0.5, 0.5)
-		)
-	);
+	makePeerPreceeder(*m_rContext.createZoneCreationInteraction(interaction));
 	delete this;
+	event->accept();
 }
 
 void
 ZoneDefaultInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
+	QTransform const to_screen(m_rContext.imageView().imageToWidget());
 
 	m_screenMousePos = to_screen.map(event->pos() + QPointF(0.5, 0.5));
-	//update();
-	m_rImageView.update();
+	m_rContext.imageView().update();
 }
 
 void
 ZoneDefaultInteraction::onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction)
 {
-	QTransform const to_screen(m_rImageView.imageToVirtual() * m_rImageView.virtualToWidget());
-	QTransform const from_screen(m_rImageView.widgetToVirtual() * m_rImageView.virtualToImage());
+	event->accept();
 
-	// Find splines containing this point.
-	std::vector<unsigned> splines;
-	for (unsigned i = 0; i < m_rSplines.size(); ++i) {
-		QPainterPath path;
-		path.setFillRule(Qt::WindingFill);
-		path.addPolygon(m_rSplines[i]->toPolygon());
-		if (path.contains(from_screen.map(event->pos() + QPointF(0.5, 0.5)))) {
-			splines.push_back(i);
-		}
-	}
-
-	if (splines.empty()) {
+	InteractionHandler* cm_interaction = m_rContext.createContextMenuInteraction(interaction);
+	if (!cm_interaction) {
 		return;
 	}
 
-	event->accept();
-
-	//handlerPushFront(new ContextMenuHandler(m_rOwner, splines, event->globalPos()));
-	//delete this;
+	makePeerPreceeder(*cm_interaction);
+	delete this;
 }
-
-} // namespace output

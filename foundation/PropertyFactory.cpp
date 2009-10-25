@@ -16,28 +16,23 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_PICTURE_ZONE_LIST_H_
-#define OUTPUT_PICTURE_ZONE_LIST_H_
+#include "PropertyFactory.h"
+#include <QDomElement>
+#include <QString>
 
-#include "PictureZone.h"
-
-class QDomDocument;
-class QDomElement;
-class QString;
-
-namespace output
+void
+PropertyFactory::registerProperty(QString const& property, PropertyConstructor constructor)
 {
+	m_registry[property] = constructor;
+}
 
-class PictureZoneList : public std::vector<PictureZone>
+IntrusivePtr<Property>
+PropertyFactory::construct(QDomElement const& el) const
 {
-public:
-	PictureZoneList() {}
-
-	PictureZoneList(QDomElement const& el);
-
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-};
-
-} // namespace output
-
-#endif
+	Registry::const_iterator it(m_registry.find(el.attribute("type")));
+	if (it != m_registry.end()) {
+		return (*it->second)(el);
+	} else {
+		return IntrusivePtr<Property>();
+	}
+}

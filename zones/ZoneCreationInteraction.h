@@ -16,47 +16,46 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_ZONE_VERTEX_DRAG_INTERACTION_H_
-#define OUTPUT_ZONE_VERTEX_DRAG_INTERACTION_H_
+#ifndef ZONE_CREATION_INTERACTION_H_
+#define ZONE_CREATION_INTERACTION_H_
 
-#include "BasicSplineVisualizer.h"
-#include "Spline.h"
 #include "InteractionHandler.h"
 #include "InteractionState.h"
+#include "DragHandler.h"
+#include "ZoomHandler.h"
+#include "BasicSplineVisualizer.h"
+#include "EditableSpline.h"
 #include <QPointF>
 #include <QCoreApplication>
 
-class ImageViewBase;
+class ZoneInteractionContext;
 
-namespace output
+class ZoneCreationInteraction : public InteractionHandler
 {
-
-class ZoneVertexDragInteraction : public InteractionHandler
-{
-	Q_DECLARE_TR_FUNCTIONS(ZoneVertexDragInteraction)
+	Q_DECLARE_TR_FUNCTIONS(ZoneCreationInteraction)
 public:
-	ZoneVertexDragInteraction(
-		ImageViewBase& image_view, std::vector<Spline::Ptr>& splines,
-		Spline::Ptr const& spline, SplineVertex::Ptr const& vertex,
-		InteractionState& interaction, QPointF const& screen_mouse_pos);
+	ZoneCreationInteraction(
+		ZoneInteractionContext& context, InteractionState& interaction);
 protected:
+	ZoneInteractionContext& context() { return m_rContext; }
+
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
+
+	virtual void onKeyPressEvent(QKeyEvent* event, InteractionState& interaction);
 
 	virtual void onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction);
 
 	virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 private:
-	void checkProximity(InteractionState const& interaction);
+	void updateStatusTip();
 
-	ImageViewBase& m_rImageView;
-	std::vector<Spline::Ptr>& m_rSplines;
-	Spline::Ptr m_ptrSpline;
-	SplineVertex::Ptr m_ptrVertex;
-	InteractionState::Captor m_interaction;
+	ZoneInteractionContext& m_rContext;
+	DragHandler m_dragHandler;
+	ZoomHandler m_zoomHandler;
 	BasicSplineVisualizer m_visualizer;
-	QPointF m_dragOffset;
+	InteractionState::Captor m_interaction;
+	EditableSpline::Ptr m_ptrSpline;
+	QPointF m_nextVertexImagePos;
 };
-
-} // namespace output
 
 #endif

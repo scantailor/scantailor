@@ -17,27 +17,29 @@
 */
 
 #include "ZonePropertiesDialog.h.moc"
+#include "Property.h"
+#include "PictureLayerProperty.h"
 
 namespace output
 {
 
 ZonePropertiesDialog::ZonePropertiesDialog(
-	int spline_idx, PictureZone::Type type, QWidget* parent)
+	IntrusivePtr<PropertySet> const& props, QWidget* parent)
 :	QDialog(parent),
-	m_splineIdx(spline_idx)
+	m_ptrProps(props)
 {
 	ui.setupUi(this);
 
-	switch (type) {
-		case PictureZone::NO_OP:
+	switch (m_ptrProps->locateOrDefault<PictureLayerProperty>()->layer()) {
+		case PictureLayerProperty::NO_OP:
 			break;
-		case PictureZone::ERASER1:
+		case PictureLayerProperty::ERASER1:
 			ui.eraser1->setChecked(true);
 			break;
-		case PictureZone::PAINTER2:
+		case PictureLayerProperty::PAINTER2:
 			ui.painter2->setChecked(true);
 			break;
-		case PictureZone::ERASER3:
+		case PictureLayerProperty::ERASER3:
 			ui.eraser3->setChecked(true);
 			break;
 	}
@@ -50,19 +52,20 @@ ZonePropertiesDialog::ZonePropertiesDialog(
 void
 ZonePropertiesDialog::itemToggled(bool selected)
 {
-	PictureZone::Type type = PictureZone::NO_OP;
+	PictureLayerProperty::Layer layer = PictureLayerProperty::NO_OP;
 
 	QObject* const obj = sender();
 	if (obj == ui.eraser1) {
-		type = PictureZone::ERASER1;
+		layer = PictureLayerProperty::ERASER1;
 	} else if (obj == ui.painter2) {
-		type = PictureZone::PAINTER2;
+		layer = PictureLayerProperty::PAINTER2;
 	} else if (obj == ui.eraser3) {
-		type = PictureZone::ERASER3;
+		layer = PictureLayerProperty::ERASER3;
 	}
 
-	emit typeChanged(m_splineIdx, type);
+	m_ptrProps->locateOrCreate<PictureLayerProperty>()->setLayer(layer);
+
+	emit updated();
 }
 
 } // namespace output
-
