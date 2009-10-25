@@ -203,7 +203,7 @@ ZoneCreationInteraction::updateStatusTip()
 			tip = tr("Connect first and last points to finish this zone.  ESC to cancel.");
 		}
 	} else {
-		tip = tr("You need at least 3 points to finish this zone.  ESC to cancel.");
+		tip = tr("Zones need to have at least 3 points.  ESC to cancel.");
 	}
 
 	m_interaction.setInteractionStatusTip(tip);

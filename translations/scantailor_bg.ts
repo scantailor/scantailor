@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>DeskewOptionsWidget</name>
     <message>
@@ -16,6 +18,13 @@
     <message>
         <source>Manual</source>
         <translation>Ръчно</translation>
+    </message>
+</context>
+<context>
+    <name>DragHandler</name>
+    <message>
+        <source>Unrestricted dragging is possible by holding down the Shift key.</source>
+        <translation type="unfinished">Чрез задържане на клавиша Shift е възможно неограничено влачене.</translation>
     </message>
 </context>
 <context>
@@ -123,7 +132,7 @@
     </message>
     <message>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
-        <translation>Чрез задържане на клавиша Shift е възможно неограничено влачене.</translation>
+        <translation type="obsolete">Чрез задържане на клавиша Shift е възможно неограничено влачене.</translation>
     </message>
 </context>
 <context>
@@ -857,6 +866,89 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     </message>
 </context>
 <context>
+    <name>ZoneContextMenuInteraction</name>
+    <message>
+        <source>Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete confirmation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Really delete this zone?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZoneCreationInteraction</name>
+    <message>
+        <source>Click to finish this zone.  ESC to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zones need to have at least 3 points.  ESC to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZoneDefaultInteraction</name>
+    <message>
+        <source>Drag the vertex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to create a new vertex here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right click to edit zone properties.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Click to start creating a new picture zone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZonePropertiesDialog</name>
+    <message>
+        <source>Zone Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtract from all layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to auto layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtract from auto layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ZoneVertexDragInteraction</name>
+    <message>
+        <source>Merge these two vertices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move the vertex to one of its neighbors to merge them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>deskew::Filter</name>
     <message>
         <source>Deskew</source>
@@ -930,6 +1022,21 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     </message>
 </context>
 <context>
+    <name>output::Task::UiUpdater</name>
+    <message>
+        <source>Picture zones are only available in Mixed mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished">Краен резултат</translation>
+    </message>
+    <message>
+        <source>Picture Zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>page_layout::Filter</name>
     <message>
         <source>Page Layout</source>
@@ -965,11 +1072,15 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <name>page_split::ImageView</name>
     <message>
         <source>Drag this handle to skew the line.</source>
-        <translation>Завлачете този манипулатор за да наклоните линията.</translation>
+        <translation type="obsolete">Завлачете този манипулатор за да наклоните линията.</translation>
     </message>
     <message>
         <source>This line can be dragged.</source>
-        <translation>Тази линия може да бъде влачена.</translation>
+        <translation type="obsolete">Тази линия може да бъде влачена.</translation>
+    </message>
+    <message>
+        <source>Drag the line or the handles.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
