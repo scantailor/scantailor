@@ -5,6 +5,15 @@ IF(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 ENDIF(COMMAND cmake_policy)
 
+SET(
+	CMAKE_USER_MAKE_RULES_OVERRIDE
+	"${CMAKE_SOURCE_DIR}/cmake/default_cflags.cmake"
+)
+SET(
+	CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
+	"${CMAKE_SOURCE_DIR}/cmake/default_cxxflags.cmake"
+)
+
 PROJECT("Scan Tailor")
 
 # This forces Visual Studio 2008 SP1 to actually link to the versions of the

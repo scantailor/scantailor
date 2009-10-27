@@ -1,5 +1,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
+SET(
+	CMAKE_USER_MAKE_RULES_OVERRIDE
+	"${CMAKE_SOURCE_DIR}/../../../cmake/default_cflags.cmake"
+)
+SET(
+	CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
+	"${CMAKE_SOURCE_DIR}/../../../cmake/default_cxxflags.cmake"
+)
+
 PROJECT("Scan Tailor Dependencies")
 
 # This forces Visual Studio 2008 SP1 to actually link to the versions of the
@@ -269,18 +278,18 @@ ENDFOREACH(file_pro)
 # that minus at the end.  That's necessary to make Qt compatible with other
 # libraries that use wchar_t stuff.
 FILE(GLOB_RECURSE conf_files "${QT_DIR}/mkspecs/*.conf")
-FOREACH(file_conf ${conf_files})
-	FILE(READ "${file_conf}" contents)
+FOREACH(conf_file ${conf_files})
+	FILE(READ "${conf_file}" contents)
 	STRING(REGEX REPLACE "-Zc:wchar_t-" "-Zc:wchar_t" new_contents "${contents}")
 	IF(NOT "${contents}" STREQUAL "${new_contents}")
 		# Make a backup copy, if not already there.
-		IF(NOT EXISTS "${file_conf}.orig")
-			CONFIGURE_FILE("${file_conf}" "${file_conf}.orig" COPYONLY)
-		ENDIF(NOT EXISTS "${file_conf}.orig")
+		IF(NOT EXISTS "${conf_file}.orig")
+			CONFIGURE_FILE("${conf_file}" "${conf_file}.orig" COPYONLY)
+		ENDIF()
 
-		FILE(WRITE "${file_conf}" "${new_contents}")
-	ENDIF(NOT "${contents}" STREQUAL "${new_contents}")
-ENDFOREACH(file_conf)
+		FILE(WRITE "${conf_file}" "${new_contents}")
+	ENDIF()
+ENDFOREACH()
 
 SET(qt_maybe_skip_tools)
 IF(EXISTS "${QT_DIR}/bin/designer.exe")
@@ -299,13 +308,32 @@ ELSEIF(MSVC)
 		SET(platform win32-msvc2003)
 	ELSEIF(MSVC80)
 		SET(platform win32-msvc2005)
+		SET(force_frame_pointer TRUE)
 	ELSE(MSVC60 OR MSVC70)
 		#MSVC90 or above
 		SET(platform win32-msvc2008)
+		SET(force_frame_pointer TRUE)
 	ENDIF(MSVC60 OR MSVC70)
 ELSE(MINGW)
 	MESSAGE(FATAL_ERROR "Unsupported platform.")
 ENDIF(MINGW)
+
+# We disable frame pointer ommission in release mode to ensure
+# good stack traced from our built-in crash reporter.
+IF(MSVC AND force_frame_pointer)
+	SET(conf_file "${QT_DIR}/mkspecs/${platform}/qmake.conf")
+	FILE(READ "${conf_file}" contents)
+	STRING(REGEX REPLACE "(QMAKE_CFLAGS_RELEASE[ \\t]*=)" "\\1 -Oy-" new_contents "${contents}")
+	STRING(REGEX REPLACE "( -Oy-)+" " -Oy-" new_contents "${new_contents}")
+	IF(NOT "${contents}" STREQUAL "${new_contents}")
+		# Make a backup copy, if not already there.
+		IF(NOT EXISTS "${conf_file}.orig")
+			CONFIGURE_FILE("${conf_file}" "${conf_file}.orig" COPYONLY)
+		ENDIF()
+
+		FILE(WRITE "${conf_file}" "${new_contents}")
+	ENDIF()
+ENDIF()
 
 # Note #1: -system-zlib is broken on Windows (bug: #186774).  So, we build with
 # internal zlib, while libpng is linked with an external zlib.  This works only
@@ -328,7 +356,6 @@ FILE(
 	" -D _BIND_TO_CURRENT_VCLIBS_VERSION=1"
 	"\n"
 	"${make_command}\n"
-	":exit\n"
 )
 
 ADD_CUSTOM_TARGET(Qt ALL "${build_qt_fname}")
