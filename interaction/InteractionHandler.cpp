@@ -18,6 +18,7 @@
 
 #include "InteractionHandler.h"
 #include "InteractionState.h"
+#include "NonCopyable.h"
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -41,6 +42,37 @@
 		return;                                  \
 	}                                            \
 }
+
+namespace
+{
+
+class ScopedClearAcceptance
+{
+	DECLARE_NON_COPYABLE(ScopedClearAcceptance)
+public:
+	ScopedClearAcceptance(QEvent* event);
+
+	~ScopedClearAcceptance();
+private:
+	QEvent* m_pEvent;
+	bool m_wasAccepted;
+};
+
+ScopedClearAcceptance::ScopedClearAcceptance(QEvent* event)
+:	m_pEvent(event),
+	m_wasAccepted(event->isAccepted())
+{
+	m_pEvent->setAccepted(false);
+}
+
+ScopedClearAcceptance::~ScopedClearAcceptance()
+{
+	if (m_wasAccepted) {
+		m_pEvent->setAccepted(true);
+	}
+}
+
+} // anonymous namespace
 
 InteractionHandler::~InteractionHandler()
 {
@@ -73,54 +105,66 @@ InteractionHandler::proximityUpdate(
 void
 InteractionHandler::keyPressEvent(QKeyEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, keyPressEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onKeyPressEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, keyPressEvent(event, interaction));
 }
 
 void
 InteractionHandler::keyReleaseEvent(QKeyEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, keyReleaseEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onKeyReleaseEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, keyReleaseEvent(event, interaction));
 }
 
 void
 InteractionHandler::mousePressEvent(QMouseEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, mousePressEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onMousePressEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, mousePressEvent(event, interaction));
 }
 
 void
 InteractionHandler::mouseReleaseEvent(QMouseEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, mouseReleaseEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onMouseReleaseEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, mouseReleaseEvent(event, interaction));
 }
 
 void
 InteractionHandler::mouseMoveEvent(QMouseEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, mouseMoveEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onMouseMoveEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, mouseMoveEvent(event, interaction));
 }
 
 void
 InteractionHandler::wheelEvent(QWheelEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, wheelEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onWheelEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, wheelEvent(event, interaction));
 }
 
@@ -128,9 +172,11 @@ void
 InteractionHandler::contextMenuEvent(
 	QContextMenuEvent* event, InteractionState& interaction)
 {
+	RETURN_IF_ACCEPTED(event);
 	DISPATCH(m_preceeders, contextMenuEvent(event, interaction));
 	RETURN_IF_ACCEPTED(event);
 	onContextMenuEvent(event, interaction);
+	ScopedClearAcceptance guard(event);
 	DISPATCH(m_followers, contextMenuEvent(event, interaction));
 }
 
