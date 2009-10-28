@@ -59,7 +59,7 @@ namespace output
 
 class Task::UiUpdater : public FilterResult
 {
-	Q_DECLARE_TR_FUNCTIONS(output::Task)
+	Q_DECLARE_TR_FUNCTIONS(output::Task::UiUpdater)
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
