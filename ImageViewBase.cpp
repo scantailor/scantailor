@@ -801,8 +801,8 @@ ImageViewBase::scheduleHqVersionRebuild()
 			m_ptrHqTransformTask.reset();
 		}
 		m_potentialHqXform = xform;
-		m_timer.start();
 	}
+	m_timer.start();
 }
 
 void

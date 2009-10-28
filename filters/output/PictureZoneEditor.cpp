@@ -195,8 +195,8 @@ PictureZoneEditor::schedulePictureMaskRebuild()
 			m_ptrMaskTransformTask.reset();
 		}
 		m_potentialPictureMaskXform = virtualToWidget();
-		m_pictureMaskRebuildTimer.start();
 	}
+	m_pictureMaskRebuildTimer.start();
 }
 
 void
