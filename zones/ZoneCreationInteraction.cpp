@@ -214,6 +214,7 @@ ZoneCreationInteraction::updateStatusTip()
 
 ZoneCreationInteraction::DragWatcher::DragWatcher(DragHandler& drag_handler)
 :	m_rDragHandler(drag_handler),
+	m_dragMaxSqDist(0),
 	m_dragInProgress(false)
 {
 }
@@ -221,27 +222,47 @@ ZoneCreationInteraction::DragWatcher::DragWatcher(DragHandler& drag_handler)
 bool
 ZoneCreationInteraction::DragWatcher::haveSignificantDrag() const
 {
-	return m_dragInProgress && QDateTime::currentDateTime() > m_dragStartTime.addMSecs(400);
+	if (!m_dragInProgress) {
+		return false;
+	}
+
+	if (QDateTime::currentDateTime() < m_dragStartTime.addMSecs(400)) {
+		return false;
+	}
+
+	if (m_dragMaxSqDist < 6*6) {
+		return false;
+	}
+
+	return true;
 }
 
 void
 ZoneCreationInteraction::DragWatcher::onMousePressEvent(QMouseEvent* event, InteractionState&)
 {
-	updateState();
+	updateState(event->pos());
 }
 
 void
 ZoneCreationInteraction::DragWatcher::onMouseMoveEvent(QMouseEvent* event, InteractionState&)
 {
-	updateState();
+	updateState(event->pos());
 }
 
 void
-ZoneCreationInteraction::DragWatcher::updateState()
+ZoneCreationInteraction::DragWatcher::updateState(QPoint const mouse_pos)
 {
 	if (m_rDragHandler.isActive()) {
 		if (!m_dragInProgress) {
 			m_dragStartTime = QDateTime::currentDateTime();
+			m_dragStartPos = mouse_pos;
+			m_dragMaxSqDist = 0;
+		} else {
+			QPoint const delta(mouse_pos - m_dragStartPos);
+			int const sqdist = delta.x() * delta.x() + delta.y() * delta.y();
+			if (sqdist > m_dragMaxSqDist) {
+				m_dragMaxSqDist = sqdist;
+			}
 		}
 		m_dragInProgress = true;
 	} else {

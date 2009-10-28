@@ -59,10 +59,12 @@ private:
 
 		virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 	private:
-		void updateState();
+		void updateState(QPoint mouse_pos);
 
 		DragHandler& m_rDragHandler;
 		QDateTime m_dragStartTime;
+		QPoint m_dragStartPos;
+		int m_dragMaxSqDist;
 		bool m_dragInProgress;
 	};
 
