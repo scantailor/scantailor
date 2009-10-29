@@ -26,6 +26,7 @@
 #include "imageproc/Morphology.h"
 #include "imageproc/MorphGradientDetect.h"
 #include "imageproc/HoughLineDetector.h"
+#include "imageproc/Constants.h"
 #include <boost/foreach.hpp>
 #include <QLineF>
 #include <QSizeF>
@@ -50,8 +51,10 @@ VertLineFinder::findLines(
 	int const max_lines, DebugImages* dbg,
 	QImage* gray_downscaled, QTransform* out_to_downscaled)
 {
+	int const dpi = 100;
+
 	ImageTransformation xform_100dpi(xform);
-	xform_100dpi.preScaleToDpi(Dpi(100, 100));
+	xform_100dpi.preScaleToDpi(Dpi(dpi, dpi));
 	
 	QColor const black(0x00, 0x00, 0x00);
 	QImage const gray100(
@@ -123,13 +126,17 @@ VertLineFinder::findLines(
 	
 	unsigned weight_table[256];
 	buildWeightTable(weight_table);
-	
-	int const width = raster_lines.width();
+
+	// We don't want to process areas too close to the vertical edges.
+	double const margin_mm = 3.5;
+	int const margin = (int)floor(0.5 + margin_mm * constants::MM2INCH * dpi);
+
+	int const x_limit = raster_lines.width() - margin;
 	int const height = raster_lines.height();
 	uint8_t const* line = raster_lines.bits();
 	int const bpl = raster_lines.bytesPerLine();
 	for (int y = 0; y < height; ++y, line += bpl) {
-		for (int x = 0; x < width; ++x) {
+		for (int x = margin; x < x_limit; ++x) {
 			unsigned const val = line[x];
 			if (val > 1) {
 				line_detector.process(x, y, weight_table[val]);
