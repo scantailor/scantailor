@@ -111,10 +111,17 @@ public:
 	 *        (by adding reduced obstacles).  There is no strict
 	 *        requirement to manually add an obstacle after calling
 	 *        this function with MANUAL_OBSTACLES.
+	 * \param max_iterations The maximum number of iterations to spend
+	 *        searching for the next maximal white rectangle.
+	 *        Reaching this limit without finding one will cause
+	 *        a null rectangle to be returned.  You generally don't
+	 *        want to set this limit MAX_INT or similar, because
+	 *        some patterns (a pixel by pixel checkboard pattern for example)
+	 *        will take prohibitively long time to process.
 	 * \return A white rectangle, or a null rectangle, if no white
 	 *         rectangles confirming to the minimum size were found.
 	 */
-	QRect next(ObstacleMode obstacle_mode = AUTO_OBSTACLES);
+	QRect next(ObstacleMode obstacle_mode = AUTO_OBSTACLES, int max_iterations = 1000);
 private:
 	class Region
 	{

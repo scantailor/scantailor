@@ -86,9 +86,9 @@ MaxWhitespaceFinder::addObstacle(QRect const& obstacle)
 }
 
 QRect
-MaxWhitespaceFinder::next(ObstacleMode const obstacle_mode)
+MaxWhitespaceFinder::next(ObstacleMode const obstacle_mode, int max_iterations)
 {
-	while (!m_ptrQueuedRegions->empty()) {
+	while (max_iterations-- > 0 && !m_ptrQueuedRegions->empty()) {
 		Region& top_region = m_ptrQueuedRegions->top();
 		Region region(top_region);
 		region.swapObstacles(top_region);
