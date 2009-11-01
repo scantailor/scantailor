@@ -20,6 +20,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QWidget>
+#include <QPaintEngine>
 #include <QTransform>
 #include <QRect>
 #include <QRectF>
@@ -46,6 +47,11 @@ PixmapRenderer::drawPixmap(
 	QPaintDevice* const redir_dev = QPainter::redirected(painter.device(), &offset);
 	QPaintDevice* const paint_dev = redir_dev ? redir_dev : dev;
 	
+	if (paint_dev->paintEngine()->type() != QPaintEngine::X11) {
+		drawPixmapNoXRender(painter, pixmap);
+		return;
+	}
+
 	QRect const device_rect(
 		QRect(0, 0, dev->width(), dev->height()).translated(-offset)
 	);
