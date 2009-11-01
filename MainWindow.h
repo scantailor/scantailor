@@ -131,6 +131,8 @@ private slots:
 	void projectOpened(ProjectOpeningContext* context);
 	
 	void closeProject();
+
+	void openSettingsDialog();
 private:
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	

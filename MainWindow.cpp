@@ -45,6 +45,7 @@
 #include "ImageMetadataLoader.h"
 #include "OrthogonalRotation.h"
 #include "FixDpiSinglePageDialog.h"
+#include "SettingsDialog.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -186,6 +187,11 @@ MainWindow::MainWindow()
 	connect(
 		actionDebug, SIGNAL(toggled(bool)),
 		this, SLOT(debugToggled(bool))
+	);
+
+	connect(
+		actionSettings, SIGNAL(triggered(bool)),
+		this, SLOT(openSettingsDialog())
 	);
 	
 	connect(
@@ -1138,6 +1144,15 @@ void
 MainWindow::closeProject()
 {
 	closeProjectInteractive();
+}
+
+void
+MainWindow::openSettingsDialog()
+{
+	SettingsDialog* dialog = new SettingsDialog(this);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowModality(Qt::WindowModal);
+	dialog->show();
 }
 
 /**

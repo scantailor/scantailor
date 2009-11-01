@@ -26,6 +26,7 @@
 #include "ScopedIncDec.h"
 #include "imageproc/PolygonUtils.h"
 #include "imageproc/Transform.h"
+#include "config.h"
 #include <QScrollBar>
 #include <QPointer>
 #include <QAtomicInt>
@@ -40,11 +41,17 @@
 #include <QResizeEvent>
 #include <QStatusTipEvent>
 #include <QApplication>
+#include <QSettings>
+#include <QVariant>
 #include <Qt>
 #include <QDebug>
 #include <algorithm>
 #include <assert.h>
 #include <math.h>
+
+#ifdef ENABLE_OPENGL
+#include <QGLWidget>
+#endif
 
 using namespace imageproc;
 
@@ -149,7 +156,11 @@ ImageViewBase::ImageViewBase(
 	m_ignoreScrollEvents(0),
 	m_hqTransformEnabled(true)
 {
-	//setViewport(new QGLWidget());
+#ifdef ENABLE_OPENGL
+	if (QSettings().value("settings/use_3d_acceleration", true) != false) {
+		setViewport(new QGLWidget());
+	}
+#endif
 
 	setFrameShape(QFrame::NoFrame);
 	viewport()->setFocusPolicy(Qt::WheelFocus);

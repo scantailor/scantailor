@@ -7,5 +7,6 @@
 #define TRANSLATIONS_DIR_ABS "@TRANSLATIONS_DIR_ABS@"
 
 #cmakedefine ENABLE_CRASH_REPORTER
+#cmakedefine ENABLE_OPENGL
 
 #endif

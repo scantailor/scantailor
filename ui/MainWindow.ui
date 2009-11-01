@@ -174,7 +174,7 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug">
@@ -182,6 +182,8 @@
      <string>Tools</string>
     </property>
     <addaction name="actionDebug"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -299,6 +301,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings ...</string>
    </property>
   </action>
  </widget>

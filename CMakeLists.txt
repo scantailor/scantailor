@@ -65,6 +65,9 @@ IF(NOT QT4_FOUND)
 	)
 ENDIF(NOT QT4_FOUND)
 
+# For config.h
+SET(ENABLE_OPENGL ${QT_QTOPENGL_FOUND})
+
 FILE(GLOB jpeg_dirs "${outer_dir}/jpeg-[0-9]*")
 FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
@@ -253,6 +256,10 @@ ENDIF(WIN32)
 # won't resolve symbols qjpeg needs from it.
 LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
 
+IF(ENABLE_OPENGL)
+	LIST(APPEND EXTRA_LIBS ${QT_QTOPENGL_LIBRARY})
+ENDIF()
+
 # Crash reporter, only Windows + MSVC supported for now.
 # Must go before generating config.h, as ENABLE_CRASH_REPORTER
 # goes in there.
@@ -314,6 +321,7 @@ SET(
 	ImageMetadata.cpp ImageMetadata.h
 	PageLayout.cpp PageLayout.h
 	RecentProjects.cpp RecentProjects.h
+	SettingsDialog.cpp SettingsDialog.h
 	FixDpiDialog.cpp FixDpiDialog.h
 	FixDpiSinglePageDialog.cpp FixDpiSinglePageDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
