@@ -26,6 +26,7 @@
 #include "ZonePropertiesDialog.h"
 #include "Settings.h"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 #include "PixmapRenderer.h"
 #include "BackgroundExecutor.h"
 #include "AbstractCommand.h"
@@ -96,7 +97,7 @@ PictureZoneEditor::PictureZoneEditor(
 	imageproc::BinaryImage const& picture_mask,
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	PageId const& page_id, IntrusivePtr<Settings> const& settings)
-:	ImageViewBase(image, downscaled_image, image_to_virt, virt_display_area),
+:	ImageViewBase(image, downscaled_image, ImagePresentation(image_to_virt, virt_display_area)),
 	m_context(*this, m_zones),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
@@ -215,7 +216,7 @@ PictureZoneEditor::initiateBuildingScreenPictureMask()
 
 	QTransform const xform(virtualToWidget());
 	IntrusivePtr<MaskTransformTask> const task(
-		new MaskTransformTask(this, m_origPictureMask, xform, size())
+		new MaskTransformTask(this, m_origPictureMask, xform, viewport()->size())
 	);
 
 	backgroundExecutor().enqueueTask(task);

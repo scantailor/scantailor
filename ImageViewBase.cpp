@@ -18,12 +18,15 @@
 
 #include "ImageViewBase.h.moc"
 #include "NonCopyable.h"
+#include "ImagePresentation.h"
 #include "PixmapRenderer.h"
 #include "BackgroundExecutor.h"
 #include "Dpm.h"
 #include "Dpi.h"
+#include "ScopedIncDec.h"
 #include "imageproc/PolygonUtils.h"
 #include "imageproc/Transform.h"
+#include <QScrollBar>
 #include <QPointer>
 #include <QAtomicInt>
 #include <QPainter>
@@ -127,29 +130,28 @@ private:
 	ImageViewBase& m_rOwner;
 	QTransform m_imageToVirtual;
 	QTransform m_virtualToWidget;
+	QRectF m_virtualDisplayArea;
 };
 
 
 ImageViewBase::ImageViewBase(
 	QImage const& image, QImage const& downscaled_image,
-	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
-	Margins const& margins)
+	ImagePresentation const& presentation, Margins const& margins)
 :	m_image(image),
-	m_virtualDisplayArea(virt_display_area),
-	m_imageToVirtual(image_to_virt),
-	m_virtualToImage(image_to_virt.inverted()),
+	m_virtualImageCropArea(presentation.cropArea()),
+	m_virtualDisplayArea(presentation.displayArea()),
+	m_imageToVirtual(presentation.transform()),
+	m_virtualToImage(presentation.transform().inverted()),
 	m_margins(margins),
 	m_zoom(1.0),
 	m_transformChangeWatchersActive(0),
-	m_currentCursorShape(Qt::ArrowCursor),
+	m_ignoreScrollEvents(0),
 	m_hqTransformEnabled(true)
 {
-	interactionState().setDefaultStatusTip(
-		tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")
-	);
-	ensureStatusTip(interactionState().statusTip());
+	//setViewport(new QGLWidget());
 
-	setFocusPolicy(Qt::WheelFocus);
+	setFrameShape(QFrame::NoFrame);
+	viewport()->setFocusPolicy(Qt::WheelFocus);
 
 	if (downscaled_image.isNull()) {
 		m_pixmap = QPixmap::fromImage(createDownscaledImage(image));
@@ -173,6 +175,16 @@ ImageViewBase::ImageViewBase(
 	);
 	
 	updateWidgetTransformAndFixFocalPoint(CENTER_IF_FITS);
+
+	interactionState().setDefaultStatusTip(
+		tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")
+	);
+	ensureStatusTip(interactionState().statusTip());
+
+	connect(horizontalScrollBar(), SIGNAL(sliderReleased()), SLOT(updateScrollBars()));
+	connect(verticalScrollBar(), SIGNAL(sliderReleased()), SLOT(updateScrollBars()));
+	connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), SLOT(reactToScrollBars()));
+	connect(verticalScrollBar(), SIGNAL(valueChanged(int)), SLOT(reactToScrollBars()));
 }
 
 ImageViewBase::~ImageViewBase()
@@ -227,124 +239,26 @@ ImageViewBase::createDownscaledImage(QImage const& image)
 	return transform(image, xform, QRect(0, 0, d_w, d_h), Qt::white);
 }
 
-void
-ImageViewBase::paintEvent(QPaintEvent* const event)
-{
-	QPainter painter(this);
-	painter.save();
-	
-#if !defined(Q_WS_X11)
-	double const xscale = m_virtualToWidget.m11();
-	
-	// Width of a source pixel in mm, as it's displayed on screen.
-	double const pixel_width = widthMM() * xscale / width();
-	
-	// On X11 SmoothPixmapTransform is too slow.
-	painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
-#endif
-
-	if (validateHqPixmap()) {
-		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);
-	} else {
-		scheduleHqVersionRebuild();
-
-		painter.setWorldTransform(
-			m_pixmapToImage * m_imageToVirtual * m_virtualToWidget
-		);
-		PixmapRenderer::drawPixmap(painter, m_pixmap);
-	}
-	
-	painter.setRenderHints(QPainter::Antialiasing, true);
-	painter.setWorldMatrixEnabled(false);
-	
-	// Cover parts of the image that should not be visible with background.
-	// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
-	// to paint the whole widget, which we do here.
-	
-	QPolygonF const image_area(
-		PolygonUtils::round(
-			m_virtualToWidget.map(
-				m_imageToVirtual.map(QRectF(m_image.rect()))
-			)
-		)
-	);
-	QPolygonF const crop_area(
-		PolygonUtils::round(m_virtualToWidget.map(m_virtualDisplayArea))
-	);
-	
-	QPolygonF const intersected_area(
-		PolygonUtils::round(image_area.intersected(crop_area))
-	);
-	
-	QPainterPath intersected_path;
-	intersected_path.addPolygon(intersected_area);
-	
-	QPainterPath containing_path;
-	containing_path.addRect(rect());
-	
-	QBrush const brush(palette().color(QPalette::Window));
-	QPen pen(brush, 1.0);
-	pen.setCosmetic(true);
-	
-	// By using a pen with the same color as the brush, we essentially
-	// expanding the area we are going to draw.  It's necessary because
-	// XRender doesn't provide subpixel accuracy.
-	
-	painter.setPen(pen);
-	painter.setBrush(brush);
-	painter.drawPath(containing_path.subtracted(intersected_path));
-	
-	painter.restore();
-	
-	painter.setWorldTransform(m_virtualToWidget);
-
-	m_interactionState.resetProximity();
-	if (!m_interactionState.captured()) {
-		m_rootInteractionHandler.proximityUpdate(
-			QPointF(0.5, 0.5) + mapFromGlobal(QCursor::pos()), m_interactionState
-		);
-		updateStatusTipAndCursor();
-	}
-
-	m_rootInteractionHandler.paint(painter, m_interactionState);
-}
-
-void
-ImageViewBase::resizeEvent(QResizeEvent* event)
-{
-	if (event->oldSize().isEmpty()) {
-		m_widgetFocalPoint = centeredWidgetFocalPoint();
-	} else {
-		double const x_fraction = m_widgetFocalPoint.x()
-				/ event->oldSize().width();
-		double const y_fraction = m_widgetFocalPoint.y()
-				/ event->oldSize().height();
-		m_widgetFocalPoint.setX(x_fraction * event->size().width());
-		m_widgetFocalPoint.setY(y_fraction * event->size().height());
-	}
-	
-	updateWidgetTransform();
-}
-
 QRectF
-ImageViewBase::marginsRect() const
+ImageViewBase::viewportRect() const
 {
-	QRectF r(rect());
+	QRectF const viewport_rect(QPointF(0, 0), maximumViewportSize());
+	QRectF r(viewport_rect);
 	r.adjust(
 		m_margins.left(), m_margins.top(),
 		-m_margins.right(), -m_margins.bottom()
 	);
 	if (r.isEmpty()) {
-		return QRectF(r.center(), r.center());
+		return QRectF(viewport_rect.center(), viewport_rect.center());
 	}
 	return r;
 }
 
 QRectF
-ImageViewBase::getVisibleWidgetRect() const
+ImageViewBase::getOccupiedWidgetRect() const
 {
 	QRectF const widget_rect(m_virtualToWidget.mapRect(virtualDisplayRect()));
-	return widget_rect.intersected(marginsRect());
+	return widget_rect.intersected(viewportRect());
 }
 
 void
@@ -370,15 +284,15 @@ ImageViewBase::zoom(double zoom)
 }
 
 void
-ImageViewBase::updateTransform(
-	QTransform const& image_to_virt, QPolygonF const& virt_display_area)
+ImageViewBase::updateTransform(ImagePresentation const& presentation)
 {
 	TransformChangeWatcher const watcher(*this);
 	TempFocalPointAdjuster const temp_fp(*this);
 
-	m_imageToVirtual = image_to_virt;
-	m_virtualToImage = image_to_virt.inverted();
-	m_virtualDisplayArea = virt_display_area;
+	m_imageToVirtual = presentation.transform();
+	m_virtualToImage = m_imageToVirtual.inverted();
+	m_virtualImageCropArea = presentation.cropArea();
+	m_virtualDisplayArea = presentation.displayArea();
 
 	updateWidgetTransform();
 	update();
@@ -386,23 +300,22 @@ ImageViewBase::updateTransform(
 
 void
 ImageViewBase::updateTransformAndFixFocalPoint(
-	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
-	FocalPointMode const mode)
+	ImagePresentation const& presentation, FocalPointMode const mode)
 {
 	TransformChangeWatcher const watcher(*this);
 	TempFocalPointAdjuster const temp_fp(*this);
 	
-	m_imageToVirtual = image_to_virt;
-	m_virtualToImage = image_to_virt.inverted();
-	m_virtualDisplayArea = virt_display_area;
+	m_imageToVirtual = presentation.transform();
+	m_virtualToImage = m_imageToVirtual.inverted();
+	m_virtualImageCropArea = presentation.cropArea();
+	m_virtualDisplayArea = presentation.displayArea();
 
 	updateWidgetTransformAndFixFocalPoint(mode);
 	update();
 }
 
 void
-ImageViewBase::updateTransformPreservingScale(
-	QTransform const& image_to_virt, QPolygonF const& virt_display_area)
+ImageViewBase::updateTransformPreservingScale(ImagePresentation const& presentation)
 {
 	TransformChangeWatcher const watcher(*this);
 	TempFocalPointAdjuster const temp_fp(*this);
@@ -414,9 +327,10 @@ ImageViewBase::updateTransformPreservingScale(
 		(m_imageToVirtual * m_virtualToWidget).map(image_line)
 	);
 	
-	m_imageToVirtual = image_to_virt;
-	m_virtualToImage = image_to_virt.inverted();
-	m_virtualDisplayArea = virt_display_area;
+	m_imageToVirtual = presentation.transform();
+	m_virtualToImage = m_imageToVirtual.inverted();
+	m_virtualImageCropArea = presentation.cropArea();
+	m_virtualDisplayArea = presentation.displayArea();
 
 	updateWidgetTransform();
 	
@@ -431,15 +345,6 @@ ImageViewBase::updateTransformPreservingScale(
 }
 
 void
-ImageViewBase::ensureCursorShape(Qt::CursorShape const cursor_shape)
-{
-	if (cursor_shape != m_currentCursorShape) {
-		m_currentCursorShape = cursor_shape;
-		setCursor(cursor_shape);
-	}
-}
-
-void
 ImageViewBase::ensureStatusTip(QString const& status_tip)
 {
 	QString const cur_status_tip(statusTip());
@@ -450,22 +355,98 @@ ImageViewBase::ensureStatusTip(QString const& status_tip)
 		return;
 	}
 	
-	setStatusTip(status_tip);
+	viewport()->setStatusTip(status_tip);
 	
-	if (underMouse()) {
+	if (viewport()->underMouse()) {
 		// Note that setStatusTip() alone is not enough,
 		// as it's only taken into account when the mouse
 		// enters the widget.
 		// Also note that we use postEvent() rather than sendEvent(),
 		// because sendEvent() may immediately process other events.
-		QApplication::postEvent(this, new QStatusTipEvent(status_tip));
+		QApplication::postEvent(viewport(), new QStatusTipEvent(status_tip));
 	}
 }
 
 void
-ImageViewBase::enterEvent(QEvent* event)
+ImageViewBase::paintEvent(QPaintEvent* event)
 {
-	setFocus(Qt::MouseFocusReason);
+	QPainter painter(viewport());
+	painter.save();
+
+#if !defined(Q_WS_X11)
+	double const xscale = m_virtualToWidget.m11();
+
+	// Width of a source pixel in mm, as it's displayed on screen.
+	double const pixel_width = widthMM() * xscale / width();
+
+	// On X11 SmoothPixmapTransform is too slow.
+	painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
+#endif
+
+	if (validateHqPixmap()) {
+		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);
+	} else {
+		scheduleHqVersionRebuild();
+
+		painter.setWorldTransform(
+			m_pixmapToImage * m_imageToVirtual * m_virtualToWidget
+		);
+		PixmapRenderer::drawPixmap(painter, m_pixmap);
+	}
+
+	painter.setRenderHints(QPainter::Antialiasing, true);
+	painter.setWorldMatrixEnabled(false);
+
+	// Cover parts of the image that should not be visible with background.
+	// Note that because of Qt::WA_OpaquePaintEvent attribute, we need
+	// to paint the whole widget, which we do here.
+
+	QPolygonF const image_area(
+		PolygonUtils::round(
+			m_virtualToWidget.map(
+				m_imageToVirtual.map(QRectF(m_image.rect()))
+			)
+		)
+	);
+	QPolygonF const crop_area(
+		PolygonUtils::round(m_virtualToWidget.map(m_virtualImageCropArea))
+	);
+
+	QPolygonF const intersected_area(
+		PolygonUtils::round(image_area.intersected(crop_area))
+	);
+
+	QPainterPath intersected_path;
+	intersected_path.addPolygon(intersected_area);
+
+	QPainterPath containing_path;
+	containing_path.addRect(viewport()->rect());
+
+	QBrush const brush(palette().color(QPalette::Window));
+	QPen pen(brush, 1.0);
+	pen.setCosmetic(true);
+
+	// By using a pen with the same color as the brush, we essentially
+	// expanding the area we are going to draw.  It's necessary because
+	// XRender doesn't provide subpixel accuracy.
+
+	painter.setPen(pen);
+	painter.setBrush(brush);
+	painter.drawPath(containing_path.subtracted(intersected_path));
+
+	painter.restore();
+
+	painter.setWorldTransform(m_virtualToWidget);
+
+	m_interactionState.resetProximity();
+	if (!m_interactionState.captured()) {
+		m_rootInteractionHandler.proximityUpdate(
+			QPointF(0.5, 0.5) + mapFromGlobal(QCursor::pos()), m_interactionState
+		);
+		updateStatusTipAndCursor();
+	}
+
+	m_rootInteractionHandler.paint(painter, m_interactionState);
 }
 
 void
@@ -552,6 +533,128 @@ ImageViewBase::contextMenuEvent(QContextMenuEvent* event)
 	updateStatusTipAndCursor();
 }
 
+void
+ImageViewBase::resizeEvent(QResizeEvent* event)
+{
+
+	ScopedIncDec<int> const guard(m_ignoreScrollEvents);
+
+	if (event->oldSize().isEmpty()) {
+		m_widgetFocalPoint = centeredWidgetFocalPoint();
+		updateWidgetTransform();
+	} else {
+		TempFocalPointAdjuster const temp_fp(*this, QPointF(0, 0));
+		updateTransformPreservingScale(
+			ImagePresentation(m_imageToVirtual, m_virtualImageCropArea, m_virtualDisplayArea)
+		);
+	}
+}
+
+/**
+ * Called when any of the transformations change.
+ */
+void
+ImageViewBase::transformChanged()
+{
+	updateScrollBars();
+}
+
+void
+ImageViewBase::updateScrollBars()
+{
+	if (verticalScrollBar()->isSliderDown() || horizontalScrollBar()->isSliderDown()) {
+		return;
+	}
+
+	TransformChangeWatcher const watcher(*this);
+	ScopedIncDec<int> const guard(m_ignoreScrollEvents);
+
+	QRectF const viewport(viewportRect());
+	QRectF const picture(m_virtualToWidget.mapRect(virtualDisplayRect()));
+
+	QPointF const viewport_center(viewport.center());
+	QPointF const picture_center(picture.center());
+
+	double const xval = picture_center.x();
+	double xmin, xmax; // Minimum and maximum positions for picture center.
+	if (picture_center.x() < viewport_center.x()) {
+		xmin = std::min<double>(xval, viewport.right() - 0.5 * picture.width());
+		xmax = std::max<double>(viewport_center.x(), viewport.left() + 0.5 * picture.width());
+	} else {
+		xmax = std::max<double>(xval, viewport.left() + 0.5 * picture.width());
+		xmin = std::min<double>(viewport_center.x(), viewport.right() - 0.5 * picture.width());
+	}
+
+	double const yval = picture_center.y();
+	double ymin, ymax; // Minimum and maximum positions for picture center.
+	if (picture_center.y() < viewport_center.y()) {
+		ymin = std::min<double>(yval, viewport.bottom() - 0.5 * picture.height());
+		ymax = std::max<double>(viewport_center.y(), viewport.top() + 0.5 * picture.height());
+	} else {
+		ymax = std::max<double>(yval, viewport.top() + 0.5 * picture.height());
+		ymin = std::min<double>(viewport_center.y(), viewport.bottom() - 0.5 * picture.height());
+	}
+
+	int const xrange = (int)ceil(xmax - xmin);
+	int const yrange = (int)ceil(ymax - ymin);
+	int const xfirst = 0;
+	int const xlast = xrange - 1;
+	int const yfirst = 0;
+	int const ylast = yrange - 1;
+
+	// We are going to map scrollbar coordinates to widget coordinates
+	// of the central point of the display area using a linear function.
+	// f(x) = ax + b
+
+	// xmin = xa * xlast + xb
+	// xmax = xa * xfirst + xb
+	double const xa = (xfirst == xlast) ? 1 : (xmax - xmin) / (xfirst - xlast);
+	double const xb = xmax - xa * xfirst;
+	double const ya = (yfirst == ylast) ? 1 : (ymax - ymin) / (yfirst - ylast);
+	double const yb = ymax - ya * yfirst;
+
+	// Inverse transformation.
+	// xlast = ixa * xmin + ixb
+	// xfirst = ixa * xmax + ixb
+	double const ixa = (xmax == xmin) ? 1 : (xfirst - xlast) / (xmax - xmin);
+	double const ixb = xfirst - ixa * xmax;
+	double const iya = (ymax == ymin) ? 1 : (yfirst - ylast) / (ymax - ymin);
+	double const iyb = yfirst - iya * ymax;
+
+	m_scrollTransform.setMatrix(xa, 0, 0, 0, ya, 0, xb, yb, 1);
+
+	int const xcur = qRound(ixa * xval + ixb);
+	int const ycur = qRound(iya * yval + iyb);
+
+	horizontalScrollBar()->setRange(xfirst, xlast);
+	verticalScrollBar()->setRange(yfirst, ylast);
+
+	horizontalScrollBar()->setValue(xcur);
+	verticalScrollBar()->setValue(ycur);
+}
+
+void
+ImageViewBase::reactToScrollBars()
+{
+	if (m_ignoreScrollEvents) {
+		return;
+	}
+
+	TransformChangeWatcher const watcher(*this);
+
+	QPointF const raw_position(
+		horizontalScrollBar()->value(), verticalScrollBar()->value()
+	);
+	QPointF const new_fp(m_scrollTransform.map(raw_position));
+	QPointF const old_fp(getWidgetFocalPoint());
+
+	m_pixmapFocalPoint = m_virtualToImage.map(m_virtualDisplayArea.center());
+	m_widgetFocalPoint = new_fp;
+	updateWidgetTransform();
+
+	setWidgetFocalPointWithoutMoving(old_fp);
+}
+
 /**
  * Updates m_virtualToWidget and m_widgetToVirtual.\n
  * To be called whenever any of the following is modified:
@@ -569,7 +672,7 @@ ImageViewBase::updateWidgetTransform()
 	QPointF const widget_origin(m_widgetFocalPoint);
 	
 	QSizeF zoom1_widget_size(virt_rect.size());
-	zoom1_widget_size.scale(marginsRect().size(), Qt::KeepAspectRatio);
+	zoom1_widget_size.scale(viewportRect().size(), Qt::KeepAspectRatio);
 	
 	double const zoom1_x = zoom1_widget_size.width() / virt_rect.width();
 	double const zoom1_y = zoom1_widget_size.height() / virt_rect.height();
@@ -628,7 +731,7 @@ QPointF
 ImageViewBase::getIdealWidgetFocalPoint(FocalPointMode const mode) const
 {
 	// Widget rect reduced by margins.
-	QRectF const display_area(marginsRect());
+	QRectF const display_area(viewportRect());
 	
 	// The virtual image rectangle in widget coordinates.
 	QRectF const image_area(m_virtualToWidget.mapRect(virtualDisplayRect()));
@@ -753,7 +856,7 @@ ImageViewBase::adjustAndSetNewWidgetFP(
 QPointF
 ImageViewBase::centeredWidgetFocalPoint() const
 {
-	return marginsRect().center();
+	return viewportRect().center();
 }
 
 void
@@ -821,7 +924,7 @@ ImageViewBase::initiateBuildingHqVersion()
 
 	QTransform const xform(m_imageToVirtual * m_virtualToWidget);
 	IntrusivePtr<HqTransformTask> const task(
-		new HqTransformTask(this, m_image, xform, size())
+		new HqTransformTask(this, m_image, xform, viewport()->size())
 	);
 	
 	backgroundExecutor().enqueueTask(task);
@@ -864,8 +967,7 @@ ImageViewBase::updateStatusTip()
 void
 ImageViewBase::updateCursor()
 {
-	// TODO: if possible, check if this cursor is already active.
-	setCursor(m_interactionState.cursor());
+	viewport()->setCursor(m_interactionState.cursor());
 }
 
 BackgroundExecutor&
@@ -973,7 +1075,8 @@ ImageViewBase::TempFocalPointAdjuster::~TempFocalPointAdjuster()
 ImageViewBase::TransformChangeWatcher::TransformChangeWatcher(ImageViewBase& owner)
 :	m_rOwner(owner),
 	m_imageToVirtual(owner.m_imageToVirtual),
-	m_virtualToWidget(owner.m_virtualToWidget)
+	m_virtualToWidget(owner.m_virtualToWidget),
+	m_virtualDisplayArea(owner.m_virtualDisplayArea)
 {
 	++m_rOwner.m_transformChangeWatchersActive;
 }
@@ -982,7 +1085,8 @@ ImageViewBase::TransformChangeWatcher::~TransformChangeWatcher()
 {
 	if (--m_rOwner.m_transformChangeWatchersActive == 0) {
 		if (m_imageToVirtual != m_rOwner.m_imageToVirtual ||
-				m_virtualToWidget != m_rOwner.m_virtualToWidget) {
+				m_virtualToWidget != m_rOwner.m_virtualToWidget ||
+				m_virtualDisplayArea != m_rOwner.m_virtualDisplayArea) {
 			m_rOwner.transformChanged();
 		}
 	}

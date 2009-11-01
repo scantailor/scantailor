@@ -25,6 +25,7 @@
 #include "InteractionState.h"
 #include <QTimer>
 #include <QWidget>
+#include <QAbstractScrollArea>
 #include <QPixmap>
 #include <QImage>
 #include <QString>
@@ -37,6 +38,7 @@
 
 class QPainter;
 class BackgroundExecutor;
+class ImagePresentation;
 
 /**
  * \brief The base class for widgets that display and manipulate images.
@@ -54,7 +56,7 @@ class BackgroundExecutor;
  *
  * \see m_pixmapToImage, m_imageToVirt, m_virtualToWidget, m_widgetToVirtual.
  */
-class ImageViewBase : public QWidget
+class ImageViewBase : public QAbstractScrollArea
 {
 	Q_OBJECT
 public:
@@ -71,17 +73,16 @@ public:
 	 *        to speed up real-time rendering of high-resolution
 	 *        images.  Note that the delayed high quality transform
 	 *        operates on the original image, not the downscaled one.
-	 * \param image_to_virt Virtual image transformation.
-	 * \param virt_display_area The area of the virtual image to be displayed.
+	 * \param image_presentation Specifies transformation from image
+	 *        pixel coordinates to virtual image coordinates, along
+	 *        with some other properties.
 	 * \param margins Reserve extra space near the widget borders.
 	 *        The units are widget pixels.  This reserved area may
-	 *        still be covered by parts of the image that are outside
-	 *        of pre_transform.resultingRect().
+	 *        be used for custom drawing or custom controls.
 	 */
 	ImageViewBase(
 		QImage const& image, QImage const& downscaled_image,
-		QTransform const& image_to_virt, QPolygonF const& virt_display_area,
-		Margins const& margins = Margins());
+		ImagePresentation const& presentation, Margins const& margins = Margins());
 	
 	virtual ~ImageViewBase();
 	
@@ -122,17 +123,15 @@ public:
 
 	QTransform widgetToImage() const { return m_widgetToVirtual * m_virtualToImage; }
 
-	QPolygonF const& virtualDisplayArea() const { return m_virtualDisplayArea; }
+	void update() { viewport()->update(); }
 
-	QRectF const virtualDisplayRect() const {
-		return m_virtualDisplayArea.boundingRect();
-	}
+	QRectF const& virtualDisplayRect() const { return m_virtualDisplayArea; }
 
 	/**
 	 * Get the bounding box of the image as it appears on the screen,
 	 * in widget coordinates.
 	 */
-	QRectF getVisibleWidgetRect() const;
+	QRectF getOccupiedWidgetRect() const;
 
 	/**
 	 * \brief A better version of setStatusTip().
@@ -184,23 +183,19 @@ public:
 	 * \brief Updates image-to-virtual and recalculates
 	 *        virtual-to-widget transformations.
 	 */
-	void updateTransform(
-		QTransform const& image_to_virt,
-		QPolygonF const& virt_display_area);
+	void updateTransform(ImagePresentation const& presentation);
 
 	/**
 	 * \brief Same as updateTransform(), but adjusts the focal point
 	 *        to improve screen space usage.
 	 */
 	void updateTransformAndFixFocalPoint(
-		QTransform const& image_to_virt,
-		QPolygonF const& virt_display_area, FocalPointMode mode);
+		ImagePresentation const& presentation, FocalPointMode mode);
 
 	/**
 	 * \brief Same as updateTransform(), but preserves the visual image scale.
 	 */
-	void updateTransformPreservingScale(
-		QTransform const& image_to_virt, QPolygonF const& virt_display_area);
+	void updateTransformPreservingScale(ImagePresentation const& presentation);
 
 	/**
 	 * \brief Sets the zoom level.
@@ -212,43 +207,7 @@ public:
 	 */
 	void zoom(double zoom);
 protected:
-	/**
-	 * \brief Repaint the widget.
-	 *
-	 * \note Don't override this one.  Override paintOverImage() instead.
-	 */
 	virtual void paintEvent(QPaintEvent* event);
-
-	/**
-	 * \brief Called when any of the transformations change.
-	 */
-	virtual void transformChanged() {}
-	
-	/**
-	 * \brief Handle widget resizing.
-	 *
-	 * \note If overriden, call this version first!
-	 */
-	virtual void resizeEvent(QResizeEvent* event);
-	
-	/**
-	 * Returns the widget area reduced by margins.
-	 */
-	QRectF marginsRect() const;
-	
-	/**
-	 * \brief A faster version of setCursor().
-	 *
-	 * This method checks if the shape we want to set is already set,
-	 * and if so, does nothing.
-	 * \note Calls to this method must not be mixed with calls to setCursor()
-	 *       and unsetCursor().
-	 */
-	void ensureCursorShape(Qt::CursorShape cursor_shape);
-
-	static BackgroundExecutor& backgroundExecutor();
-
-	virtual void enterEvent(QEvent* event);
 
 	virtual void keyPressEvent(QKeyEvent* event);
 
@@ -263,12 +222,28 @@ protected:
 	virtual void wheelEvent(QWheelEvent* event);
 
 	virtual void contextMenuEvent(QContextMenuEvent* event);
+
+	virtual void resizeEvent(QResizeEvent* event);
+	
+	/**
+	 * Returns the maximum viewport size (as if scrollbars are hidden)
+	 * reduced by margins.
+	 */
+	QRectF viewportRect() const;
+
+	static BackgroundExecutor& backgroundExecutor();
 private slots:
 	void initiateBuildingHqVersion();
+
+	void updateScrollBars();
+
+	void reactToScrollBars();
 private:
 	class HqTransformTask;
 	class TempFocalPointAdjuster;
 	class TransformChangeWatcher;
+
+	void transformChanged();
 
 	void updateWidgetTransform();
 	
@@ -355,9 +330,17 @@ private:
 	QTransform m_pixmapToImage;
 	
 	/**
-	 * The area of the image (in virtual coordinates) to display.
+	 * The area of the virtual image to be displayed.
+	 * Everything outside of it will be cropped.
 	 */
-	QPolygonF m_virtualDisplayArea;
+	QPolygonF m_virtualImageCropArea;
+
+	/**
+	 * The area in virtual image coordinates to be displayed.
+	 * The idea is that it can be larger than m_virtualImageCropArea
+	 * to reserve space for custom drawing or controls.
+	 */
+	QRectF m_virtualDisplayArea;
 
 	/**
 	 * A transformation from original to virtual image coordinates.
@@ -378,6 +361,18 @@ private:
 	 * Transformation from widget coordinates to virtual image coordinates.
 	 */
 	QTransform m_widgetToVirtual;
+
+	/**
+	 * Transforms scroll bar values to corresponding positions of the display
+	 * area (its central point) in widget coordinates.
+	 */
+	QTransform m_scrollTransform;
+
+	/**
+	 * Limits the range of positions of the display area (its centra point)
+	 * in widget coordinates during scrolling.
+	 */
+	//QRectF m_scrollBounds;
 	
 	/**
 	 * An arbitrary point in widget coordinates that corresponds
@@ -414,10 +409,7 @@ private:
 	
 	int m_transformChangeWatchersActive;
 
-	/**
-	 * The current cursor shape, cached to improve performance.
-	 */
-	Qt::CursorShape m_currentCursorShape;
+	int m_ignoreScrollEvents;
 	
 	bool m_hqTransformEnabled;
 };

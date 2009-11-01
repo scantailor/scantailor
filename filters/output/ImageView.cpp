@@ -17,12 +17,13 @@
 */
 
 #include "ImageView.h.moc"
+#include "ImagePresentation.h"
 
 namespace output
 {
 
 ImageView::ImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(image, downscaled_image, QTransform(), QRectF(image.rect())),
+:	ImageViewBase(image, downscaled_image, ImagePresentation(QTransform(), QRectF(image.rect()))),
 	m_dragHandler(*this),
 	m_zoomHandler(*this)
 {

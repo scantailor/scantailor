@@ -18,6 +18,7 @@
 
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 #include "Proximity.h"
 #include <QPainter>
 #include <QPen>
@@ -34,7 +35,10 @@ namespace page_split
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout)
-:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+:	ImageViewBase(
+		image, downscaled_image,
+		ImagePresentation(xform.transform(), xform.resultingCropArea())
+	),
 	m_lineInteractor(&m_lineSegment),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
@@ -185,7 +189,7 @@ QRectF
 ImageView::reducedWidgetArea() const
 {
 	double const delta = 0.5 * m_handlePixmap.width();
-	return getVisibleWidgetRect().adjusted(0.0, delta, 0.0, -delta);
+	return getOccupiedWidgetRect().adjusted(0.0, delta, 0.0, -delta);
 }
 
 /**
@@ -225,7 +229,7 @@ ImageView::handlePosition(int id) const
 void
 ImageView::handleMoveRequest(int const id, QPointF const& pos)
 {
-	QRectF const valid_area(getVisibleWidgetRect());
+	QRectF const valid_area(getOccupiedWidgetRect());
 	QPointF const bound_widget_pos(
 		qBound(valid_area.left(), pos.x(), valid_area.right()), pos.y()
 	);
@@ -255,7 +259,7 @@ ImageView::lineMoveRequest(QLineF line)
 	// Intersect with top and bottom.
 	QPointF p_top;
 	QPointF p_bottom;
-	QRectF const valid_area(getVisibleWidgetRect());
+	QRectF const valid_area(getOccupiedWidgetRect());
 	line.intersect(QLineF(valid_area.topLeft(), valid_area.topRight()), &p_top);
 	line.intersect(QLineF(valid_area.bottomLeft(), valid_area.bottomRight()), &p_bottom);
 

@@ -18,6 +18,7 @@
 
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 #include "imageproc/Constants.h"
 #include <QRect>
 #include <QSizeF>
@@ -25,6 +26,8 @@
 #include <QMouseEvent>
 #include <QVector>
 #include <QLineF>
+#include <QScrollBar>
+#include <QStyle>
 #include <Qt>
 #include <boost/bind.hpp>
 #include <math.h>
@@ -41,7 +44,10 @@ int const ImageView::m_cellSize = 20;
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform)
-:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+:	ImageViewBase(
+		image, downscaled_image,
+		ImagePresentation(xform.transform(), xform.resultingCropArea())
+	),
 	m_handlePixmap(":/icons/aqua-sphere.png"),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
@@ -88,7 +94,7 @@ ImageView::manualDeskewAngleSetExternally(double const degrees)
 	}
 	
 	m_xform.setPostRotation(degrees);
-	updateTransform(m_xform.transform(), m_xform.resultingCropArea());
+	updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
 }
 
 void
@@ -97,8 +103,8 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHints(QPainter::Antialiasing, false);
 
-	int const w = width();
-	int const h = height();
+	double const w = viewportRect().width();
+	double const h = viewportRect().height();
 	QPointF const center(getImageRotationOrigin());
 
 	// Draw the semi-transparent grid.
@@ -192,7 +198,7 @@ ImageView::handleMoveRequest(int idx, QPointF const& pos)
 	angle_deg = qBound(-m_maxRotationDeg, angle_deg, m_maxRotationDeg);
 
 	m_xform.setPostRotation(angle_deg);
-	updateTransformPreservingScale(m_xform.transform(), m_xform.resultingCropArea());
+	updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
 }
 
 void
@@ -208,9 +214,10 @@ ImageView::dragFinished()
 QPointF
 ImageView::getImageRotationOrigin() const
 {
+	QRectF const viewport_rect(viewportRect());
 	return QPointF(
-		floor(0.5 * width()) + 0.5,
-		floor(0.5 * height()) + 0.5
+		floor(0.5 * viewport_rect.width()) + 0.5,
+		floor(0.5 * viewport_rect.height()) + 0.5
 	);
 }
 
@@ -220,10 +227,12 @@ ImageView::getImageRotationOrigin() const
 QRectF
 ImageView::getRotationArcSquare() const
 {
-	double const h_margin = 0.5 * m_handlePixmap.width();
-	double const v_margin = 0.5 * m_handlePixmap.height();
+	double const h_margin = 0.5 * m_handlePixmap.width()
+		+ verticalScrollBar()->style()->pixelMetric(QStyle::PM_ScrollBarExtent, 0, verticalScrollBar());
+	double const v_margin = 0.5 * m_handlePixmap.height()
+		+ horizontalScrollBar()->style()->pixelMetric(QStyle::PM_ScrollBarExtent, 0, horizontalScrollBar());
 
-	QRectF reduced_screen_rect(rect());
+	QRectF reduced_screen_rect(viewportRect());
 	reduced_screen_rect.adjust(h_margin, v_margin, -h_margin, -v_margin);
 
 	QSizeF arc_size(1.0, m_maxRotationSin);

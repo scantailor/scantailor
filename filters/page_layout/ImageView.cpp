@@ -21,6 +21,7 @@
 #include "Margins.h"
 #include "Settings.h"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 #include "Utils.h"
 #include "imageproc/PolygonUtils.h"
 #include <QPointF>
@@ -33,6 +34,7 @@
 #include <QBrush>
 #include <QPen>
 #include <QColor>
+#include <QDebug>
 #include <Qt>
 #include <boost/bind.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -50,8 +52,11 @@ ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform,
 	QRectF const& adapted_content_rect, OptionsWidget const& opt_widget)
-:	ImageViewBase(image, downscaled_image, xform.transform(),
-				  xform.resultingCropArea(), Margins(5.0, 5.0, 5.0, 5.0)),
+:	ImageViewBase(
+		image, downscaled_image,
+		ImagePresentation(xform.transform(), xform.resultingCropArea()),
+		Margins(5, 5, 5, 5)
+	),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_ptrSettings(settings),
@@ -435,7 +440,7 @@ ImageView::middleRectDragContinuation(int const edge_mask, QPointF const& mouse_
 	qreal top_adjust = 0;
 	qreal bottom_adjust = 0;
 
-	QRectF const bounds(marginsRect());
+	QRectF const bounds(viewportRect());
 	QRectF const old_middle_rect(m_beforeResizing.middleWidgetRect);
 
 	if (edge_mask & LEFT) {
@@ -499,7 +504,8 @@ ImageView::dragFinished()
 		commitHardMargins(calcHardMarginsMM())
 	);
 
-	if (QRectF(rect()).contains(m_beforeResizing.middleWidgetRect)) {
+	QRectF const extended_viewport(viewportRect().adjusted(-0.5, -0.5, 0.5, 0.5));
+	if (extended_viewport.contains(m_beforeResizing.middleWidgetRect)) {
 		updatePresentationTransform(FIT);
 	} else {
 		updatePresentationTransform(DONT_FIT);
@@ -536,7 +542,7 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 
 	QRectF const outer_rect(mm_to_virt.map(poly_mm).boundingRect());
-	updateTransformAndFixFocalPoint(imageToVirtual(), outer_rect, CENTER_IF_FITS);
+	updateTransformAndFixFocalPoint(ImagePresentation(imageToVirtual(), outer_rect), CENTER_IF_FITS);
 
 	m_middleRect = middle_rect;
 	m_outerRect = outer_rect;
@@ -552,11 +558,11 @@ void
 ImageView::updatePresentationTransform(FitMode const fit_mode)
 {
 	if (fit_mode == DONT_FIT) {
-		updateTransformPreservingScale(imageToVirtual(), m_outerRect);
+		updateTransformPreservingScale(ImagePresentation(imageToVirtual(), m_outerRect));
 	} else {
 		zoom(1.0);
 		updateTransformAndFixFocalPoint(
-			imageToVirtual(), m_outerRect, CENTER_IF_FITS
+			ImagePresentation(imageToVirtual(), m_outerRect), CENTER_IF_FITS
 		);
 	}
 }

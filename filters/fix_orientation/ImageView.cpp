@@ -18,6 +18,7 @@
 
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 
 namespace fix_orientation
 {
@@ -25,7 +26,10 @@ namespace fix_orientation
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform)
-:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+:	ImageViewBase(
+		image, downscaled_image,
+		ImagePresentation(xform.transform(), xform.resultingCropArea())
+	),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_xform(xform)
@@ -48,7 +52,7 @@ ImageView::setPreRotation(OrthogonalRotation const rotation)
 	m_xform.setPreRotation(rotation);
 
 	// This should call update() by itself.
-	updateTransform(m_xform.transform(), m_xform.resultingCropArea());
+	updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
 }
 
 } // namespace fix_orientation

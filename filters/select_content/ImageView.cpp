@@ -18,6 +18,7 @@
 
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -39,7 +40,10 @@ namespace select_content
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, QRectF const& content_rect)
-:	ImageViewBase(image, downscaled_image, xform.transform(), xform.resultingCropArea()),
+:	ImageViewBase(
+		image, downscaled_image,
+		ImagePresentation(xform.transform(), xform.resultingCropArea())
+	),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_pNoContentMenu(new QMenu(this)),
@@ -256,7 +260,7 @@ ImageView::forceInsideImage(QRectF& widget_rect, int const edge_mask) const
 {
 	qreal const minw = m_minBoxSize.width();
 	qreal const minh = m_minBoxSize.height();
-	QRectF const image_rect(getVisibleWidgetRect());
+	QRectF const image_rect(getOccupiedWidgetRect());
 
 	if ((edge_mask & LEFT) && widget_rect.left() < image_rect.left()) {
 		widget_rect.setLeft(image_rect.left());

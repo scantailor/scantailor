@@ -18,11 +18,12 @@
 
 #include "BasicImageView.h.moc"
 #include "ImageTransformation.h"
+#include "ImagePresentation.h"
 #include "Dpm.h"
 #include "Dpi.h"
 
 BasicImageView::BasicImageView(QImage const& image)
-:	ImageViewBase(image, QImage(), QTransform(), QRectF(image.rect())),
+:	ImageViewBase(image, QImage(), ImagePresentation(QTransform(), QRectF(image.rect()))),
 	m_dragHandler(*this),
 	m_zoomHandler(*this)
 {
