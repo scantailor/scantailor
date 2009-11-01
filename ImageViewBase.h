@@ -367,12 +367,6 @@ private:
 	 * area (its central point) in widget coordinates.
 	 */
 	QTransform m_scrollTransform;
-
-	/**
-	 * Limits the range of positions of the display area (its centra point)
-	 * in widget coordinates during scrolling.
-	 */
-	//QRectF m_scrollBounds;
 	
 	/**
 	 * An arbitrary point in widget coordinates that corresponds
@@ -390,12 +384,12 @@ private:
 	 * m_widgetFocalPoint for zooming into a specific position.
 	 */
 	QPointF m_pixmapFocalPoint;
-	
+
 	/**
-	 * Used for dragging the image.  Holds the last cursor position
-	 * (in widget coordinates) that was processed in this dragging session.
+	 * Used to distinguish between resizes induced by scrollbars (dis)appearing
+	 * and other factors.
 	 */
-	QPoint m_lastMousePos;
+	QSize m_lastMaximumViewportSize;
 	
 	/**
 	 * The number of pixels to be left blank at each side of the widget.

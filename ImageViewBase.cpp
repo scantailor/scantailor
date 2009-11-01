@@ -142,6 +142,7 @@ ImageViewBase::ImageViewBase(
 	m_virtualDisplayArea(presentation.displayArea()),
 	m_imageToVirtual(presentation.transform()),
 	m_virtualToImage(presentation.transform().inverted()),
+	m_lastMaximumViewportSize(maximumViewportSize()),
 	m_margins(margins),
 	m_zoom(1.0),
 	m_transformChangeWatchersActive(0),
@@ -536,10 +537,10 @@ ImageViewBase::contextMenuEvent(QContextMenuEvent* event)
 void
 ImageViewBase::resizeEvent(QResizeEvent* event)
 {
-
 	ScopedIncDec<int> const guard(m_ignoreScrollEvents);
 
-	if (event->oldSize().isEmpty()) {
+	if (maximumViewportSize() != m_lastMaximumViewportSize) {
+		m_lastMaximumViewportSize = maximumViewportSize();
 		m_widgetFocalPoint = centeredWidgetFocalPoint();
 		updateWidgetTransform();
 	} else {
