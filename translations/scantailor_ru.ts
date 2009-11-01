@@ -358,6 +358,10 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <source>Stop batch processing</source>
         <translation>Остановить пакетную обработку</translation>
     </message>
+    <message>
+        <source>Settings ...</source>
+        <translation>Настройки ...</translation>
+    </message>
 </context>
 <context>
     <name>NewOpenProjectDialog</name>
@@ -972,6 +976,21 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Manual</source>
         <translation>Вручную</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Compiled without OpenGL support.</source>
+        <translation>Собрано без поддержки OpenGL.</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <source>Use 3D acceleration for user interface</source>
+        <translation>Использовать 3D ускорение для интерфейса пользователя</translation>
     </message>
 </context>
 <context>

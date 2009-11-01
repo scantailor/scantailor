@@ -319,6 +319,10 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <source>Stop batch processing</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Settings ...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NewOpenProjectPanel</name>
@@ -831,6 +835,21 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Compiled without OpenGL support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use 3D acceleration for user interface</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -326,6 +326,10 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <source>Stop batch processing</source>
         <translation>Спиране на масовата обработка</translation>
     </message>
+    <message>
+        <source>Settings ...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NewOpenProjectPanel</name>
@@ -849,6 +853,21 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <source>Manual</source>
         <translation>Ръчно</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Compiled without OpenGL support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use 3D acceleration for user interface</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
