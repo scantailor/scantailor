@@ -65,8 +65,14 @@ IF(NOT QT4_FOUND)
 	)
 ENDIF(NOT QT4_FOUND)
 
-# For config.h
-SET(ENABLE_OPENGL ${QT_QTOPENGL_FOUND})
+
+INCLUDE(FindOpenGL)
+SET(use_opengl OFF)
+IF(OPENGL_FOUND AND QT_QTOPENGL_FOUND)
+	SET(use_opengl ON)
+ENDIF()
+OPTION(ENABLE_OPENGL "OpenGL may be used for UI acceleration" ${use_opengl})
+
 
 FILE(GLOB jpeg_dirs "${outer_dir}/jpeg-[0-9]*")
 FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
@@ -257,10 +263,7 @@ ENDIF(WIN32)
 LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
 
 IF(ENABLE_OPENGL)
-	LIST(APPEND EXTRA_LIBS ${QT_QTOPENGL_LIBRARY})
-	IF(WIN32)
-		LIST(APPEND EXTRA_LIBS opengl32)
-	ENDIF()
+	LIST(APPEND EXTRA_LIBS ${QT_QTOPENGL_LIBRARY} ${OPENGL_LIBRARIES})
 ENDIF()
 
 # Crash reporter, only Windows + MSVC supported for now.
