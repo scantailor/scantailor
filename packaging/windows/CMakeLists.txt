@@ -79,7 +79,7 @@ CONFIGURE_FILE(scantailor.nsi.in ${CMAKE_BINARY_DIR}/scantailor.nsi @ONLY)
 GET_TARGET_PROPERTY(SCANTAILOR_EXE scantailor LOCATION)
 TO_NATIVE_PATH("${SCANTAILOR_EXE}" SCANTAILOR_EXE)
 
-SET(extra_deps scantailor ${QM_FILES})
+SET(extra_deps scantailor compile_translations)
 
 IF(ENABLE_CRASH_REPORTER)
 	GET_TARGET_PROPERTY(CRASHREPORTER_EXE CrashReporter LOCATION)
