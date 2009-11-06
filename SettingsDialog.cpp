@@ -30,7 +30,7 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 
 #ifdef ENABLE_OPENGL
 	ui.use3DAcceleration->setChecked(
-		settings.value("settings/use_3d_acceleration", true).toBool()
+		settings.value("settings/use_3d_acceleration", false).toBool()
 	);
 #else
 	ui.use3DAcceleration->setChecked(false);

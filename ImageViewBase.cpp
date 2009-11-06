@@ -157,7 +157,7 @@ ImageViewBase::ImageViewBase(
 	m_hqTransformEnabled(true)
 {
 #ifdef ENABLE_OPENGL
-	if (QSettings().value("settings/use_3d_acceleration", true) != false) {
+	if (QSettings().value("settings/use_3d_acceleration", false) != false) {
 		setViewport(new QGLWidget());
 	}
 #endif
