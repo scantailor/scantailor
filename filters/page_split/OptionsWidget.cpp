@@ -247,6 +247,9 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 		m_ptrSettings->updatePage(m_imageId, update);
 		
 		m_uiData.setPageLayout(new_layout);
+
+		flipSidesFrame->setVisible(false);
+
 		emit pageLayoutSetLocally(new_layout);
 		emit invalidateThumbnail(PageId(m_imageId));
 	}
