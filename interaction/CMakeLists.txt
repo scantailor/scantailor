@@ -11,6 +11,7 @@ SET(
 	InteractionHandler.cpp InteractionHandler.h
 	InteractionState.cpp InteractionState.h
 	DragHandler.cpp DragHandler.h
+	DragWatcher.cpp DragWatcher.h
 	ZoomHandler.cpp ZoomHandler.h
 )
 

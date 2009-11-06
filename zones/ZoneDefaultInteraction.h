@@ -21,6 +21,8 @@
 
 #include "InteractionHandler.h"
 #include "InteractionState.h"
+#include "DragHandler.h"
+#include "DragWatcher.h"
 #include "BasicSplineVisualizer.h"
 #include "EditableSpline.h"
 #include "SplineVertex.h"
@@ -56,6 +58,20 @@ private:
 	InteractionState::Captor m_segmentProximity;
 	InteractionState::Captor m_zoneAreaProximity;
 	QPointF m_screenMousePos;
+
+	/**
+	 * We want our own drag handler, to be able to monitor it
+	 * and decide if we should go into zone creation state
+	 * after the left mouse button is released.
+	 */
+	DragHandler m_dragHandler;
+
+	/**
+	 * Because we hold an interaction state from constructor to destructor,
+	 * we have to have our own zoom handler with explicit interaction permission
+	 * if we want zoom to work.
+	 */
+	DragWatcher m_dragWatcher;
 
 	// These are valid if m_vertexProximity is the proximity leader.
 	SplineVertex::Ptr m_ptrNearestVertex;

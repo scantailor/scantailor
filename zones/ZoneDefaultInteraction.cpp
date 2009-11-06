@@ -35,8 +35,13 @@
 #include <assert.h>
 
 ZoneDefaultInteraction::ZoneDefaultInteraction(ZoneInteractionContext& context)
-:	m_rContext(context)
+:	m_rContext(context),
+	m_dragHandler(context.imageView()),
+	m_dragWatcher(m_dragHandler)
 {
+	makeLastFollower(m_dragHandler);
+	m_dragHandler.makeFirstFollower(m_dragWatcher);
+
 	m_vertexProximity.setProximityStatusTip(tr("Drag the vertex."));
 	m_segmentProximity.setProximityStatusTip(tr("Click to create a new vertex here."));
 	m_zoneAreaProximity.setProximityStatusTip(tr("Right click to edit zone properties."));
@@ -218,11 +223,14 @@ ZoneDefaultInteraction::onMousePressEvent(QMouseEvent* event, InteractionState& 
 void
 ZoneDefaultInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	if (interaction.captured()) {
-		return;
-	}
 	if (event->button() != Qt::LeftButton) {
 		return;
+	}
+
+	if (interaction.captured()) {
+		if (!m_dragHandler.isActive() || m_dragWatcher.haveSignificantDrag()) {
+			return;
+		}
 	}
 
 	makePeerPreceeder(*m_rContext.createZoneCreationInteraction(interaction));

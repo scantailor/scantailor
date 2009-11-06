@@ -22,6 +22,7 @@
 #include "InteractionHandler.h"
 #include "InteractionState.h"
 #include "DragHandler.h"
+#include "DragWatcher.h"
 #include "ZoomHandler.h"
 #include "BasicSplineVisualizer.h"
 #include "EditableSpline.h"
@@ -48,32 +49,31 @@ protected:
 
 	virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
 private:
-	class DragWatcher : public InteractionHandler
-	{
-	public:
-		DragWatcher(DragHandler& drag_handler);
-
-		bool haveSignificantDrag() const;
-	protected:
-		virtual void onMousePressEvent(QMouseEvent* event, InteractionState& interaction);
-
-		virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction);
-	private:
-		void updateState(QPoint mouse_pos);
-
-		DragHandler& m_rDragHandler;
-		QDateTime m_dragStartTime;
-		QPoint m_dragStartPos;
-		int m_dragMaxSqDist;
-		bool m_dragInProgress;
-	};
-
 	void updateStatusTip();
 
 	ZoneInteractionContext& m_rContext;
+
+	/**
+	 * We have our own drag handler even though there is already a global one
+	 * for the purpose of being able to monitor it with DragWatcher.  Because
+	 * we capture a state in the constructor, it's guaranteed the global
+	 * drag handler will not be functioning until we release the state.
+	 */
 	DragHandler m_dragHandler;
-	DragWatcher m_dragWatcher; // Must go after m_dragHandler.
+
+	/**
+	 * This must go after m_dragHandler, otherwise DragHandler's destructor
+	 * will try to destroy this object.
+	 */
+	DragWatcher m_dragWatcher;
+
+	/**
+	 * Because we hold an interaction state from constructor to destructor,
+	 * we have to have our own zoom handler with explicit interaction permission
+	 * if we want zoom to work.
+	 */
 	ZoomHandler m_zoomHandler;
+
 	BasicSplineVisualizer m_visualizer;
 	InteractionState::Captor m_interaction;
 	EditableSpline::Ptr m_ptrSpline;

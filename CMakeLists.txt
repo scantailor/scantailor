@@ -424,7 +424,7 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output
-	interaction zones imageproc foundation
+	zones interaction imageproc foundation
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)

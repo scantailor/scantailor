@@ -120,9 +120,13 @@ PictureZoneEditor::PictureZoneEditor(
 
 	makeLastFollower(*m_context.createDefaultInteraction());
 
+	rootInteractionHandler().makeLastFollower(*this);
+
+	// We want these handlers after zone interaction handlers,
+	// as some of those have their own drag and zoom handlers,
+	// which need to get events before these standard ones.
 	rootInteractionHandler().makeLastFollower(m_dragHandler);
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
-	rootInteractionHandler().makeLastFollower(*this);
 
 	connect(&m_pictureMaskAnimateTimer, SIGNAL(timeout()), SLOT(advancePictureMaskAnimation()));
 	m_pictureMaskAnimateTimer.setSingleShot(true);
