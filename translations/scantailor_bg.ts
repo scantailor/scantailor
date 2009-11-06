@@ -24,7 +24,7 @@
     <name>DragHandler</name>
     <message>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
-        <translation type="unfinished">Чрез задържане на клавиша Shift е възможно неограничено влачене.</translation>
+        <translation>Чрез задържане на клавиша Shift е възможно неограничено влачене.</translation>
     </message>
 </context>
 <context>
@@ -256,7 +256,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <source>Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>Проследяване на грешки</translation>
     </message>
     <message>
         <source>Ctrl+S</source>
@@ -328,7 +328,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <source>Settings ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Предпочитания...</translation>
     </message>
 </context>
 <context>
@@ -374,6 +374,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <source>Every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
         <translation>Всяка друга страница</translation>
     </message>
     <message>
@@ -859,15 +860,15 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <name>SettingsDialog</name>
     <message>
         <source>Compiled without OpenGL support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Комипилирано без поддръжка на OpenGL.</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Предпочитания</translation>
     </message>
     <message>
         <source>Use 3D acceleration for user interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Използване 3D ускорение за потребителския интрефейс</translation>
     </message>
 </context>
 <context>
@@ -888,83 +889,83 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <name>ZoneContextMenuInteraction</name>
     <message>
         <source>Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойства</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Изтриване</translation>
     </message>
     <message>
         <source>Delete confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Потвърждение за изтриване</translation>
     </message>
     <message>
         <source>Really delete this zone?</source>
-        <translation type="unfinished"></translation>
+        <translation>Наистина ли да бъде изтрита тази зона?</translation>
     </message>
 </context>
 <context>
     <name>ZoneCreationInteraction</name>
     <message>
         <source>Click to finish this zone.  ESC to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Цъкнете, за да завършите тази зона.  ESC за отказ.</translation>
     </message>
     <message>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Свържете първите и последните точки, за да завършите тази зона.  ESC за отказ.</translation>
     </message>
     <message>
         <source>Zones need to have at least 3 points.  ESC to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Зоните трябва да имат поне 3 точки.  ESC за отказ.</translation>
     </message>
 </context>
 <context>
     <name>ZoneDefaultInteraction</name>
     <message>
         <source>Drag the vertex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Завлачете върхът.</translation>
     </message>
     <message>
         <source>Click to create a new vertex here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Цъкнете, за да създадете нов връх тук.</translation>
     </message>
     <message>
         <source>Right click to edit zone properties.</source>
-        <translation type="unfinished"></translation>
+        <translation>Дясно цъкане за редактиране свойствата на зоната.</translation>
     </message>
     <message>
         <source>Click to start creating a new picture zone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Цъкнете, за да започнете създаването на нова зона за изображение.</translation>
     </message>
 </context>
 <context>
     <name>ZonePropertiesDialog</name>
     <message>
         <source>Zone Properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойства на зоната</translation>
     </message>
     <message>
         <source>Subtract from all layers</source>
-        <translation type="unfinished"></translation>
+        <translation>Изваждане от всички слоеве</translation>
     </message>
     <message>
         <source>Add to auto layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавяне към автоматичен слой</translation>
     </message>
     <message>
         <source>Subtract from auto layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Изваждане от автоматичен слой</translation>
     </message>
 </context>
 <context>
     <name>ZoneVertexDragInteraction</name>
     <message>
         <source>Merge these two vertices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сливане на тези два върха.</translation>
     </message>
     <message>
         <source>Move the vertex to one of its neighbors to merge them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Преместете върхът към един от съседите му, за да ги слеете.</translation>
     </message>
 </context>
 <context>
@@ -1044,15 +1045,15 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <name>output::Task::UiUpdater</name>
     <message>
         <source>Picture zones are only available in Mixed mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
         <source>Output</source>
-        <translation type="unfinished">Краен резултат</translation>
+        <translation>Краен резултат</translation>
     </message>
     <message>
         <source>Picture Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Зони за изображения</translation>
     </message>
 </context>
 <context>
@@ -1099,7 +1100,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     </message>
     <message>
         <source>Drag the line or the handles.</source>
-        <translation type="unfinished"></translation>
+        <translation>Завлачете линията или манипулаторите.</translation>
     </message>
 </context>
 <context>
