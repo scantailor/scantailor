@@ -40,13 +40,11 @@ OptionsWidget::OptionsWidget(
 	m_ptrPages(page_sequence),
 	m_pageSelectionAccessor(page_selection_accessor),
 	m_ignoreAutoManualToggle(0),
-	m_ignoreLayoutTypeToggle(0)
+	m_ignoreLayoutTypeToggle(0),
+	m_ignoreFlipSides(0)
 {
 	setupUi(this);
 	flipSidesFrame->setVisible(false);
-	
-	m_flipLeftToRightIcon.addPixmap(QPixmap(":/icons/big-right-arrow.png"));
-	m_flipRightToLeftIcon.addPixmap(QPixmap(":/icons/big-left-arrow.png"));
 	
 	connect(
 		singlePageUncutBtn, SIGNAL(toggled(bool)),
@@ -70,7 +68,15 @@ OptionsWidget::OptionsWidget(
 	);
 	connect(
 		flipSidesBtn, SIGNAL(clicked()),
-		this, SLOT(flipSidesButtonClicked())
+		this, SLOT(flipSides())
+	);
+	connect(
+		leftSideBtn, SIGNAL(toggled(bool)),
+		this, SLOT(flipSides(bool))
+	);
+	connect(
+		rightSideBtn, SIGNAL(toggled(bool)),
+		this, SLOT(flipSides(bool))
 	);
 }
 
@@ -136,6 +142,7 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 {
 	ScopedIncDec<int> guard1(m_ignoreAutoManualToggle);
 	ScopedIncDec<int> guard2(m_ignoreLayoutTypeToggle);
+	ScopedIncDec<int> guard3(m_ignoreFlipSides);
 	
 	m_uiData = ui_data;
 
@@ -148,31 +155,27 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 	} else {
 		manualBtn->setChecked(true);
 	}
-	
-	QIcon const* flip_sides_icon = 0;
+
 	switch (ui_data.pageLayout().type()) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			singlePageUncutBtn->setChecked(true);
+			flipSidesFrame->setVisible(false);
 			break;
 		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-			flip_sides_icon = &m_flipLeftToRightIcon;
+			pagePlusOffcutBtn->setChecked(true);
+			leftSideBtn->setChecked(true);
+			flipSidesFrame->setVisible(true);
 			break;
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			flip_sides_icon = &m_flipRightToLeftIcon;
+			pagePlusOffcutBtn->setChecked(true);
+			rightSideBtn->setChecked(true);
+			flipSidesFrame->setVisible(true);
 			break;
 		case PageLayout::TWO_PAGES:
 			twoPagesBtn->setChecked(true);
+			flipSidesFrame->setVisible(false);
 			break;
 	}
-	
-	if (flip_sides_icon) {
-		pagePlusOffcutBtn->setChecked(true);
-		flipSidesBtn->setIcon(*flip_sides_icon);
-		flipSidesFrame->setVisible(true);
-	} else {
-		flipSidesFrame->setVisible(false);
-	}
-	
 	
 	if (ui_data.layoutTypeAutoDetected()) {
 		scopeLabel->setText(tr("Auto detected"));
@@ -337,20 +340,24 @@ OptionsWidget::splitLineModeChanged(bool const auto_mode)
 }
 
 void
-OptionsWidget::flipSidesButtonClicked()
+OptionsWidget::flipSides(bool const doit)
 {
-	ScopedIncDec<int> const guard(m_ignoreAutoManualToggle);
+	if (!doit || m_ignoreFlipSides) {
+		return;
+	}
+
+	ScopedIncDec<int> const guard1(m_ignoreAutoManualToggle);
+	ScopedIncDec<int> const guard2(m_ignoreFlipSides);
 	
 	PageLayout::Type new_plt;
-	QIcon const* new_flip_sides_icon = 0;
 	switch (m_uiData.pageLayout().type()) {
 		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
 			new_plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
-			new_flip_sides_icon = &m_flipRightToLeftIcon;
+			rightSideBtn->setChecked(true);
 			break;
 		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
 			new_plt = PageLayout::LEFT_PAGE_PLUS_OFFCUT;
-			new_flip_sides_icon = &m_flipLeftToRightIcon;
+			leftSideBtn->setChecked(true);
 			break;
 		default:
 			return;
@@ -370,7 +377,6 @@ OptionsWidget::flipSidesButtonClicked()
 	
 	m_uiData.setPageLayout(new_layout);
 	m_uiData.setSplitLineMode(MODE_MANUAL);
-	flipSidesBtn->setIcon(*new_flip_sides_icon);
 	manualBtn->setChecked(true);
 	
 	emit pageLayoutSetLocally(new_layout);

@@ -29,7 +29,6 @@
 #include "PageSelectionAccessor.h"
 #include "Dependencies.h"
 #include "AutoManualMode.h"
-#include <QIcon>
 #include <set>
 
 class ImageId;
@@ -98,7 +97,7 @@ private slots:
 	
 	void splitLineModeChanged(bool auto_mode);
 	
-	void flipSidesButtonClicked();
+	void flipSides(bool doit = true);
 private:
 	void commitCurrentParams();
 	
@@ -107,10 +106,9 @@ private:
 	PageSelectionAccessor m_pageSelectionAccessor;
 	ImageId m_imageId;
 	UiData m_uiData;
-	QIcon m_flipLeftToRightIcon;
-	QIcon m_flipRightToLeftIcon;
 	int m_ignoreAutoManualToggle;
 	int m_ignoreLayoutTypeToggle;
+	int m_ignoreFlipSides;
 };
 
 } // namespace page_split

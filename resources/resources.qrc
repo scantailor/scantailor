@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/flip-sides.png</file>
     <file>icons/user-trash.png</file>
     <file>icons/insert-after-16.png</file>
     <file>icons/insert-before-16.png</file>

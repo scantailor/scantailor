@@ -51,7 +51,7 @@ object-rotate-right.png
 Origin: Tango Desktop Project
 Website: http://tango.freedesktop.org/
 License: Public Domain
-Files:
+Files (some modified, but no copyright is claimed):
 big-down-arrow.png
 big-left-arrow.png
 big-right-arrow.png
@@ -59,6 +59,7 @@ big-up-arrow.png
 insert-before-16.png
 insert-after-16.png
 user-trash.png
+flip-sides.png
 
 
 Origin: Amarok
