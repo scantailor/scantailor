@@ -141,7 +141,10 @@ ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionStat
 	QPointF const screen_mouse_pos(event->pos() + QPointF(0.5, 0.5));
 	QPointF const image_mouse_pos(from_screen.map(screen_mouse_pos));
 
-	if (m_nextVertexImagePos == m_ptrSpline->firstVertex()->point()) {
+	if (m_ptrSpline->hasAtLeastSegments(2) &&
+			m_nextVertexImagePos == m_ptrSpline->firstVertex()->point()) {
+		// Finishing the spline.  Bridging the first and the last points
+		// will create another segment.
 		m_ptrSpline->setBridged(true);
 		m_rContext.zones().addZone(m_ptrSpline);
 		m_rContext.zones().commit();
@@ -149,15 +152,17 @@ ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionStat
 		makePeerPreceeder(*m_rContext.createDefaultInteraction());
 		m_rContext.imageView().update();
 		delete this;
-	} else if (m_ptrSpline->hasAtLeastSegments(2) &&
-			   m_nextVertexImagePos == m_ptrSpline->lastVertex()->point()) {
+	} else if (m_nextVertexImagePos == m_ptrSpline->lastVertex()->point()) {
+		// Removing the last vertex.
 		m_ptrSpline->lastVertex()->remove();
 		if (!m_ptrSpline->firstVertex()) {
+			// If it was the only vertex, cancelling spline creation.
 			makePeerPreceeder(*m_rContext.createDefaultInteraction());
 			m_rContext.imageView().update();
 			delete this;
 		}
 	} else {
+		// Adding a new vertex, provided we are not to close to the previous one.
 		Proximity const prox(screen_mouse_pos, m_ptrSpline->lastVertex()->point());
 		if (prox > interaction.proximityThreshold()) {
 			m_ptrSpline->appendVertex(image_mouse_pos);
