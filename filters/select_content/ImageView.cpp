@@ -163,8 +163,8 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 
 	painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
 
-	// Adjust to compensate for pen width.
-	painter.drawRect(m_contentRect.adjusted(-0.5, -0.5, 0.5, 0.5));
+	// Pen strokes will be outside of m_contentRect - that's how drawRect() works.
+	painter.drawRect(m_contentRect);
 }
 
 void
