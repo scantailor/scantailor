@@ -119,6 +119,8 @@ OptionsWidget::preUpdateUI(ImageId const& image_id)
 			break;
 	}
 	
+	splitLineGroup->setVisible(layout_type != SINGLE_PAGE_UNCUT);
+
 	if (layout_type == AUTO_LAYOUT_TYPE) {
 		changeBtn->setEnabled(false);
 		scopeLabel->setText("?");
@@ -161,7 +163,9 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 		manualBtn->setChecked(true);
 	}
 
-	switch (ui_data.pageLayout().type()) {
+	PageLayout::Type const layout_type = ui_data.pageLayout().type();
+
+	switch (layout_type) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			singlePageUncutBtn->setChecked(true);
 			flipSidesFrame->setVisible(false);
@@ -181,6 +185,8 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 			flipSidesFrame->setVisible(false);
 			break;
 	}
+
+	splitLineGroup->setVisible(layout_type != PageLayout::SINGLE_PAGE_UNCUT);
 	
 	if (ui_data.layoutTypeAutoDetected()) {
 		scopeLabel->setText(tr("Auto detected"));
@@ -225,6 +231,7 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 	Settings::UpdateAction update;
 	update.setLayoutType(lt);
 	
+	splitLineGroup->setVisible(lt != SINGLE_PAGE_UNCUT);
 	scopeLabel->setText(tr("Set manually"));
 	
 	m_ptrPages->setLogicalPagesInImage(m_imageId, logical_pages);
