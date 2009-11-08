@@ -643,6 +643,9 @@ ImageViewBase::updateScrollBars()
 
 	horizontalScrollBar()->setValue(xcur);
 	verticalScrollBar()->setValue(ycur);
+
+	horizontalScrollBar()->setPageStep(qRound(viewport.width()));
+	verticalScrollBar()->setPageStep(qRound(viewport.height()));
 }
 
 void
