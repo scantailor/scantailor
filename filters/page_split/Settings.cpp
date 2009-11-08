@@ -60,6 +60,7 @@ Settings::setLayoutTypeForAllPages(LayoutType const layout_type)
 		if (it->second.hasLayoutTypeConflict(layout_type)) {
 			m_perPageRecords.erase(it++);
 		} else {
+			it->second.clearLayoutType();
 			++it;
 		}
 	}
