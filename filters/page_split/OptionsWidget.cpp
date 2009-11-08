@@ -46,6 +46,11 @@ OptionsWidget::OptionsWidget(
 	setupUi(this);
 	flipSidesFrame->setVisible(false);
 	
+	// Workaround for QTBUG-182
+	QButtonGroup* grp = new QButtonGroup(this);
+	grp->addButton(autoBtn);
+	grp->addButton(manualBtn);
+
 	connect(
 		singlePageUncutBtn, SIGNAL(toggled(bool)),
 		this, SLOT(layoutTypeButtonToggled(bool))
