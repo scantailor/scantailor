@@ -19,6 +19,8 @@
 #include "DragWatcher.h"
 #include "DragHandler.h"
 #include <QMouseEvent>
+#include <QDebug>
+#include <math.h>
 
 DragWatcher::DragWatcher(DragHandler& drag_handler)
 :	m_rDragHandler(drag_handler),
@@ -34,15 +36,16 @@ DragWatcher::haveSignificantDrag() const
 		return false;
 	}
 
-	if (QDateTime::currentDateTime() < m_dragStartTime.addMSecs(500)) {
-		return false;
+	QDateTime const now(QDateTime::currentDateTime());
+	qint64 msec_passed = m_dragStartTime.time().msecsTo(now.time());
+	if (msec_passed < 0) {
+		msec_passed += 60*60*24;
 	}
 
-	if (m_dragMaxSqDist < 6*6) {
-		return false;
-	}
+	double const dist_score = sqrt(m_dragMaxSqDist) / 12.0;
+	double const time_score = msec_passed / 500.0;
 
-	return true;
+	return dist_score + time_score >= 1.0;
 }
 
 void
