@@ -26,6 +26,7 @@
 #include "ColorParams.h"
 #include "OutputParams.h"
 #include "ZoneSet.h"
+#include "PropertySet.h"
 #include <QMutex>
 #include <map>
 #include <memory>
@@ -70,6 +71,14 @@ public:
 	ZoneSet zonesForPage(PageId const& page_id) const;
 
 	void setZones(PageId const& page_id, ZoneSet const& zones);
+
+	/**
+	 * For now, default zone properties are not persistent.
+	 * They may become persistent later though.
+	 */
+	PropertySet defaultZoneProperties() const;
+
+	void setDefaultZoneProperties(PropertySet const& props);
 private:
 	typedef std::map<PageId, Dpi> PerPageDpi;
 	typedef std::map<PageId, ColorParams> PerPageColorParams;
@@ -92,6 +101,7 @@ private:
 	PerPageZones m_perPageZones;
 	Dpi m_defaultDpi;
 	ColorParams m_defaultColorParams;
+	PropertySet m_defaultZoneProps;
 };
 
 } // namespace output

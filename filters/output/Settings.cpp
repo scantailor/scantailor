@@ -18,6 +18,7 @@
 
 #include "Settings.h"
 #include "Params.h"
+#include "PictureLayerProperty.h"
 #include "../../Utils.h"
 #include <boost/foreach.hpp>
 #include <QMutexLocker>
@@ -28,6 +29,7 @@ namespace output
 Settings::Settings()
 :	m_defaultDpi(600, 600)
 {
+	m_defaultZoneProps.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
 }
 
 Settings::~Settings()
@@ -187,6 +189,20 @@ Settings::setZones(PageId const& page_id, ZoneSet const& zones)
 {
 	QMutexLocker const locker(&m_mutex);
 	Utils::mapSetValue(m_perPageZones, page_id, zones);
+}
+
+PropertySet
+Settings::defaultZoneProperties() const
+{
+	QMutexLocker const locker(&m_mutex);
+	return m_defaultZoneProps;
+}
+
+void
+Settings::setDefaultZoneProperties(PropertySet const& props)
+{
+	QMutexLocker const locker(&m_mutex);
+	m_defaultZoneProps = props;
 }
 
 } // namespace output

@@ -80,6 +80,8 @@ public:
 
 	const_iterator end() const { return iterator(m_splineMap.end()); }
 
+	PropertySet const& defaultProperties() const { return m_defaultProps; }
+
 	void setDefaultProperties(PropertySet const& props);
 
 	void addZone(EditableSpline::Ptr const& spline);

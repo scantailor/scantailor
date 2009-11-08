@@ -106,6 +106,8 @@ PictureZoneEditor::PictureZoneEditor(
 	m_pageId(page_id),
 	m_ptrSettings(settings)
 {
+	m_zones.setDefaultProperties(m_ptrSettings->defaultZoneProperties());
+
 	setMouseTracking(true);
 
 	m_context.setShowPropertiesCommand(
@@ -113,10 +115,6 @@ PictureZoneEditor::PictureZoneEditor(
 	);
 
 	connect(&m_zones, SIGNAL(committed()), SLOT(commitZones()));
-
-	PropertySet props;
-	props.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
-	m_zones.setDefaultProperties(props);
 
 	makeLastFollower(*m_context.createDefaultInteraction());
 
@@ -144,6 +142,7 @@ PictureZoneEditor::PictureZoneEditor(
 
 PictureZoneEditor::~PictureZoneEditor()
 {
+	m_ptrSettings->setDefaultZoneProperties(m_zones.defaultProperties());
 }
 
 void
@@ -308,6 +307,7 @@ PictureZoneEditor::showPropertiesDialog(EditableZoneSet::Zone const& zone)
 	connect(&dialog, SIGNAL(updated()), SLOT(update()));
 
 	if (dialog.exec() == QDialog::Accepted) {
+		m_zones.setDefaultProperties(*zone.properties());
 		m_zones.commit();
 	} else {
 		zone.properties()->swap(saved_properties);
