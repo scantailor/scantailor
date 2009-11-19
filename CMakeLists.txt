@@ -348,6 +348,8 @@ SET(
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
 	ContentBoxPropagator.cpp ContentBoxPropagator.h
 	DebugImages.cpp DebugImages.h
+	DebugImageView.cpp DebugImageView.h
+	TabbedDebugImages.cpp TabbedDebugImages.h
 	ImageId.cpp ImageId.h
 	PageId.cpp PageId.h
 	PageInfo.cpp PageInfo.h

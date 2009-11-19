@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,12 +16,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DEBUGIMAGES_H_
-#define DEBUGIMAGES_H_
+#ifndef DEBUG_IMAGES_H_
+#define DEBUG_IMAGES_H_
 
-#include <QImage>
+#include "RefCountable.h"
+#include "IntrusivePtr.h"
+#include "AutoRemovingFile.h"
 #include <QString>
-#include <list>
+#include <deque>
+
+class QImage;
 
 namespace imageproc
 {
@@ -29,35 +33,33 @@ namespace imageproc
 }
 
 /**
- * \brief A list of image + label pairs.
+ * \brief A sequence of image + label pairs.
  */
 class DebugImages
 {
 public:
-	class Item
-	{
-	public:
-		Item(QImage const& image, QString const& label);
-		
-		QImage& image() { return m_image; }
-		
-		QImage const& image() const { return m_image; }
-		
-		QString const& label() const { return m_label; }
-	private:
-		QImage m_image;
-		QString m_label;
-	};
-	
 	void add(QImage const& image, QString const& label);
 	
 	void add(imageproc::BinaryImage const& image, QString const& label);
 	
-	std::list<Item>& items() { return m_items; }
-	
-	std::list<Item> const& items() const { return m_items; }
+	bool empty() const { return m_sequence.empty(); }
+
+	/**
+	 * \brief Removes and returns the first item in the sequence.
+	 *
+	 * Returns a null AutoRemovingFile if image sequence is empty.
+	 */
+	AutoRemovingFile retrieveNext(QString* label = 0);
 private:
-	std::list<Item> m_items;
+	struct Item : public RefCountable
+	{
+		AutoRemovingFile file;
+		QString label;
+
+		Item(AutoRemovingFile f, QString const& l) : file(f), label(l) {}
+	};
+
+	std::deque<IntrusivePtr<Item> > m_sequence;
 };
 
 #endif

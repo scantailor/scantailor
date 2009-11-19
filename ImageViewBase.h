@@ -206,6 +206,8 @@ public:
 	 * call setWidgetFocalPointWithoutMoving() first.
 	 */
 	void zoom(double zoom);
+
+	static BackgroundExecutor& backgroundExecutor();
 protected:
 	virtual void paintEvent(QPaintEvent* event);
 
@@ -230,8 +232,6 @@ protected:
 	 * reduced by margins.
 	 */
 	QRectF viewportRect() const;
-
-	static BackgroundExecutor& backgroundExecutor();
 private slots:
 	void initiateBuildingHqVersion();
 

@@ -7,6 +7,7 @@ SET(
 	SafeDeletingQObjectPtr.h
 	ScopedIncDec.h ScopedDecInc.h
 	Span.h VirtualFunction.h FlagOps.h
+	AutoRemovingFile.cpp AutoRemovingFile.h
 	Proximity.cpp Proximity.h
 	Property.h
 	PropertyFactory.cpp PropertyFactory.h

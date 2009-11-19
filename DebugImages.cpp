@@ -18,23 +18,50 @@
 
 #include "DebugImages.h"
 #include "imageproc/BinaryImage.h"
+#include <QImage>
+#include <QImageWriter>
+#include <QTemporaryFile>
+#include <QDir>
 
 void
 DebugImages::add(QImage const& image, QString const& label)
 {
-	m_items.push_back(Item(image, label));
+	QTemporaryFile file(QDir::tempPath()+"/scantailor-dbg-XXXXXX.png");
+	if (!file.open()) {
+		return;
+	}
+
+	AutoRemovingFile arem_file(file.fileName());
+	file.setAutoRemove(false);
+
+	QImageWriter writer(&file, "png");
+	writer.setCompression(2); // Trade space for speed.
+	if (!writer.write(image)) {
+		return;
+	}
+
+	m_sequence.push_back(IntrusivePtr<Item>(new Item(arem_file, label)));
 }
 
 void
 DebugImages::add(imageproc::BinaryImage const& image, QString const& label)
 {
-	m_items.push_back(Item(image.toQImage(), label));
+	add(image.toQImage(), label);
 }
 
-DebugImages::Item::Item(QImage const& image, QString const& label)
-:	m_image(image),
-	m_label(label)
+AutoRemovingFile
+DebugImages::retrieveNext(QString* label)
 {
+	if (m_sequence.empty()) {
+		return AutoRemovingFile();
+	}
+
+	AutoRemovingFile file(m_sequence.front()->file);
+	if (label) {
+		*label = m_sequence.front()->label;
+	}
+
+	m_sequence.pop_front();
+
+	return file;
 }
-
-

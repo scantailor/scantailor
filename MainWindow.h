@@ -54,6 +54,7 @@ class ContentBoxPropagator;
 class ProjectCreationContext;
 class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
+class TabbedDebugImages;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -232,7 +233,7 @@ private:
 	QStackedLayout* m_pImageFrameLayout;
 	QStackedLayout* m_pOptionsFrameLayout;
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
-	std::auto_ptr<QTabWidget> m_ptrTabbedDebugImages;
+	std::auto_ptr<TabbedDebugImages> m_ptrTabbedDebugImages;
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
 	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
 	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;

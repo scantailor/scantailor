@@ -31,7 +31,10 @@
 #include "Utils.h"
 #include "FilterOptionsWidget.h"
 #include "ErrorWidget.h"
+#include "AutoRemovingFile.h"
 #include "DebugImages.h"
+#include "DebugImageView.h"
+#include "TabbedDebugImages.h"
 #include "BasicImageView.h"
 #include "ProjectWriter.h"
 #include "ProjectReader.h"
@@ -128,7 +131,7 @@ MainWindow::MainWindow()
 	
 	setupThumbView(); // Expects m_ptrThumbSequence to be initialized.
 	
-	m_ptrTabbedDebugImages.reset(new QTabWidget);
+	m_ptrTabbedDebugImages.reset(new TabbedDebugImages);
 	
 	m_debug = actionDebug->isChecked();
 	m_pImageFrameLayout = new QStackedLayout(imageViewFrame);
@@ -628,15 +631,16 @@ MainWindow::setImageWidget(
 		m_imageWidgetCleanup.add(widget);
 	}
 	
-	if (!debug_images || debug_images->items().empty()) {
+	if (!debug_images || debug_images->empty()) {
 		m_pImageFrameLayout->addWidget(widget);
 	} else {
 		m_ptrTabbedDebugImages->addTab(widget, "Main");
-		BOOST_FOREACH (DebugImages::Item& item, debug_images->items()) {
-			QWidget* widget = new BasicImageView(item.image());
+		AutoRemovingFile file;
+		QString label;
+		while (!(file = debug_images->retrieveNext(&label)).get().isNull()) {
+			QWidget* widget = new DebugImageView(file);
 			m_imageWidgetCleanup.add(widget);
-			m_ptrTabbedDebugImages->addTab(widget, item.label());
-			item.image() = QImage(); // Save memory.
+			m_ptrTabbedDebugImages->addTab(widget, label);
 		}
 		m_pImageFrameLayout->addWidget(m_ptrTabbedDebugImages.get());
 	}
