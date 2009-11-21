@@ -22,6 +22,7 @@
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/Connectivity.h"
 #include <boost/foreach.hpp>
+#include <QImage>
 #include <QDebug>
 #include <vector>
 #include <queue>
