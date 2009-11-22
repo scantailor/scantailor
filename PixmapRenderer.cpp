@@ -17,16 +17,20 @@
 */
 
 #include "PixmapRenderer.h"
+#include "config.h"
 #include <QPainter>
 #include <QPixmap>
 #include <QWidget>
-#include <QPaintEngine>
 #include <QTransform>
 #include <QRect>
 #include <QRectF>
 #include <Qt>
 #include <QDebug>
 #include <math.h>
+
+#ifdef ENABLE_OPENGL
+#	include <QGLWidget>
+#endif
 
 #ifdef Q_WS_X11
 #  include <QX11Info>
@@ -46,11 +50,13 @@ PixmapRenderer::drawPixmap(
 	QPoint offset; // Both x and y will be either zero or negative.
 	QPaintDevice* const redir_dev = QPainter::redirected(painter.device(), &offset);
 	QPaintDevice* const paint_dev = redir_dev ? redir_dev : dev;
-	
-	if (paint_dev->paintEngine()->type() != QPaintEngine::X11) {
+
+#if defined(ENABLE_OPENGL)
+	if (dynamic_cast<QGLWidget*>(paint_dev)) {
 		drawPixmapNoXRender(painter, pixmap);
 		return;
 	}
+#endif
 
 	QRect const device_rect(
 		QRect(0, 0, dev->width(), dev->height()).translated(-offset)

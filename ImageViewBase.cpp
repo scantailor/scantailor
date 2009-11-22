@@ -400,8 +400,12 @@ ImageViewBase::paintEvent(QPaintEvent* event)
 	QPainter painter(viewport());
 	painter.save();
 
-	// On X11 SmoothPixmapTransform is too slow, so don't enable it.
-	if (viewport()->paintEngine()->type() != QPaintEngine::X11) {
+	// On X11 (except with OpenGL), SmoothPixmapTransform is too slow, so don't enable it.
+	bool smooth_pixmap_ok = true;
+#if defined(Q_WS_X11)
+	smooth_pixmap_ok = viewport()->inherits("QGLWidget");
+#endif
+	if (smooth_pixmap_ok) {
 		double const xscale = m_virtualToWidget.m11();
 
 		// Width of a source pixel in mm, as it's displayed on screen.
@@ -412,6 +416,8 @@ ImageViewBase::paintEvent(QPaintEvent* event)
 	}
 
 	if (validateHqPixmap()) {
+		// HQ pixmap maps one to one to screen pixels, so antialiasing is not necessary.
+		painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
 		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);
 	} else {
 		scheduleHqVersionRebuild();
