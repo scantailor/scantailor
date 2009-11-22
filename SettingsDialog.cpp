@@ -17,6 +17,7 @@
 */
 
 #include "SettingsDialog.h.moc"
+#include "OpenGLSupport.h"
 #include "config.h"
 #include <QSettings>
 #include <QVariant>
@@ -28,14 +29,20 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 
 	QSettings settings;
 
-#ifdef ENABLE_OPENGL
-	ui.use3DAcceleration->setChecked(
-		settings.value("settings/use_3d_acceleration", false).toBool()
-	);
-#else
+#ifndef ENABLE_OPENGL
 	ui.use3DAcceleration->setChecked(false);
 	ui.use3DAcceleration->setEnabled(false);
 	ui.use3DAcceleration->setToolTip(tr("Compiled without OpenGL support."));
+#else
+	if (!OpenGLSupport::supported()) {
+		ui.use3DAcceleration->setChecked(false);
+		ui.use3DAcceleration->setEnabled(false);
+		ui.use3DAcceleration->setToolTip(tr("Your hardware / driver don't provide the necessary features."));
+	} else {
+		ui.use3DAcceleration->setChecked(
+			settings.value("settings/use_3d_acceleration", false).toBool()
+		);
+	}
 #endif
 
 	connect(ui.buttonBox, SIGNAL(accepted()), SLOT(commitChanges()));

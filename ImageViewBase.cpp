@@ -19,6 +19,7 @@
 #include "ImageViewBase.h.moc"
 #include "NonCopyable.h"
 #include "ImagePresentation.h"
+#include "OpenGLSupport.h"
 #include "PixmapRenderer.h"
 #include "BackgroundExecutor.h"
 #include "Dpm.h"
@@ -30,6 +31,7 @@
 #include <QScrollBar>
 #include <QPointer>
 #include <QAtomicInt>
+#include <QPaintEngine>
 #include <QPainter>
 #include <QPainterPath>
 #include <QBrush>
@@ -51,6 +53,7 @@
 
 #ifdef ENABLE_OPENGL
 #include <QGLWidget>
+#include <QGLFormat>
 #endif
 
 using namespace imageproc;
@@ -158,7 +161,19 @@ ImageViewBase::ImageViewBase(
 {
 #ifdef ENABLE_OPENGL
 	if (QSettings().value("settings/use_3d_acceleration", false) != false) {
-		setViewport(new QGLWidget());
+		if (OpenGLSupport::supported()) {
+			QGLFormat format;
+			format.setSampleBuffers(true);
+			format.setStencil(true);
+			format.setAlpha(true);
+			format.setRgba(true);
+			format.setDepth(false);
+
+			// Most of hardware refuses to work for us with direct rendering enabled.
+			format.setDirectRendering(false);
+
+			setViewport(new QGLWidget(format));
+		}
 	}
 #endif
 
@@ -385,15 +400,16 @@ ImageViewBase::paintEvent(QPaintEvent* event)
 	QPainter painter(viewport());
 	painter.save();
 
-#if !defined(Q_WS_X11)
-	double const xscale = m_virtualToWidget.m11();
+	// On X11 SmoothPixmapTransform is too slow, so don't enable it.
+	if (viewport()->paintEngine()->type() != QPaintEngine::X11) {
+		double const xscale = m_virtualToWidget.m11();
 
-	// Width of a source pixel in mm, as it's displayed on screen.
-	double const pixel_width = widthMM() * xscale / width();
+		// Width of a source pixel in mm, as it's displayed on screen.
+		double const pixel_width = widthMM() * xscale / width();
 
-	// On X11 SmoothPixmapTransform is too slow.
-	painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
-#endif
+		// Disable antialiasing for large zoom levels.
+		painter.setRenderHint(QPainter::SmoothPixmapTransform, pixel_width < 0.5);
+	}
 
 	if (validateHqPixmap()) {
 		painter.drawPixmap(m_hqPixmapPos, m_hqPixmap);

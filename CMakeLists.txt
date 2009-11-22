@@ -316,6 +316,7 @@ SET(
 	sources
 	main.cpp Application.cpp Application.h
 	BackgroundExecutor.cpp BackgroundExecutor.h
+	OpenGLSupport.cpp OpenGLSupport.h
 	PixmapRenderer.cpp PixmapRenderer.h
 	SkinnedButton.cpp SkinnedButton.h
 	BubbleAnimation.cpp BubbleAnimation.h
