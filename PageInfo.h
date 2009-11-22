@@ -30,8 +30,10 @@ public:
 	
 	PageInfo(PageId const& page_id, ImageMetadata const& metadata,
 		bool multi_page_file, int image_sub_pages);
-	
+
 	PageId const& id() const { return m_pageId; }
+
+	void setId(PageId const& id) { m_pageId = id; }
 	
 	ImageId const& imageId() const { return m_pageId.imageId(); }
 	

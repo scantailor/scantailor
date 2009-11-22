@@ -206,13 +206,13 @@ private:
 	
 	void showInsertFileDialog(
 		BeforeOrAfter before_or_after, ImageId const& existig);
-	
-	void showRemoveFileDialog(PageInfo const& page_info);
+
+	void showRemovePagesDialog(std::set<PageId> const& pages);
 	
 	void insertImage(ImageInfo const& new_image,
 		BeforeOrAfter before_or_after, ImageId const& existing);
-	
-	void removeFromProject(ImageId image_id);
+
+	void removeFromProject(std::set<PageId> const& pages);
 	
 	BackgroundTaskPtr createCompositeTask(
 		PageInfo const& page, int page_num, int last_filter_idx);

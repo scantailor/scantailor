@@ -116,9 +116,9 @@ public:
 	void setSelection(PageId const& page_id);
 	
 	void insert(PageInfo const& new_page,
-		BeforeOrAfter before_or_after, PageId const& existing);
-	
-	void remove(ImageId const& image_id);
+		BeforeOrAfter before_or_after, ImageId const& image);
+
+	void removePages(std::set<PageId> const& pages);
 	
 	QRectF selectionLeaderSceneRect() const;
 	
@@ -150,8 +150,6 @@ private:
 	typedef Container::index<ItemsByIdTag>::type ItemsById;
 	typedef Container::index<ItemsInOrderTag>::type ItemsInOrder;
 	typedef Container::index<SelectedThenUnselectedTag>::type SelectedThenUnselected;
-	
-	void remove(ItemsById::iterator const& id_it);
 	
 	void selectItemNoModifiers(ItemsById::iterator const& it);
 	
@@ -274,6 +272,19 @@ private:
 };
 
 
+class ThumbnailSequence::PageIdMutator
+{
+public:
+	PageIdMutator(PageId const& new_page_id) : m_newPageId(new_page_id) {}
+
+	void operator()(Item& item) {
+		item.pageInfo.setId(m_newPageId);
+	}
+private:
+	PageId m_newPageId;
+};
+
+
 /*============================= ThumbnailSequence ===========================*/
 
 ThumbnailSequence::ThumbnailSequence(QSizeF const& max_logical_thumb_size)
@@ -325,15 +336,15 @@ ThumbnailSequence::setSelection(PageId const& page_id)
 void
 ThumbnailSequence::insert(
 	PageInfo const& new_page,
-	BeforeOrAfter before_or_after, PageId const& existing)
+	BeforeOrAfter before_or_after, ImageId const& image)
 {
-	m_ptrImpl->insert(new_page, before_or_after, existing);
+	m_ptrImpl->insert(new_page, before_or_after, image);
 }
 
 void
-ThumbnailSequence::remove(ImageId const& image_id)
+ThumbnailSequence::removePages(std::set<PageId> const& pages)
 {
-	m_ptrImpl->remove(image_id);
+	m_ptrImpl->removePages(pages);
 }
 
 QRectF
@@ -532,10 +543,15 @@ ThumbnailSequence::Impl::setSelection(PageId const& page_id)
 	
 	// Clear selection from all items except the one for which
 	// selection is requested.
-	BOOST_FOREACH(Item const& item, m_selectedThenUnselected) {
+	SelectedThenUnselected::iterator it(m_selectedThenUnselected.begin());
+	while (it != m_selectedThenUnselected.end()) {
+		Item const& item = *it;
 		if (!item.isSelected()) {
 			break;
 		}
+
+		++it;
+
 		if (&*id_it != &item) {
 			item.setSelected(false);
 			moveToUnselected(&item);
@@ -562,10 +578,10 @@ ThumbnailSequence::Impl::setSelection(PageId const& page_id)
 void
 ThumbnailSequence::Impl::insert(
 	PageInfo const& page_info,
-	BeforeOrAfter before_or_after, PageId const& existing)
+	BeforeOrAfter before_or_after, ImageId const& image)
 {
-	ItemsById::iterator id_it(m_itemsById.find(existing));
-	if (id_it == m_itemsById.end()) {
+	ItemsById::iterator id_it(m_itemsById.lower_bound(PageId(image)));
+	if (id_it == m_itemsById.end() || id_it->pageInfo.imageId() != image) {
 		return;
 	}
 	
@@ -615,48 +631,59 @@ ThumbnailSequence::Impl::insert(
 }
 
 void
-ThumbnailSequence::Impl::remove(ImageId const& image_id)
+ThumbnailSequence::Impl::removePages(std::set<PageId> const& to_remove)
 {
-	ItemsById::iterator id_it(
-		m_itemsById.find(PageId(image_id, PageId::SINGLE_PAGE))
-	);
-	if (id_it != m_itemsById.end()) {
-		remove(id_it);
-	}
-	id_it = m_itemsById.find(PageId(image_id, PageId::LEFT_PAGE));
-	if (id_it != m_itemsById.end()) {
-		remove(id_it);
-	}
-	id_it = m_itemsById.find(PageId(image_id, PageId::RIGHT_PAGE));
-	if (id_it != m_itemsById.end()) {
-		remove(id_it);
-	}
-}
+	m_sceneRect = QRectF(0, 0, 0, 0);
 
-void
-ThumbnailSequence::Impl::remove(ItemsById::iterator const& id_it)
-{
-	QPointF const pos_delta(
-		0.0, -(id_it->composite->boundingRect().height() + SPACING)
-	);
-	
-	if (m_pSelectionLeader == &*id_it) {
-		m_pSelectionLeader = 0;
-	}
-	delete id_it->composite;
-	
-	if (pos_delta != QPointF()) {
-		ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
-		ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
-		++ord_it; // Skip the item itself.
-		for (; ord_it != ord_end; ++ord_it) {
-			ord_it->composite->setPos(ord_it->composite->pos() + pos_delta);
+	// If we are removing a LEFT_PAGE or a RIGHT_PAGE, we have to change
+	// the type of the remaining half to SINGLE_PAGE, as that's what
+	// effectively happens in PageSequence::removePages().
+	// We can't do it in place, as that will prevent the other half
+	// to be remove if it's also in the list.
+	std::vector<ImageId> images_to_singularize;
+	images_to_singularize.reserve(m_items.size());
+
+	std::set<PageId>::const_iterator const to_remove_end(to_remove.end());
+	QPointF pos_delta(0, 0);
+
+	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
+	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
+	while (ord_it != ord_end) {
+		if (to_remove.find(ord_it->pageInfo.id()) == to_remove_end) {
+			// Keeping this page.
+			if (pos_delta != QPointF(0, 0)) {
+				ord_it->composite->setPos(ord_it->composite->pos() + pos_delta);
+			}
+			ord_it->composite->updateSceneRect(m_sceneRect);
+			++ord_it;
+		} else {
+			// Removing this page.
+			if (m_pSelectionLeader == &*ord_it) {
+				m_pSelectionLeader = 0;
+			}
+
+			switch (ord_it->pageInfo.id().subPage()) {
+				case PageId::LEFT_PAGE:
+				case PageId::RIGHT_PAGE:
+					images_to_singularize.push_back(ord_it->pageInfo.imageId());
+					break;
+				default:;
+			}
+
+			pos_delta.ry() -= ord_it->composite->boundingRect().height() + SPACING;
+			delete ord_it->composite;
+			m_itemsInOrder.erase(ord_it++);
 		}
 	}
-	
-	m_itemsById.erase(id_it);
-	
-	m_sceneRect.adjust(0.0, 0.0, pos_delta.x(), pos_delta.y());
+
+	ItemsById::iterator const id_end(m_itemsById.end());
+	BOOST_FOREACH(ImageId const& image_id, images_to_singularize) {
+		ItemsById::iterator id_it(m_itemsById.lower_bound(PageId(image_id)));
+		for (; id_it != id_end && id_it->pageInfo.imageId() == image_id; ++id_it) {
+			m_itemsById.modify(id_it, PageIdMutator(PageId(image_id, PageId::SINGLE_PAGE)));
+		}
+	}
+
 	commitSceneRect();
 }
 

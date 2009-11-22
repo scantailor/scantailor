@@ -70,7 +70,7 @@
 #include "LoadFileTask.h"
 #include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
-#include "ui_RemoveFileDialog.h"
+#include "ui_RemovePagesDialog.h"
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -756,19 +756,17 @@ MainWindow::contextMenuRequested(
 		goToPage(page_info.id());
 	}
 	
-	if (getCurrentView() != PageSequence::IMAGE_VIEW) {
-		// We don't support adding / removing of pages - only of images.
-		return;
-	}
-	
 	QMenu menu;
+
 	QAction* ins_before = menu.addAction(
 		QIcon(":/icons/insert-before-16.png"), tr("Insert before ...")
 	);
 	QAction* ins_after = menu.addAction(
 		QIcon(":/icons/insert-after-16.png"), tr("Insert after ...")
 	);
+
 	menu.addSeparator();
+
 	QAction* remove = menu.addAction(
 		QIcon(":/icons/user-trash.png"), tr("Remove from project ...")
 	);
@@ -779,7 +777,7 @@ MainWindow::contextMenuRequested(
 	} else if (action == ins_after) {
 		showInsertFileDialog(AFTER, page_info.imageId());
 	} else if (action == remove) {
-		showRemoveFileDialog(page_info);
+		showRemovePagesDialog(m_ptrThumbSequence->selectedItems());
 	}
 }
 
@@ -1499,39 +1497,20 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 }
 
 void
-MainWindow::showRemoveFileDialog(PageInfo const& page_info)
+MainWindow::showRemovePagesDialog(std::set<PageId> const& pages)
 {
-	QString const file_path(page_info.imageId().filePath());
-	QString const fname(QFileInfo(file_path).fileName());
-	
 	std::auto_ptr<QDialog> dialog(new QDialog(this));
-	Ui::RemoveFileDialog ui;
+	Ui::RemovePagesDialog ui;
 	ui.setupUi(dialog.get());
-	
-	QString image_name(fname);
-	if (page_info.isMultiPageFile()) {
-		image_name = tr("%1 (page %2)").arg(fname).arg(page_info.imageId().page() + 1);
-	}
-	ui.text->setText(ui.text->text().arg(image_name));
-	
-	ui.deleteFromDisk->setEnabled(!page_info.isMultiPageFile());
-	
+
+	ui.text->setText(ui.text->text().arg(pages.size()));
+
 	QPushButton* remove_btn = ui.buttonBox->button(QDialogButtonBox::Ok);
 	remove_btn->setText(tr("Remove"));
-	
+
 	dialog->setWindowModality(Qt::WindowModal);
-	if (dialog->exec() != QDialog::Accepted) {
-		return;
-	}
-	
-	removeFromProject(page_info.imageId());
-	if (ui.deleteFromDisk->isChecked()) {
-		if (!QFile::remove(file_path)) {
-			QMessageBox::warning(
-				0, tr("Error"),
-				tr("Unable to delete file:\n%1").arg(file_path)
-			);
-		}
+	if (dialog->exec() == QDialog::Accepted) {
+		removeFromProject(pages);
 	}
 }
 
@@ -1539,31 +1518,20 @@ void
 MainWindow::insertImage(ImageInfo const& new_image,
 	BeforeOrAfter before_or_after, ImageId const& existing)
 {
-	assert(getCurrentView() == PageSequence::IMAGE_VIEW);
-
 	m_ptrPages->insertImage(new_image, before_or_after, existing);
 	PageInfo const page_info(
 		PageId(new_image.id(), PageId::SINGLE_PAGE), new_image.metadata(),
 		new_image.isMultiPageFile(), new_image.numSubPages()
 	);
-	m_ptrThumbSequence->insert(
-		page_info, before_or_after, PageId(existing, PageId::SINGLE_PAGE)
-	);
+	m_ptrThumbSequence->insert(page_info, before_or_after, existing);
 }
 
 void
-MainWindow::removeFromProject(ImageId image_id)
+MainWindow::removeFromProject(std::set<PageId> const& pages)
 {
-	// Note that image_id is passed by value intentionally.
-	// We need a local copy, because a reference might come
-	// directly from m_ptrPages, and so will be invalidated
-	// by m_ptrPages->removeImage().
-	
-	std::vector<PageId> pages;
-	pages.push_back(PageId(image_id, PageId::SINGLE_PAGE));
-	
-	m_ptrPages->removeImage(image_id);
-	m_ptrThumbSequence->remove(image_id);
+	m_ptrPages->removePages(pages);
+	m_ptrStages->pageSplitFilter()->removePages(pages);
+	m_ptrThumbSequence->removePages(pages);
 	m_ptrThumbSequence->setSelection(
 		m_ptrPages->curPage(getCurrentView()).id()
 	);

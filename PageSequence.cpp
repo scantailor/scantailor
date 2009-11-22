@@ -409,15 +409,15 @@ PageSequence::insertImage(ImageInfo const& new_image,
 }
 
 void
-PageSequence::removeImage(ImageId const& image_id)
+PageSequence::removePages(std::set<PageId> const& pages)
 {
 	bool was_modified = false;
-	
+
 	{
 		QMutexLocker locker(&m_mutex);
-		removeImageImpl(image_id, was_modified);
+		removePagesImpl(pages, was_modified);
 	}
-	
+
 	if (was_modified) {
 		emit modified();
 	}
@@ -764,44 +764,85 @@ PageSequence::insertImageImpl(ImageInfo const& new_image,
 }
 
 void
-PageSequence::removeImageImpl(ImageId const& image_id, bool& modified)
+PageSequence::removePagesImpl(std::set<PageId> const& to_remove, bool& modified)
 {
-	if (m_images.empty()) {
-		return;
-	}
-	
-	std::vector<ImageDesc>::iterator it(m_images.begin());
-	std::vector<ImageDesc>::iterator const end(m_images.end());
-	int logical_pages_seen = 0;
-	int idx = 0;
-	for (; it != end && it->id != image_id; ++it, ++idx) {
-		logical_pages_seen += it->numLogicalPages;
-	}
-	if (it == end) {
-		return;
-	}
-	
-	m_totalLogicalPages -= it->numLogicalPages;
-	if (idx == m_curImage) {
-		// Removing the current page.
-		if (idx < int(m_images.size()) - 1) {
-			// Not the last one.
-			// Set the first sub-page of the next image as the current page.
-			m_curLogicalPage -= m_curSubPage;
-			m_curSubPage = 0;
-		} else {
-			// Last one.
-			// Set the last sub-page of the previous image as the current page.
-			--m_curImage;
-			m_curLogicalPage -= m_curSubPage + 1;
-			m_curSubPage = m_images[m_curImage].numLogicalPages - 1;
+	std::set<PageId>::const_iterator const to_remove_end(to_remove.end());
+
+	std::vector<ImageDesc> new_images;
+	new_images.reserve(m_images.size());
+	int new_total_logical_pages = 0;
+	int new_cur_image_lower_bound = 0;
+	int new_cur_logical_page_lower_bound = 0;
+	int cur_image_intact = true;
+
+	int const num_old_images = m_images.size();
+	for (int i = 0; i < num_old_images; ++i) {
+		ImageDesc const& image = m_images[i];
+		if (m_curImage == i) {
+			new_cur_image_lower_bound = new_images.size();
+			new_cur_logical_page_lower_bound = new_total_logical_pages;
 		}
-	} else if (logical_pages_seen < m_curLogicalPage) {
-		m_curLogicalPage -= it->numLogicalPages;
+
+		if (image.numLogicalPages == 1) {
+			if (to_remove.find(PageId(image.id, PageId::SINGLE_PAGE)) == to_remove_end) {
+				new_images.push_back(image);
+				new_total_logical_pages += image.numLogicalPages;
+			} else {
+				modified = true;
+				if (m_curImage == i) {
+					cur_image_intact = false;
+				}
+			}
+		} else {
+			assert(image.numLogicalPages == 2);
+
+			int subpages_to_remove = 0;
+			if (to_remove.find(PageId(image.id, PageId::SINGLE_PAGE)) != to_remove_end) {
+				subpages_to_remove = 2;
+			} else {
+				if (to_remove.find(PageId(image.id, PageId::LEFT_PAGE)) != to_remove_end) {
+					++subpages_to_remove;
+				}
+				if (to_remove.find(PageId(image.id, PageId::RIGHT_PAGE)) != to_remove_end) {
+					++subpages_to_remove;
+				}
+			}
+
+			if (subpages_to_remove < 2) {
+				new_images.push_back(image);
+				if (subpages_to_remove == 1) {
+					--new_images.back().numLogicalPages;
+				}
+				new_total_logical_pages += new_images.back().numLogicalPages;
+			}
+
+			if (subpages_to_remove > 0) {
+				modified = true;
+				if (m_curImage == i) {
+					cur_image_intact = false;
+				}
+			}
+		}
 	}
-	
-	m_images.erase(it);
-	modified = true;
+
+	if (new_images.empty()) {
+		m_curImage = 0;
+		m_curLogicalPage = 0;
+		m_curSubPage = 0;
+	} else if (new_cur_image_lower_bound >= (int)new_images.size()) {
+		// The last sub-page in the sequence becomes the current page.
+		m_curImage = new_images.size() - 1;
+		m_curLogicalPage = new_total_logical_pages - 1;
+		m_curSubPage = new_images.back().numLogicalPages - 1;
+	} else {
+		m_curImage = new_cur_image_lower_bound;
+		m_curLogicalPage = new_cur_logical_page_lower_bound;
+		if (!cur_image_intact) {
+			m_curSubPage = 0;
+		}
+	}
+
+	new_images.swap(m_images);
 }
 
 PageId::SubPage

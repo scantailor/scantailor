@@ -69,15 +69,10 @@ private:
 		void clearLayoutType() { m_layoutTypeValid = false; }
 		
 		/**
-		 * \brief Checks if the layout type conflicts with PageLayout
+		 * \brief Checks if a particular layout type conflicts with PageLayout
 		 *        that is part of Params.
-		 *
-		 * \param default_layout_type The layout type for pages
-		 *        that don't have specific layout type assigned.
-		 * \return true if there is a conflict, false otherwise.
 		 */
-		bool hasLayoutTypeConflict(
-			LayoutType default_layout_type) const;
+		bool hasLayoutTypeConflict(LayoutType layout_type) const;
 		
 		Params m_params;
 		LayoutType m_layoutType;
@@ -181,10 +176,23 @@ public:
 	Record conditionalUpdate(
 		ImageId const& image_id, UpdateAction const& action,
 		bool* conflict = 0);
+
+	/**
+	 * \brief Update page records to make the layout type consistent
+	 *        with the number of sub pages which may have changes.
+	 *
+	 * For example, layout type TWO_PAGES will become LEFT_PAGE, if
+	 * the right was removed.
+	 */
+	void removePages(std::set<PageId> const& pages);
 private:
 	typedef std::map<ImageId, BaseRecord> PerPageRecords;
 	
+	Record getPageRecordLocked(ImageId const& image_id) const;
+
 	void updatePageLocked(ImageId const& image_id, UpdateAction const& action);
+
+	void updatePageLocked(PerPageRecords::iterator it, UpdateAction const& action);
 	
 	mutable QMutex m_mutex;
 	PerPageRecords m_perPageRecords;

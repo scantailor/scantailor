@@ -91,10 +91,19 @@ public:
 	 */
 	void setSelection(PageId const& page_id);
 	
+	/**
+	 * \brief Inserts a page before the first page with matching ImageId.
+	 *
+	 * We don't allow inserting a page between two halves of another page,
+	 * to be compatible with what reset() does.
+	 *
+	 * If there are no pages with matching ImageId, the new page won't
+	 * be inserted.
+	 */
 	void insert(PageInfo const& new_page,
-		BeforeOrAfter before_or_after, PageId const& existing);
-	
-	void remove(ImageId const& image_id);
+		BeforeOrAfter before_or_after, ImageId const& image);
+
+	void removePages(std::set<PageId> const& pages);
 	
 	/**
 	 * \brief The bounding rectangle in scene coordinates of the selection leader.
@@ -119,6 +128,7 @@ private:
 	class PlaceholderThumb;
 	class LabelGroup;
 	class CompositeItem;
+	class PageIdMutator;
 	
 	void emitNewSelectionLeader(
 		PageInfo const& page_info, CompositeItem const* composite,

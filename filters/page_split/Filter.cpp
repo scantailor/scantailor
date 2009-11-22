@@ -150,6 +150,12 @@ Filter::loadSettings(
 }
 
 void
+Filter::removePages(std::set<PageId> const& pages)
+{
+	m_ptrSettings->removePages(pages);
+}
+
+void
 Filter::writeImageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
 	ImageId const& image_id, int const numeric_id) const

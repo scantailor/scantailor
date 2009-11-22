@@ -24,6 +24,7 @@
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
+#include <set>
 
 class PageId;
 class ImageId;
@@ -74,6 +75,8 @@ public:
 		IntrusivePtr<deskew::CacheDrivenTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
+
+	void removePages(std::set<PageId> const& pages);
 private:
 	void writeImageSettings(
 		QDomDocument& doc, QDomElement& filter_el,

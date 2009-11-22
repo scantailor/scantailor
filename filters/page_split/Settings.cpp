@@ -85,7 +85,12 @@ Settings::Record
 Settings::getPageRecord(ImageId const& image_id) const
 {
 	QMutexLocker locker(&m_mutex);
-	
+	return getPageRecordLocked(image_id);
+}
+
+Settings::Record
+Settings::getPageRecordLocked(ImageId const& image_id) const
+{
 	PerPageRecords::const_iterator it(m_perPageRecords.find(image_id));
 	if (it == m_perPageRecords.end()) {
 		return Record(m_defaultLayoutType);
@@ -123,19 +128,24 @@ Settings::updatePageLocked(ImageId const& image_id, UpdateAction const& action)
 		}
 	} else {
 		// A record was found.
-		
-		Record record(it->second, m_defaultLayoutType);
-		record.update(action);
-		
-		if (record.hasLayoutTypeConflict()) {
-			record.clearParams();
-		}
-		
-		if (record.isNull()) {
-			m_perPageRecords.erase(it);
-		} else {
-			it->second = record;
-		}
+		updatePageLocked(it, action);
+	}
+}
+
+void
+Settings::updatePageLocked(PerPageRecords::iterator const it, UpdateAction const& action)
+{
+	Record record(it->second, m_defaultLayoutType);
+	record.update(action);
+
+	if (record.hasLayoutTypeConflict()) {
+		record.clearParams();
+	}
+
+	if (record.isNull()) {
+		m_perPageRecords.erase(it);
+	} else {
+		it->second = record;
 	}
 }
 
@@ -196,6 +206,57 @@ Settings::conditionalUpdate(
 	}
 }
 
+void
+Settings::removePages(std::set<PageId> const& pages)
+{
+	std::set<PageId>::const_iterator const pages_end(pages.end());
+
+	QMutexLocker locker(&m_mutex);
+
+	PerPageRecords::iterator it(m_perPageRecords.begin());
+	PerPageRecords::iterator const end(m_perPageRecords.end());
+	while (it != end) {
+		Record record(it->second, m_defaultLayoutType);
+		switch (record.combinedLayoutType()) {
+			case AUTO_LAYOUT_TYPE:
+			case SINGLE_PAGE_UNCUT:
+			case PAGE_PLUS_OFFCUT: {
+				if (pages.find(PageId(it->first, PageId::SINGLE_PAGE)) != pages_end) {
+					m_perPageRecords.erase(it++);
+					continue;
+				}
+				if (record.combinedLayoutType() != AUTO_LAYOUT_TYPE) {
+					break;
+				}
+			}
+			case TWO_PAGES: {
+				bool const left_removed = (pages.find(PageId(it->first, PageId::LEFT_PAGE)) != pages_end);
+				bool const right_removed = (pages.find(PageId(it->first, PageId::RIGHT_PAGE)) != pages_end);
+				if (left_removed && right_removed) {
+					m_perPageRecords.erase(it++);
+					continue;
+				} else if (left_removed || right_removed) {
+					UpdateAction update;
+					update.setLayoutType(PAGE_PLUS_OFFCUT);
+					if (record.params()) {
+						PageLayout::Type const layout_type = left_removed
+							? PageLayout::RIGHT_PAGE_PLUS_OFFCUT
+							: PageLayout::LEFT_PAGE_PLUS_OFFCUT;
+						PageLayout const layout(layout_type, record.params()->pageLayout().splitLine());
+						Params const params(layout, record.params()->dependencies(), record.params()->splitLineMode());
+						update.setParams(params);
+					}
+					updatePageLocked(it++, update);
+					continue;
+				}
+				break;
+			}
+			default:;
+		}
+		++it;
+	}
+}
+
 
 /*======================= Settings::BaseRecord ======================*/
 
@@ -222,17 +283,11 @@ Settings::BaseRecord::setLayoutType(LayoutType const layout_type)
 }
 
 bool
-Settings::BaseRecord::hasLayoutTypeConflict(
-	LayoutType const default_layout_type) const
+Settings::BaseRecord::hasLayoutTypeConflict(LayoutType const layout_type) const
 {
 	if (!m_paramsValid) {
 		// No data - no conflict.
 		return false;
-	}
-	
-	LayoutType layout_type = default_layout_type;
-	if (m_layoutTypeValid) {
-		layout_type = m_layoutType;
 	}
 	
 	if (layout_type == AUTO_LAYOUT_TYPE) {
@@ -305,7 +360,7 @@ Settings::Record::update(UpdateAction const& action)
 bool
 Settings::Record::hasLayoutTypeConflict() const
 {
-	return BaseRecord::hasLayoutTypeConflict(m_defaultLayoutType);
+	return BaseRecord::hasLayoutTypeConflict(combinedLayoutType());
 }
 
 

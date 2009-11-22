@@ -30,6 +30,7 @@
 #include <QMutex>
 #include <QString>
 #include <Qt>
+#include <set>
 #include <vector>
 #include <stddef.h>
 
@@ -101,8 +102,8 @@ public:
 	 */
 	bool insertImage(ImageInfo const& new_image,
 		BeforeOrAfter before_or_after, ImageId const& existing);
-	
-	void removeImage(ImageId const& image_id);
+
+	void removePages(std::set<PageId> const& pages);
 	
 	/**
 	 * \brief Check if all DPIs are OK, in terms of ImageMetadata::isDpiOK()
@@ -157,8 +158,8 @@ private:
 	
 	bool insertImageImpl(ImageInfo const& new_image,
 		BeforeOrAfter before_or_after, ImageId const& existing, bool& modified);
-	
-	void removeImageImpl(ImageId const& image_id, bool& modified);
+
+	void removePagesImpl(std::set<PageId> const& pages, bool& modified);
 	
 	PageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
 	
