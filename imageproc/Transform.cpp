@@ -371,9 +371,8 @@ static void transformGeneric(
 				// process the bottom-right corner
 				mixer.add(src_line[src_right], bottomright_area);
 			}
-			
-			unsigned const total_area = src_area + background_area;
-			dst_line[dx] = mixer.result(total_area - background_area);
+
+			dst_line[dx] = mixer.result(src_area + background_area);
 		}
 	}
 }
