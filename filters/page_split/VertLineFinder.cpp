@@ -56,11 +56,16 @@ VertLineFinder::findLines(
 	ImageTransformation xform_100dpi(xform);
 	xform_100dpi.preScaleToDpi(Dpi(dpi, dpi));
 	
+	QRect target_rect(xform_100dpi.resultingRect().toRect());
+	if (target_rect.isEmpty()) {
+		target_rect.setWidth(1);
+		target_rect.setHeight(1);
+	}
+
 	QColor const black(0x00, 0x00, 0x00);
 	QImage const gray100(
 		transformToGray(
-			image, xform_100dpi.transform(),
-			xform_100dpi.resultingRect().toRect(), black, true,
+			image, xform_100dpi.transform(), target_rect, black, true,
 			QSizeF(5.0, 5.0)
 		)
 	);
