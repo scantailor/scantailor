@@ -300,9 +300,6 @@ PageSequence::curPage(View const view, int* page_num) const
 {
 	QMutexLocker locker(&m_mutex);
 	
-	assert((size_t)m_curImage <= m_images.size());
-	ImageDesc const& image = m_images[m_curImage];
-	
 	if (page_num) {
 		if (view == IMAGE_VIEW) {
 			*page_num = m_curImage;
@@ -310,7 +307,13 @@ PageSequence::curPage(View const view, int* page_num) const
 			*page_num = m_curLogicalPage;
 		}
 	}
-	
+
+	if ((size_t)m_curImage >= m_images.size()) {
+		assert(m_curImage == 0 && m_images.size() == 0);
+		return PageInfo();
+	}
+
+	ImageDesc const& image = m_images[m_curImage];
 	PageId const id(image.id, curSubPageLocked(image, view));
 	return PageInfo(
 		id, image.metadata,
