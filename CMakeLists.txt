@@ -380,6 +380,7 @@ SET(
 	AtomicFileOverwriter.cpp AtomicFileOverwriter.h
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
+	Undistort.cpp Undistort.h
 	Utils.cpp Utils.h
 	AutoManualMode.h
 	AbstractCommand.h

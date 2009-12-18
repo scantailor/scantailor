@@ -24,6 +24,7 @@
 #include "DebugImages.h"
 #include "EstimateBackground.h"
 #include "Despeckle.h"
+#include "Undistort.h"
 #include "RenderParams.h"
 #include "Dpi.h"
 #include "Dpm.h"
@@ -462,7 +463,7 @@ OutputGenerator::processImpl(
 			normalize_illumination_rect, Qt::white
 		);
 	}
-	
+
 	status.throwIfCancelled();
 	
 	QImage maybe_smoothed;
@@ -517,6 +518,13 @@ OutputGenerator::processImpl(
 			);
 			
 			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_pos);
+
+			if (render_params.dewarp()) {
+				dst = undistort(dst, status, dbg);
+				if (dbg) {
+					dbg->add(dst, "undistorted");
+				}
+			}
 		}
 		
 		return dst.toQImage();

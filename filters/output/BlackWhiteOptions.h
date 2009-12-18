@@ -29,7 +29,7 @@ namespace output
 class BlackWhiteOptions
 {
 public:
-	BlackWhiteOptions() : m_thresholdAdjustment(0), m_despeckle(true) {}
+	BlackWhiteOptions() : m_thresholdAdjustment(0), m_despeckle(true), m_dewarp(false) {}
 	
 	BlackWhiteOptions(QDomElement const& el);
 	
@@ -43,12 +43,17 @@ public:
 	
 	void setDespeckle(bool enabled) { m_despeckle = enabled; }
 	
+	bool dewarp() const { return m_dewarp; }
+
+	void setDewarp(bool enabled) { m_dewarp = enabled; }
+
 	bool operator==(BlackWhiteOptions const& other) const;
 	
 	bool operator!=(BlackWhiteOptions const& other) const;
 private:
 	int m_thresholdAdjustment;
 	bool m_despeckle;
+	bool m_dewarp;
 };
 
 } // namespace output
