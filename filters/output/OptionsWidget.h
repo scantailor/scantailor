@@ -67,6 +67,8 @@ private slots:
 	void equalizeIlluminationToggled(bool checked);
 	
 	void despeckleToggled(bool checked);
+
+	void dewarpToggled(bool checked);
 	
 	void setLighterThreshold();
 	

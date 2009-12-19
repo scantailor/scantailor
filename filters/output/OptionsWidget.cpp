@@ -83,6 +83,10 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
 		this, SLOT(despeckleToggled(bool))
 	);
 	connect(
+		dewarpCB, SIGNAL(clicked(bool)),
+		this, SLOT(dewarpToggled(bool))
+	);
+	connect(
 		lighterThresholdLink, SIGNAL(linkActivated(QString const&)),
 		this, SLOT(setLighterThreshold())
 	);
@@ -177,6 +181,16 @@ OptionsWidget::despeckleToggled(bool const checked)
 {
 	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
 	opt.setDespeckle(checked);
+	m_colorParams.setBlackWhiteOptions(opt);
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::dewarpToggled(bool const checked)
+{
+	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
+	opt.setDewarp(checked);
 	m_colorParams.setBlackWhiteOptions(opt);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	emit reloadRequested();
@@ -340,6 +354,9 @@ OptionsWidget::updateColorsDisplay()
 	if (bw_options_visible) {
 		despeckleCB->setChecked(
 			m_colorParams.blackWhiteOptions().despeckle()
+		);
+		dewarpCB->setChecked(
+			m_colorParams.blackWhiteOptions().dewarp()
 		);
 		ScopedIncDec<int> const guard(m_ignoreThresholdChanges);
 		thresholdSlider->setValue(

@@ -33,6 +33,9 @@ RenderParams::RenderParams(ColorParams const& cp)
 			if (cp.blackWhiteOptions().despeckle()) {
 				m_mask |= DESPECKLE;
 			}
+			if (cp.blackWhiteOptions().dewarp()) {
+				m_mask |= DEWARP;
+			}
 			break;
 		case ColorParams::COLOR_GRAYSCALE: {
 			ColorGrayscaleOptions const opt(

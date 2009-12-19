@@ -27,7 +27,7 @@ namespace output
 BlackWhiteOptions::BlackWhiteOptions(QDomElement const& el)
 :	m_thresholdAdjustment(el.attribute("thresholdAdj").toInt()),
 	m_despeckle(el.attribute("despeckle") != "0"),
-	m_dewarp(el.attribute("dewarp") != "0")
+	m_dewarp(el.attribute("dewarp") == "1")
 {
 	// Note that we default to true if the attribute is not found.
 }
