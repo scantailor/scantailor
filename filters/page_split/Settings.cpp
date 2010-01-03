@@ -243,7 +243,9 @@ Settings::removePages(std::set<PageId> const& pages)
 							? PageLayout::RIGHT_PAGE_PLUS_OFFCUT
 							: PageLayout::LEFT_PAGE_PLUS_OFFCUT;
 						PageLayout const layout(layout_type, record.params()->pageLayout().splitLine());
-						Params const params(layout, record.params()->dependencies(), record.params()->splitLineMode());
+						Dependencies deps(record.params()->dependencies());
+						deps.setLayoutType(PAGE_PLUS_OFFCUT);
+						Params const params(layout, deps, MODE_MANUAL);
 						update.setParams(params);
 					}
 					updatePageLocked(it++, update);

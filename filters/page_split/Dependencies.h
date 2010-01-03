@@ -48,6 +48,8 @@ public:
 	Dependencies(QSize const& image_size,
 		OrthogonalRotation rotation, LayoutType layout_type);
 	
+	void setLayoutType(LayoutType type) { m_layoutType = type; }
+
 	bool compatibleWith(Params const& params) const;
 	
 	bool isNull() const { return m_imageSize.isNull(); }
