@@ -43,6 +43,8 @@ SET(
 	InfluenceMap.cpp InfluenceMap.h
 	MaxWhitespaceFinder.cpp MaxWhitespaceFinder.h
 	ColorInterpolation.cpp ColorInterpolation.h
+	LU.cpp LU.h
+	LM.cpp LM.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

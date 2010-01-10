@@ -32,7 +32,7 @@ namespace imageproc
  * \brief Attempts to fix geometric distortions of an image.
  */
 imageproc::BinaryImage undistort(
-	imageproc::BinaryImage const& bin_img,
+	imageproc::BinaryImage const& input,
 	TaskStatus const& status, DebugImages* dbg = 0);
 
 #endif
