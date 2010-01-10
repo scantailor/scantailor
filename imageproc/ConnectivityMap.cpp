@@ -189,17 +189,23 @@ ConnectivityMap::addComponent(BinaryImage const& image)
 }
 
 QImage
-ConnectivityMap::visualized() const
+ConnectivityMap::visualized(QColor bgcolor) const
 {
 	if (m_size.isEmpty()) {
 		return QImage();
 	}
-	
+
 	int const width = m_size.width();
 	int const height = m_size.height();
 	
+	// Convert to premultiplied RGBA.
+	bgcolor = bgcolor.toRgb();
+	bgcolor.setRedF(bgcolor.redF() * bgcolor.alphaF());
+	bgcolor.setGreenF(bgcolor.greenF() * bgcolor.alphaF());
+	bgcolor.setBlueF(bgcolor.blueF() * bgcolor.alphaF());
+
 	QImage dst(m_size, QImage::Format_ARGB32);
-	dst.fill(0x00FFFFFF); // transparent white
+	dst.fill(bgcolor.rgba());
 	
 	uint32_t const* src_line = m_pData;
 	int const src_stride = m_stride;

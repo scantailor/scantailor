@@ -21,6 +21,8 @@
 
 #include "Connectivity.h"
 #include <QSize>
+#include <QColor>
+#include <Qt>
 #include <vector>
 #include <queue>
 #include <stdint.h>
@@ -163,10 +165,9 @@ public:
 	/**
 	 * \brief Visualizes each label with a different color.
 	 *
-	 * Label 0 (which is assigned to background) is represented
-	 * by transparent pixels.
+	 * \param bgcolor Background color.  Transparency is supported.
 	 */
-	QImage visualized() const;
+	QImage visualized(QColor bgcolor = Qt::black) const;
 private:
 	void copyFromInfluenceMap(InfluenceMap const& imap);
 	
