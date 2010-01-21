@@ -320,6 +320,37 @@ BOOST_AUTO_TEST_CASE(test_dilate_3x3_gray_shrinked)
 	BOOST_CHECK(dilateGray(img, QSize(3, 3), dst_area) == control);
 }
 
+BOOST_AUTO_TEST_CASE(test_open_1x2_gray)
+{
+	static int const inp[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 2, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 5, 2, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		1, 2, 3, 4, 5, 6, 7, 8, 9
+	};
+
+	static int const out[] = {
+		9, 4, 9, 9, 9, 9, 9, 9, 1,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 3, 9, 9, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 2, 9, 9, 9, 9, 9,
+		9, 9, 9, 9, 9, 9, 9, 9, 9,
+		1, 2, 3, 4, 5, 6, 7, 8, 9
+	};
+
+	QImage const img(makeGrayImage(inp, 9, 9));
+	QImage const control(makeGrayImage(out, 9, 9));
+	BOOST_CHECK(openGray(img, QSize(1, 2), 0x00) == control);
+}
+
 BOOST_AUTO_TEST_CASE(test_dilate_5x5_white)
 {
 	static int const inp[] = {

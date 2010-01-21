@@ -978,7 +978,7 @@ QImage openGray(
 	
 	// We are going to make two operations:
 	// tmp = erodeGray(src, brick1), then dst = dilateGray(tmp, brick2)
-	QRect const tmp_rect(extendByBrick(dst_area, brick2));
+	QRect const tmp_rect(extendByBrick(dst_area, brick1));
 	CoordinateSystem tmp_cs(tmp_rect.topLeft());
 	
 	QImage const tmp(
