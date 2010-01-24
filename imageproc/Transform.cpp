@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include "Scale.h"
 #include "Grayscale.h"
+#include "GrayImage.h"
 #include <QImage>
 #include <QRect>
 #include <QSizeF>
@@ -158,19 +159,17 @@ static QSizeF calcSrcUnitSize(QTransform const& xform, QSizeF const& min)
 
 template<typename StorageUnit, typename Mixer>
 static void transformGeneric(
-	QImage const& src, QImage& dst, QTransform const& xform,
+	StorageUnit const* const src_data, int const src_stride, QSize const src_size,
+	StorageUnit* const dst_data, int const dst_stride, QTransform const& xform,
 	QRect const& dst_rect, StorageUnit const background_color,
 	bool const weak_background, QSizeF const& min_mapping_area)
 {
-	int const sw = src.width();
-	int const sh = src.height();
+	int const sw = src_size.width();
+	int const sh = src_size.height();
 	int const dw = dst_rect.width();
 	int const dh = dst_rect.height();
-	
-	StorageUnit const* const src_data = reinterpret_cast<StorageUnit const*>(src.bits());
-	StorageUnit* dst_line = reinterpret_cast<StorageUnit*>(dst.bits());
-	int const src_units_per_line = src.bytesPerLine() / sizeof(StorageUnit);
-	int const dst_units_per_line = dst.bytesPerLine() / sizeof(StorageUnit);
+
+	StorageUnit* dst_line = dst_data;
 	
 	QTransform inv_xform;
 	inv_xform.translate(dst_rect.x(), dst_rect.y());
@@ -184,7 +183,7 @@ static void transformGeneric(
 	int const src32_unit_w = std::max<int>(1, qRound(src32_unit_size.width()));
 	int const src32_unit_h = std::max<int>(1, qRound(src32_unit_size.height()));
 	
-	for (int dy = 0; dy < dh; ++dy, dst_line += dst_units_per_line) {
+	for (int dy = 0; dy < dh; ++dy, dst_line += dst_stride) {
 		double const f_dy_center = dy + 0.5;
 		double const f_sx32_base = f_dy_center * inv_xform.m21() + inv_xform.dx();
 		double const f_sy32_base = f_dy_center * inv_xform.m22() + inv_xform.dy();
@@ -278,7 +277,7 @@ static void transformGeneric(
 			
 			unsigned const src_area = (src32_bottom - src32_top) * (src32_right - src32_left);
 			
-			StorageUnit const* src_line = &src_data[src_top * src_units_per_line];
+			StorageUnit const* src_line = &src_data[src_top * src_stride];
 			
 			if (src_top == src_bottom) {
 				if (src_left == src_right) {
@@ -315,11 +314,11 @@ static void transformGeneric(
 				src_line += src_left;
 				mixer.add(*src_line, top_area);
 				
-				src_line += src_units_per_line;
+				src_line += src_stride;
 				
 				for (int sy = src_top + 1; sy < src_bottom; ++sy) {
 					mixer.add(*src_line, middle_area);
-					src_line += src_units_per_line;
+					src_line += src_stride;
 				}
 				
 				mixer.add(*src_line, bottom_area);
@@ -345,7 +344,7 @@ static void transformGeneric(
 				// process the top-right corner
 				mixer.add(src_line[src_right], topright_area);
 				
-				src_line += src_units_per_line;
+				src_line += src_stride;
 				
 				// process middle lines
 				for (int sy = src_top + 1; sy < src_bottom; ++sy) {
@@ -357,7 +356,7 @@ static void transformGeneric(
 					
 					mixer.add(src_line[src_right], right_area);
 					
-					src_line += src_units_per_line;
+					src_line += src_stride;
 				}
 				
 				// process bottom-left corner
@@ -400,39 +399,42 @@ QImage transform(
 		QImage dst(dst_rect.size(), QImage::Format_Indexed8);
 		dst.setColorTable(createGrayscalePalette());
 		transformGeneric<uint8_t, Gray>(
-			toGrayscale(src), dst, xform, dst_rect,
+			src.bits(), src.bytesPerLine(), src.size(),
+			dst.bits(), dst.bytesPerLine(), xform, dst_rect,
 			qGray(background_color.rgb()),
 			weak_background, min_mapping_area
 		);
 		return dst;
 	} else {
 		if (src.hasAlphaChannel() || qAlpha(background_color.rgba()) != 0xff) {
+			QImage const src_argb32(src.convertToFormat(QImage::Format_ARGB32));
 			QImage dst(dst_rect.size(), QImage::Format_ARGB32);
 			transformGeneric<uint32_t, ARGB32>(
-				src.convertToFormat(QImage::Format_ARGB32),
-				dst, xform, dst_rect, background_color.rgba(),
-				weak_background, min_mapping_area
+				(uint32_t const*)src_argb32.bits(), src_argb32.bytesPerLine() / 4, src_argb32.size(),
+				(uint32_t*)dst.bits(), dst.bytesPerLine() / 4, xform, dst_rect,
+				background_color.rgba(), weak_background, min_mapping_area
 			);
 			return dst;
 		} else {
+			QImage const src_rgb32(src.convertToFormat(QImage::Format_RGB32));
 			QImage dst(dst_rect.size(), QImage::Format_RGB32);
 			transformGeneric<uint32_t, RGB32>(
-				src.convertToFormat(QImage::Format_RGB32),
-				dst, xform, dst_rect, background_color.rgb(),
-				weak_background, min_mapping_area
+				(uint32_t const*)src_rgb32.bits(), src_rgb32.bytesPerLine() / 4, src_rgb32.size(),
+				(uint32_t*)dst.bits(), dst.bytesPerLine() / 4, xform, dst_rect,
+				background_color.rgb(), weak_background, min_mapping_area
 			);
 			return dst;
 		}
 	}
 }
 
-QImage transformToGray(
+GrayImage transformToGray(
 	QImage const& src, QTransform const& xform,
 	QRect const& dst_rect, QColor const& background_color,
 	bool const weak_background, QSizeF const& min_mapping_area)
 {
 	if (src.isNull() || dst_rect.isEmpty()) {
-		return QImage();
+		return GrayImage();
 	}
 	
 	if (!xform.isAffine()) {
@@ -443,11 +445,12 @@ QImage transformToGray(
 		throw std::invalid_argument("transformToGray: dst_rect is invalid");
 	}
 	
-	QImage dst(dst_rect.size(), QImage::Format_Indexed8);
-	dst.setColorTable(createGrayscalePalette());
+	GrayImage const gray_src(src);
+	GrayImage dst(dst_rect.size());
 	
 	transformGeneric<uint8_t, Gray>(
-		toGrayscale(src), dst, xform, dst_rect,
+		gray_src.data(), gray_src.stride(), gray_src.size(),
+		dst.data(), dst.stride(), xform, dst_rect,
 		qGray(background_color.rgb()),
 		weak_background, min_mapping_area
 	);

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ class QColor;
 
 namespace imageproc
 {
+
+class GrayImage;
 
 /**
  * \brief Apply an affine transformation to the image.
@@ -63,10 +65,9 @@ QImage transform(
  * \brief Apply an affine transformation to the image.
  *
  * Same as transform(), except the source image image is converted
- * to grayscale before transforming it.  The resulting image
- * will be grayscale as well.
+ * to grayscale before transforming it.
  */
-QImage transformToGray(
+GrayImage transformToGray(
 	QImage const& src, QTransform const& xform,
 	QRect const& dst_rect, QColor const& background_color,
 	bool weak_background = false,
