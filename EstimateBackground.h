@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,19 +22,18 @@
 class ImageTransformation;
 class TaskStatus;
 class DebugImages;
-class QImage;
 class QPolygonF;
 
 namespace imageproc
 {
 	class PolynomialSurface;
+	class GrayImage;
 }
 
 /**
  * \brief Estimates a grayscale background of a scanned page.
  *
- * \param input The image of a page. Although it doesn't have to be grayscale,
- *        it will be treated as grayscale anyway.
+ * \param input The image of a page.
  * \param area_to_consider The area in \p input image coordinates to consider.
  *        The resulting surface will only be valid in that area.
  *        This parameter can be an empty polygon, in which case all of the
@@ -59,7 +58,7 @@ namespace imageproc
  *    provided they touch the edges, but it performs better without them.
  */
 imageproc::PolynomialSurface estimateBackground(
-	QImage const& input, QPolygonF const& area_to_consider,
+	imageproc::GrayImage const& input, QPolygonF const& area_to_consider,
 	TaskStatus const& status, DebugImages* dbg = 0);
 
 #endif

@@ -31,12 +31,20 @@
 #include "imageproc/PolynomialLine.h"
 #include "imageproc/PolynomialSurface.h"
 #include "imageproc/PolygonRasterizer.h"
+#include "imageproc/GrayImage.h"
+#include "imageproc/GrayRasterOp.h"
+#include "imageproc/RasterOpGeneric.h"
+#include "imageproc/SeedFill.h"
 #include <QImage>
 #include <QColor>
 #include <QSize>
 #include <QPolygonF>
 #include <QTransform>
+#include <QDebug>
 #include <Qt>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/control_structures.hpp>
 #include <vector>
 #include <algorithm>
 #include <stdint.h>
@@ -44,6 +52,13 @@
 #include <string.h>
 
 using namespace imageproc;
+
+struct AbsoluteDifference
+{
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		return abs(int(src) - int(dst));
+	}
+};
 
 /**
  * The same as seedFillGrayInPlace() with a seed of two black lines
@@ -78,8 +93,90 @@ static void seedFillTopBottomInPlace(GrayImage& image)
 	}
 }
 
+static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg)
+{
+	using namespace boost::lambda;
+
+	// We do morphological preprocessing with one of two methods.  The first
+	// one is good for cases when the dark area is in the middle of the image,
+	// touching at least one of the vertical edges and not touching the horizontal one.
+	// The second method is good for pages that have pictures (partly) in the
+	// shadow of the spine.  Most of the other cases can be handled by any of these
+	// two methods.
+
+	GrayImage method1(createFramedImage(image.size()));
+	seedFillGrayInPlace(method1, image, CONN8);
+
+	// This will get rid of the remnants of letters.  Note that since we know we
+	// are working with at most 300x300 px images, we can just hardcode the size.
+	method1 = openGray(method1, QSize(1, 20), 0x00);
+	if (dbg) {
+		dbg->add(method1, "preproc_method1");
+	}
+
+	seedFillTopBottomInPlace(image);
+	if (dbg) {
+		dbg->add(image, "preproc_method2");
+	}
+
+	// Now let's estimate, which of the methods is better for this case.
+
+	// Take the difference between two methods.
+	GrayImage diff(image);
+	rasterOpGeneric(
+		diff.data(), diff.stride(), diff.size(),
+		method1.data(), method1.stride(), _1 -= _2
+	);
+	if (dbg) {
+		dbg->add(diff, "raw_diff");
+	}
+
+	// Approximate the difference using a polynomial function.
+	// If it fits well into our data set, we consider the difference
+	// to be caused by a shadow rather than a picture, and use method1.
+	GrayImage approximated(PolynomialSurface(3, 3, diff).render(diff.size()));
+	if (dbg) {
+		dbg->add(approximated, "approx_diff");
+	}
+
+	// Now let's take the difference between the original difference
+	// and approximated difference.
+	rasterOpGeneric(
+		diff.data(), diff.stride(), diff.size(),
+		approximated.data(), approximated.stride(),
+		if_then_else(_1 > _2, _1 -= _2, _1 = _2 - _1)
+	);
+	approximated = GrayImage(); // save memory.
+	if (dbg) {
+		dbg->add(diff, "raw_vs_approx_diff");
+	}
+
+	// Our final decision is like this:
+	// If we have at least 0.1% of pixels that are greater than 30,
+	// we consider that we have a picture rather than a shadow,
+	// and use method2.
+
+	int sum = 0;
+	GrayscaleHistogram hist(diff);
+	for (int i = 255; i > 30; --i) {
+		sum += hist[i];
+	}
+
+	if (sum < 0.001 * (diff.width() * diff.height())) {
+		image = method1;
+		if (dbg) {
+			dbg->add(image, "use_method1");
+		}
+	} else {
+		// image is already set to method2
+		if (dbg) {
+			dbg->add(image, "use_method2");
+		}
+	}
+}
+
 imageproc::PolynomialSurface estimateBackground(
-	QImage const& input, QPolygonF const& area_to_consider,
+	GrayImage const& input, QPolygonF const& area_to_consider,
 	TaskStatus const& status, DebugImages* dbg)
 {
 	QSize reduced_size(input.size());
@@ -90,11 +187,10 @@ imageproc::PolynomialSurface estimateBackground(
 	}
 	
 	status.throwIfCancelled();
-	
-	seedFillTopBottomInPlace(background);
-	if (dbg) {
-		dbg->add(background, "seedfill_topbottom");
-	}
+
+	morphologicalPreprocessingInPlace(background, dbg);
+
+	status.throwIfCancelled();
 	
 	int const width = background.width();
 	int const height = background.height();
