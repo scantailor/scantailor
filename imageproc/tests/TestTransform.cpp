@@ -47,14 +47,13 @@ BOOST_AUTO_TEST_CASE(test_null_image)
 
 BOOST_AUTO_TEST_CASE(test_random_image)
 {
-	QImage img(100, 100, QImage::Format_Indexed8);
-	img.setColorTable(createGrayscalePalette());
-	uint8_t* line = img.bits();
+	GrayImage img(QSize(100, 100));
+	uint8_t* line = img.data();
 	for (int y = 0; y < img.height(); ++y) {
 		for (int x = 0; x < img.width(); ++x) {
 			line[x] = rand() % 256;
 		}
-		line += img.bytesPerLine();
+		line += img.stride();
 	}
 	
 	QColor const bgcolor(0xff, 0xff, 0xff);
