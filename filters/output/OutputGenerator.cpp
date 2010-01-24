@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "Zone.h"
 #include "ZoneSet.h"
 #include "PictureLayerProperty.h"
+#include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
 #include "imageproc/Binarize.h"
@@ -253,7 +254,7 @@ OutputGenerator::normalizeIlluminationGray(
 	QImage const& input, QPolygonF const& area_to_consider,
 	QTransform const& xform, QRect const& target_rect, DebugImages* const dbg)
 {
-	QImage to_be_normalized(
+	GrayImage to_be_normalized(
 		transformToGray(
 			input, xform, target_rect,
 			Qt::black // <-- Important!
@@ -277,7 +278,7 @@ OutputGenerator::normalizeIlluminationGray(
 	
 	status.throwIfCancelled();
 	
-	QImage background(bg_ps.render(to_be_normalized.size()));
+	GrayImage background(bg_ps.render(to_be_normalized.size()));
 	if (dbg) {
 		dbg->add(background, "background");
 	}
@@ -294,11 +295,10 @@ OutputGenerator::normalizeIlluminationGray(
 
 imageproc::BinaryImage
 OutputGenerator::estimateBinarizationMask(
-	TaskStatus const& status, QImage const& gray_source,
+	TaskStatus const& status, GrayImage const& gray_source,
 	QRect const& source_rect, QRect const& source_sub_rect,
 	DebugImages* const dbg) const
 {
-	assert(gray_source.format() == QImage::Format_Indexed8);
 	assert(source_rect.contains(source_sub_rect));
 	
 	// If we need to strip some of the margins from a grayscale
@@ -307,7 +307,7 @@ OutputGenerator::estimateBinarizationMask(
 	// That image won't own that data, but gray_source is not
 	// going anywhere, so it's fine.
 	
-	QImage trimmed_image;
+	GrayImage trimmed_image;
 	
 	if (source_rect == source_sub_rect) {
 		trimmed_image = gray_source; // Shallow copy.
@@ -318,16 +318,15 @@ OutputGenerator::estimateBinarizationMask(
 			source_sub_rect.topLeft() - source_rect.topLeft()
 		);
 		
-		int const bpl = gray_source.bytesPerLine();
-		int const offset = relative_subrect.top() * bpl
+		int const stride = gray_source.stride();
+		int const offset = relative_subrect.top() * stride
 				+ relative_subrect.left();
 		
-		trimmed_image = QImage(
-			gray_source.bits() + offset,
+		trimmed_image = GrayImage(QImage(
+			gray_source.data() + offset,
 			relative_subrect.width(), relative_subrect.height(),
-			bpl, gray_source.format()
-		);
-		trimmed_image.setColorTable(gray_source.colorTable());
+			stride, QImage::Format_Indexed8
+		));
 	}
 	
 	status.throwIfCancelled();
@@ -335,18 +334,16 @@ OutputGenerator::estimateBinarizationMask(
 	QSize const downscaled_size(to300dpi(trimmed_image.size(), m_dpi));
 	
 	// A 300dpi version of trimmed_image.
-	QImage downscaled_input(
+	GrayImage downscaled_input(
 		scaleToGray(trimmed_image, downscaled_size)
 	);
-	trimmed_image = QImage(); // Save memory.
+	trimmed_image = GrayImage(); // Save memory.
 	
 	status.throwIfCancelled();
 	
 	// Light areas indicate pictures.
-	QImage picture_areas(
-		detectPictures(downscaled_input, status, dbg)
-	);
-	downscaled_input = QImage(); // Save memory.
+	GrayImage picture_areas(detectPictures(downscaled_input, status, dbg));
+	downscaled_input = GrayImage(); // Save memory.
 	
 	status.throwIfCancelled();
 	
@@ -412,7 +409,7 @@ OutputGenerator::processImpl(
 	
 	// For various reasons, we need some whitespace around the content
 	// area.  This is the number of pixels of such whitespace.
-	int const content_margin = 20;
+	int const content_margin = m_dpi.vertical() * 20 / 300;
 	
 	// The content area (in m_toUncropped coordinates) extended
 	// with content_margin.  Note that we prevent that extension
@@ -477,7 +474,7 @@ OutputGenerator::processImpl(
 			dbg->add(maybe_smoothed, "smoothed");
 		}
 	}
-	
+
 	status.throwIfCancelled();
 	
 	if (render_params.binaryOutput()) {
@@ -494,7 +491,9 @@ OutputGenerator::processImpl(
 			status.throwIfCancelled();
 			
 			if (render_params.despeckle()) {
-				despeckleInPlace(bw_content, m_dpi, status, dbg);
+				despeckleInPlace(
+					bw_content, normalize_illumination_rect, m_dpi, status, dbg
+				);
 				if (dbg) {
 					dbg->add(bw_content, "despeckled");
 				}
@@ -509,15 +508,9 @@ OutputGenerator::processImpl(
 			
 			status.throwIfCancelled();
 			
-			QRect dst_rect(m_contentRect);
-			dst_rect.moveTopLeft(m_contentRect.topLeft() - m_cropRect.topLeft());
-			
-			QPoint const src_pos(
-				m_contentRect.topLeft() -
-				normalize_illumination_rect.topLeft()
-			);
-			
-			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_pos);
+			QRect const src_rect(m_contentRect.translated(-normalize_illumination_rect.topLeft()));
+			QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_rect.topLeft());
 
 			if (render_params.dewarp()) {
 				dst = undistort(dst, status, dbg);
@@ -539,7 +532,7 @@ OutputGenerator::processImpl(
 		// maybe_normalized from grayscale to color mode.
 		
 		bw_mask = estimateBinarizationMask(
-			status, toGrayscale(maybe_normalized),
+			status, GrayImage(maybe_normalized),
 			normalize_illumination_rect,
 			small_margins_rect, dbg
 		);
@@ -554,9 +547,9 @@ OutputGenerator::processImpl(
 			auto_picture_mask->fill(BLACK);
 
 			if (!m_contentRect.isEmpty()) {
+				QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
 				QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
-				QPoint const src_pos(m_contentRect.topLeft() - small_margins_rect.topLeft());
-				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_pos);
+				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_rect.topLeft());
 			}
 		}
 
@@ -600,7 +593,9 @@ OutputGenerator::processImpl(
 		status.throwIfCancelled();
 		
 		if (render_params.despeckle()) {
-			despeckleInPlace(bw_content, m_dpi, status, dbg);
+			despeckleInPlace(
+				bw_content, small_margins_rect, m_dpi, status, dbg
+			);
 			if (dbg) {
 				dbg->add(bw_content, "despeckled");
 			}
@@ -640,11 +635,7 @@ OutputGenerator::processImpl(
 	}
 
 	if (!m_contentRect.isEmpty()) {
-		QRect src_rect(m_contentRect);
-		src_rect.moveTopLeft(
-			m_contentRect.topLeft() - small_margins_rect.topLeft()
-		);
-		
+		QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
 		QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
 		drawOver(dst, dst_rect, maybe_normalized, src_rect);
 	}
@@ -672,9 +663,9 @@ OutputGenerator::to300dpi(QSize const& size, Dpi const& source_dpi)
 	return QSize(std::max(1, width), std::max(1, height));
 }
 
-QImage
+GrayImage
 OutputGenerator::detectPictures(
-	QImage const& input_300dpi, TaskStatus const& status,
+	GrayImage const& input_300dpi, TaskStatus const& status,
 	DebugImages* const dbg)
 {
 	// We stretch the range of gray levels to cover the whole
@@ -682,40 +673,40 @@ OutputGenerator::detectPictures(
 	// and background to be equally far from the center
 	// of the whole range.  Otherwise text printed with a big
 	// font will be considered a picture.
-	QImage stretched(stretchGrayRange(input_300dpi, 0.01, 0.01));
+	GrayImage stretched(stretchGrayRange(input_300dpi, 0.01, 0.01));
 	if (dbg) {
 		dbg->add(stretched, "stretched");
 	}
 	
 	status.throwIfCancelled();
 	
-	QImage eroded(erodeGray(stretched, QSize(3, 3), 0x00));
+	GrayImage eroded(erodeGray(stretched, QSize(3, 3), 0x00));
 	if (dbg) {
 		dbg->add(eroded, "eroded");
 	}
 	
 	status.throwIfCancelled();
 	
-	QImage dilated(dilateGray(stretched, QSize(3, 3), 0xff));
+	GrayImage dilated(dilateGray(stretched, QSize(3, 3), 0xff));
 	if (dbg) {
 		dbg->add(dilated, "dilated");
 	}
 	
-	stretched = QImage(); // Save memory.
+	stretched = GrayImage(); // Save memory.
 	
 	status.throwIfCancelled();
 	
 	grayRasterOp<CombineInverted>(dilated, eroded);
-	QImage gray_gradient(dilated);
-	dilated = QImage();
-	eroded = QImage();
+	GrayImage gray_gradient(dilated);
+	dilated = GrayImage();
+	eroded = GrayImage();
 	if (dbg) {
 		dbg->add(gray_gradient, "gray_gradient");
 	}
 	
 	status.throwIfCancelled();
 	
-	QImage marker(erodeGray(gray_gradient, QSize(35, 35), 0x00));
+	GrayImage marker(erodeGray(gray_gradient, QSize(35, 35), 0x00));
 	if (dbg) {
 		dbg->add(marker, "marker");
 	}
@@ -723,8 +714,8 @@ OutputGenerator::detectPictures(
 	status.throwIfCancelled();
 	
 	seedFillGrayInPlace(marker, gray_gradient, CONN8);
-	QImage reconstructed(marker);
-	marker = QImage();
+	GrayImage reconstructed(marker);
+	marker = GrayImage();
 	if (dbg) {
 		dbg->add(reconstructed, "reconstructed");
 	}
@@ -738,9 +729,9 @@ OutputGenerator::detectPictures(
 	
 	status.throwIfCancelled();
 	
-	QImage holes_filled(createFramedImage(reconstructed.size()));
+	GrayImage holes_filled(createFramedImage(reconstructed.size()));
 	seedFillGrayInPlace(holes_filled, reconstructed, CONN8);
-	reconstructed = QImage();
+	reconstructed = GrayImage();
 	if (dbg) {
 		dbg->add(holes_filled, "holes_filled");
 	}
@@ -815,20 +806,40 @@ OutputGenerator::binarize(QImage const& image,
 }
 
 /**
- * Remove small connected components that are considered to be garbage.
+ * \brief Remove small connected components that are considered to be garbage.
+ *
  * Both the size and the distance to other components are taken into account.
+ *
+ * \param[in,out] image The image to despeckle.
+ * \param target_rect The image rectangle in the same coordinate system where
+ *        m_contentRect and m_cropRect are defined.
+ * \param pre_despeckle_img If provided, the image before despeckling will be
+ *        written there.  \p pre_despeckle_img and \p post_despeckle_img will
+ *        likely have different size than that of \p image, namely m_cropRect.size().
+ *        Only the content area defined by m_contentRect will be copied from
+ *        \p image.  The rest of \p pre_despeckle_img and \p post_despeckle_img
+ *        will be filled with white.
+ * \param post_despeckle_img If provided, the image after despeckling will be
+ *        written here.
+ * \param dpi The DPI of the input image.  See the note below.
+ * \param status Task status.
+ * \param dbg An optional sink for debugging images.
+ *
  * \note This function only works effectively when the DPI is symmetric,
  * that is, its horizontal and vertical components are equal.
  */
 void
 OutputGenerator::despeckleInPlace(
-	imageproc::BinaryImage& image, Dpi const& dpi,
-	TaskStatus const& status, DebugImages* dbg)
+	imageproc::BinaryImage& image, QRect const& target_rect,
+	Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const
 {
+	QRect const src_rect(m_contentRect.translated(-target_rect.topLeft()));
+	QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+
 	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
 	double const factor = min_dpi / 300.0;
 	double const squared_factor = factor * factor;
-	
+
 	int const big_object_threshold = qRound(100 * squared_factor);
 	::despeckleInPlace(image, big_object_threshold, dbg);
 }

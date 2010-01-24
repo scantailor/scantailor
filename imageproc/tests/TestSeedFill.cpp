@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -141,10 +141,10 @@ BOOST_AUTO_TEST_CASE(test_regression_4)
 BOOST_AUTO_TEST_CASE(test_gray4_random)
 {
 	for (int i = 0; i < 200; ++i) {
-		QImage const seed(randomGrayImage(5, 5));
-		QImage const mask(randomGrayImage(5, 5));
-		QImage const fill_new(seedFillGray(seed, mask, CONN4));
-		QImage const fill_old(seedFillGraySlow(seed, mask, CONN4));
+		GrayImage const seed(randomGrayImage(5, 5));
+		GrayImage const mask(randomGrayImage(5, 5));
+		GrayImage const fill_new(seedFillGray(seed, mask, CONN4));
+		GrayImage const fill_old(seedFillGraySlow(seed, mask, CONN4));
 		if (fill_new != fill_old) {
 			BOOST_ERROR("fill_new != fill_old at iteration " << i);
 			dumpGrayImage(seed, "seed");
@@ -159,10 +159,10 @@ BOOST_AUTO_TEST_CASE(test_gray4_random)
 BOOST_AUTO_TEST_CASE(test_gray8_random)
 {
 	for (int i = 0; i < 200; ++i) {
-		QImage const seed(randomGrayImage(5, 5));
-		QImage const mask(randomGrayImage(5, 5));
-		QImage const fill_new(seedFillGray(seed, mask, CONN8));
-		QImage const fill_old(seedFillGraySlow(seed, mask, CONN8));
+		GrayImage const seed(randomGrayImage(5, 5));
+		GrayImage const mask(randomGrayImage(5, 5));
+		GrayImage const fill_new(seedFillGray(seed, mask, CONN8));
+		GrayImage const fill_old(seedFillGraySlow(seed, mask, CONN8));
 		if (fill_new != fill_old) {
 			BOOST_ERROR("fill_new != fill_old at iteration " << i);
 			dumpGrayImage(seed, "seed");
@@ -179,14 +179,14 @@ BOOST_AUTO_TEST_CASE(test_gray_vs_binary)
 	for (int i = 0; i < 200; ++i) {
 		BinaryImage const bin_seed(randomBinaryImage(5, 5));
 		BinaryImage const bin_mask(randomBinaryImage(5, 5));
-		QImage const gray_seed(toGrayscale(bin_seed.toQImage()));
-		QImage const gray_mask(toGrayscale(bin_mask.toQImage()));
+		GrayImage const gray_seed(toGrayscale(bin_seed.toQImage()));
+		GrayImage const gray_mask(toGrayscale(bin_mask.toQImage()));
 		BinaryImage const fill_bin4(seedFill(bin_seed, bin_mask, CONN4));
 		BinaryImage const fill_bin8(seedFill(bin_seed, bin_mask, CONN8));
-		QImage const fill_gray4(seedFillGray(gray_seed, gray_mask, CONN4));
-		QImage const fill_gray8(seedFillGray(gray_seed, gray_mask, CONN8));
+		GrayImage const fill_gray4(seedFillGray(gray_seed, gray_mask, CONN4));
+		GrayImage const fill_gray8(seedFillGray(gray_seed, gray_mask, CONN8));
 		
-		if (fill_gray4 != toGrayscale(fill_bin4.toQImage())) {
+		if (fill_gray4 != GrayImage(fill_bin4.toQImage())) {
 			BOOST_ERROR("grayscale 4-fill != binary 4-fill at index " << i);
 			dumpBinaryImage(bin_seed, "seed");
 			dumpBinaryImage(bin_mask, "mask");
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_gray_vs_binary)
 			break;
 		}
 		
-		if (fill_gray8 != toGrayscale(fill_bin8.toQImage())) {
+		if (fill_gray8 != GrayImage(fill_bin8.toQImage())) {
 			BOOST_ERROR("grayscale 8-fill != binary 8-fill at index " << i);
 			dumpBinaryImage(bin_seed, "seed");
 			dumpBinaryImage(bin_mask, "mask");

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "Dpi.h"
 #include "DebugImages.h"
 #include "imageproc/Transform.h"
+#include "imageproc/GrayImage.h"
 #include "imageproc/Grayscale.h"
 #include "imageproc/GrayRasterOp.h"
 #include "imageproc/Morphology.h"
@@ -49,7 +50,7 @@ std::vector<QLineF>
 VertLineFinder::findLines(
 	QImage const& image, ImageTransformation const& xform,
 	int const max_lines, DebugImages* dbg,
-	QImage* gray_downscaled, QTransform* out_to_downscaled)
+	GrayImage* gray_downscaled, QTransform* out_to_downscaled)
 {
 	int const dpi = 100;
 
@@ -63,7 +64,7 @@ VertLineFinder::findLines(
 	}
 
 	QColor const black(0x00, 0x00, 0x00);
-	QImage const gray100(
+	GrayImage const gray100(
 		transformToGray(
 			image, xform_100dpi.transform(), target_rect, black, true,
 			QSizeF(5.0, 5.0)
@@ -82,7 +83,7 @@ VertLineFinder::findLines(
 	}
 	
 #if 0
-	QImage preprocessed(removeDarkVertBorders(gray100));
+	GrayImage preprocessed(removeDarkVertBorders(gray100));
 	if (dbg) {
 		dbg->add(preprocessed, "preprocessed");
 	}
@@ -93,27 +94,27 @@ VertLineFinder::findLines(
 	// removing vertical edges of a book.  Because of that, other methods
 	// of dealing with them were developed, which makes preprocessing
 	// obsolete.
-	QImage preprocessed(gray100);
+	GrayImage preprocessed(gray100);
 #endif
 	
-	QImage h_gradient(morphGradientDetectDarkSide(preprocessed, QSize(11, 1)));
-	QImage v_gradient(morphGradientDetectDarkSide(preprocessed, QSize(1, 11)));
+	GrayImage h_gradient(morphGradientDetectDarkSide(preprocessed, QSize(11, 1)));
+	GrayImage v_gradient(morphGradientDetectDarkSide(preprocessed, QSize(1, 11)));
 	if (dbg) {
 		dbg->add(h_gradient, "h_gradient");
 		dbg->add(v_gradient, "v_gradient");
 	} else {
 		// We'll need it later if debugging is on.
-		preprocessed = QImage();
+		preprocessed = GrayImage();
 	}
 	
 	grayRasterOp<GRopClippedSubtract<GRopDst, GRopSrc> >(h_gradient, v_gradient);
-	v_gradient = QImage();
+	v_gradient = GrayImage();
 	if (dbg) {
 		dbg->add(h_gradient, "vert_raster_lines");
 	}
 	
-	QImage const raster_lines(closeGray(h_gradient, QSize(1, 19), 0x00));
-	h_gradient = QImage();
+	GrayImage const raster_lines(closeGray(h_gradient, QSize(1, 19), 0x00));
+	h_gradient = GrayImage();
 	if (dbg) {
 		dbg->add(raster_lines, "short_segments_removed");
 	}
@@ -138,9 +139,9 @@ VertLineFinder::findLines(
 
 	int const x_limit = raster_lines.width() - margin;
 	int const height = raster_lines.height();
-	uint8_t const* line = raster_lines.bits();
-	int const bpl = raster_lines.bytesPerLine();
-	for (int y = 0; y < height; ++y, line += bpl) {
+	uint8_t const* line = raster_lines.data();
+	int const stride = raster_lines.stride();
+	for (int y = 0; y < height; ++y, line += stride) {
 		for (int x = margin; x < x_limit; ++x) {
 			unsigned const val = line[x];
 			if (val > 1) {
@@ -199,7 +200,7 @@ VertLineFinder::findLines(
 	
 	if (dbg) {
 		QImage visual(
-			preprocessed.convertToFormat(
+			preprocessed.toQImage().convertToFormat(
 				QImage::Format_ARGB32_Premultiplied
 			)
 		);
@@ -229,10 +230,10 @@ VertLineFinder::findLines(
 	return lines;
 }
 
-QImage
-VertLineFinder::removeDarkVertBorders(QImage const& src)
+GrayImage
+VertLineFinder::removeDarkVertBorders(GrayImage const& src)
 {
-	QImage dst(src);
+	GrayImage dst(src);
 	
 	selectVertBorders(dst);
 	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
@@ -241,17 +242,17 @@ VertLineFinder::removeDarkVertBorders(QImage const& src)
 }
 
 void
-VertLineFinder::selectVertBorders(QImage& image)
+VertLineFinder::selectVertBorders(GrayImage& image)
 {
 	int const w = image.width();
 	int const h = image.height();
 	
-	unsigned char* image_line = image.bits();
-	int const image_bpl = image.bytesPerLine();
+	unsigned char* image_line = image.data();
+	int const image_stride = image.stride();
 	
 	std::vector<unsigned char> tmp_line(w, 0x00);
 	
-	for (int y = 0; y < h; ++y, image_line += image_bpl) {
+	for (int y = 0; y < h; ++y, image_line += image_stride) {
 		// Left to right.
 		unsigned char prev_pixel = 0x00; // Black vertical border.
 		for (int x = 0; x < w; ++x) {

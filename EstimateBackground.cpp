@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "ImageTransformation.h"
 #include "TaskStatus.h"
 #include "DebugImages.h"
+#include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BWColor.h"
 #include "imageproc/BitOps.h"
@@ -48,10 +49,10 @@ using namespace imageproc;
  * The same as seedFillGrayInPlace() with a seed of two black lines
  * at top and bottom, except here colors may only spread vertically.
  */
-static void seedFillTopBottomInPlace(QImage& image)
+static void seedFillTopBottomInPlace(GrayImage& image)
 {
-	uint8_t* const data = image.bits();
-	int const bpl = image.bytesPerLine();
+	uint8_t* const data = image.data();
+	int const stride = image.stride();
 	
 	int const width = image.width();
 	int const height = image.height();
@@ -64,12 +65,12 @@ static void seedFillTopBottomInPlace(QImage& image)
 		uint8_t prev = 0; // black
 		for (int y = 0; y < height; ++y) {
 			seed_line[y] = prev = std::max(*p, prev);
-			p += bpl;
+			p += stride;
 		}
 		
 		prev = 0; // black
 		for (int y = height - 1; y >= 0; --y) {
-			p -= bpl;
+			p -= stride;
 			*p = prev = std::max(
 				*p, std::min(seed_line[y], prev)
 			);
@@ -83,7 +84,7 @@ imageproc::PolynomialSurface estimateBackground(
 {
 	QSize reduced_size(input.size());
 	reduced_size.scale(300, 300, Qt::KeepAspectRatio);
-	QImage background(scaleToGray(input, reduced_size));
+	GrayImage background(scaleToGray(GrayImage(input), reduced_size));
 	if (dbg) {
 		dbg->add(background, "downscaled");
 	}
@@ -98,8 +99,8 @@ imageproc::PolynomialSurface estimateBackground(
 	int const width = background.width();
 	int const height = background.height();
 	
-	uint8_t const* const bg_data = background.bits();
-	int const bg_bpl = background.bytesPerLine();
+	uint8_t const* const bg_data = background.data();
+	int const bg_stride = background.stride();
 	
 	BinaryImage mask(background.size(), BLACK);
 	
@@ -119,7 +120,7 @@ imageproc::PolynomialSurface estimateBackground(
 	}
 	
 	uint32_t* mask_data = mask.data();
-	int mask_wpl = mask.wordsPerLine();
+	int mask_stride = mask.wordsPerLine();
 	
 	std::vector<uint8_t> line(std::max(width, height), 0);
 	uint32_t const msb = uint32_t(1) << 31;
@@ -132,7 +133,7 @@ imageproc::PolynomialSurface estimateBackground(
 		uint32_t const mask = ~(msb >> (x & 31));
 		
 		int const degree = 2;
-		PolynomialLine pl(degree, bg_data + x, height, bg_bpl);
+		PolynomialLine pl(degree, bg_data + x, height, bg_stride);
 		pl.output(&line[0], height, 1);
 		
 		uint8_t const* p_bg = bg_data + x;
@@ -141,8 +142,8 @@ imageproc::PolynomialSurface estimateBackground(
 			if (*p_bg + 30 < line[y]) {
 				*p_mask &= mask;
 			}
-			p_bg += bg_bpl;
-			p_mask += mask_wpl;
+			p_bg += bg_stride;
+			p_mask += mask_stride;
 		}
 	}
 	
@@ -163,8 +164,8 @@ imageproc::PolynomialSurface estimateBackground(
 			}
 		}
 		
-		bg_line += bg_bpl;
-		mask_line += mask_wpl;
+		bg_line += bg_stride;
+		mask_line += mask_stride;
 	}
 	
 	if (dbg) {
@@ -182,7 +183,7 @@ imageproc::PolynomialSurface estimateBackground(
 	
 	// Update those because mask was overwritten.
 	mask_data = mask.data();
-	mask_wpl = mask.wordsPerLine();
+	mask_stride = mask.wordsPerLine();
 	
 	// Check each horizontal line.  If it's mostly
 	// white (ignored), then make it completely white.
@@ -191,7 +192,7 @@ imageproc::PolynomialSurface estimateBackground(
 		32 - width - (last_word_idx << 5)
 	);
 	mask_line = mask_data;
-	for (int y = 0; y < height; ++y, mask_line += mask_wpl) {
+	for (int y = 0; y < height; ++y, mask_line += mask_stride) {
 		int black_count = 0;
 		int i = 0;
 		
@@ -221,11 +222,11 @@ imageproc::PolynomialSurface estimateBackground(
 			if (*p_mask & mask) {
 				++black_count;
 			}
-			p_mask += mask_wpl;
+			p_mask += mask_stride;
 		}
 		if (black_count < height / 4) {
 			for (int y = height - 1; y >= 0; --y) {
-				p_mask -= mask_wpl;
+				p_mask -= mask_stride;
 				*p_mask &= ~mask;
 			}
 		}

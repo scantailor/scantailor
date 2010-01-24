@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 class QSize;
 class QRect;
 class QPoint;
-class QImage;
 
 namespace imageproc
 {
 
 class BinaryImage;
+class GrayImage;
 
 class Brick
 {
@@ -128,7 +128,7 @@ BinaryImage dilateBrick(
 /**
  * \brief Spreads darker pixels over the brick's area.
  *
- * \param src The source image.  Must be grayscale.
+ * \param src The source image.
  * \param brick The area to spread darker pixels into.
  * \param dst_area The area in source image coordinates that
  *        will be returned as a destination image. It doesn't have
@@ -136,15 +136,15 @@ BinaryImage dilateBrick(
  * \param src_surroundings The color of pixels that are assumed to
  *        surround the source image.
  */
-QImage dilateGray(
-	QImage const& src, Brick const& brick,
+GrayImage dilateGray(
+	GrayImage const& src, Brick const& brick,
 	QRect const& dst_area, unsigned char src_surroundings = 0xff);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-QImage dilateGray(
-	QImage const& src, Brick const& brick,
+GrayImage dilateGray(
+	GrayImage const& src, Brick const& brick,
 	unsigned char src_surroundings = 0xff);
 
 /**
@@ -172,7 +172,7 @@ BinaryImage erodeBrick(
 /**
  * \brief Spreads lighter pixels over the brick's area.
  *
- * \param src The source image.  Must be grayscale.
+ * \param src The source image.
  * \param brick The area to spread lighter pixels into.
  * \param dst_area The area in source image coordinates that
  *        will be returned as a destination image. It doesn't have
@@ -180,15 +180,15 @@ BinaryImage erodeBrick(
  * \param src_surroundings The color of pixels that are assumed to
  *        surround the source image.
  */
-QImage erodeGray(
-	QImage const& src, Brick const& brick,
+GrayImage erodeGray(
+	GrayImage const& src, Brick const& brick,
 	QRect const& dst_area, unsigned char src_surroundings = 0x00);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-QImage erodeGray(
-	QImage const& src, Brick const& brick,
+GrayImage erodeGray(
+	GrayImage const& src, Brick const& brick,
 	unsigned char src_surroundings = 0x00);
 
 /**
@@ -226,15 +226,15 @@ BinaryImage openBrick(
  * \param src_surroundings The color of pixels that are assumed to
  *        surround the source image.
  */
-QImage openGray(
-	QImage const& src, QSize const& brick,
+GrayImage openGray(
+	GrayImage const& src, QSize const& brick,
 	QRect const& dst_area, unsigned char src_surroundings);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-QImage openGray(
-	QImage const& src, QSize const& brick,
+GrayImage openGray(
+	GrayImage const& src, QSize const& brick,
 	unsigned char src_surroundings);
 
 /**
@@ -272,15 +272,15 @@ BinaryImage closeBrick(
  * \param src_surroundings The color of pixels that are assumed to
  *        surround the source image.
  */
-QImage closeGray(
-	QImage const& src, QSize const& brick,
+GrayImage closeGray(
+	GrayImage const& src, QSize const& brick,
 	QRect const& dst_area, unsigned char src_surroundings);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-QImage closeGray(
-	QImage const& src, QSize const& brick,
+GrayImage closeGray(
+	GrayImage const& src, QSize const& brick,
 	unsigned char src_surroundings);
 
 /**

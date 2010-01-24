@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 */
 
 #include "Morphology.h"
+#include "GrayImage.h"
 #include "BinaryImage.h"
 #include "BWColor.h"
 #include "Utils.h"
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_dilate_1x1_gray)
 		0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
 	BOOST_CHECK(dilateGray(img, QSize(1, 1), img.rect()) == img);
 }
 
@@ -129,8 +130,8 @@ BOOST_AUTO_TEST_CASE(test_dilate_1x1_shift_gray)
 		5, 5, 5, 5, 5, 5, 5, 5, 5
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 9, 9));	
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 9, 9));
 	BOOST_CHECK(dilateGray(img, QSize(1, 1), img.rect().translated(2, 2), 5) == control);
 }
 
@@ -160,8 +161,8 @@ BOOST_AUTO_TEST_CASE(test_dilate_3x1_gray)
 		9, 9, 9, 9, 9, 9, 9, 9, 9
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 9, 9));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 9, 9));
 	BOOST_CHECK(dilateGray(img, QSize(3, 1), img.rect()) == control);
 }
 
@@ -191,8 +192,8 @@ BOOST_AUTO_TEST_CASE(test_dilate_1x3_gray)
 		9, 9, 9, 9, 9, 9, 9, 9, 9
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 9, 9));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 9, 9));
 	BOOST_CHECK(dilateGray(img, QSize(1, 3), img.rect()) == control);
 }
 
@@ -222,8 +223,8 @@ BOOST_AUTO_TEST_CASE(test_dilate_1x20_gray)
 		9, 2, 9, 2, 9, 9, 5, 2, 1
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 9, 9));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 9, 9));
 	BOOST_CHECK(dilateGray(img, QSize(1, 20), img.rect()) == control);
 }
 
@@ -285,8 +286,8 @@ BOOST_AUTO_TEST_CASE(test_dilate_3x3_gray)
 		9, 9, 9, 9, 9, 9, 9, 9, 9
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 9, 9));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 9, 9));
 	BOOST_CHECK(dilateGray(img, QSize(3, 3), img.rect()) == control);
 }
 
@@ -314,8 +315,8 @@ BOOST_AUTO_TEST_CASE(test_dilate_3x3_gray_shrinked)
 		9, 2, 2, 2, 9, 9, 9
 	};
 	
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 7, 7));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 7, 7));
 	QRect const dst_area(img.rect().adjusted(1, 1, -1, -1));
 	BOOST_CHECK(dilateGray(img, QSize(3, 3), dst_area) == control);
 }
@@ -346,8 +347,8 @@ BOOST_AUTO_TEST_CASE(test_open_1x2_gray)
 		1, 2, 3, 4, 5, 6, 7, 8, 9
 	};
 
-	QImage const img(makeGrayImage(inp, 9, 9));
-	QImage const control(makeGrayImage(out, 9, 9));
+	GrayImage const img(makeGrayImage(inp, 9, 9));
+	GrayImage const control(makeGrayImage(out, 9, 9));
 	BOOST_CHECK(openGray(img, QSize(1, 2), 0x00) == control);
 }
 

@@ -54,6 +54,7 @@ BOOST_AUTO_TEST_CASE(test_sine)
 				return a[AMP] * cos(a[FREQ]*x[0] + a[PHASE]);
 			} else {
 				assert(!"Unreachable");
+				return 0;
 			}
 		}
 	};

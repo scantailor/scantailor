@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 
 #include "Morphology.h"
 #include "BinaryImage.h"
+#include "GrayImage.h"
 #include "RasterOp.h"
 #include "Grayscale.h"
 #include <QPoint>
 #include <QSize>
 #include <QRect>
-#include <QImage>
 #include <QDebug>
 #include <boost/foreach.hpp>
 #include <vector>
@@ -500,13 +500,13 @@ void fillExtremumArrayRightHalf(
 
 template<typename MinOrMax>
 void spreadGrayHorizontal(
-	QImage& dst, QImage const& src,
+	GrayImage& dst, GrayImage const& src,
 	int const dy, int const dx1, int const dx2)
 {
-	int const src_bpl = src.bytesPerLine();
-	int const dst_bpl = dst.bytesPerLine();
-	uint8_t const* src_line = src.bits() + dy * src_bpl;
-	uint8_t* dst_line = dst.bits();
+	int const src_stride = src.stride();
+	int const dst_stride = dst.stride();
+	uint8_t const* src_line = src.data() + dy * src_stride;
+	uint8_t* dst_line = dst.data();
 	
 	int const dst_width = dst.width();
 	int const dst_height = dst.height();
@@ -548,15 +548,15 @@ void spreadGrayHorizontal(
 			}
 		}
 		
-		src_line += src_bpl;
-		dst_line += dst_bpl;
+		src_line += src_stride;
+		dst_line += dst_stride;
 	}
 }
 
 template<typename MinOrMax>
 void spreadGrayHorizontal(
-	QImage& dst, CoordinateSystem const& dst_cs,
-	QImage const& src, CoordinateSystem const& src_cs,
+	GrayImage& dst, CoordinateSystem const& dst_cs,
+	GrayImage const& src, CoordinateSystem const& src_cs,
 	int const dy, int const dx1, int const dx2)
 {
 	// src_point = dst_point + dst_to_src;
@@ -570,13 +570,13 @@ void spreadGrayHorizontal(
 
 template<typename MinOrMax>
 void spreadGrayVertical(
-	QImage& dst, QImage const& src,
+	GrayImage& dst, GrayImage const& src,
 	int const dx, int const dy1, int const dy2)
 {
-	int const src_bpl = src.bytesPerLine();
-	int const dst_bpl = dst.bytesPerLine();
-	uint8_t const* const src_data = src.bits() + dx;
-	uint8_t* const dst_data = dst.bits();
+	int const src_stride = src.stride();
+	int const dst_stride = dst.stride();
+	uint8_t const* const src_data = src.data() + dx;
+	uint8_t* const dst_data = dst.data();
 	
 	int const dst_width = dst.width();
 	int const dst_height = dst.height();
@@ -598,16 +598,16 @@ void spreadGrayVertical(
 				(src_segment_first + src_segment_last) >> 1;
 			
 			fillExtremumArrayLeftHalf<MinOrMax>(
-				array_center, src_data + x + src_segment_center * src_bpl,
-				src_bpl, src_segment_first, src_segment_center
+				array_center, src_data + x + src_segment_center * src_stride,
+				src_stride, src_segment_first, src_segment_center
 			);
 			
 			fillExtremumArrayRightHalf<MinOrMax>(
-				array_center, src_data + x + src_segment_center * src_bpl,
-				src_bpl, src_segment_center, src_segment_last
+				array_center, src_data + x + src_segment_center * src_stride,
+				src_stride, src_segment_center, src_segment_last
 			);
 			
-			uint8_t* dst = dst_data + x + dst_segment_first * dst_bpl;
+			uint8_t* dst = dst_data + x + dst_segment_first * dst_stride;
 			for (int y = dst_segment_first; y <= dst_segment_last; ++y) {
 				int const src_first = y + dy1;
 				int const src_last = y + dy2; // inclusive
@@ -616,7 +616,7 @@ void spreadGrayVertical(
 				uint8_t v1 = array_center[src_first - src_segment_center];
 				uint8_t v2 = array_center[src_last - src_segment_center];
 				*dst = MinOrMax::select(v1, v2);
-				dst += dst_bpl;
+				dst += dst_stride;
 			}
 		}
 	}
@@ -624,8 +624,8 @@ void spreadGrayVertical(
 
 template<typename MinOrMax>
 void spreadGrayVertical(
-	QImage& dst, CoordinateSystem const& dst_cs,
-	QImage const& src, CoordinateSystem const& src_cs,
+	GrayImage& dst, CoordinateSystem const& dst_cs,
+	GrayImage const& src, CoordinateSystem const& src_cs,
 	int const dx, int const dy1, int const dy2)
 {
 	// src_point = dst_point + dst_to_src;
@@ -637,11 +637,10 @@ void spreadGrayVertical(
 	);
 }
 
-QImage extendGrayImage(
-	QImage const& src, QRect const& dst_area, uint8_t const background)
+GrayImage extendGrayImage(
+	GrayImage const& src, QRect const& dst_area, uint8_t const background)
 {
-	QImage dst(dst_area.size(), QImage::Format_Indexed8);
-	dst.setColorTable(createGrayscalePalette());
+	GrayImage dst(dst_area.size());
 	
 	CoordinateSystem const dst_cs(dst_area.topLeft());
 	QRect const src_rect_in_dst_cs(dst_cs.fromGlobal(src.rect()));
@@ -652,14 +651,14 @@ QImage extendGrayImage(
 		return dst;
 	}
 	
-	uint8_t const* src_line = src.bits();
-	uint8_t* dst_line = dst.bits();
-	int const src_bpl = src.bytesPerLine();
-	int const dst_bpl = dst.bytesPerLine();
+	uint8_t const* src_line = src.data();
+	uint8_t* dst_line = dst.data();
+	int const src_stride = src.stride();
+	int const dst_stride = dst.stride();
 	
 	int y = 0;
-	for (; y < bound_src_rect_in_dst_cs.top(); ++y, dst_line += dst_bpl) {
-		memset(dst_line, background, dst_bpl);
+	for (; y < bound_src_rect_in_dst_cs.top(); ++y, dst_line += dst_stride) {
+		memset(dst_line, background, dst_stride);
 	}
 	
 	int const front_span_len = bound_src_rect_in_dst_cs.left();
@@ -671,35 +670,34 @@ QImage extendGrayImage(
 		bound_src_rect_in_dst_cs.topLeft() - src_rect_in_dst_cs.topLeft()
 	);
 	
-	src_line += src_offset.x() + src_offset.y() * src_bpl;
+	src_line += src_offset.x() + src_offset.y() * src_stride;
 	for (; y <= bound_src_rect_in_dst_cs.bottom(); ++y) {
 		memset(dst_line, background, front_span_len);
 		memcpy(dst_line + front_span_len, src_line, data_span_len);
 		memset(dst_line + back_span_offset, background, back_span_len);
 		
-		src_line += src_bpl;
-		dst_line += dst_bpl;
+		src_line += src_stride;
+		dst_line += dst_stride;
 	}
 	
 	int const height = dst_area.height();
-	for (; y < height; ++y, dst_line += dst_bpl) {
-		memset(dst_line, background, dst_bpl);
+	for (; y < height; ++y, dst_line += dst_stride) {
+		memset(dst_line, background, dst_stride);
 	}
 	
 	return dst;
 }
 
 template<typename MinOrMax>
-QImage dilateOrErodeGray(
-	QImage const& src, Brick const& brick,
+GrayImage dilateOrErodeGray(
+	GrayImage const& src, Brick const& brick,
 	QRect const& dst_area, unsigned char const src_surroundings)
 {
 	assert(!src.isNull());
 	assert(!brick.isEmpty());
 	assert(!dst_area.isEmpty());
 	
-	QImage dst(dst_area.size(), QImage::Format_Indexed8);
-	dst.setColorTable(createGrayscalePalette());
+	GrayImage dst(dst_area.size());
 	
 	if (!extendByBrick(src.rect(), brick).intersects(dst_area)) {
 		dst.fill(src_surroundings);
@@ -727,8 +725,7 @@ QImage dilateOrErodeGray(
 		QRect const tmp_rect(extendByBrick(dst_area, collect_area2));
 		CoordinateSystem tmp_cs(tmp_rect.topLeft());
 		
-		QImage tmp(tmp_rect.size(), QImage::Format_Indexed8);
-		tmp.setColorTable(createGrayscalePalette());
+		GrayImage tmp(tmp_rect.size());
 		
 		// First operation.  The scope is there to destroy the
 		// effective_src image when it's no longer necessary.
@@ -736,7 +733,7 @@ QImage dilateOrErodeGray(
 			QRect const effective_src_rect(
 				extendByBrick(tmp_rect, collect_area1)
 			);
-			QImage effective_src;
+			GrayImage effective_src;
 			CoordinateSystem effective_src_cs;
 			if (src.rect().contains(effective_src_rect)) {
 				effective_src = src;
@@ -766,7 +763,7 @@ QImage dilateOrErodeGray(
 		QRect const effective_src_rect(
 			extendByBrick(dst_area, collect_area)
 		);
-		QImage effective_src;
+		GrayImage effective_src;
 		CoordinateSystem effective_src_cs;
 		if (src.rect().contains(effective_src_rect)) {
 			effective_src = src;
@@ -822,8 +819,8 @@ BinaryImage dilateBrick(
 	return dst;
 }
 
-QImage dilateGray(
-	QImage const& src, Brick const& brick,
+GrayImage dilateGray(
+	GrayImage const& src, Brick const& brick,
 	QRect const& dst_area, unsigned char const src_surroundings)
 {
 	if (src.isNull()) {
@@ -835,9 +832,6 @@ QImage dilateGray(
 	if (dst_area.isEmpty()) {
 		throw std::invalid_argument("dilateGray: dst_area is empty");
 	}
-	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
-		throw std::invalid_argument("dilateGray: src image is not grayscale");
-	}
 	
 	return dilateOrErodeGray<Darker>(src, brick, dst_area, src_surroundings);
 }
@@ -848,8 +842,8 @@ BinaryImage dilateBrick(
 	return dilateBrick(src, brick, src.rect(), src_surroundings);
 }
 
-QImage dilateGray(
-	QImage const& src, Brick const& brick, unsigned char const src_surroundings)
+GrayImage dilateGray(
+	GrayImage const& src, Brick const& brick, unsigned char const src_surroundings)
 {
 	return dilateGray(src, brick, src.rect(), src_surroundings);
 }
@@ -877,8 +871,8 @@ BinaryImage erodeBrick(
 	return dst;
 }
 
-QImage erodeGray(
-	QImage const& src, Brick const& brick,
+GrayImage erodeGray(
+	GrayImage const& src, Brick const& brick,
 	QRect const& dst_area, unsigned char const src_surroundings)
 {
 	if (src.isNull()) {
@@ -890,9 +884,6 @@ QImage erodeGray(
 	if (dst_area.isEmpty()) {
 		throw std::invalid_argument("erodeGray: dst_area is empty");
 	}
-	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
-		throw std::invalid_argument("erodeGray: src image is not grayscale");
-	}
 	
 	return dilateOrErodeGray<Lighter>(src, brick, dst_area, src_surroundings);
 }
@@ -903,8 +894,8 @@ BinaryImage erodeBrick(
 	return erodeBrick(src, brick, src.rect(), src_surroundings);
 }
 
-QImage erodeGray(
-	QImage const& src, Brick const& brick, unsigned char const src_surroundings)
+GrayImage erodeGray(
+	GrayImage const& src, Brick const& brick, unsigned char const src_surroundings)
 {
 	return erodeGray(src, brick, src.rect(), src_surroundings);
 }
@@ -956,8 +947,8 @@ BinaryImage openBrick(
 	return openBrick(src, brick, src.rect(), src_surroundings);
 }
 
-QImage openGray(
-	QImage const& src, QSize const& brick,
+GrayImage openGray(
+	GrayImage const& src, QSize const& brick,
 	QRect const& dst_area, unsigned char const src_surroundings)
 {
 	if (src.isNull()) {
@@ -969,9 +960,6 @@ QImage openGray(
 	if (dst_area.isEmpty()) {
 		throw std::invalid_argument("openGray: dst_area is empty");
 	}
-	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
-		throw std::invalid_argument("openGray: src image is not grayscale");
-	}
 	
 	Brick const brick1(brick);
 	Brick const brick2(brick1.flipped());
@@ -981,7 +969,7 @@ QImage openGray(
 	QRect const tmp_rect(extendByBrick(dst_area, brick1));
 	CoordinateSystem tmp_cs(tmp_rect.topLeft());
 	
-	QImage const tmp(
+	GrayImage const tmp(
 		dilateOrErodeGray<Lighter>(src, brick1, tmp_rect, src_surroundings)
 	);
 	return dilateOrErodeGray<Darker>(
@@ -989,8 +977,8 @@ QImage openGray(
 	);
 }
 
-QImage openGray(
-	QImage const& src, QSize const& brick,
+GrayImage openGray(
+	GrayImage const& src, QSize const& brick,
 	unsigned char const src_surroundings)
 {
 	return openGray(src, brick, src.rect(), src_surroundings);
@@ -1043,8 +1031,8 @@ BinaryImage closeBrick(
 	return closeBrick(src, brick, src.rect(), src_surroundings);
 }
 
-QImage closeGray(
-	QImage const& src, QSize const& brick,
+GrayImage closeGray(
+	GrayImage const& src, QSize const& brick,
 	QRect const& dst_area, unsigned char const src_surroundings)
 {
 	if (src.isNull()) {
@@ -1056,9 +1044,6 @@ QImage closeGray(
 	if (dst_area.isEmpty()) {
 		throw std::invalid_argument("closeGray: dst_area is empty");
 	}
-	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
-		throw std::invalid_argument("closeGray: src image is not grayscale");
-	}
 	
 	Brick const brick1(brick);
 	Brick const brick2(brick1.flipped());
@@ -1068,7 +1053,7 @@ QImage closeGray(
 	QRect const tmp_rect(extendByBrick(dst_area, brick2));
 	CoordinateSystem tmp_cs(tmp_rect.topLeft());
 	
-	QImage const tmp(
+	GrayImage const tmp(
 		dilateOrErodeGray<Darker>(src, brick1, tmp_rect, src_surroundings)
 	);
 	return dilateOrErodeGray<Lighter>(
@@ -1076,8 +1061,8 @@ QImage closeGray(
 	);
 }
 
-QImage closeGray(
-	QImage const& src, QSize const& brick,
+GrayImage closeGray(
+	GrayImage const& src, QSize const& brick,
 	unsigned char const src_surroundings)
 {
 	return closeGray(src, brick, src.rect(), src_surroundings);

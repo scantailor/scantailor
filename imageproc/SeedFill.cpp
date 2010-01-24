@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 */
 
 #include "SeedFill.h"
+#include "GrayImage.h"
 #include <QSize>
 #include <QImage>
 #include <QDebug>
@@ -267,40 +268,40 @@ void seedFillGrayHorLine(uint8_t* seed, uint8_t const* mask, int const line_len)
 }
 
 void seedFillGrayVertLine(
-	uint8_t* seed, int const seed_bpl,
-	uint8_t const* mask, int const mask_bpl, int const line_len)
+	uint8_t* seed, int const seed_stride,
+	uint8_t const* mask, int const mask_stride, int const line_len)
 {
 	assert(line_len > 0);
 	
 	*seed = lightest(*seed, *mask);
 	
 	for (int i = 1; i < line_len; ++i) {
-		seed += seed_bpl;
-		mask += mask_bpl;
-		*seed = lightest(*mask, darkest(*seed, seed[-seed_bpl]));
+		seed += seed_stride;
+		mask += mask_stride;
+		*seed = lightest(*mask, darkest(*seed, seed[-seed_stride]));
 	}
 	
 	for (int i = 1; i < line_len; ++i) {
-		seed -= seed_bpl;
-		mask -= mask_bpl;
-		*seed = lightest(*mask, darkest(*seed, seed[seed_bpl]));
+		seed -= seed_stride;
+		mask -= mask_stride;
+		*seed = lightest(*mask, darkest(*seed, seed[seed_stride]));
 	}
 }
 
 /**
  * \return non-zero if more iterations are required, zero otherwise.
  */
-uint8_t seedFillGray4SlowIteration(QImage& seed, QImage const& mask)
+uint8_t seedFillGray4SlowIteration(GrayImage& seed, GrayImage const& mask)
 {
 	int const w = seed.width();
 	int const h = seed.height();
 	
-	uint8_t* seed_line = seed.bits();
-	uint8_t const* mask_line = mask.bits();
+	uint8_t* seed_line = seed.data();
+	uint8_t const* mask_line = mask.data();
 	uint8_t const* prev_line = seed_line;
 	
-	int const seed_bpl = seed.bytesPerLine();
-	int const mask_bpl = mask.bytesPerLine();
+	int const seed_stride = seed.stride();
+	int const mask_stride = mask.stride();
 	
 	uint8_t modified = 0;
 	
@@ -323,12 +324,12 @@ uint8_t seedFillGray4SlowIteration(QImage& seed, QImage const& mask)
 		}
 		
 		prev_line = seed_line;
-		seed_line += seed_bpl;
-		mask_line += mask_bpl;
+		seed_line += seed_stride;
+		mask_line += mask_stride;
 	}
 	
-	seed_line -= seed_bpl;
-	mask_line -= mask_bpl;
+	seed_line -= seed_stride;
+	mask_line -= mask_stride;
 	prev_line = seed_line;
 	
 	// Bottom to top.
@@ -350,8 +351,8 @@ uint8_t seedFillGray4SlowIteration(QImage& seed, QImage const& mask)
 		}
 		
 		prev_line = seed_line;
-		seed_line -= seed_bpl;
-		mask_line -= mask_bpl;
+		seed_line -= seed_stride;
+		mask_line -= mask_stride;
 	}
 	
 	return modified;
@@ -360,23 +361,23 @@ uint8_t seedFillGray4SlowIteration(QImage& seed, QImage const& mask)
 /**
  * \return non-zero if more iterations are required, zero otherwise.
  */
-uint8_t seedFillGray8SlowIteration(QImage& seed, QImage const& mask)
+uint8_t seedFillGray8SlowIteration(GrayImage& seed, GrayImage const& mask)
 {
 	int const w = seed.width();
 	int const h = seed.height();
 	
-	uint8_t* seed_line = seed.bits();
-	uint8_t const* mask_line = mask.bits();
+	uint8_t* seed_line = seed.data();
+	uint8_t const* mask_line = mask.data();
 	uint8_t const* prev_line = seed_line;
 	
-	int const seed_bpl = seed.bytesPerLine();
-	int const mask_bpl = mask.bytesPerLine();
+	int const seed_stride = seed.stride();
+	int const mask_stride = mask.stride();
 	
 	uint8_t modified = 0;
 	
 	// Some code below doesn't handle such cases.
 	if (w == 1) {
-		seedFillGrayVertLine(seed_line, seed_bpl, mask_line, mask_bpl, h);
+		seedFillGrayVertLine(seed_line, seed_stride, mask_line, mask_stride, h);
 		return 0;
 	} else if (h == 1) {
 		seedFillGrayHorLine(seed_line, mask_line, w);
@@ -434,12 +435,12 @@ uint8_t seedFillGray8SlowIteration(QImage& seed, QImage const& mask)
 		seed_line[x] = pixel;
 		
 		prev_line = seed_line;
-		seed_line += seed_bpl;
-		mask_line += mask_bpl;
+		seed_line += seed_stride;
+		mask_line += mask_stride;
 	}
 	
-	seed_line -= seed_bpl;
-	mask_line -= mask_bpl;
+	seed_line -= seed_stride;
+	mask_line -= mask_stride;
 	prev_line = seed_line;
 	
 	// Bottom to top.
@@ -485,8 +486,8 @@ uint8_t seedFillGray8SlowIteration(QImage& seed, QImage const& mask)
 		seed_line[x] = pixel;
 		
 		prev_line = seed_line;
-		seed_line -= seed_bpl;
-		mask_line -= mask_bpl;
+		seed_line -= seed_stride;
+		mask_line -= mask_stride;
 	}
 	
 	return modified;
@@ -539,7 +540,7 @@ void spreadGray4(
 	std::queue<Position>& queue,
 	HTransition const* h_transitions,
 	VTransition const* v_transitions,
-	int const seed_bpl, int const mask_bpl)
+	int const seed_stride, int const mask_stride)
 {
 	while (!queue.empty()) {
 		Position const pos(queue.front());
@@ -566,15 +567,15 @@ void spreadGray4(
 		);
 		
 		// Northern neighbor.
-		seed = pos.seed - (seed_bpl & vt.north_mask);
-		mask = pos.mask - (mask_bpl & vt.north_mask);
+		seed = pos.seed - (seed_stride & vt.north_mask);
+		mask = pos.mask - (mask_stride & vt.north_mask);
 		processNeighbor(
 			queue, this_val, seed, mask, pos, 0, -1 & vt.north_mask
 		);
 		
 		// Southern neighbor.
-		seed = pos.seed + (seed_bpl & vt.south_mask);
-		mask = pos.mask + (mask_bpl & vt.south_mask);
+		seed = pos.seed + (seed_stride & vt.south_mask);
+		mask = pos.mask + (mask_stride & vt.south_mask);
 		processNeighbor(
 			queue, this_val, seed, mask, pos, 0, 1 & vt.south_mask
 		);
@@ -585,7 +586,7 @@ void spreadGray8(
 	std::queue<Position>& queue,
 	HTransition const* h_transitions,
 	VTransition const* v_transitions,
-	int const seed_bpl, int const mask_bpl)
+	int const seed_stride, int const mask_stride)
 {
 	while (!queue.empty()) {
 		Position const pos(queue.front());
@@ -598,23 +599,23 @@ void spreadGray8(
 		uint8_t const* mask;
 		
 		// Northern neighbor.
-		seed = pos.seed - (seed_bpl & vt.north_mask);
-		mask = pos.mask - (mask_bpl & vt.north_mask);
+		seed = pos.seed - (seed_stride & vt.north_mask);
+		mask = pos.mask - (mask_stride & vt.north_mask);
 		processNeighbor(
 			queue, this_val, seed, mask, pos, 0, -1 & vt.north_mask
 		);
 		
 		// North-Western neighbor.
-		seed = pos.seed - (seed_bpl & vt.north_mask) + ht.west_delta;
-		mask = pos.mask - (mask_bpl & vt.north_mask) + ht.west_delta;
+		seed = pos.seed - (seed_stride & vt.north_mask) + ht.west_delta;
+		mask = pos.mask - (mask_stride & vt.north_mask) + ht.west_delta;
 		processNeighbor(
 			queue, this_val, seed, mask,
 			pos, ht.west_delta, -1 & vt.north_mask
 		);
 		
 		// North-Eastern neighbor.
-		seed = pos.seed - (seed_bpl & vt.north_mask) + ht.east_delta;
-		mask = pos.mask - (mask_bpl & vt.north_mask) + ht.east_delta;
+		seed = pos.seed - (seed_stride & vt.north_mask) + ht.east_delta;
+		mask = pos.mask - (mask_stride & vt.north_mask) + ht.east_delta;
 		processNeighbor(
 			queue, this_val, seed, mask,
 			pos, ht.east_delta, -1 & vt.north_mask
@@ -635,23 +636,23 @@ void spreadGray8(
 		);
 		
 		// Southern neighbor.
-		seed = pos.seed + (seed_bpl & vt.south_mask);
-		mask = pos.mask + (mask_bpl & vt.south_mask);
+		seed = pos.seed + (seed_stride & vt.south_mask);
+		mask = pos.mask + (mask_stride & vt.south_mask);
 		processNeighbor(
 			queue, this_val, seed, mask, pos, 0, 1 & vt.south_mask
 		);
 		
 		// South-Eastern neighbor.
-		seed = pos.seed + (seed_bpl & vt.south_mask) + ht.east_delta;
-		mask = pos.mask + (mask_bpl & vt.south_mask) + ht.east_delta;
+		seed = pos.seed + (seed_stride & vt.south_mask) + ht.east_delta;
+		mask = pos.mask + (mask_stride & vt.south_mask) + ht.east_delta;
 		processNeighbor(
 			queue, this_val, seed, mask,
 			pos, ht.east_delta, 1 & vt.south_mask
 		);
 		
 		// South-Western neighbor.
-		seed = pos.seed + (seed_bpl & vt.south_mask) + ht.west_delta;
-		mask = pos.mask + (seed_bpl & vt.south_mask) + ht.west_delta;
+		seed = pos.seed + (seed_stride & vt.south_mask) + ht.west_delta;
+		mask = pos.mask + (seed_stride & vt.south_mask) + ht.west_delta;
 		processNeighbor(
 			queue, this_val, seed, mask,
 			pos, ht.west_delta, 1 & vt.south_mask
@@ -703,16 +704,16 @@ void initVertTransitions(std::vector<VTransition>& transitions, int const height
 	transitions.push_back(VTransition(~0, 0));
 }
 
-void seedFillGray4(QImage& seed_img, QImage const& mask_img)
+void seedFillGray4(GrayImage& seed_img, GrayImage const& mask_img)
 {
 	int const w = seed_img.width();
 	int const h = seed_img.height();
 	
-	uint8_t* seed_line = seed_img.bits();
-	uint8_t const* mask_line = mask_img.bits();
+	uint8_t* seed_line = seed_img.data();
+	uint8_t const* mask_line = mask_img.data();
 	
-	int const seed_bpl = seed_img.bytesPerLine();
-	int const mask_bpl = mask_img.bytesPerLine();
+	int const seed_stride = seed_img.stride();
+	int const mask_stride = mask_img.stride();
 	
 	uint8_t* prev_line = seed_line;
 	
@@ -734,12 +735,12 @@ void seedFillGray4(QImage& seed_img, QImage const& mask_img)
 		}
 		
 		prev_line = seed_line;
-		seed_line += seed_bpl;
-		mask_line += mask_bpl;
+		seed_line += seed_stride;
+		mask_line += mask_stride;
 	}
 	
-	seed_line -= seed_bpl;
-	mask_line -= mask_bpl;
+	seed_line -= seed_stride;
+	mask_line -= mask_stride;
 	
 	std::queue<Position> queue;
 	std::vector<HTransition> h_transitions;
@@ -759,7 +760,7 @@ void seedFillGray4(QImage& seed_img, QImage const& mask_img)
 			uint8_t const* const p_base_mask = mask_line + x;
 			
 			uint8_t* const p_east_seed = p_base_seed + ht.east_delta;
-			uint8_t* const p_south_seed = p_base_seed + (seed_bpl & vt.south_mask);
+			uint8_t* const p_south_seed = p_base_seed + (seed_stride & vt.south_mask);
 			
 			uint8_t const new_val = lightest(
 				*p_base_mask,
@@ -772,7 +773,7 @@ void seedFillGray4(QImage& seed_img, QImage const& mask_img)
 			*p_base_seed = new_val;
 			
 			uint8_t const east_mask = p_base_mask[ht.east_delta];
-			uint8_t const south_mask = p_base_mask[mask_bpl & vt.south_mask];
+			uint8_t const south_mask = p_base_mask[mask_stride & vt.south_mask];
 			
 			// Note that we access seeds through pointers.  That's
 			// because some of they may point to *p_base_seed,
@@ -788,30 +789,30 @@ void seedFillGray4(QImage& seed_img, QImage const& mask_img)
 			}
 		}
 		
-		seed_line -= seed_bpl;
-		mask_line -= mask_bpl;
+		seed_line -= seed_stride;
+		mask_line -= mask_stride;
 	}
 	
 	spreadGray4(
 		queue, &h_transitions[0],
-		&v_transitions[0], seed_bpl, mask_bpl
+		&v_transitions[0], seed_stride, mask_stride
 	);
 }
 
-void seedFillGray8(QImage& seed_img, QImage const& mask_img)
+void seedFillGray8(GrayImage& seed_img, GrayImage const& mask_img)
 {
 	int const w = seed_img.width();
 	int const h = seed_img.height();
 	
-	uint8_t* seed_line = seed_img.bits();
-	uint8_t const* mask_line = mask_img.bits();
+	uint8_t* seed_line = seed_img.data();
+	uint8_t const* mask_line = mask_img.data();
 	
-	int const seed_bpl = seed_img.bytesPerLine();
-	int const mask_bpl = mask_img.bytesPerLine();
+	int const seed_stride = seed_img.stride();
+	int const mask_stride = mask_img.stride();
 	
 	// Some code below doesn't handle such cases.
 	if (w == 1) {
-		seedFillGrayVertLine(seed_line, seed_bpl, mask_line, mask_bpl, h);
+		seedFillGrayVertLine(seed_line, seed_stride, mask_line, mask_stride, h);
 		return;
 	} else if (h == 1) {
 		seedFillGrayHorLine(seed_line, mask_line, w);
@@ -836,8 +837,8 @@ void seedFillGray8(QImage& seed_img, QImage const& mask_img)
 	
 	// Top to bottom.
 	for (int y = 1; y < h; ++y) {
-		seed_line += seed_bpl;
-		mask_line += mask_bpl;
+		seed_line += seed_stride;
+		mask_line += mask_stride;
 		
 		int x = 0;
 		
@@ -893,7 +894,7 @@ void seedFillGray8(QImage& seed_img, QImage const& mask_img)
 			uint8_t const* const p_base_mask = mask_line + x;
 			
 			uint8_t* const p_east_seed = p_base_seed + ht.east_delta;
-			uint8_t* const p_south_seed = p_base_seed + (seed_bpl & vt.south_mask);
+			uint8_t* const p_south_seed = p_base_seed + (seed_stride & vt.south_mask);
 			uint8_t* const p_south_west_seed = p_south_seed + ht.west_delta;
 			uint8_t* const p_south_east_seed = p_south_seed + ht.east_delta;
 			
@@ -911,7 +912,7 @@ void seedFillGray8(QImage& seed_img, QImage const& mask_img)
 			*p_base_seed = new_val;
 			
 			uint8_t const east_mask = p_base_mask[ht.east_delta];
-			uint8_t const* const p_south_mask = p_base_mask + (mask_bpl & vt.south_mask);
+			uint8_t const* const p_south_mask = p_base_mask + (mask_stride & vt.south_mask);
 			uint8_t const south_mask = *p_south_mask;
 			uint8_t const south_west_mask = p_south_mask[ht.west_delta];
 			uint8_t const south_east_mask = p_south_mask[ht.east_delta];
@@ -932,13 +933,13 @@ void seedFillGray8(QImage& seed_img, QImage const& mask_img)
 			}
 		}
 		
-		seed_line -= seed_bpl;
-		mask_line -= mask_bpl;
+		seed_line -= seed_stride;
+		mask_line -= mask_stride;
 	}
 	
 	spreadGray8(
 		queue, &h_transitions[0],
-		&v_transitions[0], seed_bpl, mask_bpl
+		&v_transitions[0], seed_stride, mask_stride
 	);
 }
 
@@ -967,27 +968,23 @@ BinaryImage seedFill(
 	return img;
 }
 
-QImage seedFillGray(
-	QImage const& seed, QImage const& mask, Connectivity const connectivity)
+GrayImage seedFillGray(
+	GrayImage const& seed, GrayImage const& mask, Connectivity const connectivity)
 {
-	QImage result(seed);
+	GrayImage result(seed);
 	seedFillGrayInPlace(result, mask, connectivity);
 	return result;
 }
 
 void seedFillGrayInPlace(
-	QImage& seed, QImage const& mask, Connectivity const connectivity)
+	GrayImage& seed, GrayImage const& mask, Connectivity const connectivity)
 {
 	if (seed.size() != mask.size()) {
 		throw std::invalid_argument("seedFillGrayInPlace: seed and mask have different sizes");
 	}
-	
-	// These will also catch null images.
-	if (seed.format() != QImage::Format_Indexed8 || !seed.isGrayscale()) {
-		throw std::invalid_argument("seedFillGrayInPlace: seed is not grayscale");
-	}
-	if (mask.format() != QImage::Format_Indexed8 || !mask.isGrayscale()) {
-		throw std::invalid_argument("seedFillGrayInPlace: mask is not grayscale");
+
+	if (seed.isNull()) {
+		return;
 	}
 	
 	if (connectivity == CONN4) {
@@ -997,10 +994,10 @@ void seedFillGrayInPlace(
 	}
 }
 
-QImage seedFillGraySlow(
-	QImage const& seed, QImage const& mask, Connectivity const connectivity)
+GrayImage seedFillGraySlow(
+	GrayImage const& seed, GrayImage const& mask, Connectivity const connectivity)
 {
-	QImage img(seed);
+	GrayImage img(seed);
 	
 	if (connectivity == CONN4) {
 		while (seedFillGray4SlowIteration(img, mask)) {

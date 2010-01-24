@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "ImageLoader.h"
 #include "AtomicFileOverwriter.h"
 #include "imageproc/Scale.h"
+#include "imageproc/GrayImage.h"
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QThread>
@@ -45,7 +46,7 @@
 
 using namespace ::boost;
 using namespace ::boost::multi_index;
-
+using namespace imageproc;
 
 class ThumbnailPixmapCache::Item
 {
@@ -690,7 +691,7 @@ ThumbnailPixmapCache::Impl::makeThumbnail(
 	
 	if (image.format() == QImage::Format_Indexed8 && image.isGrayscale()) {
 		// This will be faster than QImage::scale().
-		return imageproc::scaleToGray(image, to_size);
+		return scaleToGray(GrayImage(image), to_size);
 	}
 	
 	return image.scaled(

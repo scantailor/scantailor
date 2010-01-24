@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 */
 
 #include "Scale.h"
-#include "Grayscale.h"
+#include "GrayImage.h"
 #include "Utils.h"
 #include <QImage>
 #include <QSize>
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_SUITE(ScaleTestSuite);
 
 BOOST_AUTO_TEST_CASE(test_null_image)
 {
-	QImage const null_img;
+	GrayImage const null_img;
 	BOOST_CHECK(scaleToGray(null_img, QSize(1, 1)).isNull());
 }
 
@@ -66,26 +66,25 @@ static bool fuzzyCompare(QImage const& img1, QImage const& img2)
 	return true;
 }
 
-static bool checkScale(QImage const& img, QSize const& new_size)
+static bool checkScale(GrayImage const& img, QSize const& new_size)
 {
-	QImage const scaled1(scaleToGray(img, new_size));
-	QImage const scaled2(toGrayscale(img.scaled(
+	GrayImage const scaled1(scaleToGray(img, new_size));
+	GrayImage const scaled2(img.toQImage().scaled(
 		new_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation
-	)));
+	));
 	
 	return fuzzyCompare(scaled1, scaled2);
 }
 
 BOOST_AUTO_TEST_CASE(test_random_image)
 {
-	QImage img(100, 100, QImage::Format_Indexed8);
-	img.setColorTable(createGrayscalePalette());
-	uint8_t* line = img.bits();
+	GrayImage img(QSize(100, 100));
+	uint8_t* line = img.data();
 	for (int y = 0; y < img.height(); ++y) {
 		for (int x = 0; x < img.width(); ++x) {
 			line[x] = rand() % 256;
 		}
-		line += img.bytesPerLine();
+		line += img.stride();
 	}
 	
 	// Unfortunately scaleToGray() and QImage::scaled()

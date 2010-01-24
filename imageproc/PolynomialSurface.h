@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,12 +23,11 @@
 #include <vector>
 #include <stdint.h>
 
-class QImage;
-
 namespace imageproc
 {
 
 class BinaryImage;
+class GrayImage;
 
 /**
  * \brief A polynomial function describing a 2D surface.
@@ -54,7 +53,7 @@ public:
 	 *       may then be rendered in the original size, if necessary.
 	 */
 	PolynomialSurface(
-		int hor_degree, int vert_degree, QImage const& src);
+		int hor_degree, int vert_degree, GrayImage const& src);
 	
 	/**
 	 * \brief Calculate a polynomial that approximates portions of the given image.
@@ -77,14 +76,14 @@ public:
 	 */
 	PolynomialSurface(
 		int hor_degree, int vert_degree,
-		QImage const& src, BinaryImage const& mask);
+		GrayImage const& src, BinaryImage const& mask);
 	
 	/**
 	 * \brief Visualizes the polynomial surface as a grayscale image.
 	 *
 	 * The surface will be stretched / shrinked to fit the new size.
 	 */
-	QImage render(QSize const& size) const;
+	GrayImage render(QSize const& size) const;
 private:
 	void maybeReduceDegrees(int num_data_points);
 	
@@ -93,12 +92,12 @@ private:
 	static double calcScale(int dimension);
 	
 	void prepareEquationsAndDataPoints(
-		QImage const& image,
+		GrayImage const& image,
 		std::vector<double>& equations,
 		std::vector<double>& data_points) const;
 	
 	void prepareEquationsAndDataPoints(
-		QImage const& image, BinaryImage const& mask,
+		GrayImage const& image, BinaryImage const& mask,
 		std::vector<double>& equations,
 		std::vector<double>& data_points) const;
 	

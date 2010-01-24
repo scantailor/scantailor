@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,23 +102,23 @@ BinaryThreshold::mokjiThreshold(
 		throw std::invalid_argument("mokjiThreshold: invalid min_edge_magnitude");
 	}
 	
-	QImage const gray(toGrayscale(image));
+	GrayImage const gray(image);
 	
 	int const dilate_size = (max_edge_width + 1) * 2 - 1;
-	QImage dilated(dilateGray(gray, QSize(dilate_size, dilate_size)));
+	GrayImage dilated(dilateGray(gray, QSize(dilate_size, dilate_size)));
 	
 	unsigned matrix[256][256];
 	memset(matrix, 0, sizeof(matrix));
 	
 	int const w = image.width();
 	int const h = image.height();
-	unsigned char const* src_line = gray.bits();
-	int const src_bpl = gray.bytesPerLine();
-	unsigned char const* dilated_line = dilated.bits();
-	int const dilated_bpl = dilated.bytesPerLine();
+	unsigned char const* src_line = gray.data();
+	int const src_stride = gray.stride();
+	unsigned char const* dilated_line = dilated.data();
+	int const dilated_stride = dilated.stride();
 	
-	src_line += max_edge_width * src_bpl;
-	dilated_line += max_edge_width * dilated_bpl;
+	src_line += max_edge_width * src_stride;
+	dilated_line += max_edge_width * dilated_stride;
 	for (int y = max_edge_width; y < h - (int)max_edge_width; ++y) {
 		for (int x = max_edge_width; x < w - (int)max_edge_width; ++x) {
 			unsigned const pixel = src_line[x];
@@ -127,8 +127,8 @@ BinaryThreshold::mokjiThreshold(
 			
 			++matrix[darkest_neighbor][pixel];
 		}
-		src_line += src_bpl;
-		dilated_line += dilated_bpl;
+		src_line += src_stride;
+		dilated_line += dilated_stride;
 	}
 	
 	unsigned nominator = 0;

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,11 @@ class QImage;
 class ImageTransformation;
 class DebugImages;
 
+namespace imageproc
+{
+	class GrayImage;
+}
+
 namespace page_split
 {
 
@@ -38,7 +43,7 @@ public:
 	static std::vector<QLineF> findLines(
 		QImage const& image, ImageTransformation const& xform,
 		int max_lines, DebugImages* dbg = 0,
-		QImage* gray_downscaled = 0,
+		imageproc::GrayImage* gray_downscaled = 0,
 		QTransform* out_to_downscaled = 0);
 private:
 	class QualityLine
@@ -79,9 +84,9 @@ private:
 		double m_right;
 	};
 	
-	static QImage removeDarkVertBorders(QImage const& src);
+	static imageproc::GrayImage removeDarkVertBorders(imageproc::GrayImage const& src);
 	
-	static void selectVertBorders(QImage& image);
+	static void selectVertBorders(imageproc::GrayImage& image);
 	
 	static void buildWeightTable(unsigned weight_table[]);
 };

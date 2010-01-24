@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ class QImage;
 
 namespace imageproc
 {
+
+class GrayImage;
 
 /**
  * \brief Spread black pixels from seed as long as mask allows it.
@@ -57,14 +59,14 @@ BinaryImage seedFill(
  * The underlying code implements Luc Vincent's hybrid seed-fill algorithm:
  * http://www.vincent-net.com/luc/papers/93ieeeip_recons.pdf
  */
-QImage seedFillGray(
-	QImage const& seed, QImage const& mask, Connectivity connectivity);
+GrayImage seedFillGray(
+	GrayImage const& seed, GrayImage const& mask, Connectivity connectivity);
 
 /**
  * \brief A faster, in-place version of seedFillGray().
  */
 void seedFillGrayInPlace(
-	QImage& seed, QImage const& mask, Connectivity connectivity);
+	GrayImage& seed, GrayImage const& mask, Connectivity connectivity);
 
 /**
  * \brief A slower but more simple implementation of seedFillGray().
@@ -72,8 +74,8 @@ void seedFillGrayInPlace(
  * This function should not be used for anything but testing the correctness
  * of the fast and complex implementation that is seedFillGray().
  */
-QImage seedFillGraySlow(
-	QImage const& seed, QImage const& mask, Connectivity connectivity);
+GrayImage seedFillGraySlow(
+	GrayImage const& seed, GrayImage const& mask, Connectivity connectivity);
 
 } // namespace imageproc
 

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -93,13 +93,13 @@ struct CenterComparator
 	}
 };
 
-void selectHorBordersInPlace(QImage& image)
+void selectHorBordersInPlace(GrayImage& image)
 {
 	int const w = image.width();
 	int const h = image.height();
 	
-	unsigned char* const image_data = image.bits();
-	int const image_bpl = image.bytesPerLine();
+	unsigned char* const image_data = image.data();
+	int const image_stride = image.stride();
 	
 	std::vector<unsigned char> tmp_line(h, 0x00);
 	
@@ -107,15 +107,15 @@ void selectHorBordersInPlace(QImage& image)
 		// Left to right.
 		unsigned char* p_image = image_data + x;
 		unsigned char prev_pixel = 0x00; // Black vertical border.
-		for (int y = 0; y < h; ++y, p_image += image_bpl) {
+		for (int y = 0; y < h; ++y, p_image += image_stride) {
 			prev_pixel = std::max(*p_image, prev_pixel);
 			tmp_line[y] = prev_pixel;
 		}
 		
 		// Right to left
-		p_image = image_data + x + (h - 1) * image_bpl;
+		p_image = image_data + x + (h - 1) * image_stride;
 		prev_pixel = 0x00; // Black vertical border.
-		for (int y = h - 1; y >= 0; --y, p_image -= image_bpl) {
+		for (int y = h - 1; y >= 0; --y, p_image -= image_stride) {
 			prev_pixel = std::max(
 				*p_image,
 				std::min(prev_pixel, tmp_line[y])
@@ -125,9 +125,9 @@ void selectHorBordersInPlace(QImage& image)
 	}
 }
 
-QImage removeDarkHorBorders(QImage const& src)
+GrayImage removeDarkHorBorders(GrayImage const& src)
 {
-	QImage dst(src);
+	GrayImage dst(src);
 	
 	selectHorBordersInPlace(dst);
 	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
@@ -135,9 +135,9 @@ QImage removeDarkHorBorders(QImage const& src)
 	return dst;
 }
 
-QImage detectHorShadows(QImage const& src)
+GrayImage detectHorShadows(GrayImage const& src)
 {
-	QImage long_hor_lines(openGray(src, QSize(100, 1), 0xff));
+	GrayImage long_hor_lines(openGray(src, QSize(100, 1), 0xff));
 	long_hor_lines = removeDarkHorBorders(long_hor_lines);
 	return openGray(long_hor_lines, QSize(100, 1), 0xff);
 }
@@ -145,20 +145,20 @@ QImage detectHorShadows(QImage const& src)
 void countOffcutPixels(
 	unsigned* left_sum, unsigned* right_sum,
 	QLineF const& left_line, QLineF const& right_line,
-	QImage const& gray_downscaled, QImage const& hor_shadows,
+	GrayImage const& gray_downscaled, GrayImage const& hor_shadows,
 	QTransform const& out_to_downscaled, DebugImages* dbg)
 {
 	assert(left_sum && right_sum);
 	
-	QImage seed(createFramedImage(gray_downscaled.size()));
+	GrayImage seed(createFramedImage(gray_downscaled.size()));
 	
 	// Remove parts of the vertical seed lines.
 	// We don't want seed pixels to touch text.
 	{
 		int const width = seed.width();
 		int const height = seed.height();
-		uint8_t* seed_line = seed.bits();
-		int const seed_stride = seed.bytesPerLine();
+		uint8_t* seed_line = seed.data();
+		int const seed_stride = seed.stride();
 		int const from = height / 10;
 		int const to = height - from;
 		seed_line += from * seed_stride;
@@ -184,7 +184,7 @@ void countOffcutPixels(
 	}
 	
 	BinaryImage bin_img(binarizeWolf(seed, QSize(51, 51)));
-	seed = QImage();
+	seed = GrayImage();
 	
 	PageLayout const left_layout(
 		PageLayout(
@@ -244,10 +244,10 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	LayoutType const layout_type,
 	std::vector<QLineF> const& ltr_lines,
 	QRectF const& virtual_image_rect,
-	QImage const& gray_downscaled,
+	GrayImage const& gray_downscaled,
 	QTransform const& out_to_downscaled, DebugImages* dbg)
 {
-	QImage const hor_shadows(detectHorShadows(gray_downscaled));
+	GrayImage const hor_shadows(detectHorShadows(gray_downscaled));
 	if (dbg) {
 		dbg->add(hor_shadows, "hor_shadows");
 	}
@@ -472,7 +472,7 @@ PageLayoutEstimator::tryCutAtFoldingLine(
 {
 	int const num_pages = numPages(layout_type, pre_xform);
 	
-	QImage gray_downscaled;
+	GrayImage gray_downscaled;
 	QTransform out_to_downscaled;
 	
 	int const max_lines = 8;
@@ -721,7 +721,7 @@ PageLayoutEstimator::to300DpiBinary(
 		(int)ceil(yfactor * img.height())
 	);
 	
-	QImage const new_image(scaleToGray(img, new_size));
+	GrayImage const new_image(scaleToGray(GrayImage(img), new_size));
 	return BinaryImage(new_image, binary_threshold);
 }
 

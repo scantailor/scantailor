@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #define IMAGEPROC_GRAYRASTEROP_H_
 
 #include "Grayscale.h"
-#include <QImage>
+#include "GrayImage.h"
 #include <QPoint>
 #include <QRect>
 #include <QSize>
@@ -42,7 +42,7 @@ namespace imageproc
  * GRopSubtract\<GRopSrc, GRopDst\>.
  */
 template<typename GRop>
-void grayRasterOp(QImage& dst, QImage const& src);
+void grayRasterOp(GrayImage& dst, GrayImage const& src);
 
 /**
  * \brief Raster operation that takes source pixels as they are.
@@ -188,7 +188,7 @@ public:
 };
 
 template<typename GRop>
-void grayRasterOp(QImage& dst, QImage const& src)
+void grayRasterOp(GrayImage& dst, GrayImage const& src)
 {
 	if (dst.isNull() || src.isNull()) {
 		throw std::invalid_argument("grayRasterOp: can't operate on null images");
@@ -198,22 +198,10 @@ void grayRasterOp(QImage& dst, QImage const& src)
 		throw std::invalid_argument("grayRasterOp: images sizes are not the same");
 	}
 	
-	if (src.format() != QImage::Format_Indexed8 || !src.isGrayscale()) {
-		throw std::invalid_argument("grayRasterOp: source image is not grayscale");
-	}
-	
-	if (dst.format() != QImage::Format_Indexed8 || !dst.isGrayscale()) {
-		throw std::invalid_argument("grayRasterOp: source image is not grayscale");
-	}
-	
-	if (dst.numColors() != 256) {
-		dst.setColorTable(createGrayscalePalette());
-	}
-	
-	uint8_t const* src_line = src.bits();
-	uint8_t* dst_line = dst.bits();
-	int const src_bpl = src.bytesPerLine();
-	int const dst_bpl = dst.bytesPerLine();
+	uint8_t const* src_line = src.data();
+	uint8_t* dst_line = dst.data();
+	int const src_stride = src.stride();
+	int const dst_stride = dst.stride();
 	
 	int const width = src.width();
 	int const height = src.height();
@@ -222,8 +210,8 @@ void grayRasterOp(QImage& dst, QImage const& src)
 		for (int x = 0; x < width; ++x) {
 			dst_line[x] = GRop::transform(src_line[x], dst_line[x]);
 		}
-		src_line += src_bpl;
-		dst_line += dst_bpl;
+		src_line += src_stride;
+		dst_line += dst_stride;
 	}
 }
 

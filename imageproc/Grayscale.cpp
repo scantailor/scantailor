@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 */
 
 #include "Grayscale.h"
+#include "GrayImage.h"
 #include "BinaryImage.h"
 #include "BitOps.h"
 #include <QImage>
@@ -237,27 +238,26 @@ QImage stretchGrayRange(
 	return dst;
 }
 
-QImage createFramedImage(QSize const& size,
+GrayImage createFramedImage(QSize const& size,
 	unsigned char const inner_color, unsigned char const frame_color)
 {
-	QImage image(size, QImage::Format_Indexed8);
-	image.setColorTable(createGrayscalePalette());
+	GrayImage image(size);
 	image.fill(inner_color);
 	
 	int const width = size.width();
 	int const height = size.height();
 	
-	unsigned char* line = image.bits();
-	int const bpl = image.bytesPerLine();
+	unsigned char* line = image.data();
+	int const stride = image.stride();
 	
 	memset(line, frame_color, width);
 	
-	for (int y = 0; y < height; ++y, line += bpl) {
+	for (int y = 0; y < height; ++y, line += stride) {
 		line[0] = frame_color;
 		line[width - 1] = frame_color;
 	}
 	
-	memset(line - bpl, frame_color, width);
+	memset(line - stride, frame_color, width);
 	
 	return image;
 }

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #ifndef IMAGEPROC_GRAYSCALE_H_
 #define IMAGEPROC_GRAYSCALE_H_
 
+#include "GrayImage.h"
 #include <QVector>
 #include <QColor>
 
@@ -92,7 +93,7 @@ QImage stretchGrayRange(QImage const& src, double black_clip_fraction = 0.0,
  * \param frame_color The gray level of the frame area.  Defaults to black.
  * \return The resulting image.
  */
-QImage createFramedImage(
+GrayImage createFramedImage(
 	QSize const& size, unsigned char inner_color = 0xff,
 	unsigned char frame_color = 0x00);
 

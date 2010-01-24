@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ namespace imageproc
 {
 	class BinaryImage;
 	class BinaryThreshold;
+	class GrayImage;
 }
 
 namespace output
@@ -87,12 +88,12 @@ private:
 		QImage const& input, QPolygonF const& area_to_consider,
 		QTransform const& xform, QRect const& target_rect, DebugImages* dbg);
 	
-	static QImage detectPictures(
-		QImage const& input_300dpi, TaskStatus const& status,
+	static imageproc::GrayImage detectPictures(
+		imageproc::GrayImage const& input_300dpi, TaskStatus const& status,
 		DebugImages* dbg = 0);
 	
 	imageproc::BinaryImage estimateBinarizationMask(
-		TaskStatus const& status, QImage const& gray_source,
+		TaskStatus const& status, imageproc::GrayImage const& gray_source,
 		QRect const& source_rect, QRect const& source_sub_rect,
 		DebugImages* const dbg) const;
 
@@ -110,11 +111,11 @@ private:
 		QImage const& image, QPolygonF const& crop_area,
 		imageproc::BinaryImage const* mask = 0) const;
 	
+	void despeckleInPlace(
+		imageproc::BinaryImage& image, QRect const& target_rect,
+		Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const;
+
 	static QImage smoothToGrayscale(QImage const& src, Dpi const& dpi);
-	
-	static void despeckleInPlace(
-		imageproc::BinaryImage& image, Dpi const& dpi,
-		TaskStatus const& status, DebugImages* dbg);
 	
 	static void morphologicalSmoothInPlace(
 		imageproc::BinaryImage& img, TaskStatus const& status);

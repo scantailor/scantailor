@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 #include "LeastSquaresFit.h"
 #include "AlignedArray.h"
 #include "BinaryImage.h"
+#include "GrayImage.h"
 #include "Grayscale.h"
 #include "BitOps.h"
-#include <QImage>
 #include <QDebug>
 #include <boost/foreach.hpp>
 #include <stdexcept>
@@ -35,7 +35,7 @@ namespace imageproc
 {
 
 PolynomialSurface::PolynomialSurface(
-	int const hor_degree, int const vert_degree, QImage const& src)
+	int const hor_degree, int const vert_degree, GrayImage const& src)
 :	m_horDegree(hor_degree),
 	m_vertDegree(vert_degree)
 {
@@ -46,11 +46,6 @@ PolynomialSurface::PolynomialSurface(
 	}
 	if (vert_degree < 0) {
 		throw std::invalid_argument("PolynomialSurface: vertical degree is invalid");
-	}
-	
-	if (src.format() != QImage::Format_Indexed8
-			|| src.numColors() != 256 || !src.allGray()) {
-		throw std::invalid_argument("PolynomialSurface: not grayscale");
 	}
 	
 	int const num_data_points = src.width() * src.height();
@@ -80,7 +75,7 @@ PolynomialSurface::PolynomialSurface(
 
 PolynomialSurface::PolynomialSurface(
 	int const hor_degree, int const vert_degree,
-	QImage const& src, BinaryImage const& mask)
+	GrayImage const& src, BinaryImage const& mask)
 :	m_horDegree(hor_degree),
 	m_vertDegree(vert_degree)
 {
@@ -92,12 +87,6 @@ PolynomialSurface::PolynomialSurface(
 	if (vert_degree < 0) {
 		throw std::invalid_argument("PolynomialSurface: vertical degree is invalid");
 	}
-	
-	if (src.format() != QImage::Format_Indexed8
-			|| src.numColors() != 256 || !src.allGray()) {
-		throw std::invalid_argument("PolynomialSurface: not grayscale");
-	}
-	
 	if (src.size() != mask.size()) {
 		throw std::invalid_argument("PolynomialSurface: image and mask have different sizes");
 	}
@@ -128,19 +117,18 @@ PolynomialSurface::PolynomialSurface(
 	leastSquaresFit(dimensions, &equations[0], &m_coeffs[0], &data_points[0]);
 }
 
-QImage
+GrayImage
 PolynomialSurface::render(QSize const& size) const
 {
 	if (size.isEmpty()) {
-		return QImage();
+		return GrayImage();
 	}
 	
-	QImage image(size, QImage::Format_Indexed8);
-	image.setColorTable(createGrayscalePalette());
+	GrayImage image(size);
 	int const width = size.width();
 	int const height = size.height();
-	unsigned char* line = image.bits();
-	int const bpl = image.bytesPerLine();
+	unsigned char* line = image.data();
+	int const bpl = image.stride();
 	int const num_coeffs = m_coeffs.size();
 	
 	// Pretend that both x and y positions of pixels
@@ -223,15 +211,15 @@ PolynomialSurface::calcScale(int const dimension)
 
 void
 PolynomialSurface::prepareEquationsAndDataPoints(
-	QImage const& image,
+	GrayImage const& image,
 	std::vector<double>& equations,
 	std::vector<double>& data_points) const
 {
 	int const width = image.width();
 	int const height = image.height();
 	
-	uint8_t const* line = image.bits();
-	int const bpl = image.bytesPerLine();
+	uint8_t const* line = image.data();
+	int const bpl = image.stride();
 	
 	// Pretend that both x and y positions of pixels
 	// lie in range of [0, 1].
@@ -261,7 +249,7 @@ PolynomialSurface::prepareEquationsAndDataPoints(
 
 void
 PolynomialSurface::prepareEquationsAndDataPoints(
-	QImage const& image, BinaryImage const& mask,
+	GrayImage const& image, BinaryImage const& mask,
 	std::vector<double>& equations,
 	std::vector<double>& data_points) const
 {
@@ -271,8 +259,8 @@ PolynomialSurface::prepareEquationsAndDataPoints(
 	double const xscale = calcScale(width);
 	double const yscale = calcScale(height);
 	
-	uint8_t const* image_line = image.bits();
-	int const image_bpl = image.bytesPerLine();
+	uint8_t const* image_line = image.data();
+	int const image_bpl = image.stride();
 	
 	uint32_t const* mask_line = mask.data();
 	int const mask_wpl = mask.wordsPerLine();
