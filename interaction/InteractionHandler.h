@@ -20,6 +20,8 @@
 #define INTERACTION_HANDLER_H_
 
 #include "NonCopyable.h"
+#include "RefCountable.h"
+#include "IntrusivePtr.h"
 #include <boost/intrusive/list.hpp>
 
 class InteractionState;
@@ -37,7 +39,7 @@ class InteractionHandler :
 {
 	DECLARE_NON_COPYABLE(InteractionHandler)
 public:
-	InteractionHandler() {}
+	InteractionHandler();
 
 	virtual ~InteractionHandler();
 
@@ -100,12 +102,16 @@ protected:
 
 	static bool defaultInteractionPermitter(InteractionState const& interaction);
 private:
-	typedef boost::intrusive::list<
-		InteractionHandler, boost::intrusive::constant_time_size<false>
-	> HandlerList;
+	class HandlerList :
+		public RefCountable,
+		public boost::intrusive::list<
+			InteractionHandler, boost::intrusive::constant_time_size<false>
+		>
+	{
+	};
 
-	HandlerList m_preceeders;
-	HandlerList m_followers;
+	IntrusivePtr<HandlerList> m_ptrPreceeders;
+	IntrusivePtr<HandlerList> m_ptrFollowers;
 };
 
 #endif

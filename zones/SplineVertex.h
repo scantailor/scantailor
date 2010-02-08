@@ -96,6 +96,8 @@ class SentinelSplineVertex : public SplineVertex
 public:
 	SentinelSplineVertex();
 
+	virtual ~SentinelSplineVertex();
+
 	virtual SplineVertex::Ptr thisOrPrevReal(Loop loop);
 
 	virtual SplineVertex::Ptr thisOrNextReal(Loop loop);
