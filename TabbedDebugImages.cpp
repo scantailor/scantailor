@@ -23,13 +23,13 @@ TabbedDebugImages::TabbedDebugImages(QWidget* parent)
 :	QTabWidget(parent)
 {
 	setDocumentMode(true);
-	connect(this, SIGNAL(currentChanged(QWidget*)), SLOT(currentTabChanged(QWidget*)));
+	connect(this, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
 }
 
 void
-TabbedDebugImages::currentTabChanged(QWidget* widget)
+TabbedDebugImages::currentTabChanged(int const idx)
 {
-	if (DebugImageView* div = dynamic_cast<DebugImageView*>(widget)) {
+	if (DebugImageView* div = dynamic_cast<DebugImageView*>(widget(idx))) {
 		div->unlink();
 		m_liveViews.push_back(*div);
 		removeExcessLiveViews();

@@ -29,7 +29,7 @@ class TabbedDebugImages : public QTabWidget
 public:
 	TabbedDebugImages(QWidget* parent = 0);
 private slots:
-	void currentTabChanged(QWidget* widget);
+	void currentTabChanged(int idx);
 private:
 	typedef boost::intrusive::list<
 		DebugImageView, boost::intrusive::constant_time_size<false>
