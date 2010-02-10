@@ -396,15 +396,17 @@ QImage transform(
 	}
 	
 	if (src.format() == QImage::Format_Indexed8 && src.allGray()) {
-		QImage dst(dst_rect.size(), QImage::Format_Indexed8);
-		dst.setColorTable(createGrayscalePalette());
+		// The palette of src may be non-standard, so we create a GrayImage,
+		// which is guaranteed to have a standard palette.
+		GrayImage gray_src(src);
+		GrayImage gray_dst(dst_rect.size());
 		transformGeneric<uint8_t, Gray>(
-			src.bits(), src.bytesPerLine(), src.size(),
-			dst.bits(), dst.bytesPerLine(), xform, dst_rect,
+			gray_src.data(), gray_src.stride(), src.size(),
+			gray_dst.data(), gray_dst.stride(), xform, dst_rect,
 			qGray(background_color.rgb()),
 			weak_background, min_mapping_area
 		);
-		return dst;
+		return gray_dst;
 	} else {
 		if (src.hasAlphaChannel() || qAlpha(background_color.rgba()) != 0xff) {
 			QImage const src_argb32(src.convertToFormat(QImage::Format_ARGB32));
