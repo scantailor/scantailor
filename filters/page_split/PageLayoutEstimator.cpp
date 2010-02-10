@@ -717,8 +717,8 @@ PageLayoutEstimator::to300DpiBinary(
 	scale_xform.scale(xfactor, yfactor);
 	xform *= scale_xform;
 	QSize const new_size(
-		(int)ceil(xfactor * img.width()),
-		(int)ceil(yfactor * img.height())
+		std::max(1, (int)ceil(xfactor * img.width())),
+		std::max(1, (int)ceil(yfactor * img.height()))
 	);
 	
 	GrayImage const new_image(scaleToGray(GrayImage(img), new_size));
