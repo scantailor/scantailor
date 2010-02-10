@@ -61,6 +61,10 @@ ImageMetadata::dpiStatus(int pixel_size, int dpi)
 	if (dpi < 150) {
 		return DPI_TOO_SMALL;
 	}
+
+	if (dpi > 9999) {
+		return DPI_TOO_LARGE;
+	}
 	
 	double const mm = INCH2MM * pixel_size / dpi;
 	if (mm > 500) {

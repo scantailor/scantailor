@@ -29,6 +29,7 @@ public:
 	enum DpiStatus {
 		DPI_OK,
 		DPI_UNDEFINED,
+		DPI_TOO_LARGE,
 		DPI_TOO_SMALL,
 		DPI_TOO_SMALL_FOR_THIS_PIXEL_SIZE
 	};

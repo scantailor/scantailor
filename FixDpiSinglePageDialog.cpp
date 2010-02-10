@@ -133,6 +133,9 @@ FixDpiSinglePageDialog::decorateDpiInputField(QLineEdit* field, ImageMetadata::D
 		case ImageMetadata::DPI_UNDEFINED:
 			field->setToolTip(QString());
 			break;
+		case ImageMetadata::DPI_TOO_LARGE:
+			field->setToolTip(tr("DPI is too large and most likely wrong."));
+			break;
 		case ImageMetadata::DPI_TOO_SMALL:
 			field->setToolTip(tr("DPI is too small. Even if it's correct, you are not going to get acceptable results with it."));
 			break;
