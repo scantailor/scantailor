@@ -389,6 +389,10 @@ GrayImage scaleToGray(GrayImage const& src, QSize const& dst_size)
 	if (!dst_size.isValid()) {
 		throw std::invalid_argument("scaleToGray: dst_size is invalid");
 	}
+
+	if (dst_size.isEmpty()) {
+		return GrayImage();
+	}
 	
 	return scaleGrayToGray(src, dst_size);
 }
