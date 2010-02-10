@@ -204,8 +204,7 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	int const big_object_threshold = 25;
-	BinaryImage despeckled(despeckle(content, big_object_threshold));
+	BinaryImage despeckled(Despeckle::despeckle(content, Dpi(150, 150), Despeckle::NORMAL, status));
 	if (dbg) {
 		dbg->add(despeckled, "despeckled");
 	}

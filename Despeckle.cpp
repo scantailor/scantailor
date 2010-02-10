@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,11 +17,14 @@
 */
 
 #include "Despeckle.h"
+#include "TaskStatus.h"
 #include "DebugImages.h"
+#include "Dpi.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/Connectivity.h"
 #include <boost/foreach.hpp>
+#include <QtGlobal>
 #include <QImage>
 #include <QDebug>
 #include <vector>
@@ -52,18 +55,73 @@ namespace
 {
 
 /**
- * When multiplied by the number of pixels in a connected component,
- * gives the maximum squared distance to another connected component
- * we may attach it to.
+ * We treat vertical distances differently from the horizontal ones.
+ * We want horizontal proximity to have greater weight, so we
+ * multiply the vertical component distances by VERTICAL_SCALE,
+ * so that the distance is not:\n
+ * sqrt(dx^2 + dy^2)\n
+ * but:\n
+ * sqrt(dx^2 + (VERTICAL_SCALE*dy)^2)\n
+ * Keep in mind that we actually operate on squared distances,
+ * so we don't need to take that square root.
  */
-static uint32_t const PIXELS_TO_SQDIST = 9;
+static int const VERTICAL_SCALE = 2;
+static int const VERTICAL_SCALE_SQ = VERTICAL_SCALE * VERTICAL_SCALE;
 
-/**
- * When multiplied by the number of pixels in a connected component,
- * gives the minimum size (also the number of pixels) of a connected component
- * we may attach it to.
- */
-static double const MIN_RELATIVE_PARENT_WEIGHT = 0.5;
+struct Settings
+{
+	/**
+	 * When multiplied by the number of pixels in a connected component,
+	 * gives the minimum size (in terms of the number of pixels) of a connected
+	 * component we may attach it to.
+	 */
+	double minRelativeParentWeight;
+
+	/**
+	 * When multiplied by the number of pixels in a connected component,
+	 * gives the maximum squared distance to another connected component
+	 * we may attach it to.
+	 */
+	uint32_t pixelsToSqDist;
+
+	/**
+	 * Defines the minimum width or height in pixels that will guarantee
+	 * the object won't be removed.
+	 */
+	int bigObjectThreshold;
+
+	static Settings get(Despeckle::Level level, Dpi const& dpi);
+};
+
+Settings
+Settings::get(Despeckle::Level const level, Dpi const& dpi)
+{
+	Settings settings;
+
+	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
+	double const dpi_factor = min_dpi / 300.0;
+
+	switch (level) {
+		case Despeckle::CAUTIOUS:
+			settings.minRelativeParentWeight = 0.25;
+			settings.pixelsToSqDist = 10.0*10.0;
+			settings.bigObjectThreshold = qRound(7 * dpi_factor);
+			break;
+		case Despeckle::NORMAL:
+			settings.minRelativeParentWeight = 0.35;
+			settings.pixelsToSqDist = 6.5*6.5;
+			settings.bigObjectThreshold = qRound(12 * dpi_factor);
+			break;
+		case Despeckle::AGGRESSIVE:
+			settings.minRelativeParentWeight = 0.45;
+			settings.pixelsToSqDist = 3.5*3.5;
+			settings.bigObjectThreshold = qRound(17 * dpi_factor);
+			break;
+	}
+
+	return settings;
+}
+
 
 struct Component
 {
@@ -145,7 +203,7 @@ union Distance
 	uint32_t sqdist() const {
 		int const x = vec.x;
 		int const y = vec.y;
-		return static_cast<uint32_t>(x * x + y * y);
+		return static_cast<uint32_t>(x * x + VERTICAL_SCALE_SQ * y * y);
 	}
 };
 
@@ -228,19 +286,19 @@ void updateDistance(
  *        or none of the above.
  */
 void tagSourceComponent(
-	Component& source, Component const& target, uint32_t sqdist)
+	Component& source, Component const& target, uint32_t sqdist, Settings const& settings)
 {
 	if (source.anchoredToBig()) {
 		// No point in setting ANCHORED_TO_SMALL.
 		return;
 	}
 	
-	if (sqdist > source.num_pixels * PIXELS_TO_SQDIST) {
+	if (sqdist > source.num_pixels * settings.pixelsToSqDist) {
 		// Too far.
 		return;
 	}
 	
-	if (target.num_pixels >= MIN_RELATIVE_PARENT_WEIGHT * source.num_pixels) {
+	if (target.num_pixels >= settings.minRelativeParentWeight * source.num_pixels) {
 		source.setAnchoredToBig();
 	} else {
 		source.setAnchoredToSmall();
@@ -253,10 +311,10 @@ void tagSourceComponent(
  * being attached, provided that the one it's attached to is also preserved.
  */
 bool canBeAttachedTo(
-	Component const& comp, Component const& target, uint32_t sqdist)
+	Component const& comp, Component const& target, uint32_t sqdist, Settings const& settings)
 {
-	if (sqdist <= comp.num_pixels * PIXELS_TO_SQDIST) {
-		if (target.num_pixels >= comp.num_pixels * MIN_RELATIVE_PARENT_WEIGHT) {
+	if (sqdist <= comp.num_pixels * settings.pixelsToSqDist) {
+		if (target.num_pixels >= comp.num_pixels * settings.minRelativeParentWeight) {
 			return true;
 		}
 	}
@@ -308,7 +366,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 			// Propagate from top.
 			Distance top_dist = dist_line[x - width];
 			uint32_t sqdist_top = prev_sqdist_line[x];
-			sqdist_top += 1 - (int(top_dist.vec.y) << 1);
+			sqdist_top += VERTICAL_SCALE_SQ - 2 * VERTICAL_SCALE_SQ * int(top_dist.vec.y);
 			
 			if (sqdist_left < sqdist_top) {
 				this_sqdist_line[x] = sqdist_left;
@@ -367,7 +425,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 			// Propagate from bottom.
 			Distance bottom_dist = dist_line[x + width];
 			uint32_t sqdist_bottom = prev_sqdist_line[x];
-			sqdist_bottom += 1 + (int(bottom_dist.vec.y) << 1);
+			sqdist_bottom += VERTICAL_SCALE_SQ + 2 * VERTICAL_SCALE_SQ * int(bottom_dist.vec.y);
 			
 			this_sqdist_line[x] = dist_line[x].sqdist();
 			
@@ -449,7 +507,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 			Distance top_dist = dist_line[x - width];
 			if (top_dist != special_distance) {
 				uint32_t sqdist_top = prev_sqdist_line[x];
-				sqdist_top += 1 - (int(top_dist.vec.y) << 1);
+				sqdist_top += VERTICAL_SCALE_SQ - 2 * VERTICAL_SCALE_SQ * int(top_dist.vec.y);
 				if (sqdist_top < this_sqdist_line[x]) {
 					this_sqdist_line[x] = sqdist_top;
 					--top_dist.vec.y;
@@ -515,7 +573,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 			Distance bottom_dist = dist_line[x + width];
 			if (bottom_dist != special_distance) {
 				uint32_t sqdist_bottom = prev_sqdist_line[x];
-				sqdist_bottom += 1 + (int(bottom_dist.vec.y) << 1);
+				sqdist_bottom += VERTICAL_SCALE_SQ + 2 * VERTICAL_SCALE_SQ * int(bottom_dist.vec.y);
 				if (sqdist_bottom < this_sqdist_line[x]) {
 					this_sqdist_line[x] = sqdist_bottom;
 					++bottom_dist.vec.y;
@@ -597,48 +655,60 @@ void voronoiDistances(
 } // anonymous namespace
 
 
-BinaryImage despeckle(
-	BinaryImage const& src, int const big_object_threshold,
-	DebugImages* const dbg)
+BinaryImage
+Despeckle::despeckle(
+	BinaryImage const& src, Dpi const& dpi, Level const level,
+	TaskStatus const& status, DebugImages* const dbg)
 {
 	BinaryImage dst(src);
-	despeckleInPlace(dst, big_object_threshold, dbg);
+	despeckleInPlace(dst, dpi, level, status, dbg);
 	return dst;
 }
 
-void despeckleInPlace(
-	BinaryImage& image, int const big_object_threshold,
-	DebugImages* const dbg)
+void
+Despeckle::despeckleInPlace(
+	BinaryImage& image, Dpi const& dpi, Level const level,
+	TaskStatus const& status, DebugImages* const dbg)
 {
+	Settings const settings(Settings::get(level, dpi));
+
 	ConnectivityMap cmap(image, CONN8);
 	if (cmap.maxLabel() == 0) {
 		// Completely white image?
 		return;
 	}
+
+	status.throwIfCancelled();
 	
 	std::vector<Component> components(cmap.maxLabel() + 1);
-	
+	std::vector<QRect> bounding_boxes(cmap.maxLabel() + 1);
+
 	int const width = image.width();
 	int const height = image.height();
-	
+
 	uint32_t* const cmap_data = cmap.data();
 	
-	// Count the number of pixels in each component.
+	// Count the number of pixels and a bounding rect of each component.
 	uint32_t* cmap_line = cmap_data;
 	int const cmap_stride = cmap.stride();
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
-			++components[cmap_line[x]].num_pixels;
+			uint32_t const label = cmap_line[x];
+			++components[label].num_pixels;
+			bounding_boxes[label] |= QRect(x, y, 1, 1);
 		}
 		cmap_line += cmap_stride;
 	}
 	
+	status.throwIfCancelled();
+
 	// Unify big components into one.
 	std::vector<uint32_t> remapping_table(components.size());
 	uint32_t unified_big_component = 0;
 	uint32_t next_avail_component = 1;
 	for (uint32_t label = 1; label <= cmap.maxLabel(); ++label) {
-		if ((int)components[label].num_pixels < big_object_threshold) {
+		if (bounding_boxes[label].width() < settings.bigObjectThreshold &&
+				bounding_boxes[label].height() < settings.bigObjectThreshold) {
 			remapping_table[label] = next_avail_component;
 			++next_avail_component;
 		} else {
@@ -651,7 +721,10 @@ void despeckleInPlace(
 		components[remapping_table[label]] = components[label];
 	}
 	components.resize(next_avail_component);
+	std::vector<QRect>().swap(bounding_boxes); // We don't need them any more.
 	
+	status.throwIfCancelled();
+
 	uint32_t const max_label = next_avail_component - 1;
 	
 	// Remapping individual pixels.
@@ -665,6 +738,8 @@ void despeckleInPlace(
 	if (dbg) {
 		dbg->add(cmap.visualized(), "big_components_unified");
 	}
+
+	status.throwIfCancelled();
 	
 	// Build a Voronoi diagram.
 	std::vector<Distance> distance_matrix;
@@ -673,6 +748,8 @@ void despeckleInPlace(
 		dbg->add(cmap.visualized(), "voronoi");
 	}
 	
+	status.throwIfCancelled();
+
 	Distance* const distance_data = &distance_matrix[0] + width + 3;
 	
 	// Now build a bidirectional map of distances between neighboring
@@ -683,14 +760,16 @@ void despeckleInPlace(
 	
 	voronoiDistances(cmap, distance_matrix, conns);
 	
+	status.throwIfCancelled();
+
 	// Tag connected components with ANCHORED_TO_BIG or ANCHORED_TO_SMALL.
 	BOOST_FOREACH(Connections::value_type const& pair, conns) {
 		Connection const conn(pair.first);
 		uint32_t const sqdist = pair.second;
 		Component& comp1 = components[conn.lesser_label];
 		Component& comp2 = components[conn.greater_label];
-		tagSourceComponent(comp1, comp2, sqdist);
-		tagSourceComponent(comp2, comp1, sqdist);
+		tagSourceComponent(comp1, comp2, sqdist, settings);
+		tagSourceComponent(comp2, comp1, sqdist, settings);
 	}
 	
 	// Prevent it from growing when we compute the Voronoi diagram
@@ -703,6 +782,9 @@ void despeckleInPlace(
 	}
 	
 	if (have_anchored_to_small_but_not_big) {
+		
+		status.throwIfCancelled();
+		
 		// Give such components a second chance.  Maybe they do have
 		// big neighbors, but Voronoi regions from a smaller ones
 		// block the path to the bigger ones.
@@ -731,6 +813,8 @@ void despeckleInPlace(
 			}
 		}
 		
+		status.throwIfCancelled();
+
 		// Calculate the Voronoi diagram again, but this time
 		// treat pixels with a special distance in such a way
 		// to prevent them from spreading but also preventing
@@ -740,10 +824,14 @@ void despeckleInPlace(
 			dbg->add(cmap.visualized(), "voronoi_special");
 		}
 		
+		status.throwIfCancelled();
+
 		// We've got new connections.  Add them to the map.
 		voronoiDistances(cmap, distance_matrix, conns);
 	}
 	
+	status.throwIfCancelled();
+
 	// Clear the distance matrix.
 	std::vector<Distance>().swap(distance_matrix);
 	
@@ -764,17 +852,19 @@ void despeckleInPlace(
 		uint32_t const sqdist = it->second;
 		Component const& comp1 = components[label1];
 		Component const& comp2 = components[label2];
-		if (canBeAttachedTo(comp1, comp2, sqdist)) {
+		if (canBeAttachedTo(comp1, comp2, sqdist, settings)) {
 			target_source.push_back(TargetSourceConn(label2, label1));
 		}
-		if (canBeAttachedTo(comp2, comp1, sqdist)) {
+		if (canBeAttachedTo(comp2, comp1, sqdist, settings)) {
 			target_source.push_back(TargetSourceConn(label1, label2));
 		}
 		conns.erase(it);
 	}
-	
+
 	std::sort(target_source.begin(), target_source.end());
 	
+	status.throwIfCancelled();
+
 	// Create an index for quick access to a group of connections
 	// with a specified target.
 	std::vector<size_t> target_source_idx;
@@ -816,6 +906,8 @@ void despeckleInPlace(
 		}
 	}
 	
+	status.throwIfCancelled();
+
 	// Remove unmarked components from the binary image.
 	uint32_t const msb = uint32_t(1) << 31;
 	uint32_t* image_line = image.data();

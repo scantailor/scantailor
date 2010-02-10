@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,12 +24,16 @@
 namespace output
 {
 
+BlackWhiteOptions::BlackWhiteOptions()
+:	m_thresholdAdjustment(0),
+	m_dewarp(false)
+{
+}
+
 BlackWhiteOptions::BlackWhiteOptions(QDomElement const& el)
 :	m_thresholdAdjustment(el.attribute("thresholdAdj").toInt()),
-	m_despeckle(el.attribute("despeckle") != "0"),
 	m_dewarp(el.attribute("dewarp") == "1")
 {
-	// Note that we default to true if the attribute is not found.
 }
 
 QDomElement
@@ -37,7 +41,6 @@ BlackWhiteOptions::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("thresholdAdj", m_thresholdAdjustment);
-	el.setAttribute("despeckle", m_despeckle ? "1" : "0");
 	el.setAttribute("dewarp", m_dewarp ? "1" : "0");
 	return el;
 }
@@ -49,10 +52,6 @@ BlackWhiteOptions::operator==(BlackWhiteOptions const& other) const
 		return false;
 	}
 	
-	if (m_despeckle != other.m_despeckle) {
-		return false;
-	}
-
 	if (m_dewarp != other.m_dewarp) {
 		return false;
 	}

@@ -170,7 +170,7 @@ Filter::createTask(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
 			thumbnail_cache, page_id, page_num, out_dir,
-			batch, debug
+			m_ptrOptionsWidget->lastTab(), batch, debug
 		)
 	);
 }

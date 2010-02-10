@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,13 +74,15 @@ namespace output
 
 OutputGenerator::OutputGenerator(
 	Dpi const& dpi, ColorParams const& color_params,
+	DespeckleLevel const despeckle_level,
 	ImageTransformation const& pre_xform,
 	QPolygonF const& content_rect_phys,
 	QPolygonF const& page_rect_phys)
 :	m_dpi(dpi),
 	m_colorParams(color_params),
 	m_pageRectPhys(page_rect_phys),
-	m_toUncropped(pre_xform.transform())
+	m_toUncropped(pre_xform.transform()),
+	m_despeckleLevel(despeckle_level)
 {
 	QTransform const post_scale(
 		Utils::scaleFromToDpi(pre_xform.preScaledDpi(), m_dpi)
@@ -119,9 +121,16 @@ OutputGenerator::toOutput() const
 QImage
 OutputGenerator::process(
 	TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-	imageproc::BinaryImage* auto_picture_mask, DebugImages* const dbg) const
+	imageproc::BinaryImage* auto_picture_mask,
+	imageproc::BinaryImage* predespeckle_image,
+	imageproc::BinaryImage* speckles_image, DebugImages* const dbg) const
 {
-	QImage image(processImpl(status, input, zones, auto_picture_mask, dbg));
+	QImage image(
+		processImpl(
+			status, input, zones, auto_picture_mask,
+			predespeckle_image, speckles_image, dbg
+		)
+	);
 	assert(!image.isNull());
 	
 	// Set the correct DPI.
@@ -396,7 +405,9 @@ OutputGenerator::modifyBinarizationMask(
 QImage
 OutputGenerator::processImpl(
 	TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-	imageproc::BinaryImage* auto_picture_mask, DebugImages* const dbg) const
+	imageproc::BinaryImage* auto_picture_mask,
+	imageproc::BinaryImage* predespeckle_image,
+	imageproc::BinaryImage* speckles_image, DebugImages* const dbg) const
 {
 	RenderParams const render_params(m_colorParams);
 	
@@ -474,7 +485,7 @@ OutputGenerator::processImpl(
 			dbg->add(maybe_smoothed, "smoothed");
 		}
 	}
-
+	
 	status.throwIfCancelled();
 	
 	if (render_params.binaryOutput()) {
@@ -490,14 +501,10 @@ OutputGenerator::processImpl(
 			
 			status.throwIfCancelled();
 			
-			if (render_params.despeckle()) {
-				despeckleInPlace(
-					bw_content, normalize_illumination_rect, m_dpi, status, dbg
-				);
-				if (dbg) {
-					dbg->add(bw_content, "despeckled");
-				}
-			}
+			maybeDespeckleInPlace(
+				bw_content, normalize_illumination_rect, m_despeckleLevel,
+				predespeckle_image, speckles_image, m_dpi, status, dbg
+			);
 			
 			status.throwIfCancelled();
 			
@@ -592,14 +599,10 @@ OutputGenerator::processImpl(
 		
 		status.throwIfCancelled();
 		
-		if (render_params.despeckle()) {
-			despeckleInPlace(
-				bw_content, small_margins_rect, m_dpi, status, dbg
-			);
-			if (dbg) {
-				dbg->add(bw_content, "despeckled");
-			}
-		}
+		maybeDespeckleInPlace(
+			bw_content, small_margins_rect, m_despeckleLevel,
+			predespeckle_image, speckles_image, m_dpi, status, dbg
+		);
 		
 		status.throwIfCancelled();
 		
@@ -814,13 +817,13 @@ OutputGenerator::binarize(QImage const& image,
  * \param target_rect The image rectangle in the same coordinate system where
  *        m_contentRect and m_cropRect are defined.
  * \param pre_despeckle_img If provided, the image before despeckling will be
- *        written there.  \p pre_despeckle_img and \p post_despeckle_img will
+ *        written there.  \p predespeckle_img and \p speckles_img will
  *        likely have different size than that of \p image, namely m_cropRect.size().
  *        Only the content area defined by m_contentRect will be copied from
- *        \p image.  The rest of \p pre_despeckle_img and \p post_despeckle_img
+ *        \p image.  The rest of \p predespeckle_img and \p speckles_img
  *        will be filled with white.
- * \param post_despeckle_img If provided, the image after despeckling will be
- *        written here.
+ * \param speckles_img If provided, the removed black speckles will be written
+ *        there.
  * \param dpi The DPI of the input image.  See the note below.
  * \param status Task status.
  * \param dbg An optional sink for debugging images.
@@ -829,19 +832,58 @@ OutputGenerator::binarize(QImage const& image,
  * that is, its horizontal and vertical components are equal.
  */
 void
-OutputGenerator::despeckleInPlace(
-	imageproc::BinaryImage& image, QRect const& target_rect,
+OutputGenerator::maybeDespeckleInPlace(
+	imageproc::BinaryImage& image,
+	QRect const& target_rect, DespeckleLevel const level,
+	imageproc::BinaryImage* predespeckle_img,
+	imageproc::BinaryImage* speckles_img,
 	Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const
 {
 	QRect const src_rect(m_contentRect.translated(-target_rect.topLeft()));
 	QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
 
-	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
-	double const factor = min_dpi / 300.0;
-	double const squared_factor = factor * factor;
+	BinaryImage predespeckle;
 
-	int const big_object_threshold = qRound(100 * squared_factor);
-	::despeckleInPlace(image, big_object_threshold, dbg);
+	if (predespeckle_img || speckles_img) {
+		BinaryImage(m_cropRect.size(), WHITE).swap(predespeckle);
+		if (!m_contentRect.isEmpty()) {
+			rasterOp<RopSrc>(predespeckle, dst_rect, image, src_rect.topLeft());
+		}
+		if (predespeckle_img) {
+			*predespeckle_img = predespeckle;
+		}
+	}
+
+	if (level != DESPECKLE_OFF) {
+		Despeckle::Level lvl = Despeckle::NORMAL;
+		switch (level) {
+			case DESPECKLE_CAUTIOUS:
+				lvl = Despeckle::CAUTIOUS;
+				break;
+			case DESPECKLE_NORMAL:
+				lvl = Despeckle::NORMAL;
+				break;
+			case DESPECKLE_AGGRESSIVE:
+				lvl = Despeckle::AGGRESSIVE;
+				break;
+			default:;
+		}
+
+		Despeckle::despeckleInPlace(image, dpi, lvl, status, dbg);
+
+		if (dbg) {
+			dbg->add(image, "despeckled");
+		}
+	}
+
+	if (speckles_img) {
+		if (!m_contentRect.isEmpty()) {
+			rasterOp<RopSubtract<RopDst, RopSrc> >(
+				predespeckle, dst_rect, image, src_rect.topLeft()
+			);
+		}
+		*speckles_img = predespeckle;
+	}
 }
 
 void

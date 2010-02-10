@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,13 @@ ProcessingIndicationWidget::ProcessingIndicationWidget(QWidget* parent)
 {
 	m_headColor = palette().color(QPalette::Window).darker(200);
 	m_tailColor = palette().color(QPalette::Window).darker(130);
+}
+
+void
+ProcessingIndicationWidget::resetAnimation()
+{
+	m_distinction = 1.0;
+	m_distinctionDelta = distinction_increase;
 }
 
 void

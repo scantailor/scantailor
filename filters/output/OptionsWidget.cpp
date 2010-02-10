@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #include "ChangeDpiDialog.h"
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
+#include "Params.h"
+#include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PictureZoneComparator.h"
 #include "../../Utils.h"
@@ -44,6 +46,8 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
 :	m_ptrSettings(settings),
 	m_ptrPages(pages),
 	m_pageSelectionAccessor(page_selection_accessor),
+	m_despeckleLevel(DESPECKLE_NORMAL),
+	m_lastTab(TAB_OUTPUT),
 	m_ignoreThresholdChanges(0)
 {
 	setupUi(this);
@@ -79,10 +83,6 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
 		this, SLOT(equalizeIlluminationToggled(bool))
 	);
 	connect(
-		despeckleCB, SIGNAL(clicked(bool)),
-		this, SLOT(despeckleToggled(bool))
-	);
-	connect(
 		dewarpCB, SIGNAL(clicked(bool)),
 		this, SLOT(dewarpToggled(bool))
 	);
@@ -106,6 +106,27 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
 		applyColorsButton, SIGNAL(clicked()),
 		this, SLOT(applyColorsButtonClicked())
 	);
+
+	connect(
+		despeckleOffBtn, SIGNAL(clicked()),
+		this, SLOT(despeckleOffSelected())
+	);
+	connect(
+		despeckleCautiousBtn, SIGNAL(clicked()),
+		this, SLOT(despeckleCautiousSelected())
+	);
+	connect(
+		despeckleNormalBtn, SIGNAL(clicked()),
+		this, SLOT(despeckleNormalSelected())
+	);
+	connect(
+		despeckleAggressiveBtn, SIGNAL(clicked()),
+		this, SLOT(despeckleAggressiveSelected())
+	);
+	connect(
+		applyDespeckleButton, SIGNAL(clicked()),
+		this, SLOT(applyDespeckleButtonClicked())
+	);
 }
 
 OptionsWidget::~OptionsWidget()
@@ -115,9 +136,11 @@ OptionsWidget::~OptionsWidget()
 void
 OptionsWidget::preUpdateUI(PageId const& page_id)
 {
+	Params const params(m_ptrSettings->getParams(page_id));
 	m_pageId = page_id;
-	m_dpi = m_ptrSettings->getDpi(page_id);
-	m_colorParams = m_ptrSettings->getColorParams(page_id);
+	m_outputDpi = params.outputDpi();
+	m_colorParams = params.colorParams();
+	m_despeckleLevel = params.despeckleLevel();
 	updateDpiDisplay();
 	updateColorsDisplay();
 }
@@ -128,17 +151,10 @@ OptionsWidget::postUpdateUI()
 }
 
 void
-OptionsWidget::reloadIfZonesChanged()
+OptionsWidget::tabChanged(ImageViewTab const tab)
 {
-	ZoneSet saved_zones;
-	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(m_pageId));
-	if (output_params.get()) {
-		saved_zones = output_params->zones();
-	}
-
-	if (!PictureZoneComparator::equal(saved_zones, m_ptrSettings->zonesForPage(m_pageId))) {
-		emit reloadRequested();
-	}
+	m_lastTab = tab;
+	reloadIfNecessary();
 }
 
 void
@@ -172,16 +188,6 @@ OptionsWidget::equalizeIlluminationToggled(bool const checked)
 	ColorGrayscaleOptions opt(m_colorParams.colorGrayscaleOptions());
 	opt.setNormalizeIllumination(checked);
 	m_colorParams.setColorGrayscaleOptions(opt);
-	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
-	emit reloadRequested();
-}
-
-void
-OptionsWidget::despeckleToggled(bool const checked)
-{
-	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
-	opt.setDespeckle(checked);
-	m_colorParams.setBlackWhiteOptions(opt);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	emit reloadRequested();
 }
@@ -247,7 +253,7 @@ void
 OptionsWidget::changeDpiButtonClicked()
 {
 	ChangeDpiDialog* dialog = new ChangeDpiDialog(
-		this, m_dpi, m_ptrPages, m_pageSelectionAccessor
+		this, m_outputDpi, m_ptrPages, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
@@ -274,7 +280,7 @@ OptionsWidget::applyColorsButtonClicked()
 void
 OptionsWidget::dpiChanged(std::set<PageId> const& pages, Dpi const& dpi)
 {
-	m_dpi = dpi;
+	m_outputDpi = dpi;
 	updateDpiDisplay();
 	
 	if (int(pages.size()) == m_ptrPages->numImages()) {
@@ -298,22 +304,117 @@ OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 	} else {
 		BOOST_FOREACH(PageId const& page_id, pages) {
 			m_ptrSettings->setColorParams(page_id, m_colorParams);
+			emit invalidateThumbnail(page_id);
 		}
 	}
 	
-	emit reloadRequested();
+	if (pages.find(m_pageId) != pages.end()) {
+		emit reloadRequested();
+	}
+}
+
+void
+OptionsWidget::despeckleOffSelected()
+{
+	handleDespeckleLevelChange(DESPECKLE_OFF);
+}
+
+void
+OptionsWidget::despeckleCautiousSelected()
+{
+	handleDespeckleLevelChange(DESPECKLE_CAUTIOUS);
+}
+
+void
+OptionsWidget::despeckleNormalSelected()
+{
+	handleDespeckleLevelChange(DESPECKLE_NORMAL);
+}
+
+void
+OptionsWidget::despeckleAggressiveSelected()
+{
+	handleDespeckleLevelChange(DESPECKLE_AGGRESSIVE);
+}
+
+void
+OptionsWidget::handleDespeckleLevelChange(DespeckleLevel const level)
+{
+	m_despeckleLevel = level;
+	m_ptrSettings->setDespeckleLevel(m_pageId, level);
+
+	bool handled = false;
+	emit despeckleLevelChanged(level, &handled);
+	
+	if (handled) {
+		// This means we are on the "Despeckling" tab.
+		emit invalidateThumbnail(m_pageId);
+	} else {
+		emit reloadRequested();
+	}
+}
+
+void
+OptionsWidget::applyDespeckleButtonClicked()
+{
+	ApplyColorsDialog* dialog = new ApplyColorsDialog(
+		this, m_ptrPages, m_pageSelectionAccessor
+	);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	connect(
+		dialog, SIGNAL(accepted(std::set<PageId> const&)),
+		this, SLOT(applyDespeckleConfirmed(std::set<PageId> const&))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::applyDespeckleConfirmed(std::set<PageId> const& pages)
+{
+	if (int(pages.size()) == m_ptrPages->numImages()) {
+		m_ptrSettings->setDespeckleLevelForAllPages(m_despeckleLevel);
+		emit invalidateAllThumbnails();
+	} else {
+		BOOST_FOREACH(PageId const& page_id, pages) {
+			m_ptrSettings->setDespeckleLevel(page_id, m_despeckleLevel);
+			emit invalidateThumbnail(page_id);
+		}
+	}
+	
+	if (pages.find(m_pageId) != pages.end()) {
+		emit reloadRequested();
+	}
+}
+
+void
+OptionsWidget::reloadIfNecessary()
+{
+	ZoneSet saved_zones;
+	DespeckleLevel saved_despeckle_level = DESPECKLE_NORMAL;
+	
+	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(m_pageId));
+	if (output_params.get()) {
+		saved_zones = output_params->zones();
+		saved_despeckle_level = output_params->outputImageParams().despeckleLevel();
+	}
+
+	if (!PictureZoneComparator::equal(saved_zones, m_ptrSettings->zonesForPage(m_pageId))) {
+		emit reloadRequested();
+	} else if (saved_despeckle_level != m_ptrSettings->getDespeckleLevel(m_pageId)) {
+		emit reloadRequested();
+	}
 }
 
 void
 OptionsWidget::updateDpiDisplay()
 {
-	if (m_dpi.horizontal() != m_dpi.vertical()) {
+	if (m_outputDpi.horizontal() != m_outputDpi.vertical()) {
 		dpiLabel->setText(
 			QString::fromAscii("%1 x %2")
-			.arg(m_dpi.horizontal()).arg(m_dpi.vertical())
+			.arg(m_outputDpi.horizontal()).arg(m_outputDpi.vertical())
 		);
 	} else {
-		dpiLabel->setText(QString::number(m_dpi.horizontal()));
+		dpiLabel->setText(QString::number(m_outputDpi.horizontal()));
 	}
 }
 
@@ -351,13 +452,27 @@ OptionsWidget::updateColorsDisplay()
 	}
 	
 	bwOptions->setVisible(bw_options_visible);
+	despecklePanel->setVisible(bw_options_visible);
 	if (bw_options_visible) {
-		despeckleCB->setChecked(
-			m_colorParams.blackWhiteOptions().despeckle()
-		);
 		dewarpCB->setChecked(
 			m_colorParams.blackWhiteOptions().dewarp()
 		);
+
+		switch (m_despeckleLevel) {
+			case DESPECKLE_OFF:
+				despeckleOffBtn->setChecked(true);
+				break;
+			case DESPECKLE_CAUTIOUS:
+				despeckleCautiousBtn->setChecked(true);
+				break;
+			case DESPECKLE_NORMAL:
+				despeckleNormalBtn->setChecked(true);
+				break;
+			case DESPECKLE_AGGRESSIVE:
+				despeckleAggressiveBtn->setChecked(true);
+				break;
+		}
+
 		ScopedIncDec<int> const guard(m_ignoreThresholdChanges);
 		thresholdSlider->setValue(
 			m_colorParams.blackWhiteOptions().thresholdAdjustment()

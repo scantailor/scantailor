@@ -25,6 +25,7 @@
 #include "Dpi.h"
 #include "ColorParams.h"
 #include "OutputParams.h"
+#include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PropertySet.h"
 #include <QMutex>
@@ -61,6 +62,12 @@ public:
 	void setDpi(PageId const& page_id, Dpi const& dpi);
 	
 	void setDpiForAllPages(Dpi const& dpi);
+
+	DespeckleLevel getDespeckleLevel(PageId const& page_id) const;
+
+	void setDespeckleLevel(PageId const& page_id, DespeckleLevel level);
+
+	void setDespeckleLevelForAllPages(DespeckleLevel level);
 	
 	std::auto_ptr<OutputParams> getOutputParams(PageId const& page_id) const;
 	
@@ -81,6 +88,7 @@ public:
 	void setDefaultZoneProperties(PropertySet const& props);
 private:
 	typedef std::map<PageId, Dpi> PerPageDpi;
+	typedef std::map<PageId, DespeckleLevel> PerPageDespeckleLevel;
 	typedef std::map<PageId, ColorParams> PerPageColorParams;
 	typedef std::map<PageId, OutputParams> PerPageOutputParams;
 	typedef std::map<PageId, ZoneSet> PerPageZones;
@@ -88,6 +96,10 @@ private:
 	Dpi getDpiLocked(PageId const& page_id) const;
 	
 	void setDpiLocked(PageId const& page_id, Dpi const& dpi);
+
+	DespeckleLevel getDespeckleLevelLocked(PageId const& page_id) const;
+
+	void setDespeckleLevelLocked(PageId const& page_id, DespeckleLevel level);
 	
 	ColorParams getColorParamsLocked(PageId const& page_id) const;
 	
@@ -96,12 +108,14 @@ private:
 	
 	mutable QMutex m_mutex;
 	PerPageDpi m_perPageDpi;
+	PerPageDespeckleLevel m_perPageDespeckleLevel;
 	PerPageColorParams m_perPageColorParams;
 	PerPageOutputParams m_perPageOutputParams;
 	PerPageZones m_perPageZones;
 	Dpi m_defaultDpi;
 	ColorParams m_defaultColorParams;
 	PropertySet m_defaultZoneProps;
+	DespeckleLevel m_defaultDespeckleLevel;
 };
 
 } // namespace output

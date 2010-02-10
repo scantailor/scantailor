@@ -1,5 +1,8 @@
 <RCC>
-  <qresource prefix="/" >
+  <qresource prefix="/">
+    <file>icons/despeckle-normal.png.png</file>
+    <file>icons/despeckle-aggressive.png.png</file>
+    <file>icons/despeckle-cautious.png.png</file>
     <file>icons/flip-sides.png</file>
     <file>icons/user-trash.png</file>
     <file>icons/insert-after-16.png</file>

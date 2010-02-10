@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,21 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "BasicImageView.h.moc"
-#include "ImageTransformation.h"
-#include "ImagePresentation.h"
-#include "Dpm.h"
-#include "Dpi.h"
+#ifndef DESPECKLE_LEVEL_H_
+#define DESPECKLE_LEVEL_H_
 
-BasicImageView::BasicImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(image, downscaled_image, ImagePresentation(QTransform(), QRectF(image.rect()))),
-	m_dragHandler(*this),
-	m_zoomHandler(*this)
-{
-	rootInteractionHandler().makeLastFollower(m_dragHandler);
-	rootInteractionHandler().makeLastFollower(m_zoomHandler);
-}
+class QString;
 
-BasicImageView::~BasicImageView()
+namespace output
 {
-}
+
+enum DespeckleLevel {
+	DESPECKLE_OFF,
+	DESPECKLE_CAUTIOUS,
+	DESPECKLE_NORMAL,
+	DESPECKLE_AGGRESSIVE
+};
+
+QString despeckleLevelToString(DespeckleLevel level);
+
+DespeckleLevel despeckleLevelFromString(QString const& str);
+
+} // namespace output
+
+#endif

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,21 +16,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "BasicImageView.h.moc"
-#include "ImageTransformation.h"
-#include "ImagePresentation.h"
-#include "Dpm.h"
-#include "Dpi.h"
+#include "DespeckleLevel.h"
+#include <QString>
 
-BasicImageView::BasicImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(image, downscaled_image, ImagePresentation(QTransform(), QRectF(image.rect()))),
-	m_dragHandler(*this),
-	m_zoomHandler(*this)
+namespace output
 {
-	rootInteractionHandler().makeLastFollower(m_dragHandler);
-	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+
+QString despeckleLevelToString(DespeckleLevel const level)
+{
+	switch (level) {
+		case DESPECKLE_OFF:
+			return "off";
+		case DESPECKLE_CAUTIOUS:
+			return "cautious";
+		case DESPECKLE_NORMAL:
+			return "normal";
+		case DESPECKLE_AGGRESSIVE:
+			return "aggressive";
+	}
+
+	return QString();
 }
 
-BasicImageView::~BasicImageView()
+DespeckleLevel despeckleLevelFromString(QString const& str)
 {
+	if (str == "off") {
+		return DESPECKLE_OFF;
+	} else if (str == "cautious") {
+		return DESPECKLE_CAUTIOUS;
+	} else if (str == "aggressive") {
+		return DESPECKLE_AGGRESSIVE;
+	} else {
+		return DESPECKLE_NORMAL;
+	}
 }
+
+} // namespace output

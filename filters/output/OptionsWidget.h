@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 #include "PageId.h"
 #include "PageSelectionAccessor.h"
 #include "ColorParams.h"
+#include "ImageViewTab.h"
+#include "DespeckleLevel.h"
 #include "Dpi.h"
 #include <set>
 
@@ -49,8 +51,12 @@ public:
 	void preUpdateUI(PageId const& page_id);
 	
 	void postUpdateUI();
+
+	ImageViewTab lastTab() const { return m_lastTab; }
+signals:
+	void despeckleLevelChanged(DespeckleLevel level, bool* handled);
 public slots:
-	void reloadIfZonesChanged();
+	void tabChanged(ImageViewTab tab);
 private slots:
 	void changeDpiButtonClicked();
 	
@@ -65,8 +71,6 @@ private slots:
 	void whiteMarginsToggled(bool checked);
 	
 	void equalizeIlluminationToggled(bool checked);
-	
-	void despeckleToggled(bool checked);
 
 	void dewarpToggled(bool checked);
 	
@@ -77,17 +81,35 @@ private slots:
 	void setNeutralThreshold();
 	
 	void bwThresholdChanged(int value);
+
+	void despeckleOffSelected();
+
+	void despeckleCautiousSelected();
+
+	void despeckleNormalSelected();
+
+	void despeckleAggressiveSelected();
+
+	void applyDespeckleButtonClicked();
+
+	void applyDespeckleConfirmed(std::set<PageId> const& pages);
 private:
+	void handleDespeckleLevelChange(DespeckleLevel level);
+
+	void reloadIfNecessary();
+
 	void updateDpiDisplay();
-	
+
 	void updateColorsDisplay();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	IntrusivePtr<PageSequence> m_ptrPages;
 	PageSelectionAccessor m_pageSelectionAccessor;
 	PageId m_pageId;
-	Dpi m_dpi;
+	Dpi m_outputDpi;
 	ColorParams m_colorParams;
+	DespeckleLevel m_despeckleLevel;
+	ImageViewTab m_lastTab;
 	int m_ignoreThresholdChanges;
 };
 

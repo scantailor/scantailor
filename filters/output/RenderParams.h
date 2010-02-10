@@ -50,10 +50,6 @@ public:
 				== NEED_BINARIZATION;
 	}
 	
-	bool despeckle() const {
-		return (m_mask & DESPECKLE) != 0;
-	}
-
 	bool dewarp() const {
 		return (m_mask & DEWARP) != 0;
 	}
@@ -62,9 +58,8 @@ private:
 		WHITE_MARGINS = 1,
 		NORMALIZE_ILLUMINATION = 2,
 		NEED_BINARIZATION = 4,
-		DESPECKLE = 8,
-		DEWARP = 16,
-		MIXED_OUTPUT = 32
+		DEWARP = 8,
+		MIXED_OUTPUT = 16
 	};
 	
 	int m_mask;

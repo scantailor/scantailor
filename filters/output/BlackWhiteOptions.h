@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace output
 class BlackWhiteOptions
 {
 public:
-	BlackWhiteOptions() : m_thresholdAdjustment(0), m_despeckle(true), m_dewarp(false) {}
+	BlackWhiteOptions();
 	
 	BlackWhiteOptions(QDomElement const& el);
 	
@@ -39,20 +39,15 @@ public:
 	
 	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
 	
-	bool despeckle() const { return m_despeckle; }
-	
-	void setDespeckle(bool enabled) { m_despeckle = enabled; }
-	
 	bool dewarp() const { return m_dewarp; }
 
 	void setDewarp(bool enabled) { m_dewarp = enabled; }
-
+	
 	bool operator==(BlackWhiteOptions const& other) const;
 	
 	bool operator!=(BlackWhiteOptions const& other) const;
 private:
 	int m_thresholdAdjustment;
-	bool m_despeckle;
 	bool m_dewarp;
 };
 
