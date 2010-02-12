@@ -204,6 +204,42 @@ struct CombineInverted
 };
 
 /**
+ * In picture areas we make sure we don't use pure black and pure white colors.
+ * These are reserved for text areas.  This behaviour makes it possible to
+ * detect those picture areas later and treat them differently, for example
+ * encoding them as a background layer in DjVu format.
+ */
+template<typename PixelType>
+PixelType reserveBlackAndWhite(PixelType color);
+
+template<>
+uint32_t reserveBlackAndWhite(uint32_t color)
+{
+	// We handle both RGB32 and ARGB32 here.
+	switch (color & 0x00FFFFFF) {
+		case 0x00000000:
+			return 0xFF010101;
+		case 0x00FFFFFF:
+			return 0xFFFEFEFE;
+		default:
+			return color;
+	}
+}
+
+template<>
+uint8_t reserveBlackAndWhite(uint8_t color)
+{
+	switch (color) {
+		case 0x00:
+			return 0x01;
+		case 0xFF:
+			return 0xFE;
+		default:
+			return color;
+	}
+}
+
+/**
  * Fills areas of \p mixed with pixels from \p bw_content in
  * areas where \p bw_mask is black.  Supported \p mixed image formats
  * are Indexed8 grayscale, RGB32 and ARGB32.
@@ -228,6 +264,8 @@ void combineMixed(
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
+				// B/W content.
+
 				uint32_t tmp = bw_content_line[x >> 5];
 				tmp >>= (31 - (x & 31));
 				tmp &= uint32_t(1);
@@ -238,6 +276,9 @@ void combineMixed(
 				tmp |= 0xff000000; // Force opacity.
 				
 				mixed_line[x] = static_cast<MixedPixel>(tmp);
+			} else {
+				// Non-B/W content.
+				mixed_line[x] = reserveBlackAndWhite<MixedPixel>(mixed_line[x]);
 			}
 		}
 		mixed_line += mixed_stride;
