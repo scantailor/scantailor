@@ -36,9 +36,23 @@ namespace imageproc
 
 class BinaryImage::SharedData
 {
+private:
+	/**
+	 * Resolves the ambiguity of:
+	 * \code
+	 * void SharedData::operator delete(void*, size_t);
+	 * \endcode
+	 * Which may be interpreted as both a placement and non-placement delete.
+	 */
+	struct NumWords
+	{
+		size_t numWords;
+
+		NumWords(size_t num_words) : numWords(num_words) {}
+	};
 public:
 	static SharedData* create(size_t num_words) {
-		return new(num_words) SharedData();
+		return new(NumWords(num_words)) SharedData();
 	}
 	
 	uint32_t* data() { return m_data; }
@@ -53,9 +67,9 @@ public:
 	
 	void unref() const;
 	
-	static void* operator new(size_t size, size_t num_words);
+	static void* operator new(size_t size, NumWords num_words);
 	
-	static void operator delete(void* addr, size_t);
+	static void operator delete(void* addr, NumWords num_words);
 private:
 	SharedData() : m_refCounter(1) {}
 	
@@ -1126,15 +1140,16 @@ void
 BinaryImage::SharedData::unref() const
 {
 	if (!m_refCounter.deref()) {
-		delete this;
+		this->~SharedData();
+		free((void*)this);
 	}
 }
 
 void*
-BinaryImage::SharedData::operator new(size_t const size, size_t const num_words)
+BinaryImage::SharedData::operator new(size_t, NumWords const num_words)
 {
 	SharedData* sd = 0;
-	void* addr = malloc(((char*)&sd->m_data[0] - (char*)sd) + num_words * 4);
+	void* addr = malloc(((char*)&sd->m_data[0] - (char*)sd) + num_words.numWords * 4);
 	if (!addr) {
 		throw std::bad_alloc();
 	}
@@ -1142,7 +1157,7 @@ BinaryImage::SharedData::operator new(size_t const size, size_t const num_words)
 }
 
 void
-BinaryImage::SharedData::operator delete(void* addr, size_t)
+BinaryImage::SharedData::operator delete(void* addr, NumWords)
 {
 	free(addr);
 }
