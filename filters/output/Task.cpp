@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,17 +19,24 @@
 #include "Task.h"
 #include "Filter.h"
 #include "OptionsWidget.h"
+#include "Params.h"
 #include "Settings.h"
 #include "ColorParams.h"
 #include "OutputParams.h"
 #include "OutputImageParams.h"
 #include "OutputFileParams.h"
+#include "RenderParams.h"
 #include "FilterUiInterface.h"
 #include "TaskStatus.h"
 #include "FilterData.h"
 #include "ImageView.h"
+#include "ImageViewTab.h"
+#include "TabbedImageView.h"
 #include "PictureZoneComparator.h"
 #include "PictureZoneEditor.h"
+#include "DespeckleView.h"
+#include "DespeckleVisualization.h"
+#include "DespeckleLevel.h"
 #include "ImageId.h"
 #include "Dpi.h"
 #include "Dpm.h"
@@ -64,13 +71,19 @@ public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
 		std::auto_ptr<DebugImages> dbg_img,
+		ColorParams const& color_params,
 		QTransform const& image_to_virt,
 		QPolygonF const& virt_display_area,
 		PageId const& page_id,
 		QImage const& orig_image,
 		QImage const& output_image,
 		BinaryImage const& picture_mask,
-		bool batch);
+		BinaryImage const& pre_despeckle_image,
+		BinaryImage const& speckles_image,
+		Dpi const& output_dpi,
+		DespeckleVisualization const& despeckle_visualization,
+		DespeckleLevel despeckle_level,
+		bool batch, bool debug);
 	
 	virtual void updateUI(FilterUiInterface* ui);
 	
@@ -79,6 +92,7 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<DebugImages> m_ptrDbg;
+	ColorParams m_colorParams;
 	QTransform m_imageToVirt;
 	QPolygonF m_virtDisplayArea;
 	PageId m_pageId;
@@ -87,7 +101,13 @@ private:
 	QImage m_outputImage;
 	QImage m_downscaledOutputImage;
 	BinaryImage m_pictureMask;
+	BinaryImage m_preDespeckleImage;
+	BinaryImage m_specklesImage;
+	Dpi m_outputDpi;
+	DespeckleVisualization m_despeckleVisualization;
+	DespeckleLevel m_despeckleLevel;
 	bool m_batchProcessing;
+	bool m_debug;
 };
 
 
@@ -95,14 +115,17 @@ Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	ThumbnailPixmapCache& thumbnail_cache,
 	PageId const& page_id, int const page_num,
-	QString const& out_dir, bool const batch, bool const debug)
+	QString const& out_dir, ImageViewTab const last_tab,
+	bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_rThumbnailCache(thumbnail_cache),
 	m_pageId(page_id),
 	m_outDir(out_dir),
 	m_pageNum(page_num),
-	m_batchProcessing(batch)
+	m_lastTab(last_tab),
+	m_batchProcessing(batch),
+	m_debug(debug)
 {
 	if (debug) {
 		m_ptrDbg.reset(new DebugImages);
@@ -120,26 +143,42 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	ColorParams const color_params(m_ptrSettings->getColorParams(m_pageId));
-	Dpi const output_dpi(m_ptrSettings->getDpi(m_pageId));
+	Params const params(m_ptrSettings->getParams(m_pageId));
+	RenderParams const render_params(params.colorParams());
 	QString const out_file_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
 	QFileInfo const out_file_info(out_file_path);
+
 	QString const automask_dir(Utils::automaskDir(m_outDir));
 	QString const automask_file_path(
 		QDir(automask_dir).absoluteFilePath(out_file_info.fileName())
 	);
 	QFileInfo automask_file_info(automask_file_path);
-	bool const need_automask = color_params.colorMode() == ColorParams::MIXED
-							   && !m_batchProcessing;
+
+	QString const predespeckle_dir(Utils::predespeckleDir(m_outDir));
+	QString const predespeckle_file_path(
+		QDir(predespeckle_dir).absoluteFilePath(out_file_info.fileName())
+	);
+	QFileInfo predespeckle_file_info(predespeckle_file_path);
+
+	QString const speckles_dir(Utils::specklesDir(m_outDir));
+	QString const speckles_file_path(
+		QDir(speckles_dir).absoluteFilePath(out_file_info.fileName())
+	);
+	QFileInfo speckles_file_info(speckles_file_path);
+
+	bool const need_picture_editor = render_params.mixedOutput() && !m_batchProcessing;
+	bool const need_predespeckle_image =
+		params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
+	bool const need_speckles_image = need_predespeckle_image && params.despeckleLevel() != DESPECKLE_OFF;
 	
 	OutputGenerator const generator(
-		output_dpi, color_params, data.xform(),
-		content_rect_phys, page_rect_phys
+		params.outputDpi(), params.colorParams(), params.despeckleLevel(),
+		data.xform(), content_rect_phys, page_rect_phys
 	);
 	
 	OutputImageParams const new_output_image_params(
 		generator.outputImageSize(), generator.outputContentRect(),
-		data.xform(), output_dpi, color_params
+		data.xform(), params.outputDpi(), params.colorParams(), params.despeckleLevel()
 	);
 
 	ZoneSet const new_zones(m_ptrSettings->zonesForPage(m_pageId));
@@ -176,7 +215,7 @@ Task::process(
 			break;
 		}
 
-		if (need_automask) {
+		if (need_picture_editor) {
 			if (!automask_file_info.exists()) {
 				need_reprocess = true;
 				break;
@@ -187,11 +226,35 @@ Task::process(
 				break;
 			}
 		}
+
+		if (need_predespeckle_image) {
+			if (!predespeckle_file_info.exists()) {
+				need_reprocess = true;
+				break;
+			}
+			if (!stored_output_params->predespeckleFileParams().matches(OutputFileParams(predespeckle_file_info))) {
+				need_reprocess = true;
+				break;
+			}
+		}
+
+		if (need_speckles_image) {
+			if (!speckles_file_info.exists()) {
+				need_reprocess = true;
+				break;
+			}
+			if (!stored_output_params->specklesFileParams().matches(OutputFileParams(speckles_file_info))) {
+				need_reprocess = true;
+				break;
+			}
+		}
 	
 	} while (false);
 	
 	QImage out_img;
 	BinaryImage automask_img;
+	BinaryImage predespeckle_img;
+	BinaryImage speckles_img;
 	
 	if (!need_reprocess) {
 		QFile out_file(out_file_path);
@@ -200,38 +263,98 @@ Task::process(
 		}
 		need_reprocess = out_img.isNull();
 
-		if (need_automask && !need_reprocess) {
+		if (need_picture_editor && !need_reprocess) {
 			QFile automask_file(automask_file_path);
 			if (automask_file.open(QIODevice::ReadOnly)) {
 				automask_img = BinaryImage(ImageLoader::load(automask_file, 0));
 			}
 			need_reprocess = automask_img.isNull() || automask_img.size() != out_img.size();
 		}
+
+		if (need_predespeckle_image && !need_reprocess) {
+			QFile predespeckle_file(predespeckle_file_path);
+			if (predespeckle_file.open(QIODevice::ReadOnly)) {
+				predespeckle_img = BinaryImage(ImageLoader::load(predespeckle_file, 0));
+			}
+			need_reprocess = predespeckle_img.isNull();
+		}
+
+		if (need_speckles_image && !need_reprocess) {
+			QFile speckles_file(speckles_file_path);
+			if (speckles_file.open(QIODevice::ReadOnly)) {
+				speckles_img = BinaryImage(ImageLoader::load(speckles_file, 0));
+			}
+			need_reprocess = speckles_img.isNull();
+		}
+
+		if (need_predespeckle_image && need_speckles_image && !need_reprocess) {
+			need_reprocess = (predespeckle_img.size() != speckles_img.size());
+		}
 	}
 
 	if (need_reprocess) {
 		// Even in batch processing mode we should still write automask, because it
 		// will be needed when we view the results back in interactive mode.
-		bool const write_automask = (color_params.colorMode() == ColorParams::MIXED);
+		// The same applies to pre-despeckle and speckles files.  For pre-despeckle files,
+		// we write them even if despeckling was turned off, as long as it's still
+		// possible in given output mode.
+		bool const write_automask = render_params.mixedOutput();
+		bool const write_predespeckle_file = (params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE);
+		bool const write_speckles_file = write_predespeckle_file && params.despeckleLevel() != DESPECKLE_OFF;
 
 		out_img = generator.process(
-			status, data, new_zones, write_automask ? &automask_img : 0, m_ptrDbg.get()
+			status, data, new_zones,
+			write_automask ? &automask_img : 0,
+			write_predespeckle_file ? &predespeckle_img : 0,
+			write_speckles_file ? &speckles_img : 0,
+			m_ptrDbg.get()
 		);
-		
-		// Note that automask should be generated and written even if need_automask is false.
-		// That's because
 
-		if (!TiffWriter::writeImage(out_file_path, out_img) ||
-				(write_automask && (!QDir().mkpath(automask_dir) ||
-				!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())))) {
+		assert(!(write_predespeckle_file && predespeckle_img.isNull()));
+		assert(!(write_speckles_file && speckles_img.isNull()));
+
+		bool invalidate_params = false;
+		
+		if (!TiffWriter::writeImage(out_file_path, out_img)) {
+			invalidate_params = true;
+		}
+
+		if (write_automask) {
+			if (!QDir().mkpath(automask_dir)) {
+				invalidate_params = true;
+			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
+				invalidate_params = true;
+			}
+		}
+		if (write_predespeckle_file) {
+			if (!QDir().mkpath(predespeckle_dir)) {
+				invalidate_params = true;
+			} else if (!TiffWriter::writeImage(predespeckle_file_path, predespeckle_img.toQImage())) {
+				invalidate_params = true;
+			}
+		}
+		if (write_speckles_file) {
+			if (!QDir().mkpath(speckles_dir)) {
+				invalidate_params = true;
+			} else if (!TiffWriter::writeImage(speckles_file_path, speckles_img.toQImage())) {
+				invalidate_params = true;
+			}
+		}
+
+		if (invalidate_params) {
 			m_ptrSettings->removeOutputParams(m_pageId);
 		} else {
-			// Note that we can't reuse out_file_info and automask_file_info,
-			// as we've just written a new versions of these files.
+			// Note that we can't reuse *_file_info objects
+			// as we've just overwritten those files.
 			OutputParams const out_params(
 				new_output_image_params,
-				OutputFileParams(QFileInfo(out_file_path)), write_automask ?
-				OutputFileParams(QFileInfo(automask_file_path)) : OutputFileParams(),
+				OutputFileParams(QFileInfo(out_file_path)),
+				write_automask ? OutputFileParams(QFileInfo(automask_file_path))
+				: OutputFileParams(),
+				write_predespeckle_file ? OutputFileParams(QFileInfo(predespeckle_file_path))
+				: OutputFileParams(),
+				write_speckles_file ? OutputFileParams(QFileInfo(speckles_file_path))
+				: OutputFileParams(),
 				new_zones
 			);
 
@@ -240,13 +363,33 @@ Task::process(
 		
 		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);
 	}
-	
+
+	assert(!(need_predespeckle_image && predespeckle_img.isNull()));
+	assert(!(need_speckles_image && speckles_img.isNull()));
+
+	DespeckleVisualization despeckle_visualization;
+	if (m_lastTab == TAB_DESPECKLING) {
+		// Because constructing DespeckleVisualization takes a noticeable
+		// amount of time, we only do it if we are sure we'll need it.
+		// Otherwise it will get constructed on demand.
+		despeckle_visualization = DespeckleVisualization(
+			predespeckle_img, speckles_img, params.outputDpi()
+		);
+
+		// Both speckles and despeckle_visualization will eventually be passed
+		// to DespeckleVisualization constructor.  As its documentation says,
+		// the speckles image is only used of DespeckleVisualization is null,
+		// so there is no point to provide both.
+		speckles_img.release();
+	}
+
 	return FilterResultPtr(
 		new UiUpdater(
-			m_ptrFilter, m_ptrSettings, m_ptrDbg, generator.toOutput(),
-			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
-			m_pageId, data.origImage(), out_img, automask_img,
-			m_batchProcessing
+			m_ptrFilter, m_ptrSettings, m_ptrDbg, params.colorParams(),
+			generator.toOutput(), QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
+			m_pageId, data.origImage(), out_img, automask_img, predespeckle_img,
+			speckles_img, params.outputDpi(), despeckle_visualization,
+			params.despeckleLevel(), m_batchProcessing, m_debug
 		)
 	);
 }
@@ -258,16 +401,23 @@ Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	std::auto_ptr<DebugImages> dbg_img,
+	ColorParams const& color_params,
 	QTransform const& image_to_virt,
 	QPolygonF const& virt_display_area,
 	PageId const& page_id,
 	QImage const& orig_image,
 	QImage const& output_image,
 	BinaryImage const& picture_mask,
-	bool const batch)
+	BinaryImage const& pre_despeckle_image,
+	BinaryImage const& speckles_image,
+	Dpi const& output_dpi,
+	DespeckleVisualization const& despeckle_visualization,
+	DespeckleLevel const despeckle_level,
+	bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrDbg(dbg_img),
+	m_colorParams(color_params),
 	m_imageToVirt(image_to_virt),
 	m_virtDisplayArea(virt_display_area),
 	m_pageId(page_id),
@@ -276,7 +426,13 @@ Task::UiUpdater::UiUpdater(
 	m_outputImage(output_image),
 	m_downscaledOutputImage(ImageView::createDownscaledImage(output_image)),
 	m_pictureMask(picture_mask),
-	m_batchProcessing(batch)
+	m_preDespeckleImage(pre_despeckle_image),
+	m_specklesImage(speckles_image),
+	m_outputDpi(output_dpi),
+	m_despeckleVisualization(despeckle_visualization),
+	m_despeckleLevel(despeckle_level),
+	m_batchProcessing(batch),
+	m_debug(debug)
 {
 }
 
@@ -314,14 +470,36 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		);
 	}
 
-	std::auto_ptr<QTabWidget> tab_widget(new QTabWidget);
+	std::auto_ptr<QWidget> despeckle_view;
+	if (m_colorParams.colorMode() == ColorParams::COLOR_GRAYSCALE) {
+		despeckle_view.reset(
+			new ErrorWidget(tr("Despeckling can't be done in Color / Grayscale mode."))
+		);
+	} else {
+		despeckle_view.reset(
+			new DespeckleView(
+				m_preDespeckleImage, m_specklesImage,
+				m_outputDpi, m_despeckleVisualization,
+				m_despeckleLevel, m_debug
+			)
+		);
+		QObject::connect(
+			opt_widget, SIGNAL(despeckleLevelChanged(DespeckleLevel, bool*)),
+			despeckle_view.get(), SLOT(despeckleLevelChanged(DespeckleLevel, bool*))
+		);
+	}
+
+	std::auto_ptr<TabbedImageView> tab_widget(new TabbedImageView);
+	tab_widget->setDocumentMode(true);
 	tab_widget->setTabPosition(QTabWidget::East);
-	tab_widget->addTab(image_view.release(), tr("Output"));
-	tab_widget->addTab(zone_editor.release(), tr("Picture Zones"));
+	tab_widget->addTab(image_view.release(), tr("Output"), TAB_OUTPUT);
+	tab_widget->addTab(zone_editor.release(), tr("Picture Zones"), TAB_PICTURE_ZONES);
+	tab_widget->addTab(despeckle_view.release(), tr("Despeckling"), TAB_DESPECKLING);
+	tab_widget->setCurrentTab(opt_widget->lastTab());
 
 	QObject::connect(
-		tab_widget.get(), SIGNAL(currentChanged(int)),
-		opt_widget, SLOT(reloadIfZonesChanged())
+		tab_widget.get(), SIGNAL(tabChanged(ImageViewTab)),
+		opt_widget, SLOT(tabChanged(ImageViewTab))
 	);
 
 	ui->setImageWidget(tab_widget.release(), ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());

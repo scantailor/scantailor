@@ -22,12 +22,13 @@
 #include "ImageViewBase.h"
 #include "DragHandler.h"
 #include "ZoomHandler.h"
+#include <QImage>
 
 class BasicImageView : public ImageViewBase
 {
 	Q_OBJECT
 public:
-	BasicImageView(QImage const& image);
+	BasicImageView(QImage const& image, QImage const& downscaled_image = QImage());
 	
 	virtual ~BasicImageView();
 private:

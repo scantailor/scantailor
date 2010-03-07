@@ -12,6 +12,8 @@ SET(
 	ApplyColorsDialog.cpp ApplyColorsDialog.h
 	ChangeDpiDialog.cpp ChangeDpiDialog.h
 	ImageView.cpp ImageView.h
+	ImageViewTab.h
+	TabbedImageView.cpp TabbedImageView.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
 	Task.cpp Task.h
@@ -33,6 +35,9 @@ SET(
 	PictureZoneEditor.cpp PictureZoneEditor.h
 	ZonePropFactory.cpp ZonePropFactory.h
 	ZonePropertiesDialog.cpp ZonePropertiesDialog.h
+	DespeckleView.cpp DespeckleView.h
+	DespeckleVisualization.cpp DespeckleVisualization.h
+	DespeckleLevel.cpp DespeckleLevel.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

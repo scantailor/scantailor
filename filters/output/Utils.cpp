@@ -56,6 +56,18 @@ Utils::automaskDir(QString const& out_dir)
 	return QDir(out_dir).absoluteFilePath("cache/automask");
 }
 
+QString
+Utils::predespeckleDir(QString const& out_dir)
+{
+	return QDir(out_dir).absoluteFilePath("cache/predespeckle");
+}
+
+QString
+Utils::specklesDir(QString const& out_dir)
+{
+	return QDir(out_dir).absoluteFilePath("cache/speckles");
+}
+
 QTransform
 Utils::scaleFromToDpi(Dpi const& from, Dpi const& to)
 {

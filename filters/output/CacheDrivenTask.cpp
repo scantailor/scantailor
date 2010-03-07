@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,10 @@
 */
 
 #include "CacheDrivenTask.h"
+#include "OutputGenerator.h"
+#include "PictureZoneComparator.h"
 #include "Settings.h"
+#include "Params.h"
 #include "Thumbnail.h"
 #include "IncompleteThumbnail.h"
 #include "ImageTransformation.h"
@@ -29,7 +32,7 @@
 #include "../page_layout/Utils.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
-#include <QFile>
+#include <QFileInfo>
 #include <QRect>
 #include <QRectF>
 #include <QTransform>
@@ -57,11 +60,58 @@ CacheDrivenTask::process(
 {
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 		
-		QString const out_path(
+		QString const out_file_path(
 			Utils::outFilePath(page_info.id(), page_num, m_outDir)
 		);
-		
-		if (!QFile::exists(out_path)) {
+
+		bool need_reprocess = false;
+
+		do { // Just to be able to break from it.
+
+			std::auto_ptr<OutputParams> stored_output_params(
+				m_ptrSettings->getOutputParams(page_info.id())
+			);
+
+			if (!stored_output_params.get()) {
+				need_reprocess = true;
+				break;
+			}
+			
+			Params const params(m_ptrSettings->getParams(page_info.id()));
+			OutputGenerator const generator(
+				params.outputDpi(), params.colorParams(), params.despeckleLevel(),
+				xform, content_rect_phys, page_rect_phys
+			);
+			OutputImageParams const new_output_image_params(
+				generator.outputImageSize(), generator.outputContentRect(),
+				xform, params.outputDpi(), params.colorParams(), params.despeckleLevel()
+			);
+
+			if (!stored_output_params->outputImageParams().matches(new_output_image_params)) {
+				need_reprocess = true;
+				break;
+			}
+
+			ZoneSet const new_zones(m_ptrSettings->zonesForPage(page_info.id()));
+			if (!PictureZoneComparator::equal(stored_output_params->zones(), new_zones)) {
+				need_reprocess = true;
+				break;
+			}
+			
+			QFileInfo const out_file_info(out_file_path);
+
+			if (!out_file_info.exists()) {
+				need_reprocess = true;
+				break;
+			}
+			
+			if (!stored_output_params->outputFileParams().matches(OutputFileParams(out_file_info))) {
+				need_reprocess = true;
+				break;
+			}
+		} while (false);
+
+		if (need_reprocess) {
 			ImageTransformation const new_xform(
 				page_layout::Utils::calcPresentationTransform(
 					xform, page_rect_phys
@@ -98,7 +148,7 @@ CacheDrivenTask::process(
 					new Thumbnail(
 						thumb_col->thumbnailCache(),
 						thumb_col->maxLogicalThumbSize(),
-						ImageId(out_path), out_xform
+						ImageId(out_file_path), out_xform
 					)
 				)
 			);

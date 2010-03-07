@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@ namespace output
 {
 
 Settings::Settings()
-:	m_defaultDpi(600, 600)
+:	m_defaultDpi(600, 600),
+	m_defaultDespeckleLevel(DESPECKLE_NORMAL)
 {
 	m_defaultZoneProps.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
 }
@@ -52,7 +53,10 @@ Settings::getParams(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
 	
-	return Params(getDpiLocked(page_id), getColorParamsLocked(page_id));
+	return Params(
+		getDpiLocked(page_id), getColorParamsLocked(page_id),
+		getDespeckleLevelLocked(page_id)
+	);
 }
 
 void
@@ -60,7 +64,7 @@ Settings::setParams(PageId const& page_id, Params const& params)
 {
 	QMutexLocker const locker(&m_mutex);
 	
-	setDpiLocked(page_id, params.dpi());
+	setDpiLocked(page_id, params.outputDpi());
 	setColorParamsLocked(page_id, params.colorParams());
 }
 
@@ -142,6 +146,46 @@ Settings::setDpiForAllPages(Dpi const& dpi)
 	
 	m_defaultDpi = dpi;
 	m_perPageDpi.clear();
+}
+
+DespeckleLevel
+Settings::getDespeckleLevel(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+	return getDespeckleLevelLocked(page_id);
+}
+
+DespeckleLevel
+Settings::getDespeckleLevelLocked(PageId const& page_id) const
+{
+	PerPageDespeckleLevel::const_iterator const it(m_perPageDespeckleLevel.find(page_id));
+	if (it != m_perPageDespeckleLevel.end()) {
+		return it->second;
+	} else {
+		return m_defaultDespeckleLevel;
+	}
+}
+
+void
+Settings::setDespeckleLevel(PageId const& page_id, DespeckleLevel level)
+{
+	QMutexLocker const locker(&m_mutex);
+	setDespeckleLevelLocked(page_id, level);
+}
+
+void
+Settings::setDespeckleLevelLocked(PageId const& page_id, DespeckleLevel level)
+{
+	Utils::mapSetValue(m_perPageDespeckleLevel, page_id, level);
+}
+
+void
+Settings::setDespeckleLevelForAllPages(DespeckleLevel level)
+{
+	QMutexLocker const locker(&m_mutex);
+	
+	m_defaultDespeckleLevel = level;
+	m_perPageDespeckleLevel.clear();
 }
 
 std::auto_ptr<OutputParams>

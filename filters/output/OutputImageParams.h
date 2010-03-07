@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "DespeckleLevel.h"
 #include <QSize>
 #include <QRect>
 
@@ -38,11 +39,14 @@ namespace output
 class OutputImageParams
 {
 public:
-	OutputImageParams(QSize const& out_image_size, QRect const& content_rect,
-		ImageTransformation const& xform,
-		Dpi const& dpi, ColorParams const& color_params);
+	OutputImageParams(QSize const& out_image_size,
+		QRect const& content_rect, ImageTransformation const& xform,
+		Dpi const& dpi, ColorParams const& color_params,
+		DespeckleLevel const despeckle_level);
 	
 	explicit OutputImageParams(QDomElement const& el);
+
+	DespeckleLevel despeckleLevel() const { return m_despeckleLevel; }
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
@@ -71,7 +75,9 @@ private:
 		double m_22;
 	};
 	
-	static bool colorParamsMatch(ColorParams const& cp1, ColorParams const& cp2);
+	static bool colorParamsMatch(
+		ColorParams const& cp1, DespeckleLevel dl1,
+		ColorParams const& cp2, DespeckleLevel dl2);
 	
 	/** Pixel size of the output image. */
 	QSize m_size;
@@ -91,6 +97,9 @@ private:
 	
 	/** Non-geometric parameters used to generate the output image. */
 	ColorParams m_colorParams;
+
+	/** Despeckle level of the output image. */
+	DespeckleLevel m_despeckleLevel;
 };
 
 } // namespace output

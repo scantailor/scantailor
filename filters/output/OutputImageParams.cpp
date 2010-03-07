@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@ namespace output
 OutputImageParams::OutputImageParams(
 	QSize const& out_image_size, QRect const& content_rect,
 	ImageTransformation const& xform,
-	Dpi const& dpi, ColorParams const& color_params)
+	Dpi const& dpi, ColorParams const& color_params,
+	DespeckleLevel const despeckle_level)
 :	m_size(out_image_size),
 	m_contentRect(content_rect),
 	m_partialXform(xform.transform()),
 	m_dpi(dpi),
-	m_colorParams(color_params)
+	m_colorParams(color_params),
+	m_despeckleLevel(despeckle_level)
 {
 }
 
@@ -45,7 +47,8 @@ OutputImageParams::OutputImageParams(QDomElement const& el)
 	m_contentRect(XmlUnmarshaller::rect(el.namedItem("content-rect").toElement())),
 	m_partialXform(el.namedItem("partial-xform").toElement()),
 	m_dpi(XmlUnmarshaller::dpi(el.namedItem("dpi").toElement())),
-	m_colorParams(el.namedItem("color-params").toElement())
+	m_colorParams(el.namedItem("color-params").toElement()),
+	m_despeckleLevel(despeckleLevelFromString(el.attribute("despeckleLevel")))
 {
 }
 
@@ -60,6 +63,7 @@ OutputImageParams::toXml(QDomDocument& doc, QString const& name) const
 	el.appendChild(m_partialXform.toXml(doc, "partial-xform"));
 	el.appendChild(marshaller.dpi(m_dpi, "dpi"));
 	el.appendChild(m_colorParams.toXml(doc, "color-params"));
+	el.setAttribute("despeckleLevel", despeckleLevelToString(m_despeckleLevel));
 	
 	return el;
 }
@@ -83,7 +87,8 @@ OutputImageParams::matches(OutputImageParams const& other) const
 		return false;
 	}
 	
-	if (!colorParamsMatch(m_colorParams, other.m_colorParams)) {
+	if (!colorParamsMatch(m_colorParams, m_despeckleLevel,
+			other.m_colorParams, other.m_despeckleLevel)) {
 		return false;
 	}
 	
@@ -91,7 +96,9 @@ OutputImageParams::matches(OutputImageParams const& other) const
 }
 
 bool
-OutputImageParams::colorParamsMatch(ColorParams const& cp1, ColorParams const& cp2)
+OutputImageParams::colorParamsMatch(
+	ColorParams const& cp1, DespeckleLevel const dl1,
+	ColorParams const& cp2, DespeckleLevel const dl2)
 {
 	if (cp1.colorMode() != cp2.colorMode()) {
 		return false;
@@ -111,6 +118,9 @@ OutputImageParams::colorParamsMatch(ColorParams const& cp1, ColorParams const& c
 		case ColorParams::BLACK_AND_WHITE:
 		case ColorParams::MIXED:
 			if (cp1.blackWhiteOptions() != cp2.blackWhiteOptions()) {
+				return false;
+			}
+			if (dl1 != dl2) {
 				return false;
 			}
 			break;

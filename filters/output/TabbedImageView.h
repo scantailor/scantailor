@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,21 +16,33 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "BasicImageView.h.moc"
-#include "ImageTransformation.h"
-#include "ImagePresentation.h"
-#include "Dpm.h"
-#include "Dpi.h"
+#ifndef OUTPUT_TABBED_IMAGE_VIEW_H_
+#define OUTPUT_TABBED_IMAGE_VIEW_H_
 
-BasicImageView::BasicImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(image, downscaled_image, ImagePresentation(QTransform(), QRectF(image.rect()))),
-	m_dragHandler(*this),
-	m_zoomHandler(*this)
-{
-	rootInteractionHandler().makeLastFollower(m_dragHandler);
-	rootInteractionHandler().makeLastFollower(m_zoomHandler);
-}
+#include "ImageViewTab.h"
+#include <QTabWidget>
+#include <map>
 
-BasicImageView::~BasicImageView()
+namespace output
 {
-}
+
+class TabbedImageView : public QTabWidget
+{
+	Q_OBJECT
+public:
+	TabbedImageView(QWidget* parent = 0);
+
+	void addTab(QWidget* widget, QString const& label, ImageViewTab tab);
+public slots:
+	void setCurrentTab(ImageViewTab tab);
+signals:
+	void tabChanged(ImageViewTab tab);
+private slots:
+	void tabChangedSlot(int idx);
+private:
+	std::map<QWidget*, ImageViewTab> m_registry;
+};
+
+} // namespace output
+
+#endif

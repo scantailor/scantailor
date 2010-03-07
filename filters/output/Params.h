@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "DespeckleLevel.h"
 
 class QDomDocument;
 class QDomElement;
@@ -31,14 +32,16 @@ namespace output
 class Params
 {
 public:
-	Params(Dpi const& dpi, ColorParams const& color_params)
-	: m_dpi(dpi), m_colorParams(color_params) {}
+	Params(Dpi const& output_dpi, ColorParams const& color_params,
+		DespeckleLevel despeckle_level);
 	
 	Params(QDomElement const& el);
 	
-	Dpi const& dpi() const { return m_dpi; }
+	Dpi const& outputDpi() const { return m_dpi; }
 	
 	ColorParams const& colorParams() const { return m_colorParams; }
+
+	DespeckleLevel despeckleLevel() const { return m_despeckleLevel; }
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
@@ -48,6 +51,7 @@ private:
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
+	DespeckleLevel m_despeckleLevel;
 };
 
 } // namespace output

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include "imageproc/Connectivity.h"
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "DespeckleLevel.h"
 #include <QSize>
 #include <QRect>
 #include <QTransform>
@@ -52,13 +53,16 @@ class OutputGenerator
 public:
 	OutputGenerator(
 		Dpi const& dpi, ColorParams const& color_params,
+		DespeckleLevel despeckle_level,
 		ImageTransformation const& pre_xform,
 		QPolygonF const& content_rect_phys,
 		QPolygonF const& page_rect_phys);
 	
 	QImage process(
 		TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-		imageproc::BinaryImage* auto_picture_mask = 0, DebugImages* dbg = 0) const;
+		imageproc::BinaryImage* auto_picture_mask = 0,
+		imageproc::BinaryImage* predespeckle_image = 0,
+		imageproc::BinaryImage* speckles_image = 0, DebugImages* dbg = 0) const;
 	
 	/**
 	 * Returns the transformation from original to output image coordinates.
@@ -77,7 +81,9 @@ private:
 	
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-		imageproc::BinaryImage* auto_picture_mask = 0, DebugImages* dbg = 0) const;
+		imageproc::BinaryImage* auto_picture_mask = 0,
+		imageproc::BinaryImage* predespeckle_image = 0,
+		imageproc::BinaryImage* speckles_image = 0, DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
 	
@@ -111,8 +117,10 @@ private:
 		QImage const& image, QPolygonF const& crop_area,
 		imageproc::BinaryImage const* mask = 0) const;
 	
-	void despeckleInPlace(
+	void maybeDespeckleInPlace(
 		imageproc::BinaryImage& image, QRect const& target_rect,
+		DespeckleLevel level, imageproc::BinaryImage* predespeckle_img,
+		imageproc::BinaryImage* speckles_img,
 		Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const;
 
 	static QImage smoothToGrayscale(QImage const& src, Dpi const& dpi);
@@ -172,6 +180,8 @@ private:
 	 * in m_toUncropped coordinates.
 	 */
 	QRect m_fullPageRect;
+
+	DespeckleLevel m_despeckleLevel;
 };
 
 } // namespace output

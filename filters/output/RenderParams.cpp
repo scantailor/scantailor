@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #include "RenderParams.h"
 #include "ColorParams.h"
 #include "ColorGrayscaleOptions.h"
+#include "DespeckleLevel.h"
 
 namespace output
 {
@@ -30,9 +31,6 @@ RenderParams::RenderParams(ColorParams const& cp)
 		case ColorParams::BLACK_AND_WHITE:
 			m_mask |= WHITE_MARGINS|NORMALIZE_ILLUMINATION
 					|NEED_BINARIZATION;
-			if (cp.blackWhiteOptions().despeckle()) {
-				m_mask |= DESPECKLE;
-			}
 			if (cp.blackWhiteOptions().dewarp()) {
 				m_mask |= DEWARP;
 			}
@@ -52,9 +50,6 @@ RenderParams::RenderParams(ColorParams const& cp)
 		case ColorParams::MIXED:
 			m_mask |= WHITE_MARGINS|NORMALIZE_ILLUMINATION
 					|NEED_BINARIZATION|MIXED_OUTPUT;
-			if (cp.blackWhiteOptions().despeckle()) {
-				m_mask |= DESPECKLE;
-			}
 			break;
 	}
 }

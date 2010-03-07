@@ -28,10 +28,14 @@ OutputParams::OutputParams(
 	OutputImageParams const& output_image_params,
 	OutputFileParams const& output_file_params,
 	OutputFileParams const& automask_file_params,
+	OutputFileParams const& predespeckle_file_params,
+	OutputFileParams const& speckles_file_params,
 	ZoneSet const& zones)
 :	m_outputImageParams(output_image_params),
 	m_outputFileParams(output_file_params),
 	m_automaskFileParams(automask_file_params),
+	m_predespeckleFileParams(predespeckle_file_params),
+	m_specklesFileParams(speckles_file_params),
 	m_zones(zones)
 {
 }
@@ -40,6 +44,8 @@ OutputParams::OutputParams(QDomElement const& el)
 :	m_outputImageParams(el.namedItem("image").toElement()),
 	m_outputFileParams(el.namedItem("file").toElement()),
 	m_automaskFileParams(el.namedItem("automask").toElement()),
+	m_predespeckleFileParams(el.namedItem("predespeckle").toElement()),
+	m_specklesFileParams(el.namedItem("speckles").toElement()),
 	m_zones(el.namedItem("zones").toElement(), ZonePropFactory())
 {
 }
@@ -51,6 +57,8 @@ OutputParams::toXml(QDomDocument& doc, QString const& name) const
 	el.appendChild(m_outputImageParams.toXml(doc, "image"));
 	el.appendChild(m_outputFileParams.toXml(doc, "file"));
 	el.appendChild(m_automaskFileParams.toXml(doc, "automask"));
+	el.appendChild(m_predespeckleFileParams.toXml(doc, "predespeckle"));
+	el.appendChild(m_specklesFileParams.toXml(doc, "speckles"));
 	el.appendChild(m_zones.toXml(doc, "zones"));
 	return el;
 }

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,10 @@ public:
 		PageId const& page_id, int page_num, QString const& out_dir);
 
 	static QString automaskDir(QString const& out_dir);
+
+	static QString predespeckleDir(QString const& out_dir);
+
+	static QString specklesDir(QString const& out_dir);
 	
 	static QTransform scaleFromToDpi(Dpi const& from, Dpi const& to);
 };
