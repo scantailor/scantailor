@@ -127,7 +127,7 @@
 <context>
     <name>ImageViewBase</name>
     <message>
-        <source>Use the mouse wheel to zoom.  When zoomed, dragging is possible.</source>
+        <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

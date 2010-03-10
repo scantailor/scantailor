@@ -20,6 +20,7 @@
 #include "InteractionState.h"
 #include "ImageViewBase.h"
 #include <QWheelEvent>
+#include <QKeyEvent>
 #include <QRectF>
 #include <math.h>
 
@@ -51,6 +52,7 @@ ZoomHandler::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
 
 	double const degrees = event->delta() / 8.0;
 	m_zoom *= pow(2.0, degrees / 60.0); // 2 times zoom for every 60 degrees
+
 	if (m_zoom < 1.0) {
 		m_zoom = 1.0;
 	}
@@ -67,3 +69,28 @@ ZoomHandler::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
 	m_rImageView.setWidgetFocalPointWithoutMoving(focus_point);
 	m_rImageView.zoom(m_zoom); // this will call update()
 }
+
+void
+ZoomHandler::onKeyPressEvent(QKeyEvent* event, InteractionState& interaction)
+{	
+	if (!m_interactionPermitter(interaction)) {
+		return;
+	}
+
+	switch (event->key()) {
+		case Qt::Key_Plus:
+			m_zoom *= 1.12246205; // == 2^( 1/6);
+			break;
+		case Qt::Key_Minus:
+			m_zoom *= 0.89089872; // == 2^(-1/6);
+			break;
+		default:
+			return;
+	}
+
+	QPointF focus_point = QRectF(m_rImageView.rect()).center();
+
+	m_rImageView.setWidgetFocalPointWithoutMoving(focus_point);
+	m_rImageView.zoom(m_zoom); // this will call update()
+}
+

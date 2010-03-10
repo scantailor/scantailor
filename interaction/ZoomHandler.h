@@ -43,6 +43,7 @@ public:
 	void setFocus(Focus focus) { m_focus = focus; }
 protected:
 	virtual void onWheelEvent(QWheelEvent* event, InteractionState& interaction);
+	virtual void onKeyPressEvent(QKeyEvent* event, InteractionState& interaction);
 private:
 	ImageViewBase& m_rImageView;
 	boost::function<bool(InteractionState const&)> m_interactionPermitter;
