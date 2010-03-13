@@ -488,7 +488,7 @@ OutputGenerator::processImpl(
 	
 	status.throwIfCancelled();
 	
-	if (render_params.binaryOutput()) {
+	if (render_params.binaryOutput() || m_cropRect.isEmpty()) {
 		BinaryImage dst(m_cropRect.size().expandedTo(QSize(1, 1)), WHITE);
 		
 		if (!m_contentRect.isEmpty()) {
@@ -524,6 +524,17 @@ OutputGenerator::processImpl(
 				if (dbg) {
 					dbg->add(dst, "undistorted");
 				}
+			}
+		} else if (predespeckle_image || speckles_image) {
+			// If m_contentRect is empty, we can skip despeckling and stuff,
+			// but we still have to write pre-despeckle and speckles images
+			// if instructed to do so.
+			BinaryImage white_image(dst.size(), WHITE);
+			if (predespeckle_image) {
+				*predespeckle_image = white_image;
+			}
+			if (speckles_image) {
+				*speckles_image = white_image;
 			}
 		}
 		
