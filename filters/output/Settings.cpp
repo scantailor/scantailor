@@ -66,6 +66,7 @@ Settings::setParams(PageId const& page_id, Params const& params)
 	
 	setDpiLocked(page_id, params.outputDpi());
 	setColorParamsLocked(page_id, params.colorParams());
+	setDespeckleLevelLocked(page_id, params.despeckleLevel());
 }
 
 ColorParams
