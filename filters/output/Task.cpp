@@ -34,6 +34,7 @@
 #include "TabbedImageView.h"
 #include "PictureZoneComparator.h"
 #include "PictureZoneEditor.h"
+#include "DespeckleState.h"
 #include "DespeckleView.h"
 #include "DespeckleVisualization.h"
 #include "DespeckleLevel.h"
@@ -78,9 +79,9 @@ public:
 		QImage const& orig_image,
 		QImage const& output_image,
 		BinaryImage const& picture_mask,
-		BinaryImage const& pre_despeckle_image,
 		BinaryImage const& speckles_image,
 		Dpi const& output_dpi,
+		DespeckleState const& despeckle_state,
 		DespeckleVisualization const& despeckle_visualization,
 		DespeckleLevel despeckle_level,
 		bool batch, bool debug);
@@ -101,9 +102,9 @@ private:
 	QImage m_outputImage;
 	QImage m_downscaledOutputImage;
 	BinaryImage m_pictureMask;
-	BinaryImage m_preDespeckleImage;
 	BinaryImage m_specklesImage;
 	Dpi m_outputDpi;
+	DespeckleState m_despeckleState;
 	DespeckleVisualization m_despeckleVisualization;
 	DespeckleLevel m_despeckleLevel;
 	bool m_batchProcessing;
@@ -154,12 +155,6 @@ Task::process(
 	);
 	QFileInfo automask_file_info(automask_file_path);
 
-	QString const predespeckle_dir(Utils::predespeckleDir(m_outDir));
-	QString const predespeckle_file_path(
-		QDir(predespeckle_dir).absoluteFilePath(out_file_info.fileName())
-	);
-	QFileInfo predespeckle_file_info(predespeckle_file_path);
-
 	QString const speckles_dir(Utils::specklesDir(m_outDir));
 	QString const speckles_file_path(
 		QDir(speckles_dir).absoluteFilePath(out_file_info.fileName())
@@ -167,9 +162,8 @@ Task::process(
 	QFileInfo speckles_file_info(speckles_file_path);
 
 	bool const need_picture_editor = render_params.mixedOutput() && !m_batchProcessing;
-	bool const need_predespeckle_image =
-		params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
-	bool const need_speckles_image = need_predespeckle_image && params.despeckleLevel() != DESPECKLE_OFF;
+	bool const need_speckles_image = params.despeckleLevel() != DESPECKLE_OFF
+		&& params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
 	
 	OutputGenerator const generator(
 		params.outputDpi(), params.colorParams(), params.despeckleLevel(),
@@ -227,17 +221,6 @@ Task::process(
 			}
 		}
 
-		if (need_predespeckle_image) {
-			if (!predespeckle_file_info.exists()) {
-				need_reprocess = true;
-				break;
-			}
-			if (!stored_output_params->predespeckleFileParams().matches(OutputFileParams(predespeckle_file_info))) {
-				need_reprocess = true;
-				break;
-			}
-		}
-
 		if (need_speckles_image) {
 			if (!speckles_file_info.exists()) {
 				need_reprocess = true;
@@ -253,7 +236,6 @@ Task::process(
 	
 	QImage out_img;
 	BinaryImage automask_img;
-	BinaryImage predespeckle_img;
 	BinaryImage speckles_img;
 	
 	if (!need_reprocess) {
@@ -271,14 +253,6 @@ Task::process(
 			need_reprocess = automask_img.isNull() || automask_img.size() != out_img.size();
 		}
 
-		if (need_predespeckle_image && !need_reprocess) {
-			QFile predespeckle_file(predespeckle_file_path);
-			if (predespeckle_file.open(QIODevice::ReadOnly)) {
-				predespeckle_img = BinaryImage(ImageLoader::load(predespeckle_file, 0));
-			}
-			need_reprocess = predespeckle_img.isNull();
-		}
-
 		if (need_speckles_image && !need_reprocess) {
 			QFile speckles_file(speckles_file_path);
 			if (speckles_file.open(QIODevice::ReadOnly)) {
@@ -286,32 +260,24 @@ Task::process(
 			}
 			need_reprocess = speckles_img.isNull();
 		}
-
-		if (need_predespeckle_image && need_speckles_image && !need_reprocess) {
-			need_reprocess = (predespeckle_img.size() != speckles_img.size());
-		}
 	}
 
 	if (need_reprocess) {
 		// Even in batch processing mode we should still write automask, because it
 		// will be needed when we view the results back in interactive mode.
-		// The same applies to pre-despeckle and speckles files.  For pre-despeckle files,
-		// we write them even if despeckling was turned off, as long as it's still
-		// possible in given output mode.
+		// The same applies even more to speckles file, as we need it not only
+		// for visualization purposes, but also for re-doing despeckling at
+		// different levels.
 		bool const write_automask = render_params.mixedOutput();
-		bool const write_predespeckle_file = (params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE);
-		bool const write_speckles_file = write_predespeckle_file && params.despeckleLevel() != DESPECKLE_OFF;
+		bool const write_speckles_file = params.despeckleLevel() != DESPECKLE_OFF &&
+			params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE; 
 
 		out_img = generator.process(
 			status, data, new_zones,
 			write_automask ? &automask_img : 0,
-			write_predespeckle_file ? &predespeckle_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
 		);
-
-		assert(!(write_predespeckle_file && predespeckle_img.isNull()));
-		assert(!(write_speckles_file && speckles_img.isNull()));
 
 		bool invalidate_params = false;
 		
@@ -323,13 +289,6 @@ Task::process(
 			if (!QDir().mkpath(automask_dir)) {
 				invalidate_params = true;
 			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
-				invalidate_params = true;
-			}
-		}
-		if (write_predespeckle_file) {
-			if (!QDir().mkpath(predespeckle_dir)) {
-				invalidate_params = true;
-			} else if (!TiffWriter::writeImage(predespeckle_file_path, predespeckle_img.toQImage())) {
 				invalidate_params = true;
 			}
 		}
@@ -351,8 +310,6 @@ Task::process(
 				OutputFileParams(QFileInfo(out_file_path)),
 				write_automask ? OutputFileParams(QFileInfo(automask_file_path))
 				: OutputFileParams(),
-				write_predespeckle_file ? OutputFileParams(QFileInfo(predespeckle_file_path))
-				: OutputFileParams(),
 				write_speckles_file ? OutputFileParams(QFileInfo(speckles_file_path))
 				: OutputFileParams(),
 				new_zones
@@ -364,16 +321,13 @@ Task::process(
 		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);
 	}
 
-	assert(!(need_predespeckle_image && predespeckle_img.isNull()));
-	assert(!(need_speckles_image && speckles_img.isNull()));
-
 	DespeckleVisualization despeckle_visualization;
 	if (m_lastTab == TAB_DESPECKLING) {
 		// Because constructing DespeckleVisualization takes a noticeable
 		// amount of time, we only do it if we are sure we'll need it.
 		// Otherwise it will get constructed on demand.
 		despeckle_visualization = DespeckleVisualization(
-			predespeckle_img, speckles_img, params.outputDpi()
+			out_img, speckles_img, params.outputDpi()
 		);
 
 		// Both speckles and despeckle_visualization will eventually be passed
@@ -387,8 +341,10 @@ Task::process(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_ptrDbg, params.colorParams(),
 			generator.toOutput(), QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
-			m_pageId, data.origImage(), out_img, automask_img, predespeckle_img,
-			speckles_img, params.outputDpi(), despeckle_visualization,
+			m_pageId, data.origImage(), out_img, automask_img,
+			speckles_img, params.outputDpi(),
+			DespeckleState(out_img, speckles_img, params.despeckleLevel(), params.outputDpi()),
+			despeckle_visualization,
 			params.despeckleLevel(), m_batchProcessing, m_debug
 		)
 	);
@@ -408,9 +364,9 @@ Task::UiUpdater::UiUpdater(
 	QImage const& orig_image,
 	QImage const& output_image,
 	BinaryImage const& picture_mask,
-	BinaryImage const& pre_despeckle_image,
 	BinaryImage const& speckles_image,
 	Dpi const& output_dpi,
+	DespeckleState const& despeckle_state,
 	DespeckleVisualization const& despeckle_visualization,
 	DespeckleLevel const despeckle_level,
 	bool const batch, bool const debug)
@@ -426,9 +382,9 @@ Task::UiUpdater::UiUpdater(
 	m_outputImage(output_image),
 	m_downscaledOutputImage(ImageView::createDownscaledImage(output_image)),
 	m_pictureMask(picture_mask),
-	m_preDespeckleImage(pre_despeckle_image),
 	m_specklesImage(speckles_image),
 	m_outputDpi(output_dpi),
+	m_despeckleState(despeckle_state),
 	m_despeckleVisualization(despeckle_visualization),
 	m_despeckleLevel(despeckle_level),
 	m_batchProcessing(batch),
@@ -478,9 +434,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	} else {
 		despeckle_view.reset(
 			new DespeckleView(
-				m_preDespeckleImage, m_specklesImage,
-				m_outputDpi, m_despeckleVisualization,
-				m_despeckleLevel, m_debug
+				m_despeckleState, m_despeckleVisualization, m_debug
 			)
 		);
 		QObject::connect(

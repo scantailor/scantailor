@@ -48,8 +48,7 @@ public:
 	 * \param dpi Dots-per-inch of both images.
 	 */
 	DespeckleVisualization(
-		imageproc::BinaryImage const& pre_despeckle_image,
-		imageproc::BinaryImage const& speckles, Dpi const& dpi);
+		QImage const& output, imageproc::BinaryImage const& speckles, Dpi const& dpi);
 
 	bool isNull() const { return m_image.isNull(); }
 

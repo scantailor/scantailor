@@ -59,9 +59,8 @@ public:
 		QPolygonF const& page_rect_phys);
 	
 	QImage process(
-		TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-		imageproc::BinaryImage* auto_picture_mask = 0,
-		imageproc::BinaryImage* predespeckle_image = 0,
+		TaskStatus const& status, FilterData const& input,
+		ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0, DebugImages* dbg = 0) const;
 	
 	/**
@@ -80,9 +79,8 @@ private:
 		TaskStatus const& status, DebugImages* dbg = 0) const;
 	
 	QImage processImpl(
-		TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-		imageproc::BinaryImage* auto_picture_mask = 0,
-		imageproc::BinaryImage* predespeckle_image = 0,
+		TaskStatus const& status, FilterData const& input,
+		ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0, DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
@@ -118,8 +116,8 @@ private:
 		imageproc::BinaryImage const* mask = 0) const;
 	
 	void maybeDespeckleInPlace(
-		imageproc::BinaryImage& image, QRect const& target_rect,
-		DespeckleLevel level, imageproc::BinaryImage* predespeckle_img,
+		imageproc::BinaryImage& image, QRect const& image_rect,
+		QRect const& mask_rect, DespeckleLevel level,
 		imageproc::BinaryImage* speckles_img,
 		Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const;
 

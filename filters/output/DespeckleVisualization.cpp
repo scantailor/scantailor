@@ -30,15 +30,14 @@ namespace output
 {
 
 DespeckleVisualization::DespeckleVisualization(
-	imageproc::BinaryImage const& pre_despeckle_image,
-	imageproc::BinaryImage const& speckles, Dpi const& dpi)
+	QImage const& output, imageproc::BinaryImage const& speckles, Dpi const& dpi)
 {
-	if (pre_despeckle_image.isNull()) {
+	if (output.isNull()) {
 		// This can happen in batch processing mode.
 		return;
 	}
 
-	m_image = pre_despeckle_image.toQImage().convertToFormat(QImage::Format_RGB32);
+	m_image = output.convertToFormat(QImage::Format_RGB32);
 
 	if (!speckles.isNull()) {
 		colorizeSpeckles(m_image, speckles, dpi);
@@ -79,16 +78,13 @@ DespeckleVisualization::colorizeSpeckles(
 			float const scale = alpha_upper_bound / sq_radius;
 			float const alpha = alpha_upper_bound - scale * sq_dist;
 			if (alpha > 0) {
+				float const alpha2 = 1.0f - alpha;
 				float const overlay_r = 255;
 				float const overlay_g = 0;
 				float const overlay_b = 0;
-				
-				// We know background is white, that's where 255 comes from.
-				float const bg = 255 * (1.0f - alpha);
-
-				float const r = overlay_r * alpha + bg;
-				float const g = overlay_g * alpha + bg;
-				float const b = overlay_b * alpha + bg;
+				float const r = overlay_r * alpha + qRed(image_line[x]) * alpha2;
+				float const g = overlay_g * alpha + qGreen(image_line[x]) * alpha2;
+				float const b = overlay_b * alpha + qBlue(image_line[x]) * alpha2;
 				image_line[x] = qRgb(int(r), int(g), int(b));
 			}
 		}

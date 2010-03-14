@@ -120,16 +120,12 @@ OutputGenerator::toOutput() const
 
 QImage
 OutputGenerator::process(
-	TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-	imageproc::BinaryImage* auto_picture_mask,
-	imageproc::BinaryImage* predespeckle_image,
+	TaskStatus const& status, FilterData const& input,
+	ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image, DebugImages* const dbg) const
 {
 	QImage image(
-		processImpl(
-			status, input, zones, auto_picture_mask,
-			predespeckle_image, speckles_image, dbg
-		)
+		processImpl(status, input, zones, auto_picture_mask, speckles_image, dbg)
 	);
 	assert(!image.isNull());
 	
@@ -445,9 +441,8 @@ OutputGenerator::modifyBinarizationMask(
 
 QImage
 OutputGenerator::processImpl(
-	TaskStatus const& status, FilterData const& input, ZoneSet const& zones,
-	imageproc::BinaryImage* auto_picture_mask,
-	imageproc::BinaryImage* predespeckle_image,
+	TaskStatus const& status, FilterData const& input,
+	ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image, DebugImages* const dbg) const
 {
 	RenderParams const render_params(m_colorParams);
@@ -529,7 +524,7 @@ OutputGenerator::processImpl(
 	
 	status.throwIfCancelled();
 	
-	if (render_params.binaryOutput()) {
+	if (render_params.binaryOutput() || m_cropRect.isEmpty()) {
 		BinaryImage dst(m_cropRect.size().expandedTo(QSize(1, 1)), WHITE);
 		
 		if (!m_contentRect.isEmpty()) {
@@ -542,23 +537,17 @@ OutputGenerator::processImpl(
 			
 			status.throwIfCancelled();
 			
-			maybeDespeckleInPlace(
-				bw_content, normalize_illumination_rect, m_despeckleLevel,
-				predespeckle_image, speckles_image, m_dpi, status, dbg
-			);
-			
-			status.throwIfCancelled();
-			
 			morphologicalSmoothInPlace(bw_content, status);
 			if (dbg) {
 				dbg->add(bw_content, "edges_smoothed");
 			}
-			
+
 			status.throwIfCancelled();
 			
 			QRect const src_rect(m_contentRect.translated(-normalize_illumination_rect.topLeft()));
 			QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
 			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_rect.topLeft());
+			bw_content.release(); // Save memory.
 
 			if (render_params.dewarp()) {
 				dst = undistort(dst, status, dbg);
@@ -566,6 +555,17 @@ OutputGenerator::processImpl(
 					dbg->add(dst, "undistorted");
 				}
 			}
+
+			status.throwIfCancelled();
+			
+			// It's important to keep despeckling the very last operation
+			// affecting the binary part of the output. That's because
+			// we will be reconstructing the input to this despeckling
+			// operation from the final output file.
+			maybeDespeckleInPlace(
+				dst, m_cropRect, m_cropRect, m_despeckleLevel,
+				speckles_image, m_dpi, status, dbg
+			);
 		}
 		
 		return dst.toQImage();
@@ -640,17 +640,27 @@ OutputGenerator::processImpl(
 		
 		status.throwIfCancelled();
 		
-		maybeDespeckleInPlace(
-			bw_content, small_margins_rect, m_despeckleLevel,
-			predespeckle_image, speckles_image, m_dpi, status, dbg
-		);
-		
-		status.throwIfCancelled();
-		
 		morphologicalSmoothInPlace(bw_content, status);
 		if (dbg) {
 			dbg->add(bw_content, "edges_smoothed");
 		}
+
+		status.throwIfCancelled();
+		
+		// We don't want speckles in non-B/W areas, as they would
+		// then get visualized on the Despeckling tab.
+		rasterOp<RopAnd<RopSrc, RopDst> >(bw_content, bw_mask);
+
+		status.throwIfCancelled();
+
+		// It's important to keep despeckling the very last operation
+		// affecting the binary part of the output. That's because
+		// we will be reconstructing the input to this despeckling
+		// operation from the final output file.
+		maybeDespeckleInPlace(
+			bw_content, small_margins_rect, m_contentRect,
+			m_despeckleLevel, speckles_image, m_dpi, status, dbg
+		);
 		
 		status.throwIfCancelled();
 		
@@ -855,16 +865,18 @@ OutputGenerator::binarize(QImage const& image,
  * Both the size and the distance to other components are taken into account.
  *
  * \param[in,out] image The image to despeckle.
- * \param target_rect The image rectangle in the same coordinate system where
- *        m_contentRect and m_cropRect are defined.
- * \param pre_despeckle_img If provided, the image before despeckling will be
- *        written there.  \p predespeckle_img and \p speckles_img will
- *        likely have different size than that of \p image, namely m_cropRect.size().
- *        Only the content area defined by m_contentRect will be copied from
- *        \p image.  The rest of \p predespeckle_img and \p speckles_img
- *        will be filled with white.
+ * \param image_rect The rectangle corresponding to \p image in the same
+ *        coordinate system where m_contentRect and m_cropRect are defined.
+ * \param mask_rect The area within the image to consider.  Defined not
+ *        relative to \p image, but in the same coordinate system where
+ *        m_contentRect and m_cropRect are defined.  This only affects
+ *        \p speckles_img, if provided.
+ * \param level Despeckling aggressiveness.
  * \param speckles_img If provided, the removed black speckles will be written
- *        there.
+ *        there.  The speckles image is always considered to correspond
+ *        to m_cropRect, so it will have the size of m_cropRect.size().
+ *        Only the area within \p mask_rect will be copied to \p speckles_img.
+ *        The rest will be filled with white.
  * \param dpi The DPI of the input image.  See the note below.
  * \param status Task status.
  * \param dbg An optional sink for debugging images.
@@ -875,23 +887,17 @@ OutputGenerator::binarize(QImage const& image,
 void
 OutputGenerator::maybeDespeckleInPlace(
 	imageproc::BinaryImage& image,
-	QRect const& target_rect, DespeckleLevel const level,
-	imageproc::BinaryImage* predespeckle_img,
-	imageproc::BinaryImage* speckles_img,
+	QRect const& image_rect, QRect const& mask_rect,
+	DespeckleLevel const level, BinaryImage* speckles_img,
 	Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const
 {
-	QRect const src_rect(m_contentRect.translated(-target_rect.topLeft()));
-	QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+	QRect const src_rect(mask_rect.translated(-image_rect.topLeft()));
+	QRect const dst_rect(mask_rect.translated(-m_cropRect.topLeft()));
 
-	BinaryImage predespeckle;
-
-	if (predespeckle_img || speckles_img) {
-		BinaryImage(m_cropRect.size(), WHITE).swap(predespeckle);
-		if (!m_contentRect.isEmpty()) {
-			rasterOp<RopSrc>(predespeckle, dst_rect, image, src_rect.topLeft());
-		}
-		if (predespeckle_img) {
-			*predespeckle_img = predespeckle;
+	if (speckles_img) {
+		BinaryImage(m_cropRect.size(), WHITE).swap(*speckles_img);
+		if (!mask_rect.isEmpty()) {
+			rasterOp<RopSrc>(*speckles_img, dst_rect, image, src_rect.topLeft());
 		}
 	}
 
@@ -918,12 +924,11 @@ OutputGenerator::maybeDespeckleInPlace(
 	}
 
 	if (speckles_img) {
-		if (!m_contentRect.isEmpty()) {
+		if (!mask_rect.isEmpty()) {
 			rasterOp<RopSubtract<RopDst, RopSrc> >(
-				predespeckle, dst_rect, image, src_rect.topLeft()
+				*speckles_img, dst_rect, image, src_rect.topLeft()
 			);
 		}
-		*speckles_img = predespeckle;
 	}
 }
 

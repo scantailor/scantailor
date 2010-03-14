@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -226,7 +226,9 @@ void
 ThumbnailBase::setImageXform(ImageTransformation const& image_xform)
 {
 	m_imageXform = image_xform;
-	QSizeF const unscaled_size(image_xform.resultingRect().size());
+	QSizeF const unscaled_size(
+		image_xform.resultingRect().size().expandedTo(QSizeF(1, 1))
+	);
 	QSizeF scaled_size(unscaled_size);
 	scaled_size.scale(m_maxSize, Qt::KeepAspectRatio);
 	

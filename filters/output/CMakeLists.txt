@@ -35,6 +35,7 @@ SET(
 	PictureZoneEditor.cpp PictureZoneEditor.h
 	ZonePropFactory.cpp ZonePropFactory.h
 	ZonePropertiesDialog.cpp ZonePropertiesDialog.h
+	DespeckleState.cpp DespeckleState.h
 	DespeckleView.cpp DespeckleView.h
 	DespeckleVisualization.cpp DespeckleVisualization.h
 	DespeckleLevel.cpp DespeckleLevel.h
