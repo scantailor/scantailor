@@ -36,7 +36,6 @@ public:
 	OutputParams(OutputImageParams const& output_image_params,
 		OutputFileParams const& output_file_params,
 		OutputFileParams const& automask_file_params,
-		OutputFileParams const& predespeckle_file_params,
 		OutputFileParams const& speckles_file_params,
 		ZoneSet const& zones);
 	
@@ -50,8 +49,6 @@ public:
 
 	OutputFileParams const& automaskFileParams() const { return m_automaskFileParams; }
 
-	OutputFileParams const& predespeckleFileParams() const { return m_predespeckleFileParams; }
-
 	OutputFileParams const& specklesFileParams() const { return m_specklesFileParams; }
 
 	ZoneSet const& zones() const { return m_zones; }
@@ -59,7 +56,6 @@ private:
 	OutputImageParams m_outputImageParams;
 	OutputFileParams m_outputFileParams;
 	OutputFileParams m_automaskFileParams;
-	OutputFileParams m_predespeckleFileParams;
 	OutputFileParams m_specklesFileParams;
 	ZoneSet m_zones;
 };
