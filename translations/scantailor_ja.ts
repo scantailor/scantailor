@@ -127,8 +127,8 @@
     <context>
         <name>ImageViewBase</name>
         <message>
-            <source>Use the mouse wheel to zoom.  When zoomed, dragging is possible.</source>
-            <translation>マウスホイールでズームできます。ズームしている場合、ドラッグできます。</translation>
+            <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
+            <translation>マウスホイールまたは +/- キーでズームできます。ズームしている場合、ドラッグで画像を動かせます。</translation>
         </message>
     </context>
     <context>
@@ -189,7 +189,7 @@
         <message>
             <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
-            <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「内容を選択」または「ページ配置」からバッチ処理を実行してください。</translation>
+            <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
         </message>
         <message>
             <source>Unnamed</source>
@@ -209,7 +209,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Images not in project (%1)</source>
-            <translation>プロジェクト内にない画像 (%1)</translation>
+            <translation>プロジェクトに含まない画像 (%1)</translation>
         </message>
         <message>
             <source>Error opening the image file.</source>
@@ -319,7 +319,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Stop batch processing</source>
-            <translation>バッチ処理を停止</translation>
+            <translation>一括処理を停止</translation>
         </message>
         <message>
             <source>Settings ...</source>
@@ -381,7 +381,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-            <translation>Ctrl+Click / Shift+Click で複数ページを選択できます。</translation>
+            <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
         </message>
         <message>
             <source>Every other selected page</source>
@@ -443,7 +443,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-            <translation>Ctrl+Click / Shift+Click で複数ページを選択できます。</translation>
+            <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
         </message>
     </context>
     <context>
@@ -474,7 +474,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-            <translation>Ctrl+Click / Shift+Click で複数ページを選択できます。</translation>
+            <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
         </message>
         <message>
             <source>All pages</source>
@@ -548,7 +548,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-            <translation>Ctrl+Click / Shift+Click で複数ページを選択できます。</translation>
+            <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
         </message>
     </context>
     <context>
@@ -654,7 +654,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-            <translation>Ctrl+Click / Shift+Click で複数ページを選択できます。</translation>
+            <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
         </message>
         <message>
             <source>All pages</source>
@@ -681,7 +681,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         </message>
         <message>
             <source>Split Line</source>
-            <translation>行を分割する</translation>
+            <translation>分割線</translation>
         </message>
         <message>
             <source>Auto</source>
@@ -754,7 +754,7 @@ You should remove them from the project.</source>
         </message>
         <message>
             <source>Files Not In Project</source>
-            <translation>プロジェクト内にないファイル</translation>
+            <translation>プロジェクトに含まれないファイル</translation>
         </message>
         <message>
             <source>Select All</source>
@@ -790,7 +790,7 @@ p, li { white-space: pre-wrap; }
         </message>
         <message>
             <source>Files In Project</source>
-            <translation>プロジェクト内のファイル</translation>
+            <translation>プロジェクトに含まれるファイル</translation>
         </message>
         <message>
             <source>Right to left layout (for Hebrew and Arabic)</source>
@@ -865,7 +865,7 @@ p, li { white-space: pre-wrap; }
         <name>StageListView</name>
         <message>
             <source>Launch batch processing</source>
-            <translation>バッチ処理を開始</translation>
+            <translation>一括処理を開始</translation>
         </message>
     </context>
     <context>
@@ -1107,7 +1107,7 @@ p, li { white-space: pre-wrap; }
         <name>select_content::ImageView</name>
         <message>
             <source>Use the context menu to enable / disable the content box.</source>
-            <translation>コンテキストメニューから版面の有効／無効を切り替えられます。</translation>
+            <translation>コンテキストメニュー（右クリック）から版面の有効／無効を切り替えられます。</translation>
         </message>
         <message>
             <source>Drag lines or corners to resize the content box.</source>

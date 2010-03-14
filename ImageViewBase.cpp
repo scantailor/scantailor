@@ -204,7 +204,7 @@ ImageViewBase::ImageViewBase(
 	updateWidgetTransformAndFixFocalPoint(CENTER_IF_FITS);
 
 	interactionState().setDefaultStatusTip(
-		tr("Use the mouse wheel to zoom.  When zoomed, dragging is possible.")
+		tr("Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.")
 	);
 	ensureStatusTip(interactionState().statusTip());
 
