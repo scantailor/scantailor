@@ -103,17 +103,17 @@ Settings::get(Despeckle::Level const level, Dpi const& dpi)
 
 	switch (level) {
 		case Despeckle::CAUTIOUS:
-			settings.minRelativeParentWeight = 0.25;
+			settings.minRelativeParentWeight = 0.125 * dpi_factor;
 			settings.pixelsToSqDist = 10.0*10.0;
 			settings.bigObjectThreshold = qRound(7 * dpi_factor);
 			break;
 		case Despeckle::NORMAL:
-			settings.minRelativeParentWeight = 0.35;
+			settings.minRelativeParentWeight = 0.175 * dpi_factor;
 			settings.pixelsToSqDist = 6.5*6.5;
 			settings.bigObjectThreshold = qRound(12 * dpi_factor);
 			break;
 		case Despeckle::AGGRESSIVE:
-			settings.minRelativeParentWeight = 0.45;
+			settings.minRelativeParentWeight = 0.225 * dpi_factor;
 			settings.pixelsToSqDist = 3.5*3.5;
 			settings.bigObjectThreshold = qRound(17 * dpi_factor);
 			break;
