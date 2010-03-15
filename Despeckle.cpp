@@ -164,6 +164,30 @@ uint32_t const Component::ANCHORED_TO_BIG;
 uint32_t const Component::ANCHORED_TO_SMALL;
 uint32_t const Component::TAG_MASK;
 
+struct BoundingBox
+{
+	int top;
+	int left;
+	int bottom;
+	int right;
+
+	BoundingBox() {
+		top = left = std::numeric_limits<int>::max();
+		bottom = right = std::numeric_limits<int>::min();
+	}
+
+	int width() const { return right - left + 1; }
+
+	int height() const { return bottom - top + 1; }
+
+	void extend(int x, int y) {
+		top = std::min(top, y);
+		left = std::min(left, x);
+		bottom = std::max(bottom, y);
+		right = std::max(right, x);
+	}
+};
+
 struct Vector
 {
 	int16_t x;
@@ -681,7 +705,7 @@ Despeckle::despeckleInPlace(
 	status.throwIfCancelled();
 	
 	std::vector<Component> components(cmap.maxLabel() + 1);
-	std::vector<QRect> bounding_boxes(cmap.maxLabel() + 1);
+	std::vector<BoundingBox> bounding_boxes(cmap.maxLabel() + 1);
 
 	int const width = image.width();
 	int const height = image.height();
@@ -695,7 +719,7 @@ Despeckle::despeckleInPlace(
 		for (int x = 0; x < width; ++x) {
 			uint32_t const label = cmap_line[x];
 			++components[label].num_pixels;
-			bounding_boxes[label] |= QRect(x, y, 1, 1);
+			bounding_boxes[label].extend(x, y);
 		}
 		cmap_line += cmap_stride;
 	}
@@ -721,7 +745,7 @@ Despeckle::despeckleInPlace(
 		components[remapping_table[label]] = components[label];
 	}
 	components.resize(next_avail_component);
-	std::vector<QRect>().swap(bounding_boxes); // We don't need them any more.
+	std::vector<BoundingBox>().swap(bounding_boxes); // We don't need them any more.
 	
 	status.throwIfCancelled();
 
