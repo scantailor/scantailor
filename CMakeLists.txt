@@ -69,7 +69,8 @@ ENDIF(NOT QT4_FOUND)
 INCLUDE(FindOpenGL)
 SET(use_opengl OFF)
 IF(OPENGL_FOUND AND QT_QTOPENGL_FOUND)
-	SET(use_opengl ON)
+	# Disabled for now due to various problems associated with it.
+	# SET(use_opengl ON)
 ENDIF()
 OPTION(ENABLE_OPENGL "OpenGL may be used for UI acceleration" ${use_opengl})
 
@@ -272,6 +273,8 @@ ENDIF()
 IF(MSVC)
 	OPTION(ENABLE_CRASH_REPORTER "Enable crash reporter (only for official builds)" OFF)
 ENDIF(MSVC)
+
+OPTION(ENABLE_DEWARPING "Enable experimental dewarping support" OFF)
 
 # Prepare config.h
 IF(WIN32)

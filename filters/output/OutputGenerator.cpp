@@ -51,6 +51,7 @@
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
 #include "imageproc/PolygonRasterizer.h"
+#include "config.h"
 #include <boost/foreach.hpp>
 #include <QImage>
 #include <QSize>
@@ -549,6 +550,7 @@ OutputGenerator::processImpl(
 			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_rect.topLeft());
 			bw_content.release(); // Save memory.
 
+#if defined(ENABLE_DEWARPING)
 			if (render_params.dewarp()) {
 				dst = undistort(dst, status, dbg);
 				if (dbg) {
@@ -557,6 +559,7 @@ OutputGenerator::processImpl(
 			}
 
 			status.throwIfCancelled();
+#endif
 			
 			// It's important to keep despeckling the very last operation
 			// affecting the binary part of the output. That's because

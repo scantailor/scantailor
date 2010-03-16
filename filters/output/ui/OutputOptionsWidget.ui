@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>226</width>
-    <height>472</height>
+    <height>459</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -273,41 +273,46 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>13</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="dewarpCB">
-             <property name="text">
-              <string>Dewarp</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>13</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
+          <widget class="QWidget" name="dewarpPanel" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="dewarpSpacer1">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>46</width>
+                <height>13</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="dewarpCB">
+              <property name="text">
+               <string>Dewarp</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="dewarpSpacer2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>13</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>

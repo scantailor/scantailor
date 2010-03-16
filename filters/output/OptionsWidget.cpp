@@ -26,6 +26,7 @@
 #include "PictureZoneComparator.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
+#include "config.h"
 #include <boost/foreach.hpp>
 #include <QVariant>
 #include <QColorDialog>
@@ -51,6 +52,10 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
 	m_ignoreThresholdChanges(0)
 {
 	setupUi(this);
+
+#if !defined(ENABLE_DEWARPING)
+	dewarpPanel->hide();
+#endif
 	
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);

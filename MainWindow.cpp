@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "version.h"
 #include "MainWindow.h.moc"
 #include "NewOpenProjectPanel.h"
 #include "RecentProjects.h"
@@ -71,6 +70,8 @@
 #include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
 #include "ui_RemovePagesDialog.h"
+#include "config.h"
+#include "version.h"
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -123,6 +124,13 @@ MainWindow::MainWindow()
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
+
+#if !defined(ENABLE_OPENGL)
+	// Right now the only setting is 3D acceleration, so get rid of
+	// the whole Settings dialog, if it's inaccessible.
+	actionSettings->setVisible(false);
+#endif
+
 	createBatchProcessingWidget();
 	m_ptrProcessingIndicationWidget.reset(new ProcessingIndicationWidget);
 	
