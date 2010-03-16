@@ -63,7 +63,8 @@ DespeckleState::redespeckle(
 	Despeckle::Level level2 = Despeckle::NORMAL;
 	switch (level) {
 		case DESPECKLE_OFF:
-			new_state.m_speckles.fill(WHITE);
+			// Null speckles image is equivalent to a white one.
+			new_state.m_speckles.release();
 			return new_state;
 		case DESPECKLE_CAUTIOUS:
 			level2 = Despeckle::CAUTIOUS;
