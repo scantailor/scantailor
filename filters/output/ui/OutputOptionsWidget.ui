@@ -274,6 +274,9 @@
          </item>
          <item>
           <widget class="QWidget" name="dewarpPanel" native="true">
+           <property name="statusTip">
+            <string>No despeckling</string>
+           </property>
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <property name="margin">
              <number>0</number>
@@ -383,6 +386,9 @@
         </item>
         <item>
          <widget class="QToolButton" name="despeckleOffBtn">
+          <property name="statusTip">
+           <string>No despeckling</string>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -405,6 +411,9 @@
         </item>
         <item>
          <widget class="QToolButton" name="despeckleCautiousBtn">
+          <property name="statusTip">
+           <string>Cautious despeckling</string>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
@@ -428,6 +437,9 @@
         </item>
         <item>
          <widget class="QToolButton" name="despeckleNormalBtn">
+          <property name="statusTip">
+           <string>Normal despeckling</string>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
@@ -451,6 +463,9 @@
         </item>
         <item>
          <widget class="QToolButton" name="despeckleAggressiveBtn">
+          <property name="statusTip">
+           <string>Aggressive despeckling</string>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
