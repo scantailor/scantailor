@@ -152,17 +152,19 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
 	}
 
 	// Our final decision is like this:
-	// If we have at least 0.1% of pixels that are greater than 30,
+	// If we have at least 1% of pixels that are greater than 10,
 	// we consider that we have a picture rather than a shadow,
 	// and use method2.
 
 	int sum = 0;
 	GrayscaleHistogram hist(diff);
-	for (int i = 255; i > 30; --i) {
+	for (int i = 255; i > 10; --i) {
 		sum += hist[i];
 	}
 
-	if (sum < 0.001 * (diff.width() * diff.height())) {
+	//qDebug() << "% of pixels > 10: " << 100.0 * sum / (diff.width() * diff.height());
+
+	if (sum < 0.01 * (diff.width() * diff.height())) {
 		image = method1;
 		if (dbg) {
 			dbg->add(image, "use_method1");
