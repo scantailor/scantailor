@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -179,8 +179,12 @@ QLineF
 ImageView::virtualSplitLine() const
 {
 	QRectF virt_rect(virtualDisplayRect());
-	QRectF const widget_rect(virtualToWidget().mapRect(virt_rect));
-	virt_rect = widgetToVirtual().mapRect(reducedWidgetArea());
+
+	QRectF widget_rect(virtualToWidget().mapRect(virt_rect));
+	double const delta = 0.5 * m_handlePixmap.width();
+	widget_rect.adjust(0.0, delta, 0.0, -delta);
+
+	virt_rect = widgetToVirtual().mapRect(widget_rect);
 
 	return customInscribedSplitLine(m_virtLayout.splitLine(), virt_rect);
 }
