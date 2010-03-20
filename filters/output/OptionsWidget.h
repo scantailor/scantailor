@@ -80,7 +80,7 @@ private slots:
 	
 	void setNeutralThreshold();
 	
-	void bwThresholdChanged(int value);
+	void bwThresholdChanged();
 
 	void despeckleOffSelected();
 

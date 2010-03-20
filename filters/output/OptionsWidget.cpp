@@ -105,7 +105,11 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
 	);
 	connect(
 		thresholdSlider, SIGNAL(valueChanged(int)),
-		this, SLOT(bwThresholdChanged(int))
+		this, SLOT(bwThresholdChanged())
+	);
+	connect(
+		thresholdSlider, SIGNAL(sliderReleased()),
+		this, SLOT(bwThresholdChanged())
 	);
 	connect(
 		applyColorsButton, SIGNAL(clicked()),
@@ -226,8 +230,9 @@ OptionsWidget::setNeutralThreshold()
 }
 
 void
-OptionsWidget::bwThresholdChanged(int const value)
+OptionsWidget::bwThresholdChanged()
 {
+	int const value = thresholdSlider->value();
 	QString const tooltip_text(QString::number(value));
 	thresholdSlider->setToolTip(tooltip_text);
 	
@@ -247,7 +252,19 @@ OptionsWidget::bwThresholdChanged(int const value)
 	tooltip_pos = thresholdSlider->mapToGlobal(tooltip_pos);
 	QToolTip::showText(tooltip_pos, tooltip_text, thresholdSlider);
 	
+	if (thresholdSlider->isSliderDown()) {
+		// Wait for it to be released.
+		// We could have just disabled tracking, but in that case we wouldn't
+		// be able to show tooltips with a precise value.
+		return;
+	}
+
 	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
+	if (opt.thresholdAdjustment() == value) {
+		// Didn't change.
+		return;
+	}
+
 	opt.setThresholdAdjustment(value);
 	m_colorParams.setBlackWhiteOptions(opt);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
