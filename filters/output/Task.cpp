@@ -79,11 +79,8 @@ public:
 		QImage const& orig_image,
 		QImage const& output_image,
 		BinaryImage const& picture_mask,
-		BinaryImage const& speckles_image,
-		Dpi const& output_dpi,
 		DespeckleState const& despeckle_state,
 		DespeckleVisualization const& despeckle_visualization,
-		DespeckleLevel despeckle_level,
 		bool batch, bool debug);
 	
 	virtual void updateUI(FilterUiInterface* ui);
@@ -102,8 +99,6 @@ private:
 	QImage m_outputImage;
 	QImage m_downscaledOutputImage;
 	BinaryImage m_pictureMask;
-	BinaryImage m_specklesImage;
-	Dpi m_outputDpi;
 	DespeckleState m_despeckleState;
 	DespeckleVisualization m_despeckleVisualization;
 	DespeckleLevel m_despeckleLevel;
@@ -321,20 +316,16 @@ Task::process(
 		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);
 	}
 
+	DespeckleState const despeckle_state(
+		out_img, speckles_img, params.despeckleLevel(), params.outputDpi()
+	);
+
 	DespeckleVisualization despeckle_visualization;
 	if (m_lastTab == TAB_DESPECKLING) {
 		// Because constructing DespeckleVisualization takes a noticeable
 		// amount of time, we only do it if we are sure we'll need it.
 		// Otherwise it will get constructed on demand.
-		despeckle_visualization = DespeckleVisualization(
-			out_img, speckles_img, params.outputDpi()
-		);
-
-		// Both speckles and despeckle_visualization will eventually be passed
-		// to DespeckleVisualization constructor.  As its documentation says,
-		// the speckles image is only used of DespeckleVisualization is null,
-		// so there is no point to provide both.
-		speckles_img.release();
+		despeckle_visualization = despeckle_state.visualize();
 	}
 
 	return FilterResultPtr(
@@ -342,10 +333,8 @@ Task::process(
 			m_ptrFilter, m_ptrSettings, m_ptrDbg, params.colorParams(),
 			generator.toOutput(), QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
 			m_pageId, data.origImage(), out_img, automask_img,
-			speckles_img, params.outputDpi(),
-			DespeckleState(out_img, speckles_img, params.despeckleLevel(), params.outputDpi()),
-			despeckle_visualization,
-			params.despeckleLevel(), m_batchProcessing, m_debug
+			despeckle_state, despeckle_visualization,
+			m_batchProcessing, m_debug
 		)
 	);
 }
@@ -364,11 +353,8 @@ Task::UiUpdater::UiUpdater(
 	QImage const& orig_image,
 	QImage const& output_image,
 	BinaryImage const& picture_mask,
-	BinaryImage const& speckles_image,
-	Dpi const& output_dpi,
 	DespeckleState const& despeckle_state,
 	DespeckleVisualization const& despeckle_visualization,
-	DespeckleLevel const despeckle_level,
 	bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
@@ -382,11 +368,8 @@ Task::UiUpdater::UiUpdater(
 	m_outputImage(output_image),
 	m_downscaledOutputImage(ImageView::createDownscaledImage(output_image)),
 	m_pictureMask(picture_mask),
-	m_specklesImage(speckles_image),
-	m_outputDpi(output_dpi),
 	m_despeckleState(despeckle_state),
 	m_despeckleVisualization(despeckle_visualization),
-	m_despeckleLevel(despeckle_level),
 	m_batchProcessing(batch),
 	m_debug(debug)
 {
