@@ -28,7 +28,7 @@ namespace output
 
 Settings::Settings()
 :	m_defaultDpi(600, 600),
-	m_defaultDespeckleLevel(DESPECKLE_NORMAL)
+	m_defaultDespeckleLevel(DESPECKLE_CAUTIOUS)
 {
 	m_defaultZoneProps.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
 }
