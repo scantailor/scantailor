@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -133,16 +133,12 @@ TiffReader::TiffInfo::TiffInfo(TiffHandle const& tif, TiffHeader const& header)
 bool
 TiffReader::TiffInfo::mapsToBinaryOrIndexed8() const
 {
-	if (samples_per_pixel != 1 || sample_format != SAMPLEFORMAT_UINT) {
+	if (samples_per_pixel != 1 || sample_format != SAMPLEFORMAT_UINT || bits_per_sample > 8) {
 		return false;
 	}
 	
 	switch (photometric) {
 		case PHOTOMETRIC_PALETTE:
-			if (bits_per_sample <= 8) {
-				return true;
-			}
-			break;
 		case PHOTOMETRIC_MINISBLACK:
 		case PHOTOMETRIC_MINISWHITE:
 			return true;
