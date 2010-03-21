@@ -383,6 +383,7 @@ OptionsWidget::applyDespeckleButtonClicked()
 		this, m_ptrPages, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowTitle(tr("Apply Despeckling Level"));
 	connect(
 		dialog, SIGNAL(accepted(std::set<PageId> const&)),
 		this, SLOT(applyDespeckleConfirmed(std::set<PageId> const&))
