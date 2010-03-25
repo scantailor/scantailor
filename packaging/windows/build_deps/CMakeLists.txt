@@ -45,31 +45,31 @@ FILE(GLOB boost_dirs "${outer_dir}/boost_1_[0-9]*_[0-9]*")
 FILE(GLOB boost_jam_dirs "${outer_dir}/boost-jam-*")
 
 FIND_PATH(
-	JPEG_DIR jpeglib.h PATHS ${jpeg_dirs}
+	JPEG_DIR jpeglib.h HINTS ${jpeg_dirs}
 	DOC "Path to jpeg source directory."
 )
 FIND_PATH(
-	ZLIB_DIR zlib.h PATHS ${zlib_dirs}
+	ZLIB_DIR zlib.h HINTS ${zlib_dirs}
 	DOC "Path to zlib source directory."
 )
 FIND_PATH(
-	PNG_DIR png.h PATHS ${png_dirs}
+	PNG_DIR png.h HINTS ${png_dirs}
 	DOC "Path to libpng source directory."
 )
 FIND_PATH(
-	TIFF_DIR libtiff/tiff.h PATHS ${tiff_dirs}
+	TIFF_DIR libtiff/tiff.h HINTS ${tiff_dirs}
 	DOC "Path to top-level tiff source directory."
 )
 FIND_PATH(
-	QT_DIR projects.pro PATHS ${qt_dirs} ${qt_dirs2} ${qt_dirs3}
+	QT_DIR projects.pro HINTS ${qt_dirs} ${qt_dirs2} ${qt_dirs3}
 	DOC "Path to top-level Qt source directory."
 )
 FIND_PATH(
-	BOOST_DIR boost/foreach.hpp PATHS ${boost_dirs}
+	BOOST_DIR boost/foreach.hpp HINTS ${boost_dirs}
 	DOC "Path to top-level Boost source directory."
 )
 FIND_PROGRAM(
-	BJAM_EXECUTABLE bjam PATHS ${boost_jam_dirs}
+	BJAM_EXECUTABLE bjam HINTS ${boost_jam_dirs}
 	DOC "Path to a directory containing bjam executable."
 )
 
@@ -319,7 +319,7 @@ ELSE(MINGW)
 ENDIF(MINGW)
 
 # We disable frame pointer ommission in release mode to ensure
-# good stack traced from our built-in crash reporter.
+# good stack traces from our built-in crash reporter.
 IF(MSVC AND force_frame_pointer)
 	SET(conf_file "${QT_DIR}/mkspecs/${platform}/qmake.conf")
 	FILE(READ "${conf_file}" contents)
@@ -336,10 +336,10 @@ IF(MSVC AND force_frame_pointer)
 ENDIF()
 
 # Note #1: -system-zlib is broken on Windows (bug: #186774).  So, we build with
-# internal zlib, while libpng is linked with an external zlib.  This works only
+# internal zlib, while libpng is linked with an external one.  This works only
 # because both zlib's have the same ABI.
 # Note #2: We build with -no-libtiff because we have our own TIFF loading
-# and saving code.  Qt's TIFF plugin has way too much limitations.
+# and saving code.  Qt's TIFF plugin has way too many limitations.
 SET(build_qt_fname "${CMAKE_CURRENT_BINARY_DIR}/build-qt.bat")
 FILE(
 	WRITE "${build_qt_fname}"
@@ -363,3 +363,8 @@ ADD_CUSTOM_TARGET(Qt ALL "${build_qt_fname}")
 # boost added so that boost is built before Qt. That's helpful if build
 # errors occur, as rebuilding boost is much faster than rebuilding Qt.
 ADD_DEPENDENCIES(Qt zlib jpeg png tiff boost)
+
+# If you have multiple versions of Qt installed, this script
+# can easily pick the wrong one.
+MESSAGE("QT_DIR is ${QT_DIR}")
+MESSAGE("Make sure that's correct!")
