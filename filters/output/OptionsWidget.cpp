@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "OptionsWidget.h"
 #include "OptionsWidget.h.moc"
 #include "ChangeDpiDialog.h"
 #include "ApplyColorsDialog.h"

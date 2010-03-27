@@ -24,8 +24,4 @@ QT4_AUTOMOC(${sources})
 
 ADD_LIBRARY(zones STATIC ${sources})
 
-FILE(GLOB abs_sources ABSOLUTE ${sources})
-SET(
-	TRANSLATION_SOURCES ${TRANSLATION_SOURCES}
-	${abs_sources} PARENT_SCOPE
-)
+TRANSLATION_SOURCES(scantailor ${sources})

@@ -37,6 +37,7 @@ INCLUDE(cmake/FindPthreads.cmake)
 INCLUDE(cmake/SetDefaultBuildType.cmake)
 INCLUDE(cmake/SetDefaultGccFlags.cmake)
 INCLUDE(cmake/ToNativePath.cmake)
+INCLUDE(cmake/UpdateTranslations.cmake)
 
 ST_SET_DEFAULT_BUILD_TYPE(Release)
 IF(CMAKE_COMPILER_IS_GNUCC)
@@ -471,49 +472,14 @@ IF(ENABLE_CRASH_REPORTER)
 	)
 ENDIF(ENABLE_CRASH_REPORTER)
 
-SET(update_translations_subtargets)
-MACRO(UPDATE_TRANSLATIONS _subtarget) #, sources, ts_files
-	SET(_sources_str "")
-	SET(_translations_str "")
-	FOREACH(_file ${ARGN})
-		GET_FILENAME_COMPONENT(_abs "${_file}" ABSOLUTE)
-		GET_FILENAME_COMPONENT(_ext "${_file}" EXT)
-		IF(_ext STREQUAL .ts)
-			SET(_translations_str "${_translations_str} \"${_abs}\"")
-		ELSE(_ext STREQUAL .ts)
-			SET(_sources_str "${_sources_str} \"${_abs}\"")
-		ENDIF(_ext STREQUAL .ts)
-	ENDFOREACH(_file)
-
-	FILE(
-		WRITE "${CMAKE_BINARY_DIR}/update_translations_${_subtarget}.pro"
-		"SOURCES = ${_sources_str}\nTRANSLATIONS = ${_translations_str}"
-	)
-
-	LIST(APPEND update_translations_subtarget ${_subtarget})
-ENDMACRO(UPDATE_TRANSLATIONS)
-
-MACRO(CREATE_UPDATE_TRANSLATIONS_TARGET)
-	SET(_commands)
-	FOREACH(_subtarget ${update_translations_subtarget})
-		LIST(
-			APPEND _commands COMMAND "${QT_LUPDATE_EXECUTABLE}"
-			"${CMAKE_BINARY_DIR}/update_translations_${_subtarget}.pro"
-		)
-	ENDFOREACH(_subtarget)
-	ADD_CUSTOM_TARGET(update_translations ${_commands})
-ENDMACRO(CREATE_UPDATE_TRANSLATIONS_TARGET)
-
 # Translations
-FILE(GLOB abs_sources ABSOLUTE ${sources})
-FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})
-SET(TRANSLATION_SOURCES ${TRANSLATION_SOURCES} ${abs_sources} ${abs_ui_files})
+TRANSLATION_SOURCES(scantailor ${sources} ${ui_files})
 FILE(GLOB TRANSLATION_FILES translations/scantailor_*.ts)
 FILE(GLOB CR_TRANSLATION_FILES translations/crashreporter_*.ts)
 
-UPDATE_TRANSLATIONS(scantailor ${TRANSLATION_SOURCES} ${TRANSLATION_FILES})
-UPDATE_TRANSLATIONS(crashreporter ${CR_TRANSLATION_SOURCES} ${CR_TRANSLATION_FILES})
-CREATE_UPDATE_TRANSLATIONS_TARGET()
+UPDATE_TRANSLATION_SET(scantailor ${TRANSLATION_FILES})
+UPDATE_TRANSLATION_SET(crashreporter ${CR_TRANSLATION_FILES})
+UPDATE_TRANSLATIONS(scantailor crashreporter)
 
 SET(ts_files ${TRANSLATION_FILES})
 IF(ENABLE_CRASH_REPORTER)

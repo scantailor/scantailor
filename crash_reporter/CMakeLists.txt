@@ -49,9 +49,4 @@ IF(ENABLE_CRASH_REPORTER)
 	)
 ENDIF(ENABLE_CRASH_REPORTER)
 
-FILE(GLOB abs_sources ABSOLUTE ${crash_reporter_sources})
-FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})
-SET(
-	CR_TRANSLATION_SOURCES ${CR_TRANSLATION_SOURCES}
-	${abs_sources} ${abs_ui_files} PARENT_SCOPE
-)
+TRANSLATION_SOURCES(crashreporter ${crash_reporter_sources} ${ui_files})

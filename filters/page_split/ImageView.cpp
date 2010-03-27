@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ImageView.h"
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"

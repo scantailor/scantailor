@@ -26,9 +26,4 @@ QT4_AUTOMOC(${sources})
 
 ADD_LIBRARY(page_layout STATIC ${sources} ${ui_sources})
 
-FILE(GLOB abs_sources ABSOLUTE ${sources})
-FILE(GLOB abs_ui_files ABSOLUTE ${ui_files})
-SET(
-	TRANSLATION_SOURCES ${TRANSLATION_SOURCES}
-	${abs_sources} ${abs_ui_files} PARENT_SCOPE
-)
+TRANSLATION_SOURCES(scantailor ${sources} ${ui_files})
