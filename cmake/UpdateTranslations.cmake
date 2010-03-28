@@ -40,7 +40,7 @@ MACRO(UPDATE_TRANSLATION_SET _target) #, ts_files
 	SET(_inc_dirs ${${_target}_INC_DIRS})
 	LIST(REMOVE_DUPLICATES _inc_dirs)
 	
-	UNSET(_filtered_inc_dirs)
+	SET(_filtered_inc_dirs "")
 	FOREACH(_dir ${_inc_dirs})
 		# We are going to accept include directories within our
 		# source and binary trees and reject all others.  Allowing lupdate
