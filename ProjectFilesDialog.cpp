@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ProjectFilesDialog.h"
 #include "ProjectFilesDialog.h.moc"
 #include "NonCopyable.h"
 #include "ImageMetadata.h"
@@ -407,7 +408,7 @@ ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 	
 	inpDirLine->setText(QDir::toNativeSeparators(dir));
 	if (m_autoOutDir) {
-		outDirLine->setText(QDir::cleanPath(dir + QDir::separator() + "out"));
+		setOutputDir(QDir::cleanPath(QDir(dir).filePath("out")));
 	}
 	
 	QFileInfoList files(QDir(dir).entryInfoList(QDir::Files));
@@ -453,7 +454,7 @@ ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 void
 ProjectFilesDialog::setOutputDir(QString const& dir)
 {
-	outDirLine->setText(dir);
+	outDirLine->setText(QDir::toNativeSeparators(dir));
 }
 
 void

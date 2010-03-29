@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "PictureZoneEditor.h"
 #include "PictureZoneEditor.h.moc"
 #include "NonCopyable.h"
 #include "Zone.h"

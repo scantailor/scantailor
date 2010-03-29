@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "DespeckleView.h"
 #include "DespeckleView.h.moc"
 #include "DespeckleVisualization.h"
 #include "Despeckle.h"

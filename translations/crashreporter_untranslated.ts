@@ -4,37 +4,37 @@
 <context>
     <name>CrashReportDialog</name>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="70"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="71"/>
         <source>This file contains the internal state of the program when it crashed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="76"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="77"/>
         <source>Dump file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="104"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="105"/>
         <source>Sending ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="135"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="136"/>
         <source>Unexpected response (code %1) from dispatcher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="160"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="161"/>
         <source>Unexpected response from dispatcher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="220"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="221"/>
         <source>Unexpected response (code %1) from the receiving side</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="226"/>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="227"/>
         <source>Successfully sent</source>
         <translation type="unfinished"></translation>
     </message>

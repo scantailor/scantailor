@@ -477,9 +477,9 @@ TRANSLATION_SOURCES(scantailor ${sources} ${ui_files})
 FILE(GLOB TRANSLATION_FILES translations/scantailor_*.ts)
 FILE(GLOB CR_TRANSLATION_FILES translations/crashreporter_*.ts)
 
-UPDATE_TRANSLATION_SET(scantailor ${TRANSLATION_FILES})
-UPDATE_TRANSLATION_SET(crashreporter ${CR_TRANSLATION_FILES})
-UPDATE_TRANSLATIONS(scantailor crashreporter)
+FINALIZE_TRANSLATION_SET(scantailor ${TRANSLATION_FILES})
+FINALIZE_TRANSLATION_SET(crashreporter ${CR_TRANSLATION_FILES})
+UPDATE_TRANSLATIONS_TARGET(update_translations scantailor crashreporter)
 
 SET(ts_files ${TRANSLATION_FILES})
 IF(ENABLE_CRASH_REPORTER)
