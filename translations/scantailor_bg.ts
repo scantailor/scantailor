@@ -66,17 +66,17 @@
     <message>
         <location filename="../FixDpiDialog.cpp" line="476"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>DPI е твърде голямо и най-вероятно е грешно.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="479"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation>Прекалено малка стойност на DPI. Дори и да е правилна, няма да получите задоволителни резултати.</translation>
+        <translation>Стойността на DPI е прекалено малка. Дори и да е правилна, няма да получите задоволителни резултати.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="482"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>Стойността на DPI е прекалено малка за този размер на пиксела. Такава комбинация вероятно ще доведе до грешки в паметта.</translation>
+        <translation>Стойността на DPI е прекалено малка за този размер в пиксели. Такава комбинация вероятно ще доведе до препълване на паметта.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="733"/>
@@ -149,7 +149,7 @@
     <message>
         <location filename="../FixDpiSinglePageDialog.cpp" line="138"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>DPI е твърде голямо и най-вероятно е грешно.</translation>
     </message>
     <message>
         <location filename="../FixDpiSinglePageDialog.cpp" line="141"/>
@@ -167,7 +167,7 @@
     <message>
         <location filename="../ImageViewBase.cpp" line="208"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
-        <translation>Използванйте колелцето на мишката за увеличение.  При увеличен изглед е възможно влачене.</translation>
+        <translation>Използвайте колелцето на мишката или +/- за мащабиране. При увеличен изглед е възможно влачене.</translation>
     </message>
     <message>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
@@ -245,14 +245,14 @@
     <message>
         <location filename="../MainWindow.cpp" line="1121"/>
         <source>The project file is broken.</source>
-        <translation>Проектният файл е развален.</translation>
+        <translation>Проектният файл е повреден.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1272"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation>Изходният резулат все още не е възможен, тъй като не се знае крайния размер на страниците.
-За да го определите, изпълнете масова обработка на страниците &quot;Избор на съдържание&quot; или &quot;Ориентация на страницата&quot;.</translation>
+За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1303"/>
@@ -308,12 +308,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="134"/>
         <source>Keep current page in view.</source>
-        <translation>Запазване на тещущата страница в изгледа.</translation>
+        <translation>Запазване на текущата страница в изгледа.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="160"/>
         <source>Use PgUp, PgDown or Q, W to navigate between pages.</source>
-        <translation>Използвайте PgUp, PgDown или Q, W за навигация между страниците.</translation>
+        <translation>Използвайте PgUp/PgDown или Q/W за навигация между страниците.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="182"/>
@@ -420,7 +420,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="308"/>
         <source>Settings ...</source>
-        <translation>Предпочитания...</translation>
+        <translation>Настройки ...</translation>
     </message>
 </context>
 <context>
@@ -456,7 +456,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="23"/>
         <source>Apply to</source>
-        <translation>Прилагане към</translation>
+        <translation>Приложи към</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="29"/>
@@ -477,7 +477,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Всяка друга страница</translation>
+        <translation>Всяка втора страница</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="101"/>
@@ -498,7 +498,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>Всяка друга избрана страница</translation>
+        <translation>Всяка втора избрана страница</translation>
     </message>
 </context>
 <context>
@@ -532,7 +532,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="188"/>
         <source>Apply to ...</source>
-        <translation>Прилагане към...</translation>
+        <translation>Приложи към...</translation>
     </message>
 </context>
 <context>
@@ -545,7 +545,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
         <source>Apply to</source>
-        <translation>Прилагане към</translation>
+        <translation>Приложи към</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="29"/>
@@ -578,7 +578,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
         <source>Apply Output Resolution</source>
-        <translation>Прилагане на изходна разделителна способност</translation>
+        <translation>Избор на изходна разделителна способност</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="23"/>
@@ -631,7 +631,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
         <source>Change ...</source>
-        <translation>Промяна...</translation>
+        <translation>Промени...</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="103"/>
@@ -652,45 +652,45 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="281"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="393"/>
         <source>No despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Без почистване</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="303"/>
         <source>Dewarp</source>
-        <translation type="unfinished"></translation>
+        <translation>Корекция на деформации</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="344"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="526"/>
         <source>Apply To ...</source>
-        <translation>Прилагане към...</translation>
+        <translation>Приложи към...</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="369"/>
         <source>Despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Почистване на шум</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="418"/>
         <source>Cautious despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Предпазливо почистване на шум</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="473"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
         <source>Normal despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Нормално почистване на шум</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="470"/>
         <source>Aggressive despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Агресивно почистване на шум</translation>
     </message>
     <message>
         <source>Despeckle</source>
@@ -699,12 +699,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="237"/>
         <source>Thinner</source>
-        <translation>Изтъняване</translation>
+        <translation>По-тънко</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="269"/>
         <source>Thicker</source>
-        <translation>Удебеляне</translation>
+        <translation>По-дебело</translation>
     </message>
 </context>
 <context>
@@ -712,7 +712,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="20"/>
         <source>Apply to</source>
-        <translation>Прилагане към</translation>
+        <translation>Приложи към</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="26"/>
@@ -801,7 +801,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="231"/>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="564"/>
         <source>Apply To ...</source>
-        <translation>Прилагане към...</translation>
+        <translation>Приложи към...</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="256"/>
@@ -969,7 +969,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation>Входната и изходната папка не може да са една и съща.</translation>
+        <translation>Входната и изходната папка не могат да съвпадат.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="554"/>
@@ -984,7 +984,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="566"/>
         <source>Unable to create output directory.</source>
-        <translation>Не може да се създаде изходна папка.</translation>
+        <translation>Не може да се създаде изходната папка.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="575"/>
@@ -997,7 +997,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
         <translation>Някои от файловете не успяха да се заредят.
-Или са в неподдържан формат, или са развалени.
+Или са в неподдържан формат, или са повредени.
 Трябва да ги махнете от проекта.</translation>
     </message>
     <message>
@@ -1009,7 +1009,7 @@ You should remove them from the project.</source>
         <location filename="../ui/ProjectFilesDialog.ui" line="33"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="52"/>
         <source>Browse</source>
-        <translation>Отваряне</translation>
+        <translation>Преглед</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="64"/>
@@ -1105,17 +1105,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="14"/>
         <source>Remove Pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Премахване на страници</translation>
     </message>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="20"/>
         <source>Remove %1 page(s) from project?</source>
-        <translation type="unfinished"></translation>
+        <translation>Премахване на %1 страница(и) от проекта?</translation>
     </message>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="33"/>
         <source>Files will remain on disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Файловете ще останат на диска</translation>
     </message>
 </context>
 <context>
@@ -1146,17 +1146,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../SettingsDialog.cpp" line="36"/>
         <source>Compiled without OpenGL support.</source>
-        <translation>Комипилирано без поддръжка на OpenGL.</translation>
+        <translation>Компилирано без поддръжка на OpenGL.</translation>
     </message>
     <message>
         <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вашият хардуер (или драйвер) няма нужните характеристики.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
         <source>Settings</source>
-        <translation>Предпочитания</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="20"/>
@@ -1213,7 +1213,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="208"/>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
-        <translation>Свържете първите и последните точки, за да завършите тази зона.  ESC за отказ.</translation>
+        <translation>Свържете първата и последната точка, за да завършите тази зона.  ESC за отказ.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="211"/>
@@ -1226,7 +1226,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="45"/>
         <source>Drag the vertex.</source>
-        <translation>Завлачете върхът.</translation>
+        <translation>Влачете върхът.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="46"/>
@@ -1259,12 +1259,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation>Добавяне към автоматичен слой</translation>
+        <translation>Добавяне към автоматичния слой</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="34"/>
         <source>Subtract from auto layer</source>
-        <translation>Изваждане от автоматичен слой</translation>
+        <translation>Изваждане от автоматичния слой</translation>
     </message>
 </context>
 <context>
@@ -1360,7 +1360,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
         <source>Color / Grayscale</source>
-        <translation>Цвятно / Степени на сивото</translation>
+        <translation>Цветно / Степени на сивото</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
@@ -1370,7 +1370,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="387"/>
         <source>Apply Despeckling Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Прилагане почистването на шум</translation>
     </message>
 </context>
 <context>
@@ -1383,7 +1383,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/Task.cpp" line="415"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="432"/>
@@ -1398,7 +1398,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/Task.cpp" line="434"/>
         <source>Despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Почистване на шум</translation>
     </message>
 </context>
 <context>
@@ -1483,7 +1483,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="58"/>
         <source>Use the context menu to enable / disable the content box.</source>
-        <translation>Използвайте контекстното меню за включване / изключване областта със съдържание.</translation>
+        <translation>Използвайте контекстното меню за включване и изключване областта със съдържание.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="61"/>
