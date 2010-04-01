@@ -262,10 +262,13 @@ Task::process(
 		// will be needed when we view the results back in interactive mode.
 		// The same applies even more to speckles file, as we need it not only
 		// for visualization purposes, but also for re-doing despeckling at
-		// different levels.
+		// different levels without going through the whole output generation process.
 		bool const write_automask = render_params.mixedOutput();
 		bool const write_speckles_file = params.despeckleLevel() != DESPECKLE_OFF &&
 			params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE; 
+
+		automask_img = BinaryImage();
+		speckles_img = BinaryImage();
 
 		out_img = generator.process(
 			status, data, new_zones,
@@ -273,6 +276,13 @@ Task::process(
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
 		);
+
+		if (write_speckles_file && speckles_img.isNull()) {
+			// Even if despeckling didn't actually take place, we still need
+			// to write an empty speckles file.  Making it a special case
+			// is simply not worth it.
+			BinaryImage(out_img.size(), WHITE).swap(speckles_img);
+		}
 
 		bool invalidate_params = false;
 		

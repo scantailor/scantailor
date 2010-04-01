@@ -58,6 +58,28 @@ public:
 		QPolygonF const& content_rect_phys,
 		QPolygonF const& page_rect_phys);
 	
+	/**
+	 * \brief Produce the output image.
+	 *
+	 * \param status For asynchronous task cancellation.
+	 * \param input The input image plus data produced by previous stages.
+	 * \param zones A set of manual zones.
+	 * \param auto_picture_mask If provided, the auto-detected picture mask
+	 *        will be written there.  It would only happen if automatic picture
+	 *        detection actually took place.  Otherwise, nothing will be
+	 *        written into the provided image.  Black areas on the mask
+	 *        indicate pictures.  The manual zones aren't represented in it.
+	 * \param speckles_image If provided, the speckles removed from the
+	 *        binarized image will be written there.  It would only happen
+	 *        if despeckling was required and actually took place.
+	 *        Otherwise, nothing will be written into the provided image.
+	 *        Because despeckling is intentionally the last operation on
+	 *        the B/W part of the image, the "pre-despeckle" image may be
+	 *        restored from the output and speckles images, allowing despeckling
+	 *        to be performed again with different settings, without going
+	 *        through the whole output generation process again.
+	 * \param dbg An optional sink for debugging images.
+	 */
 	QImage process(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask = 0,
