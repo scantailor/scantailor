@@ -66,7 +66,7 @@
     <message>
         <location filename="../FixDpiDialog.cpp" line="476"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>Значение DPI слишком большое и скорее всего неправильное.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="479"/>
@@ -149,7 +149,7 @@
     <message>
         <location filename="../FixDpiSinglePageDialog.cpp" line="138"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>Значение DPI слишком большое и скорее всего неправильное.</translation>
     </message>
     <message>
         <location filename="../FixDpiSinglePageDialog.cpp" line="141"/>
@@ -331,7 +331,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../MainWindow.cpp" line="802"/>
         <source>Insert here ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить сюда ...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1128"/>
@@ -717,39 +717,39 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="281"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="393"/>
         <source>No despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалять пятна</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="303"/>
         <source>Dewarp</source>
-        <translation type="unfinished"></translation>
+        <translation>Устранение геометрических искажений</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="369"/>
         <source>Despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаление пятен</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="418"/>
         <source>Cautious despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Осторожное удаление пятен</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="473"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
         <source>Normal despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Обычное удаление пятен</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="470"/>
         <source>Aggressive despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Аггрессивное удаление пятен</translation>
     </message>
     <message>
         <source>Colors</source>
@@ -1233,17 +1233,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="14"/>
         <source>Remove Pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить страницы</translation>
     </message>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="20"/>
         <source>Remove %1 page(s) from project?</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить %1 страниц из проекта?</translation>
     </message>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="33"/>
         <source>Files will remain on disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Файлы останутся на диске</translation>
     </message>
 </context>
 <context>
@@ -1279,7 +1279,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ваше железо или драйвер не поддерживают необходимого функционала.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
@@ -1522,7 +1522,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="387"/>
         <source>Apply Despeckling Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Применить уровень удаления пятен</translation>
     </message>
 </context>
 <context>
@@ -1595,7 +1595,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="425"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаление пятен не делается в режиме &quot;Цветной / Серый&quot;.</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="442"/>
@@ -1610,7 +1610,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="444"/>
         <source>Despeckling</source>
-        <translation type="unfinished"></translation>
+        <translation>Удаление пятен</translation>
     </message>
 </context>
 <context>
