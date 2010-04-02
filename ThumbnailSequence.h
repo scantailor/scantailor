@@ -98,7 +98,8 @@ public:
 	 * to be compatible with what reset() does.
 	 *
 	 * If there are no pages with matching ImageId, the new page won't
-	 * be inserted.
+	 * be inserted, unless the request is to insert BEFORE a null ImageId(),
+	 * which would cause insertion at the end.
 	 */
 	void insert(PageInfo const& new_page,
 		BeforeOrAfter before_or_after, ImageId const& image);
@@ -120,11 +121,22 @@ signals:
 		PageInfo const& page_info, QRectF const& thumb_rect,
 		ThumbnailSequence::SelectionFlags flags);
 	
-	void contextMenuRequested(
+	/**
+	 * Emitted when a user right-clicks on a page thumbnail.
+	 */
+	void pageContextMenuRequested(
 		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
+
+	/**
+	 * Emitted when a user right clicks on area below the last page.
+	 * In the absence of any pages, all the area is considered to be
+	 * below the last page.
+	 */
+	void pastLastPageContextMenuRequested(QPoint const& screen_pos);
 private:
 	class Item;
 	class Impl;
+	class GraphicsScene;
 	class PlaceholderThumb;
 	class LabelGroup;
 	class CompositeItem;
@@ -133,9 +145,6 @@ private:
 	void emitNewSelectionLeader(
 		PageInfo const& page_info, CompositeItem const* composite,
 		SelectionFlags flags);
-		
-	void emitContextMenuRequested(
-		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 	
 	std::auto_ptr<Impl> m_ptrImpl;
 };

@@ -94,9 +94,11 @@ private slots:
 		PageInfo const& page_info, QRectF const& thumb_rect,
 		ThumbnailSequence::SelectionFlags flags);
 	
-	void contextMenuRequested(
+	void pageContextMenuRequested(
 		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 	
+	void pastLastPageContextMenuRequested(QPoint const& screen_pos);
+
 	void thumbViewFocusToggled(bool checked);
 	
 	void thumbViewScrolled();

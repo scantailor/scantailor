@@ -179,8 +179,13 @@ MainWindow::MainWindow()
 	);
 	connect(
 		m_ptrThumbSequence.get(),
-		SIGNAL(contextMenuRequested(PageInfo const&, QPoint const&, bool)),
-		this, SLOT(contextMenuRequested(PageInfo const&, QPoint const&, bool))
+		SIGNAL(pageContextMenuRequested(PageInfo const&, QPoint const&, bool)),
+		this, SLOT(pageContextMenuRequested(PageInfo const&, QPoint const&, bool))
+	);
+	connect(
+		m_ptrThumbSequence.get(),
+		SIGNAL(pastLastPageContextMenuRequested(QPoint const&)),
+		SLOT(pastLastPageContextMenuRequested(QPoint const&))
 	);
 	
 	connect(
@@ -755,7 +760,7 @@ MainWindow::currentPageChanged(
 }
 
 void
-MainWindow::contextMenuRequested(
+MainWindow::pageContextMenuRequested(
 	PageInfo const& page_info_, QPoint const& screen_pos, bool selected)
 {
 	// Make a copy to prevent it from being invalidated.
@@ -787,6 +792,17 @@ MainWindow::contextMenuRequested(
 		showInsertFileDialog(AFTER, page_info.imageId());
 	} else if (action == remove) {
 		showRemovePagesDialog(m_ptrThumbSequence->selectedItems());
+	}
+}
+
+void
+MainWindow::pastLastPageContextMenuRequested(QPoint const& screen_pos)
+{
+	QMenu menu;
+	menu.addAction(QIcon(":/icons/insert-here-16.png"), tr("Insert here ..."));
+	
+	if (menu.exec(screen_pos)) {
+		showInsertFileDialog(BEFORE, ImageId());
 	}
 }
 
@@ -1411,6 +1427,9 @@ MainWindow::saveProjectWithFeedback(QString const& project_file)
 	return true;
 }
 
+/**
+ * Note: showInsertFileDialog(BEFORE, ImageId()) is legal and means inserting at the end.
+ */
 void
 MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& existing)
 {
@@ -1523,6 +1542,9 @@ MainWindow::showRemovePagesDialog(std::set<PageId> const& pages)
 	}
 }
 
+/**
+ * Note: insertImage(..., BEFORE, ImageId()) is legal and means inserting at the end.
+ */
 void
 MainWindow::insertImage(ImageInfo const& new_image,
 	BeforeOrAfter before_or_after, ImageId const& existing)
@@ -1538,6 +1560,11 @@ MainWindow::insertImage(ImageInfo const& new_image,
 void
 MainWindow::removeFromProject(std::set<PageId> const& pages)
 {
+	if (pages.find(m_ptrPages->curPage(getCurrentView()).id()) != pages.end()) {
+		// Removing the current page.
+		cancelOngoingTask();
+	}
+
 	m_ptrPages->removePages(pages);
 	m_ptrStages->pageSplitFilter()->removePages(pages);
 	m_ptrThumbSequence->removePages(pages);

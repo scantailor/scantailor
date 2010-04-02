@@ -95,7 +95,8 @@ public:
 	 * \brief Insert an image before or after the existing one.
 	 *
 	 * The caller has to make sure he is not inserting an image that already
-	 * exists in this PageSequence.
+	 * exists in this PageSequence.  Requesting to insert a new image
+	 * BEFORE the null one is legal and means inserting it at the end.
 	 *
 	 * Returns true if the image was inserted, false if the \p existing
 	 * image wasn't found.

@@ -743,7 +743,9 @@ PageSequence::insertImageImpl(ImageInfo const& new_image,
 	}
 	if (it == end) {
 		// Existing image not found.
-		return false;
+		if (!(before_or_after == BEFORE && existing.isNull())) { 
+			return false;
+		} // Otherwise we can still handle that case.
 	}
 	if (before_or_after == AFTER) {
 		++it;

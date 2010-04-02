@@ -31,6 +31,8 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
@@ -96,6 +98,27 @@ private:
 };
 
 
+class ThumbnailSequence::GraphicsScene : public QGraphicsScene
+{
+public:
+	typedef boost::function<void (QGraphicsSceneContextMenuEvent*)> ContextMenuEventCallback;
+
+	void setContextMenuEventCallback(ContextMenuEventCallback callback) {
+		m_contextMenuEventCallback = callback;
+	}
+protected:
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) {
+		QGraphicsScene::contextMenuEvent(event);
+		
+		if (!event->isAccepted() && m_contextMenuEventCallback) {
+			m_contextMenuEventCallback(event);
+		}
+	}
+private:
+	ContextMenuEventCallback m_contextMenuEventCallback;
+};
+
+
 class ThumbnailSequence::Impl
 {
 public:
@@ -152,6 +175,8 @@ private:
 	typedef Container::index<ItemsInOrderTag>::type ItemsInOrder;
 	typedef Container::index<SelectedThenUnselectedTag>::type SelectedThenUnselected;
 	
+	void sceneContextMenuEvent(QGraphicsSceneContextMenuEvent* evt);
+
 	void selectItemNoModifiers(ItemsById::iterator const& it);
 	
 	void selectItemWithControl(ItemsById::iterator const& it);
@@ -197,7 +222,7 @@ private:
 	
 	Item const* m_pSelectionLeader;
 	IntrusivePtr<ThumbnailFactory> m_ptrFactory;
-	QGraphicsScene m_graphicsScene;
+	GraphicsScene m_graphicsScene;
 	QRectF m_sceneRect;
 };
 
@@ -377,13 +402,6 @@ ThumbnailSequence::emitNewSelectionLeader(
 	emit newSelectionLeader(page_info, thumb_rect, flags);
 }
 
-void
-ThumbnailSequence::emitContextMenuRequested(
-	PageInfo const& page_info, QPoint const& screen_pos, bool selected)
-{
-	emit contextMenuRequested(page_info, screen_pos, selected);
-}
-
 
 /*======================== ThumbnailSequence::Impl ==========================*/
 
@@ -397,6 +415,9 @@ ThumbnailSequence::Impl::Impl(
 	m_selectedThenUnselected(m_items.get<SelectedThenUnselectedTag>()),
 	m_pSelectionLeader(0)
 {
+	m_graphicsScene.setContextMenuEventCallback(
+		boost::bind(&Impl::sceneContextMenuEvent, this, _1)
+	);
 }
 
 ThumbnailSequence::Impl::~Impl()
@@ -581,14 +602,19 @@ ThumbnailSequence::Impl::insert(
 	PageInfo const& page_info,
 	BeforeOrAfter before_or_after, ImageId const& image)
 {
-	ItemsById::iterator id_it(m_itemsById.lower_bound(PageId(image)));
-	if (id_it == m_itemsById.end() || id_it->pageInfo.imageId() != image) {
-		return;
-	}
-	
-	ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
-	if (before_or_after == AFTER) {
-		++ord_it;
+	ItemsInOrder::iterator ord_it;
+
+	if (before_or_after == BEFORE && image.isNull()) {
+		ord_it = m_itemsInOrder.end();
+	} else {
+		ItemsById::iterator id_it(m_itemsById.lower_bound(PageId(image)));
+		if (id_it == m_itemsById.end() || id_it->pageInfo.imageId() != image) {
+			return;
+		}
+		ord_it = m_items.project<ItemsInOrderTag>(id_it);
+		if (before_or_after == AFTER) {
+			++ord_it;
+		}
 	}
 	
 	int page_num = 0;
@@ -775,7 +801,23 @@ void
 ThumbnailSequence::Impl::contextMenuRequested(
 	PageInfo const& page_info, QPoint const& screen_pos, bool selected)
 {
-	m_rOwner.emitContextMenuRequested(page_info, screen_pos, selected);
+	emit m_rOwner.pageContextMenuRequested(page_info, screen_pos, selected);
+}
+
+void
+ThumbnailSequence::Impl::sceneContextMenuEvent(QGraphicsSceneContextMenuEvent* evt)
+{
+	if (!m_itemsInOrder.empty()) {
+		CompositeItem* composite = m_itemsInOrder.back().composite;
+		QRectF const last_thumb_rect(
+			composite->mapToScene(composite->boundingRect()).boundingRect()
+		);
+		if (evt->scenePos().y() <= last_thumb_rect.bottom()) {
+			return;
+		}
+	}
+
+	emit m_rOwner.pastLastPageContextMenuRequested(evt->screenPos());
 }
 
 void
