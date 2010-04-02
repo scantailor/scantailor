@@ -607,13 +607,23 @@ ThumbnailSequence::Impl::insert(
 	if (before_or_after == BEFORE && image.isNull()) {
 		ord_it = m_itemsInOrder.end();
 	} else {
+		// Note that we have to use lower_bound() rather than find() because
+		// we are not searching for PageId(image) exactly, which implies
+		// PageId::SINGLE_PAGE configuration, but rather we search for
+		// a page with any configuration, as long as it references the same image. 
 		ItemsById::iterator id_it(m_itemsById.lower_bound(PageId(image)));
 		if (id_it == m_itemsById.end() || id_it->pageInfo.imageId() != image) {
+			// Reference page not found.
 			return;
 		}
+		
 		ord_it = m_items.project<ItemsInOrderTag>(id_it);
+		
 		if (before_or_after == AFTER) {
-			++ord_it;
+			// Advance past not only the target page, but also its other half, if it follows.
+			do {
+				++ord_it;
+			} while (ord_it != m_itemsInOrder.end() && ord_it->pageInfo.imageId() == image);
 		}
 	}
 	
