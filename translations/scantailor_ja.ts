@@ -183,100 +183,105 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="415"/>
+        <location filename="../MainWindow.cpp" line="420"/>
         <source>Beep when finished</source>
         <translation>終了時にビープ音を鳴らす</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="219"/>
-        <location filename="../MainWindow.cpp" line="478"/>
+        <location filename="../MainWindow.cpp" line="483"/>
         <source>Save Project</source>
         <translation>プロジェクトを保存する</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="478"/>
+        <location filename="../MainWindow.cpp" line="483"/>
         <source>Save this project?</source>
         <translation>プロジェクトを保存しますか？</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="771"/>
+        <location filename="../MainWindow.cpp" line="776"/>
         <source>Insert before ...</source>
         <translation>前に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="774"/>
+        <location filename="../MainWindow.cpp" line="779"/>
         <source>Insert after ...</source>
         <translation>後に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="780"/>
+        <location filename="../MainWindow.cpp" line="785"/>
         <source>Remove from project ...</source>
         <translation>プロジェクトから取り除く…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1024"/>
-        <location filename="../MainWindow.cpp" line="1092"/>
+        <location filename="../MainWindow.cpp" line="802"/>
+        <source>Insert here ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1040"/>
+        <location filename="../MainWindow.cpp" line="1108"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor プロジェクト</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1091"/>
+        <location filename="../MainWindow.cpp" line="1107"/>
         <source>Open Project</source>
         <translation>プロジェクトを開く</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1111"/>
-        <location filename="../MainWindow.cpp" line="1120"/>
-        <location filename="../MainWindow.cpp" line="1374"/>
-        <location filename="../MainWindow.cpp" line="1405"/>
-        <location filename="../MainWindow.cpp" line="1477"/>
+        <location filename="../MainWindow.cpp" line="1127"/>
+        <location filename="../MainWindow.cpp" line="1136"/>
+        <location filename="../MainWindow.cpp" line="1390"/>
+        <location filename="../MainWindow.cpp" line="1421"/>
+        <location filename="../MainWindow.cpp" line="1496"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1112"/>
+        <location filename="../MainWindow.cpp" line="1128"/>
         <source>Unable to open the project file.</source>
         <translation>プロジェクトファイルを開けませんでした。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1121"/>
+        <location filename="../MainWindow.cpp" line="1137"/>
         <source>The project file is broken.</source>
         <translation>プロジェクトファイルは破損しています。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1272"/>
+        <location filename="../MainWindow.cpp" line="1288"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1303"/>
+        <location filename="../MainWindow.cpp" line="1319"/>
         <source>Unnamed</source>
         <translation>名前なし</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1324"/>
         <source>%1 - Scan Tailor %2</source>
         <translation>%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1375"/>
-        <location filename="../MainWindow.cpp" line="1406"/>
+        <location filename="../MainWindow.cpp" line="1391"/>
+        <location filename="../MainWindow.cpp" line="1422"/>
         <source>Error saving the project file!</source>
         <translation>プロジェクトファイルを保存できません！</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1450"/>
+        <location filename="../MainWindow.cpp" line="1469"/>
         <source>File to insert</source>
         <translation>挿入するファイル</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1456"/>
+        <location filename="../MainWindow.cpp" line="1475"/>
         <source>Images not in project (%1)</source>
         <translation>プロジェクトに含まない画像 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1478"/>
+        <location filename="../MainWindow.cpp" line="1497"/>
         <source>Error opening the image file.</source>
         <translation>画像ファイルを開けません！</translation>
     </message>
@@ -285,7 +290,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1518"/>
+        <location filename="../MainWindow.cpp" line="1537"/>
         <source>Remove</source>
         <translation>取り除く</translation>
     </message>
@@ -408,7 +413,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="407"/>
+        <location filename="../MainWindow.cpp" line="412"/>
         <source>Stop batch processing</source>
         <translation>一括処理を停止</translation>
     </message>
@@ -1166,7 +1171,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1036"/>
+        <location filename="../ThumbnailSequence.cpp" line="1088"/>
         <source>%1 (page %2)</source>
         <translation>%1 （%2 ページ）</translation>
     </message>
@@ -1367,27 +1372,27 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="400"/>
+        <location filename="../filters/output/Task.cpp" line="410"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>画像領域はミックスモードでのみ有効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="415"/>
+        <location filename="../filters/output/Task.cpp" line="425"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>歪み補正はカラー／グレースケールモードでのみ有効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="432"/>
+        <location filename="../filters/output/Task.cpp" line="442"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="433"/>
+        <location filename="../filters/output/Task.cpp" line="443"/>
         <source>Picture Zones</source>
         <translation>画像領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="434"/>
+        <location filename="../filters/output/Task.cpp" line="444"/>
         <source>Despeckling</source>
         <translation>スペックル除去</translation>
     </message>
