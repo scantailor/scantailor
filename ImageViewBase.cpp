@@ -839,6 +839,8 @@ ImageViewBase::setNewWidgetFP(QPointF const widget_fp, bool const update)
  * direction.
  *
  * \param proposed_widget_fp The proposed value for m_widgetFocalPoint.
+ * \param update Whether to call this->update() in case the focal point
+ *        has changed.
  */
 void
 ImageViewBase::adjustAndSetNewWidgetFP(

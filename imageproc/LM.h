@@ -86,14 +86,17 @@ public:
 	 * NOT the value and gradient of E with respect to a!
 	 *
 	 * \param npts The number of data points.
-	 * \param x array of domain points, each may be multidimensional
-	 * \param y corresponding array of values
-	 * \param a the parameters/state of the model
-	 * \param vary false to indicate the corresponding a[k] is to be held fixed
-	 * \param lambda blend between steepest descent (lambda high) and
+	 * \param x Array of domain points, each may be multidimensional.
+	 * \param x_stride Distance in \p x from one point to another.
+	 * \param y Corresponding array of values.
+	 * \param a The parameters/state of the model.
+	 * \param s Sigma for point i.
+	 * \param vary False to indicate the corresponding a[k] is to be held fixed.
+	 * \param f The function to fit.
+	 * \param lambda Blend between steepest descent (lambda high) and
 	 *	      jump to bottom of quadratic (lambda zero). Start with 0.001.
-	 * \param termepsilon termination accuracy (0.01)
-	 * \param maxiter	stop and return after this many iterations if not done
+	 * \param termepsilon Termination accuracy (0.01).
+	 * \param maxiter Stop and return after this many iterations if not done.
 	 *
 	 * \return the new lambda for future iterations.
 	 *  Can use this and maxiter to interleave the LM descent with some other

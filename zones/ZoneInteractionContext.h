@@ -90,7 +90,7 @@ public:
 	}
 
 	/**
-	 * \node This function may refuse to create a context menu interaction by returning null.
+	 * \note This function may refuse to create a context menu interaction by returning null.
 	 */
 	virtual InteractionHandler* createContextMenuInteraction(InteractionState& interaction) {
 		return m_contextMenuInteractionCreator(interaction);

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ public:
 	 *        to speed up real-time rendering of high-resolution
 	 *        images.  Note that the delayed high quality transform
 	 *        operates on the original image, not the downscaled one.
-	 * \param image_presentation Specifies transformation from image
+	 * \param presentation Specifies transformation from image
 	 *        pixel coordinates to virtual image coordinates, along
 	 *        with some other properties.
 	 * \param margins Reserve extra space near the widget borders.

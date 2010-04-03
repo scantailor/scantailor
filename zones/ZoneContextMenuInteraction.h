@@ -41,7 +41,7 @@ class ZoneContextMenuInteraction : public QObject, public InteractionHandler
 	Q_OBJECT
 public:
 	/**
-	 * \node This factory method will return null if there are no zones
+	 * \note This factory method will return null if there are no zones
 	 *       under the mouse pointer.
 	 */
 	static ZoneContextMenuInteraction* create(

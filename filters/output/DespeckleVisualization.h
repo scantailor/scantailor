@@ -41,8 +41,8 @@ public:
 	DespeckleVisualization() {}
 
 	/**
-	 * \param pre_despeckle_image Image before despeckling.
-	 *        If this one is null, this object will be null as well.
+	 * \param output The output file, as produced by OutputGenerator::process().
+	 *        If this one is null, the visualization will be null as well.
 	 * \param speckles Speckles detected in the image.
 	 *        If this one is null, it is considered no speckles were detected.
 	 * \param dpi Dots-per-inch of both images.

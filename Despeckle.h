@@ -37,13 +37,10 @@ public:
 	 * \brief Removes small speckles from a binary image.
 	 *
 	 * \param src The image to despeckle.  Must not be null.
-	 * \param big_object_threshold The number of pixels which indicates
-	 *        the object having them is definitely not a speckle.
-	 *        Objects that have less pixels may or may not be considered
-	 *        as speckles, but if all objects consist of less pixels
-	 *        then this threshold, all of them will be considered as speckles
-	 *        and be removed.
+	 * \param dpi DPI of \p src.
+	 * \param level Despeckling aggressiveness.
 	 * \param dbg An optional sink for debugging images.
+	 * \param status For asynchronous task cancellation.
 	 * \return The despeckled image.
 	 */
 	static imageproc::BinaryImage despeckle(
