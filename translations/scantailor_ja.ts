@@ -216,7 +216,7 @@
     <message>
         <location filename="../MainWindow.cpp" line="802"/>
         <source>Insert here ...</source>
-        <translation type="unfinished"></translation>
+        <translation>ここに挿入…</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1040"/>
