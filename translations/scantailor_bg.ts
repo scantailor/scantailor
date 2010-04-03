@@ -205,12 +205,12 @@
     <message>
         <location filename="../MainWindow.cpp" line="776"/>
         <source>Insert before ...</source>
-        <translation>Вмъкване преди...</translation>
+        <translation>Вмъкни преди...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="779"/>
         <source>Insert after ...</source>
-        <translation>Вмъкване след...</translation>
+        <translation>Вмъкни след...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="785"/>
@@ -220,7 +220,7 @@
     <message>
         <location filename="../MainWindow.cpp" line="802"/>
         <source>Insert here ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Вмъкни тук ...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1040"/>
