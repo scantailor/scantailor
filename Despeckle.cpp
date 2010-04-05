@@ -733,16 +733,20 @@ Despeckle::despeckleInPlace(
 	for (uint32_t label = 1; label <= cmap.maxLabel(); ++label) {
 		if (bounding_boxes[label].width() < settings.bigObjectThreshold &&
 				bounding_boxes[label].height() < settings.bigObjectThreshold) {
+			components[next_avail_component] = components[label];
 			remapping_table[label] = next_avail_component;
 			++next_avail_component;
 		} else {
 			if (unified_big_component == 0) {
 				unified_big_component = next_avail_component;
 				++next_avail_component;
+				components[unified_big_component] = components[label];
+				// Set num_pixels to a large value so that canBeAttachedTo()
+				// always allows attaching to any such component.
+				components[unified_big_component].num_pixels = width * height;
 			}
 			remapping_table[label] = unified_big_component;
 		}
-		components[remapping_table[label]] = components[label];
 	}
 	components.resize(next_avail_component);
 	std::vector<BoundingBox>().swap(bounding_boxes); // We don't need them any more.
