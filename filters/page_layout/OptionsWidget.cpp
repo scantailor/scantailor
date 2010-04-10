@@ -183,8 +183,8 @@ OptionsWidget::preUpdateUI(Margins const& margins_mm, Alignment const& alignment
 	
 	enableDisableAlignmentButtons();
 	
-	m_leftRightLinked = true;
-	m_topBottomLinked = true;
+	m_leftRightLinked = (margins_mm.left() == margins_mm.right());
+	m_topBottomLinked = (margins_mm.top() == margins_mm.bottom());
 	updateLinkDisplay(topBottomLink, m_topBottomLinked);
 	updateLinkDisplay(leftRightLink, m_leftRightLinked);
 	
