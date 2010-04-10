@@ -20,17 +20,19 @@
 #include "ImageView.h.moc"
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
+#include "InteractionState.h"
 #include "imageproc/Constants.h"
 #include <QRect>
 #include <QSizeF>
 #include <QPainter>
-#include <QMouseEvent>
+#include <QWheelEvent>
 #include <QVector>
 #include <QLineF>
 #include <QScrollBar>
 #include <QStyle>
 #include <Qt>
 #include <boost/bind.hpp>
+#include <algorithm>
 #include <math.h>
 
 namespace deskew
@@ -55,6 +57,10 @@ ImageView::ImageView(
 	m_xform(xform)
 {
 	setMouseTracking(true);
+
+	interactionState().setDefaultStatusTip(
+		tr("Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.")
+	);
 
 	QString const tip(tr("Drag this handle to rotate the image."));
 	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
@@ -169,6 +175,32 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.drawPixmap(rect.topLeft(), m_handlePixmap);
 	rect.moveCenter(handles.second);
 	painter.drawPixmap(rect.topLeft(), m_handlePixmap);
+}
+
+void
+ImageView::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
+{
+	if (interaction.captured()) {
+		return;
+	}
+
+	double degree_fraction = 0;
+
+	if (event->modifiers() == Qt::ControlModifier) {
+		degree_fraction = 0.1;
+	} else if (event->modifiers() == (Qt::ControlModifier|Qt::ShiftModifier)) {
+		degree_fraction = 0.05;
+	} else {
+		return;
+	}
+	
+	event->accept();
+	double const delta = degree_fraction * event->delta() / 120;
+	m_xform.setPostRotation(m_xform.postRotation() - delta);
+	updateTransformPreservingScale(
+		ImagePresentation(m_xform.transform(), m_xform.resultingCropArea())
+	);
+	emit manualDeskewAngleSet(m_xform.postRotation());
 }
 
 QPointF

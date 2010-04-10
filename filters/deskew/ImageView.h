@@ -54,8 +54,9 @@ signals:
 public slots:
 	void manualDeskewAngleSetExternally(double degrees);
 protected:
-	virtual void onPaint(
-		QPainter& painter, InteractionState const& interaction);
+	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
+
+	virtual void onWheelEvent(QWheelEvent* event, InteractionState& interaction);
 private:
 	QPointF handlePosition(int idx) const;
 
