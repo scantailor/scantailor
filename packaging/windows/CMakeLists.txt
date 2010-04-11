@@ -99,4 +99,11 @@ ADD_CUSTOM_COMMAND(
 	MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/scantailor.nsi
 	DEPENDS ${extra_deps}
 )
-ADD_CUSTOM_TARGET(installer ALL DEPENDS "${INSTALLER_FILENAME}")
+
+OPTION(BUILD_INSTALLER_BY_DEFAULT "Wheter the \"installer\" target gets built by default" ON)
+SET(installer_target installer)
+IF(BUILD_INSTALLER_BY_DEFAULT)
+	LIST(APPEND installer_target ALL)
+ENDIF()
+LIST(APPEND installer_target DEPENDS "${INSTALLER_FILENAME}")
+ADD_CUSTOM_TARGET(${installer_target})
