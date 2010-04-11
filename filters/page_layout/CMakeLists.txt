@@ -5,7 +5,8 @@ INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
 FILE(GLOB ui_files "ui/*.ui")
 QT4_WRAP_UI(ui_sources ${ui_files})
 SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
-ADD_SUBDIRECTORY(ui)
+SOURCE_GROUP("UI Files" FILES ${ui_files})
+SOURCE_GROUP("Generated" FILES ${ui_sources})
 
 SET(
 	sources

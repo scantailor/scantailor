@@ -297,7 +297,7 @@ ADD_SUBDIRECTORY(zones)
 ADD_SUBDIRECTORY(tests)
 
 FILE(GLOB ui_files "ui/*.ui")
-SOURCE_GROUP("Ui Files" FILES ${ui_files})
+SOURCE_GROUP("UI Files" FILES ${ui_files})
 QT4_WRAP_UI(ui_sources ${ui_files})
 SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
 ADD_SUBDIRECTORY(ui)
@@ -314,7 +314,11 @@ ADD_SUBDIRECTORY(filters/output)
 
 SET(resource_sources)
 QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
-SOURCE_GROUP("Generated Sources" FILES ${ui_sources} ${resource_sources})
+SOURCE_GROUP("Generated" FILES ${ui_sources} ${resource_sources})
+SOURCE_GROUP("Resources" FILES resources/resources.qrc)
+IF(WIN32)
+	SOURCE_GROUP("Resources" FILES resources/win32/resources.rc)
+ENDIF()
 
 SET(
 	sources
@@ -426,7 +430,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(
-	scantailor WIN32 ${sources} ${ui_sources}
+	scantailor WIN32 ${sources} ${ui_sources} VERSION
 	${resource_sources} ${win32_resource_file}
 )
 TARGET_LINK_LIBRARIES(
