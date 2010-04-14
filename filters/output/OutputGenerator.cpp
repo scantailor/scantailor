@@ -73,6 +73,133 @@ using namespace imageproc;
 namespace output
 {
 
+namespace
+{
+
+struct RaiseAboveBackground
+{
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		// src: orig
+		// dst: background (dst >= src)
+		if (dst - src < 1) {
+			return 0xff;
+		}
+		unsigned const orig = src;
+		unsigned const background = dst;
+		return static_cast<uint8_t>((orig * 255 + background / 2) / background);
+	}
+};
+
+struct CombineInverted
+{
+	static uint8_t transform(uint8_t src, uint8_t dst) {
+		unsigned const dilated = dst;
+		unsigned const eroded = src;
+		unsigned const res = 255 - (255 - dilated) * eroded / 255;
+		return static_cast<uint8_t>(res);
+	}
+};
+
+/**
+ * In picture areas we make sure we don't use pure black and pure white colors.
+ * These are reserved for text areas.  This behaviour makes it possible to
+ * detect those picture areas later and treat them differently, for example
+ * encoding them as a background layer in DjVu format.
+ */
+template<typename PixelType>
+PixelType reserveBlackAndWhite(PixelType color);
+
+template<>
+uint32_t reserveBlackAndWhite(uint32_t color)
+{
+	// We handle both RGB32 and ARGB32 here.
+	switch (color & 0x00FFFFFF) {
+		case 0x00000000:
+			return 0xFF010101;
+		case 0x00FFFFFF:
+			return 0xFFFEFEFE;
+		default:
+			return color;
+	}
+}
+
+template<>
+uint8_t reserveBlackAndWhite(uint8_t color)
+{
+	switch (color) {
+		case 0x00:
+			return 0x01;
+		case 0xFF:
+			return 0xFE;
+		default:
+			return color;
+	}
+}
+
+template<typename PixelType>
+void reserveBlackAndWhite(QSize size, int stride, PixelType* data)
+{
+	int const width = size.width();
+	int const height = size.height();
+
+	PixelType* line = data;
+	for (int y = 0; y < height; ++y, line += stride) {
+		for (int x = 0; x < width; ++x) {
+			line[x] = reserveBlackAndWhite<PixelType>(line[x]);
+		}
+	}
+}
+
+/**
+ * Fills areas of \p mixed with pixels from \p bw_content in
+ * areas where \p bw_mask is black.  Supported \p mixed image formats
+ * are Indexed8 grayscale, RGB32 and ARGB32.
+ * The \p MixedPixel type is uint8_t for Indexed8 grayscale and uint32_t
+ * for RGB32 and ARGB32.
+ */
+template<typename MixedPixel>
+void combineMixed(
+	QImage& mixed, BinaryImage const& bw_content,
+	BinaryImage const& bw_mask)
+{
+	MixedPixel* mixed_line = reinterpret_cast<MixedPixel*>(mixed.bits());
+	int const mixed_stride = mixed.bytesPerLine() / sizeof(MixedPixel);
+	uint32_t const* bw_content_line = bw_content.data();
+	int const bw_content_stride = bw_content.wordsPerLine();
+	uint32_t const* bw_mask_line = bw_mask.data();
+	int const bw_mask_stride = bw_mask.wordsPerLine();
+	int const width = mixed.width();
+	int const height = mixed.height();
+	uint32_t const msb = uint32_t(1) << 31;
+	
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
+				// B/W content.
+
+				uint32_t tmp = bw_content_line[x >> 5];
+				tmp >>= (31 - (x & 31));
+				tmp &= uint32_t(1);
+				// Now it's 0 for white and 1 for black.
+				
+				--tmp; // 0 becomes 0xffffffff and 1 becomes 0.
+				
+				tmp |= 0xff000000; // Force opacity.
+				
+				mixed_line[x] = static_cast<MixedPixel>(tmp);
+			} else {
+				// Non-B/W content.
+				mixed_line[x] = reserveBlackAndWhite<MixedPixel>(mixed_line[x]);
+			}
+		}
+		mixed_line += mixed_stride;
+		bw_content_line += bw_content_stride;
+		bw_mask_line += bw_mask_stride;
+	}
+}
+
+} // anonymous namespace
+
 OutputGenerator::OutputGenerator(
 	Dpi const& dpi, ColorParams const& color_params,
 	DespeckleLevel const despeckle_level,
@@ -154,12 +281,16 @@ QImage
 OutputGenerator::processAsIs(FilterData const& input,
 	TaskStatus const& status, DebugImages* const dbg) const
 {
-	uint8_t const dominant_gray = calcDominantBackgroundGrayLevel(input.grayImage());
+	uint8_t const dominant_gray = reserveBlackAndWhite<uint8_t>(
+		calcDominantBackgroundGrayLevel(input.grayImage())
+	);
 	
 	status.throwIfCancelled();
 	
 	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
 	
+	QImage out;
+
 	if (input.origImage().allGray()) {
 		if (m_cropRect.isEmpty()) {
 			QImage image(1, 1, QImage::Format_Indexed8);
@@ -167,7 +298,8 @@ OutputGenerator::processAsIs(FilterData const& input,
 			image.fill(dominant_gray);
 			return image;
 		}
-		return transformToGray(
+
+		out = transformToGray(
 			input.grayImage(), m_toUncropped, m_cropRect, bg_color
 		);
 	} else {
@@ -176,124 +308,24 @@ OutputGenerator::processAsIs(FilterData const& input,
 			image.fill(bg_color.rgb());
 			return image;
 		}
-		return transform(
-			input.origImage(), m_toUncropped, m_cropRect, bg_color
-		);
+
+		out = transform(input.origImage(), m_toUncropped, m_cropRect, bg_color);
 	}
+
+	assert(out.depth() == 8 || out.depth() == 24 || out.depth() == 32);
+	switch (out.format()) {
+		case QImage::Format_Indexed8:
+			reserveBlackAndWhite(out.size(), out.bytesPerLine(), out.bits());
+			break;
+		case QImage::Format_RGB32:
+		case QImage::Format_ARGB32:
+			reserveBlackAndWhite(out.size(), out.bytesPerLine()/4, (uint32_t*)out.bits());
+			break;
+		default:; // Should not happen.
+	}
+
+	return out;
 }
-
-namespace
-{
-
-struct RaiseAboveBackground
-{
-	static uint8_t transform(uint8_t src, uint8_t dst) {
-		// src: orig
-		// dst: background (dst >= src)
-		if (dst - src < 1) {
-			return 0xff;
-		}
-		unsigned const orig = src;
-		unsigned const background = dst;
-		return static_cast<uint8_t>((orig * 255 + background / 2) / background);
-	}
-};
-
-struct CombineInverted
-{
-	static uint8_t transform(uint8_t src, uint8_t dst) {
-		unsigned const dilated = dst;
-		unsigned const eroded = src;
-		unsigned const res = 255 - (255 - dilated) * eroded / 255;
-		return static_cast<uint8_t>(res);
-	}
-};
-
-/**
- * In picture areas we make sure we don't use pure black and pure white colors.
- * These are reserved for text areas.  This behaviour makes it possible to
- * detect those picture areas later and treat them differently, for example
- * encoding them as a background layer in DjVu format.
- */
-template<typename PixelType>
-PixelType reserveBlackAndWhite(PixelType color);
-
-template<>
-uint32_t reserveBlackAndWhite(uint32_t color)
-{
-	// We handle both RGB32 and ARGB32 here.
-	switch (color & 0x00FFFFFF) {
-		case 0x00000000:
-			return 0xFF010101;
-		case 0x00FFFFFF:
-			return 0xFFFEFEFE;
-		default:
-			return color;
-	}
-}
-
-template<>
-uint8_t reserveBlackAndWhite(uint8_t color)
-{
-	switch (color) {
-		case 0x00:
-			return 0x01;
-		case 0xFF:
-			return 0xFE;
-		default:
-			return color;
-	}
-}
-
-/**
- * Fills areas of \p mixed with pixels from \p bw_content in
- * areas where \p bw_mask is black.  Supported \p mixed image formats
- * are Indexed8 grayscale, RGB32 and ARGB32.
- * The \p MixedPixel type is uint8_t for Indexed8 grayscale and uint32_t
- * for RGB32 and ARGB32.
- */
-template<typename MixedPixel>
-void combineMixed(
-	QImage& mixed, BinaryImage const& bw_content,
-	BinaryImage const& bw_mask)
-{
-	MixedPixel* mixed_line = reinterpret_cast<MixedPixel*>(mixed.bits());
-	int const mixed_stride = mixed.bytesPerLine() / sizeof(MixedPixel);
-	uint32_t const* bw_content_line = bw_content.data();
-	int const bw_content_stride = bw_content.wordsPerLine();
-	uint32_t const* bw_mask_line = bw_mask.data();
-	int const bw_mask_stride = bw_mask.wordsPerLine();
-	int const width = mixed.width();
-	int const height = mixed.height();
-	uint32_t const msb = uint32_t(1) << 31;
-	
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
-				// B/W content.
-
-				uint32_t tmp = bw_content_line[x >> 5];
-				tmp >>= (31 - (x & 31));
-				tmp &= uint32_t(1);
-				// Now it's 0 for white and 1 for black.
-				
-				--tmp; // 0 becomes 0xffffffff and 1 becomes 0.
-				
-				tmp |= 0xff000000; // Force opacity.
-				
-				mixed_line[x] = static_cast<MixedPixel>(tmp);
-			} else {
-				// Non-B/W content.
-				mixed_line[x] = reserveBlackAndWhite<MixedPixel>(mixed_line[x]);
-			}
-		}
-		mixed_line += mixed_stride;
-		bw_content_line += bw_content_stride;
-		bw_mask_line += bw_mask_stride;
-	}
-}
-
-} // anonymous namespace
 
 QImage
 OutputGenerator::normalizeIlluminationGray(
