@@ -55,10 +55,12 @@ private:
 
 
 LoadFileTask::LoadFileTask(
-	PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
+	Type type, PageInfo const& page,
+	ThumbnailPixmapCache& thumbnail_cache,
 	IntrusivePtr<PageSequence> const& page_sequence,
 	IntrusivePtr<fix_orientation::Task> const& next_task)
-:	m_rThumbnailCache(thumbnail_cache),
+:	BackgroundTask(type),
+	m_rThumbnailCache(thumbnail_cache),
 	m_imageId(page.imageId()),
 	m_imageMetadata(page.metadata()),
 	m_ptrPageSequence(page_sequence),

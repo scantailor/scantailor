@@ -15,28 +15,55 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "WorkerThread.h"
 #include "WorkerThread.h.moc"
+#include "ThreadPriority.h"
 #include <QCoreApplication>
 #include <QThread>
 #include <QEvent>
+#include <QSettings>
 #include <assert.h>
+
+#if defined(Q_OS_LINUX) // For Linux updatePriority()
+#include <unistd.h>
+#include <errno.h>
+#include <sys/resource.h>
+#endif
 
 class WorkerThread::Dispatcher : public QObject
 {
 public:
+	enum UpdatePriorityResult {
+		PriorityUpdated,
+		PriorityUpdateFailed,
+		ThreadRestartRequired
+	};
+
 	Dispatcher(Impl& owner);
+
+	UpdatePriorityResult updateThreadPriority(BackgroundTask const& task);
+
+	void maybeProcessQueuedTask();
 protected:
 	virtual void customEvent(QEvent* event);
 private:
+	void processTask(BackgroundTaskPtr const& task);
+
 	Impl& m_rOwner;
+
+	/**
+	 * This one will be set if we decide we need to restart
+	 * the background thread before processing a given task.
+	 */
+	BackgroundTaskPtr m_ptrQueuedTask;
 };
 
 
 class WorkerThread::Impl : public QThread
 {
 public:
+	enum { NormalExit = 0, ExitForRestart };
+
 	Impl(WorkerThread& owner);
 	
 	~Impl();
@@ -46,7 +73,11 @@ protected:
 	virtual void run();
 	
 	virtual void customEvent(QEvent* event);
+protected:
+	void resetPriority();
 private:
+	static QEvent::Type const ThreadRestartEvent = (QEvent::Type)(QEvent::User + 1);
+
 	WorkerThread& m_rOwner;
 	Dispatcher m_dispatcher;
 	bool m_threadStarted;
@@ -119,6 +150,68 @@ WorkerThread::Dispatcher::Dispatcher(Impl& owner)
 {
 }
 
+WorkerThread::Dispatcher::UpdatePriorityResult
+WorkerThread::Dispatcher::updateThreadPriority(BackgroundTask const& task)
+{
+	assert(QCoreApplication::thread() != QThread::currentThread());
+
+	ThreadPriority prio(
+		ThreadPriority::load(
+			QSettings(), "settings/batch_processing_priority", ThreadPriority::Normal
+		)
+	);
+	if (task.type() == task.INTERACTIVE) {
+		prio.setValue(ThreadPriority::Normal);
+	}
+	
+#if defined(Q_OS_LINUX)
+	/*
+	On Linux, there is no good way of adjusting priority of an individual
+	thread of a process.  In particular, pthread_setschedparam() only works
+	for realtime threads.
+	Fortunately, the following quote from pthread(7) provides a workaround
+	that's ugly but better than nothing:
+	----------------------------------------------------
+	NPTL still has a few non-conformances with POSIX.1:
+	...
+	Threads do not share a common nice value.
+	----------------------------------------------------
+	*/
+	if (setpriority(PRIO_PROCESS, 0, prio.toPosixNiceLevel()) != 0) {
+		if (errno == EACCES) {
+			// Unless the executable has special permissions, lowering
+			// the process nice value (even if it doesn't go below zero)
+			// will fail with this error code.  In this case, we restart
+			// the thread.
+			return ThreadRestartRequired;
+		} else {
+			return PriorityUpdateFailed;
+		}
+	}
+#else
+	// QThread::setPriority() doesn't do anything on Linux BTW.
+	m_rOwner.setPriority(prio.toQThreadPriority());
+#endif
+
+	return PriorityUpdated;
+}
+
+void
+WorkerThread::Dispatcher::maybeProcessQueuedTask()
+{
+	if (m_ptrQueuedTask.get()) {
+		BackgroundTaskPtr task;
+		m_ptrQueuedTask.swap(task);
+
+		// In this case we must not restart the thread if updateThreadPriority()
+		// tells us we should.  After all, we've just did that, and doing it again
+		// would probably lead to infinite loop.
+		updateThreadPriority(*task);
+
+		processTask(task);
+	}
+}
+
 void
 WorkerThread::Dispatcher::customEvent(QEvent* event)
 {
@@ -126,10 +219,22 @@ WorkerThread::Dispatcher::customEvent(QEvent* event)
 	assert(evt);
 	BackgroundTaskPtr const& task = evt->task();
 	
+	if (updateThreadPriority(*task) == ThreadRestartRequired) {
+		m_ptrQueuedTask = task;
+		m_rOwner.exit(Impl::ExitForRestart);
+		return;
+	}
+
+	processTask(task);
+}
+
+void
+WorkerThread::Dispatcher::processTask(BackgroundTaskPtr const& task)
+{
 	if (task->isCancelled()) {
 		return;
 	}
-	
+
 	FilterResultPtr const result((*task)());
 	if (result) {
 		QCoreApplication::postEvent(
@@ -151,7 +256,7 @@ WorkerThread::Impl::Impl(WorkerThread& owner)
 
 WorkerThread::Impl::~Impl()
 {
-	exit();
+	exit(NormalExit);
 	wait();
 }
 
@@ -168,15 +273,24 @@ WorkerThread::Impl::performTask(BackgroundTaskPtr const& task)
 void
 WorkerThread::Impl::run()
 {
-	exec();
+	m_dispatcher.maybeProcessQueuedTask();
+
+	if (exec() == ExitForRestart) {
+		QCoreApplication::postEvent(this, new QEvent(ThreadRestartEvent));
+	}
 }
 
 void
 WorkerThread::Impl::customEvent(QEvent* event)
 {
-	TaskResultEvent* evt = dynamic_cast<TaskResultEvent*>(event);
-	assert(evt);
-	m_rOwner.emitTaskResult(evt->task(), evt->result());
+	if (event->type() == ThreadRestartEvent) {
+		start();
+		return;
+	}
+
+	if (TaskResultEvent* evt = dynamic_cast<TaskResultEvent*>(event)) {
+		m_rOwner.emitTaskResult(evt->task(), evt->result());
+	}
 }
 
 
@@ -199,3 +313,4 @@ WorkerThread::TaskResultEvent::TaskResultEvent(
 	m_ptrResult(result)
 {
 }
+

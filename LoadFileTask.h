@@ -40,7 +40,8 @@ class LoadFileTask : public BackgroundTask
 {
 	DECLARE_NON_COPYABLE(LoadFileTask)
 public:
-	LoadFileTask(PageInfo const& page, ThumbnailPixmapCache& thumbnail_cache,
+	LoadFileTask(Type type, PageInfo const& page,
+		ThumbnailPixmapCache& thumbnail_cache,
 		IntrusivePtr<PageSequence> const& page_sequence,
 		IntrusivePtr<fix_orientation::Task> const& next_task);
 	

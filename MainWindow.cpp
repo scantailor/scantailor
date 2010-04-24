@@ -44,6 +44,7 @@
 #include "ProjectCreationContext.h"
 #include "ProjectOpeningContext.h"
 #include "SkinnedButton.h"
+#include "SystemLoadWidget.h"
 #include "ProcessingIndicationWidget.h"
 #include "ImageMetadataLoader.h"
 #include "OrthogonalRotation.h"
@@ -402,7 +403,7 @@ MainWindow::createBatchProcessingWidget()
 	m_ptrBatchProcessingWidget.reset(new QWidget);
 	QGridLayout* layout = new QGridLayout(m_ptrBatchProcessingWidget.get());
 	m_ptrBatchProcessingWidget->setLayout(layout);
-	
+
 	SkinnedButton* stop_btn = new SkinnedButton(
 		":/icons/stop-big.png",
 		":/icons/stop-big-hovered.png",
@@ -416,17 +417,19 @@ MainWindow::createBatchProcessingWidget()
 	lower_panel->setLayout(lower_layout);
 	
 	lower_layout->addSpacing(30);
+	lower_layout->addWidget(new SystemLoadWidget(lower_panel));
 	m_pBeepOnBatchProcessingCompletion = new QCheckBox(
 		tr("Beep when finished"), lower_panel
 	);
 	lower_layout->addWidget(m_pBeepOnBatchProcessingCompletion);
-	
-	layout->addWidget(stop_btn, 1, 1, Qt::AlignCenter);
-	layout->addWidget(lower_panel, 2, 0, 1, 3, Qt::AlignHCenter|Qt::AlignTop);
+
+	int row = 0; // Row 0 is reserved.
+	layout->addWidget(stop_btn, ++row, 1, Qt::AlignCenter);
+	layout->addWidget(lower_panel, ++row, 0, 1, 3, Qt::AlignHCenter|Qt::AlignTop);
 	layout->setColumnStretch(0, 1);
 	layout->setColumnStretch(2, 1);
 	layout->setRowStretch(0, 1);
-	layout->setRowStretch(2, 1);
+	layout->setRowStretch(row, 1);
 	
 	connect(stop_btn, SIGNAL(clicked()), SLOT(stopBatchProcessing()));
 }
@@ -1631,6 +1634,7 @@ MainWindow::createCompositeTask(
 	
 	return BackgroundTaskPtr(
 		new LoadFileTask(
+			m_batchProcessing ? BackgroundTask::BATCH : BackgroundTask::INTERACTIVE,
 			page, *m_ptrThumbnailCache,
 			m_ptrPages, fix_orientation_task
 		)

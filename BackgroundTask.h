@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,12 +29,18 @@
 class BackgroundTask : public AbstractCommand0<FilterResultPtr>, public TaskStatus
 {
 public:
+	enum Type { INTERACTIVE, BATCH };
+
 	class CancelledException : public std::exception
 	{
 	public:
 		virtual char const* what() const throw();
 	};
 	
+	BackgroundTask(Type type) : m_type(type) {}
+
+	Type type() const { return m_type; }
+
 	virtual void cancel() { m_cancelFlag.fetchAndStoreRelaxed(1); }
 	
 	virtual bool isCancelled() const {
@@ -47,6 +53,7 @@ public:
 	virtual void throwIfCancelled() const;
 private:
 	mutable QAtomicInt m_cancelFlag;
+	Type const m_type;
 };
 
 typedef IntrusivePtr<BackgroundTask> BackgroundTaskPtr;

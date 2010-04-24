@@ -389,6 +389,8 @@ SET(
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
 	Undistort.cpp Undistort.h
+	ThreadPriority.cpp ThreadPriority.h
+	SystemLoadWidget.cpp SystemLoadWidget.h
 	Utils.cpp Utils.h
 	AutoManualMode.h
 	AbstractCommand.h
