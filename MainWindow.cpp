@@ -1474,7 +1474,9 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	dialog->setProxyModel(new ProxyModel(*m_ptrPages));
 	dialog->setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));
 	
-	dialog->exec();
+	if (dialog->exec() == QDialog::Rejected) {
+		return;
+	}
 	
 	QStringList const files(dialog->selectedFiles());
 	if (files.size() != 1) {
