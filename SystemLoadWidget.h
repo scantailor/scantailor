@@ -33,6 +33,10 @@ private slots:
 	void sliderMoved(int prio);
 
 	void valueChanged(int prio);
+
+	void decreasePriority();
+
+	void increasePriority();
 private:
 	void showHideToolTip(int prio);
 

@@ -33,6 +33,8 @@ SystemLoadWidget::SystemLoadWidget(QWidget* parent)
 	connect(ui.slider, SIGNAL(sliderPressed()), SLOT(sliderPressed()));
 	connect(ui.slider, SIGNAL(sliderMoved(int)), SLOT(sliderMoved(int)));
 	connect(ui.slider, SIGNAL(valueChanged(int)), SLOT(valueChanged(int)));
+	connect(ui.minusBtn, SIGNAL(clicked()), SLOT(decreasePriority()));
+	connect(ui.plusBtn, SIGNAL(clicked()), SLOT(increasePriority()));
 }
 
 void
@@ -51,6 +53,20 @@ void
 SystemLoadWidget::valueChanged(int prio)
 {
 	ThreadPriority((ThreadPriority::Priority)prio).save("settings/batch_processing_priority");
+}
+
+void
+SystemLoadWidget::decreasePriority()
+{
+	ui.slider->setValue(ui.slider->value() - 1);
+	showHideToolTip(ui.slider->value());
+}
+
+void
+SystemLoadWidget::increasePriority()
+{
+	ui.slider->setValue(ui.slider->value() + 1);
+	showHideToolTip(ui.slider->value());
 }
 
 void
