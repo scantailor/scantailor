@@ -540,7 +540,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="17"/>
         <source>Apply Mode</source>
-        <translation>適用モード</translation>
+        <translation>モードを適用する</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
@@ -765,7 +765,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="86"/>
         <source>Top</source>
-        <translation>先頭</translation>
+        <translation>上</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="93"/>
@@ -785,7 +785,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="114"/>
         <source>Bottom</source>
-        <translation>末尾</translation>
+        <translation>下</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="131"/>
@@ -1289,7 +1289,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="62"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+マウスホイールで回転できます。Ctrl+Shift+マウスホイールでより細かく回転できます。</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
@@ -1371,7 +1371,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="387"/>
         <source>Apply Despeckling Level</source>
-        <translation>歪み補正レベルを適用する</translation>
+        <translation>スペックル除去レベルを適用する</translation>
     </message>
 </context>
 <context>
@@ -1384,7 +1384,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="425"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
-        <translation>歪み補正はカラー／グレースケールモードでのみ有効です。</translation>
+        <translation>スペックル除去はカラー／グレースケールモードでは無効です。</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="442"/>
