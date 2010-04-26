@@ -159,7 +159,7 @@
     <message>
         <location filename="../FixDpiSinglePageDialog.cpp" line="144"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>Стойността на DPI е прекалено малка за този размер на пиксела. Такава комбинация вероятно ще доведе до грешки в паметта.</translation>
+        <translation>Стойността на DPI е прекалено малка за този размер в пиксели. Такава комбинация вероятно ще доведе до грешки в паметта.</translation>
     </message>
 </context>
 <context>
@@ -1298,7 +1298,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="62"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Използвайте Ctrl+колелцето или Ctrl+Shift+колелцето за фино завъртане.</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
