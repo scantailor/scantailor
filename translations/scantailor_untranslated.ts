@@ -233,7 +233,7 @@
         <location filename="../MainWindow.cpp" line="1136"/>
         <location filename="../MainWindow.cpp" line="1390"/>
         <location filename="../MainWindow.cpp" line="1421"/>
-        <location filename="../MainWindow.cpp" line="1496"/>
+        <location filename="../MainWindow.cpp" line="1498"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -280,12 +280,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1497"/>
+        <location filename="../MainWindow.cpp" line="1499"/>
         <source>Error opening the image file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1537"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1251,7 +1251,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::ImageView</name>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="59"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="62"/>
+        <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ImageView.cpp" line="65"/>
         <source>Drag this handle to rotate the image.</source>
         <translation type="unfinished"></translation>
     </message>

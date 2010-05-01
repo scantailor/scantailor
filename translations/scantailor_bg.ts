@@ -159,7 +159,7 @@
     <message>
         <location filename="../FixDpiSinglePageDialog.cpp" line="144"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>Стойността на DPI е прекалено малка за този размер на пиксела. Такава комбинация вероятно ще доведе до грешки в паметта.</translation>
+        <translation>Стойността на DPI е прекалено малка за този размер в пиксели. Такава комбинация вероятно ще доведе до грешки в паметта.</translation>
     </message>
 </context>
 <context>
@@ -238,7 +238,7 @@
         <location filename="../MainWindow.cpp" line="1136"/>
         <location filename="../MainWindow.cpp" line="1390"/>
         <location filename="../MainWindow.cpp" line="1421"/>
-        <location filename="../MainWindow.cpp" line="1496"/>
+        <location filename="../MainWindow.cpp" line="1498"/>
         <source>Error</source>
         <translation>Грешка</translation>
     </message>
@@ -286,7 +286,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Изображения, които не са в проекта (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1497"/>
+        <location filename="../MainWindow.cpp" line="1499"/>
         <source>Error opening the image file.</source>
         <translation>Грешка при отваряне на файла с изображението.</translation>
     </message>
@@ -295,7 +295,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страница %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1537"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Remove</source>
         <translation>Премахване</translation>
     </message>
@@ -1296,7 +1296,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>deskew::ImageView</name>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="59"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="62"/>
+        <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
+        <translation>Използвайте Ctrl+колелцето или Ctrl+Shift+колелцето за фино завъртане.</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ImageView.cpp" line="65"/>
         <source>Drag this handle to rotate the image.</source>
         <translation>Влачете този манипулатор за да завъртите изображението.</translation>
     </message>

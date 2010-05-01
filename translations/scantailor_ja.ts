@@ -234,7 +234,7 @@
         <location filename="../MainWindow.cpp" line="1136"/>
         <location filename="../MainWindow.cpp" line="1390"/>
         <location filename="../MainWindow.cpp" line="1421"/>
-        <location filename="../MainWindow.cpp" line="1496"/>
+        <location filename="../MainWindow.cpp" line="1498"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -281,7 +281,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>プロジェクトに含まない画像 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1497"/>
+        <location filename="../MainWindow.cpp" line="1499"/>
         <source>Error opening the image file.</source>
         <translation>画像ファイルを開けません！</translation>
     </message>
@@ -290,7 +290,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1537"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Remove</source>
         <translation>取り除く</translation>
     </message>
@@ -540,7 +540,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="17"/>
         <source>Apply Mode</source>
-        <translation>適用モード</translation>
+        <translation>モードを適用する</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
@@ -765,7 +765,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="86"/>
         <source>Top</source>
-        <translation>先頭</translation>
+        <translation>上</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="93"/>
@@ -785,7 +785,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="114"/>
         <source>Bottom</source>
-        <translation>末尾</translation>
+        <translation>下</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="131"/>
@@ -1287,7 +1287,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::ImageView</name>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="59"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="62"/>
+        <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
+        <translation type="unfinished">Ctrl+マウスホイールで回転できます。Ctrl+Shift+マウスホイールでより細かく回転できます。</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ImageView.cpp" line="65"/>
         <source>Drag this handle to rotate the image.</source>
         <translation>ハンドルをドラッグすると画像を回転できます。</translation>
     </message>
@@ -1366,7 +1371,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="387"/>
         <source>Apply Despeckling Level</source>
-        <translation>歪み補正レベルを適用する</translation>
+        <translation>スペックル除去レベルを適用する</translation>
     </message>
 </context>
 <context>
@@ -1379,7 +1384,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="425"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
-        <translation>歪み補正はカラー／グレースケールモードでのみ有効です。</translation>
+        <translation>スペックル除去はカラー／グレースケールモードでは無効です。</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="442"/>
