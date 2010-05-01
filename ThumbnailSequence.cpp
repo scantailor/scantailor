@@ -21,6 +21,7 @@
 #include "ThumbnailFactory.h"
 #include "IncompleteThumbnail.h"
 #include "PageSequence.h"
+#include "PageOrderProvider.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "ImageId.h"
@@ -127,11 +128,12 @@ public:
 	~Impl();
 	
 	void setThumbnailFactory(IntrusivePtr<ThumbnailFactory> const& factory);
-	
+
 	void attachView(QGraphicsView* view);
 	
 	void reset(PageSequenceSnapshot const& pages,
-		SelectionAction const selection_action);
+		SelectionAction const selection_action,
+		IntrusivePtr<PageOrderProvider const> const& provider);
 	
 	void invalidateThumbnail(PageId const& page_id);
 	
@@ -189,13 +191,27 @@ private:
 	
 	void moveToUnselected(Item const* item);
 	
-	void setThumbnail(
-		ItemsById::iterator const& id_it,
-		std::auto_ptr<CompositeItem> composite);
-	
 	void clear();
 	
 	void clearSelection();
+
+	/**
+	 * Calculates the insertion position for an item with the given PageId
+	 * based on m_ptrOrderProvider.
+	 *
+	 * \param begin Beginning of the interval to consider.
+	 * \param end End of the interval to consider.
+	 * \param page_id The item to find insertion position for.
+	 * \param hint The place to start the search.  Must be within [begin, end].
+	 * \param dist_from_hint If provided, the distance from \p hint
+	 *        to the calculated insertion position will be written there.
+	 *        For example, \p dist_from_hint == -2 would indicate that the
+	 *        insertion position is two elements to the left of \p hint.
+	 */
+	ItemsInOrder::iterator itemInsertPosition(
+		ItemsInOrder::iterator begin, ItemsInOrder::iterator end,
+		PageId const& page_id, ItemsInOrder::iterator hint,
+		int* dist_from_hint = 0);
 	
 	std::auto_ptr<QGraphicsItem> getThumbnail(
 		PageInfo const& page_info, int page_num);
@@ -222,6 +238,7 @@ private:
 	
 	Item const* m_pSelectionLeader;
 	IntrusivePtr<ThumbnailFactory> m_ptrFactory;
+	IntrusivePtr<PageOrderProvider const> m_ptrOrderProvider;
 	GraphicsScene m_graphicsScene;
 	QRectF m_sceneRect;
 };
@@ -335,10 +352,12 @@ ThumbnailSequence::attachView(QGraphicsView* const view)
 }
 
 void
-ThumbnailSequence::reset(PageSequenceSnapshot const& pages,
-	SelectionAction const selection_action)
+ThumbnailSequence::reset(
+	PageSequenceSnapshot const& pages,
+	SelectionAction const selection_action,
+	IntrusivePtr<PageOrderProvider const> const& order_provider)
 {
-	m_ptrImpl->reset(pages, selection_action);
+	m_ptrImpl->reset(pages, selection_action, order_provider);
 }
 
 void
@@ -438,9 +457,13 @@ ThumbnailSequence::Impl::attachView(QGraphicsView* const view)
 }
 
 void
-ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages,
-	SelectionAction const selection_action)
+ThumbnailSequence::Impl::reset(
+	PageSequenceSnapshot const& pages,
+	SelectionAction const selection_action,
+	IntrusivePtr<PageOrderProvider const> const& order_provider)
 {
+	m_ptrOrderProvider = order_provider;
+
 	std::set<PageId> selected;
 	PageInfo selection_leader;
 	
@@ -457,12 +480,25 @@ ThumbnailSequence::Impl::reset(PageSequenceSnapshot const& pages,
 	if (num_pages == 0) {
 		return;
 	}
-	
+
+	// Sort pages using m_ptrOrderProvider.
+	std::vector<PageInfo> sorted_pages;
+	sorted_pages.reserve(num_pages);
+	for (size_t i = 0; i < num_pages; ++i) {
+		sorted_pages.push_back(pages.pageAt(i));
+	}
+	if (m_ptrOrderProvider.get()) {
+		std::stable_sort(
+			sorted_pages.begin(), sorted_pages.end(),
+			m_ptrOrderProvider->comparator()
+		);
+	}
+
 	Item const* some_selected_item = 0;
 	double offset = 0;
-	
+
 	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info(pages.pageAt(i));
+		PageInfo const& page_info(sorted_pages[i]);
 		
 		std::auto_ptr<CompositeItem> composite(
 			getCompositeItem(0, page_info, i)
@@ -514,12 +550,100 @@ void
 ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_id));
-	if (id_it != m_itemsById.end()) {
-		setThumbnail(
-			id_it,
-			getCompositeItem(&*id_it, id_it->pageInfo, id_it->pageNum)
-		);
-		id_it->composite->updateAppearence(id_it->isSelected(), id_it->isSelectionLeader());
+	if (id_it == m_itemsById.end()) {
+		return;
+	}
+
+	std::auto_ptr<CompositeItem> composite(
+		getCompositeItem(&*id_it, id_it->pageInfo, id_it->pageNum)
+	);
+	CompositeItem* const new_composite = composite.get();
+	CompositeItem* const old_composite = id_it->composite;
+	QSizeF const old_size(old_composite->boundingRect().size());
+	QSizeF const new_size(new_composite->boundingRect().size());
+	QPointF const old_pos(new_composite->pos());
+	
+	new_composite->updateAppearence(id_it->isSelected(), id_it->isSelectionLeader());
+	
+	m_graphicsScene.addItem(composite.release());
+	id_it->composite = new_composite;
+	delete old_composite;
+	
+	ItemsInOrder::iterator after_old(m_items.project<ItemsInOrderTag>(id_it));
+	// Notice after_old++ below.
+
+	// Move our item to the beginning of m_itemsInOrder, to make it out of range
+	// we are going to pass to itemInsertPosition().
+	m_itemsInOrder.relocate(m_itemsInOrder.begin(), after_old++);
+
+	int dist = 0;
+	ItemsInOrder::iterator const after_new(
+		itemInsertPosition(
+			++m_itemsInOrder.begin(), m_itemsInOrder.end(),
+			page_id, after_old, &dist
+		)
+	);
+
+	// Move our item to its intended position.
+	m_itemsInOrder.relocate(after_new, m_itemsInOrder.begin());
+
+
+	// Now let's reposition the items on the scene.
+	
+	ItemsInOrder::iterator ord_it, ord_end;
+
+	// The range of [ord_it, ord_end) is supposed to contain all items
+	// between the old and new positions of our item, with the new
+	// position in range.
+
+	if (dist <= 0) { // New position is before or equals to the old one.
+		ord_it = after_new;
+		--ord_it; // Include new item position in the range.
+		ord_end = after_old;
+	} else { // New position is after the old one.
+		ord_it = after_old;
+		ord_end = after_new;
+	}
+	
+	double offset = 0;
+
+	if (ord_it != m_itemsInOrder.begin()) {
+		ItemsInOrder::iterator prev(ord_it);
+		--prev;
+		offset = prev->composite->pos().y() + prev->composite->boundingRect().height() + SPACING;
+	}
+
+	// Reposition items between the old and the new position of our item,
+	// including the item itself.
+	for (; ord_it != ord_end; ++ord_it) {
+		ord_it->composite->setPos(0.0, offset);
+		offset += ord_it->composite->boundingRect().height() + SPACING;
+	}
+
+	// Reposition the items following both the new and the old position
+	// of the item, if the item size has changed.
+	if (old_size != new_size) {
+		for (; ord_it != m_itemsInOrder.end(); ++ord_it) {
+			ord_it->composite->setPos(0.0, offset);
+			offset += ord_it->composite->boundingRect().height() + SPACING;
+		}
+	}
+	
+	// Update scene rect.
+	m_sceneRect.setTop(m_sceneRect.bottom());
+	m_itemsInOrder.front().composite->updateSceneRect(m_sceneRect);
+	m_sceneRect.setBottom(m_sceneRect.top());
+	m_itemsInOrder.back().composite->updateSceneRect(m_sceneRect);
+	id_it->composite->updateSceneRect(m_sceneRect);
+	commitSceneRect();
+
+	// Possibly emit the newSelectionLeader() signal.
+	if (m_pSelectionLeader == &*id_it) {
+		if (old_size != new_size || old_pos != id_it->composite->pos()) {
+			m_rOwner.emitNewSelectionLeader(
+				id_it->pageInfo, id_it->composite, REDUNDANT_SELECTION
+			);
+		}
 	}
 }
 
@@ -529,6 +653,16 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
 	double offset = 0;
 	
+	// Sort pages in m_itemsInOrder using m_ptrOrderProvider.
+	if (m_ptrOrderProvider.get()) {
+		m_itemsInOrder.sort(
+			bind(
+				&PageOrderProvider::precedes, m_ptrOrderProvider.get(),
+				bind(&Item::pageId, _1), bind(&Item::pageId, _2) 
+			)
+		);
+	}
+
 	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
 	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
 	for (; ord_it != ord_end; ++ord_it) {
@@ -620,18 +754,31 @@ ThumbnailSequence::Impl::insert(
 		ord_it = m_items.project<ItemsInOrderTag>(id_it);
 		
 		if (before_or_after == AFTER) {
-			// Advance past not only the target page, but also its other half, if it follows.
-			do {
-				++ord_it;
-			} while (ord_it != m_itemsInOrder.end() && ord_it->pageInfo.imageId() == image);
+			++ord_it;
+			if (!m_ptrOrderProvider.get()) { 
+				// Advance past not only the target page, but also its other half, if it follows.
+				while (ord_it != m_itemsInOrder.end() && ord_it->pageInfo.imageId() == image) {
+					++ord_it;
+				}
+			}
 		}
 	}
+
+	// If m_ptrOrderProvider is not set, ord_it won't change.
+	ord_it = itemInsertPosition(
+		m_itemsInOrder.begin(), m_itemsInOrder.end(), page_info.id(), ord_it
+	);
 	
 	int page_num = 0;
 	double offset = 0.0;
 	if (!m_items.empty()) {
 		// That's the best thing we can do here.
 		// A proper solution would require renaming files.
+		// XXX: if m_ptrOrderProvider is set, what we do is completely
+		// wrong and could lead to a wrong thumbnail being displayed.
+		// The proper solution in this case is to get rid of sequential
+		// numbering of output files, but rather adopt a naming scheme
+		// like {orig_name}_{L|R}.tiff
 		page_num = m_itemsInOrder.rbegin()->pageNum + 1;
 		
 		if (ord_it != m_itemsInOrder.end()) {
@@ -997,37 +1144,6 @@ ThumbnailSequence::Impl::selectItemNoModifiers(ItemsById::iterator const& id_it)
 }
 
 void
-ThumbnailSequence::Impl::setThumbnail(
-	ItemsById::iterator const& id_it, std::auto_ptr<CompositeItem> composite)
-{
-	CompositeItem* const old_composite = id_it->composite;
-	CompositeItem* const new_composite = composite.get();
-	QSizeF const old_size(old_composite->boundingRect().size());
-	QSizeF const new_size(new_composite->boundingRect().size());
-	
-	new_composite->setPos(old_composite->pos());
-	composite->updateSceneRect(m_sceneRect);
-	
-	QPointF const pos_delta(0.0, new_size.height() - old_size.height());
-	delete old_composite;
-	
-	if (pos_delta != QPointF(0.0, 0.0)) {
-		ItemsInOrder::iterator ord_it(m_items.project<ItemsInOrderTag>(id_it));
-		ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
-		++ord_it; // Skip the item itself.
-		for (; ord_it != ord_end; ++ord_it) {
-			ord_it->composite->setPos(ord_it->composite->pos() + pos_delta);
-			ord_it->composite->updateSceneRect(m_sceneRect);
-		}
-	}
-	
-	id_it->composite = new_composite;
-	m_graphicsScene.addItem(composite.release());
-	
-	commitSceneRect();
-}
-
-void
 ThumbnailSequence::Impl::clear()
 {
 	m_pSelectionLeader = 0;
@@ -1056,6 +1172,56 @@ ThumbnailSequence::Impl::clearSelection()
 		}
 		item.setSelected(false);
 	}
+}
+
+ThumbnailSequence::Impl::ItemsInOrder::iterator
+ThumbnailSequence::Impl::itemInsertPosition(
+	ItemsInOrder::iterator const begin, ItemsInOrder::iterator const end,
+	PageId const& page_id, ItemsInOrder::iterator const hint, int* dist_from_hint)
+{
+	if (!m_ptrOrderProvider.get()) {
+		if (dist_from_hint) {
+			*dist_from_hint = 0;
+		}
+		return hint;
+	}
+
+	ItemsInOrder::iterator ins_pos(hint);
+	int dist = 0;
+
+	// Move back ins_pos until it points to an element preceding
+	// or equivalent to page_id, or to the first element in range.
+	if (ins_pos != begin) {
+		if (ins_pos == end) {
+			--ins_pos;
+			--dist;
+		}
+		while (ins_pos != begin) {
+			if (m_ptrOrderProvider->precedes(page_id, ins_pos->pageId())) {
+				--ins_pos;
+				--dist;
+			} else {
+				break;
+			}
+		}
+	}
+
+	// Advance ins_pos until it points to an element following page_id
+	// or to the end of range.
+	while (ins_pos != end) {
+		if (m_ptrOrderProvider->precedes(page_id, ins_pos->pageId())) {
+			break;
+		} else {
+			++ins_pos;
+			++dist;
+		}
+	}
+
+	if (dist_from_hint) {
+		*dist_from_hint = dist;
+	}
+
+	return ins_pos;
 }
 
 std::auto_ptr<QGraphicsItem>

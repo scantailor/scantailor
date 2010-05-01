@@ -400,6 +400,8 @@ SET(
 	CompositeCacheDrivenTask.h
 	Margins.h
 	ChangedStateItemDelegate.h
+	PageOrderProvider.h
+	PageOrderOption.h
 	PageRange.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h

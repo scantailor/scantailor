@@ -25,6 +25,8 @@
 #include "PageSelectionAccessor.h"
 #include "StageSequence.h"
 #include "ThumbnailSequence.h"
+#include "PageOrderOption.h"
+#include "PageOrderProvider.h"
 #include "ImageInfo.h"
 #include "PageInfo.h"
 #include "ImageId.h"
@@ -118,6 +120,7 @@ MainWindow::MainWindow()
 	m_ptrWorkerThread(new WorkerThread),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
+	m_ignorePageOrderingChanges(0),
 	m_debug(false),
 	m_batchProcessing(false),
 	m_closing(false)
@@ -200,6 +203,10 @@ MainWindow::MainWindow()
 	connect(
 		focusButton, SIGNAL(clicked(bool)),
 		this, SLOT(thumbViewFocusToggled(bool))
+	);
+	connect(
+		sortOptions, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(pageOrderingChanged(int))
 	);
 	
 	connect(
@@ -297,7 +304,7 @@ MainWindow::switchToNewProject(
 	m_ptrPages = pages;
 	m_outDir = out_dir;
 	m_projectFile = project_file_path;
-	
+
 	// Recreate the stages and load their state.
 	m_ptrStages.reset(new StageSequence(pages, this));
 	if (project_reader) {
@@ -322,6 +329,8 @@ MainWindow::switchToNewProject(
 			this, SLOT(filterSelectionChanged(QItemSelection const&))
 		);
 	}
+
+	updateSortOptions();
 	
 	m_ptrContentBoxPropagator.reset(
 		new ContentBoxPropagator(
@@ -339,7 +348,7 @@ MainWindow::switchToNewProject(
 	} else {
 		m_ptrThumbnailCache = createThumbnailCache();
 	}
-	resetThumbSequence(ThumbnailSequence::RESET_SELECTION);
+	resetThumbSequence(ThumbnailSequence::RESET_SELECTION, currentPageOrderProvider());
 	
 	removeFilterOptionsWidget();
 	updateProjectActions();
@@ -529,9 +538,42 @@ MainWindow::compareFiles(QString const& fpath1, QString const& fpath2)
 	}
 }
 
+IntrusivePtr<PageOrderProvider const>
+MainWindow::currentPageOrderProvider() const
+{
+	int const idx = sortOptions->currentIndex();
+	if (idx < 0) {
+		return IntrusivePtr<PageOrderProvider const>();
+	}
+
+	IntrusivePtr<AbstractFilter> const filter(m_ptrStages->filterAt(m_curFilter));
+	return filter->pageOrderOptions()[idx].provider();
+}
+
+void
+MainWindow::updateSortOptions()
+{
+	ScopedIncDec<int> const guard(m_ignorePageOrderingChanges);
+
+	IntrusivePtr<AbstractFilter> const filter(m_ptrStages->filterAt(m_curFilter));
+
+	sortOptions->clear();
+	
+	BOOST_FOREACH(PageOrderOption const& opt, filter->pageOrderOptions()) {
+		sortOptions->addItem(opt.name());
+	}
+
+	sortOptions->setVisible(sortOptions->count() > 0);
+	
+	if (sortOptions->count() > 0) {
+		sortOptions->setCurrentIndex(filter->selectedPageOrder());
+	}
+}
+
 void
 MainWindow::resetThumbSequence(
-	ThumbnailSequence::SelectionAction const selection_action)
+	ThumbnailSequence::SelectionAction const selection_action,
+	IntrusivePtr<PageOrderProvider const> const& page_order_provider)
 {
 	if (m_ptrThumbnailCache.get()) {
 		IntrusivePtr<CompositeCacheDrivenTask> const task(
@@ -549,7 +591,8 @@ MainWindow::resetThumbSequence(
 	}
 	
 	m_ptrThumbSequence->reset(
-		m_ptrPages->snapshot(getCurrentView()), selection_action
+		m_ptrPages->snapshot(getCurrentView()),
+		selection_action, page_order_provider
 	);
 	
 	if (!m_ptrThumbnailCache.get()) {
@@ -869,7 +912,10 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	bool const now_below_select_content = isBelowSelectContent(m_curFilter);
 	
 	m_ptrStages->filterAt(m_curFilter)->selected();
+	
+	updateSortOptions();
 
+	// Propagate context boxes down the stage list, if necessary.
 	if (!was_below_select_content && now_below_select_content) {
 		// IMPORTANT: this needs to go before resetting thumbnails,
 		// because it may affect them.
@@ -879,8 +925,26 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	}
 	
 	focusButton->setChecked(true); // Should go before resetThumbSequence().
-	resetThumbSequence(ThumbnailSequence::KEEP_SELECTION);
+	resetThumbSequence(ThumbnailSequence::KEEP_SELECTION, currentPageOrderProvider());
 	updateMainArea();
+}
+
+void
+MainWindow::pageOrderingChanged(int idx)
+{
+	if (m_ignorePageOrderingChanges) {
+		return;
+	}
+
+	focusButton->setChecked(true); // Keep the current page in view.
+
+	m_ptrStages->filterAt(m_curFilter)->selectPageOrder(idx);
+
+	m_ptrThumbSequence->reset(
+		m_ptrPages->snapshot(getCurrentView()),
+		ThumbnailSequence::KEEP_SELECTION,
+		currentPageOrderProvider()
+	);
 }
 
 void

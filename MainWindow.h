@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 class AbstractFilter;
 class ThumbnailPixmapCache;
 class StageSequence;
+class PageOrderProvider;
 class FilterOptionsWidget;
 class ProcessingIndicationWidget;
 class ImageInfo;
@@ -102,8 +103,10 @@ private slots:
 	void thumbViewFocusToggled(bool checked);
 	
 	void thumbViewScrolled();
-	
+
 	void filterSelectionChanged(QItemSelection const& selected);
+
+	void pageOrderingChanged(int idx);
 	
 	void reloadRequested();
 	
@@ -170,7 +173,13 @@ private:
 	
 	static bool compareFiles(QString const& fpath1, QString const& fpath2);
 	
-	void resetThumbSequence(ThumbnailSequence::SelectionAction selection_action);
+	IntrusivePtr<PageOrderProvider const> currentPageOrderProvider() const;
+
+	void updateSortOptions();
+
+	void resetThumbSequence(
+		ThumbnailSequence::SelectionAction selection_action,
+		IntrusivePtr<PageOrderProvider const> const& page_order_provider);
 	
 	void removeWidgetsFromLayout(QLayout* layout);
 	
@@ -245,6 +254,7 @@ private:
 	QObjectCleanupHandler m_imageWidgetCleanup;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
+	int m_ignorePageOrderingChanges;
 	bool m_debug;
 	bool m_batchProcessing;
 	bool m_closing;

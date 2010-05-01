@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "RefCountable.h"
 #include "PageSequence.h"
+#include "PageOrderOption.h"
 #include <vector>
 
 class FilterUiInterface;
@@ -41,6 +42,14 @@ public:
 	virtual PageSequence::View getView() const = 0;
 	
 	virtual void selected() {}
+
+	virtual int selectedPageOrder() const { return -1; }
+
+	virtual void selectPageOrder(int option) {}
+
+	virtual std::vector<PageOrderOption> pageOrderOptions() const {
+		return std::vector<PageOrderOption>();
+	}
 
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id) = 0;
 	

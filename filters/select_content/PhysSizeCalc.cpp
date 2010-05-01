@@ -16,49 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECT_CONTENT_PARAMS_H_
-#define SELECT_CONTENT_PARAMS_H_
-
-#include "Dependencies.h"
-#include "AutoManualMode.h"
-#include <QRectF>
-#include <QSizeF>
-
-class QDomDocument;
-class QDomElement;
-class QString;
+#include "PhysSizeCalc.h"
+#include "ImageTransformation.h"
+#include "PhysicalTransformation.h"
+#include <QPolygonF>
 
 namespace select_content
 {
 
-class Params
+PhysSizeCalc::PhysSizeCalc()
 {
-public:
-	// Member-wise copying is OK.
-	
-	Params(QRectF const& rect, QSizeF const& size_mm,
-		Dependencies const& deps, AutoManualMode mode);
-	
-	Params(QDomElement const& filter_el);
-	
-	~Params();
-	
-	QRectF const& contentRect() const { return m_contentRect; }
+}
 
-	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
-	
-	Dependencies const& dependencies() const { return m_deps; }
-	
-	AutoManualMode mode() const { return m_mode; }
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-private:
-	QRectF m_contentRect;
-	QSizeF m_contentSizeMM;
-	Dependencies m_deps;
-	AutoManualMode m_mode;
-};
+PhysSizeCalc::PhysSizeCalc(ImageTransformation const& xform)
+:	m_virtToPhys(xform.transformBack() * PhysicalTransformation(xform.origDpi()).pixelsToMM())
+{
+}
+
+QSizeF
+PhysSizeCalc::sizeMM(QRectF const& rect_px) const
+{
+	QPolygonF const poly_mm(m_virtToPhys.map(rect_px));
+	QSizeF const size_mm(
+		QLineF(poly_mm[0], poly_mm[1]).length(),
+		QLineF(poly_mm[1], poly_mm[2]).length()
+	);
+	return size_mm;
+}
 
 } // namespace select_content
-
-#endif

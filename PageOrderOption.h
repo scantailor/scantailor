@@ -16,49 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECT_CONTENT_PARAMS_H_
-#define SELECT_CONTENT_PARAMS_H_
+#ifndef PAGE_ORDER_OPTION_H_
+#define PAGE_ORDER_OPTION_H_
 
-#include "Dependencies.h"
-#include "AutoManualMode.h"
-#include <QRectF>
-#include <QSizeF>
+#include "IntrusivePtr.h"
+#include "PageOrderProvider.h"
+#include <QString>
 
-class QDomDocument;
-class QDomElement;
-class QString;
-
-namespace select_content
+class PageOrderOption
 {
-
-class Params
-{
-public:
 	// Member-wise copying is OK.
-	
-	Params(QRectF const& rect, QSizeF const& size_mm,
-		Dependencies const& deps, AutoManualMode mode);
-	
-	Params(QDomElement const& filter_el);
-	
-	~Params();
-	
-	QRectF const& contentRect() const { return m_contentRect; }
+public:
+	typedef IntrusivePtr<PageOrderProvider const> ProviderPtr;
 
-	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
-	
-	Dependencies const& dependencies() const { return m_deps; }
-	
-	AutoManualMode mode() const { return m_mode; }
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
+	PageOrderOption(QString const& name, ProviderPtr const& provider)
+		: m_name(name), m_ptrProvider(provider) {}
+
+	QString const& name() const { return m_name; }
+
+	/**
+	 * Returns the ordering information provider.
+	 * A null provider is OK and is to be interpreted as default order.
+	 */
+	ProviderPtr const& provider() const { return m_ptrProvider; }
 private:
-	QRectF m_contentRect;
-	QSizeF m_contentSizeMM;
-	Dependencies m_deps;
-	AutoManualMode m_mode;
+	QString m_name;
+	ProviderPtr m_ptrProvider;
 };
-
-} // namespace select_content
 
 #endif

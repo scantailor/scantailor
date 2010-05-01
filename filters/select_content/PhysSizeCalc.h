@@ -16,47 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECT_CONTENT_PARAMS_H_
-#define SELECT_CONTENT_PARAMS_H_
+#ifndef SELECT_CONTENT_PHYS_SIZE_CALC_H_
+#define SELECT_CONTENT_PHYS_SIZE_CALC_H_
 
-#include "Dependencies.h"
-#include "AutoManualMode.h"
-#include <QRectF>
+#include <QTransform>
 #include <QSizeF>
+#include <QRectF>
 
-class QDomDocument;
-class QDomElement;
-class QString;
+class ImageTransformation;
 
 namespace select_content
 {
 
-class Params
+class PhysSizeCalc
 {
-public:
 	// Member-wise copying is OK.
-	
-	Params(QRectF const& rect, QSizeF const& size_mm,
-		Dependencies const& deps, AutoManualMode mode);
-	
-	Params(QDomElement const& filter_el);
-	
-	~Params();
-	
-	QRectF const& contentRect() const { return m_contentRect; }
+public:
+	PhysSizeCalc();
 
-	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
-	
-	Dependencies const& dependencies() const { return m_deps; }
-	
-	AutoManualMode mode() const { return m_mode; }
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
+	explicit PhysSizeCalc(ImageTransformation const& xform);
+
+	QSizeF sizeMM(QRectF const& rect_px) const;
 private:
-	QRectF m_contentRect;
-	QSizeF m_contentSizeMM;
-	Dependencies m_deps;
-	AutoManualMode m_mode;
+	QTransform m_virtToPhys;
 };
 
 } // namespace select_content

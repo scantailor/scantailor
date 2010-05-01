@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ class PageId;
 class ImageId;
 class PageInfo;
 class PageSequenceSnapshot;
+class PageOrderProvider;
 class ThumbnailFactory;
 class QSizeF;
 class QRectF;
@@ -77,13 +78,44 @@ public:
 	
 	void attachView(QGraphicsView* view);
 	
+	/**
+	 * \brief Re-populate the list of thumbnails.
+	 *
+	 * \param pages Pages to put in the sequence.
+	 * \param selection_action Whether to keep the selection, provided
+	 *        selected item(s) are still present in the new list of pages.
+	 * \param order_provider The source of ordering information.  It will
+	 *        be preserved until the next reset() call and will be taken
+	 *        into account by other methods, like invalidateThumbnail()
+	 *        and insert().  A null order provider indicates to keep the
+	 *        order of PageSequence.
+	 */
 	void reset(PageSequenceSnapshot const& pages,
-		SelectionAction const selection_action);
+		SelectionAction const selection_action,
+		IntrusivePtr<PageOrderProvider const> const& order_provider
+			= IntrusivePtr<PageOrderProvider const>());
 	
+	/**
+	 * \brief Updates appearence and possibly position of a thumbnail.
+	 *
+	 * If thumbnail's size or position have changed and this thumbnail
+	 * is a selection leader, newSelectionLeader() signal will be emitted
+	 * with REDUNDANT_SELECTION flag set.
+	 *
+	 * \note This function assumes the thumbnail specified by page_id
+	 *       is the only thumbnail at incorrect position.  If you do
+	 *       something that changes the logical position of more than
+	 *       one thumbnail at once, use invalidateAllThumbnails()
+	 *       instead of sequentially calling invalidateThumbnail().
+	 */
 	void invalidateThumbnail(PageId const& page_id);
 	
-	void invalidateThumbnail(ImageId const& image_id);
-	
+	/**
+	 * \brief Updates appearence of all thumbnails and possibly their order.
+	 *
+	 * Whether or not order will be updated depends on whether an order provider
+	 * was specified by the most recent reset() call.
+	 */
 	void invalidateAllThumbnails();
 	
 	/**
@@ -94,8 +126,11 @@ public:
 	/**
 	 * \brief Inserts a page before the first page with matching ImageId.
 	 *
-	 * We don't allow inserting a page between two halves of another page,
-	 * to be compatible with what reset() does.
+	 * If no order provider was specified by the previous reset() call,
+	 * we won't allow inserting a page between two halves of another page,
+	 * to be compatible with what reset() does.  Otherwise, the new
+	 * page will be inserted at a correct position according to the current
+	 * order provider.  In this case \p before_or_after doesn't really matter.
 	 *
 	 * If there are no pages with matching ImageId, the new page won't
 	 * be inserted, unless the request is to insert BEFORE a null ImageId(),

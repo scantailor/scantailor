@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,10 @@ namespace select_content
 {
 
 Params::Params(
-	QRectF const& content_rect,
+	QRectF const& content_rect, QSizeF const& content_size_mm,
 	Dependencies const& deps, AutoManualMode const mode)
 :	m_contentRect(content_rect),
+	m_contentSizeMM(content_size_mm),
 	m_deps(deps),
 	m_mode(mode)
 {
@@ -38,6 +39,11 @@ Params::Params(QDomElement const& filter_el)
 :	m_contentRect(
 		XmlUnmarshaller::rectF(
 			filter_el.namedItem("content-rect").toElement()
+		)
+	),
+	m_contentSizeMM(
+		XmlUnmarshaller::sizeF(
+			filter_el.namedItem("content-size-mm").toElement()
 		)
 	),
 	m_deps(filter_el.namedItem("dependencies").toElement()),
@@ -57,6 +63,7 @@ Params::toXml(QDomDocument& doc, QString const& name) const
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("mode", m_mode == MODE_AUTO ? "auto" : "manual");
 	el.appendChild(marshaller.rectF(m_contentRect, "content-rect"));
+	el.appendChild(marshaller.sizeF(m_contentSizeMM, "content-size-mm"));
 	el.appendChild(m_deps.toXml(doc, "dependencies"));
 	return el;
 }

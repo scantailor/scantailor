@@ -102,7 +102,7 @@ void
 OptionsWidget::commitCurrentParams()
 {
 	Params const params(
-		m_uiData.contentRect(),
+		m_uiData.contentRect(), m_uiData.contentSizeMM(),
 		m_uiData.dependencies(), m_uiData.mode()
 	);
 	m_ptrSettings->setPageParams(m_pageId, params);
@@ -121,6 +121,12 @@ OptionsWidget::UiData::~UiData()
 }
 
 void
+OptionsWidget::UiData::setSizeCalc(PhysSizeCalc const& calc)
+{
+	m_sizeCalc = calc;
+}
+
+void
 OptionsWidget::UiData::setContentRect(QRectF const& content_rect)
 {
 	m_contentRect = content_rect;
@@ -130,6 +136,12 @@ QRectF const&
 OptionsWidget::UiData::contentRect() const
 {
 	return m_contentRect;
+}
+
+QSizeF
+OptionsWidget::UiData::contentSizeMM() const
+{
+	return m_sizeCalc.sizeMM(m_contentRect);
 }
 
 void

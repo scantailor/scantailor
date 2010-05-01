@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,8 +31,10 @@
 #include "ImageView.h"
 #include "OrthogonalRotation.h"
 #include "ImageTransformation.h"
+#include "PhysSizeCalc.h"
 #include "filters/page_layout/Task.h"
 #include <QObject>
+#include <QTransform>
 #include <QDebug>
 
 namespace select_content
@@ -95,20 +97,34 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	}
 	
 	OptionsWidget::UiData ui_data;
-	
+	ui_data.setSizeCalc(PhysSizeCalc(data.xform()));
+
 	if (params.get()) {
 		ui_data.setContentRect(params->contentRect());
 		ui_data.setDependencies(params->dependencies());
 		ui_data.setMode(params->mode());
+
+		if (params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty()) {
+			// Backwards compatibilty: put the missing data where it belongs.
+			Params const new_params(
+				ui_data.contentRect(), ui_data.contentSizeMM(),
+				params->dependencies(), params->mode()
+			);
+			m_ptrSettings->setPageParams(m_pageId, new_params);
+		}
 	} else {
-		ui_data.setContentRect(
+		QRectF const content_rect(
 			ContentBoxFinder::findContentBox(
 				status, data, m_ptrDbg.get()
 			)
 		);
+		ui_data.setContentRect(content_rect);
 		ui_data.setDependencies(deps);
 		ui_data.setMode(MODE_AUTO);
-		Params const new_params(ui_data.contentRect(), deps, MODE_AUTO);
+
+		Params const new_params(
+			ui_data.contentRect(), ui_data.contentSizeMM(), deps, MODE_AUTO
+		);
 		m_ptrSettings->setPageParams(m_pageId, new_params);
 	}
 	

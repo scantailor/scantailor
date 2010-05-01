@@ -16,49 +16,40 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECT_CONTENT_PARAMS_H_
-#define SELECT_CONTENT_PARAMS_H_
-
-#include "Dependencies.h"
-#include "AutoManualMode.h"
-#include <QRectF>
+#include "OrderByWidthProvider.h"
+#include "Params.h"
 #include <QSizeF>
-
-class QDomDocument;
-class QDomElement;
-class QString;
+#include <memory>
 
 namespace select_content
 {
 
-class Params
+OrderByWidthProvider::OrderByWidthProvider(IntrusivePtr<Settings> const& settings)
+:	m_ptrSettings(settings)
 {
-public:
-	// Member-wise copying is OK.
-	
-	Params(QRectF const& rect, QSizeF const& size_mm,
-		Dependencies const& deps, AutoManualMode mode);
-	
-	Params(QDomElement const& filter_el);
-	
-	~Params();
-	
-	QRectF const& contentRect() const { return m_contentRect; }
+}
 
-	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
+bool
+OrderByWidthProvider::precedes(PageId const& lhs, PageId const& rhs) const
+{
+	std::auto_ptr<Params> const lhs_params(m_ptrSettings->getPageParams(lhs));
+	std::auto_ptr<Params> const rhs_params(m_ptrSettings->getPageParams(rhs));
 	
-	Dependencies const& dependencies() const { return m_deps; }
+	QSizeF lhs_size;
+	if (lhs_params.get()) {
+		lhs_size = lhs_params->contentSizeMM();
+	}
+	QSizeF rhs_size;
+	if (rhs_params.get()) {
+		rhs_size = rhs_params->contentSizeMM();
+	}
 	
-	AutoManualMode mode() const { return m_mode; }
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-private:
-	QRectF m_contentRect;
-	QSizeF m_contentSizeMM;
-	Dependencies m_deps;
-	AutoManualMode m_mode;
-};
+	if (lhs_size.isValid() != rhs_size.isValid()) {
+		// Invalid (unknown) sizes go to the back.
+		return lhs_size.isValid();
+	}
+
+	return lhs_size.width() < rhs_size.width();
+}
 
 } // namespace select_content
-
-#endif

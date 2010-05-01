@@ -16,47 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SELECT_CONTENT_PARAMS_H_
-#define SELECT_CONTENT_PARAMS_H_
+#ifndef SELECT_CONTENT_ORDER_BY_HEIGHT_PROVIDER_H_
+#define SELECT_CONTENT_ORDER_BY_HEIGHT_PROVIDER_H_
 
-#include "Dependencies.h"
-#include "AutoManualMode.h"
-#include <QRectF>
-#include <QSizeF>
-
-class QDomDocument;
-class QDomElement;
-class QString;
+#include "Settings.h"
+#include "IntrusivePtr.h"
+#include "PageOrderProvider.h"
 
 namespace select_content
 {
 
-class Params
+class OrderByHeightProvider : public PageOrderProvider
 {
 public:
-	// Member-wise copying is OK.
-	
-	Params(QRectF const& rect, QSizeF const& size_mm,
-		Dependencies const& deps, AutoManualMode mode);
-	
-	Params(QDomElement const& filter_el);
-	
-	~Params();
-	
-	QRectF const& contentRect() const { return m_contentRect; }
+	OrderByHeightProvider(IntrusivePtr<Settings> const& settings);
 
-	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
-	
-	Dependencies const& dependencies() const { return m_deps; }
-	
-	AutoManualMode mode() const { return m_mode; }
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
+	virtual bool precedes(PageId const& lhs, PageId const& rhs) const;
 private:
-	QRectF m_contentRect;
-	QSizeF m_contentSizeMM;
-	Dependencies m_deps;
-	AutoManualMode m_mode;
+	IntrusivePtr<Settings> m_ptrSettings;
 };
 
 } // namespace select_content

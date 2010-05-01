@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
+#include "PageOrderOption.h"
+#include <QCoreApplication>
+#include <vector>
 
 class PageId;
 class QString;
@@ -45,6 +48,7 @@ class Settings;
 class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
+	Q_DECLARE_TR_FUNCTIONS(select_content::Filter)
 public:
 	Filter();
 	
@@ -54,6 +58,12 @@ public:
 	
 	virtual PageSequence::View getView() const;
 	
+	virtual int selectedPageOrder() const;
+
+	virtual void selectPageOrder(int option);
+
+	virtual std::vector<PageOrderOption> pageOrderOptions() const;
+
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
 	virtual QDomElement saveSettings(
@@ -79,6 +89,8 @@ private:
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
+	std::vector<PageOrderOption> m_pageOrderOptions;
+	int m_selectedPageOrder;
 };
 
 } // namespace select_content

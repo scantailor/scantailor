@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@
 #include "IntrusivePtr.h"
 #include "AutoManualMode.h"
 #include "Dependencies.h"
+#include "PhysSizeCalc.h"
 #include "PageId.h"
+#include <QSizeF>
 #include <QRectF>
 #include <memory>
 
@@ -46,9 +48,13 @@ public:
 		
 		~UiData();
 		
+		void setSizeCalc(PhysSizeCalc const& calc);
+
 		void setContentRect(QRectF const& content_rect);
 		
 		QRectF const& contentRect() const;
+
+		QSizeF contentSizeMM() const;
 		
 		void setDependencies(Dependencies const& deps);
 		
@@ -59,6 +65,7 @@ public:
 		AutoManualMode mode() const;
 	private:
 		QRectF m_contentRect; // In virtual image coordinates.
+		PhysSizeCalc m_sizeCalc;
 		Dependencies m_deps;
 		AutoManualMode m_mode;
 	};

@@ -23,11 +23,14 @@
 #include "RefCountable.h"
 #include "FilterResult.h"
 #include "PageId.h"
+#include <QSizeF>
+#include <QRectF>
 #include <memory>
 
 class TaskStatus;
 class FilterData;
 class DebugImages;
+class ImageTransformation;
 
 namespace page_layout
 {
