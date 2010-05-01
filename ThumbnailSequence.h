@@ -23,6 +23,7 @@
 #include "FlagOps.h"
 #include "IntrusivePtr.h"
 #include "PageRange.h"
+#include "PageOrderProvider.h"
 #include "BeforeOrAfter.h"
 #include <QObject>
 #include <memory>
@@ -35,7 +36,6 @@ class PageId;
 class ImageId;
 class PageInfo;
 class PageSequenceSnapshot;
-class PageOrderProvider;
 class ThumbnailFactory;
 class QSizeF;
 class QRectF;
