@@ -129,6 +129,7 @@ MainWindow::MainWindow()
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
+	sortOptions->setVisible(false);
 
 #if !defined(ENABLE_OPENGL)
 	// Right now the only setting is 3D acceleration, so get rid of

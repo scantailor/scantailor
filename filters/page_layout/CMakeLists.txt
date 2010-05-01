@@ -21,6 +21,8 @@ SET(
 	Thumbnail.cpp Thumbnail.h
 	ApplyDialog.cpp ApplyDialog.h
 	Alignment.cpp Alignment.h
+	OrderByWidthProvider.cpp OrderByWidthProvider.h
+	OrderByHeightProvider.cpp OrderByHeightProvider.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

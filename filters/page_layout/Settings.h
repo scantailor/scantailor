@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ public:
 	 * \brief Set all page parameters at once.
 	 */
 	void setPageParams(PageId const& page_id, Params const& params);
-	
+
 	/**
 	 * \brief Updates content size and returns all parameters at once.
 	 */
@@ -148,26 +148,6 @@ public:
 	QSizeF getAggregateHardSizeMM(
 		PageId const& page_id, QSizeF const& hard_size_mm,
 		Alignment const& alignment) const;
-	
-	/**
-	 * \brief Find the widest page and return its id.
-	 *
-	 * We only consider the hard page size, that is content size + hard
-	 * margins.
-	 * \return The page id of the widest page or a null PageId if no
-	 *         pages were defined.
-	 */
-	PageId findWidestPage() const;
-	
-	/**
-	 * \brief Find the tallest page and return its id.
-	 *
-	 * We only consider the hard page size, that is content size + hard
-	 * margins.
-	 * \return The page id of the tallest page or a null PageId if no
-	 *         pages were defined.
-	 */
-	PageId findTallestPage() const;
 private:
 	class Impl;
 	class Item;

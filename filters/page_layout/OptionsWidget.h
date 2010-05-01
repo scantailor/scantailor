@@ -90,10 +90,6 @@ private slots:
 	
 	void alignmentButtonClicked();
 	
-	void goToWidestPage();
-	
-	void goToTallestPage();
-	
 	void showApplyMarginsDialog();
 	
 	void showApplyAlignmentDialog();

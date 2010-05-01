@@ -1,32 +1,33 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>PageLayoutOptionsWidget</class>
- <widget class="QWidget" name="PageLayoutOptionsWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="PageLayoutOptionsWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>214</width>
-    <height>554</height>
+    <height>451</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" >
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QGroupBox" name="marginsGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="marginsGroup">
+     <property name="title">
       <string>Margins</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" >
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" >
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <spacer name="horizontalSpacer_4" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -35,25 +36,25 @@
          </spacer>
         </item>
         <item>
-         <widget class="QComboBox" name="unitsComboBox" >
+         <widget class="QComboBox" name="unitsComboBox">
           <item>
-           <property name="text" >
+           <property name="text">
             <string>Millimeters (mm)</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>Inches (in)</string>
            </property>
           </item>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_2" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -64,13 +65,13 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" >
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <spacer name="horizontalSpacer_3" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -79,116 +80,116 @@
          </spacer>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label" >
-            <property name="text" >
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
              <string>Top</string>
             </property>
            </widget>
           </item>
-          <item rowspan="2" row="0" column="2" >
-           <widget class="QToolButton" name="topBottomLink" >
-            <property name="text" >
+          <item row="0" column="2" rowspan="2">
+           <widget class="QToolButton" name="topBottomLink">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-vchain-broken-24.png</normaloff>
               <normalon>:/icons/stock-vchain-24.png</normalon>:/icons/stock-vchain-broken-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>9</width>
               <height>24</height>
              </size>
             </property>
-            <property name="autoRaise" >
+            <property name="autoRaise">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
              <string>Bottom</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QDoubleSpinBox" name="bottomMarginSpinBox" >
-            <property name="decimals" >
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="bottomMarginSpinBox">
+            <property name="decimals">
              <number>1</number>
             </property>
-            <property name="maximum" >
+            <property name="maximum">
              <double>999.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="label_3" >
-            <property name="text" >
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
              <string>Left</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1" >
-           <widget class="QDoubleSpinBox" name="leftMarginSpinBox" >
-            <property name="decimals" >
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="leftMarginSpinBox">
+            <property name="decimals">
              <number>1</number>
             </property>
-            <property name="maximum" >
+            <property name="maximum">
              <double>999.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item rowspan="2" row="2" column="2" >
-           <widget class="QToolButton" name="leftRightLink" >
-            <property name="text" >
+          <item row="2" column="2" rowspan="2">
+           <widget class="QToolButton" name="leftRightLink">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-vchain-broken-24.png</normaloff>
               <normalon>:/icons/stock-vchain-24.png</normalon>:/icons/stock-vchain-broken-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>9</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checked" >
+            <property name="checked">
              <bool>false</bool>
             </property>
-            <property name="autoRaise" >
+            <property name="autoRaise">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="label_4" >
-            <property name="text" >
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
              <string>Right</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1" >
-           <widget class="QDoubleSpinBox" name="rightMarginSpinBox" >
-            <property name="decimals" >
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="rightMarginSpinBox">
+            <property name="decimals">
              <number>1</number>
             </property>
-            <property name="maximum" >
+            <property name="maximum">
              <double>999.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QDoubleSpinBox" name="topMarginSpinBox" >
-            <property name="decimals" >
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="topMarginSpinBox">
+            <property name="decimals">
              <number>1</number>
             </property>
-            <property name="maximum" >
+            <property name="maximum">
              <double>999.000000000000000</double>
             </property>
            </widget>
@@ -196,11 +197,11 @@
          </layout>
         </item>
         <item>
-         <spacer name="horizontalSpacer" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -211,13 +212,13 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5" >
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
         <item>
-         <spacer name="horizontalSpacer_9" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -226,18 +227,18 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="applyMarginsBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="applyMarginsBtn">
+          <property name="text">
            <string>Apply To ...</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_10" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -251,19 +252,19 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="alignmentGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="alignmentGroup">
+     <property name="title">
       <string>Alignment</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" >
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3" >
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <spacer name="horizontalSpacer_7" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>0</width>
             <height>0</height>
@@ -272,21 +273,21 @@
          </spacer>
         </item>
         <item>
-         <widget class="QCheckBox" name="alignWithOthersCB" >
-          <property name="text" >
+         <widget class="QCheckBox" name="alignWithOthersCB">
+          <property name="text">
            <string>Align with other pages</string>
           </property>
-          <property name="checked" >
+          <property name="checked">
            <bool>true</bool>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_8" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>0</width>
             <height>0</height>
@@ -297,13 +298,13 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4" >
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <spacer name="horizontalSpacer_6" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -312,216 +313,216 @@
          </spacer>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout_2" >
-          <property name="spacing" >
+         <layout class="QGridLayout" name="gridLayout_2">
+          <property name="spacing">
            <number>16</number>
           </property>
-          <item row="0" column="0" >
-           <widget class="QToolButton" name="alignTopLeftBtn" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QToolButton" name="alignTopLeftBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-north-west-24.png</normaloff>:/icons/stock-gravity-north-west-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QToolButton" name="alignTopBtn" >
-            <property name="text" >
+          <item row="0" column="1">
+           <widget class="QToolButton" name="alignTopBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-north-24.png</normaloff>:/icons/stock-gravity-north-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="2" >
-           <widget class="QToolButton" name="alignTopRightBtn" >
-            <property name="text" >
+          <item row="0" column="2">
+           <widget class="QToolButton" name="alignTopRightBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-north-east-24.png</normaloff>:/icons/stock-gravity-north-east-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="QToolButton" name="alignLeftBtn" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QToolButton" name="alignLeftBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-west-24.png</normaloff>:/icons/stock-gravity-west-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QToolButton" name="alignCenterBtn" >
-            <property name="text" >
+          <item row="1" column="1">
+           <widget class="QToolButton" name="alignCenterBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-center-24.png</normaloff>:/icons/stock-center-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="checked" >
+            <property name="checked">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="2" >
-           <widget class="QToolButton" name="alignRightBtn" >
-            <property name="text" >
+          <item row="1" column="2">
+           <widget class="QToolButton" name="alignRightBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-east-24.png</normaloff>:/icons/stock-gravity-east-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QToolButton" name="alignBottomLeftBtn" >
-            <property name="text" >
+          <item row="2" column="0">
+           <widget class="QToolButton" name="alignBottomLeftBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-south-west-24.png</normaloff>:/icons/stock-gravity-south-west-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="2" column="1" >
-           <widget class="QToolButton" name="alignBottomBtn" >
-            <property name="text" >
+          <item row="2" column="1">
+           <widget class="QToolButton" name="alignBottomBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-south-24.png</normaloff>:/icons/stock-gravity-south-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="2" column="2" >
-           <widget class="QToolButton" name="alignBottomRightBtn" >
-            <property name="text" >
+          <item row="2" column="2">
+           <widget class="QToolButton" name="alignBottomRightBtn">
+            <property name="text">
              <string>...</string>
             </property>
-            <property name="icon" >
-             <iconset resource="../../../resources/resources.qrc" >
+            <property name="icon">
+             <iconset resource="../../../resources/resources.qrc">
               <normaloff>:/icons/stock-gravity-south-east-24.png</normaloff>:/icons/stock-gravity-south-east-24.png</iconset>
             </property>
-            <property name="iconSize" >
+            <property name="iconSize">
              <size>
               <width>24</width>
               <height>24</height>
              </size>
             </property>
-            <property name="checkable" >
+            <property name="checkable">
              <bool>true</bool>
             </property>
-            <property name="autoExclusive" >
+            <property name="autoExclusive">
              <bool>true</bool>
             </property>
            </widget>
@@ -529,11 +530,11 @@
          </layout>
         </item>
         <item>
-         <spacer name="horizontalSpacer_5" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -544,13 +545,13 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6" >
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <spacer name="horizontalSpacer_11" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_11">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -559,18 +560,18 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="applyAlignmentBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="applyAlignmentBtn">
+          <property name="text">
            <string>Apply To ...</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_12" >
-          <property name="orientation" >
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>1</height>
@@ -584,97 +585,11 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_8" >
-     <item>
-      <spacer name="horizontalSpacer_13" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="widestPageLink" >
-       <property name="toolTip" >
-        <string>Go to the widest page.</string>
-       </property>
-       <property name="text" >
-        <string>Widest Page</string>
-       </property>
-       <property name="alignment" >
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_14" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7" >
-     <item>
-      <spacer name="horizontalSpacer_15" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="tallestPageLink" >
-       <property name="toolTip" >
-        <string>Go to the tallest page.</string>
-       </property>
-       <property name="text" >
-        <string>Tallest Page</string>
-       </property>
-       <property name="alignment" >
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_16" >
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer" >
-     <property name="orientation" >
+    <spacer name="verticalSpacer">
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>1</width>
        <height>1</height>
@@ -706,7 +621,7 @@
   <tabstop>applyAlignmentBtn</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../resources/resources.qrc" />
+  <include location="../../../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
+#include "OrderByWidthProvider.h"
+#include "OrderByHeightProvider.h"
 #include "Utils.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -39,6 +41,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QDomElement>
+#include <assert.h>
 
 namespace page_layout
 {
@@ -46,11 +49,21 @@ namespace page_layout
 Filter::Filter(IntrusivePtr<PageSequence> const& pages,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(pages),
-	m_ptrSettings(new Settings)
+	m_ptrSettings(new Settings),
+	m_selectedPageOrder(0)
 {
 	m_ptrOptionsWidget.reset(
 		new OptionsWidget(m_ptrSettings, pages, page_selection_accessor)
 	);
+
+	typedef PageOrderOption::ProviderPtr ProviderPtr;
+
+	ProviderPtr const default_order;
+	ProviderPtr const order_by_width(new OrderByWidthProvider(m_ptrSettings));
+	ProviderPtr const order_by_height(new OrderByHeightProvider(m_ptrSettings));
+	m_pageOrderOptions.push_back(PageOrderOption(tr("Natural order"), default_order));
+	m_pageOrderOptions.push_back(PageOrderOption(tr("Order by increasing width"), order_by_width));
+	m_pageOrderOptions.push_back(PageOrderOption(tr("Order by increasing height"), order_by_height));
 }
 
 Filter::~Filter()
@@ -60,7 +73,7 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return QCoreApplication::translate("page_layout::Filter", "Page Layout");
+	return tr("Page Layout");
 }
 
 PageSequence::View
@@ -73,6 +86,25 @@ void
 Filter::selected()
 {
 	m_ptrSettings->removePagesMissingFrom(m_ptrPages->snapshot(getView()));
+}
+
+int
+Filter::selectedPageOrder() const
+{
+	return m_selectedPageOrder;
+}
+
+void
+Filter::selectPageOrder(int option)
+{
+	assert((unsigned)option < m_pageOrderOptions.size());
+	m_selectedPageOrder = option;
+}
+
+std::vector<PageOrderOption>
+Filter::pageOrderOptions() const
+{
+	return m_pageOrderOptions;
 }
 
 void

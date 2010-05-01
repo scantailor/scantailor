@@ -24,6 +24,9 @@
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
+#include "PageOrderOption.h"
+#include <QCoreApplication>
+#include <vector>
 
 class PageId;
 class PageSequence;
@@ -49,6 +52,7 @@ class Settings;
 class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
+	Q_DECLARE_TR_FUNCTIONS(page_layout::Filter)
 public:
 	Filter(IntrusivePtr<PageSequence> const& page_sequence,
 		PageSelectionAccessor const& page_selection_accessor);
@@ -60,6 +64,12 @@ public:
 	virtual PageSequence::View getView() const;
 
 	virtual void selected();
+
+	virtual int selectedPageOrder() const;
+
+	virtual void selectPageOrder(int option);
+
+	virtual std::vector<PageOrderOption> pageOrderOptions() const;
 
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
@@ -95,6 +105,8 @@ private:
 	IntrusivePtr<PageSequence> m_ptrPages;
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
+	std::vector<PageOrderOption> m_pageOrderOptions;
+	int m_selectedPageOrder;
 };
 
 } // namespace page_layout

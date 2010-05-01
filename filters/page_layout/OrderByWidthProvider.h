@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,30 +16,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FILTEROPTIONSWIDGET_H_
-#define FILTEROPTIONSWIDGET_H_
+#ifndef PAGE_LAYOUT_ORDER_BY_WIDTH_PROVIDER_H_
+#define PAGE_LAYOUT_ORDER_BY_WIDTH_PROVIDER_H_
 
-#include "PageId.h"
-#include <QWidget>
+#include "Settings.h"
+#include "IntrusivePtr.h"
+#include "PageOrderProvider.h"
 
-class FilterOptionsWidget : public QWidget
+namespace page_layout
 {
-	Q_OBJECT
-signals:
-	/**
-	 * \brief To be emitted by subclasses when they want to reload the page.
-	 */
-	void reloadRequested();
-	
-	void invalidateThumbnail(PageId const& page_id);
-	
-	void invalidateAllThumbnails();
-	
-	/**
-	 * After we've got rid of "Widest Page" / "Tallest Page" links,
-	 * there is no one using this signal.  It's a candidate for removal.
-	 */
-	void goToPage(PageId const& page_id);
+
+class OrderByWidthProvider : public PageOrderProvider
+{
+public:
+	OrderByWidthProvider(IntrusivePtr<Settings> const& settings);
+
+	virtual bool precedes(PageId const& lhs, PageId const& rhs) const;
+private:
+	IntrusivePtr<Settings> m_ptrSettings;
 };
+
+} // namespace page_layout
 
 #endif

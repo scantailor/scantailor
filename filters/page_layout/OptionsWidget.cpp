@@ -57,8 +57,6 @@ OptionsWidget::OptionsWidget(
 	);
 	
 	setupUi(this);
-	widestPageLink->setText(Utils::richTextForLink(widestPageLink->text()));
-	tallestPageLink->setText(Utils::richTextForLink(tallestPageLink->text()));
 	updateLinkDisplay(topBottomLink, m_topBottomLinked);
 	updateLinkDisplay(leftRightLink, m_leftRightLinked);
 	enableDisableAlignmentButtons();
@@ -135,14 +133,6 @@ OptionsWidget::OptionsWidget(
 	connect(
 		alignWithOthersCB, SIGNAL(toggled(bool)),
 		this, SLOT(alignWithOthersToggled())
-	);
-	connect(
-		widestPageLink, SIGNAL(linkActivated(QString const&)),
-		this, SLOT(goToWidestPage())
-	);
-	connect(
-		tallestPageLink, SIGNAL(linkActivated(QString const&)),
-		this, SLOT(goToTallestPage())
 	);
 	connect(
 		applyAlignmentBtn, SIGNAL(clicked()),
@@ -309,24 +299,6 @@ OptionsWidget::alignmentButtonClicked()
 	
 	m_alignment = it->second;
 	emit alignmentChanged(m_alignment);
-}
-
-void
-OptionsWidget::goToWidestPage()
-{
-	PageId const page_id(m_ptrSettings->findWidestPage());
-	if (!page_id.isNull()) {
-		emit goToPage(page_id);
-	}
-}
-
-void
-OptionsWidget::goToTallestPage()
-{
-	PageId const page_id(m_ptrSettings->findTallestPage());
-	if (!page_id.isNull()) {
-		emit goToPage(page_id);
-	}
 }
 
 void
