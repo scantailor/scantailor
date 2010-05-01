@@ -153,7 +153,7 @@ WorkerThread::Dispatcher::Dispatcher(Impl& owner)
 WorkerThread::Dispatcher::UpdatePriorityResult
 WorkerThread::Dispatcher::updateThreadPriority(BackgroundTask const& task)
 {
-	assert(QCoreApplication::thread() != QThread::currentThread());
+	assert(QCoreApplication::instance()->thread() != QThread::currentThread());
 
 	ThreadPriority prio(
 		ThreadPriority::load(
