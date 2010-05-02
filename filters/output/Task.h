@@ -22,10 +22,11 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "FilterResult.h"
-#include "PageId.h"
+#include "PageInfo.h"
 #include "ImageViewTab.h"
 #include <QString>
 #include <QColor>
+#include <Qt>
 #include <memory>
 
 class DebugImages;
@@ -56,9 +57,9 @@ public:
 	Task(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
 		ThumbnailPixmapCache& thumbnail_cache,
-		PageId const& page_id, int page_num,
-		QString const& out_dir, ImageViewTab last_tab,
-		bool batch, bool debug);
+		PageInfo const& page_info, QString const& out_dir,
+		Qt::LayoutDirection layout_direction,
+		ImageViewTab last_tab, bool batch, bool debug);
 	
 	virtual ~Task();
 	
@@ -73,9 +74,9 @@ private:
 	IntrusivePtr<Settings> m_ptrSettings;
 	ThumbnailPixmapCache& m_rThumbnailCache;
 	std::auto_ptr<DebugImages> m_ptrDbg;
-	PageId m_pageId;
+	PageInfo m_pageInfo;
 	QString m_outDir;
-	int m_pageNum;
+	Qt::LayoutDirection m_layoutDirection;
 	ImageViewTab m_lastTab;
 	bool m_batchProcessing;
 	bool m_debug;

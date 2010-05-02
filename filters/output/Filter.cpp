@@ -162,24 +162,27 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 
 IntrusivePtr<Task>
 Filter::createTask(
-	PageId const& page_id, int const page_num,
-	QString const& out_dir, ThumbnailPixmapCache& thumbnail_cache,
+	PageInfo const& page_info, QString const& out_dir,
+	ThumbnailPixmapCache& thumbnail_cache,
+	Qt::LayoutDirection const layout_direction,
 	bool const batch, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
-			thumbnail_cache, page_id, page_num, out_dir,
-			m_ptrOptionsWidget->lastTab(), batch, debug
+			thumbnail_cache, page_info, out_dir,
+			layout_direction, m_ptrOptionsWidget->lastTab(),
+			batch, debug
 		)
 	);
 }
 
 IntrusivePtr<CacheDrivenTask>
-Filter::createCacheDrivenTask(QString const& out_dir)
+Filter::createCacheDrivenTask(
+	QString const& out_dir, Qt::LayoutDirection const layout_direction)
 {
 	return IntrusivePtr<CacheDrivenTask>(
-		new CacheDrivenTask(m_ptrSettings, out_dir)
+		new CacheDrivenTask(m_ptrSettings, out_dir, layout_direction)
 	);
 }
 

@@ -17,7 +17,9 @@
 */
 
 #include "Utils.h"
+#include "ImageId.h"
 #include "PageId.h"
+#include "PageInfo.h"
 #include "Dpi.h"
 #include <QString>
 #include <QTransform>
@@ -28,26 +30,33 @@ namespace output
 {
 
 QString
-Utils::outFilePath(
-	PageId const& page_id, int const page_num, QString const& out_dir)
+Utils::outFilePath(PageInfo const& page_info,
+				   Qt::LayoutDirection layout_direction, QString const& out_dir)
 {
 	QString const base_file_name(
-		QFileInfo(page_id.imageId().filePath()).completeBaseName()
+		QFileInfo(page_info.imageId().filePath()).completeBaseName()
 	);
 	
-	QString const padded_number(
-		QString::fromAscii("%1").arg(
-			QString::number(page_num + 1), 4, QChar('0')
-		)
-	);
+	bool const ltr = (layout_direction == Qt::LeftToRight);
+	PageId::SubPage const sub_page = page_info.id().subPage();
+
+	QString path(out_dir);
+	path += QLatin1Char('/');
+	path += base_file_name;
+	if (page_info.isMultiPageFile()) {
+		path += QString::fromAscii("_page_");
+		path += QString::fromAscii("%1").arg(
+			page_info.imageId().page()+1, 4, 10, QLatin1Char('0')
+		);
+	}
+	if (sub_page != PageId::SINGLE_PAGE) {
+		path += QLatin1Char('_');
+		path += QLatin1Char(ltr == (sub_page == PageId::LEFT_PAGE) ? '1' : '2');
+		path += QLatin1Char(sub_page == PageId::LEFT_PAGE ? 'L' : 'R');
+	}
+	path += QString::fromAscii(".tiff");
 	
-	QString const out_path(
-		QString::fromAscii("%1/%2_%3.tiff").arg(
-			out_dir, padded_number, base_file_name
-		)
-	);
-	
-	return out_path;
+	return path;
 }
 
 QString

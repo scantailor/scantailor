@@ -110,15 +110,15 @@ private:
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	ThumbnailPixmapCache& thumbnail_cache,
-	PageId const& page_id, int const page_num,
-	QString const& out_dir, ImageViewTab const last_tab,
-	bool const batch, bool const debug)
+	PageInfo const& page_info, QString const& out_dir,
+	Qt::LayoutDirection const layout_direction,
+	ImageViewTab const last_tab, bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_rThumbnailCache(thumbnail_cache),
-	m_pageId(page_id),
+	m_pageInfo(page_info),
 	m_outDir(out_dir),
-	m_pageNum(page_num),
+	m_layoutDirection(layout_direction),
 	m_lastTab(last_tab),
 	m_batchProcessing(batch),
 	m_debug(debug)
@@ -139,9 +139,9 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	Params const params(m_ptrSettings->getParams(m_pageId));
+	Params const params(m_ptrSettings->getParams(m_pageInfo.id()));
 	RenderParams const render_params(params.colorParams());
-	QString const out_file_path(Utils::outFilePath(m_pageId, m_pageNum, m_outDir));
+	QString const out_file_path(Utils::outFilePath(m_pageInfo, m_layoutDirection, m_outDir));
 	QFileInfo const out_file_info(out_file_path);
 
 	QString const automask_dir(Utils::automaskDir(m_outDir));
@@ -170,13 +170,13 @@ Task::process(
 		data.xform(), params.outputDpi(), params.colorParams(), params.despeckleLevel()
 	);
 
-	ZoneSet const new_zones(m_ptrSettings->zonesForPage(m_pageId));
+	ZoneSet const new_zones(m_ptrSettings->zonesForPage(m_pageInfo.id()));
 	
 	bool need_reprocess = false;
 	do { // Just to be able to break from it.
 		
 		std::auto_ptr<OutputParams> stored_output_params(
-			m_ptrSettings->getOutputParams(m_pageId)
+			m_ptrSettings->getOutputParams(m_pageInfo.id())
 		);
 		
 		if (!stored_output_params.get()) {
@@ -306,7 +306,7 @@ Task::process(
 		}
 
 		if (invalidate_params) {
-			m_ptrSettings->removeOutputParams(m_pageId);
+			m_ptrSettings->removeOutputParams(m_pageInfo.id());
 		} else {
 			// Note that we can't reuse *_file_info objects
 			// as we've just overwritten those files.
@@ -320,7 +320,7 @@ Task::process(
 				new_zones
 			);
 
-			m_ptrSettings->setOutputParams(m_pageId, out_params);
+			m_ptrSettings->setOutputParams(m_pageInfo.id(), out_params);
 		}
 		
 		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);
@@ -342,7 +342,7 @@ Task::process(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_ptrDbg, params.colorParams(),
 			generator.toOutput(), QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
-			m_pageId, data.origImage(), out_img, automask_img,
+			m_pageInfo.id(), data.origImage(), out_img, automask_img,
 			despeckle_state, despeckle_visualization,
 			m_batchProcessing, m_debug
 		)

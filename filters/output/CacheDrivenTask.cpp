@@ -41,9 +41,11 @@ namespace output
 {
 
 CacheDrivenTask::CacheDrivenTask(
-	IntrusivePtr<Settings> const& settings, QString const& out_dir)
+	IntrusivePtr<Settings> const& settings, QString const& out_dir,
+	Qt::LayoutDirection const layout_direction)
 :	m_ptrSettings(settings),
-	m_outDir(out_dir)
+	m_outDir(out_dir),
+	m_layoutDirection(layout_direction)
 {
 }
 
@@ -53,15 +55,14 @@ CacheDrivenTask::~CacheDrivenTask()
 
 void
 CacheDrivenTask::process(
-	PageInfo const& page_info, int const page_num,
-	AbstractFilterDataCollector* collector,
+	PageInfo const& page_info, AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform,
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 		
 		QString const out_file_path(
-			Utils::outFilePath(page_info.id(), page_num, m_outDir)
+			Utils::outFilePath(page_info, m_layoutDirection, m_outDir)
 		);
 
 		bool need_reprocess = false;

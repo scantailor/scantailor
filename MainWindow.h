@@ -205,7 +205,7 @@ private:
 	
 	bool checkReadyForOutput(PageId const* ignore = 0) const;
 	
-	void loadImage(PageInfo const& page, int page_num);
+	void loadImage(PageInfo const& page);
 	
 	void updateWindowTitle();
 	
@@ -226,7 +226,7 @@ private:
 	void removeFromProject(std::set<PageId> const& pages);
 	
 	BackgroundTaskPtr createCompositeTask(
-		PageInfo const& page, int page_num, int last_filter_idx);
+		PageInfo const& page, int last_filter_idx);
 	
 	IntrusivePtr<CompositeCacheDrivenTask>
 	createCompositeCacheDrivenTask(int last_filter_idx);

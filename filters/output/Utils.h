@@ -19,7 +19,9 @@
 #ifndef OUTPUT_UTILS_H_
 #define OUTPUT_UTILS_H_
 
-class PageId;
+#include <Qt>
+
+class PageInfo;
 class Dpi;
 class QString;
 class QTransform;
@@ -30,8 +32,8 @@ namespace output
 class Utils
 {
 public:
-	static QString outFilePath(
-		PageId const& page_id, int page_num, QString const& out_dir);
+	static QString outFilePath(PageInfo const& page_info,
+		Qt::LayoutDirection layout_direction, QString const& out_dir);
 
 	static QString automaskDir(QString const& out_dir);
 

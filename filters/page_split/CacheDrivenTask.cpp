@@ -43,8 +43,7 @@ CacheDrivenTask::~CacheDrivenTask()
 
 void
 CacheDrivenTask::process(
-	PageInfo const& page_info, int const page_num,
-	AbstractFilterDataCollector* collector,
+	PageInfo const& page_info, AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform)
 {
 	Settings::Record const record(
@@ -78,7 +77,7 @@ CacheDrivenTask::process(
 	PageLayout const layout(params->pageLayout());
 	
 	if (m_ptrNextTask) {
-		m_ptrNextTask->process(page_info, page_num, collector, xform, layout);
+		m_ptrNextTask->process(page_info, collector, xform, layout);
 		return;
 	}
 	

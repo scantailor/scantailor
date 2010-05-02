@@ -23,6 +23,7 @@
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
 #include <QString>
+#include <Qt>
 
 class QPolygonF;
 class PageInfo;
@@ -40,19 +41,18 @@ class CacheDrivenTask : public RefCountable
 public:
 	CacheDrivenTask(
 		IntrusivePtr<Settings> const& settings,
-		QString const& out_dir);
+		QString const& out_dir, Qt::LayoutDirection layout_direction);
 	
 	virtual ~CacheDrivenTask();
 	
 	void process(
-		PageInfo const& page_info, int page_num,
-		AbstractFilterDataCollector* collector,
+		PageInfo const& page_info, AbstractFilterDataCollector* collector,
 		ImageTransformation const& xform,
-		QPolygonF const& content_rect_phys,
-		QPolygonF const& page_rect_phys);
+		QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys);
 private:
 	IntrusivePtr<Settings> m_ptrSettings;
 	QString m_outDir;
+	Qt::LayoutDirection m_layoutDirection;
 };
 
 } // namespace output

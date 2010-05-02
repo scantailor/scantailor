@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
 #include "ZonePropFactory.h"
+#include <Qt>
 
 class PageId;
 class PageSequence;
@@ -62,13 +63,13 @@ public:
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
 	IntrusivePtr<Task> createTask(
-		PageId const& page_id, int page_num,
-		QString const& out_dir,
+		PageInfo const& page_info, QString const& out_dir,
 		ThumbnailPixmapCache& thumbnail_cache,
+		Qt::LayoutDirection layout_direction,
 		bool batch, bool debug);
 	
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
-		QString const& out_dir);
+		QString const& out_dir, Qt::LayoutDirection layout_direction);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

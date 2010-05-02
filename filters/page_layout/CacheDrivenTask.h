@@ -48,8 +48,7 @@ public:
 	virtual ~CacheDrivenTask();
 	
 	void process(
-		PageInfo const& page_info, int page_num,
-		AbstractFilterDataCollector* collector,
+		PageInfo const& page_info, AbstractFilterDataCollector* collector,
 		ImageTransformation const& xform, QRectF const& content_rect);
 private:
 	IntrusivePtr<output::CacheDrivenTask> m_ptrNextTask;

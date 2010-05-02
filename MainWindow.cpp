@@ -749,12 +749,11 @@ MainWindow::nextPage()
 		return;
 	}
 	
-	int page_num = 0;
 	PageInfo const next_page(
-		m_ptrPages->setNextPage(getCurrentView(), &page_num)
+		m_ptrPages->setNextPage(getCurrentView())
 	);
 	m_ptrThumbSequence->setSelection(next_page.id());
-	loadImage(next_page, page_num);
+	loadImage(next_page);
 }
 
 void
@@ -764,12 +763,11 @@ MainWindow::prevPage()
 		return;
 	}
 	
-	int page_num = 0;
 	PageInfo const prev_page(
-		m_ptrPages->setPrevPage(getCurrentView(), &page_num)
+		m_ptrPages->setPrevPage(getCurrentView())
 	);
 	m_ptrThumbSequence->setSelection(prev_page.id());
-	loadImage(prev_page, page_num);
+	loadImage(prev_page);
 }
 
 void
@@ -1007,13 +1005,12 @@ MainWindow::stopBatchProcessing(MainAreaAction main_area)
 	// that during batch processing we select not the thumbnail that is
 	// currently being processed, but the one that has been processed
 	// before that.
-	int page_num = 0;
-	PageInfo const page(m_ptrPages->curPage(getCurrentView(), &page_num));
+	PageInfo const page(m_ptrPages->curPage(getCurrentView()));
 	m_ptrThumbSequence->setSelection(page.id());
 	
 	switch (main_area) {
 		case LOAD_IMAGE:
-			loadImage(page, page_num);
+			loadImage(page);
 			break;
 		case CLEAR_MAIN_AREA:
 			removeImageWidget();
@@ -1054,10 +1051,7 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		PageInfo const cur_page(m_ptrPages->curPage(getCurrentView()));
 		m_ptrThumbSequence->setSelection(cur_page.id());
 		
-		int page_num = 0;
-		PageInfo const next_page(
-			m_ptrPages->setNextPage(getCurrentView(), &page_num)
-		);
+		PageInfo const next_page(m_ptrPages->setNextPage(getCurrentView()));
 		
 		if (next_page.id() == cur_page.id()) {
 			m_ptrPages->setFirstPage(getCurrentView());
@@ -1067,7 +1061,7 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 				QApplication::beep();
 			}
 		} else {
-			loadImage(next_page, page_num);
+			loadImage(next_page);
 		}
 	}
 }
@@ -1321,11 +1315,8 @@ MainWindow::updateMainArea()
 	if (m_ptrPages->numImages() == 0) {
 		showNewOpenProjectPanel();
 	} else {
-		int page_num = 0;
-		PageInfo const page_info(
-			m_ptrPages->curPage(getCurrentView(), &page_num)
-		);
-		loadImage(page_info, page_num);
+		PageInfo const page_info(m_ptrPages->curPage(getCurrentView()));
+		loadImage(page_info);
 	}
 }
 
@@ -1338,7 +1329,7 @@ MainWindow::checkReadyForOutput(PageId const* ignore) const
 }
 
 void
-MainWindow::loadImage(PageInfo const& page, int const page_num)
+MainWindow::loadImage(PageInfo const& page)
 {
 	cancelOngoingTask();
 	
@@ -1373,7 +1364,7 @@ MainWindow::loadImage(PageInfo const& page, int const page_num)
 	}
 	
 	assert(m_ptrThumbnailCache.get());
-	m_ptrCurTask = createCompositeTask(page, page_num, m_curFilter);
+	m_ptrCurTask = createCompositeTask(page, m_curFilter);
 	if (m_ptrCurTask) {
 		m_ptrWorkerThread->performTask(m_ptrCurTask);
 	}
@@ -1646,7 +1637,7 @@ MainWindow::removeFromProject(std::set<PageId> const& pages)
 
 BackgroundTaskPtr
 MainWindow::createCompositeTask(
-	PageInfo const& page, int const page_num, int const last_filter_idx)
+	PageInfo const& page, int const last_filter_idx)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
 	IntrusivePtr<page_split::Task> page_split_task;
@@ -1662,8 +1653,8 @@ MainWindow::createCompositeTask(
 	
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), page_num, m_outDir,
-			*m_ptrThumbnailCache, m_batchProcessing, debug
+			page, m_outDir, *m_ptrThumbnailCache,
+			m_ptrPages->layoutDirection(), m_batchProcessing, debug
 		);
 		debug = false;
 	}
@@ -1719,8 +1710,9 @@ MainWindow::createCompositeCacheDrivenTask(int const last_filter_idx)
 	IntrusivePtr<output::CacheDrivenTask> output_task;
 	
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
-		output_task = m_ptrStages->outputFilter()
-				->createCacheDrivenTask(m_outDir);
+		output_task = m_ptrStages->outputFilter()->createCacheDrivenTask(
+			m_outDir, m_ptrPages->layoutDirection()
+		);
 	}
 	if (last_filter_idx >= m_ptrStages->pageLayoutFilterIdx()) {
 		page_layout_task = m_ptrStages->pageLayoutFilter()
