@@ -25,6 +25,7 @@
 #include "ThumbnailBase.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
+#include "filter_dc/PageOrientationCollector.h"
 #include "filters/page_split/CacheDrivenTask.h"
 
 namespace fix_orientation
@@ -51,6 +52,10 @@ CacheDrivenTask::process(
 	ImageTransformation xform(initial_rect, page_info.metadata().dpi());
 	xform.setPreRotation(m_ptrSettings->getRotationFor(page_info.imageId()));
 	
+	if (PageOrientationCollector* col = dynamic_cast<PageOrientationCollector*>(collector)) {
+		col->process(xform.preRotation());
+	}
+
 	if (m_ptrNextTask) {
 		m_ptrNextTask->process(page_info, page_num, collector, xform);
 		return;

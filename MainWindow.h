@@ -52,6 +52,7 @@ class WorkerThread;
 class ProjectReader;
 class DebugImages;
 class ContentBoxPropagator;
+class PageOrientationPropagator;
 class ProjectCreationContext;
 class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
@@ -194,6 +195,8 @@ private:
 	bool isBelowSelectContent() const;
 	
 	bool isBelowSelectContent(int filter_idx) const;
+
+	bool isBelowFixOrientation(int filter_idx) const;
 	
 	bool isOutputFilter() const;
 	
@@ -246,6 +249,7 @@ private:
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
 	std::auto_ptr<TabbedDebugImages> m_ptrTabbedDebugImages;
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
+	std::auto_ptr<PageOrientationPropagator> m_ptrPageOrientationPropagator;
 	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
 	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;
 	QCheckBox* m_pBeepOnBatchProcessingCompletion;

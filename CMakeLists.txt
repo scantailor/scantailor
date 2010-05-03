@@ -356,6 +356,7 @@ SET(
 	ThumbnailFactory.cpp ThumbnailFactory.h
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
 	ContentBoxPropagator.cpp ContentBoxPropagator.h
+	PageOrientationPropagator.cpp PageOrientationPropagator.h
 	DebugImages.cpp DebugImages.h
 	DebugImageView.cpp DebugImageView.h
 	TabbedDebugImages.cpp TabbedDebugImages.h
@@ -406,6 +407,7 @@ SET(
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h
+	filter_dc/PageOrientationCollector.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

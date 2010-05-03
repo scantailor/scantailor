@@ -26,9 +26,11 @@
 #include "ProjectWriter.h"
 #include "PageId.h"
 #include "ImageId.h"
+#include "PageLayout.h"
 #include "LayoutType.h"
 #include "Params.h"
 #include "CacheDrivenTask.h"
+#include "OrthogonalRotation.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -147,6 +149,26 @@ Filter::loadSettings(
 		
 		m_ptrSettings->updatePage(image_id, update);
 	}
+}
+
+void
+Filter::pageOrientationUpdate(
+	ImageId const& image_id, OrthogonalRotation const& orientation)
+{
+	Settings::Record const record(m_ptrSettings->getPageRecord(image_id));
+
+	if (record.layoutType() && *record.layoutType() != AUTO_LAYOUT_TYPE) {
+		// The layout type was set manually, so we don't care about orientation.
+		return;
+	}
+
+	if (record.params() && record.params()->dependencies().orientation() == orientation) {
+		// We've already estimated the number of pages for this orientation.
+		return;
+	}
+
+	// Use orientation to update the number of logical pages in an image.
+	m_ptrPages->autoSetLogicalPagesInImage(image_id, orientation);
 }
 
 void

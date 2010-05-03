@@ -43,6 +43,7 @@
 #include "ThumbnailPixmapCache.h"
 #include "ThumbnailFactory.h"
 #include "ContentBoxPropagator.h"
+#include "PageOrientationPropagator.h"
 #include "ProjectCreationContext.h"
 #include "ProjectOpeningContext.h"
 #include "SkinnedButton.h"
@@ -338,6 +339,15 @@ MainWindow::switchToNewProject(
 			m_ptrStages->pageLayoutFilter(),
 			createCompositeCacheDrivenTask(
 				m_ptrStages->selectContentFilterIdx()
+			)
+		)
+	);
+
+	m_ptrPageOrientationPropagator.reset(
+		new PageOrientationPropagator(
+			m_ptrStages->pageSplitFilter(),
+			createCompositeCacheDrivenTask(
+				m_ptrStages->fixOrientationFilterIdx()
 			)
 		)
 	);
@@ -908,8 +918,10 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	
 	cancelOngoingTask();
 	
+	bool const was_below_fix_orientation = isBelowFixOrientation(m_curFilter);
 	bool const was_below_select_content = isBelowSelectContent(m_curFilter);
 	m_curFilter = selected.front().top();
+	bool const now_below_fix_orientation = isBelowFixOrientation(m_curFilter);
 	bool const now_below_select_content = isBelowSelectContent(m_curFilter);
 	
 	m_ptrStages->filterAt(m_curFilter)->selected();
@@ -922,6 +934,15 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 		// because it may affect them.
 		if (m_ptrContentBoxPropagator.get()) {
 			m_ptrContentBoxPropagator->propagate(*m_ptrPages);
+		} // Otherwise probably no project is loaded.
+	}
+
+	// Propagate page orientations (that might have changed) to the "Split Pages" stage.
+	if (!was_below_fix_orientation && now_below_fix_orientation) {
+		// IMPORTANT: this needs to go before resetting thumbnails,
+		// because it may affect them.
+		if (m_ptrPageOrientationPropagator.get()) {
+			m_ptrPageOrientationPropagator->propagate(*m_ptrPages);
 		} // Otherwise probably no project is loaded.
 	}
 	
@@ -1291,6 +1312,12 @@ bool
 MainWindow::isBelowSelectContent(int const filter_idx) const
 {
 	return (filter_idx > m_ptrStages->selectContentFilterIdx());
+}
+
+bool
+MainWindow::isBelowFixOrientation(int filter_idx) const
+{
+	return (filter_idx > m_ptrStages->fixOrientationFilterIdx());
 }
 
 bool

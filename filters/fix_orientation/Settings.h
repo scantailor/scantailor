@@ -21,15 +21,12 @@
 
 #include "RefCountable.h"
 #include "NonCopyable.h"
-#include "IntrusivePtr.h"
 #include "OrthogonalRotation.h"
 #include "ImageId.h"
 #include "PageId.h"
 #include <QMutex>
 #include <map>
 #include <set>
-
-class PageSequence;
 
 namespace fix_orientation
 {
@@ -38,7 +35,7 @@ class Settings : public RefCountable
 {
 	DECLARE_NON_COPYABLE(Settings)
 public:
-	Settings(IntrusivePtr<PageSequence> const& pages);
+	Settings();
 	
 	virtual ~Settings();
 	
@@ -56,7 +53,6 @@ private:
 		ImageId const& image_id, OrthogonalRotation const& rotation);
 	
 	mutable QMutex m_mutex;
-	IntrusivePtr<PageSequence> m_ptrPages;
 	PerImageRotation m_perImageRotation;
 };
 
