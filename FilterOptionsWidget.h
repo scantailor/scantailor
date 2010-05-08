@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #define FILTEROPTIONSWIDGET_H_
 
 #include "PageId.h"
+#include "PageInfo.h"
 #include <QWidget>
 
 class FilterOptionsWidget : public QWidget
@@ -32,6 +33,12 @@ signals:
 	void reloadRequested();
 	
 	void invalidateThumbnail(PageId const& page_id);
+
+	/**
+	 * This signature differs from invalidateThumbnail(PageId) in that
+	 * it will cause PageInfo stored by ThumbnailSequence to be updated.
+	 */
+	void invalidateThumbnail(PageInfo const& page_info);
 	
 	void invalidateAllThumbnails();
 	

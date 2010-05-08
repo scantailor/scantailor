@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,8 +52,9 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
+		IntrusivePtr<PageSequence> const& pages,
 		std::auto_ptr<DebugImages> dbg_img,
-		QImage const& image, ImageId const& image_id,
+		QImage const& image, PageInfo const& page_info,
 		ImageTransformation const& xform,
 		OptionsWidget::UiData const& ui_data,
 		bool batch_processing);
@@ -63,10 +64,11 @@ public:
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
+	IntrusivePtr<PageSequence> m_ptrPages;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
 	QImage m_downscaledImage;
-	ImageId m_imageId;
+	PageInfo m_pageInfo;
 	ImageTransformation m_xform;
 	OptionsWidget::UiData m_uiData;
 	bool m_batchProcessing;
@@ -78,13 +80,13 @@ Task::Task(
 	IntrusivePtr<Settings> const& settings,
 	IntrusivePtr<PageSequence> const& page_sequence,
 	IntrusivePtr<deskew::Task> const& next_task,
-	ImageId const& image_id,
+	PageInfo const& page_info,
 	bool const batch_processing, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrPageSequence(page_sequence),
 	m_ptrNextTask(next_task),
-	m_imageId(image_id),
+	m_pageInfo(page_info),
 	m_batchProcessing(batch_processing)
 {
 	if (debug) {
@@ -101,7 +103,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
 	
-	Settings::Record record(m_ptrSettings->getPageRecord(m_imageId));
+	Settings::Record record(m_ptrSettings->getPageRecord(m_pageInfo.imageId()));
 	
 	OrthogonalRotation const pre_rotation(data.xform().preRotation());
 	Dependencies const deps(
@@ -131,7 +133,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 			update.setParams(new_params);
 			bool conflict = false;
 			record = m_ptrSettings->conditionalUpdate(
-				m_imageId, update, &conflict
+				m_pageInfo.imageId(), update, &conflict
 			);
 			if (conflict && !record.params()) {
 				// If there was a conflict, it means
@@ -157,7 +159,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setSplitLineMode(record.params()->splitLineMode());
 	
 	m_ptrPageSequence->setLogicalPagesInImage(
-		m_imageId, layout.numSubPages()
+		m_pageInfo.imageId(), layout.numSubPages()
 	);
 	
 	if (m_ptrNextTask) {
@@ -165,8 +167,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, m_ptrDbg, data.origImage(), m_imageId,
-				data.xform(), ui_data, m_batchProcessing
+				m_ptrFilter, m_ptrPageSequence, m_ptrDbg, data.origImage(),
+				m_pageInfo, data.xform(), ui_data, m_batchProcessing
 			)
 		);
 	}
@@ -177,16 +179,18 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
+	IntrusivePtr<PageSequence> const& pages,
 	std::auto_ptr<DebugImages> dbg_img,
-	QImage const& image, ImageId const& image_id,
+	QImage const& image, PageInfo const& page_info,
 	ImageTransformation const& xform,
 	OptionsWidget::UiData const& ui_data,
 	bool const batch_processing)
 :	m_ptrFilter(filter),
+	m_ptrPages(pages),
 	m_ptrDbg(dbg_img),
 	m_image(image),
 	m_downscaledImage(ImageView::createDownscaledImage(image)),
-	m_imageId(image_id),
+	m_pageInfo(page_info),
 	m_xform(xform),
 	m_uiData(ui_data),
 	m_batchProcessing(batch_processing)
@@ -202,17 +206,23 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	opt_widget->postUpdateUI(m_uiData);
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
-	ui->invalidateThumbnail(PageId(m_imageId));
+	ui->invalidateThumbnail(m_pageInfo.id());
 	
 	if (m_batchProcessing) {
 		return;
 	}
 	
 	ImageView* view = new ImageView(
-		m_image, m_downscaledImage, m_xform, m_uiData.pageLayout()
+		m_image, m_downscaledImage, m_xform, m_uiData.pageLayout(),
+		m_ptrPages, m_pageInfo.imageId(),
+		m_pageInfo.leftHalfRemoved(), m_pageInfo.rightHalfRemoved()
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	
+	QObject::connect(
+		view, SIGNAL(invalidateThumbnail(PageInfo const&)),
+		opt_widget, SIGNAL(invalidateThumbnail(PageInfo const&))
+	);
 	QObject::connect(
 		view, SIGNAL(pageLayoutSetLocally(PageLayout const&)),
 		opt_widget, SLOT(pageLayoutSetExternally(PageLayout const&))

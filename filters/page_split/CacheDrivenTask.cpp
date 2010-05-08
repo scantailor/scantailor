@@ -88,7 +88,9 @@ CacheDrivenTask::process(
 				new Thumbnail(
 					thumb_col->thumbnailCache(),
 					thumb_col->maxLogicalThumbSize(),
-					page_info.imageId(), xform, layout
+					page_info.imageId(), xform, layout,
+					page_info.leftHalfRemoved(),
+					page_info.rightHalfRemoved()
 				)
 			)
 		);

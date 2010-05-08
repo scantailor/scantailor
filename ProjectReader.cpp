@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) Joseph Artsimovich <joseph.artsimovich@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QDomElement>
 #include <QDomNode>
+#include <set>
 
 ProjectReader::ProjectReader(QDomDocument const& doc)
 :	m_doc(doc)
@@ -187,16 +188,20 @@ ProjectReader::processImages(
 		if (!ok) {
 			continue;
 		}
+
+		QString const removed(el.attribute("removed"));
+		bool const left_half_removed = (removed == "L");
+		bool const right_half_removed = (removed == "R");
 		
 		FileInfo const file_info(getFileInfo(file_id));
 		if (file_info.isNull()) {
 			continue;
 		}
-		
 		ImageId const image_id(file_info.path, file_image);
 		ImageMetadata const metadata(processImageMetadata(el));
 		ImageInfo const image_info(
-			image_id, metadata, file_info.multiPageFile, sub_pages
+			image_id, metadata, file_info.multiPageFile, sub_pages,
+			left_half_removed, right_half_removed
 		);
 		
 		images.push_back(image_info);
@@ -267,7 +272,7 @@ ProjectReader::processPages(QDomElement const& pages_el)
 		
 		PageId const page_id(image.id(), sub_page);
 		m_pageMap.insert(PageMap::value_type(id, page_id));
-		
+
 		if (el.attribute("selected") == "selected") {
 			if (m_ptrPages.get()) {
 				m_ptrPages->setCurPage(page_id);

@@ -28,6 +28,7 @@
 
 class PageId;
 class ImageId;
+class PageInfo;
 class PageSequence;
 class PageSelectionAccessor;
 class OrthogonalRotation;
@@ -68,7 +69,7 @@ public:
 	virtual void loadSettings(
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
-	IntrusivePtr<Task> createTask(PageId const& page_id,
+	IntrusivePtr<Task> createTask(PageInfo const& page_info,
 		IntrusivePtr<deskew::Task> const& next_task,
 		bool batch_processing, bool debug);
 	
@@ -79,8 +80,6 @@ public:
 
 	void pageOrientationUpdate(
 		ImageId const& image_id, OrthogonalRotation const& orientation);
-
-	void removePages(std::set<PageId> const& pages);
 private:
 	void writeImageSettings(
 		QDomDocument& doc, QDomElement& filter_el,

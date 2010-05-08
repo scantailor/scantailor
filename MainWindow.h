@@ -115,9 +115,11 @@ private slots:
 	
 	void stopBatchProcessing(MainAreaAction main_area = LOAD_IMAGE);
 	
-	void invalidateThumbnailSlot(PageId const& page_id);
+	void invalidateThumbnail(PageId const& page_id);
+
+	void invalidateThumbnail(PageInfo const& page_info);
 	
-	void invalidateAllThumbnailsSlot();
+	void invalidateAllThumbnails();
 	
 	void filterResult(
 		BackgroundTaskPtr const& task,
@@ -151,10 +153,6 @@ private:
 	virtual void setImageWidget(
 		QWidget* widget, Ownership ownership,
 		DebugImages* debug_images = 0);
-	
-	virtual void invalidateThumbnail(PageId const& page_id);
-	
-	virtual void invalidateAllThumbnails();
 	
 	void cancelOngoingTask();
 	
@@ -224,7 +222,7 @@ private:
 	void showRemovePagesDialog(std::set<PageId> const& pages);
 	
 	void insertImage(ImageInfo const& new_image,
-		BeforeOrAfter before_or_after, ImageId const& existing);
+		BeforeOrAfter before_or_after, ImageId existing);
 
 	void removeFromProject(std::set<PageId> const& pages);
 	

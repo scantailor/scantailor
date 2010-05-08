@@ -110,6 +110,10 @@ public:
 	QString const& defaultStatusTip() const { return m_defaultStatusTip; }
 
 	void setDefaultStatusTip(QString const& status_tip) { m_defaultStatusTip = status_tip; }
+
+	bool redrawRequested() const { return m_redrawRequested; }
+
+	void setRedrawRequested(bool requested) { m_redrawRequested = requested; }
 private:
 	typedef boost::intrusive::list<
 		Captor, boost::intrusive::constant_time_size<false>
@@ -126,6 +130,7 @@ private:
 	Proximity m_bestProximity;
 	Proximity m_proximityThreshold;
 	int m_bestProximityPriority;
+	bool m_redrawRequested;
 };
 
 #endif

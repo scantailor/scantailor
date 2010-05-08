@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -203,59 +203,6 @@ Settings::conditionalUpdate(
 			*conflict = false;
 		}
 		return record;
-	}
-}
-
-void
-Settings::removePages(std::set<PageId> const& pages)
-{
-	std::set<PageId>::const_iterator const pages_end(pages.end());
-
-	QMutexLocker locker(&m_mutex);
-
-	PerPageRecords::iterator it(m_perPageRecords.begin());
-	PerPageRecords::iterator const end(m_perPageRecords.end());
-	while (it != end) {
-		Record record(it->second, m_defaultLayoutType);
-		switch (record.combinedLayoutType()) {
-			case AUTO_LAYOUT_TYPE:
-			case SINGLE_PAGE_UNCUT:
-			case PAGE_PLUS_OFFCUT: {
-				if (pages.find(PageId(it->first, PageId::SINGLE_PAGE)) != pages_end) {
-					m_perPageRecords.erase(it++);
-					continue;
-				}
-				if (record.combinedLayoutType() != AUTO_LAYOUT_TYPE) {
-					break;
-				}
-			}
-			case TWO_PAGES: {
-				bool const left_removed = (pages.find(PageId(it->first, PageId::LEFT_PAGE)) != pages_end);
-				bool const right_removed = (pages.find(PageId(it->first, PageId::RIGHT_PAGE)) != pages_end);
-				if (left_removed && right_removed) {
-					m_perPageRecords.erase(it++);
-					continue;
-				} else if (left_removed || right_removed) {
-					UpdateAction update;
-					update.setLayoutType(PAGE_PLUS_OFFCUT);
-					if (record.params()) {
-						PageLayout::Type const layout_type = left_removed
-							? PageLayout::RIGHT_PAGE_PLUS_OFFCUT
-							: PageLayout::LEFT_PAGE_PLUS_OFFCUT;
-						PageLayout const layout(layout_type, record.params()->pageLayout().splitLine());
-						Dependencies deps(record.params()->dependencies());
-						deps.setLayoutType(PAGE_PLUS_OFFCUT);
-						Params const params(layout, deps, MODE_MANUAL);
-						update.setParams(params);
-					}
-					updatePageLocked(it++, update);
-					continue;
-				}
-				break;
-			}
-			default:;
-		}
-		++it;
 	}
 }
 

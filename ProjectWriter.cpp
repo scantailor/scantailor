@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ ProjectWriter::ProjectWriter(
 			++next_id;
 		}
 		
-		if (m_images.insert(Image(image_id, next_id, page.imageSubPages())).second) {
+		if (m_images.insert(Image(page, next_id)).second) {
 			++next_id;
 		}
 		
@@ -151,6 +151,10 @@ ProjectWriter::processImages(QDomDocument& doc) const
 		image_el.setAttribute("subPages", image.numSubPages);
 		image_el.setAttribute("fileId", fileId(image.id.filePath()));
 		image_el.setAttribute("fileImage", image.id.page());
+		if (image.leftHalfRemoved != image.rightHalfRemoved) {
+			// Both are not supposed to be removed.
+			image_el.setAttribute("removed", image.leftHalfRemoved ? "L" : "R");
+		}
 		writeImageMetadata(doc, image_el, image.id);
 		images_el.appendChild(image_el);
 	}
@@ -246,4 +250,16 @@ ProjectWriter::enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) co
 	BOOST_FOREACH(Page const& page, m_pages.get<Sequenced>()) {
 		out(page.id, page.numericId);
 	}
+}
+
+
+/*======================== ProjectWriter::Image =========================*/
+
+ProjectWriter::Image::Image(PageInfo const& page, int numeric_id)
+:	id(page.imageId()),
+	numericId(numeric_id),
+	numSubPages(page.imageSubPages()),
+	leftHalfRemoved(page.leftHalfRemoved()),
+	rightHalfRemoved(page.rightHalfRemoved())
+{
 }

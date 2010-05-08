@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,14 @@
 #include "DraggablePoint.h"
 #include "DraggableLineSegment.h"
 #include "PageLayout.h"
+#include "UnremoveButton.h"
+#include "ImageId.h"
+#include "IntrusivePtr.h"
 #include <QPixmap>
 
 class ImageTransformation;
+class PageSequence;
+class PageInfo;
 class QPointF;
 class QRectF;
 class QLineF;
@@ -43,10 +48,14 @@ class ImageView :
 	Q_OBJECT
 public:
 	ImageView(QImage const& image, QImage const& downscaled_image,
-		ImageTransformation const& xform, PageLayout const& layout);
+		ImageTransformation const& xform, PageLayout const& layout,
+		IntrusivePtr<PageSequence> const& pages, ImageId const& image_id,
+		bool left_half_removed, bool right_half_removed);
 	
 	virtual ~ImageView();
 signals:
+	void invalidateThumbnail(PageInfo const& page_info);
+
 	void pageLayoutSetLocally(PageLayout const& layout);
 public slots:
 	void pageLayoutSetExternally(PageLayout const& layout);
@@ -62,6 +71,14 @@ private:
 	void lineMoveRequest(QLineF line);
 
 	void dragFinished();
+
+	QPointF leftPageCenter() const;
+
+	QPointF rightPageCenter() const;
+
+	void unremoveLeftPage();
+
+	void unremoveRightPage();
 
 	/**
 	 * \return Page layout in widget coordinates.
@@ -93,10 +110,14 @@ private:
 
 	static QLineF customInscribedSplitLine(QLineF const& line, QRectF const& rect);
 
+	IntrusivePtr<PageSequence> m_ptrPages;
+	ImageId m_imageId;
 	DraggablePoint m_handles[2];
 	ObjectDragHandler m_handleInteractors[2];
 	DraggableLineSegment m_lineSegment;
 	ObjectDragHandler m_lineInteractor;
+	UnremoveButton m_leftUnremoveButton;
+	UnremoveButton m_rightUnremoveButton;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 
@@ -106,6 +127,9 @@ private:
 	 * Page layout in virtual image coordinates.
 	 */
 	PageLayout m_virtLayout;
+
+	bool m_leftPageRemoved;
+	bool m_rightPageRemoved;
 };
 
 } // namespace page_split

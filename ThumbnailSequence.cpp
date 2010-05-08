@@ -33,7 +33,8 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/function.hpp>
-#include <boost/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 #include <boost/foreach.hpp>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
@@ -69,8 +70,8 @@
 #include <stddef.h>
 #include <assert.h>
 
-using namespace ::boost;
 using namespace ::boost::multi_index;
+using namespace ::boost::lambda;
 
 
 class ThumbnailSequence::Item
@@ -136,6 +137,8 @@ public:
 		IntrusivePtr<PageOrderProvider const> const& provider);
 	
 	void invalidateThumbnail(PageId const& page_id);
+
+	void invalidateThumbnail(PageInfo const& page_info);
 	
 	void invalidateAllThumbnails();
 	
@@ -177,6 +180,8 @@ private:
 	typedef Container::index<ItemsInOrderTag>::type ItemsInOrder;
 	typedef Container::index<SelectedThenUnselectedTag>::type SelectedThenUnselected;
 	
+	void invalidateThumbnailImpl(ItemsById::iterator id_it);
+
 	void sceneContextMenuEvent(QGraphicsSceneContextMenuEvent* evt);
 
 	void selectItemNoModifiers(ItemsById::iterator const& it);
@@ -315,19 +320,6 @@ private:
 };
 
 
-class ThumbnailSequence::PageIdMutator
-{
-public:
-	PageIdMutator(PageId const& new_page_id) : m_newPageId(new_page_id) {}
-
-	void operator()(Item& item) {
-		item.pageInfo.setId(m_newPageId);
-	}
-private:
-	PageId m_newPageId;
-};
-
-
 /*============================= ThumbnailSequence ===========================*/
 
 ThumbnailSequence::ThumbnailSequence(QSizeF const& max_logical_thumb_size)
@@ -364,6 +356,12 @@ void
 ThumbnailSequence::invalidateThumbnail(PageId const& page_id)
 {
 	m_ptrImpl->invalidateThumbnail(page_id);
+}
+
+void
+ThumbnailSequence::invalidateThumbnail(PageInfo const& page_info)
+{
+	m_ptrImpl->invalidateThumbnail(page_info);
 }
 
 void
@@ -435,7 +433,7 @@ ThumbnailSequence::Impl::Impl(
 	m_pSelectionLeader(0)
 {
 	m_graphicsScene.setContextMenuEventCallback(
-		boost::bind(&Impl::sceneContextMenuEvent, this, _1)
+		bind(&Impl::sceneContextMenuEvent, this, _1)
 	);
 }
 
@@ -550,10 +548,24 @@ void
 ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_id));
-	if (id_it == m_itemsById.end()) {
-		return;
+	if (id_it != m_itemsById.end()) {
+		invalidateThumbnailImpl(id_it);
 	}
+}
 
+void
+ThumbnailSequence::Impl::invalidateThumbnail(PageInfo const& page_info)
+{
+	ItemsById::iterator const id_it(m_itemsById.find(page_info.id()));
+	if (id_it != m_itemsById.end()) {
+		m_itemsById.modify(id_it, bind(&Item::pageInfo, _1) = page_info);
+		invalidateThumbnailImpl(id_it);
+	}
+}
+
+void
+ThumbnailSequence::Impl::invalidateThumbnailImpl(ItemsById::iterator const id_it)
+{
 	std::auto_ptr<CompositeItem> composite(
 		getCompositeItem(&*id_it, id_it->pageInfo, id_it->pageNum)
 	);
@@ -580,7 +592,7 @@ ThumbnailSequence::Impl::invalidateThumbnail(PageId const& page_id)
 	ItemsInOrder::iterator const after_new(
 		itemInsertPosition(
 			++m_itemsInOrder.begin(), m_itemsInOrder.end(),
-			page_id, after_old, &dist
+			id_it->pageInfo.id(), after_old, &dist
 		)
 	);
 
@@ -819,14 +831,6 @@ ThumbnailSequence::Impl::removePages(std::set<PageId> const& to_remove)
 {
 	m_sceneRect = QRectF(0, 0, 0, 0);
 
-	// If we are removing a LEFT_PAGE or a RIGHT_PAGE, we have to change
-	// the type of the remaining half to SINGLE_PAGE, as that's what
-	// effectively happens in PageSequence::removePages().
-	// We can't do it in place, as that will prevent the other half
-	// to be remove if it's also in the list.
-	std::vector<ImageId> images_to_singularize;
-	images_to_singularize.reserve(m_items.size());
-
 	std::set<PageId>::const_iterator const to_remove_end(to_remove.end());
 	QPointF pos_delta(0, 0);
 
@@ -845,26 +849,9 @@ ThumbnailSequence::Impl::removePages(std::set<PageId> const& to_remove)
 			if (m_pSelectionLeader == &*ord_it) {
 				m_pSelectionLeader = 0;
 			}
-
-			switch (ord_it->pageInfo.id().subPage()) {
-				case PageId::LEFT_PAGE:
-				case PageId::RIGHT_PAGE:
-					images_to_singularize.push_back(ord_it->pageInfo.imageId());
-					break;
-				default:;
-			}
-
 			pos_delta.ry() -= ord_it->composite->boundingRect().height() + SPACING;
 			delete ord_it->composite;
 			m_itemsInOrder.erase(ord_it++);
-		}
-	}
-
-	ItemsById::iterator const id_end(m_itemsById.end());
-	BOOST_FOREACH(ImageId const& image_id, images_to_singularize) {
-		ItemsById::iterator id_it(m_itemsById.lower_bound(PageId(image_id)));
-		for (; id_it != id_end && id_it->pageInfo.imageId() == image_id; ++id_it) {
-			m_itemsById.modify(id_it, PageIdMutator(PageId(image_id, PageId::SINGLE_PAGE)));
 		}
 	}
 

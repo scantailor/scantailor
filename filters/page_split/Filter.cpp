@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -172,12 +172,6 @@ Filter::pageOrientationUpdate(
 }
 
 void
-Filter::removePages(std::set<PageId> const& pages)
-{
-	m_ptrSettings->removePages(pages);
-}
-
-void
 Filter::writeImageSettings(
 	QDomDocument& doc, QDomElement& filter_el,
 	ImageId const& image_id, int const numeric_id) const
@@ -200,14 +194,14 @@ Filter::writeImageSettings(
 
 IntrusivePtr<Task>
 Filter::createTask(
-	PageId const& page_id,
+	PageInfo const& page_info,
 	IntrusivePtr<deskew::Task> const& next_task,
 	bool const batch_processing, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings, m_ptrPages,
-			next_task, page_id.imageId(), batch_processing, debug
+			next_task, page_info, batch_processing, debug
 		)
 	);
 }

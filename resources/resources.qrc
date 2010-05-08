@@ -1,6 +1,9 @@
 <RCC>
   <qresource prefix="/">
+    <file>icons/trashed-small.png</file>
     <file>icons/plus-16.png</file>
+    <file>icons/trashed-big.png</file>
+    <file>icons/untrash-big.png</file>
     <file>icons/minus-16.png</file>
     <file>icons/insert-here-16.png</file>
     <file>icons/despeckle-normal.png.png</file>

@@ -24,6 +24,7 @@ SET(
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
 	LayoutType.cpp LayoutType.h
+	UnremoveButton.cpp UnremoveButton.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

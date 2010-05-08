@@ -482,6 +482,7 @@ ImageViewBase::paintEvent(QPaintEvent* event)
 	}
 
 	m_rootInteractionHandler.paint(painter, m_interactionState);
+	maybeQueueRedraw();
 }
 
 void
@@ -491,6 +492,7 @@ ImageViewBase::keyPressEvent(QKeyEvent* event)
 	m_rootInteractionHandler.keyPressEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	maybeQueueRedraw();
 }
 
 void
@@ -500,6 +502,7 @@ ImageViewBase::keyReleaseEvent(QKeyEvent* event)
 	m_rootInteractionHandler.keyReleaseEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	maybeQueueRedraw();
 }
 
 void
@@ -516,6 +519,7 @@ ImageViewBase::mousePressEvent(QMouseEvent* event)
 	m_rootInteractionHandler.mousePressEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	void maybeQueueRedraw();
 }
 
 void
@@ -532,6 +536,7 @@ ImageViewBase::mouseReleaseEvent(QMouseEvent* event)
 	m_rootInteractionHandler.mouseReleaseEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	maybeQueueRedraw();
 }
 
 void
@@ -548,6 +553,7 @@ ImageViewBase::mouseMoveEvent(QMouseEvent* event)
 	m_rootInteractionHandler.mouseMoveEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	maybeQueueRedraw();
 }
 
 void
@@ -557,6 +563,7 @@ ImageViewBase::wheelEvent(QWheelEvent* event)
 	m_rootInteractionHandler.wheelEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	maybeQueueRedraw();
 }
 
 void
@@ -566,6 +573,7 @@ ImageViewBase::contextMenuEvent(QContextMenuEvent* event)
 	m_rootInteractionHandler.contextMenuEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
+	maybeQueueRedraw();
 }
 
 void
@@ -1008,6 +1016,15 @@ void
 ImageViewBase::updateCursor()
 {
 	viewport()->setCursor(m_interactionState.cursor());
+}
+
+void
+ImageViewBase::maybeQueueRedraw()
+{
+	if (m_interactionState.redrawRequested()) {
+		m_interactionState.setRedrawRequested(false);
+		update();
+	}
 }
 
 BackgroundExecutor&

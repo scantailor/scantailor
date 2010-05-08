@@ -647,11 +647,15 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 		);
 		disconnect(
 			m_ptrOptionsWidget, SIGNAL(invalidateThumbnail(PageId const&)),
-			this, SLOT(invalidateThumbnailSlot(PageId const&))
+			this, SLOT(invalidateThumbnail(PageId const&))
+		);
+		disconnect(
+			m_ptrOptionsWidget, SIGNAL(invalidateThumbnail(PageInfo const&)),
+			this, SLOT(invalidateThumbnail(PageInfo const&))
 		);
 		disconnect(
 			m_ptrOptionsWidget, SIGNAL(invalidateAllThumbnails()),
-			this, SLOT(invalidateAllThumbnailsSlot())
+			this, SLOT(invalidateAllThumbnails())
 		);
 		disconnect(
 			m_ptrOptionsWidget, SIGNAL(goToPage(PageId const&)),
@@ -672,11 +676,15 @@ MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const owners
 	);
 	connect(
 		widget, SIGNAL(invalidateThumbnail(PageId const&)),
-		this, SLOT(invalidateThumbnailSlot(PageId const&))
+		this, SLOT(invalidateThumbnail(PageId const&))
+	);
+	connect(
+		widget, SIGNAL(invalidateThumbnail(PageInfo const&)),
+		this, SLOT(invalidateThumbnail(PageInfo const&))
 	);
 	connect(
 		widget, SIGNAL(invalidateAllThumbnails()),
-		this, SLOT(invalidateAllThumbnailsSlot())
+		this, SLOT(invalidateAllThumbnails())
 	);
 	connect(
 		widget, SIGNAL(goToPage(PageId const&)),
@@ -735,19 +743,13 @@ MainWindow::invalidateThumbnail(PageId const& page_id)
 }
 
 void
+MainWindow::invalidateThumbnail(PageInfo const& page_info)
+{
+	m_ptrThumbSequence->invalidateThumbnail(page_info);
+}
+
+void
 MainWindow::invalidateAllThumbnails()
-{
-	m_ptrThumbSequence->invalidateAllThumbnails();
-}
-
-void
-MainWindow::invalidateThumbnailSlot(PageId const& page_id)
-{
-	invalidateThumbnail(page_id);
-}
-
-void
-MainWindow::invalidateAllThumbnailsSlot()
 {
 	m_ptrThumbSequence->invalidateAllThumbnails();
 }
@@ -1616,7 +1618,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 		metadata, OrthogonalRotation()
 	);
 	ImageInfo const image_info(
-		image_id, metadata, is_multipage_file, num_sub_pages
+		image_id, metadata, is_multipage_file, num_sub_pages, false, false
 	);
 	insertImage(image_info, before_or_after, existing);
 }
@@ -1644,14 +1646,24 @@ MainWindow::showRemovePagesDialog(std::set<PageId> const& pages)
  */
 void
 MainWindow::insertImage(ImageInfo const& new_image,
-	BeforeOrAfter before_or_after, ImageId const& existing)
+	BeforeOrAfter before_or_after, ImageId existing)
 {
-	m_ptrPages->insertImage(new_image, before_or_after, existing);
-	PageInfo const page_info(
-		PageId(new_image.id(), PageId::SINGLE_PAGE), new_image.metadata(),
-		new_image.isMultiPageFile(), new_image.numSubPages()
+	std::vector<PageInfo> pages(
+		m_ptrPages->insertImage(
+			new_image, before_or_after, existing, getCurrentView()
+		)
 	);
-	m_ptrThumbSequence->insert(page_info, before_or_after, existing);
+
+	if (before_or_after == BEFORE) {
+		// The second one will be inserted first, then the first
+		// one will be inserted BEFORE the second one.
+		std::reverse(pages.begin(), pages.end());
+	}
+	
+	BOOST_FOREACH(PageInfo const& page_info, pages) {
+		m_ptrThumbSequence->insert(page_info, before_or_after, existing);
+		existing = page_info.imageId();
+	}
 }
 
 void
@@ -1663,7 +1675,6 @@ MainWindow::removeFromProject(std::set<PageId> const& pages)
 	}
 
 	m_ptrPages->removePages(pages);
-	m_ptrStages->pageSplitFilter()->removePages(pages);
 	m_ptrThumbSequence->removePages(pages);
 	m_ptrThumbSequence->setSelection(
 		m_ptrPages->curPage(getCurrentView()).id()
@@ -1714,7 +1725,7 @@ MainWindow::createCompositeTask(
 	}
 	if (last_filter_idx >= m_ptrStages->pageSplitFilterIdx()) {
 		page_split_task = m_ptrStages->pageSplitFilter()->createTask(
-			page.id(), deskew_task, m_batchProcessing, debug
+			page, deskew_task, m_batchProcessing, debug
 		);
 		debug = false;
 	}

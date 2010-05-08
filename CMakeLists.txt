@@ -315,7 +315,7 @@ ADD_SUBDIRECTORY(filters/output)
 SET(resource_sources)
 QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
 SOURCE_GROUP("Generated" FILES ${ui_sources} ${resource_sources})
-SOURCE_GROUP("Resources" FILES resources/resources.qrc)
+SOURCE_GROUP("Resources" FILES resources/resources.qrc resources/icons/COPYING)
 IF(WIN32)
 	SOURCE_GROUP("Resources" FILES resources/win32/resources.rc)
 ENDIF()
@@ -437,7 +437,7 @@ ENDIF(WIN32)
 
 ADD_EXECUTABLE(
 	scantailor WIN32 ${sources} ${ui_sources} VERSION
-	${resource_sources} ${win32_resource_file}
+	${resource_sources} ${win32_resource_file} resources/icons/COPYING
 )
 TARGET_LINK_LIBRARIES(
 	scantailor

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "RefCountable.h"
 #include "FilterResult.h"
 #include "IntrusivePtr.h"
-#include "ImageId.h"
+#include "PageInfo.h"
 #include <memory>
 
 class TaskStatus;
@@ -52,7 +52,7 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<PageSequence> const& page_sequence,
 		IntrusivePtr<deskew::Task> const& next_task,
-		ImageId const& image_id,
+		PageInfo const& page_info,
 		bool batch_processing, bool debug);
 	
 	virtual ~Task();
@@ -66,7 +66,7 @@ private:
 	IntrusivePtr<PageSequence> m_ptrPageSequence;
 	IntrusivePtr<deskew::Task> m_ptrNextTask;
 	std::auto_ptr<DebugImages> m_ptrDbg;
-	ImageId m_imageId;
+	PageInfo m_pageInfo;
 	bool m_batchProcessing;
 };
 

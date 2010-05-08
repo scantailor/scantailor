@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 #include <map>
 
 class AbstractFilter;
+class PageInfo;
 class QDomDocument;
 class QDomElement;
 
@@ -85,9 +86,10 @@ private:
 		ImageId id;
 		int numericId;
 		int numSubPages;
+		bool leftHalfRemoved;
+		bool rightHalfRemoved;
 		
-		Image(ImageId const& id, int numeric_id, int num_sub_pages)
-		: id(id), numericId(numeric_id), numSubPages(num_sub_pages) {}
+		Image(PageInfo const& page_info, int numeric_id);
 	};
 	
 	struct Page

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,13 +98,28 @@ public:
 	 * exists in this PageSequence.  Requesting to insert a new image
 	 * BEFORE the null one is legal and means inserting it at the end.
 	 *
-	 * Returns true if the image was inserted, false if the \p existing
-	 * image wasn't found.
+	 * \param new_image The image to insert.
+	 * \param before_or_after Whether to insert before or after another image.
+	 * \param existing The image we are inserting before or after.
+	 * \param view This one only affects what is returned.
+	 * \return One or two (or zero, if existing image wasn't found) logical
+	 *         page descriptors.  If two are returned, they will be returned
+	 *         in the order dependent on the layout direction specified
+	 *         at construction time.
 	 */
-	bool insertImage(ImageInfo const& new_image,
-		BeforeOrAfter before_or_after, ImageId const& existing);
+	std::vector<PageInfo> insertImage(ImageInfo const& new_image,
+		BeforeOrAfter before_or_after, ImageId const& existing, View view);
 
 	void removePages(std::set<PageId> const& pages);
+
+	/**
+	 * \brief Unremoves half-a-page, if the other half is still present.
+	 * 
+	 * \param page_id Left or right sub-page to restore.
+	 * \return A PageInfo corresponding to the page restored or
+	 *         a null PageInfo if restoring failed.
+	 */
+	PageInfo unremovePage(PageId const& page_id);
 	
 	/**
 	 * \brief Check if all DPIs are OK, in terms of ImageMetadata::isDpiOK()
@@ -124,10 +139,11 @@ private:
 		ImageId id;
 		ImageMetadata metadata;
 		int numLogicalPages; // 1 or 2
+		bool leftHalfRemoved;  // Both can't be true, and if one is true,
+		bool rightHalfRemoved; // then numLogicalPages is 1.
 		bool multiPageFile;
 		
-		ImageDesc(ImageId const& id, ImageMetadata const& metadata,
-			bool multi_page_file, int sub_pages);
+		ImageDesc(ImageInfo const& image_info);
 		
 		ImageDesc(ImageId const& id, ImageMetadata const& metadata,
 			bool multi_page_file, Pages pages);
@@ -157,10 +173,13 @@ private:
 	
 	PageInfo setNextPageImpl(View view, int* page_num, bool& modified);
 	
-	bool insertImageImpl(ImageInfo const& new_image,
-		BeforeOrAfter before_or_after, ImageId const& existing, bool& modified);
+	std::vector<PageInfo> insertImageImpl(
+		ImageInfo const& new_image, BeforeOrAfter before_or_after,
+		ImageId const& existing, View view, bool& modified);
 
 	void removePagesImpl(std::set<PageId> const& pages, bool& modified);
+
+	PageInfo unremovePageImpl(PageId const& page_id, bool& modified);
 	
 	PageId::SubPage curSubPageLocked(ImageDesc const& image, View view) const;
 	
