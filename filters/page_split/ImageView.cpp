@@ -21,6 +21,8 @@
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
 #include "Proximity.h"
+#include "PageId.h"
+#include "PageSequence.h"
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
@@ -35,18 +37,29 @@ namespace page_split
 
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
-	ImageTransformation const& xform, PageLayout const& layout)
+	ImageTransformation const& xform, PageLayout const& layout,
+	IntrusivePtr<PageSequence> const& pages, ImageId const& image_id,
+	bool left_half_removed, bool right_half_removed)
 :	ImageViewBase(
 		image, downscaled_image,
 		ImagePresentation(xform.transform(), xform.resultingCropArea())
 	),
+	m_ptrPages(pages),
+	m_imageId(image_id),
 	m_lineInteractor(&m_lineSegment),
+	m_leftUnremoveButton(boost::bind(&ImageView::leftPageCenter, this)),
+	m_rightUnremoveButton(boost::bind(&ImageView::rightPageCenter, this)),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_handlePixmap(":/icons/aqua-sphere.png"),
-	m_virtLayout(layout)
+	m_virtLayout(layout),
+	m_leftPageRemoved(left_half_removed),
+	m_rightPageRemoved(right_half_removed)
 {
 	setMouseTracking(true);
+
+	m_leftUnremoveButton.setClickCallback(boost::bind(&ImageView::unremoveLeftPage, this));
+	m_rightUnremoveButton.setClickCallback(boost::bind(&ImageView::unremoveRightPage, this));
 
 	QString const tip(tr("Drag the line or the handles."));
 	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
@@ -81,8 +94,14 @@ ImageView::ImageView(
 	m_lineInteractor.setProximityCursor(Qt::SplitHCursor);
 	m_lineInteractor.setInteractionCursor(Qt::SplitHCursor);
 	m_lineInteractor.setProximityStatusTip(tip);
-
 	makeLastFollower(m_lineInteractor);
+
+	if (m_leftPageRemoved) {
+		makeLastFollower(m_leftUnremoveButton);
+	}
+	if (m_rightPageRemoved) {
+		makeLastFollower(m_rightUnremoveButton);
+	}
 
 	rootInteractionHandler().makeLastFollower(*this);
 	rootInteractionHandler().makeLastFollower(m_dragHandler);
@@ -122,14 +141,10 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 			);
 			break;
 		case PageLayout::TWO_PAGES:
-			painter.setBrush(QColor(0, 0, 255, 50));
-			painter.drawPolygon(
-				m_virtLayout.leftPageOutline(virt_rect)
-			);
-			painter.setBrush(QColor(255, 0, 0, 50));
-			painter.drawPolygon(
-				m_virtLayout.rightPageOutline(virt_rect)
-			);
+			painter.setBrush(m_leftPageRemoved ? QColor(0, 0, 0, 80) : QColor(0, 0, 255, 50));
+			painter.drawPolygon(m_virtLayout.leftPageOutline(virt_rect));
+			painter.setBrush(m_rightPageRemoved ? QColor(0, 0, 0, 80) : QColor(255, 0, 0, 50));
+			painter.drawPolygon(m_virtLayout.rightPageOutline(virt_rect));
 			break;
 	}
 
@@ -294,6 +309,66 @@ ImageView::dragFinished()
 	// is to make them visible and accessible for dragging.
 	update();
 	emit pageLayoutSetLocally(m_virtLayout);
+}
+
+QPointF
+ImageView::leftPageCenter() const
+{
+	QRectF left_rect(m_virtLayout.leftPageOutline(virtualDisplayRect()).boundingRect());
+	QRectF right_rect(m_virtLayout.rightPageOutline(virtualDisplayRect()).boundingRect());
+
+	double const x_mid = 0.5 * (left_rect.right() + right_rect.left());
+	left_rect.setRight(x_mid);
+	right_rect.setLeft(x_mid);
+
+	return virtualToWidget().map(left_rect.center());
+}
+
+QPointF
+ImageView::rightPageCenter() const
+{
+	QRectF left_rect(m_virtLayout.leftPageOutline(virtualDisplayRect()).boundingRect());
+	QRectF right_rect(m_virtLayout.rightPageOutline(virtualDisplayRect()).boundingRect());
+
+	double const x_mid = 0.5 * (left_rect.right() + right_rect.left());
+	left_rect.setRight(x_mid);
+	right_rect.setLeft(x_mid);
+
+	return virtualToWidget().map(right_rect.center());
+}
+
+void
+ImageView::unremoveLeftPage()
+{
+	PageInfo page_info(
+		m_ptrPages->unremovePage(PageId(m_imageId, PageId::LEFT_PAGE))
+	);
+	m_leftUnremoveButton.unlink();
+	m_leftPageRemoved = false;
+	
+	update();
+
+	// We need invalidateThumbnail(PageInfo) rather than (PageId),
+	// as we are updating page removal status.
+	page_info.setId(PageId(m_imageId, PageId::SINGLE_PAGE));
+	emit invalidateThumbnail(page_info);
+}
+
+void
+ImageView::unremoveRightPage()
+{
+	PageInfo page_info(
+		m_ptrPages->unremovePage(PageId(m_imageId, PageId::RIGHT_PAGE))
+	);
+	m_rightUnremoveButton.unlink();
+	m_rightPageRemoved = false;
+	
+	update();
+	
+	// We need invalidateThumbnail(PageInfo) rather than (PageId),
+	// as we are updating page removal status.
+	page_info.setId(PageId(m_imageId, PageId::SINGLE_PAGE));
+	emit invalidateThumbnail(page_info);
 }
 
 } // namespace page_split

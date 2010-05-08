@@ -46,7 +46,7 @@ Filter::Filter(
 	IntrusivePtr<PageSequence> const& page_sequence,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(page_sequence),
-	m_ptrSettings(new Settings(page_sequence))
+	m_ptrSettings(new Settings)
 {
 	m_ptrOptionsWidget.reset(
 		new OptionsWidget(

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -176,15 +176,6 @@ public:
 	Record conditionalUpdate(
 		ImageId const& image_id, UpdateAction const& action,
 		bool* conflict = 0);
-
-	/**
-	 * \brief Update page records to make the layout type consistent
-	 *        with the number of sub pages which may have changes.
-	 *
-	 * For example, layout type TWO_PAGES will become LEFT_PAGE, if
-	 * the right was removed.
-	 */
-	void removePages(std::set<PageId> const& pages);
 private:
 	typedef std::map<ImageId, BaseRecord> PerPageRecords;
 	

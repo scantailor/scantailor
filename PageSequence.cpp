@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,13 +55,21 @@ PageSequence::PageSequence(
 	initSubPagesInOrder(layout_direction);
 	
 	BOOST_FOREACH(ImageInfo const& image, info) {
-		m_images.push_back(
-			ImageDesc(
-				image.id(), image.metadata(),
-				image.isMultiPageFile(), image.numSubPages()
-			)
-		);
-		m_totalLogicalPages += m_images.back().numLogicalPages;
+		ImageDesc image_desc(image);
+		
+		// Enforce some rules.
+		if (image_desc.numLogicalPages == 2) {
+			image_desc.leftHalfRemoved = false;
+			image_desc.rightHalfRemoved = false;
+		} else if (image_desc.numLogicalPages != 1) {
+			continue;
+		} else if (image_desc.leftHalfRemoved && image_desc.rightHalfRemoved) {
+			image_desc.leftHalfRemoved = false;
+			image_desc.rightHalfRemoved = false;
+		}
+
+		m_images.push_back(image_desc);
+		m_totalLogicalPages += image_desc.numLogicalPages;
 	}
 }
 
@@ -79,11 +87,11 @@ PageSequence::PageSequence(
 		QString const& file_path = file.fileInfo().absoluteFilePath();
 		std::vector<ImageMetadata> const& images = file.imageInfo();
 		int const num_images = images.size();
-		bool multi_page = num_images > 1;
+		int const multi_page_base = num_images > 1 ? 1 : 0;
 		for (int i = 0; i < num_images; ++i) {
 			ImageMetadata const& metadata = images[i];
-			ImageId const id(file_path, i);
-			m_images.push_back(ImageDesc(id, metadata, multi_page, pages));
+			ImageId const id(file_path, multi_page_base + i);
+			m_images.push_back(ImageDesc(id, metadata, pages));
 			m_totalLogicalPages += m_images.back().numLogicalPages;
 		}
 	}
@@ -141,8 +149,9 @@ PageSequence::snapshot(View const view) const
 				pages.push_back(
 					PageInfo(
 						id, image.metadata,
-						image.multiPageFile,
-						image.numLogicalPages
+						image.numLogicalPages,
+						image.leftHalfRemoved,
+						image.rightHalfRemoved
 					)
 				);
 			}
@@ -161,8 +170,9 @@ PageSequence::snapshot(View const view) const
 			pages.push_back(
 				PageInfo(
 					id, image.metadata,
-					image.multiPageFile,
-					image.numLogicalPages
+					image.numLogicalPages,
+					image.leftHalfRemoved,
+					image.rightHalfRemoved
 				)
 			);
 		}
@@ -316,8 +326,8 @@ PageSequence::curPage(View const view, int* page_num) const
 	ImageDesc const& image = m_images[m_curImage];
 	PageId const id(image.id, curSubPageLocked(image, view));
 	return PageInfo(
-		id, image.metadata,
-		image.multiPageFile, image.numLogicalPages
+		id, image.metadata, image.numLogicalPages,
+		image.leftHalfRemoved, image.rightHalfRemoved
 	);
 }
 
@@ -345,8 +355,8 @@ PageSequence::setFirstPage(View const view)
 		
 		PageId const id(image.id, curSubPageLocked(image, view));
 		info = PageInfo(
-			id, image.metadata,
-			image.multiPageFile, image.numLogicalPages
+			id, image.metadata, image.numLogicalPages,
+			image.leftHalfRemoved, image.rightHalfRemoved
 		);
 	} while (false);
 	
@@ -395,15 +405,18 @@ PageSequence::setNextPage(View const view, int* page_num)
 	return info;
 }
 
-bool
-PageSequence::insertImage(ImageInfo const& new_image,
-	BeforeOrAfter before_or_after, ImageId const& existing)
+std::vector<PageInfo>
+PageSequence::insertImage(
+	ImageInfo const& new_image, BeforeOrAfter before_or_after,
+	ImageId const& existing, View const view)
 {
 	bool was_modified = false;
 	
 	{
 		QMutexLocker locker(&m_mutex);
-		return insertImageImpl(new_image, before_or_after, existing, was_modified);
+		return insertImageImpl(
+			new_image, before_or_after, existing, view, was_modified
+		);
 	}
 	
 	if (was_modified) {
@@ -424,6 +437,25 @@ PageSequence::removePages(std::set<PageId> const& pages)
 	if (was_modified) {
 		emit modified();
 	}
+}
+
+PageInfo
+PageSequence::unremovePage(PageId const& page_id)
+{
+	bool was_modified = false;
+
+	PageInfo page_info;
+
+	{
+		QMutexLocker locker(&m_mutex);
+		page_info = unremovePageImpl(page_id, was_modified);
+	}
+
+	if (was_modified) {
+		emit modified();
+	}
+
+	return page_info;
 }
 
 bool
@@ -510,18 +542,25 @@ PageSequence::setLogicalPagesInImageImpl(
 	ImageId const& image_id, int const num_pages, bool* modified)
 {
 	assert(num_pages >= 1 && num_pages <= 2);
-	
+
 	int logical_pages_seen = 0;
 	int const num_images = m_images.size();
 	for (int i = 0; i < num_images; ++i) {
 		ImageDesc& image = m_images[i];
 		if (image.id == image_id) {
-			int const delta = num_pages - image.numLogicalPages;
+			int adjusted_num_pages = num_pages;
+			if (num_pages == 2 && image.leftHalfRemoved != image.rightHalfRemoved) {
+				// Both can't be removed, but we handle that case anyway
+				// by treating it like none are removed.
+				--adjusted_num_pages;
+			}
+
+			int const delta = adjusted_num_pages - image.numLogicalPages;
 			if (delta == 0) {
 				break;
 			}
 			
-			image.numLogicalPages = num_pages;
+			image.numLogicalPages = adjusted_num_pages;
 			m_totalLogicalPages += delta;
 			if (logical_pages_seen < m_curLogicalPage) {
 				m_curLogicalPage += delta;
@@ -545,7 +584,15 @@ PageSequence::setLogicalPagesInAllImagesImpl(
 	int const num_images = m_images.size();
 	for (int i = 0; i < num_images; ++i) {
 		ImageDesc& image = m_images[i];
-		int const delta = num_pages - image.numLogicalPages;
+
+		int adjusted_num_pages = num_pages;
+		if (num_pages == 2 && image.leftHalfRemoved != image.rightHalfRemoved) {
+			// Both can't be removed, but we handle that case anyway
+			// by treating it like none are removed.
+			--adjusted_num_pages;
+		}
+
+		int const delta = adjusted_num_pages - image.numLogicalPages;
 		if (delta == 0) {
 			continue;
 		}
@@ -554,13 +601,14 @@ PageSequence::setLogicalPagesInAllImagesImpl(
 		if (logical_pages_seen < m_curLogicalPage) {
 			m_curLogicalPage += delta;
 		}
+
+		if (m_curImage == i && adjusted_num_pages == 1) {
+			m_curSubPage = 0;
+		}
+
 		logical_pages_seen += image.numLogicalPages;
-		image.numLogicalPages = num_pages;
+		image.numLogicalPages = adjusted_num_pages;
 		*modified = true;
-	}
-	
-	if (num_pages == 1) {
-		m_curSubPage = 0;
 	}
 }
 
@@ -573,9 +621,13 @@ PageSequence::autoSetLogicalPagesInImageImpl(
 	for (int i = 0; i < num_images; ++i) {
 		ImageDesc& image = m_images[i];
 		if (image.id == image_id) {
-			int const num_pages = adviseNumberOfLogicalPages(
-				image.metadata, rotation
-			);
+			int num_pages = adviseNumberOfLogicalPages(image.metadata, rotation);
+			if (num_pages == 2 && image.leftHalfRemoved != image.rightHalfRemoved) {
+				// Both can't be removed, but we handle that case anyway
+				// by treating it like none are removed.
+				--num_pages;
+			}
+
 			int const delta = num_pages - image.numLogicalPages;
 			if (delta == 0) {
 				break;
@@ -684,8 +736,8 @@ PageSequence::setPrevPageImpl(View const view, int* page_num, bool& modified)
 	
 	PageId const id(image->id, curSubPageLocked(*image, view));
 	return PageInfo(
-		id, image->metadata,
-		image->multiPageFile, image->numLogicalPages
+		id, image->metadata, image->numLogicalPages,
+		image->leftHalfRemoved, image->rightHalfRemoved
 	);
 }
 
@@ -724,17 +776,18 @@ PageSequence::setNextPageImpl(View const view, int* page_num, bool& modified)
 	
 	PageId const id(image->id, curSubPageLocked(*image, view));
 	return PageInfo(
-		id, image->metadata,
-		image->multiPageFile, image->numLogicalPages
+		id, image->metadata, image->numLogicalPages,
+		image->leftHalfRemoved, image->rightHalfRemoved
 	);
 }
 
-bool
-PageSequence::insertImageImpl(ImageInfo const& new_image,
-	BeforeOrAfter before_or_after, ImageId const& existing, bool& modified)
-{
-	assert(new_image.numSubPages() >= 1 && new_image.numSubPages() <= 2);
-	
+std::vector<PageInfo>
+PageSequence::insertImageImpl(
+	ImageInfo const& new_image, BeforeOrAfter before_or_after,
+	ImageId const& existing, View const view, bool& modified)
+{	
+	std::vector<PageInfo> logical_pages;
+
 	std::vector<ImageDesc>::iterator it(m_images.begin());
 	std::vector<ImageDesc>::iterator const end(m_images.end());
 	int logical_pages_seen = 0;
@@ -744,7 +797,7 @@ PageSequence::insertImageImpl(ImageInfo const& new_image,
 	if (it == end) {
 		// Existing image not found.
 		if (!(before_or_after == BEFORE && existing.isNull())) { 
-			return false;
+			return logical_pages;
 		} // Otherwise we can still handle that case.
 	}
 	if (before_or_after == AFTER) {
@@ -754,10 +807,19 @@ PageSequence::insertImageImpl(ImageInfo const& new_image,
 		}
 	}
 	
-	ImageDesc const image_desc(
-		new_image.id(), new_image.metadata(),
-		new_image.isMultiPageFile(), new_image.numSubPages()
-	);
+	ImageDesc image_desc(new_image);
+
+	// Enforce some rules.
+	if (image_desc.numLogicalPages == 2) {
+		image_desc.leftHalfRemoved = false;
+		image_desc.rightHalfRemoved = false;
+	} else if (image_desc.numLogicalPages != 1) {
+		return logical_pages;
+	} else if (image_desc.leftHalfRemoved && image_desc.rightHalfRemoved) {
+		image_desc.leftHalfRemoved = false;
+		image_desc.rightHalfRemoved = false;
+	}
+
 	m_images.insert(it, image_desc);
 	
 	m_totalLogicalPages += new_image.numSubPages();
@@ -765,7 +827,29 @@ PageSequence::insertImageImpl(ImageInfo const& new_image,
 		m_curLogicalPage += new_image.numSubPages();
 	}
 	
-	return true;
+	PageInfo page_info_templ(
+		PageId(new_image.id(), PageId::SINGLE_PAGE),
+		image_desc.metadata, image_desc.numLogicalPages,
+		image_desc.leftHalfRemoved, image_desc.rightHalfRemoved
+	);
+
+	if (view == IMAGE_VIEW || (image_desc.numLogicalPages == 1 &&
+			image_desc.leftHalfRemoved == image_desc.rightHalfRemoved)) {
+		logical_pages.push_back(page_info_templ);
+	} else {
+		if (image_desc.numLogicalPages == 2 ||
+				image_desc.numLogicalPages == 1 && image_desc.rightHalfRemoved) {
+			page_info_templ.setId(PageId(new_image.id(), m_subPagesInOrder[0]));
+			logical_pages.push_back(page_info_templ);
+		}
+		if (image_desc.numLogicalPages == 2 ||
+				image_desc.numLogicalPages == 1 && image_desc.leftHalfRemoved) {
+			page_info_templ.setId(PageId(new_image.id(), m_subPagesInOrder[1]));
+			logical_pages.push_back(page_info_templ);
+		}
+	}
+
+	return logical_pages;
 }
 
 void
@@ -782,7 +866,7 @@ PageSequence::removePagesImpl(std::set<PageId> const& to_remove, bool& modified)
 
 	int const num_old_images = m_images.size();
 	for (int i = 0; i < num_old_images; ++i) {
-		ImageDesc const& image = m_images[i];
+		ImageDesc image(m_images[i]);
 		if (m_curImage == i) {
 			new_cur_image_lower_bound = new_images.size();
 			new_cur_logical_page_lower_bound = new_total_logical_pages;
@@ -806,18 +890,19 @@ PageSequence::removePagesImpl(std::set<PageId> const& to_remove, bool& modified)
 				subpages_to_remove = 2;
 			} else {
 				if (to_remove.find(PageId(image.id, PageId::LEFT_PAGE)) != to_remove_end) {
+					image.leftHalfRemoved = true;
+					--image.numLogicalPages;
 					++subpages_to_remove;
 				}
 				if (to_remove.find(PageId(image.id, PageId::RIGHT_PAGE)) != to_remove_end) {
+					image.rightHalfRemoved = true;
+					--image.numLogicalPages;
 					++subpages_to_remove;
 				}
 			}
 
 			if (subpages_to_remove < 2) {
 				new_images.push_back(image);
-				if (subpages_to_remove == 1) {
-					--new_images.back().numLogicalPages;
-				}
 				new_total_logical_pages += new_images.back().numLogicalPages;
 			}
 
@@ -850,11 +935,71 @@ PageSequence::removePagesImpl(std::set<PageId> const& to_remove, bool& modified)
 	new_images.swap(m_images);
 }
 
+PageInfo
+PageSequence::unremovePageImpl(PageId const& page_id, bool& modified)
+{
+	if (page_id.subPage() == PageId::SINGLE_PAGE) {
+		// These can't be unremoved.
+		return PageInfo();
+	}
+
+	std::vector<ImageDesc>::iterator it(m_images.begin());
+	std::vector<ImageDesc>::iterator const end(m_images.end());
+	int logical_pages_seen = 0;
+	for (; it != end && it->id != page_id.imageId(); ++it) {
+		logical_pages_seen += it->numLogicalPages;
+	}
+	if (it == end) {
+		// The corresponding image wasn't found.
+		return PageInfo();
+	}
+	
+	ImageDesc& image = *it;
+
+	if (image.numLogicalPages != 1) {
+		return PageInfo();
+	}
+
+	if (page_id.subPage() == PageId::LEFT_PAGE && image.leftHalfRemoved) {
+		if (logical_pages_seen == m_curLogicalPage) {
+			assert(m_curSubPage == 0);
+			m_curSubPage = 1;
+		}
+		image.leftHalfRemoved = false;
+	} else if (page_id.subPage() == PageId::RIGHT_PAGE && image.rightHalfRemoved) {
+		++logical_pages_seen;
+		image.rightHalfRemoved = false;
+	} else {
+		return PageInfo();
+	}
+	
+	image.numLogicalPages = 2;
+	++m_totalLogicalPages;
+	if (logical_pages_seen <= m_curLogicalPage) {
+		++m_curLogicalPage;
+	}
+
+	return PageInfo(
+		page_id, image.metadata, image.numLogicalPages,
+		image.leftHalfRemoved, image.rightHalfRemoved
+	);
+}
+
 PageId::SubPage
 PageSequence::curSubPageLocked(ImageDesc const& image, View const view) const
 {
-	if (view == IMAGE_VIEW || image.numLogicalPages == 1) {
+	if (view == IMAGE_VIEW) {
 		return PageId::SINGLE_PAGE;
+	}
+
+	if (image.numLogicalPages == 1) {
+		if (image.leftHalfRemoved && !image.rightHalfRemoved) {
+			return PageId::RIGHT_PAGE;
+		} else if (image.rightHalfRemoved && !image.leftHalfRemoved) {
+			return PageId::LEFT_PAGE;
+		} else {
+			return PageId::SINGLE_PAGE;
+		}
 	}
 	
 	return m_subPagesInOrder[m_curSubPage];
@@ -888,22 +1033,21 @@ PageSequenceSnapshot::pageAt(size_t const idx) const
 
 /*========================= PageSequence::ImageDesc ======================*/
 
-PageSequence::ImageDesc::ImageDesc(
-	ImageId const& id, ImageMetadata const& metadata,
-	bool const multi_page, int sub_pages)
-:	id(id),
-	metadata(metadata),
-	numLogicalPages(sub_pages),
-	multiPageFile(multi_page)
+PageSequence::ImageDesc::ImageDesc(ImageInfo const& image_info)
+:	id(image_info.id()),
+	metadata(image_info.metadata()),
+	numLogicalPages(image_info.numSubPages()),
+	leftHalfRemoved(image_info.leftHalfRemoved()),
+	rightHalfRemoved(image_info.rightHalfRemoved())
 {
 }
 
 PageSequence::ImageDesc::ImageDesc(
-	ImageId const& id, ImageMetadata const& metadata,
-	bool const multi_page, Pages const pages)
+	ImageId const& id, ImageMetadata const& metadata, Pages const pages)
 :	id(id),
 	metadata(metadata),
-	multiPageFile(multi_page)
+	leftHalfRemoved(false),
+	rightHalfRemoved(false)
 {
 	switch (pages) {
 		case ONE_PAGE:
@@ -928,7 +1072,13 @@ PageSequence::ImageDesc::logicalPageToSubPage(
 	assert(logical_page >= 0 && logical_page < numLogicalPages);
 	
 	if (numLogicalPages == 1) {
-		return PageId::SINGLE_PAGE;
+		if (leftHalfRemoved && !rightHalfRemoved) {
+			return PageId::RIGHT_PAGE;
+		} else if (rightHalfRemoved && !leftHalfRemoved) {
+			return PageId::LEFT_PAGE;
+		} else {
+			return PageId::SINGLE_PAGE;
+		}
 	} else {
 		return sub_pages_in_order[logical_page];
 	}

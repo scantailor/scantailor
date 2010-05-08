@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "IntrusivePtr.h"
 #include "PageSequence.h"
+#include "OutputFileNameGenerator.h"
 #include "ImageId.h"
 #include "PageId.h"
 #include "VirtualFunction.h"
@@ -34,6 +35,7 @@
 #include <map>
 
 class AbstractFilter;
+class PageInfo;
 class QDomDocument;
 class QDomElement;
 
@@ -43,7 +45,9 @@ class ProjectWriter
 public:
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
 	
-	ProjectWriter(QString const& out_dir, IntrusivePtr<PageSequence> const& page_sequence);
+	ProjectWriter(
+		IntrusivePtr<PageSequence> const& page_sequence,
+		OutputFileNameGenerator const& out_file_name_gen);
 	
 	~ProjectWriter();
 	
@@ -74,10 +78,9 @@ private:
 	{
 		QString path;
 		int numericId;
-		bool multiPageFile;
 		
-		File(QString const& path, int numeric_id, bool multi_page)
-		: path(path), numericId(numeric_id), multiPageFile(multi_page) {}
+		File(QString const& path, int numeric_id)
+		: path(path), numericId(numeric_id) {}
 	};
 	
 	struct Image
@@ -85,9 +88,10 @@ private:
 		ImageId id;
 		int numericId;
 		int numSubPages;
+		bool leftHalfRemoved;
+		bool rightHalfRemoved;
 		
-		Image(ImageId const& id, int numeric_id, int num_sub_pages)
-		: id(id), numericId(numeric_id), numSubPages(num_sub_pages) {}
+		Image(PageInfo const& page_info, int numeric_id);
 	};
 	
 	struct Page
@@ -158,6 +162,8 @@ private:
 	int dirId(QString const& dir_path) const;
 	
 	int fileId(QString const& file_path) const;
+
+	QString packFilePath(QString const& file_path) const;
 	
 	int imageId(ImageId const& image_id) const;
 	
@@ -167,8 +173,8 @@ private:
 	
 	void enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) const;
 	
-	QString m_outDir;
 	PageSequenceSnapshot m_pageSequence;
+	OutputFileNameGenerator m_outFileNameGen;
 	Directories m_dirs;
 	Files m_files;
 	Images m_images;

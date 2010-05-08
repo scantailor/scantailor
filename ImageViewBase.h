@@ -268,6 +268,8 @@ private:
 	void updateStatusTip();
 
 	void updateCursor();
+
+	void maybeQueueRedraw();
 	
 	InteractionHandler m_rootInteractionHandler;
 

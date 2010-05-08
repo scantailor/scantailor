@@ -26,8 +26,7 @@
 #include <QColor>
 
 FixDpiSinglePageDialog::FixDpiSinglePageDialog(
-	ImageId const& image_id, ImageMetadata const& image_metadata,
-	bool is_multipage_file, QWidget* parent)
+	ImageId const& image_id, ImageMetadata const& image_metadata, QWidget* parent)
 :	QDialog(parent),
 	m_metadata(image_metadata)
 {
@@ -39,8 +38,8 @@ FixDpiSinglePageDialog::FixDpiSinglePageDialog(
 	
 	QString const file_name(QFileInfo(image_id.filePath()).fileName());
 	QString image_name(file_name);
-	if (is_multipage_file) {
-		image_name = tr("%1 (page %2)").arg(file_name).arg(image_id.page() + 1);
+	if (image_id.isMultiPageFile()) {
+		image_name = tr("%1 (page %2)").arg(file_name).arg(image_id.page());
 	}
 	ui.text->setText(ui.text->text().arg(image_name));
 	

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include "ProjectReader.h"
 #include "PageSequence.h"
+#include "FileNameDisambiguator.h"
 #include "AbstractFilter.h"
 #include "XmlUnmarshaller.h"
 #include "Dpi.h"
@@ -25,9 +26,12 @@
 #include <QDir>
 #include <QDomElement>
 #include <QDomNode>
+#include <boost/bind.hpp>
+#include <set>
 
 ProjectReader::ProjectReader(QDomDocument const& doc)
-:	m_doc(doc)
+:	m_doc(doc),
+	m_ptrDisambiguator(new FileNameDisambiguator)
 {
 	QDomElement project_el(m_doc.documentElement());
 	m_outDir = project_el.attribute("outputDirectory");
@@ -60,6 +64,16 @@ ProjectReader::ProjectReader(QDomDocument const& doc)
 		return;
 	}
 	processPages(pages_el);
+
+	// Load naming disambiguator.  This needs to be done after processing pages.
+	QDomElement const disambig_el(
+		project_el.namedItem("file-name-disambiguation").toElement()
+	);
+	m_ptrDisambiguator.reset(
+		new FileNameDisambiguator(
+			disambig_el, boost::bind(&ProjectReader::expandFilePath, this, _1)
+		)
+	);
 }
 
 ProjectReader::~ProjectReader()
@@ -139,15 +153,17 @@ ProjectReader::processFiles(QDomElement const& files_el)
 			continue;
 		}
 		
-		bool multi_page = el.attribute("multiPage") == "1";
-		
 		QString const dir_path(getDirPath(dir_id));
 		if (dir_path.isEmpty()) {
 			continue;
 		}
 		
-		FileInfo const file_info(QDir(dir_path).filePath(name), multi_page);
-		m_fileMap.insert(FileMap::value_type(id, file_info));
+		// Backwards compatibility.
+		bool const compat_multi_page = (el.attribute("multiPage") == "1");
+
+		QString const file_path(QDir(dir_path).filePath(name));
+		FileRecord const rec(file_path, compat_multi_page);
+		m_fileMap.insert(FileMap::value_type(id, rec));
 	}
 }
 
@@ -187,16 +203,23 @@ ProjectReader::processImages(
 		if (!ok) {
 			continue;
 		}
+
+		QString const removed(el.attribute("removed"));
+		bool const left_half_removed = (removed == "L");
+		bool const right_half_removed = (removed == "R");
 		
-		FileInfo const file_info(getFileInfo(file_id));
-		if (file_info.isNull()) {
+		FileRecord const file_record(getFileRecord(file_id));
+		if (file_record.filePath.isEmpty()) {
 			continue;
 		}
-		
-		ImageId const image_id(file_info.path, file_image);
+		ImageId const image_id(
+			file_record.filePath,
+			file_image + int(file_record.compatMultiPage)
+		);
 		ImageMetadata const metadata(processImageMetadata(el));
 		ImageInfo const image_info(
-			image_id, metadata, file_info.multiPageFile, sub_pages
+			image_id, metadata, sub_pages,
+			left_half_removed, right_half_removed
 		);
 		
 		images.push_back(image_info);
@@ -267,7 +290,7 @@ ProjectReader::processPages(QDomElement const& pages_el)
 		
 		PageId const page_id(image.id(), sub_page);
 		m_pageMap.insert(PageMap::value_type(id, page_id));
-		
+
 		if (el.attribute("selected") == "selected") {
 			if (m_ptrPages.get()) {
 				m_ptrPages->setCurPage(page_id);
@@ -286,14 +309,25 @@ ProjectReader::getDirPath(int const id) const
 	return QString();
 }
 
-ProjectReader::FileInfo
-ProjectReader::getFileInfo(int const id) const
+ProjectReader::FileRecord
+ProjectReader::getFileRecord(int id) const
 {
 	FileMap::const_iterator const it(m_fileMap.find(id));
 	if (it != m_fileMap.end()) {
 		return it->second;
 	}
-	return FileInfo();
+	return FileRecord();
+}
+
+QString
+ProjectReader::expandFilePath(QString const& path_shorthand) const
+{
+	bool ok = false;
+	int const file_id = path_shorthand.toInt(&ok);
+	if (!ok) {
+		return QString();
+	}
+	return getFileRecord(file_id).filePath;
 }
 
 ImageInfo

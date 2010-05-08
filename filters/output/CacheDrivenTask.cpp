@@ -32,6 +32,7 @@
 #include "../page_layout/Utils.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
+#include <QString>
 #include <QFileInfo>
 #include <QRect>
 #include <QRectF>
@@ -41,11 +42,10 @@ namespace output
 {
 
 CacheDrivenTask::CacheDrivenTask(
-	IntrusivePtr<Settings> const& settings, QString const& out_dir,
-	Qt::LayoutDirection const layout_direction)
+	IntrusivePtr<Settings> const& settings,
+	OutputFileNameGenerator const& out_file_name_gen)
 :	m_ptrSettings(settings),
-	m_outDir(out_dir),
-	m_layoutDirection(layout_direction)
+	m_outFileNameGen(out_file_name_gen)
 {
 }
 
@@ -61,9 +61,7 @@ CacheDrivenTask::process(
 {
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 		
-		QString const out_file_path(
-			Utils::outFilePath(page_info, m_layoutDirection, m_outDir)
-		);
+		QString const out_file_path(m_outFileNameGen.filePathFor(page_info.id()));
 
 		bool need_reprocess = false;
 

@@ -315,7 +315,7 @@ ADD_SUBDIRECTORY(filters/output)
 SET(resource_sources)
 QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
 SOURCE_GROUP("Generated" FILES ${ui_sources} ${resource_sources})
-SOURCE_GROUP("Resources" FILES resources/resources.qrc)
+SOURCE_GROUP("Resources" FILES resources/resources.qrc resources/icons/COPYING)
 IF(WIN32)
 	SOURCE_GROUP("Resources" FILES resources/win32/resources.rc)
 ENDIF()
@@ -356,6 +356,7 @@ SET(
 	ThumbnailFactory.cpp ThumbnailFactory.h
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
 	ContentBoxPropagator.cpp ContentBoxPropagator.h
+	PageOrientationPropagator.cpp PageOrientationPropagator.h
 	DebugImages.cpp DebugImages.h
 	DebugImageView.cpp DebugImageView.h
 	TabbedDebugImages.cpp TabbedDebugImages.h
@@ -391,6 +392,8 @@ SET(
 	Undistort.cpp Undistort.h
 	ThreadPriority.cpp ThreadPriority.h
 	SystemLoadWidget.cpp SystemLoadWidget.h
+	FileNameDisambiguator.cpp FileNameDisambiguator.h
+	OutputFileNameGenerator.cpp OutputFileNameGenerator.h
 	Utils.cpp Utils.h
 	AutoManualMode.h
 	AbstractCommand.h
@@ -406,6 +409,7 @@ SET(
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h
+	filter_dc/PageOrientationCollector.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
@@ -435,7 +439,7 @@ ENDIF(WIN32)
 
 ADD_EXECUTABLE(
 	scantailor WIN32 ${sources} ${ui_sources} VERSION
-	${resource_sources} ${win32_resource_file}
+	${resource_sources} ${win32_resource_file} resources/icons/COPYING
 )
 TARGET_LINK_LIBRARIES(
 	scantailor

@@ -76,7 +76,7 @@ LoadFileTask::~LoadFileTask()
 FilterResultPtr
 LoadFileTask::operator()()
 {
-	QImage image(ImageLoader::load(m_imageId.filePath(), m_imageId.page()));
+	QImage image(ImageLoader::load(m_imageId));
 	
 	try {
 		throwIfCancelled();

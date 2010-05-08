@@ -1,10 +1,11 @@
-The icons in this folder and in sub-folders have different origins and
-different licenses.  Details follow.
+The icons in this folder and in sub-folders are all licensed under
+GPL version 3 or above.  The origins and original licenses for each icon
+are given below.
 
 
 Origin: Created by Scan Tailor developers or contributors
 Website: http://scantailor.sourceforge.net/
-License: GNU GPL version 3 or above
+Original license: GNU GPL version 3 or above
 Files:
 ../appicon.svg
 aqua-sphere.png
@@ -25,7 +26,7 @@ two_pages_selected.png
 
 Origin: The GNU Image Manipulation Project (GIMP)
 Website: http://gimp.org/
-License: GNU GPL version 2 or above
+Original license: GNU GPL version 2 or above
 Files:
 stock-center-24.png
 stock-gravity-east-24.png
@@ -42,7 +43,7 @@ stock-vchain-broken-24.png
 
 Origin: F-Spot
 Website: http://f-spot.org/
-License: GNU GPL version 2 or above
+Original license: GNU GPL version 2 or above
 Files:
 object-rotate-left.png
 object-rotate-right.png
@@ -50,8 +51,8 @@ object-rotate-right.png
 
 Origin: Tango Desktop Project
 Website: http://tango.freedesktop.org/
-License: Public Domain
-Files (some modified, but no copyright is claimed):
+Original license: Public Domain
+Files (some modified):
 big-down-arrow.png
 big-left-arrow.png
 big-right-arrow.png
@@ -66,11 +67,14 @@ user-trash.png
 flip-sides.png
 plus-16.png
 minus-16.png
+trashed-small.png
+trashed-big.png
+untrash-big.png
 
 
 Origin: Amarok
 Website: http://amarok.kde.org/
-License: GNU GPL version 2 or above
+Original license: GNU GPL version 2 or above
 Files (derived from default-theme-clean.svg):
 play-small.png
 play-small-hovered.png

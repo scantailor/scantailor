@@ -16,37 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FILTEROPTIONSWIDGET_H_
-#define FILTEROPTIONSWIDGET_H_
+#ifndef PAGE_ORIENTATION_COLLECTOR_H_
+#define PAGE_ORIENTATION_COLLECTOR_H_
 
-#include "PageId.h"
-#include "PageInfo.h"
-#include <QWidget>
+#include "AbstractFilterDataCollector.h"
 
-class FilterOptionsWidget : public QWidget
+class OrthogonalRotation;
+
+class PageOrientationCollector : public AbstractFilterDataCollector
 {
-	Q_OBJECT
-signals:
-	/**
-	 * \brief To be emitted by subclasses when they want to reload the page.
-	 */
-	void reloadRequested();
-	
-	void invalidateThumbnail(PageId const& page_id);
-
-	/**
-	 * This signature differs from invalidateThumbnail(PageId) in that
-	 * it will cause PageInfo stored by ThumbnailSequence to be updated.
-	 */
-	void invalidateThumbnail(PageInfo const& page_info);
-	
-	void invalidateAllThumbnails();
-	
-	/**
-	 * After we've got rid of "Widest Page" / "Tallest Page" links,
-	 * there is no one using this signal.  It's a candidate for removal.
-	 */
-	void goToPage(PageId const& page_id);
+public:
+	virtual void process(OrthogonalRotation const& orientation) = 0;
 };
 
 #endif

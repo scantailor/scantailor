@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,11 +38,16 @@ public:
 	QString const& filePath() const { return m_filePath; }
 	
 	int page() const { return m_page; }
+
+	int zeroBasedPage() const { return m_page > 0 ? m_page - 1 : 0; } 
+
+	bool isMultiPageFile() const { return m_page > 0; }
 private:
 	QString m_filePath;
 	
 	/**
-	 * \brief A zero-based page number of a multi-page file.
+	 * If zero, indicates the file is not multipage.
+	 * If above zero, indicates Nth page in a multipage file.
 	 */
 	int m_page;
 };

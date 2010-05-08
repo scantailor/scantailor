@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,18 +23,21 @@
 #include "ImageId.h"
 #include "ImageMetadata.h"
 #include "AbstractFilter.h"
+#include "FileNameDisambiguator.h"
 #include <QtXml>
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
+#include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <stddef.h>
 #include <assert.h>
 
 ProjectWriter::ProjectWriter(
-	QString const& out_dir, IntrusivePtr<PageSequence> const& page_sequence)
-:	m_outDir(out_dir),
-	m_pageSequence(page_sequence->snapshot(PageSequence::PAGE_VIEW)),
+	IntrusivePtr<PageSequence> const& page_sequence,
+	OutputFileNameGenerator const& out_file_name_gen)
+:	m_pageSequence(page_sequence->snapshot(PageSequence::PAGE_VIEW)),
+	m_outFileNameGen(out_file_name_gen),
 	m_layoutDirection(page_sequence->layoutDirection())
 {
 	int next_id = 1;
@@ -53,11 +56,11 @@ ProjectWriter::ProjectWriter(
 			++next_id;
 		}
 		
-		if (m_files.insert(File(file_path, next_id, page.isMultiPageFile())).second) {
+		if (m_files.insert(File(file_path, next_id)).second) {
 			++next_id;
 		}
 		
-		if (m_images.insert(Image(image_id, next_id, page.imageSubPages())).second) {
+		if (m_images.insert(Image(page, next_id)).second) {
 			++next_id;
 		}
 		
@@ -77,7 +80,7 @@ ProjectWriter::write(QString const& file_path, std::vector<FilterPtr> const& fil
 	QDomDocument doc;
 	QDomElement root_el(doc.createElement("project"));
 	doc.appendChild(root_el);
-	root_el.setAttribute("outputDirectory", m_outDir);
+	root_el.setAttribute("outputDirectory", m_outFileNameGen.outDir());
 	root_el.setAttribute(
 		"layoutDirection",
 		m_layoutDirection == Qt::LeftToRight ? "LTR" : "RTL"
@@ -87,6 +90,12 @@ ProjectWriter::write(QString const& file_path, std::vector<FilterPtr> const& fil
 	root_el.appendChild(processFiles(doc));
 	root_el.appendChild(processImages(doc));
 	root_el.appendChild(processPages(doc));
+	root_el.appendChild(
+		m_outFileNameGen.disambiguator()->toXml(
+			doc, "file-name-disambiguation",
+			boost::bind(&ProjectWriter::packFilePath, this, _1)
+		)
+	);
 	
 	QDomElement filters_el(doc.createElement("filters"));
 	root_el.appendChild(filters_el);
@@ -133,7 +142,6 @@ ProjectWriter::processFiles(QDomDocument& doc) const
 		file_el.setAttribute("id", file.numericId);
 		file_el.setAttribute("dirId", dirId(dir_path));
 		file_el.setAttribute("name", file_info.fileName());
-		file_el.setAttribute("multiPage", file.multiPageFile ? "1" : "0");
 		files_el.appendChild(file_el);
 	}
 	
@@ -151,6 +159,10 @@ ProjectWriter::processImages(QDomDocument& doc) const
 		image_el.setAttribute("subPages", image.numSubPages);
 		image_el.setAttribute("fileId", fileId(image.id.filePath()));
 		image_el.setAttribute("fileImage", image.id.page());
+		if (image.leftHalfRemoved != image.rightHalfRemoved) {
+			// Both are not supposed to be removed.
+			image_el.setAttribute("removed", image.leftHalfRemoved ? "L" : "R");
+		}
 		writeImageMetadata(doc, image_el, image.id);
 		images_el.appendChild(image_el);
 	}
@@ -212,8 +224,22 @@ int
 ProjectWriter::fileId(QString const& file_path) const
 {
 	Files::const_iterator const it(m_files.find(file_path));
-	assert(it != m_files.end());
-	return it->numericId;
+	if (it != m_files.end()) {
+		return it->numericId;
+	} else {
+		return -1;
+	}
+}
+
+QString
+ProjectWriter::packFilePath(QString const& file_path) const
+{
+	Files::const_iterator const it(m_files.find(file_path));
+	if (it != m_files.end()) {
+		return QString::number(it->numericId);
+	} else {
+		return QString();
+	}
 }
 
 int
@@ -246,4 +272,16 @@ ProjectWriter::enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) co
 	BOOST_FOREACH(Page const& page, m_pages.get<Sequenced>()) {
 		out(page.id, page.numericId);
 	}
+}
+
+
+/*======================== ProjectWriter::Image =========================*/
+
+ProjectWriter::Image::Image(PageInfo const& page, int numeric_id)
+:	id(page.imageId()),
+	numericId(numeric_id),
+	numSubPages(page.imageSubPages()),
+	leftHalfRemoved(page.leftHalfRemoved()),
+	rightHalfRemoved(page.rightHalfRemoved())
+{
 }

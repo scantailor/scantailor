@@ -25,12 +25,12 @@
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
 #include "ZonePropFactory.h"
-#include <Qt>
 
 class PageId;
 class PageSequence;
 class PageSelectionAccessor;
 class ThumbnailPixmapCache;
+class OutputFileNameGenerator;
 class QString;
 
 namespace output
@@ -63,13 +63,12 @@ public:
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
 	IntrusivePtr<Task> createTask(
-		PageInfo const& page_info, QString const& out_dir,
-		ThumbnailPixmapCache& thumbnail_cache,
-		Qt::LayoutDirection layout_direction,
+		PageId const& page_id, ThumbnailPixmapCache& thumbnail_cache,
+		OutputFileNameGenerator const& out_file_name_gen,
 		bool batch, bool debug);
 	
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
-		QString const& out_dir, Qt::LayoutDirection layout_direction);
+		OutputFileNameGenerator const& out_file_name_gen);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
 private:

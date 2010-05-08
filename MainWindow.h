@@ -27,6 +27,7 @@
 #include "FilterResult.h"
 #include "PageSequence.h"
 #include "ThumbnailSequence.h"
+#include "OutputFileNameGenerator.h"
 #include "PageId.h"
 #include "PageRange.h"
 #include "BeforeOrAfter.h"
@@ -52,6 +53,7 @@ class WorkerThread;
 class ProjectReader;
 class DebugImages;
 class ContentBoxPropagator;
+class PageOrientationPropagator;
 class ProjectCreationContext;
 class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
@@ -114,9 +116,11 @@ private slots:
 	
 	void stopBatchProcessing(MainAreaAction main_area = LOAD_IMAGE);
 	
-	void invalidateThumbnailSlot(PageId const& page_id);
+	void invalidateThumbnail(PageId const& page_id);
+
+	void invalidateThumbnail(PageInfo const& page_info);
 	
-	void invalidateAllThumbnailsSlot();
+	void invalidateAllThumbnails();
 	
 	void filterResult(
 		BackgroundTaskPtr const& task,
@@ -150,10 +154,6 @@ private:
 	virtual void setImageWidget(
 		QWidget* widget, Ownership ownership,
 		DebugImages* debug_images = 0);
-	
-	virtual void invalidateThumbnail(PageId const& page_id);
-	
-	virtual void invalidateAllThumbnails();
 	
 	void cancelOngoingTask();
 	
@@ -189,11 +189,13 @@ private:
 	
 	void updateProjectActions();
 	
-	bool isProjectLoaded() const { return !m_outDir.isEmpty(); }
+	bool isProjectLoaded() const;
 	
 	bool isBelowSelectContent() const;
 	
 	bool isBelowSelectContent(int filter_idx) const;
+
+	bool isBelowFixOrientation(int filter_idx) const;
 	
 	bool isOutputFilter() const;
 	
@@ -221,9 +223,11 @@ private:
 	void showRemovePagesDialog(std::set<PageId> const& pages);
 	
 	void insertImage(ImageInfo const& new_image,
-		BeforeOrAfter before_or_after, ImageId const& existing);
+		BeforeOrAfter before_or_after, ImageId existing);
 
 	void removeFromProject(std::set<PageId> const& pages);
+
+	void eraseOutputFiles(std::set<PageId> const& pages);
 	
 	BackgroundTaskPtr createCompositeTask(
 		PageInfo const& page, int last_filter_idx);
@@ -232,12 +236,14 @@ private:
 	createCompositeCacheDrivenTask(int last_filter_idx);
 	
 	void createBatchProcessingWidget();
+
+	void updateDisambiguationRecords(PageSequenceSnapshot const& pages);
 	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<PageSequence> m_ptrPages;
 	IntrusivePtr<StageSequence> m_ptrStages;
-	QString m_outDir;
 	QString m_projectFile;
+	OutputFileNameGenerator m_outFileNameGen;
 	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence;
 	std::auto_ptr<WorkerThread> m_ptrWorkerThread;
@@ -246,6 +252,7 @@ private:
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
 	std::auto_ptr<TabbedDebugImages> m_ptrTabbedDebugImages;
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
+	std::auto_ptr<PageOrientationPropagator> m_ptrPageOrientationPropagator;
 	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
 	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;
 	QCheckBox* m_pBeepOnBatchProcessingCompletion;

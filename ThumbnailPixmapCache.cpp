@@ -636,7 +636,7 @@ ThumbnailPixmapCache::Impl::loadSaveThumbnail(
 		return image;
 	}
 	
-	image = ImageLoader::load(image_id.filePath(), image_id.page());
+	image = ImageLoader::load(image_id);
 	if (image.isNull()) {
 		return QImage();
 	}
@@ -669,7 +669,7 @@ ThumbnailPixmapCache::Impl::getThumbFilePath(
 	thumb_file_path += QChar('/');
 	thumb_file_path += orig_img_path.baseName();
 	thumb_file_path += QChar('_');
-	thumb_file_path += QString::number(image_id.page());
+	thumb_file_path += QString::number(image_id.zeroBasedPage());
 	thumb_file_path += QChar('_');
 	thumb_file_path += orig_path_hash_str;
 	thumb_file_path += QString::fromAscii(".png");

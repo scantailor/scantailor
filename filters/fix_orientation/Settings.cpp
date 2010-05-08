@@ -17,15 +17,13 @@
 */
 
 #include "Settings.h"
-#include "PageSequence.h"
 #include "Utils.h"
 #include <boost/foreach.hpp>
 
 namespace fix_orientation
 {
 
-Settings::Settings(IntrusivePtr<PageSequence> const& pages)
-:	m_ptrPages(pages)
+Settings::Settings()
 {
 }
 
@@ -77,7 +75,6 @@ Settings::setImageRotationLocked(
 	ImageId const& image_id, OrthogonalRotation const& rotation)
 {
 	Utils::mapSetValue(m_perImageRotation, image_id, rotation);
-	m_ptrPages->autoSetLogicalPagesInImage(image_id, rotation);
 }
 
 } // namespace fix_orientation

@@ -22,8 +22,7 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
-#include <QString>
-#include <Qt>
+#include "OutputFileNameGenerator.h"
 
 class QPolygonF;
 class PageInfo;
@@ -41,7 +40,7 @@ class CacheDrivenTask : public RefCountable
 public:
 	CacheDrivenTask(
 		IntrusivePtr<Settings> const& settings,
-		QString const& out_dir, Qt::LayoutDirection layout_direction);
+		OutputFileNameGenerator const& out_file_name_gen);
 	
 	virtual ~CacheDrivenTask();
 	
@@ -51,8 +50,7 @@ public:
 		QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys);
 private:
 	IntrusivePtr<Settings> m_ptrSettings;
-	QString m_outDir;
-	Qt::LayoutDirection m_layoutDirection;
+	OutputFileNameGenerator m_outFileNameGen;
 };
 
 } // namespace output

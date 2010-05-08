@@ -109,6 +109,12 @@ public:
 	 *       instead of sequentially calling invalidateThumbnail().
 	 */
 	void invalidateThumbnail(PageId const& page_id);
+
+	/**
+	 * This signature differs from invalidateThumbnail(PageId) in that
+	 * it will cause PageInfo stored by ThumbnailSequence to be updated.
+	 */
+	void invalidateThumbnail(PageInfo const& page_info);
 	
 	/**
 	 * \brief Updates appearence of all thumbnails and possibly their order.
@@ -175,7 +181,6 @@ private:
 	class PlaceholderThumb;
 	class LabelGroup;
 	class CompositeItem;
-	class PageIdMutator;
 	
 	void emitNewSelectionLeader(
 		PageInfo const& page_info, CompositeItem const* composite,

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -162,27 +162,24 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 
 IntrusivePtr<Task>
 Filter::createTask(
-	PageInfo const& page_info, QString const& out_dir,
-	ThumbnailPixmapCache& thumbnail_cache,
-	Qt::LayoutDirection const layout_direction,
+	PageId const& page_id, ThumbnailPixmapCache& thumbnail_cache,
+	OutputFileNameGenerator const& out_file_name_gen,
 	bool const batch, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
-			thumbnail_cache, page_info, out_dir,
-			layout_direction, m_ptrOptionsWidget->lastTab(),
-			batch, debug
+			thumbnail_cache, page_id, out_file_name_gen,
+			m_ptrOptionsWidget->lastTab(), batch, debug
 		)
 	);
 }
 
 IntrusivePtr<CacheDrivenTask>
-Filter::createCacheDrivenTask(
-	QString const& out_dir, Qt::LayoutDirection const layout_direction)
+Filter::createCacheDrivenTask(OutputFileNameGenerator const& out_file_name_gen)
 {
 	return IntrusivePtr<CacheDrivenTask>(
-		new CacheDrivenTask(m_ptrSettings, out_dir, layout_direction)
+		new CacheDrivenTask(m_ptrSettings, out_file_name_gen)
 	);
 }
 

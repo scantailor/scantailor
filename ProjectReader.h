@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 class QDomElement;
 class ProjectData;
 class PageSequence;
+class FileNameDisambiguator;
 class AbstractFilter;
 
 class ProjectReader
@@ -51,26 +52,28 @@ public:
 	QString const& outputDirectory() const { return m_outDir; }
 	
 	IntrusivePtr<PageSequence> const& pages() const { return m_ptrPages; }
+
+	IntrusivePtr<FileNameDisambiguator> const& namingDisambiguator() const {
+		return m_ptrDisambiguator;
+	}
 	
 	ImageId imageId(int numeric_id) const;
 	
 	PageId pageId(int numeric_id) const;
 private:
-	struct FileInfo
+	struct FileRecord
 	{
-		QString path;
-		bool multiPageFile;
-		
-		FileInfo() : multiPageFile(false) {}
-		
-		FileInfo(QString path, bool multi_page)
-		: path(path), multiPageFile(multi_page) {}
-		
-		bool isNull() const { return path.isEmpty(); }
+		QString filePath;
+		bool compatMultiPage; // Backwards compatibility.
+
+		FileRecord() : compatMultiPage(false) {}
+
+		FileRecord(QString const& file_path, bool compat_multi_page)
+			: filePath(file_path), compatMultiPage(compat_multi_page) {}
 	};
-	
+
 	typedef std::map<int, QString> DirMap;
-	typedef std::map<int, FileInfo> FileMap;
+	typedef std::map<int, FileRecord> FileMap;
 	typedef std::map<int, ImageInfo> ImageMap;
 	typedef std::map<int, PageId> PageMap;
 	
@@ -87,7 +90,9 @@ private:
 	
 	QString getDirPath(int id) const;
 	
-	FileInfo getFileInfo(int id) const;
+	FileRecord getFileRecord(int id) const;
+
+	QString expandFilePath(QString const& path_shorthand) const;
 	
 	ImageInfo getImageInfo(int id) const;
 	
@@ -98,6 +103,7 @@ private:
 	ImageMap m_imageMap;
 	PageMap m_pageMap;
 	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<FileNameDisambiguator> m_ptrDisambiguator;
 };
 
 #endif

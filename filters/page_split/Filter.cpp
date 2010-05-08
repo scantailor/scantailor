@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,11 @@
 #include "ProjectWriter.h"
 #include "PageId.h"
 #include "ImageId.h"
+#include "PageLayout.h"
 #include "LayoutType.h"
 #include "Params.h"
 #include "CacheDrivenTask.h"
+#include "OrthogonalRotation.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -150,9 +152,23 @@ Filter::loadSettings(
 }
 
 void
-Filter::removePages(std::set<PageId> const& pages)
+Filter::pageOrientationUpdate(
+	ImageId const& image_id, OrthogonalRotation const& orientation)
 {
-	m_ptrSettings->removePages(pages);
+	Settings::Record const record(m_ptrSettings->getPageRecord(image_id));
+
+	if (record.layoutType() && *record.layoutType() != AUTO_LAYOUT_TYPE) {
+		// The layout type was set manually, so we don't care about orientation.
+		return;
+	}
+
+	if (record.params() && record.params()->dependencies().orientation() == orientation) {
+		// We've already estimated the number of pages for this orientation.
+		return;
+	}
+
+	// Use orientation to update the number of logical pages in an image.
+	m_ptrPages->autoSetLogicalPagesInImage(image_id, orientation);
 }
 
 void
@@ -178,14 +194,14 @@ Filter::writeImageSettings(
 
 IntrusivePtr<Task>
 Filter::createTask(
-	PageId const& page_id,
+	PageInfo const& page_info,
 	IntrusivePtr<deskew::Task> const& next_task,
 	bool const batch_processing, bool const debug)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings, m_ptrPages,
-			next_task, page_id.imageId(), batch_processing, debug
+			next_task, page_info, batch_processing, debug
 		)
 	);
 }
