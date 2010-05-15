@@ -163,7 +163,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	);
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(status, data, layout);
+		return m_ptrNextTask->process(status, data);
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(

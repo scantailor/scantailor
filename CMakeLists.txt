@@ -334,7 +334,6 @@ SET(
 	ImageInfo.cpp ImageInfo.h
 	ImageFileInfo.cpp ImageFileInfo.h
 	ImageMetadata.cpp ImageMetadata.h
-	PageLayout.cpp PageLayout.h
 	RecentProjects.cpp RecentProjects.h
 	SettingsDialog.cpp SettingsDialog.h
 	FixDpiDialog.cpp FixDpiDialog.h

@@ -32,7 +32,6 @@ class QTransform;
 class ImageTransformation;
 class DebugImages;
 class Span;
-class PageLayout;
 
 namespace imageproc
 {
@@ -42,6 +41,8 @@ namespace imageproc
 
 namespace page_split
 {
+
+class PageLayout;
 
 class PageLayoutEstimator
 {

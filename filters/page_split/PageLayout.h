@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@ class QRectF;
 class QTransform;
 class QDomElement;
 class QDomDocument;
+
+namespace page_split
+{
 
 class PageLayout
 {
@@ -133,5 +136,7 @@ private:
 	QLineF m_splitLine;
 	Type m_type;
 };
+
+} // namespace page_split
 
 #endif

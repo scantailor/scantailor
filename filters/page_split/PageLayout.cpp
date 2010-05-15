@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@
 #include <algorithm>
 #include <math.h>
 #include <assert.h>
+
+namespace page_split
+{
 
 PageLayout::PageLayout()
 :	m_type(SINGLE_PAGE_UNCUT)
@@ -394,3 +397,5 @@ PageLayout::typeToString(Type const type)
 	
 	return QString::fromAscii(str);
 }
+
+} // namespace page_split

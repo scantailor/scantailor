@@ -15,6 +15,7 @@ SET(
 	Thumbnail.cpp Thumbnail.h
 	Params.cpp Params.h
 	Dependencies.cpp Dependencies.h
+	PageLayout.cpp PageLayout.h
 	PageLayoutEstimator.cpp PageLayoutEstimator.h
 	VertLineFinder.cpp VertLineFinder.h
 	Filter.cpp Filter.h

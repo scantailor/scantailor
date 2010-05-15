@@ -75,9 +75,13 @@ CacheDrivenTask::process(
 	}
 	
 	PageLayout const layout(params->pageLayout());
-	
+
 	if (m_ptrNextTask) {
-		m_ptrNextTask->process(page_info, collector, xform, layout);
+		ImageTransformation new_xform(xform);
+		new_xform.setCropArea(
+			layout.pageOutline(xform.resultingRect(), page_info.id().subPage())
+		);
+		m_ptrNextTask->process(page_info, collector, new_xform);
 		return;
 	}
 	

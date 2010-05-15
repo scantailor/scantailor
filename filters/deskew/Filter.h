@@ -26,7 +26,6 @@
 #include "SafeDeletingQObjectPtr.h"
 
 class PageId;
-class PageLayout;
 class QString;
 
 namespace select_content

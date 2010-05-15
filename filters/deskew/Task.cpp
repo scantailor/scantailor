@@ -23,7 +23,6 @@
 #include "Params.h"
 #include "Dependencies.h"
 #include "TaskStatus.h"
-#include "PageLayout.h"
 #include "DebugImages.h"
 #include "filters/select_content/Task.h"
 #include "FilterUiInterface.h"
@@ -104,18 +103,13 @@ Task::~Task()
 }
 
 FilterResultPtr
-Task::process(
-	TaskStatus const& status, FilterData const& data,
-	PageLayout const& page_layout)
+Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
 	
-	QRectF const rect(data.xform().rectBeforeCropping());
-	
-	QPolygonF const page_outline(
-		page_layout.pageOutline(rect, m_pageId.subPage())
+	Dependencies const deps(
+		data.xform().resultingCropArea(), data.xform().preRotation()
 	);
-	Dependencies const deps(page_outline, data.xform().preRotation());
 	
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
@@ -130,12 +124,9 @@ Task::process(
 		}
 	}
 	
-	ImageTransformation new_xform(data.xform());
-	new_xform.setCropArea(page_outline);
-	
 	if (!params.get()) {
 		QRectF const image_area(
-			new_xform.transformBack().mapRect(new_xform.resultingRect())
+			data.xform().transformBack().mapRect(data.xform().resultingRect())
 		);
 		QRect const bounded_image_area(
 			image_area.toRect().intersected(data.origImage().rect())
@@ -190,6 +181,7 @@ Task::process(
 		}
 	}
 	
+	ImageTransformation new_xform(data.xform());
 	new_xform.setPostRotation(ui_data.effectiveDeskewAngle());
 	
 	if (m_ptrNextTask) {

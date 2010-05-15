@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "IncompleteThumbnail.h"
 #include "Settings.h"
 #include "PageInfo.h"
-#include "PageLayout.h"
 #include "ImageTransformation.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
@@ -45,16 +44,9 @@ CacheDrivenTask::~CacheDrivenTask()
 void
 CacheDrivenTask::process(
 	PageInfo const& page_info, AbstractFilterDataCollector* collector,
-	ImageTransformation const& xform, PageLayout const& layout)
+	ImageTransformation const& xform)
 {
-	QRectF const rect(xform.rectBeforeCropping());
-	QPolygonF const page_outline(
-		layout.pageOutline(rect, page_info.id().subPage())
-	);
-	ImageTransformation new_xform(xform);
-	new_xform.setCropArea(page_outline);
-	
-	Dependencies const deps(page_outline, xform.preRotation());
+	Dependencies const deps(xform.resultingCropArea(), xform.preRotation());
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	if (!params.get() || !deps.matches(params->dependencies())) {
 		
@@ -64,7 +56,7 @@ CacheDrivenTask::process(
 					new IncompleteThumbnail(
 						thumb_col->thumbnailCache(),
 						thumb_col->maxLogicalThumbSize(),
-						page_info.imageId(), new_xform
+						page_info.imageId(), xform
 					)
 				)
 			);
@@ -73,6 +65,7 @@ CacheDrivenTask::process(
 		return;
 	}
 	
+	ImageTransformation new_xform(xform);
 	new_xform.setPostRotation(params->deskewAngle());
 	
 	if (m_ptrNextTask) {

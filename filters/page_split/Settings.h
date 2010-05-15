@@ -21,6 +21,7 @@
 
 #include "RefCountable.h"
 #include "NonCopyable.h"
+#include "PageLayout.h"
 #include "LayoutType.h"
 #include "Params.h"
 #include "ImageId.h"
