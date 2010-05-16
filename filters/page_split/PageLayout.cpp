@@ -25,7 +25,9 @@
 #include <QTransform>
 #include <QDomElement>
 #include <QDomDocument>
+#include <boost/foreach.hpp>
 #include <algorithm>
+#include <limits>
 #include <math.h>
 #include <assert.h>
 
@@ -37,64 +39,130 @@ PageLayout::PageLayout()
 {
 }
 
-PageLayout::PageLayout(Type const type, QLineF const& split_line)
-:	m_splitLine(split_line),
+PageLayout::PageLayout(QRectF const& full_rect)
+:	m_uncutOutline(full_rect),
+	m_cutter1(full_rect.topLeft(), full_rect.bottomLeft()),
+	m_cutter2(full_rect.topRight(), full_rect.bottomRight()),
+	m_type(SINGLE_PAGE_UNCUT)
+{
+}
+	
+PageLayout::PageLayout(QRectF const& full_rect, QLineF const& cutter1, QLineF const& cutter2)
+:	m_uncutOutline(full_rect),
+	m_cutter1(cutter1),
+	m_cutter2(cutter2),
+	m_type(SINGLE_PAGE_CUT)
+{
+}
+
+PageLayout::PageLayout(QRectF const full_rect, QLineF const& split_line)
+:	m_uncutOutline(full_rect),
+	m_cutter1(split_line),
+	m_cutter2(split_line),
+	m_type(TWO_PAGES)
+{
+}
+
+PageLayout::PageLayout(
+	QPolygonF const& outline, QLineF const& cutter1,
+	QLineF const& cutter2, Type type)
+:	m_uncutOutline(outline),
+	m_cutter1(cutter1),
+	m_cutter2(cutter2),
 	m_type(type)
 {
 }
 
 PageLayout::PageLayout(QDomElement const& layout_el)
-:	m_splitLine(
-		XmlUnmarshaller::lineF(
-			layout_el.namedItem("split-line").toElement()
+:	m_uncutOutline(
+		XmlUnmarshaller::polygonF(
+			layout_el.namedItem("outline").toElement()
 		)
 	),
-	m_type(SINGLE_PAGE_UNCUT)
+	m_cutter1(
+		XmlUnmarshaller::lineF(
+			layout_el.namedItem("cutter1").toElement()
+		)
+	),
+	m_cutter2(
+		XmlUnmarshaller::lineF(
+			layout_el.namedItem("cutter2").toElement()
+		)
+	)
 {
-	if (layout_el.hasAttribute("type")) {
-		m_type = typeFromString(layout_el.attribute("type"));
+	QString const type(layout_el.attribute("type"));
+	QDomElement const split_line_el(layout_el.namedItem("split-line").toElement());
+	if (split_line_el.isNull()) {
+		m_type = typeFromString(type);
 	} else {
+		// Backwards compatibility with versions < 0.9.9
+		// Note that we fill in m_uncutOutline elsewhere, namely in Task::process().
+		QLineF const split_line(XmlUnmarshaller::lineF(split_line_el));
+
 		// Backwards compatibility with versions <= 0.9.1
-		
 		bool const left_page = (
 			layout_el.attribute("leftPageValid") == "1"
 		);
 		bool const right_page = (
 			layout_el.attribute("rightPageValid") == "1"
 		);
-		
-		if (left_page && right_page) {
+
+		if (type == "two-pages" || (left_page && right_page)) {
 			m_type = TWO_PAGES;
-		} else if (left_page && !right_page) {
-			m_type = LEFT_PAGE_PLUS_OFFCUT;
-		} else if (!left_page && right_page) {
-			m_type = RIGHT_PAGE_PLUS_OFFCUT;
+			m_cutter1 = split_line;
+			m_cutter2 = split_line;
+		} else if (type == "left-page" || left_page) {
+			m_type = SINGLE_PAGE_CUT;
+			m_cutter1 = QLineF(0, 0, 0, 1); // A bit of a hack, but should work.
+			m_cutter2 = split_line;
+		} else if (type == "right-page" || right_page) {
+			m_type = SINGLE_PAGE_CUT;
+			m_cutter1 = split_line;
+			m_cutter2 = QLineF();
+			// This one is a special case.  We don't know the outline at this point,
+			// so we make m_cutter2 null.  We'll assign the correct value to it in
+			// setUncutOutline().
+		} else {
+			m_type = SINGLE_PAGE_UNCUT;
+			m_cutter1 = QLineF();
+			m_cutter2 = QLineF();
 		}
 	}
 }
 
-PageLayout
-PageLayout::singlePageUncut()
+void
+PageLayout::setType(Type type)
 {
-	return PageLayout(SINGLE_PAGE_UNCUT, QLineF());
+	m_type = type;
+	if (type == TWO_PAGES) {
+		m_cutter2 = m_cutter1;
+	}
 }
 
-PageLayout
-PageLayout::leftPagePlusOffcut(QLineF const& split_line)
+void
+PageLayout::setUncutOutline(QRectF const& outline)
 {
-	return PageLayout(LEFT_PAGE_PLUS_OFFCUT, split_line);
+	m_uncutOutline = outline;
+	if (m_uncutOutline.size() < 4) {
+		// Empty rect?
+		return;
+	}
+
+	if (m_type == SINGLE_PAGE_CUT && m_cutter2.isNull()) {
+		// Backwards compatibility.  See PageLayout(QDomElement const&);
+		m_cutter2.setP1(m_uncutOutline[1]);
+		m_cutter2.setP2(m_uncutOutline[2]);
+	}
 }
 
-PageLayout
-PageLayout::rightPagePlusOffcut(QLineF const& split_line)
+void
+PageLayout::setCutterLine(int line_idx, QLineF const& cutter)
 {
-	return PageLayout(RIGHT_PAGE_PLUS_OFFCUT, split_line);
-}
-
-PageLayout
-PageLayout::twoPages(QLineF const& split_line)
-{
-	return PageLayout(TWO_PAGES, split_line);
+	if (line_idx == 0) {
+		m_cutter1 = cutter;
+	} else {
+		m_cutter2 = cutter;
+	}
 }
 
 int
@@ -104,124 +172,148 @@ PageLayout::numSubPages() const
 }
 
 QLineF
-PageLayout::inscribedSplitLine(QRectF const& rect) const
+PageLayout::inscribedCutterLine(int idx) const
 {
-	QLineF line(m_splitLine);
-	if (fabs(line.p2().x() - line.p1().x()) <
-	    fabs(line.p2().y() - line.p1().y())) {
-		line = intersectTopBottom(line, rect.top(), rect.bottom());
-		line = clipLeftRight(line, rect.left(), rect.right());
-	} else {
-		line = intersectLeftRight(line, rect.left(), rect.right());
-		line = clipTopBottom(line, rect.top(), rect.bottom());
+	assert(idx == 0 || idx == 1);
+
+	if (m_uncutOutline.size() < 4) {
+		return QLineF();
 	}
-	return line;
+
+	QLineF const raw_line(cutterLine(idx));
+	QPointF const origin(raw_line.p1());
+	QPointF const line_vec(raw_line.p2() - origin);
+	
+	double min_proj = std::numeric_limits<double>::max();
+	double max_proj = std::numeric_limits<double>::min();
+	QPointF min_pt;
+	QPointF max_pt;
+
+	QPointF p1, p2;
+	double projection;
+
+	for (int i = 0; i < 4; ++i) {
+		QLineF const poly_segment(m_uncutOutline[i], m_uncutOutline[(i + 1) & 3]);
+		QPointF intersection;
+		if (poly_segment.intersect(raw_line, &intersection) == QLineF::NoIntersection) {
+			continue;
+		}
+
+		// Project the intersection point on poly_segment to check
+		// if it's between its endpoints.
+		p1 = poly_segment.p2() - poly_segment.p1();
+		p2 = intersection - poly_segment.p1();
+		projection = p1.x() * p2.x() + p1.y() * p2.y();
+		if (projection < 0 || projection > p1.x() * p1.x() + p1.y() * p1.y()) {
+			// Intersection point not on the polygon segment.
+			continue;
+		}
+
+		// Now project it on raw_line and update min/max projections.
+		p1 = intersection - origin;
+		p2 = line_vec;
+		projection = p1.x() * p2.x() + p1.y() * p2.y();
+		if (projection <= min_proj) {
+			min_proj = projection;
+			min_pt = intersection;
+		}
+		if (projection >= max_proj) {
+			max_proj = projection;
+			max_pt = intersection;
+		}
+	}
+
+	QLineF res(min_pt, max_pt);
+	ensureSameDirection(raw_line, res);
+	return res;
 }
 
 QPolygonF
-PageLayout::singlePageOutline(QRectF const& rect) const
+PageLayout::singlePageOutline() const
 {
+	if (m_uncutOutline.size() < 4) {
+		return QPolygonF();
+	}
+
 	switch (m_type) {
 		case SINGLE_PAGE_UNCUT:
-			return rect;
-		case LEFT_PAGE_PLUS_OFFCUT:
-			return leftPageOutline(rect);
-		case RIGHT_PAGE_PLUS_OFFCUT:
-			return rightPageOutline(rect);
-		case TWO_PAGES:
+			return m_uncutOutline;
+		case SINGLE_PAGE_CUT:
 			break;
-	}
-	
-	return QPolygonF();
-}
-
-QPolygonF
-PageLayout::leftPageOutline(QRectF const& rect) const
-{
-	switch (m_type) {
-		case LEFT_PAGE_PLUS_OFFCUT:
 		case TWO_PAGES:
-			break;
-		default:
 			return QPolygonF();
 	}
-	
-	if (m_splitLine.p1().y() == m_splitLine.p2().y()) {
-		return QPolygonF();
-	}
-	
-	QLineF const top_line(rect.topLeft(), rect.topRight());
-	QLineF const bottom_line(rect.bottomLeft(), rect.bottomRight());
-	
-	QPointF p_top;
-	QPointF p_bottom;
-	m_splitLine.intersect(top_line, &p_top);
-	m_splitLine.intersect(bottom_line, &p_bottom);
-	
-	double const left = std::min(
-		rect.left() - 1, std::min(p_top.x(), p_bottom.x())
-	);
-	// Why - 1?  Because QPolygonF::intersected(QRectF) doesn't work
-	// right (as of Qt 4.3.1) when the polygon is exactly equal
-	// to the rect.
+
+	QLineF const line1(extendToCover(m_cutter1, m_uncutOutline));
+	QLineF line2(extendToCover(m_cutter2, m_uncutOutline));
+	ensureSameDirection(line1, line2);
 	
 	QPolygonF poly;
-	poly.push_back(QPointF(left, rect.top()));
-	poly.push_back(QPointF(p_top.x(), rect.top()));
-	poly.push_back(QPointF(p_bottom.x(), rect.bottom()));
-	poly.push_back(QPointF(left, rect.bottom()));
-	poly.push_back(QPointF(left, rect.top()));
-	return poly.intersected(rect);
+	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
+
+	return m_uncutOutline.intersected(poly);
 }
 
 QPolygonF
-PageLayout::rightPageOutline(QRectF const& rect) const
+PageLayout::leftPageOutline() const
 {
+	if (m_uncutOutline.size() < 4) {
+		return QPolygonF();
+	}
+
 	switch (m_type) {
-		case RIGHT_PAGE_PLUS_OFFCUT:
+		case SINGLE_PAGE_UNCUT:
+		case SINGLE_PAGE_CUT:
+			return QPolygonF();
 		case TWO_PAGES:
 			break;
-		default:
-			return QPolygonF();
 	}
-	if (m_splitLine.p1().y() == m_splitLine.p2().y()) {
-		return QPolygonF();
-	}
-	
-	QLineF const top_line(rect.topLeft(), rect.topRight());
-	QLineF const bottom_line(rect.bottomLeft(), rect.bottomRight());
-	
-	QPointF p_top;
-	QPointF p_bottom;
-	m_splitLine.intersect(top_line, &p_top);
-	m_splitLine.intersect(bottom_line, &p_bottom);
+
+	QLineF const line1(m_uncutOutline[0], m_uncutOutline[3]);
+	QLineF line2(extendToCover(m_cutter1, m_uncutOutline));
+	ensureSameDirection(line1, line2);
 	
 	QPolygonF poly;
-	double const right = std::max(
-		rect.right() + 1, std::max(p_top.x(), p_bottom.x())
-	);
-	// Why + 1?  Because QPolygonF::intersected(QRectF) doesn't work
-	// right (as of Qt 4.3.1) when the polygon is exactly equal
-	// to the rect.
-	
-	poly.push_back(QPointF(right, rect.top()));
-	poly.push_back(QPointF(p_top.x(), rect.top()));
-	poly.push_back(QPointF(p_bottom.x(), rect.bottom()));
-	poly.push_back(QPointF(right, rect.bottom()));
-	poly.push_back(QPointF(right, rect.top()));
-	return poly.intersected(rect);
+	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
+
+	return m_uncutOutline.intersected(poly);
 }
 
 QPolygonF
-PageLayout::pageOutline(QRectF const& rect, PageId::SubPage const page) const
+PageLayout::rightPageOutline() const
+{
+	if (m_uncutOutline.size() < 4) {
+		return QPolygonF();
+	}
+
+	switch (m_type) {
+		case SINGLE_PAGE_UNCUT:
+		case SINGLE_PAGE_CUT:
+			return QPolygonF();
+		case TWO_PAGES:
+			break;
+	}
+
+	QLineF const line1(m_uncutOutline[1], m_uncutOutline[2]);
+	QLineF line2(extendToCover(m_cutter2, m_uncutOutline));
+	ensureSameDirection(line1, line2);
+	
+	QPolygonF poly;
+	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
+
+	return m_uncutOutline.intersected(poly);
+}
+
+QPolygonF
+PageLayout::pageOutline(PageId::SubPage const page) const
 {
 	switch (page) {
 		case PageId::SINGLE_PAGE:
-			return singlePageOutline(rect);
+			return singlePageOutline();
 		case PageId::LEFT_PAGE:
-			return leftPageOutline(rect);
+			return leftPageOutline();
 		case PageId::RIGHT_PAGE:
-			return rightPageOutline(rect);
+			return rightPageOutline();
 	}
 	
 	assert(!"Unreachable");
@@ -231,7 +323,10 @@ PageLayout::pageOutline(QRectF const& rect, PageId::SubPage const page) const
 PageLayout
 PageLayout::transformed(QTransform const& xform) const
 {
-	return PageLayout(m_type, xform.map(m_splitLine));
+	return PageLayout(
+		xform.map(m_uncutOutline),
+		xform.map(m_cutter1), xform.map(m_cutter2), m_type
+	);
 }
 
 QDomElement
@@ -241,136 +336,20 @@ PageLayout::toXml(QDomDocument& doc, QString const& name) const
 	
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("type", typeToString(m_type));
-	el.appendChild(marshaller.lineF(m_splitLine, "split-line"));
+	el.appendChild(marshaller.polygonF(m_uncutOutline, "outline"));
+	el.appendChild(marshaller.lineF(m_cutter1, "cutter1"));
+	el.appendChild(marshaller.lineF(m_cutter2, "cutter2"));
 	
 	return el;
-}
-
-QLineF
-PageLayout::intersectLeftRight(QLineF const& line, double const x_left, double const x_right)
-{
-	if (line.p1().x() == line.p2().x()) {
-		// This will prevent division by zero and also catch null lines.
-		return line;
-	}
-	
-	// y = p1.y() + (x - p1.x()) * tg;
-	// x = p1.x() + (y - p1.y()) * ctg;
-	
-	double const tg = (line.p2().y() - line.p1().y()) / (line.p2().x() - line.p1().x());
-	double const y_left = line.p1().y() + (x_left - line.p1().x()) * tg;
-	double const y_right = line.p1().y() + (x_right - line.p1().x()) * tg;
-	
-	return QLineF(x_left, y_left, x_right, y_right);
-}
-
-QLineF
-PageLayout::intersectTopBottom(QLineF const& line, double const y_top, double const y_bottom)
-{
-	if (line.p1().y() == line.p2().y()) {
-		// This will prevent division by zero and also catch null lines.
-		return line;
-	}
-	
-	// y = p1.y() + (x - p1.x()) * tg;
-	// x = p1.x() + (y - p1.y()) * ctg;
-	
-	double const ctg = (line.p2().x() - line.p1().x()) / (line.p2().y() - line.p1().y());
-	double const x_top = line.p1().x() + (y_top - line.p1().y()) * ctg;
-	double const x_bottom = line.p1().x() + (y_bottom - line.p1().y()) * ctg;
-	
-	return QLineF(x_top, y_top, x_bottom, y_bottom);
-}
-
-QLineF
-PageLayout::clipLeftRight(QLineF const& line, double x_left, double x_right)
-{
-	QPointF p_left(line.p1());
-	QPointF p_right(line.p2());
-	bool swap = false;
-	if (p_left.x() > p_right.x()) {
-		std::swap(p_left, p_right);
-		swap = true;
-	} else if (p_left.x() == p_right.x()) {
-		// This will prevent division by zero and also catch null lines.
-		return line;
-	}
-	
-	if (p_right.x() < x_left || p_left.x() > x_right) {
-		return QLineF();
-	}
-	
-	// y = p1.y() + (x - p1.x()) * tg;
-	// x = p1.x() + (y - p1.y()) * ctg;
-	
-	double const tg = (line.p2().y() - line.p1().y()) / (line.p2().x() - line.p1().x());
-	
-	if (p_left.x() < x_left) {
-		p_left.setY(line.p1().y() + (x_left - line.p1().x()) * tg);
-		p_left.setX(x_left);
-	}
-	
-	if (p_right.x() > x_right) {
-		p_right.setY(line.p1().y() + (x_right - line.p1().x()) * tg);
-		p_right.setX(x_right);
-	}
-	
-	if (swap) {
-		std::swap(p_left, p_right);
-	}
-
-	return QLineF(p_left, p_right);
-}
-
-QLineF
-PageLayout::clipTopBottom(QLineF const& line, double y_top, double y_bottom)
-{
-	QPointF p_top(line.p1());
-	QPointF p_bottom(line.p2());
-	bool swap = false;
-	if (p_top.y() > p_bottom.y()) {
-		std::swap(p_top, p_bottom);
-		swap = true;
-	} else if (p_top.y() == p_bottom.y()) {
-		// This will prevent division by zero and also catch null lines.
-		return line;
-	}
-	
-	if (p_bottom.y() < y_top || p_top.y() > y_bottom) {
-		return QLineF();
-	}
-	
-	// y = p1.y() + (x - p1.x()) * tg;
-	// x = p1.x() + (y - p1.y()) * ctg;
-	
-	double const ctg = (line.p2().x() - line.p1().x()) / (line.p2().y() - line.p1().y());
-	
-	if (p_top.y() < y_top) {
-		p_top.setX(line.p1().x() + (y_top - line.p1().y()) * ctg);
-		p_top.setY(y_top);
-	}
-	
-	if (p_bottom.y() > y_bottom) {
-		p_bottom.setX(line.p1().x() + (y_bottom - line.p1().y()) * ctg);
-		p_bottom.setY(y_bottom);
-	}
-	
-	if (swap) {
-		std::swap(p_top, p_bottom);
-	}
-
-	return QLineF(p_top, p_bottom);
 }
 
 PageLayout::Type
 PageLayout::typeFromString(QString const& str)
 {
-	if (str == "left-page") {
-		return LEFT_PAGE_PLUS_OFFCUT;
-	} else if (str == "right-page") {
-		return RIGHT_PAGE_PLUS_OFFCUT;
-	} else if (str == "two-pages") {
+	if (str == "two-pages") {
 		return TWO_PAGES;
+	} else if (str == "single-cut") {
+		return SINGLE_PAGE_CUT;
 	} else { // "single-uncut"
 		return SINGLE_PAGE_UNCUT;
 	}
@@ -384,11 +363,8 @@ PageLayout::typeToString(Type const type)
 		case SINGLE_PAGE_UNCUT:
 			str = "single-uncut";
 			break;
-		case LEFT_PAGE_PLUS_OFFCUT:
-			str = "left-page";
-			break;
-		case RIGHT_PAGE_PLUS_OFFCUT:
-			str = "right-page";
+		case SINGLE_PAGE_CUT:
+			str = "single-cut";
 			break;
 		case TWO_PAGES:
 			str = "two-pages";
@@ -396,6 +372,60 @@ PageLayout::typeToString(Type const type)
 	}
 	
 	return QString::fromAscii(str);
+}
+
+/**
+ * Extends or shrinks a line segment in such a way that if you draw perpendicular
+ * lines through its endpoints, the given polygon would be squeezed between these
+ * two perpendiculars.  This ensures that the resulting line segment intersects
+ * all the polygon edges it can possibly intersect.
+ */
+QLineF
+PageLayout::extendToCover(QLineF const& line, QPolygonF const& poly)
+{
+	if (poly.isEmpty()) {
+		return line;
+	}
+
+	// Project every vertex of the polygon onto the line and take extremas.
+
+	QLineF const unit_line(line.unitVector());
+	QPointF const origin(unit_line.p1());
+	QPointF const unit_vec(unit_line.p2() - origin);
+	
+	double min = std::numeric_limits<double>::max();
+	double max = std::numeric_limits<double>::min();
+
+	BOOST_FOREACH(QPointF pt, poly) {
+		pt -= origin;
+		double const dot = pt.x() * unit_vec.x() + pt.y() * unit_vec.y();
+		if (dot <= min) {
+			min = dot;
+		}
+		if (dot >= max) {
+			max = dot;
+		}
+	}
+
+	QPointF const p1(origin + unit_vec * min);
+	QPointF const p2(origin + unit_vec * max);
+	return QLineF(p1, p2);
+}
+
+/**
+ * Flips \p line2 if that would make the angle between the two lines more acute.
+ * The angle between lines is interpreted as an angle between vectors
+ * (line1.p2() - line1.p1()) and (line2.p2() - line2.p1()).
+ */
+void
+PageLayout::ensureSameDirection(QLineF const& line1, QLineF& line2)
+{
+	QPointF const v1(line1.p2() - line1.p1());
+	QPointF const v2(line2.p2() - line2.p1());
+	double const dot = v1.x() * v2.x() + v1.y() * v2.y();
+	if (dot < 0.0) {
+		line2 = QLineF(line2.p2(), line2.p1());
+	}
 }
 
 } // namespace page_split

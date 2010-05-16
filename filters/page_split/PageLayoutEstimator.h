@@ -113,7 +113,7 @@ private:
 		int width, int height);
 	
 	static PageLayout processTwoPagesWithSingleSpan(
-		Span const& span, int width);
+		Span const& span, int width, int height);
 	
 	static QLineF vertLine(double x);
 };

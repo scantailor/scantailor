@@ -30,6 +30,7 @@
 #include <QtGlobal>
 #include <QDebug>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 #include <algorithm>
 
 namespace page_split
@@ -46,7 +47,6 @@ ImageView::ImageView(
 	),
 	m_ptrPages(pages),
 	m_imageId(image_id),
-	m_lineInteractor(&m_lineSegment),
 	m_leftUnremoveButton(boost::bind(&ImageView::leftPageCenter, this)),
 	m_rightUnremoveButton(boost::bind(&ImageView::rightPageCenter, this)),
 	m_dragHandler(*this),
@@ -63,38 +63,43 @@ ImageView::ImageView(
 
 	QString const tip(tr("Drag the line or the handles."));
 	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
-	for (int i = 0; i < 2; ++i) {
-		m_handles[i].setHitRadius(hit_radius);
-		m_handles[i].setPositionCallback(
-			boost::bind(&ImageView::handlePosition, this, i)
+	int const num_lines = m_virtLayout.numSubPages();
+	for (int i = 0; i < num_lines; ++i) { // Loop over lines.
+		m_lineInteractors[i].setObject(&m_lineSegments[0]);
+
+		for (int j = 0; j < 2; ++j) { // Loop over handles.
+			m_handles[i][j].setHitRadius(hit_radius);
+			m_handles[i][j].setPositionCallback(
+				boost::bind(&ImageView::handlePosition, this, i, j)
+			);
+			m_handles[i][j].setMoveRequestCallback(
+				boost::bind(&ImageView::handleMoveRequest, this, i, j, _1)
+			);
+			m_handles[i][j].setDragFinishedCallback(
+				boost::bind(&ImageView::dragFinished, this)
+			);
+
+			m_handleInteractors[i][j].setObject(&m_handles[i][j]);
+			m_handleInteractors[i][j].setProximityStatusTip(tip);
+			makeLastFollower(m_handleInteractors[i][j]);
+		}
+		
+		m_lineSegments[i].setPositionCallback(
+			boost::bind(&ImageView::linePosition, this, i)
 		);
-		m_handles[i].setMoveRequestCallback(
-			boost::bind(&ImageView::handleMoveRequest, this, i, _1)
+		m_lineSegments[i].setMoveRequestCallback(
+			boost::bind(&ImageView::lineMoveRequest, this, i, _1)
 		);
-		m_handles[i].setDragFinishedCallback(
+		m_lineSegments[i].setDragFinishedCallback(
 			boost::bind(&ImageView::dragFinished, this)
 		);
 
-		m_handleInteractors[i].setProximityStatusTip(tip);
-		m_handleInteractors[i].setObject(&m_handles[i]);
-
-		makeLastFollower(m_handleInteractors[i]);
+		m_lineInteractors[i].setObject(&m_lineSegments[i]);
+		m_lineInteractors[i].setProximityCursor(Qt::SplitHCursor);
+		m_lineInteractors[i].setInteractionCursor(Qt::SplitHCursor);
+		m_lineInteractors[i].setProximityStatusTip(tip);
+		makeLastFollower(m_lineInteractors[i]);
 	}
-
-	m_lineSegment.setPositionCallback(
-		boost::bind(&ImageView::linePosition, this)
-	);
-	m_lineSegment.setMoveRequestCallback(
-		boost::bind(&ImageView::lineMoveRequest, this, _1)
-	);
-	m_lineSegment.setDragFinishedCallback(
-		boost::bind(&ImageView::dragFinished, this)
-	);
-
-	m_lineInteractor.setProximityCursor(Qt::SplitHCursor);
-	m_lineInteractor.setInteractionCursor(Qt::SplitHCursor);
-	m_lineInteractor.setProximityStatusTip(tip);
-	makeLastFollower(m_lineInteractor);
 
 	if (m_leftPageRemoved) {
 		makeLastFollower(m_leftUnremoveButton);
@@ -133,18 +138,15 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 			painter.setBrush(QColor(0, 0, 255, 50));
 			painter.drawRect(virt_rect);
 			return; // No Split Line will be drawn.
-		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+		case PageLayout::SINGLE_PAGE_CUT:
 			painter.setBrush(QColor(0, 0, 255, 50));
-			painter.drawPolygon(
-				m_virtLayout.singlePageOutline(virt_rect)
-			);
+			painter.drawPolygon(m_virtLayout.singlePageOutline());
 			break;
 		case PageLayout::TWO_PAGES:
 			painter.setBrush(m_leftPageRemoved ? QColor(0, 0, 0, 80) : QColor(0, 0, 255, 50));
-			painter.drawPolygon(m_virtLayout.leftPageOutline(virt_rect));
+			painter.drawPolygon(m_virtLayout.leftPageOutline());
 			painter.setBrush(m_rightPageRemoved ? QColor(0, 0, 0, 80) : QColor(255, 0, 0, 50));
-			painter.drawPolygon(m_virtLayout.rightPageOutline(virt_rect));
+			painter.drawPolygon(m_virtLayout.rightPageOutline());
 			break;
 	}
 
@@ -157,16 +159,21 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setPen(pen);
 	painter.setBrush(Qt::NoBrush);
 
-	QLineF const line(widgetSplitLine());
-	painter.drawLine(line);
+	std::vector<QLineF> cutters;
+	cutters.push_back(widgetCutterLine(0));
+	if (m_virtLayout.type() == PageLayout::SINGLE_PAGE_CUT) {
+		cutters.push_back(widgetCutterLine(1));
+	}
 
-	if (m_virtLayout.type() != PageLayout::SINGLE_PAGE_UNCUT) {
+	BOOST_FOREACH(QLineF const& cutter, cutters) {
+		painter.drawLine(cutter);
+		
 		QRectF rect(m_handlePixmap.rect());
 
-		rect.moveCenter(line.p1());
+		rect.moveCenter(cutter.p1());
 		painter.drawPixmap(rect.topLeft(), m_handlePixmap);
 
-		rect.moveCenter(line.p2());
+		rect.moveCenter(cutter.p2());
 		painter.drawPixmap(rect.topLeft(), m_handlePixmap);
 	}
 }
@@ -178,21 +185,25 @@ ImageView::widgetLayout() const
 }
 
 QLineF
-ImageView::widgetSplitLine() const
+ImageView::widgetCutterLine(int const line_idx) const
 {
-	QLineF line(customInscribedSplitLine(widgetLayout().splitLine(), reducedWidgetArea()));
+	QLineF line(
+		customInscribedCutterLine(
+			widgetLayout().cutterLine(line_idx), reducedWidgetArea()
+		)
+	);
 
-	if (m_handleInteractors[1].interactionInProgress(interactionState())) {
-		line.setP1(virtualToWidget().map(virtualSplitLine().p1()));
-	} else if (m_handleInteractors[0].interactionInProgress(interactionState())) {
-		line.setP2(virtualToWidget().map(virtualSplitLine().p2()));
+	if (m_handleInteractors[line_idx][1].interactionInProgress(interactionState())) {
+		line.setP1(virtualToWidget().map(virtualCutterLine(line_idx).p1()));
+	} else if (m_handleInteractors[line_idx][0].interactionInProgress(interactionState())) {
+		line.setP2(virtualToWidget().map(virtualCutterLine(line_idx).p2()));
 	}
 
 	return line;
 }
 
 QLineF
-ImageView::virtualSplitLine() const
+ImageView::virtualCutterLine(int line_idx) const
 {
 	QRectF virt_rect(virtualDisplayRect());
 
@@ -201,8 +212,7 @@ ImageView::virtualSplitLine() const
 	widget_rect.adjust(0.0, delta, 0.0, -delta);
 
 	virt_rect = widgetToVirtual().mapRect(widget_rect);
-
-	return customInscribedSplitLine(m_virtLayout.splitLine(), virt_rect);
+	return customInscribedCutterLine(m_virtLayout.cutterLine(line_idx), virt_rect);
 }
 
 QRectF
@@ -213,12 +223,12 @@ ImageView::reducedWidgetArea() const
 }
 
 /**
- * This implementation differs from PageLayout::inscribedSplitLine() in that
+ * This implementation differs from PageLayout::inscribedCutterLine() in that
  * it forces the endpoints to lie on the top and bottom boundary lines.
  * Line's angle may change as a result.
  */
 QLineF
-ImageView::customInscribedSplitLine(QLineF const& line, QRectF const& rect)
+ImageView::customInscribedCutterLine(QLineF const& line, QRectF const& rect)
 {
 	if (line.p1().y() == line.p2().y()) {
 		// This should not happen, but if it does, we need to handle it gracefully.
@@ -240,14 +250,14 @@ ImageView::customInscribedSplitLine(QLineF const& line, QRectF const& rect)
 }
 
 QPointF
-ImageView::handlePosition(int id) const
+ImageView::handlePosition(int line_idx, int handle_idx) const
 {
-	QLineF const line(widgetSplitLine());
-	return id == 0 ? line.p1() : line.p2();
+	QLineF const line(widgetCutterLine(line_idx));
+	return handle_idx == 0 ? line.p1() : line.p2();
 }
 
 void
-ImageView::handleMoveRequest(int const id, QPointF const& pos)
+ImageView::handleMoveRequest(int line_idx, int handle_idx, QPointF const& pos)
 {
 	QRectF const valid_area(getOccupiedWidgetRect());
 	QPointF const bound_widget_pos(
@@ -256,25 +266,25 @@ ImageView::handleMoveRequest(int const id, QPointF const& pos)
 
 	double const x = widgetToVirtual().map(bound_widget_pos).x();
 
-	QLineF virt_line(virtualSplitLine());
-	if (id == 0) {
+	QLineF virt_line(virtualCutterLine(line_idx));
+	if (handle_idx == 0) {
 		virt_line.setP1(QPointF(x, virt_line.p1().y()));
 	} else {
 		virt_line.setP2(QPointF(x, virt_line.p2().y()));
 	}
 
-	m_virtLayout = PageLayout(m_virtLayout.type(), virt_line);
+	m_virtLayout.setCutterLine(line_idx, virt_line);
 	update();
 }
 
 QLineF
-ImageView::linePosition() const
+ImageView::linePosition(int line_idx) const
 {
-	return widgetSplitLine();
+	return widgetCutterLine(line_idx);
 }
 
 void
-ImageView::lineMoveRequest(QLineF line)
+ImageView::lineMoveRequest(int line_idx, QLineF line)
 {
 	// Intersect with top and bottom.
 	QPointF p_top;
@@ -294,8 +304,7 @@ ImageView::lineMoveRequest(QLineF line)
 		line.translate(-right, 0.0);
 	}
 
-	PageLayout const new_widget_layout(m_virtLayout.type(), line);
-	m_virtLayout = new_widget_layout.transformed(widgetToVirtual());
+	m_virtLayout.setCutterLine(line_idx, widgetToVirtual().map(line));
 	update();
 }
 
@@ -314,8 +323,8 @@ ImageView::dragFinished()
 QPointF
 ImageView::leftPageCenter() const
 {
-	QRectF left_rect(m_virtLayout.leftPageOutline(virtualDisplayRect()).boundingRect());
-	QRectF right_rect(m_virtLayout.rightPageOutline(virtualDisplayRect()).boundingRect());
+	QRectF left_rect(m_virtLayout.leftPageOutline().boundingRect());
+	QRectF right_rect(m_virtLayout.rightPageOutline().boundingRect());
 
 	double const x_mid = 0.5 * (left_rect.right() + right_rect.left());
 	left_rect.setRight(x_mid);
@@ -327,8 +336,8 @@ ImageView::leftPageCenter() const
 QPointF
 ImageView::rightPageCenter() const
 {
-	QRectF left_rect(m_virtLayout.leftPageOutline(virtualDisplayRect()).boundingRect());
-	QRectF right_rect(m_virtLayout.rightPageOutline(virtualDisplayRect()).boundingRect());
+	QRectF left_rect(m_virtLayout.leftPageOutline().boundingRect());
+	QRectF right_rect(m_virtLayout.rightPageOutline().boundingRect());
 
 	double const x_mid = 0.5 * (left_rect.right() + right_rect.left());
 	left_rect.setRight(x_mid);

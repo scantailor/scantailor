@@ -247,8 +247,7 @@ Settings::BaseRecord::hasLayoutTypeConflict(LayoutType const layout_type) const
 	switch (m_params.pageLayout().type()) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			return layout_type != SINGLE_PAGE_UNCUT;
-		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+		case PageLayout::SINGLE_PAGE_CUT:
 			return layout_type != PAGE_PLUS_OFFCUT;
 		case PageLayout::TWO_PAGES:
 			return layout_type != TWO_PAGES;

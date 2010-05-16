@@ -20,10 +20,10 @@
 #define PAGELAYOUT_H_
 
 #include "PageId.h"
+#include <QPolygonF>
 #include <QLineF>
 #include <QString>
 
-class QPolygonF;
 class QRectF;
 class QTransform;
 class QDomElement;
@@ -32,108 +32,148 @@ class QDomDocument;
 namespace page_split
 {
 
+/**
+ * The page layout comprises the following:
+ * \li A rectangular outline, possibly affine-transformed.
+ * \li Layout type indicator.
+ * \li One or two cutters.
+ *
+ * Cutters are lines with *arbitrary endpoints* that have different meaning
+ * depending on layout type.  In case of SINGLE_PAGE_UNCUT layout, they don't
+ * have any meaning at all.  In case of TWO_PAGES layout, the two cutters
+ * are treated as one spliting line and are expected to be equal.  In case of
+ * SINGLE_PAGE_CUT layout, the two cutters cut the outline from two sides.
+ * The cutters don't have a special meaning, like being a left or right cutter.
+ * From this class' point of view, it doesn't matter, as we are only
+ * interested in the area between them.
+ */
 class PageLayout
 {
 public:
 	enum Type {
 		SINGLE_PAGE_UNCUT,
-		LEFT_PAGE_PLUS_OFFCUT,
-		RIGHT_PAGE_PLUS_OFFCUT,
+		SINGLE_PAGE_CUT,
 		TWO_PAGES
 	};
 	
 	/**
-	 * \brief Constructs a SINGLE_PAGE_UNCUT layout with a null split line.
+	 * \brief Constructs a null layout.
 	 */
 	PageLayout();
+
+	/**
+	 * \brief Constructs a SINGLE_PAGE_UNCUT layout.
+	 */
+	PageLayout(QRectF const& full_rect);
 	
 	/**
-	 * \brief Construct a page layout.
-	 *
-	 * \param type The layout type.
-	 * \param split_line The line that splits pages or cuts off garbage.
-	 *        Endpoints don't matter - they only define a line, not a line
-	 *        segment. The split line may not be null.
+	 * \brief Constructs a SINGLE_PAGE_CUT layout.
 	 */
-	PageLayout(Type type, QLineF const& split_line);
+	PageLayout(QRectF const& full_rect, QLineF const& cutter1, QLineF const& cutter2);
+
+	/**
+	 * \brief Constructs a TWO_PAGES layout.
+	 */
+	PageLayout(QRectF const full_rect, QLineF const& split_line);
 	
 	/**
 	 * \brief Construct a page layout based on XML data.
 	 */
 	PageLayout(QDomElement const& layout_el);
 	
-	static PageLayout singlePageUncut();
-	
-	static PageLayout leftPagePlusOffcut(QLineF const& split_line);
-	
-	static PageLayout rightPagePlusOffcut(QLineF const& split_line);
-	
-	static PageLayout twoPages(QLineF const& split_line);
-	
+	bool isNull() const { return m_uncutOutline.isEmpty(); }
+
 	Type type() const { return m_type; }
-	
+
 	/**
-	 * \brief Get a split line with arbitrary end points.
-	 *
-	 * The line may be null, which indicates that a split line
-	 * was not found.  leftPageValid() and rightPageValid()
-	 * will be false in this case.
+	 * \brief Sets layout type and ensures the internal state
+	 *        is consistent with the new type.
 	 */
-	QLineF const& splitLine() const { return m_splitLine; }
-	
+	void setType(Type type);
+
+	QPolygonF const& uncutOutline() const { return m_uncutOutline; }
+
+	/**
+	 * We don't provide a method to set a polygon, but only a rectangle
+	 * because we want to make sure the polygon stored internally corresponds
+	 * to a rectangle.  For example, we want to be sure vertices 0 and 3
+	 * comprise the line corresponding to a left edge of a rectangle.
+	 */
+	void setUncutOutline(QRectF const& outline);
+
+	QLineF const& cutterLine(int line_idx) const {
+		return line_idx == 0 ? m_cutter1 : m_cutter2;
+	}
+
+	void setCutterLine(int line_idx, QLineF const& cutter);
+
+	/**
+	 * Unlike cutterLine(), which returns a line segment with arbitrary
+	 * arbitrary endpoints, inscribedCutterLine() returns a line segment
+	 * with endpoints touching the edges of the outline polygon.
+	 */
+	QLineF inscribedCutterLine(int idx) const;
+
 	/**
 	 * \brief Get the number of pages (1 or 2) for this layout.
 	 */
 	int numSubPages() const;
 	
 	/**
-	 * \brief Get a split line inscribed into a rectangle.
-	 * \return A line where both ends touch enges of a rectangle,
-	 *         or null line, if it doesn't pass through the rectangle.
-	 *
-	 * This function guarantees the returned line's endpoints correspond
-	 * to the stored line's endpoints.  In other words, the line is
-	 * not flipped.
-	 */
-	QLineF inscribedSplitLine(QRectF const& rect) const;
-	
-	/**
 	 * \brief For single page layouts, return the outline of that page,
 	 *        otherwise return QPolygonF().
 	 */
-	QPolygonF singlePageOutline(QRectF const& rect) const;
+	QPolygonF singlePageOutline() const;
 	
 	/**
-	 * \brief Get the outline of the left page, if it exists.
+	 * \brief For two page layouts, return the outline of the left page,
+	 *        otherwise return QPolygonF().
 	 */
-	QPolygonF leftPageOutline(QRectF const& rect) const;
+	QPolygonF leftPageOutline() const;
 	
 	/**
-	 * \brief Get the outline of the right page, if it exists.
+	 * \brief For two pages layouts, return the outline of the right page,
+	 *        otherwise return QPolygonF().
 	 */
-	QPolygonF rightPageOutline(QRectF const& rect) const;
+	QPolygonF rightPageOutline() const;
 	
-	QPolygonF pageOutline(QRectF const& rect, PageId::SubPage page) const;
+	/**
+	 * \brief Determines and calls the appropriate *PageOutline() method.
+	 */
+	QPolygonF pageOutline(PageId::SubPage page) const;
 	
+	/**
+	 * Returns an affine-transformed version of this layout.
+	 */
 	PageLayout transformed(QTransform const& xform) const;
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
-	static QLineF inscribeLine(QLineF const& line, QRectF const& rect);
-	
-	static QLineF intersectLeftRight(QLineF const& line, double x_left, double x_right);
-	
-	static QLineF intersectTopBottom(QLineF const& line, double y_top, double y_bottom);
-	
-	static QLineF clipLeftRight(QLineF const& line, double x_left, double x_right);
-	
-	static QLineF clipTopBottom(QLineF const& line, double y_top, double y_bottom);
+	PageLayout(QPolygonF const& outline, QLineF const& cutter1,
+		QLineF const& cutter2, Type type);
 	
 	static Type typeFromString(QString const& str);
 	
 	static QString typeToString(Type type);
+
+	static QLineF extendToCover(QLineF const& line, QPolygonF const& poly);
+
+	static void ensureSameDirection(QLineF const& line1, QLineF& line2);
 	
-	QLineF m_splitLine;
+	/**
+	 * This polygon always corresponds to a rectangle, unless it's empty.
+	 * It's vertex 0 corresponds to top-left vertex of a rectangle, and
+	 * it goes clockwise from there, ending at vertex 3.
+	 */
+	QPolygonF m_uncutOutline;
+
+	/**
+	 * In case of two page layouts, both cutters refer to the split line,
+	 * and both are supposed to be equal.
+	 */
+	QLineF m_cutter1;
+	QLineF m_cutter2;
+	
 	Type m_type;
 };
 

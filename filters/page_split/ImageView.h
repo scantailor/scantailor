@@ -62,13 +62,13 @@ public slots:
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
-	QPointF handlePosition(int id) const;
+	QPointF handlePosition(int line_idx, int handle_idx) const;
 
-	void handleMoveRequest(int id, QPointF const& pos);
+	void handleMoveRequest(int line_idx, int handle_idx, QPointF const& pos);
 
-	QLineF linePosition() const;
+	QLineF linePosition(int line_idx) const;
 
-	void lineMoveRequest(QLineF line);
+	void lineMoveRequest(int line_idx, QLineF line);
 
 	void dragFinished();
 
@@ -86,21 +86,21 @@ private:
 	PageLayout widgetLayout() const;
 
 	/**
-	 * \return Split line in widget coordinates.
+	 * \return A Cutter line in widget coordinates.
 	 *
 	 * Depending on the current interaction state, the line segment
 	 * may end either shortly before the widget boundaries, or shortly
 	 * before the image boundaries.
 	 */
-	QLineF widgetSplitLine() const;
+	QLineF widgetCutterLine(int line_idx) const;
 
 	/**
-	 * \return Split line in virtual image coordinates.
+	 * \return A Cutter line in virtual image coordinates.
 	 *
-	 * Unlike widgetSplitLine(), this one always ends shortly before
+	 * Unlike widgetCutterLine(), this one always ends shortly before
 	 * the image boundaries.
 	 */
-	QLineF virtualSplitLine() const;
+	QLineF virtualCutterLine(int line_idx) const;
 
 	/**
 	 * Same as ImageViewBase::getVisibleWidgetRect(), except reduced
@@ -108,14 +108,14 @@ private:
 	 */
 	QRectF reducedWidgetArea() const;
 
-	static QLineF customInscribedSplitLine(QLineF const& line, QRectF const& rect);
+	static QLineF customInscribedCutterLine(QLineF const& line, QRectF const& rect);
 
 	IntrusivePtr<PageSequence> m_ptrPages;
 	ImageId m_imageId;
-	DraggablePoint m_handles[2];
-	ObjectDragHandler m_handleInteractors[2];
-	DraggableLineSegment m_lineSegment;
-	ObjectDragHandler m_lineInteractor;
+	DraggablePoint m_handles[2][2];
+	ObjectDragHandler m_handleInteractors[2][2];
+	DraggableLineSegment m_lineSegments[2];
+	ObjectDragHandler m_lineInteractors[2];
 	UnremoveButton m_leftUnremoveButton;
 	UnremoveButton m_rightUnremoveButton;
 	DragHandler m_dragHandler;

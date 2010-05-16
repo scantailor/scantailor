@@ -113,41 +113,47 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
-		
+
 	for (;;) {
 		Params const* const params = record.params();
 		
+		PageLayout new_layout;
+		
 		if (!params || !deps.compatibleWith(*params)) {
-			PageLayout const layout(
-				PageLayoutEstimator::estimatePageLayout(
-					record.combinedLayoutType(),
-					data.grayImage(), data.xform(),
-					data.bwThreshold(), m_ptrDbg.get()
-				)
+			new_layout = PageLayoutEstimator::estimatePageLayout(
+				record.combinedLayoutType(),
+				data.grayImage(), data.xform(),
+				data.bwThreshold(), m_ptrDbg.get()
 			);
-			
 			status.throwIfCancelled();
-			
-			Params const new_params(layout, deps, MODE_AUTO);
-			Settings::UpdateAction update;
-			update.setParams(new_params);
-			bool conflict = false;
-			record = m_ptrSettings->conditionalUpdate(
-				m_pageInfo.imageId(), update, &conflict
-			);
-			if (conflict && !record.params()) {
-				// If there was a conflict, it means
-				// the record was updated by another
-				// thread somewhere between getPageRecord()
-				// and conditionalUpdate().  If that
-				// external update didn't leave page
-				// parameters clear, we are just going
-				// to use it's data, otherwise we need
-				// to process this page again for the
-				// new layout type.
-				continue;
-			}
+		} else if (params->pageLayout().uncutOutline().isEmpty()) {
+			// Backwards compatibility with versions < 0.9.9
+			new_layout = params->pageLayout();
+			new_layout.setUncutOutline(data.xform().resultingRect());
+		} else {
+			break;
 		}
+			
+		Params const new_params(new_layout, deps, MODE_AUTO);
+		Settings::UpdateAction update;
+		update.setParams(new_params);
+		bool conflict = false;
+		record = m_ptrSettings->conditionalUpdate(
+			m_pageInfo.imageId(), update, &conflict
+		);
+		if (conflict && !record.params()) {
+			// If there was a conflict, it means
+			// the record was updated by another
+			// thread somewhere between getPageRecord()
+			// and conditionalUpdate().  If that
+			// external update didn't leave page
+			// parameters clear, we are just going
+			// to use it's data, otherwise we need
+			// to process this page again for the
+			// new layout type.
+			continue;
+		}
+		
 		break;
 	}
 	
@@ -164,11 +170,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	if (m_ptrNextTask) {
 		ImageTransformation new_xform(data.xform());
-		new_xform.setCropArea(
-			layout.pageOutline(
-				data.xform().resultingRect(), m_pageInfo.id().subPage()
-			)
-		);
+		new_xform.setCropArea(layout.pageOutline(m_pageInfo.id().subPage()));
 		return m_ptrNextTask->process(status, FilterData(data, new_xform));
 	} else {
 		return FilterResultPtr(

@@ -128,9 +128,7 @@ SplitModeDialog::combinedLayoutType() const
 	switch (m_autoDetectedLayoutType) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			return SINGLE_PAGE_UNCUT;
-		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-			return PAGE_PLUS_OFFCUT;
-		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+		case PageLayout::SINGLE_PAGE_CUT:
 			return PAGE_PLUS_OFFCUT;
 		case PageLayout::TWO_PAGES:
 			return TWO_PAGES;

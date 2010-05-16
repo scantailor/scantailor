@@ -41,11 +41,9 @@ OptionsWidget::OptionsWidget(
 	m_ptrPages(page_sequence),
 	m_pageSelectionAccessor(page_selection_accessor),
 	m_ignoreAutoManualToggle(0),
-	m_ignoreLayoutTypeToggle(0),
-	m_ignoreFlipSides(0)
+	m_ignoreLayoutTypeToggle(0)
 {
 	setupUi(this);
-	flipSidesFrame->setVisible(false);
 	
 	// Workaround for QTBUG-182
 	QButtonGroup* grp = new QButtonGroup(this);
@@ -71,18 +69,6 @@ OptionsWidget::OptionsWidget(
 	connect(
 		autoBtn, SIGNAL(toggled(bool)),
 		this, SLOT(splitLineModeChanged(bool))
-	);
-	connect(
-		flipSidesBtn, SIGNAL(clicked()),
-		this, SLOT(flipSides())
-	);
-	connect(
-		leftSideBtn, SIGNAL(toggled(bool)),
-		this, SLOT(flipSides(bool))
-	);
-	connect(
-		rightSideBtn, SIGNAL(toggled(bool)),
-		this, SLOT(flipSides(bool))
 	);
 }
 
@@ -139,10 +125,6 @@ OptionsWidget::preUpdateUI(ImageId const& image_id)
 	// And disable both of them.
 	autoBtn->setEnabled(false);
 	manualBtn->setEnabled(false);
-	
-	// Hide the flip-sides panel, because we don't yet know
-	// where the split line is.
-	flipSidesFrame->setVisible(false);
 }
 
 void
@@ -150,7 +132,6 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 {
 	ScopedIncDec<int> guard1(m_ignoreAutoManualToggle);
 	ScopedIncDec<int> guard2(m_ignoreLayoutTypeToggle);
-	ScopedIncDec<int> guard3(m_ignoreFlipSides);
 	
 	m_uiData = ui_data;
 
@@ -169,21 +150,12 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 	switch (layout_type) {
 		case PageLayout::SINGLE_PAGE_UNCUT:
 			singlePageUncutBtn->setChecked(true);
-			flipSidesFrame->setVisible(false);
 			break;
-		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
+		case PageLayout::SINGLE_PAGE_CUT:
 			pagePlusOffcutBtn->setChecked(true);
-			leftSideBtn->setChecked(true);
-			flipSidesFrame->setVisible(true);
-			break;
-		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			pagePlusOffcutBtn->setChecked(true);
-			rightSideBtn->setChecked(true);
-			flipSidesFrame->setVisible(true);
 			break;
 		case PageLayout::TWO_PAGES:
 			twoPagesBtn->setChecked(true);
-			flipSidesFrame->setVisible(false);
 			break;
 	}
 
@@ -251,9 +223,8 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 			plt = PageLayout::TWO_PAGES;
 		}
 		
-		PageLayout const new_layout(
-			plt, m_uiData.pageLayout().splitLine()
-		);
+		PageLayout new_layout(m_uiData.pageLayout());
+		new_layout.setType(plt);
 		Params const new_params(
 			new_layout, m_uiData.dependencies(),
 			m_uiData.splitLineMode()
@@ -263,8 +234,6 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 		m_ptrSettings->updatePage(m_imageId, update);
 		
 		m_uiData.setPageLayout(new_layout);
-
-		flipSidesFrame->setVisible(false);
 
 		emit pageLayoutSetLocally(new_layout);
 		emit invalidateThumbnail(PageId(m_imageId));
@@ -350,50 +319,6 @@ OptionsWidget::splitLineModeChanged(bool const auto_mode)
 		m_uiData.setSplitLineMode(MODE_MANUAL);
 		commitCurrentParams();
 	}
-}
-
-void
-OptionsWidget::flipSides(bool const doit)
-{
-	if (!doit || m_ignoreFlipSides) {
-		return;
-	}
-
-	ScopedIncDec<int> const guard1(m_ignoreAutoManualToggle);
-	ScopedIncDec<int> const guard2(m_ignoreFlipSides);
-	
-	PageLayout::Type new_plt;
-	switch (m_uiData.pageLayout().type()) {
-		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-			new_plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
-			rightSideBtn->setChecked(true);
-			break;
-		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
-			new_plt = PageLayout::LEFT_PAGE_PLUS_OFFCUT;
-			leftSideBtn->setChecked(true);
-			break;
-		default:
-			return;
-	}
-	
-	PageLayout const new_layout(
-		new_plt, m_uiData.pageLayout().splitLine()
-	);
-	Params const new_params(
-		new_layout, m_uiData.dependencies(),
-		m_uiData.splitLineMode()
-	);
-	
-	Settings::UpdateAction update;
-	update.setParams(new_params);
-	m_ptrSettings->updatePage(m_imageId, update);
-	
-	m_uiData.setPageLayout(new_layout);
-	m_uiData.setSplitLineMode(MODE_MANUAL);
-	manualBtn->setChecked(true);
-	
-	emit pageLayoutSetLocally(new_layout);
-	emit invalidateThumbnail(PageId(m_imageId));
 }
 
 void

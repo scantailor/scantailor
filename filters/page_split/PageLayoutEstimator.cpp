@@ -93,141 +93,6 @@ struct CenterComparator
 	}
 };
 
-void selectHorBordersInPlace(GrayImage& image)
-{
-	int const w = image.width();
-	int const h = image.height();
-	
-	unsigned char* const image_data = image.data();
-	int const image_stride = image.stride();
-	
-	std::vector<unsigned char> tmp_line(h, 0x00);
-	
-	for (int x = 0; x < w; ++x) {
-		// Left to right.
-		unsigned char* p_image = image_data + x;
-		unsigned char prev_pixel = 0x00; // Black vertical border.
-		for (int y = 0; y < h; ++y, p_image += image_stride) {
-			prev_pixel = std::max(*p_image, prev_pixel);
-			tmp_line[y] = prev_pixel;
-		}
-		
-		// Right to left
-		p_image = image_data + x + (h - 1) * image_stride;
-		prev_pixel = 0x00; // Black vertical border.
-		for (int y = h - 1; y >= 0; --y, p_image -= image_stride) {
-			prev_pixel = std::max(
-				*p_image,
-				std::min(prev_pixel, tmp_line[y])
-			);
-			*p_image = prev_pixel;
-		}
-	}
-}
-
-GrayImage removeDarkHorBorders(GrayImage const& src)
-{
-	GrayImage dst(src);
-	
-	selectHorBordersInPlace(dst);
-	grayRasterOp<GRopInvert<GRopClippedSubtract<GRopDst, GRopSrc> > >(dst, src);
-	
-	return dst;
-}
-
-GrayImage detectHorShadows(GrayImage const& src)
-{
-	GrayImage long_hor_lines(openGray(src, QSize(100, 1), 0xff));
-	long_hor_lines = removeDarkHorBorders(long_hor_lines);
-	return openGray(long_hor_lines, QSize(100, 1), 0xff);
-}
-
-void countOffcutPixels(
-	unsigned* left_sum, unsigned* right_sum,
-	QLineF const& left_line, QLineF const& right_line,
-	GrayImage const& gray_downscaled, GrayImage const& hor_shadows,
-	QTransform const& out_to_downscaled, DebugImages* dbg)
-{
-	assert(left_sum && right_sum);
-	
-	GrayImage seed(createFramedImage(gray_downscaled.size()));
-	
-	// Remove parts of the vertical seed lines.
-	// We don't want seed pixels to touch text.
-	{
-		int const width = seed.width();
-		int const height = seed.height();
-		uint8_t* seed_line = seed.data();
-		int const seed_stride = seed.stride();
-		int const from = height / 10;
-		int const to = height - from;
-		seed_line += from * seed_stride;
-		for (int y = from; y < to; ++y) {
-			seed_line[0] = 0xff;
-			seed_line[width - 1] = 0xff;
-			seed_line += seed_stride;
-		}
-	}
-	
-	grayRasterOp<GRopDarkest<GRopSrc, GRopDst> >(
-		seed, hor_shadows
-	);
-	
-	seedFillGrayInPlace(seed, gray_downscaled, CONN8);
-	
-	typedef GRopInvert<
-		GRopUnclippedSubtract<GRopDst, GRopSrc>
-	> SubtractBorders;
-	grayRasterOp<SubtractBorders>(seed, gray_downscaled);
-	if (dbg) {
-		dbg->add(seed, "borders_removed");
-	}
-	
-	BinaryImage bin_img(binarizeWolf(seed, QSize(51, 51)));
-	seed = GrayImage();
-	
-	PageLayout const left_layout(
-		PageLayout(
-			PageLayout::LEFT_PAGE_PLUS_OFFCUT, left_line
-		).transformed(out_to_downscaled)
-	);
-	QPolygonF const left_poly(
-		left_layout.singlePageOutline(
-			gray_downscaled.rect()
-		)
-	);
-	
-	PageLayout const right_layout(
-		PageLayout(
-			PageLayout::RIGHT_PAGE_PLUS_OFFCUT, right_line
-		).transformed(out_to_downscaled)
-	);
-	QPolygonF const right_poly(
-		right_layout.singlePageOutline(
-			gray_downscaled.rect()
-		)
-	);
-	
-	BinaryImage left_offcut(bin_img);
-	PolygonRasterizer::fillExcept(
-		left_offcut, WHITE, left_poly, Qt::WindingFill
-	);
-	*left_sum = left_offcut.countBlackPixels();
-	if (dbg) {
-		dbg->add(left_offcut, "left_offcut");
-	}
-	
-	left_offcut.release();
-	BinaryImage right_offcut(bin_img.release());
-	PolygonRasterizer::fillExcept(
-		right_offcut, WHITE, right_poly, Qt::WindingFill
-	);
-	*right_sum = right_offcut.countBlackPixels();
-	if (dbg) {
-		dbg->add(right_offcut, "right_offcut");
-	}
-}
-
 /**
  * \brief Try to auto-detect a page layout for a single-page configuration.
  *
@@ -247,93 +112,66 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
 	GrayImage const& gray_downscaled,
 	QTransform const& out_to_downscaled, DebugImages* dbg)
 {
-	GrayImage const hor_shadows(detectHorShadows(gray_downscaled));
-	if (dbg) {
-		dbg->add(hor_shadows, "hor_shadows");
-	}
-	
-	QRect left_area(hor_shadows.rect());
-	left_area.setWidth(std::min(5, hor_shadows.width()));
-	QRect right_area(left_area);
-	right_area.moveRight(hor_shadows.rect().right());
-	
-	BinaryImage const hor_shadows_bin(binarizeMokji(hor_shadows, 20, 30));
-	if (dbg) {
-		dbg->add(hor_shadows_bin, "hor_shadows_bin");
-	}
-	unsigned left_sum = hor_shadows_bin.countBlackPixels(left_area);
-	unsigned right_sum = hor_shadows_bin.countBlackPixels(right_area);
-	
 	double const image_center = virtual_image_rect.center().x();
 	
 	// A loop just to be able to break from it.
-	while (left_sum == 0 && right_sum == 0) {
+	do {
 		// This whole branch (loop) leads to SINGLE_PAGE_UNCUT,
 		// which conflicts with PAGE_PLUS_OFFCUT.
 		if (layout_type == PAGE_PLUS_OFFCUT) {
 			break;
 		}
 		
-		// If we have a single single line close to the edge,
-		// then it's unlikely to be SINGLE_PAGE_UNCUT
-		if (ltr_lines.size() == 1) {
-			QLineF const& line = ltr_lines.front();
-			double const line_center = lineCenterX(line);
-			if (fabs(image_center - line_center) > 0.8 * image_center) {
+		// If we have a single line close to an edge,
+		// Or more than one line, with the first and the last
+		// ones close to an edge, that looks more like
+		// SINGLE_PAGE_CUT layout.
+		if (!ltr_lines.empty()) {
+			QLineF const& first_line = ltr_lines.front();
+			double const line_center = lineCenterX(first_line);
+			if (fabs(image_center - line_center) > 0.65 * image_center) {
+				break;
+			}
+		}
+		if (ltr_lines.size() > 1) {
+			QLineF const& last_line = ltr_lines.back();
+			double const line_center = lineCenterX(last_line);
+			if (fabs(image_center - line_center) > 0.65 * image_center) {
 				break;
 			}
 		}
 		
-		// Looks like this scan doesn't have a horizontal shadow that
-		// touches the left or the right edge.  This probably means it
-		// doesn't have a split line there as well, and those that
-		// we found are false positives.
-		return std::auto_ptr<PageLayout>(
-			new PageLayout(
-				PageLayout::SINGLE_PAGE_UNCUT, QLineF()
-			)
-		);
-	}
+		// Return a SINGLE_PAGE_UNCUT layout.
+		return std::auto_ptr<PageLayout>(new PageLayout(virtual_image_rect));
+	} while (false);
 	
 	if (ltr_lines.empty()) {
 		// Impossible to detect the layout type.
 		return std::auto_ptr<PageLayout>();
-	} else if (ltr_lines.size() == 1) {
+	} else if (ltr_lines.size() > 1) {
+		return std::auto_ptr<PageLayout>(
+			new PageLayout(virtual_image_rect, ltr_lines.front(), ltr_lines.back())
+		);
+	} else {
+		assert(ltr_lines.size() == 1);
 		QLineF const& line = ltr_lines.front();
 		double const line_center = lineCenterX(line);
-		PageLayout::Type plt;
 		if (line_center < image_center) {
-			plt = PageLayout::RIGHT_PAGE_PLUS_OFFCUT;
-		} else {
-			plt = PageLayout::LEFT_PAGE_PLUS_OFFCUT;
-		}
-		return std::auto_ptr<PageLayout>(new PageLayout(plt, line));
-	} else {
-		if ((left_sum == 0) == (right_sum == 0)) {
-			countOffcutPixels(
-				&left_sum, &right_sum,
-				ltr_lines.front(), ltr_lines.back(),
-				gray_downscaled, hor_shadows,
-				out_to_downscaled, dbg
+			QLineF const right_line(
+				virtual_image_rect.topRight(), virtual_image_rect.bottomRight()
 			);
-		}
-		if (left_sum > right_sum) {
 			return std::auto_ptr<PageLayout>(
-				new PageLayout(
-					PageLayout::RIGHT_PAGE_PLUS_OFFCUT,
-					ltr_lines.front()
-				)
+				new PageLayout(virtual_image_rect, line, right_line)
 			);
 		} else {
+			QLineF const left_line(
+				virtual_image_rect.topLeft(), virtual_image_rect.bottomLeft()
+			);
 			return std::auto_ptr<PageLayout>(
-				new PageLayout(
-					PageLayout::LEFT_PAGE_PLUS_OFFCUT,
-					ltr_lines.back()
-				)
+				new PageLayout(virtual_image_rect, left_line, line)
 			);
 		}
 	}
-	
 }
 
 /**
@@ -352,7 +190,7 @@ std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
 		return std::auto_ptr<PageLayout>();
 	} else if (ltr_lines.size() == 1) {
 		return std::auto_ptr<PageLayout>(
-			new PageLayout(PageLayout::TWO_PAGES, ltr_lines.front())
+			new PageLayout(virtual_image_rect, ltr_lines.front())
 		);
 	}
 	
@@ -370,7 +208,7 @@ std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
 	}
 	
 	return std::auto_ptr<PageLayout>(
-		new PageLayout(PageLayout::TWO_PAGES, *best_line)
+		new PageLayout(virtual_image_rect, *best_line)
 	);
 }
 
@@ -412,7 +250,7 @@ PageLayoutEstimator::estimatePageLayout(
 	DebugImages* const dbg)
 {
 	if (layout_type == SINGLE_PAGE_UNCUT) {
-		return PageLayout(PageLayout::SINGLE_PAGE_UNCUT, QLineF());
+		return PageLayout(pre_xform.resultingRect());
 	}
 	
 	std::auto_ptr<PageLayout> layout(
@@ -623,7 +461,13 @@ PageLayoutEstimator::cutAtWhitespace(
 			left_offcut, right_offcut, dbg
 		)
 	);
-	return layout.transformed(xform.inverted());
+
+	PageLayout transformed_layout(layout.transformed(xform.inverted()));
+
+	// We don't want a skewed outline!
+	transformed_layout.setUncutOutline(pre_xform.resultingRect());
+	
+	return transformed_layout;
 }
 
 /**
@@ -869,7 +713,9 @@ PageLayoutEstimator::processContentSpansSinglePage(
 {
 	assert(layout_type == AUTO_LAYOUT_TYPE
 			|| layout_type == PAGE_PLUS_OFFCUT);
-	
+
+	QRectF const virtual_image_rect(0, 0, width, height);
+
 	// Just to be able to break from it.
 	while (left_offcut && !right_offcut
 			&& layout_type == AUTO_LAYOUT_TYPE) {
@@ -889,7 +735,11 @@ PageLayoutEstimator::processContentSpansSinglePage(
 				x = std::min(spans[0].end() + 20, width);
 			}
 		}
-		return PageLayout::rightPagePlusOffcut(vertLine(x));
+
+		QLineF const right_line(
+			virtual_image_rect.topRight(), virtual_image_rect.bottomRight()
+		);
+		return PageLayout(virtual_image_rect, vertLine(x), right_line);
 	}
 	
 	// Just to be able to break from it.
@@ -911,21 +761,14 @@ PageLayoutEstimator::processContentSpansSinglePage(
 				x = std::max(spans.back().begin() - 20, 0);
 			}
 		}
-		return PageLayout::leftPagePlusOffcut(vertLine(x));
+
+		QLineF const left_line(
+			virtual_image_rect.topLeft(), virtual_image_rect.bottomLeft()
+		);
+		return PageLayout(virtual_image_rect, left_line, vertLine(x));
 	}
 	
-	if (spans.empty()) {
-		return PageLayout::singlePageUncut();
-	} else {
-		// If there is more whitespace before the first content
-		// span than after the last one, cut on the left,
-		// otherwise cut on the right.
-		if (spans.front().begin() < width - spans.back().end()) {
-			return PageLayout::rightPagePlusOffcut(vertLine(0.0));
-		} else {
-			return PageLayout::leftPagePlusOffcut(vertLine(width));
-		}
-	}
+	return PageLayout(virtual_image_rect);
 }
 
 PageLayout
@@ -934,12 +777,14 @@ PageLayoutEstimator::processContentSpansTwoPages(
 	std::deque<Span> const& spans, int const width, int const height)
 {
 	assert(layout_type == AUTO_LAYOUT_TYPE || layout_type == TWO_PAGES);
-	
+
+	QRectF const virtual_image_rect(0, 0, width, height);
+
 	double x;
 	if (spans.empty()) {
 		x = 0.5 * width;
 	} else if (spans.size() == 1) {
-		return processTwoPagesWithSingleSpan(spans.front(), width);
+		return processTwoPagesWithSingleSpan(spans.front(), width, height);
 	} else {
 		// GapInfo.first: the amount of content preceding this gap.
 		// GapInfo.second: the amount of content following this gap.
@@ -981,7 +826,7 @@ PageLayoutEstimator::processContentSpansTwoPages(
 		if (best_ratio < 0.25) {
 			// Probably one of the pages is just empty.
 			return processTwoPagesWithSingleSpan(
-				Span(content_begin, content_end), width
+				Span(content_begin, content_end), width, height
 			);
 		}
 		
@@ -1019,12 +864,14 @@ PageLayoutEstimator::processContentSpansTwoPages(
 		Span const gap(spans[widest_gap],  spans[widest_gap + 1]);
 		x = gap.center();
 	}
-	return PageLayout(PageLayout::TWO_PAGES, vertLine(x));
+	return PageLayout(virtual_image_rect, vertLine(x));
 }
 
 PageLayout
-PageLayoutEstimator::processTwoPagesWithSingleSpan(Span const& span, int width)
+PageLayoutEstimator::processTwoPagesWithSingleSpan(Span const& span, int width, int height)
 {
+	QRectF const virtual_image_rect(0, 0, width, height);
+
 	double const page_center = 0.5 * width;
 	double const box_center = span.center();
 	double const box_half_width = 0.5 * span.width();
@@ -1045,7 +892,7 @@ PageLayoutEstimator::processTwoPagesWithSingleSpan(Span const& span, int width)
 		}
 	}
 	
-	return PageLayout(PageLayout::TWO_PAGES, vertLine(x));
+	return PageLayout(virtual_image_rect, vertLine(x));
 }
 
 QLineF

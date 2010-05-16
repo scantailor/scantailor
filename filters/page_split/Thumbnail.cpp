@@ -60,14 +60,13 @@ Thumbnail::paintOverImage(
 			painter.setBrush(QColor(0, 0, 255, 50));
 			painter.drawRect(canvas_rect);
 			return; // No split line will be drawn.
-		case PageLayout::LEFT_PAGE_PLUS_OFFCUT:
-		case PageLayout::RIGHT_PAGE_PLUS_OFFCUT:
+		case PageLayout::SINGLE_PAGE_CUT:
 			painter.setBrush(QColor(0, 0, 255, 50));
-			painter.drawPolygon(m_layout.singlePageOutline(canvas_rect));
+			painter.drawPolygon(m_layout.singlePageOutline());
 			break;
 		case PageLayout::TWO_PAGES:
-			QPolygonF const left_poly(m_layout.leftPageOutline(canvas_rect));
-			QPolygonF const right_poly(m_layout.rightPageOutline(canvas_rect));
+			QPolygonF const left_poly(m_layout.leftPageOutline());
+			QPolygonF const right_poly(m_layout.rightPageOutline());
 			painter.setBrush(m_leftHalfRemoved ? QColor(0, 0, 0, 80) : QColor(0, 0, 255, 50));
 			painter.drawPolygon(left_poly);
 			painter.setBrush(m_rightHalfRemoved ? QColor(0, 0, 0, 80) : QColor(255, 0, 0, 50));
@@ -98,7 +97,17 @@ Thumbnail::paintOverImage(
 	pen.setCosmetic(true);
 	painter.setPen(pen);
 	
-	painter.drawLine(m_layout.inscribedSplitLine(canvas_rect));
+	switch (m_layout.type()) {
+		case PageLayout::SINGLE_PAGE_CUT:
+			painter.drawLine(m_layout.inscribedCutterLine(0));
+			painter.drawLine(m_layout.inscribedCutterLine(1));
+			break;
+		case PageLayout::TWO_PAGES:
+			painter.drawLine(m_layout.inscribedCutterLine(0));
+			break;
+		default:;
+	}
+	
 }
 
 QPointF
