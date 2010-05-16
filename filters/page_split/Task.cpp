@@ -163,7 +163,13 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	);
 	
 	if (m_ptrNextTask) {
-		return m_ptrNextTask->process(status, data);
+		ImageTransformation new_xform(data.xform());
+		new_xform.setCropArea(
+			layout.pageOutline(
+				data.xform().resultingRect(), m_pageInfo.id().subPage()
+			)
+		);
+		return m_ptrNextTask->process(status, FilterData(data, new_xform));
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(

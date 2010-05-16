@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,18 +46,18 @@ class ImageTransformation
 {
 public:
 	// Member-wise copying is OK.
-	
+
 	ImageTransformation(QRectF const& orig_image_rect, Dpi const& orig_dpi);
-	
+
 	~ImageTransformation();
-	
+
 	/**
 	 * \brief Set the 1st step transformation, recalculating the following ones.
 	 *
 	 * \see \ref transformations Transformations.
 	 */
 	void preScaleToDpi(Dpi const& dpi);
-	
+
 	/**
 	 * \brief Set the 1st step transformation, recalculating the following ones.
 	 *
@@ -69,12 +69,12 @@ public:
 	 * \see \ref transformations Transformations.
 	 */
 	void preScaleToEqualizeDpi();
-	
+
 	/**
 	 * \brief Get the original image DPI.
 	 */
 	Dpi const& origDpi() const { return m_origDpi; }
-	
+
 	/**
 	 * \brief Get the target DPI for pre-scaling.
 	 *
@@ -82,19 +82,19 @@ public:
 	 * a symmetric DPI will be applied implicitly.
 	 */
 	Dpi const& preScaledDpi() const { return m_preScaledDpi; }
-	
+
 	/**
 	 * \brief Set the 2nd step transformation, resetting the following ones.
 	 *
 	 * \see \ref transformations Transformations.
 	 */
 	void setPreRotation(OrthogonalRotation rotation);
-	
+
 	/**
 	 * \brief Returns the 2nd step rotation.
 	 */
 	OrthogonalRotation preRotation() const { return m_preRotation; }
-	
+
 	/**
 	 * \brief Set the 3rd step transformation, resetting the following ones.
 	 *
@@ -105,7 +105,16 @@ public:
 	 * \see \ref transformations Transformations.
 	 */
 	void setCropArea(QPolygonF const& area);
-	
+
+	/**
+	 * \brief Get the effective crop area in pre-rotated coordinates.
+	 *
+	 * If crop area was explicitly set with setCropArea(), then
+	 * this function returns it as is.  Otherwise, the whole available
+	 * area is returned.
+	 */
+	QPolygonF const& cropArea() const { return m_cropArea; }
+
 	/**
 	 * \brief Returns the crop area after all transformations.
 	 *
@@ -113,51 +122,51 @@ public:
 	 * the crop area.
 	 */
 	QPolygonF const& resultingCropArea() const { return m_resultingCropArea; }
-	
+
 	/**
 	 * \brief Set the 4th step transformation.
 	 *
 	 * \see \ref transformations Transformations.
 	 */
 	void setPostRotation(double degrees);
-	
+
 	/**
 	 * \brief Returns the 4th step rotation in degrees, as specified.
 	 */
 	double postRotation() const { return m_postRotation; }
-	
+
 	/**
 	 * \brief Returns the sine of the 4th step rotation angle.
 	 */
 	double postRotationSin() const { return m_postRotateXform.m12(); }
-	
+
 	/**
 	 * \brief Returns the cosine of the 3rd step rotation angle.
 	 */
 	double postRotationCos() const { return m_postRotateXform.m11(); }
-	
+
 	/**
 	 * \brief Returns the transformation matrix from the original
 	 *        to resulting image coordinates.
 	 */
 	QTransform const& transform() const { return m_transform; }
-	
+
 	/**
 	 * \brief Returns the transformation matrix from the resulting
 	 *        to original image coordinates.
 	 */
 	QTransform const& transformBack() const { return m_invTransform; }
-	
+
 	/**
 	 * \brief Returns the original image rectangle, as specified.
 	 */
 	QRectF const& origRect() const { return m_origRect; }
-	
+
 	/**
 	 * \brief Returns the image rectangle after pre-scaling and pre-rotation.
 	 */
 	QRectF rectBeforeCropping() const;
-	
+
 	/**
 	 * \brief Returns the resulting image rectangle.
 	 *
@@ -168,15 +177,15 @@ public:
 	QRectF const& resultingRect() const { return m_resultingRect; }
 private:
 	QTransform calcCropXform(QPolygonF const& crop_area);
-	
+
 	QTransform calcPostRotateXform(double degrees);
-	
+
 	void resetCropArea();
-	
+
 	void resetPostRotation();
-	
+
 	void update();
-	
+
 	QTransform m_preScaleXform;
 	QTransform m_preRotateXform;
 	QTransform m_cropXform;
