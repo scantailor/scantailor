@@ -19,6 +19,7 @@
 #include "PageLayout.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "imageproc/PolygonUtils.h"
 #include <QPolygonF>
 #include <QSizeF>
 #include <QPointF>
@@ -30,6 +31,8 @@
 #include <limits>
 #include <math.h>
 #include <assert.h>
+
+using namespace imageproc;
 
 namespace page_split
 {
@@ -166,6 +169,22 @@ PageLayout::setCutterLine(int line_idx, QLineF const& cutter)
 }
 
 int
+PageLayout::numCutters() const
+{
+	switch (m_type) {
+		case SINGLE_PAGE_UNCUT:
+			return 0;
+		case SINGLE_PAGE_CUT:
+			return 2;
+		case TWO_PAGES:
+			return 1;
+	}
+
+	assert(!"Unreachable");
+	return 0;
+}
+
+int
 PageLayout::numSubPages() const
 {
 	return m_type == TWO_PAGES ? 2 : 1;
@@ -251,7 +270,7 @@ PageLayout::singlePageOutline() const
 	QPolygonF poly;
 	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
 
-	return m_uncutOutline.intersected(poly);
+	return PolygonUtils::round(m_uncutOutline).intersected(PolygonUtils::round(poly));
 }
 
 QPolygonF
@@ -276,7 +295,7 @@ PageLayout::leftPageOutline() const
 	QPolygonF poly;
 	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
 
-	return m_uncutOutline.intersected(poly);
+	return PolygonUtils::round(m_uncutOutline).intersected(PolygonUtils::round(poly));
 }
 
 QPolygonF
@@ -301,7 +320,7 @@ PageLayout::rightPageOutline() const
 	QPolygonF poly;
 	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
 
-	return m_uncutOutline.intersected(poly);
+	return PolygonUtils::round(m_uncutOutline).intersected(PolygonUtils::round(poly));
 }
 
 QPolygonF

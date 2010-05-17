@@ -63,8 +63,8 @@ ImageView::ImageView(
 
 	QString const tip(tr("Drag the line or the handles."));
 	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
-	int const num_lines = m_virtLayout.numSubPages();
-	for (int i = 0; i < num_lines; ++i) { // Loop over lines.
+	int const num_cutters = m_virtLayout.numCutters();
+	for (int i = 0; i < num_cutters; ++i) { // Loop over lines.
 		m_lineInteractors[i].setObject(&m_lineSegments[0]);
 
 		for (int j = 0; j < 2; ++j) { // Loop over handles.
@@ -159,13 +159,9 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setPen(pen);
 	painter.setBrush(Qt::NoBrush);
 
-	std::vector<QLineF> cutters;
-	cutters.push_back(widgetCutterLine(0));
-	if (m_virtLayout.type() == PageLayout::SINGLE_PAGE_CUT) {
-		cutters.push_back(widgetCutterLine(1));
-	}
-
-	BOOST_FOREACH(QLineF const& cutter, cutters) {
+	int const num_cutters = m_virtLayout.numCutters();
+	for (int i = 0; i < num_cutters; ++i) {
+		QLineF const cutter(widgetCutterLine(i));
 		painter.drawLine(cutter);
 		
 		QRectF rect(m_handlePixmap.rect());

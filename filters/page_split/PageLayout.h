@@ -115,6 +115,11 @@ public:
 	QLineF inscribedCutterLine(int idx) const;
 
 	/**
+	 * \brief Return the number of cutters (0, 1 or 2) for the current layout type.
+	 */
+	int numCutters() const;
+
+	/**
 	 * \brief Get the number of pages (1 or 2) for this layout.
 	 */
 	int numSubPages() const;
