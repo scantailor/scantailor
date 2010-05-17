@@ -183,9 +183,17 @@ ImageView::widgetLayout() const
 QLineF
 ImageView::widgetCutterLine(int const line_idx) const
 {
+	QRectF const widget_rect(virtualToWidget().mapRect(virtualDisplayRect()));
+	QRectF reduced_widget_rect(reducedWidgetArea());
+	reduced_widget_rect.setLeft(widget_rect.left());
+	reduced_widget_rect.setRight(widget_rect.right());
+	// The reason we restore original left and right boundaries is that
+	// we want to allow cutter handles to go off-screen horizontally
+	// but not vertically.
+
 	QLineF line(
 		customInscribedCutterLine(
-			widgetLayout().cutterLine(line_idx), reducedWidgetArea()
+			widgetLayout().cutterLine(line_idx), reduced_widget_rect
 		)
 	);
 
@@ -201,14 +209,22 @@ ImageView::widgetCutterLine(int const line_idx) const
 QLineF
 ImageView::virtualCutterLine(int line_idx) const
 {
-	QRectF virt_rect(virtualDisplayRect());
+	QRectF const virt_rect(virtualDisplayRect());
 
 	QRectF widget_rect(virtualToWidget().mapRect(virt_rect));
 	double const delta = 0.5 * m_handlePixmap.width();
 	widget_rect.adjust(0.0, delta, 0.0, -delta);
 
-	virt_rect = widgetToVirtual().mapRect(widget_rect);
-	return customInscribedCutterLine(m_virtLayout.cutterLine(line_idx), virt_rect);
+	QRectF reduced_virt_rect(widgetToVirtual().mapRect(widget_rect));
+	reduced_virt_rect.setLeft(virt_rect.left());
+	reduced_virt_rect.setRight(virt_rect.right());
+	// The reason we restore original left and right boundaries is that
+	// we want to allow cutter handles to go off-screen horizontally
+	// but not vertically.
+	
+	return customInscribedCutterLine(
+		m_virtLayout.cutterLine(line_idx), reduced_virt_rect
+	);
 }
 
 QRectF
