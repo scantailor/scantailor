@@ -158,6 +158,7 @@ ImageViewBase::ImageViewBase(
 	m_zoom(1.0),
 	m_transformChangeWatchersActive(0),
 	m_ignoreScrollEvents(0),
+	m_ignoreResizeEvents(0),
 	m_hqTransformEnabled(true)
 {
 #ifdef ENABLE_OPENGL
@@ -268,9 +269,24 @@ ImageViewBase::createDownscaledImage(QImage const& image)
 }
 
 QRectF
-ImageViewBase::viewportRect() const
+ImageViewBase::maxViewportRect() const
 {
 	QRectF const viewport_rect(QPointF(0, 0), maximumViewportSize());
+	QRectF r(viewport_rect);
+	r.adjust(
+		m_margins.left(), m_margins.top(),
+		-m_margins.right(), -m_margins.bottom()
+	);
+	if (r.isEmpty()) {
+		return QRectF(viewport_rect.center(), viewport_rect.center());
+	}
+	return r;
+}
+
+QRectF
+ImageViewBase::dynamicViewportRect() const
+{
+	QRectF const viewport_rect(viewport()->rect());
 	QRectF r(viewport_rect);
 	r.adjust(
 		m_margins.left(), m_margins.top(),
@@ -286,7 +302,7 @@ QRectF
 ImageViewBase::getOccupiedWidgetRect() const
 {
 	QRectF const widget_rect(m_virtualToWidget.mapRect(virtualDisplayRect()));
-	return widget_rect.intersected(viewportRect());
+	return widget_rect.intersected(dynamicViewportRect());
 }
 
 void
@@ -579,6 +595,12 @@ ImageViewBase::contextMenuEvent(QContextMenuEvent* event)
 void
 ImageViewBase::resizeEvent(QResizeEvent* event)
 {
+	QAbstractScrollArea::resizeEvent(event);
+
+	if (m_ignoreResizeEvents) {
+		return;
+	}
+
 	ScopedIncDec<int> const guard(m_ignoreScrollEvents);
 
 	if (maximumViewportSize() != m_lastMaximumViewportSize) {
@@ -586,6 +608,7 @@ ImageViewBase::resizeEvent(QResizeEvent* event)
 		m_widgetFocalPoint = centeredWidgetFocalPoint();
 		updateWidgetTransform();
 	} else {
+		TransformChangeWatcher const watcher(*this);
 		TempFocalPointAdjuster const temp_fp(*this, QPointF(0, 0));
 		updateTransformPreservingScale(
 			ImagePresentation(m_imageToVirtual, m_virtualImageCropArea, m_virtualDisplayArea)
@@ -609,74 +632,91 @@ ImageViewBase::updateScrollBars()
 		return;
 	}
 
-	TransformChangeWatcher const watcher(*this);
-	ScopedIncDec<int> const guard(m_ignoreScrollEvents);
+	ScopedIncDec<int> const guard1(m_ignoreScrollEvents);
+	ScopedIncDec<int> const guard2(m_ignoreResizeEvents);
 
-	QRectF const viewport(viewportRect());
 	QRectF const picture(m_virtualToWidget.mapRect(virtualDisplayRect()));
-
-	QPointF const viewport_center(viewport.center());
+	QPointF const viewport_center(maxViewportRect().center());
 	QPointF const picture_center(picture.center());
+	QRectF viewport(maxViewportRect());
 
-	double const xval = picture_center.x();
-	double xmin, xmax; // Minimum and maximum positions for picture center.
-	if (picture_center.x() < viewport_center.x()) {
-		xmin = std::min<double>(xval, viewport.right() - 0.5 * picture.width());
-		xmax = std::max<double>(viewport_center.x(), viewport.left() + 0.5 * picture.width());
-	} else {
-		xmax = std::max<double>(xval, viewport.left() + 0.5 * picture.width());
-		xmin = std::min<double>(viewport_center.x(), viewport.right() - 0.5 * picture.width());
+	// Introduction of one scrollbar will decrease the available size in
+	// another direction, which may cause a scrollbar in that direction
+	// to become necessary.  For this reason, we have a loop here.
+	for (int i = 0; i < 2; ++i) {
+		double const xval = picture_center.x();
+		double xmin, xmax; // Minimum and maximum positions for picture center.
+		if (picture_center.x() < viewport_center.x()) {
+			xmin = std::min<double>(xval, viewport.right() - 0.5 * picture.width());
+			xmax = std::max<double>(viewport_center.x(), viewport.left() + 0.5 * picture.width());
+		} else {
+			xmax = std::max<double>(xval, viewport.left() + 0.5 * picture.width());
+			xmin = std::min<double>(viewport_center.x(), viewport.right() - 0.5 * picture.width());
+		}
+
+		double const yval = picture_center.y();
+		double ymin, ymax; // Minimum and maximum positions for picture center.
+		if (picture_center.y() < viewport_center.y()) {
+			ymin = std::min<double>(yval, viewport.bottom() - 0.5 * picture.height());
+			ymax = std::max<double>(viewport_center.y(), viewport.top() + 0.5 * picture.height());
+		} else {
+			ymax = std::max<double>(yval, viewport.top() + 0.5 * picture.height());
+			ymin = std::min<double>(viewport_center.y(), viewport.bottom() - 0.5 * picture.height());
+		}
+
+		int const xrange = (int)ceil(xmax - xmin);
+		int const yrange = (int)ceil(ymax - ymin);
+		int const xfirst = 0;
+		int const xlast = xrange - 1;
+		int const yfirst = 0;
+		int const ylast = yrange - 1;
+
+		// We are going to map scrollbar coordinates to widget coordinates
+		// of the central point of the display area using a linear function.
+		// f(x) = ax + b
+
+		// xmin = xa * xlast + xb
+		// xmax = xa * xfirst + xb
+		double const xa = (xfirst == xlast) ? 1 : (xmax - xmin) / (xfirst - xlast);
+		double const xb = xmax - xa * xfirst;
+		double const ya = (yfirst == ylast) ? 1 : (ymax - ymin) / (yfirst - ylast);
+		double const yb = ymax - ya * yfirst;
+
+		// Inverse transformation.
+		// xlast = ixa * xmin + ixb
+		// xfirst = ixa * xmax + ixb
+		double const ixa = (xmax == xmin) ? 1 : (xfirst - xlast) / (xmax - xmin);
+		double const ixb = xfirst - ixa * xmax;
+		double const iya = (ymax == ymin) ? 1 : (yfirst - ylast) / (ymax - ymin);
+		double const iyb = yfirst - iya * ymax;
+
+		m_scrollTransform.setMatrix(xa, 0, 0, 0, ya, 0, xb, yb, 1);
+
+		int const xcur = qRound(ixa * xval + ixb);
+		int const ycur = qRound(iya * yval + iyb);
+
+		horizontalScrollBar()->setRange(xfirst, xlast);
+		verticalScrollBar()->setRange(yfirst, ylast);
+
+		horizontalScrollBar()->setValue(xcur);
+		verticalScrollBar()->setValue(ycur);
+
+		horizontalScrollBar()->setPageStep(qRound(viewport.width()));
+		verticalScrollBar()->setPageStep(qRound(viewport.height()));
+
+		// XXX: a hack to force immediate update of viewport()->rect(),
+		// which is used by dynamicViewportRect() below.
+		// Note that it involves a resize event being sent not only to
+		// the viewport, but for some reason also to the containing
+		// QAbstractScrollArea, that is to this object.
+		setHorizontalScrollBarPolicy(horizontalScrollBarPolicy());
+
+		QRectF const old_viewport(viewport);
+		viewport = dynamicViewportRect();
+		if (viewport == old_viewport) {
+			break;
+		}
 	}
-
-	double const yval = picture_center.y();
-	double ymin, ymax; // Minimum and maximum positions for picture center.
-	if (picture_center.y() < viewport_center.y()) {
-		ymin = std::min<double>(yval, viewport.bottom() - 0.5 * picture.height());
-		ymax = std::max<double>(viewport_center.y(), viewport.top() + 0.5 * picture.height());
-	} else {
-		ymax = std::max<double>(yval, viewport.top() + 0.5 * picture.height());
-		ymin = std::min<double>(viewport_center.y(), viewport.bottom() - 0.5 * picture.height());
-	}
-
-	int const xrange = (int)ceil(xmax - xmin);
-	int const yrange = (int)ceil(ymax - ymin);
-	int const xfirst = 0;
-	int const xlast = xrange - 1;
-	int const yfirst = 0;
-	int const ylast = yrange - 1;
-
-	// We are going to map scrollbar coordinates to widget coordinates
-	// of the central point of the display area using a linear function.
-	// f(x) = ax + b
-
-	// xmin = xa * xlast + xb
-	// xmax = xa * xfirst + xb
-	double const xa = (xfirst == xlast) ? 1 : (xmax - xmin) / (xfirst - xlast);
-	double const xb = xmax - xa * xfirst;
-	double const ya = (yfirst == ylast) ? 1 : (ymax - ymin) / (yfirst - ylast);
-	double const yb = ymax - ya * yfirst;
-
-	// Inverse transformation.
-	// xlast = ixa * xmin + ixb
-	// xfirst = ixa * xmax + ixb
-	double const ixa = (xmax == xmin) ? 1 : (xfirst - xlast) / (xmax - xmin);
-	double const ixb = xfirst - ixa * xmax;
-	double const iya = (ymax == ymin) ? 1 : (yfirst - ylast) / (ymax - ymin);
-	double const iyb = yfirst - iya * ymax;
-
-	m_scrollTransform.setMatrix(xa, 0, 0, 0, ya, 0, xb, yb, 1);
-
-	int const xcur = qRound(ixa * xval + ixb);
-	int const ycur = qRound(iya * yval + iyb);
-
-	horizontalScrollBar()->setRange(xfirst, xlast);
-	verticalScrollBar()->setRange(yfirst, ylast);
-
-	horizontalScrollBar()->setValue(xcur);
-	verticalScrollBar()->setValue(ycur);
-
-	horizontalScrollBar()->setPageStep(qRound(viewport.width()));
-	verticalScrollBar()->setPageStep(qRound(viewport.height()));
 }
 
 void
@@ -718,7 +758,7 @@ ImageViewBase::updateWidgetTransform()
 	QPointF const widget_origin(m_widgetFocalPoint);
 	
 	QSizeF zoom1_widget_size(virt_rect.size());
-	zoom1_widget_size.scale(viewportRect().size(), Qt::KeepAspectRatio);
+	zoom1_widget_size.scale(maxViewportRect().size(), Qt::KeepAspectRatio);
 	
 	double const zoom1_x = zoom1_widget_size.width() / virt_rect.width();
 	double const zoom1_y = zoom1_widget_size.height() / virt_rect.height();
@@ -777,7 +817,7 @@ QPointF
 ImageViewBase::getIdealWidgetFocalPoint(FocalPointMode const mode) const
 {
 	// Widget rect reduced by margins.
-	QRectF const display_area(viewportRect());
+	QRectF const display_area(maxViewportRect());
 	
 	// The virtual image rectangle in widget coordinates.
 	QRectF const image_area(m_virtualToWidget.mapRect(virtualDisplayRect()));
@@ -904,7 +944,7 @@ ImageViewBase::adjustAndSetNewWidgetFP(
 QPointF
 ImageViewBase::centeredWidgetFocalPoint() const
 {
-	return viewportRect().center();
+	return maxViewportRect().center();
 }
 
 void

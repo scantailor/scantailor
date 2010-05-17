@@ -231,7 +231,7 @@ protected:
 	 * Returns the maximum viewport size (as if scrollbars are hidden)
 	 * reduced by margins.
 	 */
-	QRectF viewportRect() const;
+	QRectF maxViewportRect() const;
 private slots:
 	void initiateBuildingHqVersion();
 
@@ -242,6 +242,8 @@ private:
 	class HqTransformTask;
 	class TempFocalPointAdjuster;
 	class TransformChangeWatcher;
+
+	QRectF dynamicViewportRect() const;
 
 	void transformChanged();
 
@@ -406,6 +408,8 @@ private:
 	int m_transformChangeWatchersActive;
 
 	int m_ignoreScrollEvents;
+
+	int m_ignoreResizeEvents;
 	
 	bool m_hqTransformEnabled;
 };

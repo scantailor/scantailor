@@ -110,8 +110,8 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setWorldMatrixEnabled(false);
 	painter.setRenderHints(QPainter::Antialiasing, false);
 
-	double const w = viewportRect().width();
-	double const h = viewportRect().height();
+	double const w = maxViewportRect().width();
+	double const h = maxViewportRect().height();
 	QPointF const center(getImageRotationOrigin());
 
 	// Draw the semi-transparent grid.
@@ -247,7 +247,7 @@ ImageView::dragFinished()
 QPointF
 ImageView::getImageRotationOrigin() const
 {
-	QRectF const viewport_rect(viewportRect());
+	QRectF const viewport_rect(maxViewportRect());
 	return QPointF(
 		floor(0.5 * viewport_rect.width()) + 0.5,
 		floor(0.5 * viewport_rect.height()) + 0.5
@@ -265,7 +265,7 @@ ImageView::getRotationArcSquare() const
 	double const v_margin = 0.5 * m_handlePixmap.height()
 		+ horizontalScrollBar()->style()->pixelMetric(QStyle::PM_ScrollBarExtent, 0, horizontalScrollBar());
 
-	QRectF reduced_screen_rect(viewportRect());
+	QRectF reduced_screen_rect(maxViewportRect());
 	reduced_screen_rect.adjust(h_margin, v_margin, -h_margin, -v_margin);
 
 	QSizeF arc_size(1.0, m_maxRotationSin);

@@ -441,7 +441,7 @@ ImageView::middleRectDragContinuation(int const edge_mask, QPointF const& mouse_
 	qreal top_adjust = 0;
 	qreal bottom_adjust = 0;
 
-	QRectF const bounds(viewportRect());
+	QRectF const bounds(maxViewportRect());
 	QRectF const old_middle_rect(m_beforeResizing.middleWidgetRect);
 
 	if (edge_mask & LEFT) {
@@ -505,7 +505,7 @@ ImageView::dragFinished()
 		commitHardMargins(calcHardMarginsMM())
 	);
 
-	QRectF const extended_viewport(viewportRect().adjusted(-0.5, -0.5, 0.5, 0.5));
+	QRectF const extended_viewport(maxViewportRect().adjusted(-0.5, -0.5, 0.5, 0.5));
 	if (extended_viewport.contains(m_beforeResizing.middleWidgetRect)) {
 		updatePresentationTransform(FIT);
 	} else {
