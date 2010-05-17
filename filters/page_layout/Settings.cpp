@@ -134,7 +134,8 @@ public:
 	
 	Alignment getPageAlignment(PageId const& page_id) const;
 	
-	void setPageAlignment(PageId const& page_id, Alignment const& alignment);
+	AggregateSizeChanged setPageAlignment(
+		PageId const& page_id, Alignment const& alignment);
 	
 	AggregateSizeChanged setContentSizeMM(
 		PageId const& page_id, QSizeF const& content_size_mm);
@@ -273,10 +274,10 @@ Settings::getPageAlignment(PageId const& page_id) const
 	return m_ptrImpl->getPageAlignment(page_id);
 }
 
-void
+Settings::AggregateSizeChanged
 Settings::setPageAlignment(PageId const& page_id, Alignment const& alignment)
 {
-	m_ptrImpl->setPageAlignment(page_id, alignment);
+	return m_ptrImpl->setPageAlignment(page_id, alignment);
 }
 
 Settings::AggregateSizeChanged
@@ -522,12 +523,14 @@ Settings::Impl::getPageAlignment(PageId const& page_id) const
 	}
 }
 
-void
+Settings::AggregateSizeChanged
 Settings::Impl::setPageAlignment(
 	PageId const& page_id, Alignment const& alignment)
 {
 	QMutexLocker const locker(&m_mutex);
 	
+	QSizeF const agg_size_before(getAggregateHardSizeMMLocked());
+
 	Container::iterator const it(m_items.lower_bound(page_id));
 	if (it == m_items.end() || page_id < it->pageId) {
 		Item const item(
@@ -536,6 +539,13 @@ Settings::Impl::setPageAlignment(
 		m_items.insert(it, item);
 	} else {
 		m_items.modify(it, ModifyAlignment(alignment));
+	}
+
+	QSizeF const agg_size_after(getAggregateHardSizeMMLocked());
+	if (agg_size_before == agg_size_after) {
+		return AGGREGATE_SIZE_UNCHANGED;
+	} else {
+		return AGGREGATE_SIZE_CHANGED;
 	}
 }
 

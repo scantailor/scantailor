@@ -246,9 +246,17 @@ void
 ImageView::alignmentChanged(Alignment const& alignment)
 {
 	m_alignment = alignment;
-	m_ptrSettings->setPageAlignment(m_pageId, alignment);
+
+	Settings::AggregateSizeChanged const size_changed =
+		m_ptrSettings->setPageAlignment(m_pageId, alignment);
+	
 	recalcBoxesAndFit(calcHardMarginsMM());
-	emit invalidateThumbnail(m_pageId);
+	
+	if (size_changed == Settings::AGGREGATE_SIZE_CHANGED) {
+		emit invalidateAllThumbnails();
+	} else {
+		emit invalidateThumbnail(m_pageId);
+	}
 }
 
 void

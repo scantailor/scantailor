@@ -119,9 +119,10 @@ public:
 	/**
 	 * \brief Sets alignment for the specified page.
 	 *
-	 * Alignments affect the distribution of soft margins.
+	 * Alignments affect the distribution of soft margins and whether this
+	 * page's size affects others and vice versa.
 	 */
-	void setPageAlignment(PageId const& page_id, Alignment const& alignment);
+	AggregateSizeChanged setPageAlignment(PageId const& page_id, Alignment const& alignment);
 	
 	/**
 	 * \brief Sets content size in millimeters for the specified page.
