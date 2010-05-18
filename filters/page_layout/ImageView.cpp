@@ -271,6 +271,19 @@ ImageView::aggregateHardSizeChanged()
 void
 ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 {	
+	QColor bg_color;
+	QColor fg_color;
+	if (m_alignment.isNull()) {
+		// "Align with other pages" is turned off.
+		// Different color is useful on a thumbnail list to
+		// distinguish "safe" pages from potentially problematic ones.
+		bg_color = QColor(0x58, 0x7f, 0xf4, 70);
+		fg_color = QColor(0x00, 0x52, 0xff);
+	} else {
+		bg_color = QColor(0xbb, 0x00, 0xff, 40);
+		fg_color = QColor(0xbe, 0x5b, 0xec);
+	}
+
 	QPainterPath outer_outline;
 	outer_outline.addPolygon(
 		PolygonUtils::round(
@@ -284,10 +297,10 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
 	painter.setPen(Qt::NoPen);
-	painter.setBrush(QColor(0xbb, 0x00, 0xff, 40));
+	painter.setBrush(bg_color);
 	painter.drawPath(outer_outline.subtracted(content_outline));
 	
-	QPen pen(QColor(0xbe, 0x5b, 0xec));
+	QPen pen(fg_color);
 	pen.setCosmetic(true);
 	pen.setWidthF(2.0);
 	painter.setPen(pen);

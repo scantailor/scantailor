@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,10 +100,23 @@ Thumbnail::paintOverImage(
 	// but belong to outer_rect.
 	painter.fillPath(outer_outline.subtracted(page_outline), QApplication::palette().window());
 	
+	QColor bg_color;
+	QColor fg_color;
+	if (m_params.alignment().isNull()) {
+		// "Align with other pages" is turned off.
+		// Different color is useful on a thumbnail list to
+		// distinguish "safe" pages from potentially problematic ones.
+		bg_color = QColor(0x58, 0x7f, 0xf4, 70);
+		fg_color = QColor(0x00, 0x52, 0xff);
+	} else {
+		bg_color = QColor(0xbb, 0x00, 0xff, 40);
+		fg_color = QColor(0xbe, 0x5b, 0xec);
+	}
+
 	// Draw margins.
-	painter.fillPath(outer_outline.subtracted(content_outline), QColor(0xbb, 0x00, 0xff, 40));
+	painter.fillPath(outer_outline.subtracted(content_outline), bg_color);
 	
-	QPen pen(QColor(0xbe, 0x5b, 0xec));
+	QPen pen(fg_color);
 	pen.setCosmetic(true);
 	pen.setWidthF(1.0);
 	painter.setPen(pen);
