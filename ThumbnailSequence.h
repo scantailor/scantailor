@@ -128,6 +128,29 @@ public:
 	 * \brief Makes the item a selection leader, and unselects the other items.
 	 */
 	void setSelection(PageId const& page_id);
+
+	/**
+	 * \brief Returns the current selection leader.
+	 *
+	 * A null PageInfo is returned if no items are currently selected.
+	 */
+	PageInfo selectionLeader() const;
+
+	/**
+	 * \brief Returns the page immediately following the given one.
+	 *
+	 * A null PageInfo is returned if the given page wasn't found or
+	 * there are no pages preceeding it.
+	 */
+	PageInfo prevPage(PageId const& reference_page) const;
+
+	/**
+	 * \brief Returns the page immediately following the given one.
+	 *
+	 * A null PageInfo is returned if the given page wasn't found or
+	 * there are no pages following it.
+	 */
+	PageInfo nextPage(PageId const& reference_page) const;
 	
 	/**
 	 * \brief Inserts a page before the first page with matching ImageId.

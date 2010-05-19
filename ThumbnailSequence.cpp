@@ -142,6 +142,12 @@ public:
 	void invalidateAllThumbnails();
 	
 	void setSelection(PageId const& page_id);
+
+	PageInfo selectionLeader() const;
+
+	PageInfo prevPage(PageId const& page_id) const;
+
+	PageInfo nextPage(PageId const& page_id) const;
 	
 	void insert(PageInfo const& new_page,
 		BeforeOrAfter before_or_after, ImageId const& image);
@@ -372,6 +378,24 @@ void
 ThumbnailSequence::setSelection(PageId const& page_id)
 {
 	m_ptrImpl->setSelection(page_id);
+}
+
+PageInfo
+ThumbnailSequence::selectionLeader() const
+{
+	return m_ptrImpl->selectionLeader();
+}
+
+PageInfo
+ThumbnailSequence::prevPage(PageId const& reference_page) const
+{
+	return m_ptrImpl->prevPage(reference_page);
+}
+
+PageInfo
+ThumbnailSequence::nextPage(PageId const& reference_page) const
+{
+	return m_ptrImpl->nextPage(reference_page);
 }
 
 void
@@ -739,6 +763,60 @@ ThumbnailSequence::Impl::setSelection(PageId const& page_id)
 	}
 	
 	m_rOwner.emitNewSelectionLeader(id_it->pageInfo, id_it->composite, flags);
+}
+
+PageInfo
+ThumbnailSequence::Impl::selectionLeader() const
+{
+	if (m_pSelectionLeader) {
+		return m_pSelectionLeader->pageInfo;
+	} else {
+		return PageInfo();
+	}
+}
+
+PageInfo
+ThumbnailSequence::Impl::prevPage(PageId const& reference_page) const
+{
+	ItemsInOrder::iterator ord_it;
+
+	if (m_pSelectionLeader && m_pSelectionLeader->pageInfo.id() == reference_page) {
+		// Common case optimization.
+		ord_it = m_itemsInOrder.iterator_to(*m_pSelectionLeader);
+	} else {
+		ord_it = m_items.project<ItemsInOrderTag>(m_itemsById.find(reference_page));
+	}
+
+	if (ord_it != m_itemsInOrder.end()) {
+		if (ord_it != m_itemsInOrder.begin()) {
+			--ord_it;
+			return ord_it->pageInfo;
+		}
+	}
+
+	return PageInfo();
+}
+
+PageInfo
+ThumbnailSequence::Impl::nextPage(PageId const& reference_page) const
+{
+	ItemsInOrder::iterator ord_it;
+
+	if (m_pSelectionLeader && m_pSelectionLeader->pageInfo.id() == reference_page) {
+		// Common case optimization.
+		ord_it = m_itemsInOrder.iterator_to(*m_pSelectionLeader);
+	} else {
+		ord_it = m_items.project<ItemsInOrderTag>(m_itemsById.find(reference_page));
+	}
+
+	if (ord_it != m_itemsInOrder.end()) {
+		++ord_it;
+		if (ord_it != m_itemsInOrder.end()) {
+			return ord_it->pageInfo;
+		}
+	}
+
+	return PageInfo();
 }
 
 void
@@ -1154,6 +1232,9 @@ ThumbnailSequence::Impl::itemInsertPosition(
 	ItemsInOrder::iterator const begin, ItemsInOrder::iterator const end,
 	PageId const& page_id, ItemsInOrder::iterator const hint, int* dist_from_hint)
 {
+	// Note that to preserve stable ordering, this function *must* return hint,
+	// as long as it's an acceptable position.
+
 	if (!m_ptrOrderProvider.get()) {
 		if (dist_from_hint) {
 			*dist_from_hint = 0;
@@ -1164,31 +1245,27 @@ ThumbnailSequence::Impl::itemInsertPosition(
 	ItemsInOrder::iterator ins_pos(hint);
 	int dist = 0;
 
-	// Move back ins_pos until it points to an element preceding
-	// or equivalent to page_id, or to the first element in range.
-	if (ins_pos != begin) {
-		if (ins_pos == end) {
-			--ins_pos;
+	// While the element immediately preceeding ins_pos is supposed to
+	// follow the page we are inserting, move ins_pos one element back.
+	while (ins_pos != begin) {
+		ItemsInOrder::iterator prev(ins_pos);
+		--prev;
+		if (m_ptrOrderProvider->precedes(page_id, prev->pageId())) {
+			ins_pos = prev;
 			--dist;
-		}
-		while (ins_pos != begin) {
-			if (m_ptrOrderProvider->precedes(page_id, ins_pos->pageId())) {
-				--ins_pos;
-				--dist;
-			} else {
-				break;
-			}
+		} else {
+			break;
 		}
 	}
 
-	// Advance ins_pos until it points to an element following page_id
-	// or to the end of range.
+	// While the element pointed to by ins_pos is supposed to precede
+	// the page we are inserting, advance ins_pos.
 	while (ins_pos != end) {
-		if (m_ptrOrderProvider->precedes(page_id, ins_pos->pageId())) {
-			break;
-		} else {
+		if (m_ptrOrderProvider->precedes(ins_pos->pageId(), page_id)) {
 			++ins_pos;
 			++dist;
+		} else {
+			break;
 		}
 	}
 
