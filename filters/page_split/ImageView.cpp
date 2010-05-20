@@ -61,6 +61,27 @@ ImageView::ImageView(
 	m_leftUnremoveButton.setClickCallback(boost::bind(&ImageView::unremoveLeftPage, this));
 	m_rightUnremoveButton.setClickCallback(boost::bind(&ImageView::unremoveRightPage, this));
 
+	if (m_leftPageRemoved) {
+		makeLastFollower(m_leftUnremoveButton);
+	}
+	if (m_rightPageRemoved) {
+		makeLastFollower(m_rightUnremoveButton);
+	}
+
+	setupCuttersInteraction();
+
+	rootInteractionHandler().makeLastFollower(*this);
+	rootInteractionHandler().makeLastFollower(m_dragHandler);
+	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+}
+
+ImageView::~ImageView()
+{
+}
+
+void
+ImageView::setupCuttersInteraction()
+{
 	QString const tip(tr("Drag the line or the handles."));
 	double const hit_radius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
 	int const num_cutters = m_virtLayout.numCutters();
@@ -101,26 +122,20 @@ ImageView::ImageView(
 		makeLastFollower(m_lineInteractors[i]);
 	}
 
-	if (m_leftPageRemoved) {
-		makeLastFollower(m_leftUnremoveButton);
+	// Turn off cutters we don't need anymore.
+	for (int i = num_cutters; i < 2; ++i) {
+		for (int j = 0; j < 2; ++j) {
+			m_handleInteractors[i][j].unlink();
+		}
+		m_lineInteractors[i].unlink();
 	}
-	if (m_rightPageRemoved) {
-		makeLastFollower(m_rightUnremoveButton);
-	}
-
-	rootInteractionHandler().makeLastFollower(*this);
-	rootInteractionHandler().makeLastFollower(m_dragHandler);
-	rootInteractionHandler().makeLastFollower(m_zoomHandler);
-}
-
-ImageView::~ImageView()
-{
 }
 
 void
 ImageView::pageLayoutSetExternally(PageLayout const& layout)
 {
 	m_virtLayout = layout;
+	setupCuttersInteraction();
 	update();
 }
 

@@ -36,16 +36,15 @@ namespace page_split
  * The page layout comprises the following:
  * \li A rectangular outline, possibly affine-transformed.
  * \li Layout type indicator.
- * \li One or two cutters.
+ * \li Zero, 1 or 2 cutters.
  *
  * Cutters are lines with *arbitrary endpoints* that have different meaning
- * depending on layout type.  In case of SINGLE_PAGE_UNCUT layout, they don't
- * have any meaning at all.  In case of TWO_PAGES layout, the two cutters
- * are treated as one spliting line and are expected to be equal.  In case of
- * SINGLE_PAGE_CUT layout, the two cutters cut the outline from two sides.
- * The cutters don't have a special meaning, like being a left or right cutter.
- * From this class' point of view, it doesn't matter, as we are only
- * interested in the area between them.
+ * depending on layout type.  The SINGLE_PAGE_UNCUT layout doesn't have any
+ * cutters.  The TWO_PAGES layout has one cutter that splits the outline into
+ * two pages.  The SINGLE_PAGE_CUT layout has two cutters that cut the outline
+ * from two sides.  They don't have a special identity like being a left or
+ * a right cutter.  Swapping them won't change the area they bound, and that
+ * area is the only thing we care about.
  */
 class PageLayout
 {
@@ -101,16 +100,29 @@ public:
 	 */
 	void setUncutOutline(QRectF const& outline);
 
-	QLineF const& cutterLine(int line_idx) const {
-		return line_idx == 0 ? m_cutter1 : m_cutter2;
-	}
+	/**
+	 * \brief Get a cutter line.
+	 *
+	 * \param idx Cutter index, from 0 inclusive to numCutters() exclusive.
+	 * \return The cutter line with *arbitrary* endpoints.
+	 */
+	QLineF const& cutterLine(int idx) const;
 
-	void setCutterLine(int line_idx, QLineF const& cutter);
+	/**
+	 * \brief Set a cutter line.
+	 *
+	 * \param idx Cutter index, from 0 inclusive to numCutters() exclusive.
+	 * \param cutter The new cutter line with *arbitrary* endpoints.
+	 */
+	void setCutterLine(int idx, QLineF const& cutter);
 
 	/**
 	 * Unlike cutterLine(), which returns a line segment with arbitrary
-	 * arbitrary endpoints, inscribedCutterLine() returns a line segment
-	 * with endpoints touching the edges of the outline polygon.
+	 * endpoints, inscribedCutterLine() returns a line segment with endpoints
+	 * touching the edges of the outline polygon.
+	 *
+	 * \param idx Cutter index, from 0 inclusive to numCutters() exclusive.
+	 * \return The cutter line segment with endpoints touching the outline polygon.
 	 */
 	QLineF inscribedCutterLine(int idx) const;
 

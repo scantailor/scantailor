@@ -61,7 +61,6 @@ PageLayout::PageLayout(QRectF const& full_rect, QLineF const& cutter1, QLineF co
 PageLayout::PageLayout(QRectF const full_rect, QLineF const& split_line)
 :	m_uncutOutline(full_rect),
 	m_cutter1(split_line),
-	m_cutter2(split_line),
 	m_type(TWO_PAGES)
 {
 }
@@ -113,7 +112,7 @@ PageLayout::PageLayout(QDomElement const& layout_el)
 		if (type == "two-pages" || (left_page && right_page)) {
 			m_type = TWO_PAGES;
 			m_cutter1 = split_line;
-			m_cutter2 = split_line;
+			m_cutter2 = QLineF();
 		} else if (type == "left-page" || left_page) {
 			m_type = SINGLE_PAGE_CUT;
 			m_cutter1 = QLineF(0, 0, 0, 1); // A bit of a hack, but should work.
@@ -158,14 +157,18 @@ PageLayout::setUncutOutline(QRectF const& outline)
 	}
 }
 
-void
-PageLayout::setCutterLine(int line_idx, QLineF const& cutter)
+QLineF const&
+PageLayout::cutterLine(int idx) const
 {
-	if (line_idx == 0) {
-		m_cutter1 = cutter;
-	} else {
-		m_cutter2 = cutter;
-	}
+	assert(idx >= 0 && idx < numCutters());
+	return idx == 0 ? m_cutter1 : m_cutter2;
+}
+
+void
+PageLayout::setCutterLine(int idx, QLineF const& cutter)
+{
+	assert(idx >= 0 && idx < numCutters());
+	(idx == 0 ? m_cutter1 : m_cutter2) = cutter;
 }
 
 int
@@ -193,7 +196,7 @@ PageLayout::numSubPages() const
 QLineF
 PageLayout::inscribedCutterLine(int idx) const
 {
-	assert(idx == 0 || idx == 1);
+	assert(idx >= 0 && idx < numCutters());
 
 	if (m_uncutOutline.size() < 4) {
 		return QLineF();
@@ -314,7 +317,7 @@ PageLayout::rightPageOutline() const
 	}
 
 	QLineF const line1(m_uncutOutline[1], m_uncutOutline[2]);
-	QLineF line2(extendToCover(m_cutter2, m_uncutOutline));
+	QLineF line2(extendToCover(m_cutter1, m_uncutOutline));
 	ensureSameDirection(line1, line2);
 	
 	QPolygonF poly;
@@ -356,8 +359,14 @@ PageLayout::toXml(QDomDocument& doc, QString const& name) const
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("type", typeToString(m_type));
 	el.appendChild(marshaller.polygonF(m_uncutOutline, "outline"));
-	el.appendChild(marshaller.lineF(m_cutter1, "cutter1"));
-	el.appendChild(marshaller.lineF(m_cutter2, "cutter2"));
+	
+	int const num_cutters = numCutters();
+	if (num_cutters > 0) {
+		el.appendChild(marshaller.lineF(m_cutter1, "cutter1"));
+		if (num_cutters > 1) { 
+			el.appendChild(marshaller.lineF(m_cutter2, "cutter2"));
+		}
+	}
 	
 	return el;
 }

@@ -62,6 +62,8 @@ public slots:
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
+	void setupCuttersInteraction();
+
 	QPointF handlePosition(int line_idx, int handle_idx) const;
 
 	void handleMoveRequest(int line_idx, int handle_idx, QPointF const& pos);
