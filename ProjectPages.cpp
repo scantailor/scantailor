@@ -527,12 +527,12 @@ ProjectPages::insertImageImpl(
 		logical_pages.push_back(page_info_templ);
 	} else {
 		if (image_desc.numLogicalPages == 2 ||
-				image_desc.numLogicalPages == 1 && image_desc.rightHalfRemoved) {
+				(image_desc.numLogicalPages == 1 && image_desc.rightHalfRemoved)) {
 			page_info_templ.setId(PageId(new_image.id(), m_subPagesInOrder[0]));
 			logical_pages.push_back(page_info_templ);
 		}
 		if (image_desc.numLogicalPages == 2 ||
-				image_desc.numLogicalPages == 1 && image_desc.leftHalfRemoved) {
+				(image_desc.numLogicalPages == 1 && image_desc.leftHalfRemoved)) {
 			page_info_templ.setId(PageId(new_image.id(), m_subPagesInOrder[1]));
 			logical_pages.push_back(page_info_templ);
 		}
