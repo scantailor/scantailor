@@ -110,12 +110,12 @@ private:
 
 Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
-	ThumbnailPixmapCache& thumbnail_cache, PageId const& page_id,
-	OutputFileNameGenerator const& out_file_name_gen,
+	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+	PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
 	ImageViewTab const last_tab, bool const batch, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
-	m_rThumbnailCache(thumbnail_cache),
+	m_ptrThumbnailCache(thumbnail_cache),
 	m_pageId(page_id),
 	m_outFileNameGen(out_file_name_gen),
 	m_lastTab(last_tab),
@@ -324,7 +324,7 @@ Task::process(
 			m_ptrSettings->setOutputParams(m_pageId, out_params);
 		}
 		
-		m_rThumbnailCache.recreateThumbnail(ImageId(out_file_path), out_img);
+		m_ptrThumbnailCache->recreateThumbnail(ImageId(out_file_path), out_img);
 	}
 
 	DespeckleState const despeckle_state(

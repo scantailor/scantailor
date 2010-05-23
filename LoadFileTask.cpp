@@ -56,11 +56,11 @@ private:
 
 LoadFileTask::LoadFileTask(
 	Type type, PageInfo const& page,
-	ThumbnailPixmapCache& thumbnail_cache,
+	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	IntrusivePtr<ProjectPages> const& pages,
 	IntrusivePtr<fix_orientation::Task> const& next_task)
 :	BackgroundTask(type),
-	m_rThumbnailCache(thumbnail_cache),
+	m_ptrThumbnailCache(thumbnail_cache),
 	m_imageId(page.imageId()),
 	m_imageMetadata(page.metadata()),
 	m_ptrPages(pages),
@@ -86,7 +86,7 @@ LoadFileTask::operator()()
 		} else {
 			updateImageSizeIfChanged(image);
 			overrideDpi(image);
-			m_rThumbnailCache.ensureThumbnailExists(m_imageId, image);
+			m_ptrThumbnailCache->ensureThumbnailExists(m_imageId, image);
 			return m_ptrNextTask->process(*this, FilterData(image));
 		}
 	} catch (CancelledException const&) {

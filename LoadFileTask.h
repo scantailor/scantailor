@@ -41,7 +41,7 @@ class LoadFileTask : public BackgroundTask
 	DECLARE_NON_COPYABLE(LoadFileTask)
 public:
 	LoadFileTask(Type type, PageInfo const& page,
-		ThumbnailPixmapCache& thumbnail_cache,
+		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		IntrusivePtr<ProjectPages> const& pages,
 		IntrusivePtr<fix_orientation::Task> const& next_task);
 	
@@ -55,7 +55,7 @@ private:
 	
 	void overrideDpi(QImage& image) const;
 	
-	ThumbnailPixmapCache& m_rThumbnailCache;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	ImageId m_imageId;
 	ImageMetadata m_imageMetadata;
 	IntrusivePtr<ProjectPages> const m_ptrPages;

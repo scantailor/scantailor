@@ -55,8 +55,8 @@ class Task : public RefCountable
 public:
 	Task(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
-		ThumbnailPixmapCache& thumbnail_cache, PageId const& page_id,
-		OutputFileNameGenerator const& out_file_name_gen,
+		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+		PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
 		ImageViewTab last_tab, bool batch, bool debug);
 	
 	virtual ~Task();
@@ -72,7 +72,7 @@ private:
 
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
-	ThumbnailPixmapCache& m_rThumbnailCache;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	PageId m_pageId;
 	OutputFileNameGenerator m_outFileNameGen;

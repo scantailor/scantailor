@@ -21,6 +21,7 @@
 
 #include "ThumbnailBase.h"
 #include "PageLayout.h"
+#include "IntrusivePtr.h"
 #include <QPixmap>
 
 class QPointF;
@@ -36,9 +37,10 @@ namespace page_split
 class Thumbnail : public ThumbnailBase
 {
 public:
-	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		ImageId const& image_id, ImageTransformation const& xform,
-		PageLayout const& layout, bool left_half_removed, bool right_half_removed);
+	Thumbnail(IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+		QSizeF const& max_size, ImageId const& image_id,
+		ImageTransformation const& xform, PageLayout const& layout,
+		bool left_half_removed, bool right_half_removed);
 	
 	virtual void paintOverImage(
 		QPainter& painter,

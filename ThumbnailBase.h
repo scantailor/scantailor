@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,23 +19,27 @@
 #ifndef THUMBNAILBASE_H_
 #define THUMBNAILBASE_H_
 
+#include "NonCopyable.h"
 #include "ImageId.h"
 #include "ImageTransformation.h"
+#include "IntrusivePtr.h"
+#include "ThumbnailPixmapCache.h"
 #include <boost/shared_ptr.hpp>
 #include <QTransform>
 #include <QGraphicsItem>
 #include <QSizeF>
 #include <QRectF>
 
-class ThumbnailPixmapCache;
 class ThumbnailLoadResult;
 
 class ThumbnailBase : public QGraphicsItem
 {
+	DECLARE_NON_COPYABLE(ThumbnailBase)
 public:
 	ThumbnailBase(
-		ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		ImageId const& image_id, ImageTransformation const& image_xform);
+		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+		QSizeF const& max_size, ImageId const& image_id,
+		ImageTransformation const& image_xform);
 	
 	virtual ~ThumbnailBase();
 	
@@ -86,7 +90,7 @@ private:
 	
 	void handleLoadResult(ThumbnailLoadResult const& result);
 	
-	ThumbnailPixmapCache& m_rThumbnailCache;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	QSizeF m_maxSize;
 	ImageId m_imageId;
 	ImageTransformation m_imageXform;

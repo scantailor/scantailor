@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "Params.h"
 #include "ImageTransformation.h"
 #include "PhysicalTransformation.h"
+#include "IntrusivePtr.h"
 #include <QTransform>
 #include <QSizeF>
 #include <QRectF>
@@ -36,9 +37,10 @@ namespace page_layout
 class Thumbnail : public ThumbnailBase
 {
 public:
-	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		ImageId const& image_id, ImageTransformation const& xform,
-		Params const& params, QRectF const& adapted_content_rect,
+	Thumbnail(IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+		QSizeF const& max_size, ImageId const& image_id,
+		ImageTransformation const& xform, Params const& params,
+		QRectF const& adapted_content_rect,
 		QSizeF const& aggregate_hard_size_mm);
 	
 	virtual void paintOverImage(

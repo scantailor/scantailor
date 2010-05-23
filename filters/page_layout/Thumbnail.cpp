@@ -38,9 +38,10 @@ namespace page_layout
 {
 
 Thumbnail::Thumbnail(
-	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-	ImageId const& image_id, ImageTransformation const& xform,
-	Params const& params, QRectF const& adapted_content_rect,
+	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+	QSizeF const& max_size, ImageId const& image_id,
+	ImageTransformation const& xform, Params const& params,
+	QRectF const& adapted_content_rect,
 	QSizeF const& aggregate_hard_size_mm)
 :	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
 	m_params(params),

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,26 +25,26 @@
 class ThumbnailFactory::Collector : public ThumbnailCollector
 {
 public:
-	Collector(ThumbnailPixmapCache& cache, QSizeF const& max_size);
+	Collector(IntrusivePtr<ThumbnailPixmapCache> const& cache, QSizeF const& max_size);
 	
 	virtual void processThumbnail(std::auto_ptr<QGraphicsItem> thumbnail);
 	
-	virtual ThumbnailPixmapCache& thumbnailCache();
+	virtual IntrusivePtr<ThumbnailPixmapCache> thumbnailCache();
 	
 	virtual QSizeF maxLogicalThumbSize() const;
 	
 	std::auto_ptr<QGraphicsItem> retrieveThumbnail() { return m_ptrThumbnail; }
 private:
-	ThumbnailPixmapCache& m_rCache;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrCache;
 	QSizeF m_maxSize;
 	std::auto_ptr<QGraphicsItem> m_ptrThumbnail;
 };
 
 
 ThumbnailFactory::ThumbnailFactory(
-	ThumbnailPixmapCache& pixmap_cache, QSizeF const& max_size,
-	IntrusivePtr<CompositeCacheDrivenTask> const& task)
-:	m_rPixmapCache(pixmap_cache),
+	IntrusivePtr<ThumbnailPixmapCache> const& pixmap_cache,
+	QSizeF const& max_size, IntrusivePtr<CompositeCacheDrivenTask> const& task)
+:	m_ptrPixmapCache(pixmap_cache),
 	m_maxSize(max_size),
 	m_ptrTask(task)
 {
@@ -57,7 +57,7 @@ ThumbnailFactory::~ThumbnailFactory()
 std::auto_ptr<QGraphicsItem>
 ThumbnailFactory::get(PageInfo const& page_info)
 {
-	Collector collector(m_rPixmapCache, m_maxSize);
+	Collector collector(m_ptrPixmapCache, m_maxSize);
 	m_ptrTask->process(page_info, &collector);
 	return collector.retrieveThumbnail();
 }
@@ -66,8 +66,8 @@ ThumbnailFactory::get(PageInfo const& page_info)
 /*======================= ThumbnailFactory::Collector ======================*/
 
 ThumbnailFactory::Collector::Collector(
-	ThumbnailPixmapCache& cache, QSizeF const& max_size)
-:	m_rCache(cache),
+	IntrusivePtr<ThumbnailPixmapCache> const& cache, QSizeF const& max_size)
+:	m_ptrCache(cache),
 	m_maxSize(max_size)
 {
 }
@@ -79,10 +79,10 @@ ThumbnailFactory::Collector::processThumbnail(
 	m_ptrThumbnail = thumbnail;
 }
 
-ThumbnailPixmapCache&
+IntrusivePtr<ThumbnailPixmapCache>
 ThumbnailFactory::Collector::thumbnailCache()
 {
-	return m_rCache;
+	return m_ptrCache;
 }
 
 QSizeF

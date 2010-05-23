@@ -58,9 +58,10 @@ private:
 
 
 ThumbnailBase::ThumbnailBase(
-	ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-	ImageId const& image_id, ImageTransformation const& image_xform)
-:	m_rThumbnailCache(thumbnail_cache),
+	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+	QSizeF const& max_size, ImageId const& image_id,
+	ImageTransformation const& image_xform)
+:	m_ptrThumbnailCache(thumbnail_cache),
 	m_maxSize(max_size),
 	m_imageId(image_id),
 	m_imageXform(image_xform),
@@ -90,7 +91,7 @@ ThumbnailBase::paint(QPainter* painter,
 			new LoadCompletionHandler(this)
 		);
 		ThumbnailPixmapCache::Status const status =
-			m_rThumbnailCache.loadRequest(m_imageId, pixmap, handler);
+			m_ptrThumbnailCache->loadRequest(m_imageId, pixmap, handler);
 		if (status == ThumbnailPixmapCache::QUEUED) {
 			m_ptrCompletionHandler.swap(handler);
 		}

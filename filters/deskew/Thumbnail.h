@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #define DESKEW_THUMBNAIL_H_
 
 #include "ThumbnailBase.h"
+#include "IntrusivePtr.h"
 
 class QSizeF;
 class ThumbnailPixmapCache;
@@ -32,8 +33,9 @@ namespace deskew
 class Thumbnail : public ThumbnailBase
 {
 public:
-	Thumbnail(ThumbnailPixmapCache& thumbnail_cache, QSizeF const& max_size,
-		ImageId const& image_id, ImageTransformation const& xform);
+	Thumbnail(IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
+		QSizeF const& max_size, ImageId const& image_id,
+		ImageTransformation const& xform);
 	
 	virtual void paintOverImage(
 		QPainter& painter,

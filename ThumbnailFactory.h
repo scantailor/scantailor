@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
+#include "ThumbnailPixmapCache.h"
 #include <QSizeF>
 #include <memory>
 
 class PageInfo;
 class CompositeCacheDrivenTask;
-class ThumbnailPixmapCache;
 class QGraphicsItem;
 
 class ThumbnailFactory : public RefCountable
@@ -35,8 +35,8 @@ class ThumbnailFactory : public RefCountable
 	DECLARE_NON_COPYABLE(ThumbnailFactory)
 public:
 	ThumbnailFactory(
-		ThumbnailPixmapCache& pixmap_cache, QSizeF const& max_size,
-		IntrusivePtr<CompositeCacheDrivenTask> const& task);
+		IntrusivePtr<ThumbnailPixmapCache> const& pixmap_cache,
+		QSizeF const& max_size, IntrusivePtr<CompositeCacheDrivenTask> const& task);
 	
 	virtual ~ThumbnailFactory();
 	
@@ -44,7 +44,7 @@ public:
 private:
 	class Collector;
 	
-	ThumbnailPixmapCache& m_rPixmapCache;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrPixmapCache;
 	QSizeF m_maxSize;
 	IntrusivePtr<CompositeCacheDrivenTask> m_ptrTask;
 };

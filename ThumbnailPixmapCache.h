@@ -20,6 +20,7 @@
 #define THUMBNAILPIXMAPCACHE_H_
 
 #include "NonCopyable.h"
+#include "RefCountable.h"
 #include "ThumbnailLoadResult.h"
 #include "AbstractCommand.h"
 #include <boost/weak_ptr.hpp>
@@ -31,7 +32,7 @@ class QPixmap;
 class QString;
 class QSize;
 
-class ThumbnailPixmapCache
+class ThumbnailPixmapCache : public RefCountable
 {
 	DECLARE_NON_COPYABLE(ThumbnailPixmapCache)
 public:

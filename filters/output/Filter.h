@@ -62,7 +62,8 @@ public:
 		ProjectReader const& reader, QDomElement const& filters_el);
 	
 	IntrusivePtr<Task> createTask(
-		PageId const& page_id, ThumbnailPixmapCache& thumbnail_cache,
+		PageId const& page_id,
+		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		OutputFileNameGenerator const& out_file_name_gen,
 		bool batch, bool debug);
 	

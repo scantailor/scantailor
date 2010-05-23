@@ -167,7 +167,7 @@ private:
 		QString const& project_file_path = QString(),
 		ProjectReader const* project_reader = 0);
 	
-	std::auto_ptr<ThumbnailPixmapCache> createThumbnailCache();
+	IntrusivePtr<ThumbnailPixmapCache> createThumbnailCache();
 	
 	void setupThumbView();
 	
@@ -249,7 +249,7 @@ private:
 	IntrusivePtr<StageSequence> m_ptrStages;
 	QString m_projectFile;
 	OutputFileNameGenerator m_outFileNameGen;
-	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence;
 	std::auto_ptr<WorkerThread> m_ptrWorkerThread;
 	std::auto_ptr<ProcessingTaskQueue> m_ptrBatchQueue;

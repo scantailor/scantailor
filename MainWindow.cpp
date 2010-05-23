@@ -385,12 +385,12 @@ MainWindow::switchToNewProject(
 	updateMainArea();
 }
 
-std::auto_ptr<ThumbnailPixmapCache>
+IntrusivePtr<ThumbnailPixmapCache>
 MainWindow::createThumbnailCache()
 {
 	QSize const max_pixmap_size(200, 200);
 	
-	return std::auto_ptr<ThumbnailPixmapCache>(
+	return IntrusivePtr<ThumbnailPixmapCache>(
 		new ThumbnailPixmapCache(
 			m_outFileNameGen.outDir()+"/cache/thumbs", max_pixmap_size, 40, 5
 		)
@@ -611,7 +611,7 @@ MainWindow::resetThumbSequence(
 		m_ptrThumbSequence->setThumbnailFactory(
 			IntrusivePtr<ThumbnailFactory>(
 				new ThumbnailFactory(
-					*m_ptrThumbnailCache,
+					m_ptrThumbnailCache,
 					m_maxLogicalThumbSize, task
 				)
 			)
@@ -1799,7 +1799,7 @@ MainWindow::createCompositeTask(
 
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), *m_ptrThumbnailCache, m_outFileNameGen, batch, debug
+			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
 		);
 		debug = false;
 	}
@@ -1838,7 +1838,7 @@ MainWindow::createCompositeTask(
 	return BackgroundTaskPtr(
 		new LoadFileTask(
 			batch ? BackgroundTask::BATCH : BackgroundTask::INTERACTIVE,
-			page, *m_ptrThumbnailCache, m_ptrPages, fix_orientation_task
+			page, m_ptrThumbnailCache, m_ptrPages, fix_orientation_task
 		)
 	);
 }
