@@ -1466,10 +1466,12 @@ MainWindow::loadPageInteractive(PageInfo const& page)
 	}
 	
 	assert(m_ptrThumbnailCache.get());
-	// XXX: re isBatchProcessingInProgress()
-	m_ptrWorkerThread->performTask(
-		createCompositeTask(page, m_curFilter, isBatchProcessingInProgress(), m_debug)
+
+	m_ptrInteractiveQueue->cancelAndClear();
+	m_ptrInteractiveQueue->addProcessingTask(
+		page, createCompositeTask(page, m_curFilter, /*batch=*/false, m_debug)
 	);
+	m_ptrWorkerThread->performTask(m_ptrInteractiveQueue->takeForProcessing());
 }
 
 void
