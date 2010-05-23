@@ -27,9 +27,9 @@
 #include <memory>
 
 class TaskStatus;
-class PageSequence;
 class FilterData;
 class DebugImages;
+class ProjectPages;
 class QImage;
 
 namespace deskew
@@ -42,6 +42,7 @@ namespace page_split
 
 class Filter;
 class Settings;
+class PageLayout;
 
 class Task : public RefCountable
 {
@@ -50,7 +51,7 @@ public:
 	Task(
 		IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& page_sequence,
+		IntrusivePtr<ProjectPages> const& pages,
 		IntrusivePtr<deskew::Task> const& next_task,
 		PageInfo const& page_info,
 		bool batch_processing, bool debug);
@@ -60,10 +61,10 @@ public:
 	FilterResultPtr process(TaskStatus const& status, FilterData const& data);
 private:
 	class UiUpdater;
-	
+
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPageSequence;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<deskew::Task> m_ptrNextTask;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	PageInfo m_pageInfo;

@@ -21,12 +21,14 @@
 #include "NewOpenProjectPanel.h"
 #include "RecentProjects.h"
 #include "WorkerThread.h"
+#include "ProjectPages.h"
 #include "PageSequence.h"
 #include "PageSelectionAccessor.h"
 #include "StageSequence.h"
 #include "ThumbnailSequence.h"
 #include "PageOrderOption.h"
 #include "PageOrderProvider.h"
+#include "ProcessingTaskQueue.h"
 #include "FileNameDisambiguator.h"
 #include "OutputFileNameGenerator.h"
 #include "ImageInfo.h"
@@ -119,14 +121,14 @@
 #include <assert.h>
 
 MainWindow::MainWindow()
-:	m_ptrPages(new PageSequence),
+:	m_ptrPages(new ProjectPages),
 	m_ptrStages(new StageSequence(m_ptrPages, PageSelectionAccessor(this))),
 	m_ptrWorkerThread(new WorkerThread),
+	m_ptrInteractiveQueue(new ProcessingTaskQueue(ProcessingTaskQueue::RANDOM_ORDER)),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
 	m_debug(false),
-	m_batchProcessing(false),
 	m_closing(false)
 {
 	m_maxLogicalThumbSize = QSize(250, 160);
@@ -267,12 +269,21 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-	cancelOngoingTask();
+	m_ptrInteractiveQueue->cancelAndClear();
+	if (m_ptrBatchQueue.get()) {
+		m_ptrBatchQueue->cancelAndClear();
+	}
 	m_ptrWorkerThread->shutdown();
 	
 	removeWidgetsFromLayout(m_pImageFrameLayout);
 	removeWidgetsFromLayout(m_pOptionsFrameLayout);
 	m_ptrTabbedDebugImages->clear();
+}
+
+PageSequence
+MainWindow::allPages() const
+{
+	return m_ptrThumbSequence->toPageSequence();
 }
 
 std::set<PageId>
@@ -288,26 +299,20 @@ MainWindow::selectedRanges() const
 }
 
 void
-MainWindow::cancelOngoingTask()
-{
-	if (m_ptrCurTask) {
-		m_ptrCurTask->cancel();
-		m_ptrCurTask.reset();
-	}
-}
-
-void
 MainWindow::switchToNewProject(
-	IntrusivePtr<PageSequence> const& pages,
+	IntrusivePtr<ProjectPages> const& pages,
 	QString const& out_dir, QString const& project_file_path,
 	ProjectReader const* project_reader)
 {
 	stopBatchProcessing(CLEAR_MAIN_AREA);
-	
-	cancelOngoingTask();
+	m_ptrInteractiveQueue->cancelAndClear();
 	
 	m_ptrPages = pages;
 	m_projectFile = project_file_path;
+
+	if (project_reader) {
+		m_selectedPage = project_reader->selectedPage();
+	}
 
 	IntrusivePtr<FileNameDisambiguator> disambiguator;
 	if (project_reader) {
@@ -320,14 +325,12 @@ MainWindow::switchToNewProject(
 		disambiguator, out_dir, pages->layoutDirection()
 	);
 	// These two need to go in this order.
-	updateDisambiguationRecords(pages->snapshot(PageSequence::IMAGE_VIEW));
+	updateDisambiguationRecords(pages->toPageSequence(IMAGE_VIEW));
 
 	// Recreate the stages and load their state.
 	m_ptrStages.reset(new StageSequence(pages, this));
 	if (project_reader) {
-		project_reader->readFilterSettings(
-			m_ptrStages->filters()
-		);
+		project_reader->readFilterSettings(m_ptrStages->filters());
 	}
 	
 	// Connect the filter list model to the view and select
@@ -374,8 +377,8 @@ MainWindow::switchToNewProject(
 	} else {
 		m_ptrThumbnailCache = createThumbnailCache();
 	}
-	resetThumbSequence(ThumbnailSequence::RESET_SELECTION, currentPageOrderProvider());
-	
+	resetThumbSequence(currentPageOrderProvider());
+
 	removeFilterOptionsWidget();
 	updateProjectActions();
 	updateWindowTitle();
@@ -598,7 +601,6 @@ MainWindow::updateSortOptions()
 
 void
 MainWindow::resetThumbSequence(
-	ThumbnailSequence::SelectionAction const selection_action,
 	IntrusivePtr<PageOrderProvider const> const& page_order_provider)
 {
 	if (m_ptrThumbnailCache.get()) {
@@ -617,8 +619,8 @@ MainWindow::resetThumbSequence(
 	}
 	
 	m_ptrThumbSequence->reset(
-		m_ptrPages->snapshot(getCurrentView()),
-		selection_action, page_order_provider
+		m_ptrPages->toPageSequence(getCurrentView()),
+		ThumbnailSequence::RESET_SELECTION, page_order_provider
 	);
 	
 	if (!m_ptrThumbnailCache.get()) {
@@ -628,12 +630,26 @@ MainWindow::resetThumbSequence(
 			IntrusivePtr<ThumbnailFactory>()
 		);
 	}
+
+	PageId const page(m_selectedPage.get(getCurrentView()));
+	if (m_ptrThumbSequence->setSelection(page)) {
+		// OK
+	} else if (m_ptrThumbSequence->setSelection(PageId(page.imageId(), PageId::LEFT_PAGE))) {
+		// OK
+	} else if (m_ptrThumbSequence->setSelection(PageId(page.imageId(), PageId::RIGHT_PAGE))) {
+		// OK
+	} else if (m_ptrThumbSequence->setSelection(PageId(page.imageId(), PageId::SINGLE_PAGE))) {
+		// OK
+	} else {
+		// Last resort.
+		m_ptrThumbSequence->setSelection(m_ptrThumbSequence->firstPage().id());
+	}
 }
 
 void
 MainWindow::setOptionsWidget(FilterOptionsWidget* widget, Ownership const ownership)
 {
-	if (m_batchProcessing) {
+	if (isBatchProcessingInProgress()) {
 		if (ownership == TRANSFER_OWNERSHIP) {
 			delete widget;
 		}
@@ -712,7 +728,7 @@ MainWindow::setImageWidget(
 	QWidget* widget, Ownership const ownership,
 	DebugImages* debug_images)
 {
-	if (m_batchProcessing) {
+	if (isBatchProcessingInProgress() && widget != m_ptrBatchProcessingWidget.get()) {
 		if (ownership == TRANSFER_OWNERSHIP) {
 			delete widget;
 		}
@@ -772,41 +788,42 @@ MainWindow::invalidateAllThumbnails()
 void
 MainWindow::nextPage()
 {
-	if (m_batchProcessing || !isProjectLoaded()) {
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
 		return;
 	}
 	
 	PageInfo const next_page(
-		m_ptrPages->setNextPage(getCurrentView())
+		m_ptrThumbSequence->nextPage(m_ptrThumbSequence->selectionLeader().id())
 	);
-	m_ptrThumbSequence->setSelection(next_page.id());
-	loadImage(next_page);
+	if (!next_page.isNull()) {
+		goToPage(next_page.id());
+	}
 }
 
 void
 MainWindow::prevPage()
 {
-	if (m_batchProcessing || !isProjectLoaded()) {
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
 		return;
 	}
 	
 	PageInfo const prev_page(
-		m_ptrPages->setPrevPage(getCurrentView())
+		m_ptrThumbSequence->prevPage(m_ptrThumbSequence->selectionLeader().id())
 	);
-	m_ptrThumbSequence->setSelection(prev_page.id());
-	loadImage(prev_page);
+	if (!prev_page.isNull()) {
+		goToPage(prev_page.id());
+	}
 }
 
 void
 MainWindow::goToPage(PageId const& page_id)
 {
 	focusButton->setChecked(true);
-	m_ptrPages->setCurPage(page_id);
 	
-	// This will result in currentPageChanged() being called
-	// with SELECTED_BY_USER flag unset.
 	m_ptrThumbSequence->setSelection(page_id);
 	
+	// If the page was already selected, it will be reloaded.
+	// That's by design.
 	updateMainArea();
 }
 
@@ -815,6 +832,8 @@ MainWindow::currentPageChanged(
 	PageInfo const& page_info, QRectF const& thumb_rect,
 	ThumbnailSequence::SelectionFlags const flags)
 {
+	m_selectedPage.set(page_info.id(), getCurrentView());
+
 	if ((flags & ThumbnailSequence::SELECTED_BY_USER) || focusButton->isChecked()) {
 		if (!(flags & ThumbnailSequence::AVOID_SCROLLING_TO)) {
 			thumbView->ensureVisible(thumb_rect, 0, 0);
@@ -822,10 +841,10 @@ MainWindow::currentPageChanged(
 	}
 	
 	if (flags & ThumbnailSequence::SELECTED_BY_USER) {
-		m_ptrPages->setCurPage(page_info.id());
-		if (m_batchProcessing) {
+		if (isBatchProcessingInProgress()) {
 			stopBatchProcessing();
 		} else if (!(flags & ThumbnailSequence::REDUNDANT_SELECTION)) {
+			// Start loading / processing the newly selected page.
 			updateMainArea();
 		}
 	}
@@ -835,6 +854,10 @@ void
 MainWindow::pageContextMenuRequested(
 	PageInfo const& page_info_, QPoint const& screen_pos, bool selected)
 {
+	if (isBatchProcessingInProgress()) {
+		return;
+	}
+
 	// Make a copy to prevent it from being invalidated.
 	PageInfo const page_info(page_info_);
 	
@@ -931,7 +954,11 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 		return;
 	}
 	
-	cancelOngoingTask();
+	m_ptrInteractiveQueue->cancelAndClear();
+	if (m_ptrBatchQueue.get()) {
+		// Should not happen, but just in case.
+		m_ptrBatchQueue->cancelAndClear();
+	}
 	
 	bool const was_below_fix_orientation = isBelowFixOrientation(m_curFilter);
 	bool const was_below_select_content = isBelowSelectContent(m_curFilter);
@@ -962,7 +989,8 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	}
 	
 	focusButton->setChecked(true); // Should go before resetThumbSequence().
-	resetThumbSequence(ThumbnailSequence::KEEP_SELECTION, currentPageOrderProvider());
+	resetThumbSequence(currentPageOrderProvider());
+	
 	updateMainArea();
 }
 
@@ -978,7 +1006,7 @@ MainWindow::pageOrderingChanged(int idx)
 	m_ptrStages->filterAt(m_curFilter)->selectPageOrder(idx);
 
 	m_ptrThumbSequence->reset(
-		m_ptrPages->snapshot(getCurrentView()),
+		m_ptrPages->toPageSequence(getCurrentView()),
 		ThumbnailSequence::KEEP_SELECTION,
 		currentPageOrderProvider()
 	);
@@ -987,68 +1015,76 @@ MainWindow::pageOrderingChanged(int idx)
 void
 MainWindow::reloadRequested()
 {
+	// Start loading / processing the current page.
 	updateMainArea();
 }
 
 void
 MainWindow::startBatchProcessing()
 {
-	if (m_batchProcessing || !isProjectLoaded()) {
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
 		return;
 	}
+
+	m_ptrInteractiveQueue->cancelAndClear();
 	
-	// Must be done before setting m_batchProcessing to true.
-	setImageWidget(m_ptrBatchProcessingWidget.get(), KEEP_OWNERSHIP);
-	
-	m_batchProcessing = true;
-	
+	m_ptrBatchQueue.reset(
+		new ProcessingTaskQueue(
+			currentPageOrderProvider().get()
+			? ProcessingTaskQueue::RANDOM_ORDER
+			: ProcessingTaskQueue::SEQUENTIAL_ORDER
+		)
+	);
+	PageInfo page(m_ptrThumbSequence->selectionLeader());
+	for (; !page.isNull(); page = m_ptrThumbSequence->nextPage(page.id())) {
+		m_ptrBatchQueue->addProcessingTask(
+			page, createCompositeTask(page, m_curFilter, /*batch=*/true, m_debug)
+		);
+	}
+
 	focusButton->setChecked(true);
 	
 	removeFilterOptionsWidget();
 	filterList->setBatchProcessingInProgress(true);
 	filterList->setEnabled(false);
-	
-	// In batch processing mode we highlight the page that
-	// was just processed, while processing the next one.
-	// Keep in mind that next one will have a question mark
-	// on it until it's fully processed.
-	
-	if (!m_ptrCurTask) {
-		// If the task for the current page has already finished, then the
-		// current page is already processed, so move to the next one.
-		m_ptrPages->setNextPage(getCurrentView());
+
+	BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
+	if (task) {
+		m_ptrWorkerThread->performTask(task);
 	} else {
-		cancelOngoingTask();
+		stopBatchProcessing();
 	}
-	
+
+	page = m_ptrBatchQueue->selectedPage();
+	if (!page.isNull()) {
+		m_ptrThumbSequence->setSelection(page.id());
+	}
+
+	// Display the batch processing screen.
 	updateMainArea();
 }
 
 void
 MainWindow::stopBatchProcessing(MainAreaAction main_area)
 {
-	if (!m_batchProcessing) {
+	if (!isBatchProcessingInProgress()) {
 		return;
 	}
 	
-	// The current task is being cancelled because
-	// it's probably a batch processing task.
-	cancelOngoingTask();
+	PageInfo const page(m_ptrBatchQueue->selectedPage());
+	if (!page.isNull()) {
+		m_ptrThumbSequence->setSelection(page.id());
+	}
+
+	m_ptrBatchQueue->cancelAndClear();
+	m_ptrBatchQueue.reset();
 	
-	m_batchProcessing = false;
 	filterList->setBatchProcessingInProgress(false);
 	filterList->setEnabled(true);
-	
-	// The necessity to explicitly select a thumbnail comes from the fact
-	// that during batch processing we select not the thumbnail that is
-	// currently being processed, but the one that has been processed
-	// before that.
-	PageInfo const page(m_ptrPages->curPage(getCurrentView()));
-	m_ptrThumbSequence->setSelection(page.id());
-	
+
 	switch (main_area) {
-		case LOAD_IMAGE:
-			loadImage(page);
+		case UPDATE_MAIN_AREA:
+			updateMainArea();
 			break;
 		case CLEAR_MAIN_AREA:
 			removeImageWidget();
@@ -1059,13 +1095,17 @@ MainWindow::stopBatchProcessing(MainAreaAction main_area)
 void
 MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result)
 {
-	if (task != m_ptrCurTask || task->isCancelled()) {
+	// Cancelled or not, we must mark it as finished.
+	m_ptrInteractiveQueue->processingFinished(task);
+	if (m_ptrBatchQueue.get()) {
+		m_ptrBatchQueue->processingFinished(task);
+	}
+
+	if (task->isCancelled()) {
 		return;
 	}
 	
-	m_ptrCurTask.reset(); // We check if a task is in progress in startBatchProcessing().
-	
-	if (!m_batchProcessing) {
+	if (!isBatchProcessingInProgress()) {
 		if (!result->filter()) {
 			// Error loading file.  No special action is necessary.
 		} else if (result->filter() != m_ptrStages->filterAt(m_curFilter)) {
@@ -1078,28 +1118,29 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 			filterList->selectRow(idx);
 		}
 	}
-	
+
+	// This needs to be done even if batch processing is taking place,
+	// for instance because thumbnail invalidation is done from here.
 	result->updateUI(this);
 	
-	if (m_batchProcessing) {
-		// During batch processing we prefer to select the thumbnail
-		// after it has been processed, not before.  Otherwise selected
-		// thumbnail will always be an unprocessed one, with the
-		// question mark on it.
-		PageInfo const cur_page(m_ptrPages->curPage(getCurrentView()));
-		m_ptrThumbSequence->setSelection(cur_page.id());
-		
-		PageInfo const next_page(m_ptrPages->setNextPage(getCurrentView()));
-		
-		if (next_page.id() == cur_page.id()) {
-			m_ptrPages->setFirstPage(getCurrentView());
-			stopBatchProcessing(); // This will call loadImage().
+	if (isBatchProcessingInProgress()) {
+		if (m_ptrBatchQueue->allProcessed()) {
+			stopBatchProcessing();
 			QApplication::alert(this); // Flash the taskbar entry.
 			if (m_pBeepOnBatchProcessingCompletion->isChecked()) {
 				QApplication::beep();
 			}
-		} else {
-			loadImage(next_page);
+			return;
+		}
+
+		BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
+		if (task) {
+			m_ptrWorkerThread->performTask(task);
+		}
+
+		PageInfo const page(m_ptrBatchQueue->selectedPage());
+		if (!page.isNull()) {
+			m_ptrThumbSequence->setSelection(page.id());
 		}
 	}
 }
@@ -1183,9 +1224,9 @@ MainWindow::newProject()
 void
 MainWindow::newProjectCreated(ProjectCreationContext* context)
 {
-	IntrusivePtr<PageSequence> pages(
-		new PageSequence(
-			context->files(), PageSequence::AUTO_PAGES,
+	IntrusivePtr<ProjectPages> pages(
+		new ProjectPages(
+			context->files(), ProjectPages::AUTO_PAGES,
 			context->layoutDirection()
 		)
 	);
@@ -1312,6 +1353,12 @@ MainWindow::updateProjectActions()
 }
 
 bool
+MainWindow::isBatchProcessingInProgress() const
+{
+	return m_ptrBatchQueue.get() != 0;
+}
+
+bool
 MainWindow::isProjectLoaded() const
 {
 	return !m_outFileNameGen.outDir().isEmpty();
@@ -1347,7 +1394,7 @@ MainWindow::isOutputFilter(int const filter_idx) const
 	return (filter_idx == m_ptrStages->outputFilterIdx());
 }
 
-PageSequence::View
+PageView
 MainWindow::getCurrentView() const
 {
 	return m_ptrStages->filterAt(m_curFilter)->getView();
@@ -1356,15 +1403,23 @@ MainWindow::getCurrentView() const
 void
 MainWindow::updateMainArea()
 {
-	filterList->setBatchProcessingPossible(true);
-	// Both showNewOpenProjectPanel() and loadImage()
-	// can set it to false though.
-	
 	if (m_ptrPages->numImages() == 0) {
+		filterList->setBatchProcessingPossible(false);
 		showNewOpenProjectPanel();
+	} else if (isBatchProcessingInProgress()) {
+		filterList->setBatchProcessingPossible(false);
+		setImageWidget(m_ptrBatchProcessingWidget.get(), KEEP_OWNERSHIP);
 	} else {
-		PageInfo const page_info(m_ptrPages->curPage(getCurrentView()));
-		loadImage(page_info);
+		PageInfo const page(m_ptrThumbSequence->selectionLeader());
+		if (page.isNull()) {
+			filterList->setBatchProcessingPossible(false);
+			removeImageWidget();
+			removeFilterOptionsWidget();
+		} else {
+			// Note that loadPageInteractive may reset it to false.
+			filterList->setBatchProcessingPossible(true);
+			loadPageInteractive(page);
+		}
 	}
 }
 
@@ -1377,19 +1432,18 @@ MainWindow::checkReadyForOutput(PageId const* ignore) const
 }
 
 void
-MainWindow::loadImage(PageInfo const& page)
+MainWindow::loadPageInteractive(PageInfo const& page)
 {
-	cancelOngoingTask();
+	assert(!isBatchProcessingInProgress());
+	
+	m_ptrInteractiveQueue->cancelAndClear();
 	
 	if (isOutputFilter() && !checkReadyForOutput(&page.id())) {
 		filterList->setBatchProcessingPossible(false);
 		
 		// Switch to the first page - the user will need
 		// to process all pages in batch mode.
-		PageInfo const first_page(
-			m_ptrPages->setFirstPage(getCurrentView())
-		);
-		m_ptrThumbSequence->setSelection(first_page.id());
+		m_ptrThumbSequence->setSelection(m_ptrThumbSequence->firstPage().id());
 		
 		QString const err_text(
 			tr("Output is not yet possible, as the final size"
@@ -1403,7 +1457,7 @@ MainWindow::loadImage(PageInfo const& page)
 		return;
 	}
 	
-	if (!m_batchProcessing) {
+	if (!isBatchProcessingInProgress()) {
 		if (m_pImageFrameLayout->indexOf(m_ptrProcessingIndicationWidget.get()) != -1) {
 			m_ptrProcessingIndicationWidget->processingRestartedEffect();
 		}
@@ -1412,10 +1466,10 @@ MainWindow::loadImage(PageInfo const& page)
 	}
 	
 	assert(m_ptrThumbnailCache.get());
-	m_ptrCurTask = createCompositeTask(page, m_curFilter);
-	if (m_ptrCurTask) {
-		m_ptrWorkerThread->performTask(m_ptrCurTask);
-	}
+	// XXX: re isBatchProcessingInProgress()
+	m_ptrWorkerThread->performTask(
+		createCompositeTask(page, m_curFilter, isBatchProcessingInProgress(), m_debug)
+	);
 }
 
 void
@@ -1464,7 +1518,7 @@ MainWindow::closeProjectInteractive()
 	);
 	QString const backup_file_path(backup_file.absoluteFilePath());
 	
-	ProjectWriter writer(m_ptrPages, m_outFileNameGen);
+	ProjectWriter writer(m_ptrPages, m_selectedPage, m_outFileNameGen);
 	
 	if (!writer.write(backup_file_path, m_ptrStages->filters())) {
 		// Backup file could not be written???
@@ -1514,14 +1568,14 @@ MainWindow::closeProjectInteractive()
 void
 MainWindow::closeProjectWithoutSaving()
 {
-	IntrusivePtr<PageSequence> pages(new PageSequence());
+	IntrusivePtr<ProjectPages> pages(new ProjectPages());
 	switchToNewProject(pages, QString());
 }
 
 bool
 MainWindow::saveProjectWithFeedback(QString const& project_file)
 {
-	ProjectWriter writer(m_ptrPages, m_outFileNameGen);
+	ProjectWriter writer(m_ptrPages, m_selectedPage, m_outFileNameGen);
 	
 	if (!writer.write(project_file, m_ptrStages->filters())) {
 		QMessageBox::warning(
@@ -1544,13 +1598,13 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	class ProxyModel : public QSortFilterProxyModel
 	{
 	public:
-		ProxyModel(PageSequence const& pages) {
+		ProxyModel(ProjectPages const& pages) {
 			setDynamicSortFilter(true);
 			
-			PageSequenceSnapshot const snapshot(pages.snapshot(PageSequence::IMAGE_VIEW));
-			unsigned const count = snapshot.numPages();
+			PageSequence const sequence(pages.toPageSequence(IMAGE_VIEW));
+			unsigned const count = sequence.numPages();
 			for (unsigned i = 0; i < count; ++i) {
-				PageInfo const& page = snapshot.pageAt(i);
+				PageInfo const& page = sequence.pageAt(i);
 				m_inProjectFiles.push_back(QFileInfo(page.imageId().filePath()));
 			}
 		}
@@ -1623,7 +1677,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	}
 	
 	// This has to be done after metadata.setDpi() call above.
-	int const num_sub_pages = PageSequence::adviseNumberOfLogicalPages(
+	int const num_sub_pages = ProjectPages::adviseNumberOfLogicalPages(
 		metadata, OrthogonalRotation()
 	);
 	ImageInfo const image_info(
@@ -1681,16 +1735,18 @@ MainWindow::insertImage(ImageInfo const& new_image,
 void
 MainWindow::removeFromProject(std::set<PageId> const& pages)
 {
-	if (pages.find(m_ptrPages->curPage(getCurrentView()).id()) != pages.end()) {
-		// Removing the current page.
-		cancelOngoingTask();
+	m_ptrInteractiveQueue->cancelAndRemove(pages);
+	if (m_ptrBatchQueue.get()) {
+		m_ptrBatchQueue->cancelAndRemove(pages);
 	}
 
 	m_ptrPages->removePages(pages);
 	m_ptrThumbSequence->removePages(pages);
-	m_ptrThumbSequence->setSelection(
-		m_ptrPages->curPage(getCurrentView()).id()
-	);
+	
+	if (m_ptrThumbSequence->selectionLeader().isNull()) {
+		m_ptrThumbSequence->setSelection(m_ptrThumbSequence->firstPage().id());
+	}
+	
 	updateMainArea();
 }
 
@@ -1726,7 +1782,7 @@ MainWindow::eraseOutputFiles(std::set<PageId> const& pages)
 
 BackgroundTaskPtr
 MainWindow::createCompositeTask(
-	PageInfo const& page, int const last_filter_idx)
+	PageInfo const& page, int const last_filter_idx, bool const batch, bool debug)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
 	IntrusivePtr<page_split::Task> page_split_task;
@@ -1735,44 +1791,43 @@ MainWindow::createCompositeTask(
 	IntrusivePtr<page_layout::Task> page_layout_task;
 	IntrusivePtr<output::Task> output_task;
 	
-	bool debug = m_debug;
-	if (m_batchProcessing) {
+	if (batch) {
 		debug = false;
 	}
-	
+
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), *m_ptrThumbnailCache, m_outFileNameGen, m_batchProcessing, debug
+			page.id(), *m_ptrThumbnailCache, m_outFileNameGen, batch, debug
 		);
 		debug = false;
 	}
 	if (last_filter_idx >= m_ptrStages->pageLayoutFilterIdx()) {
 		page_layout_task = m_ptrStages->pageLayoutFilter()->createTask(
-			page.id(), output_task, m_batchProcessing, debug
+			page.id(), output_task, batch, debug
 		);
 		debug = false;
 	}
 	if (last_filter_idx >= m_ptrStages->selectContentFilterIdx()) {
 		select_content_task = m_ptrStages->selectContentFilter()->createTask(
-			page.id(), page_layout_task, m_batchProcessing, debug
+			page.id(), page_layout_task, batch, debug
 		);
 		debug = false;
 	}
 	if (last_filter_idx >= m_ptrStages->deskewFilterIdx()) {
 		deskew_task = m_ptrStages->deskewFilter()->createTask(
-			page.id(), select_content_task, m_batchProcessing, debug
+			page.id(), select_content_task, batch, debug
 		);
 		debug = false;
 	}
 	if (last_filter_idx >= m_ptrStages->pageSplitFilterIdx()) {
 		page_split_task = m_ptrStages->pageSplitFilter()->createTask(
-			page, deskew_task, m_batchProcessing, debug
+			page, deskew_task, batch, debug
 		);
 		debug = false;
 	}
 	if (last_filter_idx >= m_ptrStages->fixOrientationFilterIdx()) {
 		fix_orientation_task = m_ptrStages->fixOrientationFilter()->createTask(
-			page.id(), page_split_task, m_batchProcessing
+			page.id(), page_split_task, batch
 		);
 		debug = false;
 	}
@@ -1780,9 +1835,8 @@ MainWindow::createCompositeTask(
 	
 	return BackgroundTaskPtr(
 		new LoadFileTask(
-			m_batchProcessing ? BackgroundTask::BATCH : BackgroundTask::INTERACTIVE,
-			page, *m_ptrThumbnailCache,
-			m_ptrPages, fix_orientation_task
+			batch ? BackgroundTask::BATCH : BackgroundTask::INTERACTIVE,
+			page, *m_ptrThumbnailCache, m_ptrPages, fix_orientation_task
 		)
 	);
 }
@@ -1828,7 +1882,7 @@ MainWindow::createCompositeCacheDrivenTask(int const last_filter_idx)
 }
 
 void
-MainWindow::updateDisambiguationRecords(PageSequenceSnapshot const& pages)
+MainWindow::updateDisambiguationRecords(PageSequence const& pages)
 {
 	int const count = pages.numPages();
 	for (int i = 0; i < count; ++i) {

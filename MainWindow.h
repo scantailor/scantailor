@@ -25,11 +25,12 @@
 #include "IntrusivePtr.h"
 #include "BackgroundTask.h"
 #include "FilterResult.h"
-#include "PageSequence.h"
 #include "ThumbnailSequence.h"
 #include "OutputFileNameGenerator.h"
 #include "PageId.h"
+#include "PageView.h"
 #include "PageRange.h"
+#include "SelectedPage.h"
 #include "BeforeOrAfter.h"
 #include <QMainWindow>
 #include <QString>
@@ -42,6 +43,8 @@
 
 class AbstractFilter;
 class ThumbnailPixmapCache;
+class ProjectPages;
+class PageSequence;
 class StageSequence;
 class PageOrderProvider;
 class FilterOptionsWidget;
@@ -58,6 +61,7 @@ class ProjectCreationContext;
 class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
 class TabbedDebugImages;
+class ProcessingTaskQueue;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -75,6 +79,8 @@ public:
 	
 	virtual ~MainWindow();
 	
+	PageSequence allPages() const;
+
 	std::set<PageId> selectedPages() const;
 	
 	std::vector<PageRange> selectedRanges() const;
@@ -85,7 +91,7 @@ protected:
 public slots:
 	void openProject(QString const& project_file);
 private:
-	enum MainAreaAction { LOAD_IMAGE, CLEAR_MAIN_AREA };
+	enum MainAreaAction { UPDATE_MAIN_AREA, CLEAR_MAIN_AREA };
 private slots:
 	void nextPage();
 	
@@ -114,7 +120,7 @@ private slots:
 	
 	void startBatchProcessing();
 	
-	void stopBatchProcessing(MainAreaAction main_area = LOAD_IMAGE);
+	void stopBatchProcessing(MainAreaAction main_area = UPDATE_MAIN_AREA);
 	
 	void invalidateThumbnail(PageId const& page_id);
 
@@ -155,10 +161,8 @@ private:
 		QWidget* widget, Ownership ownership,
 		DebugImages* debug_images = 0);
 	
-	void cancelOngoingTask();
-	
 	void switchToNewProject(
-		IntrusivePtr<PageSequence> const& pages,
+		IntrusivePtr<ProjectPages> const& pages,
 		QString const& out_dir,
 		QString const& project_file_path = QString(),
 		ProjectReader const* project_reader = 0);
@@ -178,7 +182,6 @@ private:
 	void updateSortOptions();
 
 	void resetThumbSequence(
-		ThumbnailSequence::SelectionAction selection_action,
 		IntrusivePtr<PageOrderProvider const> const& page_order_provider);
 	
 	void removeWidgetsFromLayout(QLayout* layout);
@@ -189,6 +192,8 @@ private:
 	
 	void updateProjectActions();
 	
+	bool isBatchProcessingInProgress() const;
+
 	bool isProjectLoaded() const;
 	
 	bool isBelowSelectContent() const;
@@ -201,13 +206,13 @@ private:
 	
 	bool isOutputFilter(int filter_idx) const;
 	
-	PageSequence::View getCurrentView() const;
+	PageView getCurrentView() const;
 	
 	void updateMainArea();
 	
 	bool checkReadyForOutput(PageId const* ignore = 0) const;
 	
-	void loadImage(PageInfo const& page);
+	void loadPageInteractive(PageInfo const& page);
 	
 	void updateWindowTitle();
 	
@@ -230,23 +235,25 @@ private:
 	void eraseOutputFiles(std::set<PageId> const& pages);
 	
 	BackgroundTaskPtr createCompositeTask(
-		PageInfo const& page, int last_filter_idx);
+		PageInfo const& page, int last_filter_idx, bool batch, bool debug);
 	
 	IntrusivePtr<CompositeCacheDrivenTask>
 	createCompositeCacheDrivenTask(int last_filter_idx);
 	
 	void createBatchProcessingWidget();
 
-	void updateDisambiguationRecords(PageSequenceSnapshot const& pages);
+	void updateDisambiguationRecords(PageSequence const& pages);
 	
 	QSizeF m_maxLogicalThumbSize;
-	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<StageSequence> m_ptrStages;
 	QString m_projectFile;
 	OutputFileNameGenerator m_outFileNameGen;
 	std::auto_ptr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence;
 	std::auto_ptr<WorkerThread> m_ptrWorkerThread;
+	std::auto_ptr<ProcessingTaskQueue> m_ptrBatchQueue;
+	std::auto_ptr<ProcessingTaskQueue> m_ptrInteractiveQueue;
 	QStackedLayout* m_pImageFrameLayout;
 	QStackedLayout* m_pOptionsFrameLayout;
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
@@ -256,14 +263,13 @@ private:
 	std::auto_ptr<QWidget> m_ptrBatchProcessingWidget;
 	std::auto_ptr<ProcessingIndicationWidget> m_ptrProcessingIndicationWidget;
 	QCheckBox* m_pBeepOnBatchProcessingCompletion;
-	BackgroundTaskPtr m_ptrCurTask;
+	SelectedPage m_selectedPage;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
 	int m_ignorePageOrderingChanges;
 	bool m_debug;
-	bool m_batchProcessing;
 	bool m_closing;
 	bool m_beepOnBatchProcessingCompletion;
 };

@@ -363,7 +363,9 @@ SET(
 	PageId.cpp PageId.h
 	PageInfo.cpp PageInfo.h
 	BackgroundTask.cpp BackgroundTask.h
+	ProcessingTaskQueue.cpp ProcessingTaskQueue.h
 	PageSequence.cpp PageSequence.h
+	ProjectPages.cpp ProjectPages.h
 	StageSequence.cpp StageSequence.h
 	FilterData.cpp FilterData.h
 	ImageMetadataLoader.cpp ImageMetadataLoader.h
@@ -393,7 +395,10 @@ SET(
 	SystemLoadWidget.cpp SystemLoadWidget.h
 	FileNameDisambiguator.cpp FileNameDisambiguator.h
 	OutputFileNameGenerator.cpp OutputFileNameGenerator.h
+	PageRange.cpp PageRange.h
+	SelectedPage.cpp SelectedPage.h
 	Utils.cpp Utils.h
+	PageView.h
 	AutoManualMode.h
 	AbstractCommand.h
 	AbstractFilter.h
@@ -404,7 +409,6 @@ SET(
 	ChangedStateItemDelegate.h
 	PageOrderProvider.h
 	PageOrderOption.h
-	PageRange.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h

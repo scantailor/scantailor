@@ -30,8 +30,6 @@
 #include "Dpi.h"
 #include <set>
 
-class PageSequence;
-
 namespace output
 {
 
@@ -43,7 +41,6 @@ class OptionsWidget
 	Q_OBJECT
 public:
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& pages,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
@@ -64,8 +61,12 @@ private slots:
 	
 	void dpiChanged(std::set<PageId> const& pages, Dpi const& dpi);
 	
+	void dpiChangedForAllPages(Dpi const& dpi);
+
 	void applyColorsConfirmed(std::set<PageId> const& pages);
 	
+	void applyColorsToAllPagesConfirmed();
+
 	void colorModeChanged(int idx);
 	
 	void whiteMarginsToggled(bool checked);
@@ -93,6 +94,8 @@ private slots:
 	void applyDespeckleButtonClicked();
 
 	void applyDespeckleConfirmed(std::set<PageId> const& pages);
+
+	void applyDespeckleToAllPagesConfirmed();
 private:
 	void handleDespeckleLevelChange(DespeckleLevel level);
 
@@ -103,7 +106,6 @@ private:
 	void updateColorsDisplay();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPages;
 	PageSelectionAccessor m_pageSelectionAccessor;
 	PageId m_pageId;
 	Dpi m_outputDpi;

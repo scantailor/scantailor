@@ -17,7 +17,8 @@
 */
 
 #include "ProjectWriter.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
+#include "PageView.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "ImageId.h"
@@ -34,10 +35,12 @@
 #include <assert.h>
 
 ProjectWriter::ProjectWriter(
-	IntrusivePtr<PageSequence> const& page_sequence,
+	IntrusivePtr<ProjectPages> const& page_sequence,
+	SelectedPage const& selected_page,
 	OutputFileNameGenerator const& out_file_name_gen)
-:	m_pageSequence(page_sequence->snapshot(PageSequence::PAGE_VIEW)),
+:	m_pageSequence(page_sequence->toPageSequence(PAGE_VIEW)),
 	m_outFileNameGen(out_file_name_gen),
+	m_selectedPage(selected_page),
 	m_layoutDirection(page_sequence->layoutDirection())
 {
 	int next_id = 1;
@@ -194,7 +197,9 @@ ProjectWriter::processPages(QDomDocument& doc) const
 {
 	QDomElement pages_el(doc.createElement("pages"));
 	
-	size_t const cur_page = m_pageSequence.curPageIdx();
+	PageId const sel_opt_1(m_selectedPage.get(IMAGE_VIEW));
+	PageId const sel_opt_2(m_selectedPage.get(PAGE_VIEW));
+
 	size_t const num_pages = m_pageSequence.numPages();
 	for (size_t i = 0; i < num_pages; ++i) {
 		PageInfo const& page = m_pageSequence.pageAt(i);
@@ -203,7 +208,7 @@ ProjectWriter::processPages(QDomDocument& doc) const
 		page_el.setAttribute("id", pageId(page_id));
 		page_el.setAttribute("imageId", imageId(page_id.imageId()));
 		page_el.setAttribute("subPage", page_id.subPageAsString());
-		if (cur_page == i) {
+		if (page_id == sel_opt_1 || page_id == sel_opt_2) {
 			page_el.setAttribute("selected", "selected");
 		}
 		pages_el.appendChild(page_el);

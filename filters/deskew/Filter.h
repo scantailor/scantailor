@@ -21,6 +21,7 @@
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
+#include "PageView.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
@@ -52,7 +53,7 @@ public:
 	
 	virtual QString getName() const;
 	
-	virtual PageSequence::View getView() const;
+	virtual PageView getView() const;
 	
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	

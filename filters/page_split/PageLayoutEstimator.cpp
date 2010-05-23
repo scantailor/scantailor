@@ -22,7 +22,7 @@
 #include "VertLineFinder.h"
 #include "ContentSpanFinder.h"
 #include "ImageMetadata.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include "DebugImages.h"
 #include "Dpi.h"
 #include "ImageTransformation.h"
@@ -221,7 +221,7 @@ int numPages(LayoutType const layout_type, ImageTransformation const& pre_xform)
 			QSize const image_size(
 				pre_xform.origRect().size().toSize()
 			);
-			num_pages = PageSequence::adviseNumberOfLogicalPages(
+			num_pages = ProjectPages::adviseNumberOfLogicalPages(
 				ImageMetadata(image_size, pre_xform.origDpi()),
 				pre_xform.preRotation()
 			);

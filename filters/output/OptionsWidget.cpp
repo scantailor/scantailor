@@ -42,11 +42,10 @@
 namespace output
 {
 
-OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& pages,
+OptionsWidget::OptionsWidget(
+	IntrusivePtr<Settings> const& settings,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
-	m_ptrPages(pages),
 	m_pageSelectionAccessor(page_selection_accessor),
 	m_despeckleLevel(DESPECKLE_NORMAL),
 	m_lastTab(TAB_OUTPUT),
@@ -276,12 +275,16 @@ void
 OptionsWidget::changeDpiButtonClicked()
 {
 	ChangeDpiDialog* dialog = new ChangeDpiDialog(
-		this, m_outputDpi, m_ptrPages, m_pageSelectionAccessor
+		this, m_outputDpi, m_pageId, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
 		dialog, SIGNAL(accepted(std::set<PageId> const&, Dpi const&)),
 		this, SLOT(dpiChanged(std::set<PageId> const&, Dpi const&))
+	);
+	connect(
+		dialog, SIGNAL(acceptedForAllPages(Dpi const&)),
+		this, SLOT(dpiChangedForAllPages(Dpi const&))
 	);
 	dialog->show();
 }
@@ -290,12 +293,16 @@ void
 OptionsWidget::applyColorsButtonClicked()
 {
 	ApplyColorsDialog* dialog = new ApplyColorsDialog(
-		this, m_ptrPages, m_pageSelectionAccessor
+		this, m_pageId, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
 		dialog, SIGNAL(accepted(std::set<PageId> const&)),
 		this, SLOT(applyColorsConfirmed(std::set<PageId> const&))
+	);
+	connect(
+		dialog, SIGNAL(acceptedForAllPages()),
+		this, SLOT(applyColorsToAllPagesConfirmed())
 	);
 	dialog->show();
 }
@@ -303,37 +310,50 @@ OptionsWidget::applyColorsButtonClicked()
 void
 OptionsWidget::dpiChanged(std::set<PageId> const& pages, Dpi const& dpi)
 {
-	m_outputDpi = dpi;
 	updateDpiDisplay();
 	
-	if (int(pages.size()) == m_ptrPages->numImages()) {
-		m_ptrSettings->setDpiForAllPages(dpi);
-		emit invalidateAllThumbnails();
-	} else {
-		BOOST_FOREACH(PageId const& page_id, pages) {
-			m_ptrSettings->setDpi(page_id, dpi);
-		}
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		m_ptrSettings->setDpi(page_id, dpi);
+		emit invalidateThumbnail(page_id);
 	}
 	
+	if (pages.find(m_pageId) != pages.end()) {
+		m_outputDpi = dpi;
+		emit reloadRequested();
+	}
+}
+
+void
+OptionsWidget::dpiChangedForAllPages(Dpi const& dpi)
+{
+	m_outputDpi = dpi;
+	updateDpiDisplay();
+
+	m_ptrSettings->setDpiForAllPages(dpi);
+	emit invalidateAllThumbnails();
 	emit reloadRequested();
 }
 
 void
 OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 {
-	if (int(pages.size()) == m_ptrPages->numImages()) {
-		m_ptrSettings->setColorParamsForAllPages(m_colorParams);
-		emit invalidateAllThumbnails();
-	} else {
-		BOOST_FOREACH(PageId const& page_id, pages) {
-			m_ptrSettings->setColorParams(page_id, m_colorParams);
-			emit invalidateThumbnail(page_id);
-		}
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		m_ptrSettings->setColorParams(page_id, m_colorParams);
+		emit invalidateThumbnail(page_id);
 	}
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		emit reloadRequested();
 	}
+}
+
+void
+OptionsWidget::applyColorsToAllPagesConfirmed()
+{
+	m_ptrSettings->setColorParamsForAllPages(m_colorParams);
+	emit invalidateAllThumbnails();
+
+	emit reloadRequested();
 }
 
 void
@@ -381,7 +401,7 @@ void
 OptionsWidget::applyDespeckleButtonClicked()
 {
 	ApplyColorsDialog* dialog = new ApplyColorsDialog(
-		this, m_ptrPages, m_pageSelectionAccessor
+		this, m_pageId, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowTitle(tr("Apply Despeckling Level"));
@@ -389,25 +409,32 @@ OptionsWidget::applyDespeckleButtonClicked()
 		dialog, SIGNAL(accepted(std::set<PageId> const&)),
 		this, SLOT(applyDespeckleConfirmed(std::set<PageId> const&))
 	);
+	connect(
+		dialog, SIGNAL(acceptedForAllPages()),
+		this, SLOT(applyDespeckleToAllPagesConfirmed())
+	);
 	dialog->show();
 }
 
 void
 OptionsWidget::applyDespeckleConfirmed(std::set<PageId> const& pages)
 {
-	if (int(pages.size()) == m_ptrPages->numImages()) {
-		m_ptrSettings->setDespeckleLevelForAllPages(m_despeckleLevel);
-		emit invalidateAllThumbnails();
-	} else {
-		BOOST_FOREACH(PageId const& page_id, pages) {
-			m_ptrSettings->setDespeckleLevel(page_id, m_despeckleLevel);
-			emit invalidateThumbnail(page_id);
-		}
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		m_ptrSettings->setDespeckleLevel(page_id, m_despeckleLevel);
+		emit invalidateThumbnail(page_id);
 	}
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		emit reloadRequested();
 	}
+}
+
+void
+OptionsWidget::applyDespeckleToAllPagesConfirmed()
+{
+	m_ptrSettings->setDespeckleLevelForAllPages(m_despeckleLevel);
+	emit invalidateAllThumbnails();
+	emit reloadRequested();
 }
 
 void

@@ -22,7 +22,7 @@
 #include "ImagePresentation.h"
 #include "Proximity.h"
 #include "PageId.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
@@ -39,7 +39,7 @@ namespace page_split
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
 	ImageTransformation const& xform, PageLayout const& layout,
-	IntrusivePtr<PageSequence> const& pages, ImageId const& image_id,
+	IntrusivePtr<ProjectPages> const& pages, ImageId const& image_id,
 	bool left_half_removed, bool right_half_removed)
 :	ImageViewBase(
 		image, downscaled_image,

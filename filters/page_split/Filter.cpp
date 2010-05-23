@@ -21,7 +21,7 @@
 #include "OptionsWidget.h"
 #include "Task.h"
 #include "Settings.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "PageId.h"
@@ -42,7 +42,7 @@
 namespace page_split
 {
 
-Filter::Filter(IntrusivePtr<PageSequence> const& page_sequence,
+Filter::Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(page_sequence),
 	m_ptrSettings(new Settings)
@@ -64,16 +64,16 @@ Filter::getName() const
 	return QCoreApplication::translate("page_split::Filter", "Split Pages");
 }
 
-PageSequence::View
+PageView
 Filter::getView() const
 {
-	return PageSequence::IMAGE_VIEW;
+	return IMAGE_VIEW;
 }
 
 void
 Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
-	m_ptrOptionsWidget->preUpdateUI(page_id.imageId());
+	m_ptrOptionsWidget->preUpdateUI(page_id);
 	ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 }
 
@@ -168,7 +168,7 @@ Filter::pageOrientationUpdate(
 	}
 
 	// Use orientation to update the number of logical pages in an image.
-	m_ptrPages->autoSetLogicalPagesInImage(image_id, orientation);
+	m_ptrPages->autoSetLayoutTypeFor(image_id, orientation);
 }
 
 void

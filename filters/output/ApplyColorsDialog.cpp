@@ -24,12 +24,13 @@
 namespace output
 {
 
-ApplyColorsDialog::ApplyColorsDialog(QWidget* parent,
-	IntrusivePtr<PageSequence> const& pages,
+ApplyColorsDialog::ApplyColorsDialog(
+	QWidget* parent, PageId const& cur_page,
 	PageSelectionAccessor const& page_selection_accessor)
 :	QDialog(parent),
-	m_pages(pages->snapshot(PageSequence::PAGE_VIEW)),
+	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_curPage(cur_page),
 	m_pScopeGroup(new QButtonGroup(this))
 {
 	setupUi(this);
@@ -50,21 +51,14 @@ ApplyColorsDialog::~ApplyColorsDialog()
 
 void
 ApplyColorsDialog::onSubmit()
-{
-	int const num_pages = m_pages.numPages();
-	int const cur_page = m_pages.curPageIdx();
-	
+{	
 	std::set<PageId> pages;
 	
 	// thisPageRB is intentionally not handled.
 	if (allPagesRB->isChecked()) {
-		for (int i = 0; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		emit acceptedForAllPages();
 	} else if (thisPageAndFollowersRB->isChecked()) {
-		for (int i = cur_page; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {
 		emit accepted(m_selectedPages);
 		accept();

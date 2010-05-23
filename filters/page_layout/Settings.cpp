@@ -115,10 +115,10 @@ public:
 	
 	void clear();
 	
-	void removePagesMissingFrom(PageSequenceSnapshot const& pages);
+	void removePagesMissingFrom(PageSequence const& pages);
 	
 	bool checkEverythingDefined(
-		PageSequenceSnapshot const& pages, PageId const* ignore) const;
+		PageSequence const& pages, PageId const* ignore) const;
 	
 	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
 	
@@ -221,14 +221,14 @@ Settings::clear()
 }
 
 void
-Settings::removePagesMissingFrom(PageSequenceSnapshot const& pages)
+Settings::removePagesMissingFrom(PageSequence const& pages)
 {
 	m_ptrImpl->removePagesMissingFrom(pages);
 }
 
 bool
 Settings::checkEverythingDefined(
-	PageSequenceSnapshot const& pages, PageId const* ignore) const
+	PageSequence const& pages, PageId const* ignore) const
 {
 	return m_ptrImpl->checkEverythingDefined(pages, ignore);
 }
@@ -370,7 +370,7 @@ Settings::Impl::clear()
 }
 
 void
-Settings::Impl::removePagesMissingFrom(PageSequenceSnapshot const& pages)
+Settings::Impl::removePagesMissingFrom(PageSequence const& pages)
 {
 	QMutexLocker const locker(&m_mutex);
 
@@ -395,7 +395,7 @@ Settings::Impl::removePagesMissingFrom(PageSequenceSnapshot const& pages)
 
 bool
 Settings::Impl::checkEverythingDefined(
-	PageSequenceSnapshot const& pages, PageId const* ignore) const
+	PageSequence const& pages, PageId const* ignore) const
 {
 	QMutexLocker const locker(&m_mutex);
 	

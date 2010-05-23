@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,13 +38,15 @@ class ChangeDpiDialog : public QDialog, private Ui::OutputChangeDpiDialog
 {
 	Q_OBJECT
 public:
-	ChangeDpiDialog(QWidget* parent, Dpi const& dpi,
-		IntrusivePtr<PageSequence> const& pages,
+	ChangeDpiDialog(
+		QWidget* parent, Dpi const& dpi, PageId const& cur_page,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~ChangeDpiDialog();
 signals:
 	void accepted(std::set<PageId> const& pages, Dpi const& dpi);
+
+	void acceptedForAllPages(Dpi const& dpi);
 private slots:
 	void dpiSelectionChanged(int index);
 	
@@ -52,8 +54,9 @@ private slots:
 	
 	void onSubmit();
 private:
-	PageSequenceSnapshot m_pages;
+	PageSequence m_pages;
 	std::set<PageId> m_selectedPages;
+	PageId m_curPage;
 	QButtonGroup* m_pScopeGroup;
 	int m_customItemIdx;
 	QString m_customDpiString;

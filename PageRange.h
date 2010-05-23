@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "PageId.h"
 #include <vector>
+#include <set>
 
 class PageRange
 {
@@ -29,13 +30,8 @@ public:
 	 * \brief Ordered list of consecutive pages.
 	 */
 	std::vector<PageId> pages;
-	
-	/**
-	 * \brief The index of the first page in the global page sequence.
-	 */
-	int firstPageIdx;
-	
-	PageRange() : firstPageIdx(-1) {}
+
+	std::set<PageId> selectEveryOther(PageId const& base) const;
 };
 
 #endif

@@ -39,12 +39,12 @@
 namespace output
 {
 
-Filter::Filter(IntrusivePtr<PageSequence> const& pages,
+Filter::Filter(
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
 	m_ptrOptionsWidget.reset(
-		new OptionsWidget(m_ptrSettings, pages, page_selection_accessor)
+		new OptionsWidget(m_ptrSettings, page_selection_accessor)
 	);
 }
 
@@ -58,10 +58,10 @@ Filter::getName() const
 	return QCoreApplication::translate("output::Filter", "Output");
 }
 
-PageSequence::View
+PageView
 Filter::getView() const
 {
-	return PageSequence::PAGE_VIEW;
+	return PAGE_VIEW;
 }
 
 void

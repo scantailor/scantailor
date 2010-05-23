@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class ApplyDialog : public QDialog, private Ui::PageLayoutApplyDialog
 {
 	Q_OBJECT
 public:
-	ApplyDialog(QWidget* parent, IntrusivePtr<PageSequence> const& pages,
+	ApplyDialog(QWidget* parent, PageId const& cur_page,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~ApplyDialog();
@@ -45,8 +45,9 @@ signals:
 private slots:
 	void onSubmit();
 private:
-	PageSequenceSnapshot m_pages;
+	PageSequence m_pages;
 	std::set<PageId> m_selectedPages;
+	PageId m_curPage;
 	QButtonGroup* m_pScopeGroup;
 };
 

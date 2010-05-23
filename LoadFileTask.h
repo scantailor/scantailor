@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 class ThumbnailPixmapCache;
 class PageInfo;
-class PageSequence;
+class ProjectPages;
 class QImage;
 
 namespace fix_orientation
@@ -42,7 +42,7 @@ class LoadFileTask : public BackgroundTask
 public:
 	LoadFileTask(Type type, PageInfo const& page,
 		ThumbnailPixmapCache& thumbnail_cache,
-		IntrusivePtr<PageSequence> const& page_sequence,
+		IntrusivePtr<ProjectPages> const& pages,
 		IntrusivePtr<fix_orientation::Task> const& next_task);
 	
 	virtual ~LoadFileTask();
@@ -58,7 +58,7 @@ private:
 	ThumbnailPixmapCache& m_rThumbnailCache;
 	ImageId m_imageId;
 	ImageMetadata m_imageMetadata;
-	IntrusivePtr<PageSequence> const m_ptrPageSequence;
+	IntrusivePtr<ProjectPages> const m_ptrPages;
 	IntrusivePtr<fix_orientation::Task> const m_ptrNextTask;
 };
 

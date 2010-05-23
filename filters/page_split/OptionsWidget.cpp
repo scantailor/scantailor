@@ -24,7 +24,7 @@
 #include "Params.h"
 #include "LayoutType.h"
 #include "PageId.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include "ScopedIncDec.h"
 #include <QPixmap>
 #include <boost/foreach.hpp>
@@ -35,7 +35,7 @@ namespace page_split
 
 OptionsWidget::OptionsWidget(
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& page_sequence,
+	IntrusivePtr<ProjectPages> const& page_sequence,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
 	m_ptrPages(page_sequence),
@@ -77,13 +77,13 @@ OptionsWidget::~OptionsWidget()
 }
 
 void
-OptionsWidget::preUpdateUI(ImageId const& image_id)
+OptionsWidget::preUpdateUI(PageId const& page_id)
 {
 	ScopedIncDec<int> guard1(m_ignoreAutoManualToggle);
 	ScopedIncDec<int> guard2(m_ignoreLayoutTypeToggle);
 	
-	m_imageId = image_id;
-	Settings::Record const record(m_ptrSettings->getPageRecord(image_id));
+	m_pageId = page_id;
+	Settings::Record const record(m_ptrSettings->getPageRecord(page_id.imageId()));
 	LayoutType const layout_type(record.combinedLayoutType());
 	
 	switch (layout_type) {
@@ -177,7 +177,7 @@ OptionsWidget::pageLayoutSetExternally(PageLayout const& page_layout)
 	
 	manualBtn->setChecked(true);
 	
-	emit invalidateThumbnail(PageId(m_imageId));
+	emit invalidateThumbnail(m_pageId);
 }
 
 void
@@ -188,7 +188,7 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 	}
 	
 	LayoutType lt;
-	int logical_pages = 1;
+	ProjectPages::LayoutType plt = ProjectPages::ONE_PAGE_LAYOUT;
 	
 	QObject* button = sender();
 	if (button == singlePageUncutBtn) {
@@ -198,7 +198,7 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 	} else {
 		assert(button == twoPagesBtn);
 		lt = TWO_PAGES;
-		logical_pages = 2;
+		plt = ProjectPages::TWO_PAGE_LAYOUT;
 	}
 	
 	Settings::UpdateAction update;
@@ -207,12 +207,12 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 	splitLineGroup->setVisible(lt != SINGLE_PAGE_UNCUT);
 	scopeLabel->setText(tr("Set manually"));
 	
-	m_ptrPages->setLogicalPagesInImage(m_imageId, logical_pages);
+	m_ptrPages->setLayoutTypeFor(m_pageId.imageId(), plt);
 	
 	if (lt == PAGE_PLUS_OFFCUT ||
 			(lt != SINGLE_PAGE_UNCUT &&
 			m_uiData.splitLineMode() == MODE_AUTO)) {
-		m_ptrSettings->updatePage(m_imageId, update);
+		m_ptrSettings->updatePage(m_pageId.imageId(), update);
 		emit reloadRequested();
 	} else {
 		PageLayout::Type plt;
@@ -231,62 +231,62 @@ OptionsWidget::layoutTypeButtonToggled(bool const checked)
 		);
 		
 		update.setParams(new_params);
-		m_ptrSettings->updatePage(m_imageId, update);
+		m_ptrSettings->updatePage(m_pageId.imageId(), update);
 		
 		m_uiData.setPageLayout(new_layout);
 
 		emit pageLayoutSetLocally(new_layout);
-		emit invalidateThumbnail(PageId(m_imageId));
+		emit invalidateThumbnail(m_pageId);
 	}
 }
 
 void
 OptionsWidget::showChangeDialog()
 {
-	Settings::Record const record(m_ptrSettings->getPageRecord(m_imageId));
+	Settings::Record const record(m_ptrSettings->getPageRecord(m_pageId.imageId()));
 	Params const* params = record.params();
 	if (!params) {
 		return;
 	}
 	
 	SplitModeDialog* dialog = new SplitModeDialog(
-		this, m_ptrPages, m_pageSelectionAccessor, record.combinedLayoutType(),
+		this, m_pageId, m_pageSelectionAccessor, record.combinedLayoutType(),
 		params->pageLayout().type(), params->splitLineMode() == MODE_AUTO
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(accepted(std::set<PageId> const&, LayoutType)),
-		this, SLOT(layoutTypeSet(std::set<PageId> const&, LayoutType))
+		dialog, SIGNAL(accepted(std::set<PageId> const&, bool, LayoutType)),
+		this, SLOT(layoutTypeSet(std::set<PageId> const&, bool, LayoutType))
 	);
 	dialog->show();
 }
 
 void
-OptionsWidget::layoutTypeSet(std::set<PageId> const& pages, LayoutType const layout_type)
+OptionsWidget::layoutTypeSet(
+	std::set<PageId> const& pages, bool all_pages, LayoutType const layout_type)
 {
 	if (pages.empty()) {
 		return;
 	}
 	
-	int const logical_pages = (layout_type == TWO_PAGES) ? 2 : 1;
+	ProjectPages::LayoutType const plt = (layout_type == TWO_PAGES)
+		? ProjectPages::TWO_PAGE_LAYOUT : ProjectPages::ONE_PAGE_LAYOUT;
 
-	if (int(pages.size()) == m_ptrPages->numImages()) {
+	if (all_pages) {
 		m_ptrSettings->setLayoutTypeForAllPages(layout_type);
 		if (layout_type != AUTO_LAYOUT_TYPE) {
-			m_ptrPages->setLogicalPagesInAllImages(logical_pages);
+			m_ptrPages->setLayoutTypeForAllPages(plt);
 		}
 	} else {
 		m_ptrSettings->setLayoutTypeFor(layout_type, pages);
 		if (layout_type != AUTO_LAYOUT_TYPE) {
 			BOOST_FOREACH(PageId const& page_id, pages) {
-				m_ptrPages->setLogicalPagesInImage(
-					page_id.imageId(), logical_pages
-				);
+				m_ptrPages->setLayoutTypeFor(page_id.imageId(), plt);
 			}
 		}
 	}
 	
-	if (int(pages.size()) > m_ptrPages->numImages() / 2) {
+	if (all_pages) {
 		emit invalidateAllThumbnails();
 	} else {
 		BOOST_FOREACH(PageId const& page_id, pages) {
@@ -312,7 +312,7 @@ OptionsWidget::splitLineModeChanged(bool const auto_mode)
 	if (auto_mode) {
 		Settings::UpdateAction update;
 		update.clearParams();
-		m_ptrSettings->updatePage(m_imageId, update);
+		m_ptrSettings->updatePage(m_pageId.imageId(), update);
 		m_uiData.setSplitLineMode(MODE_AUTO);
 		emit reloadRequested();
 	} else {
@@ -330,7 +330,7 @@ OptionsWidget::commitCurrentParams()
 	);
 	Settings::UpdateAction update;
 	update.setParams(params);
-	m_ptrSettings->updatePage(m_imageId, update);
+	m_ptrSettings->updatePage(m_pageId.imageId(), update);
 }
 
 

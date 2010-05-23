@@ -32,7 +32,7 @@
 #include <set>
 
 class QToolButton;
-class PageSequence;
+class ProjectPages;
 
 namespace page_layout
 {
@@ -47,12 +47,12 @@ class OptionsWidget :
 public:
 	OptionsWidget(
 		IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& pages,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
-	void preUpdateUI(Margins const& margins_mm, Alignment const& alignment);
+	void preUpdateUI(PageId const& page_id,
+		Margins const& margins_mm, Alignment const& alignment);
 	
 	void postUpdateUI();
 	
@@ -107,13 +107,13 @@ private:
 	void enableDisableAlignmentButtons();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPages;
 	PageSelectionAccessor m_pageSelectionAccessor;
 	QIcon m_chainIcon;
 	QIcon m_brokenChainIcon;
 	AlignmentByButton m_alignmentByButton;
 	double m_mmToUnit;
 	double m_unitToMM;
+	PageId m_pageId;
 	Margins m_marginsMM;
 	Alignment m_alignment;
 	int m_ignoreMarginChanges;

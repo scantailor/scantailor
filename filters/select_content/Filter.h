@@ -21,6 +21,7 @@
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
+#include "PageView.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
@@ -56,7 +57,7 @@ public:
 	
 	virtual QString getName() const;
 	
-	virtual PageSequence::View getView() const;
+	virtual PageView getView() const;
 	
 	virtual int selectedPageOrder() const;
 

@@ -65,10 +65,10 @@ Filter::getName() const
 	return tr("Select Content");
 }
 
-PageSequence::View
+PageView
 Filter::getView() const
 {
-	return PageSequence::PAGE_VIEW;
+	return PAGE_VIEW;
 }
 
 int

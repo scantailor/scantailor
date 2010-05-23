@@ -131,9 +131,11 @@ public:
 
 	void attachView(QGraphicsView* view);
 	
-	void reset(PageSequenceSnapshot const& pages,
+	void reset(PageSequence const& pages,
 		SelectionAction const selection_action,
 		IntrusivePtr<PageOrderProvider const> const& provider);
+
+	PageSequence toPageSequence() const;
 	
 	void invalidateThumbnail(PageId const& page_id);
 
@@ -141,13 +143,15 @@ public:
 	
 	void invalidateAllThumbnails();
 	
-	void setSelection(PageId const& page_id);
+	bool setSelection(PageId const& page_id);
 
 	PageInfo selectionLeader() const;
 
 	PageInfo prevPage(PageId const& page_id) const;
 
 	PageInfo nextPage(PageId const& page_id) const;
+
+	PageInfo firstPage() const;
 	
 	void insert(PageInfo const& new_page,
 		BeforeOrAfter before_or_after, ImageId const& image);
@@ -349,11 +353,17 @@ ThumbnailSequence::attachView(QGraphicsView* const view)
 
 void
 ThumbnailSequence::reset(
-	PageSequenceSnapshot const& pages,
+	PageSequence const& pages,
 	SelectionAction const selection_action,
 	IntrusivePtr<PageOrderProvider const> const& order_provider)
 {
 	m_ptrImpl->reset(pages, selection_action, order_provider);
+}
+
+PageSequence
+ThumbnailSequence::toPageSequence() const
+{
+	return m_ptrImpl->toPageSequence();
 }
 
 void
@@ -374,10 +384,10 @@ ThumbnailSequence::invalidateAllThumbnails()
 	m_ptrImpl->invalidateAllThumbnails();
 }
 
-void
+bool
 ThumbnailSequence::setSelection(PageId const& page_id)
 {
-	m_ptrImpl->setSelection(page_id);
+	return m_ptrImpl->setSelection(page_id);
 }
 
 PageInfo
@@ -396,6 +406,12 @@ PageInfo
 ThumbnailSequence::nextPage(PageId const& reference_page) const
 {
 	return m_ptrImpl->nextPage(reference_page);
+}
+
+PageInfo
+ThumbnailSequence::firstPage() const
+{
+	return m_ptrImpl->firstPage();
 }
 
 void
@@ -478,7 +494,7 @@ ThumbnailSequence::Impl::attachView(QGraphicsView* const view)
 
 void
 ThumbnailSequence::Impl::reset(
-	PageSequenceSnapshot const& pages,
+	PageSequence const& pages,
 	SelectionAction const selection_action,
 	IntrusivePtr<PageOrderProvider const> const& order_provider)
 {
@@ -549,12 +565,6 @@ ThumbnailSequence::Impl::reset(
 	if (!m_pSelectionLeader) {
 		if (some_selected_item) {
 			m_pSelectionLeader = some_selected_item;
-		} else {
-			ItemsById::iterator id_it(m_itemsById.find(pages.curPage().id()));
-			if (id_it != m_itemsById.end()) {
-				m_pSelectionLeader = &*id_it;
-				moveToSelected(m_pSelectionLeader);
-			}
 		}
 	}
 	
@@ -564,6 +574,18 @@ ThumbnailSequence::Impl::reset(
 			selection_leader, m_pSelectionLeader->composite, DEFAULT_SELECTION_FLAGS
 		);
 	}
+}
+
+PageSequence
+ThumbnailSequence::Impl::toPageSequence() const
+{
+	PageSequence pages;
+
+	BOOST_FOREACH(Item const& item, m_itemsInOrder) {
+		pages.append(item.pageInfo);
+	}
+
+	return pages;
 }
 
 void
@@ -721,12 +743,12 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	commitSceneRect();
 }
 
-void
+bool
 ThumbnailSequence::Impl::setSelection(PageId const& page_id)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_id));
 	if (id_it == m_itemsById.end()) {
-		return;
+		return false;
 	}
 	
 	bool const was_selection_leader = (&*id_it == m_pSelectionLeader);
@@ -763,6 +785,8 @@ ThumbnailSequence::Impl::setSelection(PageId const& page_id)
 	}
 	
 	m_rOwner.emitNewSelectionLeader(id_it->pageInfo, id_it->composite, flags);
+
+	return true;
 }
 
 PageInfo
@@ -817,6 +841,16 @@ ThumbnailSequence::Impl::nextPage(PageId const& reference_page) const
 	}
 
 	return PageInfo();
+}
+
+PageInfo
+ThumbnailSequence::Impl::firstPage() const
+{
+	if (m_items.empty()) {
+		return PageInfo();
+	}
+
+	return m_itemsInOrder.front().pageInfo;
 }
 
 void
@@ -987,9 +1021,8 @@ ThumbnailSequence::Impl::selectedRanges() const
 	
 	ItemsInOrder::iterator it(m_itemsInOrder.begin());
 	ItemsInOrder::iterator const end(m_itemsInOrder.end());
-	int page_idx = 0;
 	for (;;) {
-		for (; it != end && !it->isSelected(); ++it, ++page_idx) {
+		for (; it != end && !it->isSelected(); ++it) {
 			// Skip unselected items.
 		}
 		if (it == end) {
@@ -998,8 +1031,7 @@ ThumbnailSequence::Impl::selectedRanges() const
 		
 		ranges.push_back(PageRange());
 		PageRange& range = ranges.back();
-		range.firstPageIdx = page_idx;
-		for (; it != end && it->isSelected(); ++it, ++page_idx) {
+		for (; it != end && it->isSelected(); ++it) {
 			range.pages.push_back(it->pageInfo.id());
 		}
 	}

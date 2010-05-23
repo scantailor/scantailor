@@ -16,42 +16,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGEINFO_H_
-#define PAGEINFO_H_
+#ifndef SELECTED_PAGE_H_
+#define SELECTED_PAGE_H_
 
 #include "PageId.h"
-#include "ImageMetadata.h"
+#include "PageView.h"
 
-class PageInfo
+/**
+ * The whole point of this class can be demonstrated with a few lines of code:
+ * \code
+ * ImageId image_id = ...;
+ * SelectedPage page;
+ * page.set(PageId(image_id, PageId::RIGHT_PAGE), PAGE_VIEW);
+ * page.set(PageId(image_id, PageId::SINGLE_PAGE), IMAGE_VIEW);
+ * page.get(PAGE_VIEW); // Returns a RIGHT_PAGE PageId.
+ * \endcode
+ * As seen above, this class remembers the sub-page as long as image id
+ * stays the same.  Note that set(..., PAGE_VIEW) will always overwrite
+ * the sub-page, while get(IMAGE_VIEW) will always return SINGLE_PAGE sub-pages.
+ */
+class SelectedPage
 {
-	// Member-wise copying is OK.
 public:
-	PageInfo();
-	
-	PageInfo(PageId const& page_id, ImageMetadata const& metadata,
-		int image_sub_pages, bool left_half_removed, bool right_half_removed);
+	SelectedPage() {}
+
+	SelectedPage(PageId const& page_id, PageView view);
 
 	bool isNull() const { return m_pageId.isNull(); }
 
-	PageId const& id() const { return m_pageId; }
+	void set(PageId const& page_id, PageView view);
 
-	void setId(PageId const& id) { m_pageId = id; }
-	
-	ImageId const& imageId() const { return m_pageId.imageId(); }
-	
-	ImageMetadata const& metadata() const { return m_metadata; }
-	
-	int imageSubPages() const { return m_imageSubPages; }
-
-	bool leftHalfRemoved() const { return m_leftHalfRemoved; }
-
-	bool rightHalfRemoved() const { return m_rightHalfRemoved; }
+	PageId get(PageView view) const;
 private:
 	PageId m_pageId;
-	ImageMetadata m_metadata;
-	int m_imageSubPages;
-	bool m_leftHalfRemoved;
-	bool m_rightHalfRemoved;
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "AbstractFilter.h"
 #include "FilterOptionsWidget.h"
 #include "ThumbnailPixmapCache.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include "PageInfo.h"
 #include "Dpi.h"
 #include "Dpm.h"
@@ -57,13 +57,13 @@ private:
 LoadFileTask::LoadFileTask(
 	Type type, PageInfo const& page,
 	ThumbnailPixmapCache& thumbnail_cache,
-	IntrusivePtr<PageSequence> const& page_sequence,
+	IntrusivePtr<ProjectPages> const& pages,
 	IntrusivePtr<fix_orientation::Task> const& next_task)
 :	BackgroundTask(type),
 	m_rThumbnailCache(thumbnail_cache),
 	m_imageId(page.imageId()),
 	m_imageMetadata(page.metadata()),
-	m_ptrPageSequence(page_sequence),
+	m_ptrPages(pages),
 	m_ptrNextTask(next_task)
 {
 	assert(m_ptrNextTask);
@@ -107,7 +107,7 @@ LoadFileTask::updateImageSizeIfChanged(QImage const& image)
 	// creating a project).
 	if (image.size() != m_imageMetadata.size()) {
 		m_imageMetadata.setSize(image.size());
-		m_ptrPageSequence->updateImageMetadata(m_imageId, m_imageMetadata);
+		m_ptrPages->updateImageMetadata(m_imageId, m_imageMetadata);
 	}
 }
 

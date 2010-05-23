@@ -25,7 +25,7 @@
 #include "Margins.h"
 #include "Alignment.h"
 #include "Params.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "CacheDrivenTask.h"
@@ -46,14 +46,14 @@
 namespace page_layout
 {
 
-Filter::Filter(IntrusivePtr<PageSequence> const& pages,
+Filter::Filter(IntrusivePtr<ProjectPages> const& pages,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(pages),
 	m_ptrSettings(new Settings),
 	m_selectedPageOrder(0)
 {
 	m_ptrOptionsWidget.reset(
-		new OptionsWidget(m_ptrSettings, pages, page_selection_accessor)
+		new OptionsWidget(m_ptrSettings, page_selection_accessor)
 	);
 
 	typedef PageOrderOption::ProviderPtr ProviderPtr;
@@ -76,16 +76,16 @@ Filter::getName() const
 	return tr("Page Layout");
 }
 
-PageSequence::View
+PageView
 Filter::getView() const
 {
-	return PageSequence::PAGE_VIEW;
+	return PAGE_VIEW;
 }
 
 void
 Filter::selected()
 {
-	m_ptrSettings->removePagesMissingFrom(m_ptrPages->snapshot(getView()));
+	m_ptrSettings->removePagesMissingFrom(m_ptrPages->toPageSequence(getView()));
 }
 
 int
@@ -112,7 +112,7 @@ Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
 	Margins const margins_mm(m_ptrSettings->getHardMarginsMM(page_id));
 	Alignment const alignment(m_ptrSettings->getPageAlignment(page_id));
-	m_ptrOptionsWidget->preUpdateUI(margins_mm, alignment);
+	m_ptrOptionsWidget->preUpdateUI(page_id, margins_mm, alignment);
 	ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 }
 
@@ -208,12 +208,9 @@ Filter::invalidateContentBox(PageId const& page_id)
 }
 
 bool
-Filter::checkReadyForOutput(PageSequence const& pages, PageId const* ignore)
+Filter::checkReadyForOutput(ProjectPages const& pages, PageId const* ignore)
 {
-	PageSequenceSnapshot const snapshot(
-		pages.snapshot(PageSequence::PAGE_VIEW)
-	);
-	
+	PageSequence const snapshot(pages.toPageSequence(PAGE_VIEW));
 	return m_ptrSettings->checkEverythingDefined(snapshot, ignore);
 }
 

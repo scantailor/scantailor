@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include "OrthogonalRotation.h"
 #include "PageId.h"
 #include "ImageId.h"
-#include "PageSequence.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "XmlMarshaller.h"
@@ -43,15 +42,11 @@ namespace fix_orientation
 {
 
 Filter::Filter(
-	IntrusivePtr<PageSequence> const& page_sequence,
 	PageSelectionAccessor const& page_selection_accessor)
-:	m_ptrPages(page_sequence),
-	m_ptrSettings(new Settings)
+:	m_ptrSettings(new Settings)
 {
 	m_ptrOptionsWidget.reset(
-		new OptionsWidget(
-			m_ptrSettings, page_sequence, page_selection_accessor
-		)
+		new OptionsWidget(m_ptrSettings, page_selection_accessor)
 	);
 }
 
@@ -67,10 +62,10 @@ Filter::getName() const
 	);
 }
 
-PageSequence::View
+PageView
 Filter::getView() const
 {
-	return PageSequence::IMAGE_VIEW;
+	return IMAGE_VIEW;
 }
 
 void
@@ -80,7 +75,7 @@ Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 		OrthogonalRotation const rotation(
 			m_ptrSettings->getRotationFor(page_id.imageId())
 		);
-		m_ptrOptionsWidget->preUpdateUI(rotation);
+		m_ptrOptionsWidget->preUpdateUI(page_id, rotation);
 		ui->setOptionsWidget(m_ptrOptionsWidget.get(), ui->KEEP_OWNERSHIP);
 	}
 }

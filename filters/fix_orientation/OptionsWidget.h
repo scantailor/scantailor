@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,10 +22,9 @@
 #include "ui_OrientationOptionsWidget.h"
 #include "FilterOptionsWidget.h"
 #include "OrthogonalRotation.h"
+#include "PageId.h"
 #include "IntrusivePtr.h"
 #include "PageSelectionAccessor.h"
-
-class PageSequence;
 
 namespace fix_orientation
 {
@@ -38,12 +37,11 @@ class OptionsWidget :
 	Q_OBJECT
 public:
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& pages,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
-	void preUpdateUI(OrthogonalRotation rotation);
+	void preUpdateUI(PageId const& page_id, OrthogonalRotation rotation);
 	
 	void postUpdateUI(OrthogonalRotation rotation);
 signals:
@@ -58,14 +56,16 @@ private slots:
 	void showApplyToDialog();
 	
 	void appliedTo(std::set<PageId> const& pages);
+
+	void appliedToAllPages(std::set<PageId> const& pages);
 private:
 	void setRotation(OrthogonalRotation rotation);
 	
 	void setRotationPixmap();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPages;
 	PageSelectionAccessor m_pageSelectionAccessor;
+	PageId m_pageId;
 	OrthogonalRotation m_rotation;
 };
 

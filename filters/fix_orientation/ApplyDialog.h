@@ -40,18 +40,21 @@ class ApplyDialog : public QDialog, private Ui::OrientationApplyDialog
 {
 	Q_OBJECT
 public:
-	ApplyDialog(QWidget* parent, IntrusivePtr<PageSequence> const& pages,
+	ApplyDialog(QWidget* parent, PageId const& cur_page,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~ApplyDialog();
 signals:
 	void appliedTo(std::set<PageId> const& pages);
+
+	void appliedToAllPages(std::set<PageId> const& pages);
 private slots:
 	void onSubmit();
 private:
-	PageSequenceSnapshot m_pages;
+	PageSequence m_pages;
 	std::set<PageId> m_selectedPages;
 	std::vector<PageRange> m_selectedRanges;
+	PageId m_curPage;
 	QButtonGroup* m_pBtnGroup;
 };
 

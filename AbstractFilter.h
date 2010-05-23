@@ -20,7 +20,7 @@
 #define ABSTRACTFILTER_H_
 
 #include "RefCountable.h"
-#include "PageSequence.h"
+#include "PageView.h"
 #include "PageOrderOption.h"
 #include <vector>
 
@@ -39,7 +39,7 @@ public:
 	
 	virtual QString getName() const = 0;
 	
-	virtual PageSequence::View getView() const = 0;
+	virtual PageView getView() const = 0;
 	
 	virtual void selected() {}
 

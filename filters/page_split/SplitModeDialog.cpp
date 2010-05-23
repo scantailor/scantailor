@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,15 +26,15 @@ namespace page_split
 {
 
 SplitModeDialog::SplitModeDialog(
-	QWidget* const parent,
-	IntrusivePtr<PageSequence> const& pages,
+	QWidget* const parent, PageId const& cur_page,
 	PageSelectionAccessor const& page_selection_accessor,
 	LayoutType const layout_type,
 	PageLayout::Type const auto_detected_layout_type,
 	bool const auto_detected_layout_type_valid)
 :	QDialog(parent),
-	m_pages(pages->snapshot(PageSequence::IMAGE_VIEW)),
+	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_curPage(cur_page),
 	m_pScopeGroup(new QButtonGroup(this)),
 	m_layoutType(layout_type),
 	m_autoDetectedLayoutType(auto_detected_layout_type),
@@ -86,28 +86,23 @@ SplitModeDialog::onSubmit()
 		layout_type = combinedLayoutType();
 	}
 	
-	int const num_pages = m_pages.numPages();
-	int const cur_page = m_pages.curPageIdx();
-	
 	std::set<PageId> pages;
 	
 	if (thisPageRB->isChecked()) {
-		pages.insert(m_pages.curPage().id());
+		pages.insert(m_curPage);
 	} else if (allPagesRB->isChecked()) {
-		for (int i = 0; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectAll().swap(pages);
+		emit accepted(m_selectedPages, true, layout_type);
+		accept();
 	} else if (thisPageAndFollowersRB->isChecked()) {
-		for (int i = cur_page; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {
-		emit accepted(m_selectedPages, layout_type);
+		emit accepted(m_selectedPages, false, layout_type);
 		accept();
 		return;
 	}
 	
-	emit accepted(pages, layout_type);
+	emit accepted(pages, false, layout_type);
 	
 	// We assume the default connection from accepted() to accept()
 	// was removed.

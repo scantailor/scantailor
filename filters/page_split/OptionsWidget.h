@@ -31,8 +31,7 @@
 #include "AutoManualMode.h"
 #include <set>
 
-class ImageId;
-class PageSequence;
+class ProjectPages;
 
 namespace page_split
 {
@@ -76,12 +75,12 @@ public:
 	
 	
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
-		IntrusivePtr<PageSequence> const& page_sequence,
+		IntrusivePtr<ProjectPages> const& page_sequence,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
-	void preUpdateUI(ImageId const& image_id);
+	void preUpdateUI(PageId const& page_id);
 	
 	void postUpdateUI(UiData const& ui_data);
 signals:
@@ -93,16 +92,18 @@ private slots:
 	
 	void showChangeDialog();
 	
-	void layoutTypeSet(std::set<PageId> const& pages, LayoutType layout_type);
+	void layoutTypeSet(
+		std::set<PageId> const& pages,
+		bool all_pages, LayoutType layout_type);
 	
 	void splitLineModeChanged(bool auto_mode);
 private:
 	void commitCurrentParams();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
-	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	PageSelectionAccessor m_pageSelectionAccessor;
-	ImageId m_imageId;
+	PageId m_pageId;
 	UiData m_uiData;
 	int m_ignoreAutoManualToggle;
 	int m_ignoreLayoutTypeToggle;

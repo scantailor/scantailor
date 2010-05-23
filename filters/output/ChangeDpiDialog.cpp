@@ -32,12 +32,13 @@
 namespace output
 {
 
-ChangeDpiDialog::ChangeDpiDialog(QWidget* parent, Dpi const& dpi,
-	IntrusivePtr<PageSequence> const& pages,
+ChangeDpiDialog::ChangeDpiDialog(
+	QWidget* parent, Dpi const& dpi, PageId const& cur_page,
 	PageSelectionAccessor const& page_selection_accessor)
 :	QDialog(parent),
-	m_pages(pages->snapshot(PageSequence::PAGE_VIEW)),
+	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_curPage(cur_page),
 	m_pScopeGroup(new QButtonGroup(this))
 {
 	setupUi(this);
@@ -150,21 +151,16 @@ ChangeDpiDialog::onSubmit()
 		return;
 	}
 	
-	int const num_pages = m_pages.numPages();
-	int const cur_page = m_pages.curPageIdx();
-	
 	std::set<PageId> pages;
 	
 	if (thisPageRB->isChecked()) {
-		pages.insert(m_pages.curPage().id());
+		pages.insert(m_curPage);
 	} else if (allPagesRB->isChecked()) {
-		for (int i = 0; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		emit acceptedForAllPages(Dpi(dpi, dpi));
+		accept();
+		return;
 	} else if (thisPageAndFollowersRB->isChecked()) {
-		for (int i = cur_page; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {
 		emit accepted(m_selectedPages, Dpi(dpi, dpi));
 		accept();

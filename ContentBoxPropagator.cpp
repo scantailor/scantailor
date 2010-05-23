@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include "ContentBoxPropagator.h"
 #include "CompositeCacheDrivenTask.h"
+#include "ProjectPages.h"
 #include "PageSequence.h"
 #include "PageInfo.h"
 #include "ImageTransformation.h"
@@ -59,13 +60,13 @@ ContentBoxPropagator::~ContentBoxPropagator()
 }
 
 void
-ContentBoxPropagator::propagate(PageSequence const& pages)
+ContentBoxPropagator::propagate(ProjectPages const& pages)
 {
-	PageSequenceSnapshot snapshot(pages.snapshot(PageSequence::PAGE_VIEW));
-	size_t const num_pages = snapshot.numPages();
+	PageSequence const sequence(pages.toPageSequence(PAGE_VIEW));
+	size_t const num_pages = sequence.numPages();
 	
 	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info = snapshot.pageAt(i);
+		PageInfo const& page_info = sequence.pageAt(i);
 		Collector collector;
 		m_ptrTask->process(page_info, &collector);
 		if (collector.collected()) {

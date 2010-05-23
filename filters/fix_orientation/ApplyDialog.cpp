@@ -27,12 +27,13 @@ namespace fix_orientation
 {
 
 ApplyDialog::ApplyDialog(
-	QWidget* parent, IntrusivePtr<PageSequence> const& pages,
-	PageSelectionAccessor const& page_selection_accessor)
+	QWidget* parent,
+	PageId const& cur_page, PageSelectionAccessor const& page_selection_accessor)
 :	QDialog(parent),
-	m_pages(pages->snapshot(PageSequence::IMAGE_VIEW)),
+	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
 	m_selectedRanges(page_selection_accessor.selectedRanges()),
+	m_curPage(cur_page),
 	m_pBtnGroup(new QButtonGroup(this))
 {
 	setupUi(this);
@@ -62,36 +63,26 @@ ApplyDialog::~ApplyDialog()
 void
 ApplyDialog::onSubmit()
 {
-	int const cur_page = m_pages.curPageIdx();
-	int const num_pages = m_pages.numPages();
-	
 	std::set<PageId> pages;
 	
 	// thisPageOnlyRB is intentionally not handled.
 	if (allPagesRB->isChecked()) {
-		for (int i = 0; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectAll().swap(pages);
+		emit appliedToAllPages(pages);
+		accept();
+		return;
 	} else if (thisPageAndFollowersRB->isChecked()) {
-		for (int i = cur_page; i < num_pages; ++i) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {
 		emit appliedTo(m_selectedPages);
 		accept();
 		return;
 	} else if (everyOtherRB->isChecked()) {
-		for (int i = cur_page & 1; i < num_pages; i += 2) {
-			pages.insert(m_pages.pageAt(i).id());
-		}
+		m_pages.selectEveryOther(m_curPage).swap(pages);
 	} else if (everyOtherSelectedRB->isChecked()) {
 		assert(m_selectedRanges.size() == 1);
 		PageRange const& range = m_selectedRanges.front();
-		int i = (cur_page - range.firstPageIdx) & 1;
-		int const limit = range.pages.size();
-		for (; i < limit; i += 2) {
-			pages.insert(range.pages[i]);
-		}
+		range.selectEveryOther(m_curPage).swap(pages);
 	}
 	
 	emit appliedTo(pages);

@@ -22,7 +22,6 @@
 #include "ApplyDialog.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
-#include "PageSequence.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "imageproc/Constants.h"
@@ -38,10 +37,8 @@ namespace page_layout
 
 OptionsWidget::OptionsWidget(
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& pages,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
-	m_ptrPages(pages),
 	m_pageSelectionAccessor(page_selection_accessor),
 	m_mmToUnit(1.0),
 	m_unitToMM(1.0),
@@ -153,8 +150,10 @@ OptionsWidget::~OptionsWidget()
 }
 
 void
-OptionsWidget::preUpdateUI(Margins const& margins_mm, Alignment const& alignment)
+OptionsWidget::preUpdateUI(
+	PageId const& page_id, Margins const& margins_mm, Alignment const& alignment)
 {
+	m_pageId = page_id;
 	m_marginsMM = margins_mm;
 	m_alignment = alignment;
 	
@@ -305,7 +304,7 @@ void
 OptionsWidget::showApplyMarginsDialog()
 {
 	ApplyDialog* dialog = new ApplyDialog(
-		this, m_ptrPages, m_pageSelectionAccessor
+		this, m_pageId, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowTitle(tr("Apply Margins"));
@@ -320,7 +319,7 @@ void
 OptionsWidget::showApplyAlignmentDialog()
 {
 	ApplyDialog* dialog = new ApplyDialog(
-		this, m_ptrPages, m_pageSelectionAccessor
+		this, m_pageId, m_pageSelectionAccessor
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowTitle(tr("Apply Alignment"));

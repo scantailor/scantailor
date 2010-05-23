@@ -22,6 +22,7 @@
 #include "OptionsWidget.h"
 #include "Settings.h"
 #include "LayoutType.h"
+#include "ProjectPages.h"
 #include "PageInfo.h"
 #include "PageId.h"
 #include "PageLayoutEstimator.h"
@@ -42,6 +43,7 @@
 #include <QObject>
 #include <QDebug>
 #include <memory>
+#include <assert.h>
 
 namespace page_split
 {
@@ -52,7 +54,7 @@ class Task::UiUpdater : public FilterResult
 {
 public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
-		IntrusivePtr<PageSequence> const& pages,
+		IntrusivePtr<ProjectPages> const& pages,
 		std::auto_ptr<DebugImages> dbg_img,
 		QImage const& image, PageInfo const& page_info,
 		ImageTransformation const& xform,
@@ -64,7 +66,7 @@ public:
 	virtual IntrusivePtr<AbstractFilter> filter() { return m_ptrFilter; }
 private:
 	IntrusivePtr<Filter> m_ptrFilter;
-	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	QImage m_image;
 	QImage m_downscaledImage;
@@ -74,17 +76,30 @@ private:
 	bool m_batchProcessing;
 };
 
+static ProjectPages::LayoutType toPageLayoutType(PageLayout const& layout)
+{
+	switch (layout.type()) {
+		case PageLayout::SINGLE_PAGE_UNCUT:
+		case PageLayout::SINGLE_PAGE_CUT:
+			return ProjectPages::ONE_PAGE_LAYOUT;
+		case PageLayout::TWO_PAGES:
+			return ProjectPages::TWO_PAGE_LAYOUT;
+	}
+
+	assert(!"Unreachable");
+	return ProjectPages::ONE_PAGE_LAYOUT;
+}
 
 Task::Task(
 	IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
-	IntrusivePtr<PageSequence> const& page_sequence,
+	IntrusivePtr<ProjectPages> const& pages,
 	IntrusivePtr<deskew::Task> const& next_task,
 	PageInfo const& page_info,
 	bool const batch_processing, bool const debug)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
-	m_ptrPageSequence(page_sequence),
+	m_ptrPages(pages),
 	m_ptrNextTask(next_task),
 	m_pageInfo(page_info),
 	m_batchProcessing(batch_processing)
@@ -164,9 +179,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setPageLayout(layout);
 	ui_data.setSplitLineMode(record.params()->splitLineMode());
 	
-	m_ptrPageSequence->setLogicalPagesInImage(
-		m_pageInfo.imageId(), layout.numSubPages()
-	);
+	m_ptrPages->setLayoutTypeFor(m_pageInfo.imageId(), toPageLayoutType(layout));
 	
 	if (m_ptrNextTask) {
 		ImageTransformation new_xform(data.xform());
@@ -175,7 +188,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	} else {
 		return FilterResultPtr(
 			new UiUpdater(
-				m_ptrFilter, m_ptrPageSequence, m_ptrDbg, data.origImage(),
+				m_ptrFilter, m_ptrPages, m_ptrDbg, data.origImage(),
 				m_pageInfo, data.xform(), ui_data, m_batchProcessing
 			)
 		);
@@ -187,7 +200,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
-	IntrusivePtr<PageSequence> const& pages,
+	IntrusivePtr<ProjectPages> const& pages,
 	std::auto_ptr<DebugImages> dbg_img,
 	QImage const& image, PageInfo const& page_info,
 	ImageTransformation const& xform,

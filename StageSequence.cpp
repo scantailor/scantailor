@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
 */
 
 #include "StageSequence.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include <boost/foreach.hpp>
 
-StageSequence::StageSequence(IntrusivePtr<PageSequence> const& pages,
+StageSequence::StageSequence(IntrusivePtr<ProjectPages> const& pages,
 	PageSelectionAccessor const& page_selection_accessor)
-:	m_ptrFixOrientationFilter(new fix_orientation::Filter(pages, page_selection_accessor)),
+:	m_ptrFixOrientationFilter(new fix_orientation::Filter(page_selection_accessor)),
 	m_ptrPageSplitFilter(new page_split::Filter(pages, page_selection_accessor)),
 	m_ptrDeskewFilter(new deskew::Filter()),
 	m_ptrSelectContentFilter(new select_content::Filter()),
 	m_ptrPageLayoutFilter(new page_layout::Filter(pages, page_selection_accessor)),
-	m_ptrOutputFilter(new output::Filter(pages, page_selection_accessor))
+	m_ptrOutputFilter(new output::Filter(page_selection_accessor))
 {
 	m_fixOrientationFilterIdx = m_filters.size();
 	m_filters.push_back(m_ptrFixOrientationFilter);

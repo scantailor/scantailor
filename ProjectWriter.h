@@ -24,6 +24,7 @@
 #include "OutputFileNameGenerator.h"
 #include "ImageId.h"
 #include "PageId.h"
+#include "SelectedPage.h"
 #include "VirtualFunction.h"
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -35,6 +36,7 @@
 #include <map>
 
 class AbstractFilter;
+class ProjectPages;
 class PageInfo;
 class QDomDocument;
 class QDomElement;
@@ -46,7 +48,8 @@ public:
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
 	
 	ProjectWriter(
-		IntrusivePtr<PageSequence> const& page_sequence,
+		IntrusivePtr<ProjectPages> const& page_sequence,
+		SelectedPage const& selected_page,
 		OutputFileNameGenerator const& out_file_name_gen);
 	
 	~ProjectWriter();
@@ -173,8 +176,9 @@ private:
 	
 	void enumPagesImpl(VirtualFunction2<void, PageId const&, int>& out) const;
 	
-	PageSequenceSnapshot m_pageSequence;
+	PageSequence m_pageSequence;
 	OutputFileNameGenerator m_outFileNameGen;
+	SelectedPage m_selectedPage;
 	Directories m_dirs;
 	Files m_files;
 	Images m_images;

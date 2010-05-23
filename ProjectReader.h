@@ -23,6 +23,7 @@
 #include "PageId.h"
 #include "ImageInfo.h"
 #include "ImageMetadata.h"
+#include "SelectedPage.h"
 #include "IntrusivePtr.h"
 #include <QString>
 #include <QDomDocument>
@@ -32,7 +33,7 @@
 
 class QDomElement;
 class ProjectData;
-class PageSequence;
+class ProjectPages;
 class FileNameDisambiguator;
 class AbstractFilter;
 
@@ -51,7 +52,9 @@ public:
 	
 	QString const& outputDirectory() const { return m_outDir; }
 	
-	IntrusivePtr<PageSequence> const& pages() const { return m_ptrPages; }
+	IntrusivePtr<ProjectPages> const& pages() const { return m_ptrPages; }
+
+	SelectedPage const& selectedPage() const { return m_selectedPage; }
 
 	IntrusivePtr<FileNameDisambiguator> const& namingDisambiguator() const {
 		return m_ptrDisambiguator;
@@ -102,7 +105,8 @@ private:
 	FileMap m_fileMap;
 	ImageMap m_imageMap;
 	PageMap m_pageMap;
-	IntrusivePtr<PageSequence> m_ptrPages;
+	SelectedPage m_selectedPage;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<FileNameDisambiguator> m_ptrDisambiguator;
 };
 

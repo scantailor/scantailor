@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include <QDialog>
 #include <set>
 
+class ProjectPages;
 class PageSelectionAccessor;
 class QButtonGroup;
 
@@ -38,15 +39,15 @@ class SplitModeDialog : public QDialog, private Ui::PageSplitModeDialog
 {
 	Q_OBJECT
 public:
-	SplitModeDialog(QWidget* parent,
-		IntrusivePtr<PageSequence> const& pages,
+	SplitModeDialog(QWidget* parent, PageId const& cur_page,
 		PageSelectionAccessor const& page_selection_accessor,
 		LayoutType layout_type, PageLayout::Type auto_detected_layout_type,
 		bool auto_detected_layout_type_valid);
 	
 	virtual ~SplitModeDialog();
 signals:
-	void accepted(std::set<PageId> const& pages, LayoutType layout_type);
+	void accepted(std::set<PageId> const& pages,
+		bool all_pages, LayoutType layout_type);
 private slots:
 	void autoDetectionSelected();
 	
@@ -58,8 +59,9 @@ private:
 	
 	static char const* iconFor(LayoutType layout_type);
 	
-	PageSequenceSnapshot m_pages;
+	PageSequence m_pages;
 	std::set<PageId> m_selectedPages;
+	PageId m_curPage;
 	QButtonGroup* m_pScopeGroup;
 	LayoutType m_layoutType;
 	PageLayout::Type m_autoDetectedLayoutType;

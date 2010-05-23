@@ -16,31 +16,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SEQUENCE_H_
-#define PAGE_SEQUENCE_H_
+#include "PageRange.h"
+#include <boost/foreach.hpp>
 
-#include "PageInfo.h"
-#include <vector>
-#include <set>
-#include <stddef.h>
-
-class PageSequence
+std::set<PageId>
+PageRange::selectEveryOther(PageId const& base) const
 {
-	// Member-wise copying is OK.
-public:
-	void append(PageInfo const& page_info);
+	std::set<PageId> selection;
 	
-	size_t numPages() const { return m_pages.size(); }
-	
-	PageInfo const& pageAt(size_t idx) const;
+	std::vector<PageId>::const_iterator it(pages.begin());
+	std::vector<PageId>::const_iterator const end(pages.end());
+	for (; it != end && *it != base; ++it) {
+		// Continue until we have a match.
+	}
+	if (it == end) {
+		return selection;
+	}
 
-	std::set<PageId> selectAll() const;
+	int const base_idx = it - pages.begin();
+	int idx = 0;
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		if (((idx - base_idx) & 1) == 0) {
+			selection.insert(*it);
+		}
+		++idx;
+	}
 
-	std::set<PageId> selectPagePlusFollowers(PageId const& page) const;
-
-	std::set<PageId> selectEveryOther(PageId const& base) const;
-private:
-	std::vector<PageInfo> m_pages;
-};
-
-#endif
+	return selection;
+}

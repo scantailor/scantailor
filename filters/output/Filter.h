@@ -21,13 +21,13 @@
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
+#include "PageView.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
 #include "ZonePropFactory.h"
 
 class PageId;
-class PageSequence;
 class PageSelectionAccessor;
 class ThumbnailPixmapCache;
 class OutputFileNameGenerator;
@@ -45,14 +45,13 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& pages,
-		PageSelectionAccessor const& page_selection_accessor);
+	Filter(PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	
 	virtual QString getName() const;
 	
-	virtual PageSequence::View getView() const;
+	virtual PageView getView() const;
 	
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	

@@ -16,31 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SEQUENCE_H_
-#define PAGE_SEQUENCE_H_
+#ifndef PAGE_VIEW_H_
+#define PAGE_VIEW_H_
 
-#include "PageInfo.h"
-#include <vector>
-#include <set>
-#include <stddef.h>
-
-class PageSequence
-{
-	// Member-wise copying is OK.
-public:
-	void append(PageInfo const& page_info);
-	
-	size_t numPages() const { return m_pages.size(); }
-	
-	PageInfo const& pageAt(size_t idx) const;
-
-	std::set<PageId> selectAll() const;
-
-	std::set<PageId> selectPagePlusFollowers(PageId const& page) const;
-
-	std::set<PageId> selectEveryOther(PageId const& base) const;
-private:
-	std::vector<PageInfo> m_pages;
-};
+enum PageView { IMAGE_VIEW, PAGE_VIEW };
 
 #endif

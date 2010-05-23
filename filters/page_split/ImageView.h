@@ -32,7 +32,7 @@
 #include <QPixmap>
 
 class ImageTransformation;
-class PageSequence;
+class ProjectPages;
 class PageInfo;
 class QPointF;
 class QRectF;
@@ -49,7 +49,7 @@ class ImageView :
 public:
 	ImageView(QImage const& image, QImage const& downscaled_image,
 		ImageTransformation const& xform, PageLayout const& layout,
-		IntrusivePtr<PageSequence> const& pages, ImageId const& image_id,
+		IntrusivePtr<ProjectPages> const& pages, ImageId const& image_id,
 		bool left_half_removed, bool right_half_removed);
 	
 	virtual ~ImageView();
@@ -112,7 +112,7 @@ private:
 
 	static QLineF customInscribedCutterLine(QLineF const& line, QRectF const& rect);
 
-	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	ImageId m_imageId;
 	DraggablePoint m_handles[2][2];
 	ObjectDragHandler m_handleInteractors[2][2];

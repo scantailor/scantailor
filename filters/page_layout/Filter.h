@@ -21,6 +21,7 @@
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
+#include "PageView.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
@@ -29,7 +30,7 @@
 #include <vector>
 
 class PageId;
-class PageSequence;
+class ProjectPages;
 class PageSelectionAccessor;
 class ImageTransformation;
 class QString;
@@ -54,14 +55,14 @@ class Filter : public AbstractFilter
 	DECLARE_NON_COPYABLE(Filter)
 	Q_DECLARE_TR_FUNCTIONS(page_layout::Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& page_sequence,
+	Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	
 	virtual QString getName() const;
 	
-	virtual PageSequence::View getView() const;
+	virtual PageView getView() const;
 
 	virtual void selected();
 
@@ -86,7 +87,7 @@ public:
 	void invalidateContentBox(PageId const& page_id);
 	
 	bool checkReadyForOutput(
-		PageSequence const& pages, PageId const* ignore = 0);
+		ProjectPages const& pages, PageId const* ignore = 0);
 	
 	IntrusivePtr<Task> createTask(
 		PageId const& page_id,
@@ -102,7 +103,7 @@ private:
 		QDomDocument& doc, QDomElement& filter_el,
 		PageId const& page_id, int numeric_id) const;
 	
-	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
 	std::vector<PageOrderOption> m_pageOrderOptions;

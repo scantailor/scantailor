@@ -19,7 +19,9 @@
 #include "PageOrientationPropagator.h"
 #include "CompositeCacheDrivenTask.h"
 #include "OrthogonalRotation.h"
+#include "ProjectPages.h"
 #include "PageSequence.h"
+#include "PageView.h"
 #include "PageInfo.h"
 #include "filters/page_split/Filter.h"
 #include "filter_dc/PageOrientationCollector.h"
@@ -50,13 +52,13 @@ PageOrientationPropagator::~PageOrientationPropagator()
 }
 
 void
-PageOrientationPropagator::propagate(PageSequence const& pages)
+PageOrientationPropagator::propagate(ProjectPages const& pages)
 {
-	PageSequenceSnapshot snapshot(pages.snapshot(PageSequence::PAGE_VIEW));
-	size_t const num_pages = snapshot.numPages();
+	PageSequence const sequence(pages.toPageSequence(PAGE_VIEW));
+	size_t const num_pages = sequence.numPages();
 	
 	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info = snapshot.pageAt(i);
+		PageInfo const& page_info = sequence.pageAt(i);
 		Collector collector;
 		m_ptrTask->process(page_info, &collector);
 		m_ptrPageSplitFilter->pageOrientationUpdate(

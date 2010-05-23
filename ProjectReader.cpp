@@ -17,7 +17,7 @@
 */
 
 #include "ProjectReader.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include "FileNameDisambiguator.h"
 #include "AbstractFilter.h"
 #include "XmlUnmarshaller.h"
@@ -227,7 +227,7 @@ ProjectReader::processImages(
 	}
 	
 	if (!images.empty()) {
-		m_ptrPages.reset(new PageSequence(images, layout_direction));
+		m_ptrPages.reset(new ProjectPages(images, layout_direction));
 	}
 }
 
@@ -292,9 +292,7 @@ ProjectReader::processPages(QDomElement const& pages_el)
 		m_pageMap.insert(PageMap::value_type(id, page_id));
 
 		if (el.attribute("selected") == "selected") {
-			if (m_ptrPages.get()) {
-				m_ptrPages->setCurPage(page_id);
-			}
+			m_selectedPage.set(page_id, PAGE_VIEW);
 		}
 	}
 }

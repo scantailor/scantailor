@@ -35,7 +35,7 @@ class QGraphicsView;
 class PageId;
 class ImageId;
 class PageInfo;
-class PageSequenceSnapshot;
+class PageSequence;
 class ThumbnailFactory;
 class QSizeF;
 class QRectF;
@@ -88,13 +88,15 @@ public:
 	 *        be preserved until the next reset() call and will be taken
 	 *        into account by other methods, like invalidateThumbnail()
 	 *        and insert().  A null order provider indicates to keep the
-	 *        order of PageSequence.
+	 *        order of ProjectPages.
 	 */
-	void reset(PageSequenceSnapshot const& pages,
+	void reset(PageSequence const& pages,
 		SelectionAction const selection_action,
 		IntrusivePtr<PageOrderProvider const> const& order_provider
 			= IntrusivePtr<PageOrderProvider const>());
 	
+	PageSequence toPageSequence() const;
+
 	/**
 	 * \brief Updates appearence and possibly position of a thumbnail.
 	 *
@@ -125,9 +127,16 @@ public:
 	void invalidateAllThumbnails();
 	
 	/**
-	 * \brief Makes the item a selection leader, and unselects the other items.
+	 * \brief Makes the item a selection leader, and unselects other items.
+	 *
+	 * \param page_id The page to select.
+	 * \return true on success, false if the requested page wasn't found.
+	 *
+	 * On success, the newSelectionLeader() signal is emitted, possibly
+	 * with REDUNDANT_SELECTION flag set, in case our page was already the
+	 * selection leader.
 	 */
-	void setSelection(PageId const& page_id);
+	bool setSelection(PageId const& page_id);
 
 	/**
 	 * \brief Returns the current selection leader.
@@ -151,6 +160,13 @@ public:
 	 * there are no pages following it.
 	 */
 	PageInfo nextPage(PageId const& reference_page) const;
+
+	/**
+	 * \brief Returns the first page in this sequence.
+	 *
+	 * A null PageInfo is returned if the sequence is empty.
+	 */
+	PageInfo firstPage() const;
 	
 	/**
 	 * \brief Inserts a page before the first page with matching ImageId.
@@ -176,7 +192,7 @@ public:
 	 * Returns a null rectangle if no item is currently selected.
 	 */
 	QRectF selectionLeaderSceneRect() const;
-	
+
 	std::set<PageId> selectedItems() const;
 	
 	std::vector<PageRange> selectedRanges() const;

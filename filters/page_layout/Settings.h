@@ -25,7 +25,7 @@
 
 class PageId;
 class Margins;
-class PageSequenceSnapshot;
+class PageSequence;
 class QSizeF;
 
 namespace page_layout
@@ -52,7 +52,7 @@ public:
 	/**
 	 * \brief Removes all stored data for pages that are not in the provided list.
 	 */
-	void removePagesMissingFrom(PageSequenceSnapshot const& pages);
+	void removePagesMissingFrom(PageSequence const& pages);
 
 	/**
 	 * \brief Check that we have all the essential parameters for every
@@ -63,7 +63,7 @@ public:
 	 * \param ignore The page to be ignored by the check.  Optional.
 	 */
 	bool checkEverythingDefined(
-		PageSequenceSnapshot const& pages, PageId const* ignore = 0) const;
+		PageSequence const& pages, PageId const* ignore = 0) const;
 	
 	/**
 	 * \brief Get all page parameters at once.

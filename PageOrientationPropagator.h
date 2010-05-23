@@ -23,7 +23,7 @@
 #include <QSizeF>
 
 class CompositeCacheDrivenTask;
-class PageSequence;
+class ProjectPages;
 
 namespace page_split
 {
@@ -48,7 +48,7 @@ public:
 	
 	~PageOrientationPropagator();
 	
-	void propagate(PageSequence const& pages);
+	void propagate(ProjectPages const& pages);
 private:
 	class Collector;
 	

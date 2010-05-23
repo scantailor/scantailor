@@ -21,6 +21,7 @@
 
 #include "NonCopyable.h"
 #include "AbstractFilter.h"
+#include "PageView.h"
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
@@ -29,7 +30,7 @@
 class PageId;
 class ImageId;
 class PageInfo;
-class PageSequence;
+class ProjectPages;
 class PageSelectionAccessor;
 class OrthogonalRotation;
 
@@ -52,14 +53,14 @@ class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
 public:
-	Filter(IntrusivePtr<PageSequence> const& page_sequence,
+	Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	
 	virtual QString getName() const;
 	
-	virtual PageSequence::View getView() const;
+	virtual PageView getView() const;
 	
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
@@ -85,7 +86,7 @@ private:
 		QDomDocument& doc, QDomElement& filter_el,
 		ImageId const& image_id, int const numeric_id) const;
 	
-	IntrusivePtr<PageSequence> m_ptrPages;
+	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
 };

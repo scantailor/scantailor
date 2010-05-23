@@ -23,9 +23,9 @@
 #include "ImageMetadata.h"
 
 /**
- * This class stores the same information about an image as PageSequence does,
- * and is used for adding images to PageSequence objects.  Beyond that,
- * PageSequence doesn't operate with ImageInfo objects, but with PageInfo ones.
+ * This class stores the same information about an image as ProjectPages does,
+ * and is used for adding images to ProjectPages objects.  Beyond that,
+ * ProjectPages doesn't operate with ImageInfo objects, but with PageInfo ones.
  */
 class ImageInfo
 {

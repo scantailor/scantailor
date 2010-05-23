@@ -19,7 +19,7 @@
 #include "ProjectOpeningContext.h"
 #include "ProjectOpeningContext.h.moc"
 #include "FixDpiDialog.h"
-#include "PageSequence.h"
+#include "ProjectPages.h"
 #include <QString>
 #include <QMessageBox>
 #include <Qt>
