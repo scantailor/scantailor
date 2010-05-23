@@ -22,13 +22,30 @@ ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
 ENABLE_TESTING()
 
-# A hack to force cmake to be re-run when the VERSION file changes.
-CONFIGURE_FILE(
-	"${PROJECT_SOURCE_DIR}/VERSION"
-	"${PROJECT_BINARY_DIR}/VERSION" COPYONLY
-)
+# Prevent this leftover from old builds to be used in favour
+# of the one in ${PROJECT_SOURCE_DIR}
+FILE(REMOVE "${PROJECT_BINARY_DIR}/version.h")
 
-FILE(STRINGS "${PROJECT_SOURCE_DIR}/VERSION" VERSION LIMIT_COUNT 1)
+# Extract VERSION and VERSION_QUAD from version.h
+FILE(READ "${PROJECT_SOURCE_DIR}/version.h" version_h_contents)
+STRING(
+	REGEX REPLACE
+	".*#define[ \\t]+VERSION[ \\t]+\"([^\"]*)\".*"
+	"\\1" VERSION "${version_h_contents}"
+)
+IF("${VERSION}" STREQUAL "${version_h_contents}")
+	MESSAGE(FATAL_ERROR "Failed to extract VERSION from version.h")
+ENDIF()
+
+# VERSION_QUAD must be either empty or be in the form of X.Y.Z.Y
+STRING(
+	REGEX REPLACE
+	".*#define[ \\t]+VERSION_QUAD[ \\t]+\"(([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)?)\".*"
+	"\\1" VERSION_QUAD "${version_h_contents}"
+)
+IF("${VERSION_QUAD}" STREQUAL "${version_h_contents}")
+	MESSAGE(FATAL_ERROR "Failed to extract VERSION_QUAD from version.h")
+ENDIF()
 
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
@@ -286,7 +303,6 @@ ENDIF(WIN32)
 SET(TRANSLATIONS_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${TRANSLATIONS_DIR_REL}")
 
 CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
-CONFIGURE_FILE(version.h.in ${CMAKE_BINARY_DIR}/version.h @ONLY)
 
 # crash_reporter is included unconditionally to collect translation sources from there.
 ADD_SUBDIRECTORY(crash_reporter)
@@ -417,6 +433,8 @@ SET(
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
 
+SOURCE_GROUP("Version Header" FILES version.h)
+
 SET(win32_resource_file)
 IF(WIN32)
 	SET(rc_file "${CMAKE_SOURCE_DIR}/resources/win32/resources.rc")
@@ -441,7 +459,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(
-	scantailor WIN32 ${sources} ${ui_sources} VERSION
+	scantailor WIN32 ${sources} ${ui_sources} version.h
 	${resource_sources} ${win32_resource_file} resources/icons/COPYING
 )
 TARGET_LINK_LIBRARIES(

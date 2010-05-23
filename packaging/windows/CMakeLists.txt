@@ -64,16 +64,6 @@ SET(INSTALLER_FILENAME "scantailor-${VERSION}-install.exe")
 SET(REGISTER_EXTENSION_NSH "${CMAKE_CURRENT_SOURCE_DIR}/registerExtension.nsh")
 TO_NATIVE_PATH("${REGISTER_EXTENSION_NSH}" REGISTER_EXTENSION_NSH)
 
-# VERSION_QUAD must be either empty or have a format of x.x.x.x
-STRING(
-	REGEX MATCH "^[0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
-	VERSION_QUAD "${VERSION}"
-)
-STRING(
-	REGEX REPLACE "^([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1.0"
-	VERSION_QUAD "${VERSION_QUAD}"
-)
-
 CONFIGURE_FILE(scantailor.nsi.in ${CMAKE_BINARY_DIR}/scantailor.nsi @ONLY)
 
 GET_TARGET_PROPERTY(SCANTAILOR_EXE scantailor LOCATION)
