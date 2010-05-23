@@ -469,7 +469,6 @@ TARGET_LINK_LIBRARIES(
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
-GET_TARGET_PROPERTY(scantailor_executable scantailor LOCATION)
 
 IF(ENABLE_CRASH_REPORTER)
 	FIND_PATH(
@@ -495,14 +494,6 @@ IF(ENABLE_CRASH_REPORTER)
 
 	INCLUDE_DIRECTORIES(crash_reporter crash_reporter/google-breakpad)
 	TARGET_LINK_LIBRARIES(scantailor crash_handler)
-
-	ADD_CUSTOM_COMMAND(
-		TARGET scantailor POST_BUILD
-		COMMAND "${CMAKE_COMMAND}" ARGS -E echo "Dumping symbols..."
-		COMMAND "${DUMP_SYMS_EXECUTABLE}" ARGS "${scantailor_executable}" ">" "temp.sym"
-		COMMAND "${CMAKE_COMMAND}" ARGS -P "${CMAKE_SOURCE_DIR}/cmake/move_sym_file.cmake"
-		WORKING_DIRECTORY "${SYMBOLS_PATH}"
-	)
 ENDIF(ENABLE_CRASH_REPORTER)
 
 # Translations
