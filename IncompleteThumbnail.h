@@ -20,7 +20,7 @@
 #define INCOMPLETETHUMBNAIL_H_
 
 #include "ThumbnailBase.h"
-#include "intrusivePtr.h"
+#include "IntrusivePtr.h"
 #include <QPainterPath>
 
 class ThumbnailPixmapCache;

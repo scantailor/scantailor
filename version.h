@@ -1,5 +1,3 @@
-/* This file is a template for version.h, for use with CMake. */
-
 #ifndef SCANTAILOR_VERSION_H_
 #define SCANTAILOR_VERSION_H_
 

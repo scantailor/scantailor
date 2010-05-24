@@ -24,7 +24,9 @@ ENABLE_TESTING()
 
 # Prevent this leftover from old builds to be used in favour
 # of the one in ${PROJECT_SOURCE_DIR}
-FILE(REMOVE "${PROJECT_BINARY_DIR}/version.h")
+IF(NOT "${PROJECT_BINARY_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}")
+	FILE(REMOVE "${PROJECT_BINARY_DIR}/version.h")
+ENDIF()
 
 # Extract VERSION and VERSION_QUAD from version.h
 FILE(READ "${PROJECT_SOURCE_DIR}/version.h" version_h_contents)
