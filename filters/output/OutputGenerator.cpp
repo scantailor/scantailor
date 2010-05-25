@@ -855,7 +855,10 @@ OutputGenerator::adjustThreshold(BinaryThreshold threshold) const
 {
 	int const adjusted = threshold +
 		m_colorParams.blackWhiteOptions().thresholdAdjustment();
-	return BinaryThreshold(qBound(0, adjusted, 255));
+
+	// Hard-bounding threshold values is necessary for example
+	// if all the content went into the picture mask.
+	return BinaryThreshold(qBound(30, adjusted, 225));
 }
 
 BinaryImage
