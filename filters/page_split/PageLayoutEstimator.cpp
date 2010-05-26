@@ -768,7 +768,14 @@ PageLayoutEstimator::processContentSpansSinglePage(
 		return PageLayout(virtual_image_rect, left_line, vertLine(x));
 	}
 	
-	return PageLayout(virtual_image_rect);
+	if (layout_type == PAGE_PLUS_OFFCUT) {
+		QLineF const line1(virtual_image_rect.topLeft(), virtual_image_rect.bottomLeft());
+		QLineF const line2(virtual_image_rect.topRight(), virtual_image_rect.bottomRight());
+		return PageLayout(virtual_image_rect, line1, line2);
+	} else {
+		// Returning a SINGLE_PAGE_UNCUT layout.
+		return PageLayout(virtual_image_rect);
+	}
 }
 
 PageLayout

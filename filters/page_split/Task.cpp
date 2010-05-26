@@ -152,6 +152,18 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		Params const new_params(new_layout, deps, MODE_AUTO);
 		Settings::UpdateAction update;
 		update.setParams(new_params);
+
+#ifndef NDEBUG
+		{
+			Settings::Record updated_record(record);
+			updated_record.update(update);
+			assert(!updated_record.hasLayoutTypeConflict());
+			// This assert effectively verifies that PageLayoutEstimator::estimatePageLayout()
+			// returned a layout with of a type consistent with the requested one.
+			// If it didn't, it's a bug which will in fact cause a dead loop.
+		}
+#endif
+
 		bool conflict = false;
 		record = m_ptrSettings->conditionalUpdate(
 			m_pageInfo.imageId(), update, &conflict

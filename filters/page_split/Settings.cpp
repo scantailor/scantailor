@@ -190,19 +190,20 @@ Settings::conditionalUpdate(
 			if (conflict) {
 				*conflict = true;
 			}
-			return Record(m_defaultLayoutType);
+			return Record(it->second, m_defaultLayoutType);
+		}
+
+		if (conflict) {
+			*conflict = false;
 		}
 		
 		if (record.isNull()) {
 			m_perPageRecords.erase(it);
+			return Record(m_defaultLayoutType);
 		} else {
 			it->second = record;
+			return record;
 		}
-		
-		if (conflict) {
-			*conflict = false;
-		}
-		return record;
 	}
 }
 
