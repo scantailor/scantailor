@@ -37,7 +37,7 @@ PageRange::selectEveryOther(PageId const& base) const
 	int idx = 0;
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		if (((idx - base_idx) & 1) == 0) {
-			selection.insert(*it);
+			selection.insert(page_id);
 		}
 		++idx;
 	}

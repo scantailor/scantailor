@@ -78,7 +78,7 @@ PageSequence::selectEveryOther(PageId const& base) const
 	int idx = 0;
 	BOOST_FOREACH(PageInfo const& page_info, m_pages) {
 		if (((idx - base_idx) & 1) == 0) {
-			selection.insert(it->id());
+			selection.insert(page_info.id());
 		}
 		++idx;
 	}
