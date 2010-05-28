@@ -114,9 +114,13 @@ ContentBoxFinder::findContentBox(
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
+
+	if (xform_150dpi.resultingRect().toRect().isEmpty()) {
+		return QRectF();
+	}
 	
 	uint8_t const darkest_gray_level = darkestGrayLevel(data.grayImage());
-	
+
 	QImage gray150(
 		transformToGray(
 			data.grayImage(), xform_150dpi.transform(),
