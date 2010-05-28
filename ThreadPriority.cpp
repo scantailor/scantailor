@@ -77,7 +77,8 @@ ThreadPriority::load(
 ThreadPriority
 ThreadPriority::load(QString const& key, Priority dflt)
 {
-	return load(QSettings(), key, dflt);
+	QSettings settings;
+	return load(settings, key, dflt);
 }
 
 void

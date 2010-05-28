@@ -157,7 +157,7 @@ WorkerThread::Dispatcher::updateThreadPriority(BackgroundTask const& task)
 
 	ThreadPriority prio(
 		ThreadPriority::load(
-			QSettings(), "settings/batch_processing_priority", ThreadPriority::Normal
+			"settings/batch_processing_priority", ThreadPriority::Normal
 		)
 	);
 	if (task.type() == task.INTERACTIVE) {
