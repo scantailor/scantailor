@@ -31,7 +31,9 @@ class OrderByHeightProvider : public PageOrderProvider
 public:
 	OrderByHeightProvider(IntrusivePtr<Settings> const& settings);
 
-	virtual bool precedes(PageId const& lhs, PageId const& rhs) const;
+	virtual bool precedes(
+		PageId const& lhs_page, bool lhs_incomplete,
+		PageId const& rhs_page, bool rhs_incomplete) const;
 private:
 	IntrusivePtr<Settings> m_ptrSettings;
 };

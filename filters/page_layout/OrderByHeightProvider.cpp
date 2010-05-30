@@ -31,10 +31,12 @@ OrderByHeightProvider::OrderByHeightProvider(IntrusivePtr<Settings> const& setti
 }
 
 bool
-OrderByHeightProvider::precedes(PageId const& lhs, PageId const& rhs) const
+OrderByHeightProvider::precedes(
+	PageId const& lhs_page, bool const lhs_incomplete,
+	PageId const& rhs_page, bool const rhs_incomplete) const
 {
-	std::auto_ptr<Params> const lhs_params(m_ptrSettings->getPageParams(lhs));
-	std::auto_ptr<Params> const rhs_params(m_ptrSettings->getPageParams(rhs));
+	std::auto_ptr<Params> const lhs_params(m_ptrSettings->getPageParams(lhs_page));
+	std::auto_ptr<Params> const rhs_params(m_ptrSettings->getPageParams(rhs_page));
 	
 	QSizeF lhs_size;
 	if (lhs_params.get()) {
@@ -53,9 +55,12 @@ OrderByHeightProvider::precedes(PageId const& lhs, PageId const& rhs) const
 		);
 	}
 	
-	if (lhs_size.isValid() != rhs_size.isValid()) {
+	bool const lhs_valid = !lhs_incomplete && lhs_size.isValid();
+	bool const rhs_valid = !rhs_incomplete && rhs_size.isValid();
+
+	if (lhs_valid != rhs_valid) {
 		// Invalid (unknown) sizes go to the back.
-		return lhs_size.isValid();
+		return lhs_valid;
 	}
 
 	return lhs_size.height() < rhs_size.height();

@@ -20,41 +20,23 @@
 #define PAGE_ORDER_PROVIDER_H_
 
 #include "RefCountable.h"
-#include "PageId.h"
-#include "PageInfo.h"
 
+class PageId;
+
+/**
+ * A base class for different page ordering strategies.
+ */
 class PageOrderProvider : public RefCountable
 {
 public:
-	class Comparator
-	{
-		// Member-wise copying is OK.
-	public:
-		Comparator(IntrusivePtr<PageOrderProvider const> const& provider)
-			: m_ptrProvider(provider) {}
-
-		bool operator()(PageInfo const& lhs, PageInfo const& rhs) const {
-			return (*this)(lhs.id(), rhs.id());
-		}
-
-		bool operator()(PageId const& lhs, PageId const& rhs) const {
-			return m_ptrProvider->precedes(lhs, rhs);
-		}
-	private:
-		IntrusivePtr<PageOrderProvider const> m_ptrProvider;
-	};
-
 	/**
-	 * Returns true if \p lhs precedes \p rhs.
+	 * Returns true if \p lhs_page precedes \p rhs_page.
+	 * \p lhs_incomplete and \p rhs_incomplete indicate whether
+	 * a page is represented by IncompleteThumbnail.
 	 */
-	virtual bool precedes(PageId const& lhs, PageId const& rhs) const = 0;
-
-	/**
-	 * Provides a comparator suitable for sort()-like kinds of functions.
-	 */
-	Comparator comparator() const {
-		return Comparator(IntrusivePtr<PageOrderProvider const>(this));
-	}
+	virtual bool precedes(
+		PageId const& lhs_page, bool lhs_incomplete,
+		PageId const& rhs_page, bool rhs_incomplete) const = 0;
 };
 
 #endif

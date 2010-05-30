@@ -77,9 +77,7 @@ using namespace ::boost::lambda;
 class ThumbnailSequence::Item
 {
 public:
-	Item(PageInfo const& page_info, CompositeItem* comp_item)
-	: pageInfo(page_info), composite(comp_item),
-	m_isSelected(false), m_isSelectionLeader(false) {}
+	Item(PageInfo const& page_info, CompositeItem* comp_item);
 	
 	PageId const& pageId() const { return pageInfo.id(); }
 	
@@ -93,6 +91,7 @@ public:
 	
 	PageInfo pageInfo;
 	mutable CompositeItem* composite;
+	mutable bool incompleteThumbnail;
 private:
 	mutable bool m_isSelected;
 	mutable bool m_isSelectionLeader;
@@ -216,6 +215,7 @@ private:
 	 * \param begin Beginning of the interval to consider.
 	 * \param end End of the interval to consider.
 	 * \param page_id The item to find insertion position for.
+	 * \param page_incomplete Whether the page is represented by IncompleteThumbnail.
 	 * \param hint The place to start the search.  Must be within [begin, end].
 	 * \param dist_from_hint If provided, the distance from \p hint
 	 *        to the calculated insertion position will be written there.
@@ -224,8 +224,8 @@ private:
 	 */
 	ItemsInOrder::iterator itemInsertPosition(
 		ItemsInOrder::iterator begin, ItemsInOrder::iterator end,
-		PageId const& page_id, ItemsInOrder::iterator hint,
-		int* dist_from_hint = 0);
+		PageId const& page_id, bool page_incomplete,
+		ItemsInOrder::iterator hint, int* dist_from_hint = 0);
 	
 	std::auto_ptr<QGraphicsItem> getThumbnail(PageInfo const& page_info);
 	
@@ -300,6 +300,8 @@ public:
 	void setItem(Item const* item) { m_pItem = item; }
 	
 	Item const* item() { return m_pItem; }
+
+	bool incompleteThumbnail() const;
 	
 	void updateSceneRect(QRectF& scene_rect);
 	
@@ -517,37 +519,16 @@ ThumbnailSequence::Impl::reset(
 		return;
 	}
 
-	// Sort pages using m_ptrOrderProvider.
-	std::vector<PageInfo> sorted_pages;
-	sorted_pages.reserve(num_pages);
-	for (size_t i = 0; i < num_pages; ++i) {
-		sorted_pages.push_back(pages.pageAt(i));
-	}
-	if (m_ptrOrderProvider.get()) {
-		std::stable_sort(
-			sorted_pages.begin(), sorted_pages.end(),
-			m_ptrOrderProvider->comparator()
-		);
-	}
-
 	Item const* some_selected_item = 0;
-	double offset = 0;
 
 	for (size_t i = 0; i < num_pages; ++i) {
-		PageInfo const& page_info(sorted_pages[i]);
+		PageInfo const& page_info(pages.pageAt(i));
 		
-		std::auto_ptr<CompositeItem> composite(
-			getCompositeItem(0, page_info)
-		);
-		composite->setPos(0.0, offset);
-		composite->updateSceneRect(m_sceneRect);
-		
-		offset += composite->boundingRect().height() + SPACING;
-		
-		m_itemsInOrder.push_back(Item(page_info, composite.get()));
+		std::auto_ptr<CompositeItem> composite(getCompositeItem(0, page_info));
+		m_itemsInOrder.push_back(Item(page_info, composite.release()));
 		Item const* item = &m_itemsInOrder.back();
-		composite->setItem(item);
-		
+		item->composite->setItem(item);
+
 		if (selected.find(page_info.id()) != selected.end()) {
 			item->setSelected(true);
 			moveToSelected(item);
@@ -556,11 +537,9 @@ ThumbnailSequence::Impl::reset(
 		if (page_info.id() == selection_leader.id()) {
 			m_pSelectionLeader = item;
 		}
-		
-		m_graphicsScene.addItem(composite.release());
 	}
-	
-	commitSceneRect();
+
+	invalidateAllThumbnails();
 	
 	if (!m_pSelectionLeader) {
 		if (some_selected_item) {
@@ -623,6 +602,7 @@ ThumbnailSequence::Impl::invalidateThumbnailImpl(ItemsById::iterator const id_it
 	
 	m_graphicsScene.addItem(composite.release());
 	id_it->composite = new_composite;
+	id_it->incompleteThumbnail = new_composite->incompleteThumbnail();
 	delete old_composite;
 	
 	ItemsInOrder::iterator after_old(m_items.project<ItemsInOrderTag>(id_it));
@@ -636,7 +616,8 @@ ThumbnailSequence::Impl::invalidateThumbnailImpl(ItemsById::iterator const id_it
 	ItemsInOrder::iterator const after_new(
 		itemInsertPosition(
 			++m_itemsInOrder.begin(), m_itemsInOrder.end(),
-			id_it->pageInfo.id(), after_old, &dist
+			id_it->pageInfo.id(), id_it->incompleteThumbnail,
+			after_old, &dist
 		)
 	);
 
@@ -706,38 +687,39 @@ ThumbnailSequence::Impl::invalidateThumbnailImpl(ItemsById::iterator const id_it
 void
 ThumbnailSequence::Impl::invalidateAllThumbnails()
 {
-	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
-	double offset = 0;
-	
+	// Recreate thumbnails now, whether a thumbnail is incomplete
+	// is taken into account when sorting.
+	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
+	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
+	for (; ord_it != ord_end; ++ord_it) {
+		CompositeItem* const old_composite = ord_it->composite;
+		ord_it->composite = getCompositeItem(&*ord_it, ord_it->pageInfo).release();
+		ord_it->incompleteThumbnail = ord_it->composite->incompleteThumbnail();
+		delete old_composite;
+	}
+
 	// Sort pages in m_itemsInOrder using m_ptrOrderProvider.
 	if (m_ptrOrderProvider.get()) {
 		m_itemsInOrder.sort(
 			bind(
 				&PageOrderProvider::precedes, m_ptrOrderProvider.get(),
-				bind(&Item::pageId, _1), bind(&Item::pageId, _2) 
+				bind(&Item::pageId, _1), bind(&Item::incompleteThumbnail, _1),
+				bind(&Item::pageId, _2), bind(&Item::incompleteThumbnail, _2) 
 			)
 		);
 	}
+	
+	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
+	double offset = 0;
 
-	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
-	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
-	for (; ord_it != ord_end; ++ord_it) {
-		std::auto_ptr<CompositeItem> composite(
-			getCompositeItem(&*ord_it, ord_it->pageInfo)
-		);
-		
-		CompositeItem* const old_composite = ord_it->composite;
-		CompositeItem* const new_composite = composite.get();
-		
-		new_composite->setPos(0.0, offset);
-		new_composite->updateSceneRect(m_sceneRect);
-		new_composite->updateAppearence(ord_it->isSelected(), ord_it->isSelectionLeader());
-		
-		offset += new_composite->boundingRect().height() + SPACING;
-		delete old_composite;
-		
-		ord_it->composite = new_composite;
-		m_graphicsScene.addItem(composite.release());
+	for (ord_it = m_itemsInOrder.begin(); ord_it != ord_end; ++ord_it) {
+		CompositeItem* composite = ord_it->composite;
+		composite->setPos(0.0, offset);
+		composite->updateSceneRect(m_sceneRect);
+		composite->updateAppearence(ord_it->isSelected(), ord_it->isSelectionLeader());
+
+		offset += composite->boundingRect().height() + SPACING;
+		m_graphicsScene.addItem(composite);
 	}
 	
 	commitSceneRect();
@@ -888,7 +870,8 @@ ThumbnailSequence::Impl::insert(
 
 	// If m_ptrOrderProvider is not set, ord_it won't change.
 	ord_it = itemInsertPosition(
-		m_itemsInOrder.begin(), m_itemsInOrder.end(), page_info.id(), ord_it
+		m_itemsInOrder.begin(), m_itemsInOrder.end(), page_info.id(),
+		/*page_incomplete=*/true, ord_it
 	);
 	
 	double offset = 0.0;
@@ -1262,7 +1245,8 @@ ThumbnailSequence::Impl::clearSelection()
 ThumbnailSequence::Impl::ItemsInOrder::iterator
 ThumbnailSequence::Impl::itemInsertPosition(
 	ItemsInOrder::iterator const begin, ItemsInOrder::iterator const end,
-	PageId const& page_id, ItemsInOrder::iterator const hint, int* dist_from_hint)
+	PageId const& page_id, bool const page_incomplete,
+	ItemsInOrder::iterator const hint, int* dist_from_hint)
 {
 	// Note that to preserve stable ordering, this function *must* return hint,
 	// as long as it's an acceptable position.
@@ -1282,7 +1266,10 @@ ThumbnailSequence::Impl::itemInsertPosition(
 	while (ins_pos != begin) {
 		ItemsInOrder::iterator prev(ins_pos);
 		--prev;
-		if (m_ptrOrderProvider->precedes(page_id, prev->pageId())) {
+		bool const precedes = m_ptrOrderProvider->precedes(
+			page_id, page_incomplete, prev->pageId(), prev->incompleteThumbnail
+		);
+		if (precedes) {
 			ins_pos = prev;
 			--dist;
 		} else {
@@ -1293,7 +1280,11 @@ ThumbnailSequence::Impl::itemInsertPosition(
 	// While the element pointed to by ins_pos is supposed to precede
 	// the page we are inserting, advance ins_pos.
 	while (ins_pos != end) {
-		if (m_ptrOrderProvider->precedes(ins_pos->pageId(), page_id)) {
+		bool const precedes = m_ptrOrderProvider->precedes(
+			ins_pos->pageId(), ins_pos->incompleteThumbnail,
+			page_id, page_incomplete
+		);
+		if (precedes) {
 			++ins_pos;
 			++dist;
 		} else {
@@ -1406,6 +1397,15 @@ ThumbnailSequence::Impl::commitSceneRect()
 
 
 /*==================== ThumbnailSequence::Item ======================*/
+
+ThumbnailSequence::Item::Item(PageInfo const& page_info, CompositeItem* comp_item)
+:	pageInfo(page_info),
+	composite(comp_item),
+	incompleteThumbnail(comp_item->incompleteThumbnail()),
+	m_isSelected(false),
+	m_isSelectionLeader(false)
+{
+}
 
 void
 ThumbnailSequence::Item::setSelected(bool selected) const
@@ -1524,6 +1524,12 @@ ThumbnailSequence::CompositeItem::CompositeItem(
 	
 	setCursor(Qt::PointingHandCursor);
 	setZValue(-1);
+}
+
+bool
+ThumbnailSequence::CompositeItem::incompleteThumbnail() const
+{
+	return dynamic_cast<IncompleteThumbnail*>(m_pThumb) != 0;
 }
 
 void
