@@ -96,13 +96,22 @@ VertLineFinder::findLines(
 	// obsolete.
 	GrayImage preprocessed(gray100);
 #endif
-	
+
+#if 0
 	GrayImage h_gradient(morphGradientDetectDarkSide(preprocessed, QSize(11, 1)));
 	GrayImage v_gradient(morphGradientDetectDarkSide(preprocessed, QSize(1, 11)));
 	if (dbg) {
 		dbg->add(h_gradient, "h_gradient");
 		dbg->add(v_gradient, "v_gradient");
-	} else {
+	}
+#else
+	// These are not gradients, but their difference is the same as for
+	// the two gradients above.  This branch is an optimization.
+	GrayImage h_gradient(erodeGray(preprocessed, QSize(11, 1), 0x00));
+	GrayImage v_gradient(erodeGray(preprocessed, QSize(1, 11), 0x00));
+#endif
+
+	if (!dbg) {
 		// We'll need it later if debugging is on.
 		preprocessed = GrayImage();
 	}
@@ -112,7 +121,7 @@ VertLineFinder::findLines(
 	if (dbg) {
 		dbg->add(h_gradient, "vert_raster_lines");
 	}
-	
+
 	GrayImage const raster_lines(closeGray(h_gradient, QSize(1, 19), 0x00));
 	h_gradient = GrayImage();
 	if (dbg) {
