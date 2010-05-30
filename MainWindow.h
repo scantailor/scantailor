@@ -93,9 +93,13 @@ public slots:
 private:
 	enum MainAreaAction { UPDATE_MAIN_AREA, CLEAR_MAIN_AREA };
 private slots:
-	void nextPage();
+	void goFirstPage();
+
+	void goLastPage();
+
+	void goNextPage();
 	
-	void prevPage();
+	void goPrevPage();
 	
 	void goToPage(PageId const& page_id);
 	

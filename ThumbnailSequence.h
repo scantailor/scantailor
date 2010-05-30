@@ -160,14 +160,21 @@ public:
 	 * there are no pages following it.
 	 */
 	PageInfo nextPage(PageId const& reference_page) const;
-
+	
 	/**
-	 * \brief Returns the first page in this sequence.
+	 * \brief Returns the first page in the sequence.
 	 *
 	 * A null PageInfo is returned if the sequence is empty.
 	 */
 	PageInfo firstPage() const;
-	
+
+	/**
+	 * \brief Returns the last page in the sequence.
+	 *
+	 * A null PageInfo is returned if the sequence is empty.
+	 */
+	PageInfo lastPage() const;
+
 	/**
 	 * \brief Inserts a page before the first page with matching ImageId.
 	 *

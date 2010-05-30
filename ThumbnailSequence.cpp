@@ -151,7 +151,9 @@ public:
 	PageInfo nextPage(PageId const& page_id) const;
 
 	PageInfo firstPage() const;
-	
+
+	PageInfo lastPage() const;
+
 	void insert(PageInfo const& new_page,
 		BeforeOrAfter before_or_after, ImageId const& image);
 
@@ -414,6 +416,12 @@ PageInfo
 ThumbnailSequence::firstPage() const
 {
 	return m_ptrImpl->firstPage();
+}
+
+PageInfo
+ThumbnailSequence::lastPage() const
+{
+	return m_ptrImpl->lastPage();
 }
 
 void
@@ -833,6 +841,16 @@ ThumbnailSequence::Impl::firstPage() const
 	}
 
 	return m_itemsInOrder.front().pageInfo;
+}
+
+PageInfo
+ThumbnailSequence::Impl::lastPage() const
+{
+	if (m_items.empty()) {
+		return PageInfo();
+	}
+
+	return m_itemsInOrder.back().pageInfo;
 }
 
 void

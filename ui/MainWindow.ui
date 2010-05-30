@@ -114,6 +114,7 @@
        <property name="frameShadow">
         <enum>QFrame::Sunken</enum>
        </property>
+       <zorder></zorder>
       </widget>
      </widget>
     </item>
@@ -157,7 +158,7 @@
          </size>
         </property>
         <property name="statusTip">
-         <string>Use PgUp, PgDown or Q, W to navigate between pages.</string>
+         <string>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignHCenter|Qt::AlignTop</set>
@@ -313,6 +314,22 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings ...</string>
+   </property>
+  </action>
+  <action name="actionFirstPage">
+   <property name="text">
+    <string>First Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Home</string>
+   </property>
+  </action>
+  <action name="actionLastPage">
+   <property name="text">
+    <string>Last Page</string>
+   </property>
+   <property name="shortcut">
+    <string>End</string>
    </property>
   </action>
  </widget>

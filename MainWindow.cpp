@@ -157,15 +157,19 @@ MainWindow::MainWindow()
 	m_pImageFrameLayout = new QStackedLayout(imageViewFrame);
 	m_pOptionsFrameLayout = new QStackedLayout(filterOptions);
 	
+	addAction(actionFirstPage);
+	addAction(actionLastPage);
 	addAction(actionNextPage);
 	addAction(actionPrevPage);
 	addAction(actionPrevPageQ);
 	addAction(actionNextPageW);
 	
-	connect(actionPrevPage, SIGNAL(triggered(bool)), this, SLOT(prevPage()));
-	connect(actionNextPage, SIGNAL(triggered(bool)), this, SLOT(nextPage()));
-	connect(actionPrevPageQ, SIGNAL(triggered(bool)), this, SLOT(prevPage()));
-	connect(actionNextPageW, SIGNAL(triggered(bool)), this, SLOT(nextPage()));
+	connect(actionFirstPage, SIGNAL(triggered(bool)), SLOT(goFirstPage()));
+	connect(actionLastPage, SIGNAL(triggered(bool)), SLOT(goLastPage()));
+	connect(actionPrevPage, SIGNAL(triggered(bool)), SLOT(goPrevPage()));
+	connect(actionNextPage, SIGNAL(triggered(bool)), SLOT(goNextPage()));
+	connect(actionPrevPageQ, SIGNAL(triggered(bool)), this, SLOT(goPrevPage()));
+	connect(actionNextPageW, SIGNAL(triggered(bool)), this, SLOT(goNextPage()));
 	
 	connect(
 		filterList->selectionModel(),
@@ -786,7 +790,33 @@ MainWindow::invalidateAllThumbnails()
 }
 
 void
-MainWindow::nextPage()
+MainWindow::goFirstPage()
+{
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
+		return;
+	}
+	
+	PageInfo const first_page(m_ptrThumbSequence->firstPage());
+	if (!first_page.isNull()) {
+		goToPage(first_page.id());
+	}
+}
+
+void
+MainWindow::goLastPage()
+{
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
+		return;
+	}
+	
+	PageInfo const last_page(m_ptrThumbSequence->lastPage());
+	if (!last_page.isNull()) {
+		goToPage(last_page.id());
+	}
+}
+
+void
+MainWindow::goNextPage()
 {
 	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
 		return;
@@ -801,7 +831,7 @@ MainWindow::nextPage()
 }
 
 void
-MainWindow::prevPage()
+MainWindow::goPrevPage()
 {
 	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
 		return;
