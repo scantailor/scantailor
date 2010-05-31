@@ -196,7 +196,13 @@ ImageView::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
 	
 	event->accept();
 	double const delta = degree_fraction * event->delta() / 120;
-	m_xform.setPostRotation(m_xform.postRotation() - delta);
+	double angle_deg = m_xform.postRotation() - delta;
+	angle_deg = qBound(-m_maxRotationDeg, angle_deg, m_maxRotationDeg);
+	if (angle_deg == m_xform.postRotation()) {
+		return;
+	}
+
+	m_xform.setPostRotation(angle_deg);
 	updateTransformPreservingScale(
 		ImagePresentation(m_xform.transform(), m_xform.resultingCropArea())
 	);
@@ -229,6 +235,9 @@ ImageView::handleMoveRequest(int idx, QPointF const& pos)
 	}
 	double angle_deg = angle_rad * imageproc::constants::RAD2DEG;
 	angle_deg = qBound(-m_maxRotationDeg, angle_deg, m_maxRotationDeg);
+	if (angle_deg == m_xform.postRotation()) {
+		return;
+	}
 
 	m_xform.setPostRotation(angle_deg);
 	updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
