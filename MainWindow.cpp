@@ -79,6 +79,7 @@
 #include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
 #include "ui_RemovePagesDialog.h"
+#include "ui_BatchProcessingLowerPanel.h"
 #include "config.h"
 #include "version.h"
 #include <boost/foreach.hpp>
@@ -442,6 +443,8 @@ MainWindow::showNewOpenProjectPanel()
 void
 MainWindow::createBatchProcessingWidget()
 {
+	using namespace boost::lambda;
+
 	m_ptrBatchProcessingWidget.reset(new QWidget);
 	QGridLayout* layout = new QGridLayout(m_ptrBatchProcessingWidget.get());
 	m_ptrBatchProcessingWidget->setLayout(layout);
@@ -454,16 +457,15 @@ MainWindow::createBatchProcessingWidget()
 	);
 	stop_btn->setStatusTip(tr("Stop batch processing"));
 	
-	QWidget* lower_panel = new QWidget(m_ptrBatchProcessingWidget.get());
-	QVBoxLayout* lower_layout = new QVBoxLayout(lower_panel);
-	lower_panel->setLayout(lower_layout);
-	
-	lower_layout->addSpacing(30);
-	lower_layout->addWidget(new SystemLoadWidget(lower_panel));
-	m_pBeepOnBatchProcessingCompletion = new QCheckBox(
-		tr("Beep when finished"), lower_panel
-	);
-	lower_layout->addWidget(m_pBeepOnBatchProcessingCompletion);
+	class LowerPanel : public QWidget
+	{
+	public:
+		LowerPanel(QWidget* parent = 0) : QWidget(parent) { ui.setupUi(this); }
+
+		Ui::BatchProcessingLowerPanel ui;
+	};
+	LowerPanel* lower_panel = new LowerPanel(m_ptrBatchProcessingWidget.get());
+	m_checkBeepWhenFinished = bind(&QCheckBox::isChecked, lower_panel->ui.beepWhenFinished);
 
 	int row = 0; // Row 0 is reserved.
 	layout->addWidget(stop_btn, ++row, 1, Qt::AlignCenter);
@@ -1157,7 +1159,7 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 		if (m_ptrBatchQueue->allProcessed()) {
 			stopBatchProcessing();
 			QApplication::alert(this); // Flash the taskbar entry.
-			if (m_pBeepOnBatchProcessingCompletion->isChecked()) {
+			if (m_checkBeepWhenFinished()) {
 				QApplication::beep();
 			}
 			return;
