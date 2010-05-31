@@ -328,6 +328,32 @@ ImageViewBase::zoom(double zoom)
 }
 
 void
+ImageViewBase::moveTowardsIdealPosition(double const pixel_length)
+{
+	if (pixel_length <= 0) {
+		// The name implies we are moving *towards* the ideal position.
+		return;
+	}
+
+	QPointF const ideal_widget_fp(getIdealWidgetFocalPoint(CENTER_IF_FITS));
+	if (ideal_widget_fp == m_widgetFocalPoint) {
+		return;
+	}
+
+	QPointF vec(ideal_widget_fp - m_widgetFocalPoint);
+	double const max_length = sqrt(vec.x() * vec.x() + vec.y() * vec.y());
+	if (pixel_length >= max_length) {
+		m_widgetFocalPoint = ideal_widget_fp;
+	} else {
+		vec *= pixel_length / max_length;
+		m_widgetFocalPoint += vec;
+	}
+
+	updateWidgetTransform();
+	update();
+}
+
+void
 ImageViewBase::updateTransform(ImagePresentation const& presentation)
 {
 	TransformChangeWatcher const watcher(*this);

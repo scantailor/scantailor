@@ -45,8 +45,25 @@ ZoomHandler::ZoomHandler(
 
 void
 ZoomHandler::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
-{	
+{
+	if (event->orientation() != Qt::Vertical) {
+		return;
+	}
+
 	if (!m_interactionPermitter(interaction)) {
+		return;
+	}
+
+	event->accept();
+
+	if (m_zoom == 1.0 && event->delta() < 0) {
+		// Alredy zoomed out and trying to zoom out more.
+		
+		// Scroll amount in terms of typical mouse wheel "clicks".
+		double const delta_clicks = event->delta() / 120;
+		
+		double const dist = -delta_clicks * 30; // 30px per "click"
+		m_rImageView.moveTowardsIdealPosition(dist);
 		return;
 	}
 

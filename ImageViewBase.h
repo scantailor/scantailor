@@ -207,6 +207,15 @@ public:
 	 */
 	void zoom(double zoom);
 
+	/**
+	 * The image is considered ideally positioned when as little as possible
+	 * screen space is wasted.
+	 *
+	 * \param pixel_length The euclidean distance in widget pixels to move the image.
+	 *        Will be clipped if it's more than required to reach the ideal position.
+	 */
+	void moveTowardsIdealPosition(double pixel_length);
+
 	static BackgroundExecutor& backgroundExecutor();
 protected:
 	virtual void paintEvent(QPaintEvent* event);
