@@ -598,15 +598,9 @@ ProjectFilesDialog::startLoadingMetadata()
 	forceFixDpi->setEnabled(false);
 	buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 	offProjectList->clearSelection();
-
-	//inProjectList->clearSelection();
-	// Somehow the above line is triggering a bug in Qt
-	// which causes the timer event we setup below to be
-	// issued only once, then pause, and continue only
-	// after a mouse move event.
-	
-	m_metadataLoadFailed = false;
+	inProjectList->clearSelection();
 	m_loadTimerId = startTimer(0);
+	m_metadataLoadFailed = false;
 }
 
 void
