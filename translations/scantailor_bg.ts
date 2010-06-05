@@ -2,6 +2,19 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="bg_BG">
 <context>
+    <name>BatchProcessingLowerPanel</name>
+    <message>
+        <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/BatchProcessingLowerPanel.ui" line="36"/>
+        <source>Beep when finished</source>
+        <translation type="unfinished">Звуков сигнал при завършване</translation>
+    </message>
+</context>
+<context>
     <name>DeskewOptionsWidget</name>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
@@ -142,22 +155,22 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="43"/>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="42"/>
         <source>%1 (page %2)</source>
         <translation>%1 (страница %2)</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="138"/>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="137"/>
         <source>DPI is too large and most likely wrong.</source>
         <translation>DPI е твърде голямо и най-вероятно е грешно.</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="141"/>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="140"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
         <translation>Стойността на DPI е прекалено малка. Дори и да е правилна, няма да получите задоволителни резултати.</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="144"/>
+        <location filename="../FixDpiSinglePageDialog.cpp" line="143"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
         <translation>Стойността на DPI е прекалено малка за този размер в пиксели. Такава комбинация вероятно ще доведе до грешки в паметта.</translation>
     </message>
@@ -165,7 +178,7 @@
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="208"/>
+        <location filename="../ImageViewBase.cpp" line="209"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
         <translation>Използвайте колелцето на мишката или +/- за мащабиране. При увеличен изглед е възможно влачене.</translation>
     </message>
@@ -177,7 +190,7 @@
 <context>
     <name>LoadFileTask</name>
     <message>
-        <location filename="../LoadFileTask.cpp" line="134"/>
+        <location filename="../LoadFileTask.cpp" line="136"/>
         <source>The following file could not be loaded:
 %1</source>
         <translation>Следния файл не може да бъде зареден:
@@ -187,106 +200,110 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="420"/>
         <source>Beep when finished</source>
-        <translation>Звуков сигнал при завършване</translation>
+        <translation type="obsolete">Звуков сигнал при завършване</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="219"/>
-        <location filename="../MainWindow.cpp" line="483"/>
+        <location filename="../ui/MainWindow.ui" line="227"/>
+        <location filename="../MainWindow.cpp" line="530"/>
         <source>Save Project</source>
         <translation>Запазване на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="483"/>
+        <location filename="../MainWindow.cpp" line="530"/>
         <source>Save this project?</source>
         <translation>Да се запази ли този проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="776"/>
+        <location filename="../MainWindow.cpp" line="903"/>
         <source>Insert before ...</source>
         <translation>Вмъкни преди...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="779"/>
+        <location filename="../MainWindow.cpp" line="906"/>
         <source>Insert after ...</source>
         <translation>Вмъкни след...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="785"/>
+        <location filename="../MainWindow.cpp" line="912"/>
         <source>Remove from project ...</source>
         <translation>Премахване от проекта...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="802"/>
+        <location filename="../MainWindow.cpp" line="929"/>
         <source>Insert here ...</source>
         <translation>Вмъкни тук ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1040"/>
-        <location filename="../MainWindow.cpp" line="1108"/>
+        <location filename="../MainWindow.cpp" line="1220"/>
+        <location filename="../MainWindow.cpp" line="1288"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекти на Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1107"/>
+        <location filename="../MainWindow.cpp" line="1287"/>
         <source>Open Project</source>
         <translation>Отваряне на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1127"/>
-        <location filename="../MainWindow.cpp" line="1136"/>
-        <location filename="../MainWindow.cpp" line="1390"/>
-        <location filename="../MainWindow.cpp" line="1421"/>
-        <location filename="../MainWindow.cpp" line="1498"/>
+        <location filename="../MainWindow.cpp" line="1305"/>
+        <location filename="../MainWindow.cpp" line="1314"/>
+        <location filename="../MainWindow.cpp" line="1592"/>
+        <location filename="../MainWindow.cpp" line="1623"/>
+        <location filename="../MainWindow.cpp" line="1700"/>
         <source>Error</source>
         <translation>Грешка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1128"/>
+        <location filename="../MainWindow.cpp" line="1306"/>
         <source>Unable to open the project file.</source>
         <translation>Проектният файл не може да бъде отворен.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1137"/>
+        <location filename="../MainWindow.cpp" line="1315"/>
         <source>The project file is broken.</source>
         <translation>Проектният файл е повреден.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1288"/>
+        <location filename="../MainWindow.cpp" line="1488"/>
+        <source>Output is not yet possible, as the final size of pages is not yet known.
+To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
-        <translation>Изходният резулат все още не е възможен, тъй като не се знае крайния размер на страниците.
+        <translation type="obsolete">Изходният резулат все още не е възможен, тъй като не се знае крайния размер на страниците.
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1319"/>
+        <location filename="../MainWindow.cpp" line="1521"/>
         <source>Unnamed</source>
         <translation>Без име</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1324"/>
+        <location filename="../MainWindow.cpp" line="1526"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1391"/>
-        <location filename="../MainWindow.cpp" line="1422"/>
+        <location filename="../MainWindow.cpp" line="1593"/>
+        <location filename="../MainWindow.cpp" line="1624"/>
         <source>Error saving the project file!</source>
         <translation>Грешка при запазване на проектния файл!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1469"/>
+        <location filename="../MainWindow.cpp" line="1671"/>
         <source>File to insert</source>
         <translation>Файл за вмъкване</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1475"/>
+        <location filename="../MainWindow.cpp" line="1677"/>
         <source>Images not in project (%1)</source>
         <translation>Изображения, които не са в проекта (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1499"/>
+        <location filename="../MainWindow.cpp" line="1701"/>
         <source>Error opening the image file.</source>
         <translation>Грешка при отваряне на файла с изображението.</translation>
     </message>
@@ -295,7 +312,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страница %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1741"/>
         <source>Remove</source>
         <translation>Премахване</translation>
     </message>
@@ -311,119 +328,143 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="134"/>
+        <location filename="../ui/MainWindow.ui" line="135"/>
         <source>Keep current page in view.</source>
         <translation>Запазване на текущата страница в изгледа.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="160"/>
         <source>Use PgUp, PgDown or Q, W to navigate between pages.</source>
-        <translation>Използвайте PgUp/PgDown или Q/W за навигация между страниците.</translation>
+        <translation type="obsolete">Използвайте PgUp/PgDown или Q/W за навигация между страниците.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="182"/>
+        <location filename="../ui/MainWindow.ui" line="161"/>
+        <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="190"/>
         <source>Tools</source>
         <translation>Инструменти</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="190"/>
+        <location filename="../ui/MainWindow.ui" line="198"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="214"/>
+        <location filename="../ui/MainWindow.ui" line="222"/>
         <source>Debug</source>
         <translation>Проследяване на грешки</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="222"/>
+        <location filename="../ui/MainWindow.ui" line="230"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="227"/>
+        <location filename="../ui/MainWindow.ui" line="235"/>
         <source>Save Project As ...</source>
         <translation>Запазване на проекта като...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="232"/>
-        <location filename="../ui/MainWindow.ui" line="281"/>
+        <location filename="../ui/MainWindow.ui" line="240"/>
+        <location filename="../ui/MainWindow.ui" line="289"/>
         <source>Next Page</source>
         <translation>Следваща страница</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="235"/>
+        <location filename="../ui/MainWindow.ui" line="243"/>
         <source>PgDown</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="243"/>
-        <location filename="../ui/MainWindow.ui" line="270"/>
+        <location filename="../ui/MainWindow.ui" line="251"/>
+        <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Previous Page</source>
         <translation>Предишна страница</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="246"/>
+        <location filename="../ui/MainWindow.ui" line="254"/>
         <source>PgUp</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="254"/>
+        <location filename="../ui/MainWindow.ui" line="262"/>
         <source>New Project ...</source>
         <translation>Нов проект...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="257"/>
+        <location filename="../ui/MainWindow.ui" line="265"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="262"/>
+        <location filename="../ui/MainWindow.ui" line="270"/>
         <source>Open Project ...</source>
         <translation>Отваряне на проект...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="265"/>
+        <location filename="../ui/MainWindow.ui" line="273"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="273"/>
+        <location filename="../ui/MainWindow.ui" line="281"/>
         <source>Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="284"/>
+        <location filename="../ui/MainWindow.ui" line="292"/>
         <source>W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="292"/>
+        <location filename="../ui/MainWindow.ui" line="300"/>
         <source>Close Project</source>
         <translation>Затваряне на проект</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="295"/>
+        <location filename="../ui/MainWindow.ui" line="303"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="300"/>
+        <location filename="../ui/MainWindow.ui" line="308"/>
         <source>Quit</source>
         <translation>Изход</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="303"/>
+        <location filename="../ui/MainWindow.ui" line="311"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="412"/>
+        <location filename="../ui/MainWindow.ui" line="321"/>
+        <source>First Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="324"/>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="329"/>
+        <source>Last Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="332"/>
+        <source>End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="458"/>
         <source>Stop batch processing</source>
         <translation>Спиране на масовата обработка</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="308"/>
+        <location filename="../ui/MainWindow.ui" line="316"/>
         <source>Settings ...</source>
         <translation>Настройки ...</translation>
     </message>
@@ -748,95 +789,95 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 <context>
     <name>PageLayoutOptionsWidget</name>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="13"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="14"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="19"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="20"/>
         <source>Margins</source>
         <translation>Граници</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="41"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="42"/>
         <source>Millimeters (mm)</source>
         <translation>Милиметри (mm)</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="46"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="47"/>
         <source>Inches (in)</source>
         <translation>Инчове (in)</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="86"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="87"/>
         <source>Top</source>
         <translation>Отгоре</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="93"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="148"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="322"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="345"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="368"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="391"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="414"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="440"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="463"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="486"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="509"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="149"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="326"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="349"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="372"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="395"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="418"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="444"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="467"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="490"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="513"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="114"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
         <source>Bottom</source>
         <translation>Отдолу</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="131"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
         <source>Left</source>
         <translation>Отляво</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="172"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="173"/>
         <source>Right</source>
         <translation>Отдясно</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="231"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="564"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="232"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="568"/>
         <source>Apply To ...</source>
         <translation>Приложи към...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="256"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="257"/>
         <source>Alignment</source>
         <translation>Подравняване</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="277"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
+        <source>Match size with other pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Align with other pages</source>
-        <translation>Подравняване с другите страници</translation>
+        <translation type="obsolete">Подравняване с другите страници</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="604"/>
         <source>Go to the widest page.</source>
-        <translation>Отиване към най-широката страница.</translation>
+        <translation type="obsolete">Отиване към най-широката страница.</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="607"/>
         <source>Widest Page</source>
-        <translation>Най-широка страница</translation>
+        <translation type="obsolete">Най-широка страница</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="647"/>
         <source>Go to the tallest page.</source>
-        <translation>Отиване към най-тясната страница.</translation>
+        <translation type="obsolete">Отиване към най-тясната страница.</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="650"/>
         <source>Tallest Page</source>
-        <translation>Най-тясна страница</translation>
+        <translation type="obsolete">Най-тясна страница</translation>
     </message>
 </context>
 <context>
@@ -930,11 +971,8 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Ръчно</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="283"/>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="306"/>
-        <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="326"/>
         <source>...</source>
-        <translation>...</translation>
+        <translation type="obsolete">...</translation>
     </message>
 </context>
 <context>
@@ -1113,14 +1151,18 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <translation>Премахване на страници</translation>
     </message>
     <message>
-        <location filename="../ui/RemovePagesDialog.ui" line="20"/>
+        <location filename="../ui/RemovePagesDialog.ui" line="57"/>
         <source>Remove %1 page(s) from project?</source>
         <translation>Премахване на %1 страница(и) от проекта?</translation>
     </message>
     <message>
-        <location filename="../ui/RemovePagesDialog.ui" line="33"/>
+        <location filename="../ui/RemovePagesDialog.ui" line="72"/>
+        <source>Corresponding output files will be deleted, while input files will remain.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Files will remain on disk</source>
-        <translation>Файловете ще останат на диска</translation>
+        <translation type="obsolete">Файловете ще останат на диска</translation>
     </message>
 </context>
 <context>
@@ -1178,9 +1220,38 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     </message>
 </context>
 <context>
+    <name>SystemLoadWidget</name>
+    <message>
+        <location filename="../ui/SystemLoadWidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SystemLoadWidget.ui" line="23"/>
+        <source>System load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SystemLoadWidget.ui" line="46"/>
+        <location filename="../ui/SystemLoadWidget.ui" line="73"/>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <location filename="../SystemLoadWidget.cpp" line="98"/>
+        <source>Minimal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SystemLoadWidget.cpp" line="100"/>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1088"/>
+        <location filename="../ThumbnailSequence.cpp" line="1345"/>
         <source>%1 (page %2)</source>
         <translation>%1 (страница %2)</translation>
     </message>
@@ -1309,7 +1380,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="52"/>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more that one group is selected.</source>
         <translation>Не може да се изпълни: избрана е повече от една група.</translation>
     </message>
@@ -1317,7 +1388,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="65"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
         <source>Fix Orientation</source>
         <translation>Поправка на ориентацията</translation>
     </message>
@@ -1325,29 +1396,29 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::ChangeDpiDialog</name>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="71"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="72"/>
         <source>Custom</source>
         <translation>Потребителски</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="130"/>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="139"/>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="147"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="131"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="140"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="148"/>
         <source>Error</source>
         <translation>Грешка</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="131"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="132"/>
         <source>DPI is not set.</source>
         <translation>Няма зададена стойност за DPI.</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="140"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="141"/>
         <source>DPI is too low!</source>
         <translation>Прекалено ниска стойност за DPI!</translation>
     </message>
     <message>
-        <location filename="../filters/output/ChangeDpiDialog.cpp" line="148"/>
+        <location filename="../filters/output/ChangeDpiDialog.cpp" line="149"/>
         <source>DPI is too high!</source>
         <translation>Прекалено висока стойност за DPI!</translation>
     </message>
@@ -1363,22 +1434,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="60"/>
         <source>Black and White</source>
         <translation>Черно и бяло</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
         <source>Color / Grayscale</source>
         <translation>Цветно / Степени на сивото</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
         <source>Mixed</source>
         <translation>Смесено</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="387"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
         <translation>Прилагане почистването на шум</translation>
     </message>
@@ -1386,27 +1457,27 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="410"/>
+        <location filename="../filters/output/Task.cpp" line="441"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="425"/>
+        <location filename="../filters/output/Task.cpp" line="456"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="442"/>
+        <location filename="../filters/output/Task.cpp" line="473"/>
         <source>Output</source>
         <translation>Краен резултат</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="443"/>
+        <location filename="../filters/output/Task.cpp" line="474"/>
         <source>Picture Zones</source>
         <translation>Зони за изображения</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="444"/>
+        <location filename="../filters/output/Task.cpp" line="475"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
     </message>
@@ -1414,9 +1485,28 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_layout::Filter</name>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="63"/>
         <source>Page Layout</source>
-        <translation>Оформление на страница</translation>
+        <translation type="obsolete">Оформление на страница</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/Filter.cpp" line="64"/>
+        <source>Natural order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/Filter.cpp" line="65"/>
+        <source>Order by increasing width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/Filter.cpp" line="66"/>
+        <source>Order by increasing height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/Filter.cpp" line="76"/>
+        <source>Margins</source>
+        <translation type="unfinished">Граници</translation>
     </message>
 </context>
 <context>
@@ -1430,12 +1520,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_layout::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="339"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="310"/>
         <source>Apply Margins</source>
         <translation>Прилагане на граници</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="354"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="325"/>
         <source>Apply Alignment</source>
         <translation>Прилагане на подравняване</translation>
     </message>
@@ -1443,7 +1533,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="62"/>
+        <location filename="../filters/page_split/Filter.cpp" line="64"/>
         <source>Split Pages</source>
         <translation>Разделяне на страници</translation>
     </message>
@@ -1459,7 +1549,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <translation type="obsolete">Тази линия може да бъде влачена.</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/ImageView.cpp" line="51"/>
+        <location filename="../filters/page_split/ImageView.cpp" line="85"/>
         <source>Drag the line or the handles.</source>
         <translation>Завлачете линията или манипулаторите.</translation>
     </message>
@@ -1467,23 +1557,46 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_split::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="130"/>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="236"/>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="332"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="116"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="208"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="301"/>
         <source>Set manually</source>
         <translation>Ръчно задаване</translation>
     </message>
     <message>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="193"/>
-        <location filename="../filters/page_split/OptionsWidget.cpp" line="329"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="165"/>
+        <location filename="../filters/page_split/OptionsWidget.cpp" line="298"/>
         <source>Auto detected</source>
         <translation>Автоматично засечено</translation>
+    </message>
+</context>
+<context>
+    <name>page_split::UnremoveButton</name>
+    <message>
+        <location filename="../filters/page_split/UnremoveButton.cpp" line="38"/>
+        <source>Restore removed page.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>select_content::Filter</name>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="53"/>
+        <source>Natural order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/Filter.cpp" line="54"/>
+        <source>Order by increasing width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/Filter.cpp" line="55"/>
+        <source>Order by increasing height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/Filter.cpp" line="65"/>
         <source>Select Content</source>
         <translation>Избор на съдържание</translation>
     </message>
