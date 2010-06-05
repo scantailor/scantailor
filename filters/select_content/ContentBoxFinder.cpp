@@ -135,7 +135,7 @@ ContentBoxFinder::findContentBox(
 		dbg->add(gray150, "gray150");
 	}
 	
-	BinaryImage bw150(binarizeWolf(gray150, QSize(51, 51), 80));
+	BinaryImage bw150(binarizeWolf(gray150, QSize(51, 51), 50));
 	if (dbg) {
 		dbg->add(bw150, "bw150");
 	}
