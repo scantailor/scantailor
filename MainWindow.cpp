@@ -1158,10 +1158,17 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 	if (isBatchProcessingInProgress()) {
 		if (m_ptrBatchQueue->allProcessed()) {
 			stopBatchProcessing();
+			
 			QApplication::alert(this); // Flash the taskbar entry.
 			if (m_checkBeepWhenFinished()) {
 				QApplication::beep();
 			}
+
+			if (m_selectedPage.get(getCurrentView()) == m_ptrThumbSequence->lastPage().id()) {
+				// If batch processing finished at the last page, jump to the first one.	
+				goFirstPage();
+			}
+
 			return;
 		}
 
