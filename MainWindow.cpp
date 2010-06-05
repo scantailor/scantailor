@@ -1488,7 +1488,7 @@ MainWindow::loadPageInteractive(PageInfo const& page)
 			tr("Output is not yet possible, as the final size"
 			" of pages is not yet known.\nTo determine it,"
 			" run batch processing at \"Select Content\" or"
-			" \"Page Layout\".")
+			" \"Margins\".")
 		);
 		
 		removeFilterOptionsWidget();

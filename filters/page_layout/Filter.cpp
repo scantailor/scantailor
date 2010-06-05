@@ -73,7 +73,7 @@ Filter::~Filter()
 QString
 Filter::getName() const
 {
-	return tr("Page Layout");
+	return tr("Margins");
 }
 
 PageView

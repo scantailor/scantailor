@@ -259,6 +259,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <spacer name="horizontalSpacer_7">
           <property name="orientation">
@@ -275,7 +278,7 @@
         <item>
          <widget class="QCheckBox" name="alignWithOthersCB">
           <property name="text">
-           <string>Align with other pages</string>
+           <string>Match size with other pages</string>
           </property>
           <property name="checked">
            <bool>true</bool>
