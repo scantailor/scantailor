@@ -46,6 +46,9 @@ SET(
 	ColorInterpolation.cpp ColorInterpolation.h
 	LU.cpp LU.h
 	LM.cpp LM.h
+	LocalMinMaxGeneric.h
+	SeedFillGeneric.cpp SeedFillGeneric.h
+	FindPeaksGeneric.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})
