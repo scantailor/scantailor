@@ -6,12 +6,12 @@
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="36"/>
         <source>Beep when finished</source>
-        <translation type="unfinished">Звуков сигнал при завършване</translation>
+        <translation>Звуков сигнал при завършване</translation>
     </message>
 </context>
 <context>
@@ -268,7 +268,8 @@
         <location filename="../MainWindow.cpp" line="1488"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Изходният резулат все още не е възможен, тъй като не се знае крайният размер на страниците.
+За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
@@ -339,7 +340,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="161"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
-        <translation type="unfinished"></translation>
+        <translation>Използвайте Home, End, PgUp (или Q), PgDown (или W) за навигация между страниците.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="190"/>
@@ -441,22 +442,22 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="321"/>
         <source>First Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Първа страница</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="324"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="329"/>
         <source>Last Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Последна страница</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="332"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="458"/>
@@ -857,7 +858,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
         <source>Match size with other pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Подравняване с другите страници</translation>
     </message>
     <message>
         <source>Align with other pages</source>
@@ -1158,7 +1159,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="72"/>
         <source>Corresponding output files will be deleted, while input files will remain.</source>
-        <translation type="unfinished"></translation>
+        <translation>Съответстващите изходни файлове ще бъдат изтрити, но входните файлове ще останат.</translation>
     </message>
     <message>
         <source>Files will remain on disk</source>
@@ -1224,28 +1225,28 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="23"/>
         <source>System load</source>
-        <translation type="unfinished"></translation>
+        <translation>Натоварване на системата</translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="46"/>
         <location filename="../ui/SystemLoadWidget.ui" line="73"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation type="unfinished"></translation>
+        <translation>Минимално</translation>
     </message>
     <message>
         <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимално</translation>
     </message>
 </context>
 <context>
@@ -1491,22 +1492,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="64"/>
         <source>Natural order</source>
-        <translation type="unfinished"></translation>
+        <translation>Естествено подреждане</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="65"/>
         <source>Order by increasing width</source>
-        <translation type="unfinished"></translation>
+        <translation>Сортировка по нарастваща ширина</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="66"/>
         <source>Order by increasing height</source>
-        <translation type="unfinished"></translation>
+        <translation>Сортировка по нарастваща височина</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="76"/>
         <source>Margins</source>
-        <translation type="unfinished">Граници</translation>
+        <translation>Полета</translation>
     </message>
 </context>
 <context>
@@ -1575,7 +1576,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/page_split/UnremoveButton.cpp" line="38"/>
         <source>Restore removed page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Връщане на премахната страница.</translation>
     </message>
 </context>
 <context>
@@ -1583,17 +1584,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="53"/>
         <source>Natural order</source>
-        <translation type="unfinished"></translation>
+        <translation>Естествено подреждане</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="54"/>
         <source>Order by increasing width</source>
-        <translation type="unfinished"></translation>
+        <translation>Сортировка по нарастваща ширина</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="55"/>
         <source>Order by increasing height</source>
-        <translation type="unfinished"></translation>
+        <translation>Сортировка по нарастваща височина</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="65"/>
