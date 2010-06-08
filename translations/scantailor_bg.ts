@@ -15,6 +15,14 @@
     </message>
 </context>
 <context>
+    <name>ColorPickupInteraction</name>
+    <message>
+        <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
+        <source>Click on an area to pick up its color, or ESC to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DeskewOptionsWidget</name>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
@@ -178,7 +186,7 @@
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="209"/>
+        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
         <translation>Използвайте колелцето на мишката или +/- за мащабиране. При увеличен изглед е възможно влачене.</translation>
     </message>
@@ -977,6 +985,29 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
 </context>
 <context>
+    <name>PictureZonePropDialog</name>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="14"/>
+        <source>Zone Properties</source>
+        <translation type="unfinished">Свойства на зоната</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="20"/>
+        <source>Subtract from all layers</source>
+        <translation type="unfinished">Изваждане от всички слоеве</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
+        <source>Add to auto layer</source>
+        <translation type="unfinished">Добавяне към автоматичния слой</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
+        <source>Subtract from auto layer</source>
+        <translation type="unfinished">Изваждане от автоматичния слой</translation>
+    </message>
+</context>
+<context>
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
@@ -1260,22 +1291,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="119"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="125"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
         <source>Delete</source>
         <translation>Изтриване</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="180"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
         <source>Delete confirmation</source>
         <translation>Потвърждение за изтриване</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="180"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
         <source>Really delete this zone?</source>
         <translation>Наистина ли да бъде изтрита тази зона?</translation>
     </message>
@@ -1324,24 +1355,20 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ZonePropertiesDialog</name>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="14"/>
         <source>Zone Properties</source>
-        <translation>Свойства на зоната</translation>
+        <translation type="obsolete">Свойства на зоната</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="20"/>
         <source>Subtract from all layers</source>
-        <translation>Изваждане от всички слоеве</translation>
+        <translation type="obsolete">Изваждане от всички слоеве</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation>Добавяне към автоматичния слой</translation>
+        <translation type="obsolete">Добавяне към автоматичния слой</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="34"/>
         <source>Subtract from auto layer</source>
-        <translation>Изваждане от автоматичния слой</translation>
+        <translation type="obsolete">Изваждане от автоматичния слой</translation>
     </message>
 </context>
 <context>
@@ -1425,6 +1452,14 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     </message>
 </context>
 <context>
+    <name>output::FillZoneEditor</name>
+    <message>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="137"/>
+        <source>Pick color</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>output::Filter</name>
     <message>
         <location filename="../filters/output/Filter.cpp" line="58"/>
@@ -1435,22 +1470,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="60"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
         <source>Black and White</source>
         <translation>Черно и бяло</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
         <source>Color / Grayscale</source>
         <translation>Цветно / Степени на сивото</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Mixed</source>
         <translation>Смесено</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
         <source>Apply Despeckling Level</source>
         <translation>Прилагане почистването на шум</translation>
     </message>
@@ -1458,27 +1493,32 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="441"/>
+        <location filename="../filters/output/Task.cpp" line="450"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="456"/>
+        <location filename="../filters/output/Task.cpp" line="472"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="473"/>
+        <location filename="../filters/output/Task.cpp" line="489"/>
         <source>Output</source>
         <translation>Краен резултат</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="474"/>
+        <location filename="../filters/output/Task.cpp" line="490"/>
         <source>Picture Zones</source>
         <translation>Зони за изображения</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="475"/>
+        <location filename="../filters/output/Task.cpp" line="491"/>
+        <source>Fill Zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="492"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
     </message>

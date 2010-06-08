@@ -15,6 +15,14 @@
     </message>
 </context>
 <context>
+    <name>ColorPickupInteraction</name>
+    <message>
+        <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
+        <source>Click on an area to pick up its color, or ESC to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DeskewOptionsWidget</name>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
@@ -178,7 +186,7 @@
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="209"/>
+        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
         <translation>マウスホイールまたは +/- キーでズームできます。ズームしている場合、ドラッグで画像を動かせます。</translation>
     </message>
@@ -971,6 +979,29 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
 </context>
 <context>
+    <name>PictureZonePropDialog</name>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="14"/>
+        <source>Zone Properties</source>
+        <translation type="unfinished">領域のプロパティ</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="20"/>
+        <source>Subtract from all layers</source>
+        <translation type="unfinished">全てのレイヤーから除く</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
+        <source>Add to auto layer</source>
+        <translation type="unfinished">自動レイヤーに加える</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
+        <source>Subtract from auto layer</source>
+        <translation type="unfinished">自動レイヤーから除く</translation>
+    </message>
+</context>
+<context>
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
@@ -1250,22 +1281,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="119"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
         <source>Properties</source>
         <translation>プロパティ</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="125"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="180"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
         <source>Delete confirmation</source>
         <translation>削除の確認</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="180"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
         <source>Really delete this zone?</source>
         <translation>この領域を本当に削除しますか？</translation>
     </message>
@@ -1314,24 +1345,20 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ZonePropertiesDialog</name>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="14"/>
         <source>Zone Properties</source>
-        <translation>領域のプロパティ</translation>
+        <translation type="obsolete">領域のプロパティ</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="20"/>
         <source>Subtract from all layers</source>
-        <translation>全てのレイヤーから除く</translation>
+        <translation type="obsolete">全てのレイヤーから除く</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation>自動レイヤーに加える</translation>
+        <translation type="obsolete">自動レイヤーに加える</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="34"/>
         <source>Subtract from auto layer</source>
-        <translation>自動レイヤーから除く</translation>
+        <translation type="obsolete">自動レイヤーから除く</translation>
     </message>
 </context>
 <context>
@@ -1415,6 +1442,14 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>output::FillZoneEditor</name>
+    <message>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="137"/>
+        <source>Pick color</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>output::Filter</name>
     <message>
         <location filename="../filters/output/Filter.cpp" line="58"/>
@@ -1425,22 +1460,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="60"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
         <source>Black and White</source>
         <translation>白黒</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
         <source>Color / Grayscale</source>
         <translation>カラー／グレースケール</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Mixed</source>
         <translation>ミックス</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
         <source>Apply Despeckling Level</source>
         <translation>スペックル除去レベルを適用する</translation>
     </message>
@@ -1448,27 +1483,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="441"/>
+        <location filename="../filters/output/Task.cpp" line="450"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>画像領域はミックスモードでのみ有効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="456"/>
+        <location filename="../filters/output/Task.cpp" line="472"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>スペックル除去はカラー／グレースケールモードでは無効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="473"/>
+        <location filename="../filters/output/Task.cpp" line="489"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="474"/>
+        <location filename="../filters/output/Task.cpp" line="490"/>
         <source>Picture Zones</source>
         <translation>画像領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="475"/>
+        <location filename="../filters/output/Task.cpp" line="491"/>
+        <source>Fill Zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="492"/>
         <source>Despeckling</source>
         <translation>スペックル除去</translation>
     </message>

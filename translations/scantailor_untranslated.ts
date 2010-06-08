@@ -15,6 +15,14 @@
     </message>
 </context>
 <context>
+    <name>ColorPickupInteraction</name>
+    <message>
+        <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
+        <source>Click on an area to pick up its color, or ESC to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DeskewOptionsWidget</name>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
@@ -178,7 +186,7 @@
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="209"/>
+        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -919,6 +927,29 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
 </context>
 <context>
+    <name>PictureZonePropDialog</name>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="14"/>
+        <source>Zone Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="20"/>
+        <source>Subtract from all layers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
+        <source>Add to auto layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
+        <source>Subtract from auto layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
@@ -1173,22 +1204,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="119"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
         <source>Properties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="125"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="180"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
         <source>Delete confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="180"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
         <source>Really delete this zone?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1231,29 +1262,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="49"/>
         <source>Click to start creating a new picture zone.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ZonePropertiesDialog</name>
-    <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="14"/>
-        <source>Zone Properties</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="20"/>
-        <source>Subtract from all layers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="27"/>
-        <source>Add to auto layer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/ZonePropertiesDialog.ui" line="34"/>
-        <source>Subtract from auto layer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1338,6 +1346,14 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>output::FillZoneEditor</name>
+    <message>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="137"/>
+        <source>Pick color</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>output::Filter</name>
     <message>
         <location filename="../filters/output/Filter.cpp" line="58"/>
@@ -1348,22 +1364,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="60"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
         <source>Black and White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
         <source>Color / Grayscale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Mixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
         <source>Apply Despeckling Level</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1371,27 +1387,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="441"/>
+        <location filename="../filters/output/Task.cpp" line="450"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="456"/>
+        <location filename="../filters/output/Task.cpp" line="472"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="473"/>
+        <location filename="../filters/output/Task.cpp" line="489"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="474"/>
+        <location filename="../filters/output/Task.cpp" line="490"/>
         <source>Picture Zones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="475"/>
+        <location filename="../filters/output/Task.cpp" line="491"/>
+        <source>Fill Zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="492"/>
         <source>Despeckling</source>
         <translation type="unfinished"></translation>
     </message>
