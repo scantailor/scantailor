@@ -227,10 +227,11 @@ ZoneDefaultInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionState
 		return;
 	}
 
-	if (interaction.captured()) {
-		if (!m_dragHandler.isActive() || m_dragWatcher.haveSignificantDrag()) {
-			return;
-		}
+	if (!interaction.captured()) {
+		return;
+	}
+	if (!m_dragHandler.isActive() || m_dragWatcher.haveSignificantDrag()) {
+		return;		
 	}
 
 	makePeerPreceeder(*m_rContext.createZoneCreationInteraction(interaction));

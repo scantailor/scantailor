@@ -16,33 +16,19 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERIALIZABLE_SPLINE_H_
-#define SERIALIZABLE_SPLINE_H_
+#include "QtSignalForwarder.h"
+#include "QtSignalForwarder.h.moc"
 
-#include <QVector>
-#include <QPointF>
-#include <QPolygonF>
-
-class EditableSpline;
-class QTransform;
-class QDomDocument;
-class QDomElement;
-class QString;
-
-class SerializableSpline
+QtSignalForwarder::QtSignalForwarder(
+	QObject* emitter, char const* signal, boost::function<void()> const& slot)
+:	QObject(emitter),
+	m_slot(slot)
 {
-public:
-	SerializableSpline(EditableSpline const& spline);
+	connect(emitter, signal, SLOT(handleSignal()));
+}
 
-	explicit SerializableSpline(QDomElement const& el);
-
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-
-	SerializableSpline transformed(QTransform const& xform) const;
-
-	QPolygonF toPolygon() const { return QPolygonF(m_points); }
-private:
-	QVector<QPointF> m_points;
-};
-
-#endif
+void
+QtSignalForwarder::handleSignal()
+{
+	m_slot();
+}

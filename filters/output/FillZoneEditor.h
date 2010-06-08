@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,29 +17,27 @@
 */
 
 
-#ifndef OUTPUT_PICTURE_ZONE_EDITOR_H_
-#define OUTPUT_PICTURE_ZONE_EDITOR_H_
+#ifndef OUTPUT_FILL_ZONE_EDITOR_H_
+#define OUTPUT_FILL_ZONE_EDITOR_H_
 
 #include "ImageViewBase.h"
+#include "ImagePixmapUnion.h"
 #include "NonCopyable.h"
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
 #include "PageId.h"
 #include "ZoneInteractionContext.h"
+#include "ColorPickupInteraction.h"
 #include "EditableSpline.h"
 #include "EditableZoneSet.h"
 #include "ZoomHandler.h"
 #include "DragHandler.h"
-#include "imageproc/BinaryImage.h"
 #include <QTransform>
 #include <QPoint>
-#include <QTimer>
-#include <QPixmap>
+#include <QColor>
 
-class ImageTransformation;
 class InteractionState;
 class QPainter;
-class QMenu;
 
 namespace output
 {
@@ -47,58 +45,51 @@ namespace output
 class Settings;
 
 
-class PictureZoneEditor : public ImageViewBase, private InteractionHandler
+class FillZoneEditor : public ImageViewBase, private InteractionHandler
 {
 	Q_OBJECT
 public:
-	PictureZoneEditor(
-		QImage const& image, QImage const& downscaled_image,
-		imageproc::BinaryImage const& picture_mask,
-		QTransform const& image_to_virt, QPolygonF const& virt_display_area,
-		PageId const& page_id, IntrusivePtr<Settings> const& settings);
+	FillZoneEditor(
+		QImage const& image, ImagePixmapUnion const& downscaled_version,
+		QTransform const& orig_to_image, PageId const& page_id,
+		IntrusivePtr<Settings> const& settings);
 	
-	virtual ~PictureZoneEditor();
+	virtual ~FillZoneEditor();
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private slots:
-	void advancePictureMaskAnimation();
-
-	void initiateBuildingScreenPictureMask();
-
 	void commitZones();
 
 	void updateRequested();
 private:
-	class MaskTransformTask;
-	
-	bool validateScreenPictureMask() const;
+	typedef QColor (*ColorAdapter)(QColor const&);
 
-	void schedulePictureMaskRebuild();
+	InteractionHandler* createContextMenuInteraction(InteractionState& interaction);
 
-	void screenPictureMaskBuilt(QPoint const& origin, QImage const& mask);
+	InteractionHandler* createColorPickupInteraction(
+		EditableZoneSet::Zone const& zone, InteractionState& interaction);
 
-	void paintOverPictureMask(QPainter& painter);
+	static QColor toOpaque(QColor const& color);
 
-	void showPropertiesDialog(EditableZoneSet::Zone const& zone);
+	static QColor toGrayscale(QColor const& color);
 
+	static QColor toBlackWhite(QColor const& color);
+
+	static ColorAdapter colorAdapterFor(QImage const& image);
+
+	ColorAdapter m_colorAdapter;
 	EditableZoneSet m_zones;
 
 	// Must go after m_zones.
 	ZoneInteractionContext m_context;
 
+	// Must go after m_context.
+	ColorPickupInteraction m_colorPickupInteraction;
 	DragHandler m_dragHandler;
-	ZoomHandler m_zoomHandler;
+	ZoomHandler m_zoomHandler;	
 
-	imageproc::BinaryImage m_origPictureMask;
-	QPixmap m_screenPictureMask;
-	QPoint m_screenPictureMaskOrigin;
-	QTransform m_screenPictureMaskXform;
-	QTransform m_potentialPictureMaskXform;
-	QTimer m_pictureMaskRebuildTimer;
-	QTimer m_pictureMaskAnimateTimer;
-	int m_pictureMaskAnimationPhase; // degrees
-	IntrusivePtr<MaskTransformTask> m_ptrMaskTransformTask;
-
+	QTransform m_origToImage;
+	QTransform m_imageToOrig;
 	PageId m_pageId;
 	IntrusivePtr<Settings> m_ptrSettings;
 };

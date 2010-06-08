@@ -16,19 +16,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_IMAGE_VIEW_TAB_H_
-#define OUTPUT_IMAGE_VIEW_TAB_H_
+#ifndef IMAGE_PIXMAP_UNION_H_
+#define IMAGE_PIXMAP_UNION_H_
 
-namespace output
+#include <QImage>
+#include <QPixmap>
+
+class ImagePixmapUnion
 {
+	// Member-wise copying is OK.
+public:
+	ImagePixmapUnion() {}
 
-enum ImageViewTab {
-	TAB_OUTPUT,
-	TAB_PICTURE_ZONES,
-	TAB_FILL_ZONES,
-	TAB_DESPECKLING
+	ImagePixmapUnion(QImage const& image) : m_image(image) {}
+
+	ImagePixmapUnion(QPixmap const& pixmap) : m_pixmap(pixmap) {}
+
+	QImage const& image() const { return m_image; }
+
+	QPixmap const& pixmap() const { return m_pixmap; }
+
+	bool isNull() const { return m_image.isNull() && m_pixmap.isNull(); }
+private:
+	QImage m_image;
+	QPixmap m_pixmap;
 };
-
-} // namespace output
 
 #endif

@@ -37,7 +37,7 @@ public:
 		OutputFileParams const& output_file_params,
 		OutputFileParams const& automask_file_params,
 		OutputFileParams const& speckles_file_params,
-		ZoneSet const& zones);
+		ZoneSet const& picture_zones, ZoneSet const& fill_zones);
 	
 	explicit OutputParams(QDomElement const& el);
 	
@@ -51,13 +51,16 @@ public:
 
 	OutputFileParams const& specklesFileParams() const { return m_specklesFileParams; }
 
-	ZoneSet const& zones() const { return m_zones; }
+	ZoneSet const& pictureZones() const { return m_pictureZones; }
+
+	ZoneSet const& fillZones() const { return m_fillZones; }
 private:
 	OutputImageParams m_outputImageParams;
 	OutputFileParams m_outputFileParams;
 	OutputFileParams m_automaskFileParams;
 	OutputFileParams m_specklesFileParams;
-	ZoneSet m_zones;
+	ZoneSet m_pictureZones;
+	ZoneSet m_fillZones;
 };
 
 } // namespace output

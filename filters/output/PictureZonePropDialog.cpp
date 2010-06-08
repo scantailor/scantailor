@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,14 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ZonePropertiesDialog.h.moc"
+#include "PictureZonePropDialog.h"
+#include "PictureZonePropDialog.h.moc"
 #include "Property.h"
 #include "PictureLayerProperty.h"
 
 namespace output
 {
 
-ZonePropertiesDialog::ZonePropertiesDialog(
+PictureZonePropDialog::PictureZonePropDialog(
 	IntrusivePtr<PropertySet> const& props, QWidget* parent)
 :	QDialog(parent),
 	m_ptrProps(props)
@@ -50,7 +51,7 @@ ZonePropertiesDialog::ZonePropertiesDialog(
 }
 
 void
-ZonePropertiesDialog::itemToggled(bool selected)
+PictureZonePropDialog::itemToggled(bool selected)
 {
 	PictureLayerProperty::Layer layer = PictureLayerProperty::NO_OP;
 

@@ -1,6 +1,6 @@
 /*
 	Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 #ifndef ZONE_CONTEXT_MENU_INTERACTION_H_
 #define ZONE_CONTEXT_MENU_INTERACTION_H_
 
+#include "ZoneContextMenuItem.h"
 #include "InteractionHandler.h"
 #include "InteractionState.h"
 #include "EditableSpline.h"
@@ -28,6 +29,7 @@
 #include "BasicSplineVisualizer.h"
 #include <QObject>
 #include <QColor>
+#include <boost/function.hpp>
 #include <map>
 #include <memory>
 #include <vector>
@@ -40,12 +42,35 @@ class ZoneContextMenuInteraction : public QObject, public InteractionHandler
 {
 	Q_OBJECT
 public:
+	struct StandardMenuItems
+	{
+		ZoneContextMenuItem propertiesItem;
+		ZoneContextMenuItem deleteItem;
+
+		StandardMenuItems(
+			ZoneContextMenuItem const& properties_item,
+			ZoneContextMenuItem const& delete_item);
+	};
+
+	typedef boost::function<
+		std::vector<ZoneContextMenuItem>(
+			EditableZoneSet::Zone const&, StandardMenuItems const&
+		)
+	> MenuCustomizer;
+
 	/**
 	 * \note This factory method will return null if there are no zones
 	 *       under the mouse pointer.
 	 */
 	static ZoneContextMenuInteraction* create(
 		ZoneInteractionContext& context, InteractionState& interaction);
+
+	/**
+	 * Same as above, plus a menu customization callback.
+	 */
+	static ZoneContextMenuInteraction* create(
+		ZoneInteractionContext& context, InteractionState& interaction,
+		MenuCustomizer const& menu_customizer);
 
 	virtual ~ZoneContextMenuInteraction();
 protected:
@@ -57,16 +82,15 @@ protected:
 		Zone(EditableZoneSet::Zone const& zone) : EditableZoneSet::Zone(zone) {}
 	};
 
-	ZoneContextMenuInteraction(ZoneInteractionContext& context,
-		InteractionState& interaction, std::vector<Zone>& selectable_zones);
+	static std::vector<Zone> zonesUnderMouse(ZoneInteractionContext& context);
+
+	ZoneContextMenuInteraction(
+		ZoneInteractionContext& context, InteractionState& interaction,
+		MenuCustomizer const& menu_customizer, std::vector<Zone>& selectable_zones);
 
 	ZoneInteractionContext& context() { return m_rContext; }
 private slots:
 	void menuAboutToHide();
-
-	virtual void propertiesRequest(int zone_idx);
-
-	virtual void deleteRequest(int zone_idx);
 
 	void highlightItem(int zone_idx);
 private:
@@ -84,9 +108,21 @@ private:
 		QColor m_color;
 	};
 
+	static std::vector<ZoneContextMenuItem> defaultMenuCustomizer(
+		EditableZoneSet::Zone const& zone, StandardMenuItems const& std_items);
+
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 
-	void maybeSwitchToDefaultState();
+	void menuItemTriggered(InteractionState& interaction,
+		ZoneContextMenuItem::Callback const& callback);
+
+	InteractionHandler* deleteRequest(EditableZoneSet::Zone const& zone);
+
+	InteractionHandler* propertiesRequest(EditableZoneSet::Zone const& zone);
+
+	ZoneContextMenuItem propertiesMenuItemFor(EditableZoneSet::Zone const& zone);
+
+	ZoneContextMenuItem deleteMenuItemFor(EditableZoneSet::Zone const& zone);
 
 	ZoneInteractionContext& m_rContext;
 	std::vector<Zone> m_selectableZones;
@@ -94,7 +130,7 @@ private:
 	Visualizer m_visualizer;
 	std::auto_ptr<QMenu> m_ptrMenu;
 	int m_highlightedZoneIdx;
-	int m_switchToDefaultStatePreventer;
+	bool m_menuItemTriggered;
 };
 
 #endif

@@ -24,7 +24,7 @@
 #include "SerializableSpline.h"
 #include "PropertySet.h"
 #include "PictureLayerProperty.h"
-#include "ZonePropertiesDialog.h"
+#include "PictureZonePropDialog.h"
 #include "Settings.h"
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
@@ -108,7 +108,7 @@ PictureZoneEditor::PictureZoneEditor(
 	m_pageId(page_id),
 	m_ptrSettings(settings)
 {
-	m_zones.setDefaultProperties(m_ptrSettings->defaultZoneProperties());
+	m_zones.setDefaultProperties(m_ptrSettings->defaultPictureZoneProperties());
 
 	setMouseTracking(true);
 
@@ -136,7 +136,7 @@ PictureZoneEditor::PictureZoneEditor(
 	m_pictureMaskRebuildTimer.setSingleShot(true);
 	m_pictureMaskRebuildTimer.setInterval(150);
 
-	BOOST_FOREACH(Zone const& zone, m_ptrSettings->zonesForPage(page_id)) {
+	BOOST_FOREACH(Zone const& zone, m_ptrSettings->pictureZonesForPage(page_id)) {
 		EditableSpline::Ptr spline(new EditableSpline(zone.spline()));
 		m_zones.addZone(spline, zone.properties());
 	}
@@ -144,7 +144,7 @@ PictureZoneEditor::PictureZoneEditor(
 
 PictureZoneEditor::~PictureZoneEditor()
 {
-	m_ptrSettings->setDefaultZoneProperties(m_zones.defaultProperties());
+	m_ptrSettings->setDefaultPictureZoneProperties(m_zones.defaultProperties());
 }
 
 void
@@ -305,14 +305,19 @@ PictureZoneEditor::showPropertiesDialog(EditableZoneSet::Zone const& zone)
 	zone.properties()->swap(saved_properties);
 	*zone.properties() = saved_properties;
 
-	ZonePropertiesDialog dialog(zone.properties(), this);
-	connect(&dialog, SIGNAL(updated()), SLOT(update()));
+	PictureZonePropDialog dialog(zone.properties(), this);
+	
+	// We can't connect to the update() slot directly, as since some time,
+	// Qt ignores such update requests on inactive windows.  Updating
+	// it through a proxy slot does work though.
+	connect(&dialog, SIGNAL(updated()), SLOT(updateRequested()));
 
 	if (dialog.exec() == QDialog::Accepted) {
 		m_zones.setDefaultProperties(*zone.properties());
 		m_zones.commit();
 	} else {
 		zone.properties()->swap(saved_properties);
+		update();
 	}
 }
 
@@ -325,7 +330,13 @@ PictureZoneEditor::commitZones()
 		zones.add(Zone(*zone.spline(), *zone.properties()));
 	}
 	
-	m_ptrSettings->setZones(m_pageId, zones);
+	m_ptrSettings->setPictureZones(m_pageId, zones);
+}
+
+void
+PictureZoneEditor::updateRequested()
+{
+	update();
 }
 
 

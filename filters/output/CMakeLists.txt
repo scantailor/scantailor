@@ -32,10 +32,15 @@ SET(
 	OutputFileParams.cpp OutputFileParams.h
 	OutputParams.cpp OutputParams.h
 	PictureLayerProperty.cpp PictureLayerProperty.h
+	PictureZonePropFactory.cpp PictureZonePropFactory.h
+	PictureZonePropDialog.cpp PictureZonePropDialog.h
 	PictureZoneComparator.cpp PictureZoneComparator.h
 	PictureZoneEditor.cpp PictureZoneEditor.h
-	ZonePropFactory.cpp ZonePropFactory.h
-	ZonePropertiesDialog.cpp ZonePropertiesDialog.h
+	FillColorProperty.cpp FillColorProperty.h
+	FillZonePropFactory.cpp FillZonePropFactory.h
+	FillZoneComparator.cpp FillZoneComparator.h
+	FillZoneEditor.cpp FillZoneEditor.h
+	ColorPickupInteraction.cpp ColorPickupInteraction.h
 	DespeckleState.cpp DespeckleState.h
 	DespeckleView.cpp DespeckleView.h
 	DespeckleVisualization.cpp DespeckleVisualization.h

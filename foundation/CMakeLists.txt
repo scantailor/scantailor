@@ -1,5 +1,7 @@
 PROJECT("Foundation library")
 
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
+
 SET(
 	sources
 	NonCopyable.h IntrusivePtr.h RefCountable.h
@@ -13,7 +15,9 @@ SET(
 	PropertyFactory.cpp PropertyFactory.h
 	PropertySet.cpp PropertySet.h
 	PerformanceTimer.cpp PerformanceTimer.h
+	QtSignalForwarder.cpp QtSignalForwarder.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
+QT4_AUTOMOC(${sources})
 
 ADD_LIBRARY(foundation STATIC ${sources})

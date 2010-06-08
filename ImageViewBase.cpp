@@ -146,7 +146,7 @@ private:
 
 
 ImageViewBase::ImageViewBase(
-	QImage const& image, QImage const& downscaled_image,
+	QImage const& image, ImagePixmapUnion const& downscaled_version,
 	ImagePresentation const& presentation, Margins const& margins)
 :	m_image(image),
 	m_virtualImageCropArea(presentation.cropArea()),
@@ -182,10 +182,12 @@ ImageViewBase::ImageViewBase(
 	setFrameShape(QFrame::NoFrame);
 	viewport()->setFocusPolicy(Qt::WheelFocus);
 
-	if (downscaled_image.isNull()) {
+	if (downscaled_version.isNull()) {
 		m_pixmap = QPixmap::fromImage(createDownscaledImage(image));
+	} else if (downscaled_version.pixmap().isNull()) {
+		m_pixmap = QPixmap::fromImage(downscaled_version.image());
 	} else {
-		m_pixmap = QPixmap::fromImage(downscaled_image);
+		m_pixmap = downscaled_version.pixmap();
 	}
 	
 	m_pixmapToImage.scale(

@@ -19,6 +19,7 @@
 #include "CacheDrivenTask.h"
 #include "OutputGenerator.h"
 #include "PictureZoneComparator.h"
+#include "FillZoneComparator.h"
 #include "Settings.h"
 #include "Params.h"
 #include "Thumbnail.h"
@@ -91,8 +92,14 @@ CacheDrivenTask::process(
 				break;
 			}
 
-			ZoneSet const new_zones(m_ptrSettings->zonesForPage(page_info.id()));
-			if (!PictureZoneComparator::equal(stored_output_params->zones(), new_zones)) {
+			ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(page_info.id()));
+			if (!PictureZoneComparator::equal(stored_output_params->pictureZones(), new_picture_zones)) {
+				need_reprocess = true;
+				break;
+			}
+
+			ZoneSet const new_fill_zones(m_ptrSettings->fillZonesForPage(page_info.id()));
+			if (!FillZoneComparator::equal(stored_output_params->fillZones(), new_fill_zones)) {
 				need_reprocess = true;
 				break;
 			}

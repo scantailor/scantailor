@@ -34,6 +34,8 @@
 #include "TabbedImageView.h"
 #include "PictureZoneComparator.h"
 #include "PictureZoneEditor.h"
+#include "FillZoneComparator.h"
+#include "FillZoneEditor.h"
 #include "DespeckleState.h"
 #include "DespeckleView.h"
 #include "DespeckleVisualization.h"
@@ -169,7 +171,8 @@ Task::process(
 		data.xform(), params.outputDpi(), params.colorParams(), params.despeckleLevel()
 	);
 
-	ZoneSet const new_zones(m_ptrSettings->zonesForPage(m_pageId));
+	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
+	ZoneSet const new_fill_zones(m_ptrSettings->fillZonesForPage(m_pageId));
 	
 	bool need_reprocess = false;
 	do { // Just to be able to break from it.
@@ -188,7 +191,12 @@ Task::process(
 			break;
 		}
 
-		if (!PictureZoneComparator::equal(stored_output_params->zones(), new_zones)) {
+		if (!PictureZoneComparator::equal(stored_output_params->pictureZones(), new_picture_zones)) {
+			need_reprocess = true;
+			break;
+		}
+
+		if (!FillZoneComparator::equal(stored_output_params->fillZones(), new_fill_zones)) {
 			need_reprocess = true;
 			break;
 		}
@@ -270,7 +278,7 @@ Task::process(
 		speckles_img = BinaryImage();
 
 		out_img = generator.process(
-			status, data, new_zones,
+			status, data, new_picture_zones, new_fill_zones,
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
@@ -318,7 +326,7 @@ Task::process(
 				: OutputFileParams(),
 				write_speckles_file ? OutputFileParams(QFileInfo(speckles_file_path))
 				: OutputFileParams(),
-				new_zones
+				new_picture_zones, new_fill_zones
 			);
 
 			m_ptrSettings->setOutputParams(m_pageId, out_params);
@@ -431,17 +439,18 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		return;
 	}
 
-	std::auto_ptr<QWidget> image_view(
+	std::auto_ptr<ImageViewBase> image_view(
 		new ImageView(m_outputImage, m_downscaledOutputImage)
 	);
+	QPixmap const downscaled_output_pixmap(image_view->downscaledPixmap());
 
-	std::auto_ptr<QWidget> zone_editor;
+	std::auto_ptr<QWidget> picture_zone_editor;
 	if (m_pictureMask.isNull()) {
-		zone_editor.reset(
+		picture_zone_editor.reset(
 			new ErrorWidget(tr("Picture zones are only available in Mixed mode."))
 		);
 	} else {
-		zone_editor.reset(
+		picture_zone_editor.reset(
 			new PictureZoneEditor(
 				m_origImage, m_downscaledOrigImage, m_pictureMask,
 				m_imageToVirt, m_virtDisplayArea,
@@ -449,6 +458,13 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 			)
 		);
 	}
+
+	std::auto_ptr<QWidget> fill_zone_editor(
+		new FillZoneEditor(
+			m_outputImage, downscaled_output_pixmap,
+			m_imageToVirt, m_pageId, m_ptrSettings
+		)
+	);
 
 	std::auto_ptr<QWidget> despeckle_view;
 	if (m_colorParams.colorMode() == ColorParams::COLOR_GRAYSCALE) {
@@ -471,7 +487,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	tab_widget->setDocumentMode(true);
 	tab_widget->setTabPosition(QTabWidget::East);
 	tab_widget->addTab(image_view.release(), tr("Output"), TAB_OUTPUT);
-	tab_widget->addTab(zone_editor.release(), tr("Picture Zones"), TAB_PICTURE_ZONES);
+	tab_widget->addTab(picture_zone_editor.release(), tr("Picture Zones"), TAB_PICTURE_ZONES);
+	tab_widget->addTab(fill_zone_editor.release(), tr("Fill Zones"), TAB_FILL_ZONES);
 	tab_widget->addTab(despeckle_view.release(), tr("Despeckling"), TAB_DESPECKLING);
 	tab_widget->setCurrentTab(opt_widget->lastTab());
 

@@ -19,8 +19,11 @@
 #include "Settings.h"
 #include "Params.h"
 #include "PictureLayerProperty.h"
+#include "FillColorProperty.h"
 #include "../../Utils.h"
 #include <boost/foreach.hpp>
+#include <Qt>
+#include <QColor>
 #include <QMutexLocker>
 
 namespace output
@@ -30,7 +33,8 @@ Settings::Settings()
 :	m_defaultDpi(600, 600),
 	m_defaultDespeckleLevel(DESPECKLE_CAUTIOUS)
 {
-	m_defaultZoneProps.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
+	m_defaultPictureZoneProps.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
+	m_defaultFillZoneProps.locateOrCreate<FillColorProperty>()->setColor(Qt::white);
 }
 
 Settings::~Settings()
@@ -217,12 +221,25 @@ Settings::setOutputParams(PageId const& page_id, OutputParams const& params)
 }
 
 ZoneSet
-Settings::zonesForPage(PageId const& page_id) const
+Settings::pictureZonesForPage(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
 
-	PerPageZones::const_iterator const it(m_perPageZones.find(page_id));
-	if (it != m_perPageZones.end()) {
+	PerPageZones::const_iterator const it(m_perPagePictureZones.find(page_id));
+	if (it != m_perPagePictureZones.end()) {
+		return it->second;
+	} else {
+		return ZoneSet();
+	}
+}
+
+ZoneSet
+Settings::fillZonesForPage(PageId const& page_id) const
+{
+	QMutexLocker const locker(&m_mutex);
+
+	PerPageZones::const_iterator const it(m_perPageFillZones.find(page_id));
+	if (it != m_perPageFillZones.end()) {
 		return it->second;
 	} else {
 		return ZoneSet();
@@ -230,24 +247,45 @@ Settings::zonesForPage(PageId const& page_id) const
 }
 
 void
-Settings::setZones(PageId const& page_id, ZoneSet const& zones)
+Settings::setPictureZones(PageId const& page_id, ZoneSet const& zones)
 {
 	QMutexLocker const locker(&m_mutex);
-	Utils::mapSetValue(m_perPageZones, page_id, zones);
-}
-
-PropertySet
-Settings::defaultZoneProperties() const
-{
-	QMutexLocker const locker(&m_mutex);
-	return m_defaultZoneProps;
+	Utils::mapSetValue(m_perPagePictureZones, page_id, zones);
 }
 
 void
-Settings::setDefaultZoneProperties(PropertySet const& props)
+Settings::setFillZones(PageId const& page_id, ZoneSet const& zones)
 {
 	QMutexLocker const locker(&m_mutex);
-	m_defaultZoneProps = props;
+	Utils::mapSetValue(m_perPageFillZones, page_id, zones);
+}
+
+PropertySet
+Settings::defaultPictureZoneProperties() const
+{
+	QMutexLocker const locker(&m_mutex);
+	return m_defaultPictureZoneProps;
+}
+
+PropertySet
+Settings::defaultFillZoneProperties() const
+{
+	QMutexLocker const locker(&m_mutex);
+	return m_defaultFillZoneProps;
+}
+
+void
+Settings::setDefaultPictureZoneProperties(PropertySet const& props)
+{
+	QMutexLocker const locker(&m_mutex);
+	m_defaultPictureZoneProps = props;
+}
+
+void
+Settings::setDefaultFillZoneProperties(PropertySet const& props)
+{
+	QMutexLocker const locker(&m_mutex);
+	m_defaultFillZoneProps = props;
 }
 
 } // namespace output

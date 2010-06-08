@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,17 +75,25 @@ public:
 	
 	void setOutputParams(PageId const& page_id, OutputParams const& params);
 
-	ZoneSet zonesForPage(PageId const& page_id) const;
+	ZoneSet pictureZonesForPage(PageId const& page_id) const;
 
-	void setZones(PageId const& page_id, ZoneSet const& zones);
+	ZoneSet fillZonesForPage(PageId const& page_id) const;
+
+	void setPictureZones(PageId const& page_id, ZoneSet const& zones);
+
+	void setFillZones(PageId const& page_id, ZoneSet const& zones);
 
 	/**
 	 * For now, default zone properties are not persistent.
 	 * They may become persistent later though.
 	 */
-	PropertySet defaultZoneProperties() const;
+	PropertySet defaultPictureZoneProperties() const;
 
-	void setDefaultZoneProperties(PropertySet const& props);
+	PropertySet defaultFillZoneProperties() const;
+
+	void setDefaultPictureZoneProperties(PropertySet const& props);
+
+	void setDefaultFillZoneProperties(PropertySet const& props);
 private:
 	typedef std::map<PageId, Dpi> PerPageDpi;
 	typedef std::map<PageId, DespeckleLevel> PerPageDespeckleLevel;
@@ -111,10 +119,12 @@ private:
 	PerPageDespeckleLevel m_perPageDespeckleLevel;
 	PerPageColorParams m_perPageColorParams;
 	PerPageOutputParams m_perPageOutputParams;
-	PerPageZones m_perPageZones;
+	PerPageZones m_perPagePictureZones;
+	PerPageZones m_perPageFillZones;
 	Dpi m_defaultDpi;
 	ColorParams m_defaultColorParams;
-	PropertySet m_defaultZoneProps;
+	PropertySet m_defaultPictureZoneProps;
+	PropertySet m_defaultFillZoneProps;
 	DespeckleLevel m_defaultDespeckleLevel;
 };
 

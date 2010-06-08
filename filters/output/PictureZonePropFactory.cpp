@@ -1,6 +1,6 @@
 /*
 	Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ZonePropFactory.h"
+#include "PictureZonePropFactory.h"
 #include "PictureLayerProperty.h"
 
 namespace output
 {
 
-ZonePropFactory::ZonePropFactory()
+PictureZonePropFactory::PictureZonePropFactory()
 {
 	PictureLayerProperty::registerIn(*this);
 }

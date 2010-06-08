@@ -99,7 +99,8 @@ Filter::writePageSettings(
 	QDomElement page_el(doc.createElement("page"));
 	page_el.setAttribute("id", numeric_id);
 
-	page_el.appendChild(m_ptrSettings->zonesForPage(page_id).toXml(doc, "zones"));
+	page_el.appendChild(m_ptrSettings->pictureZonesForPage(page_id).toXml(doc, "zones"));
+	page_el.appendChild(m_ptrSettings->fillZonesForPage(page_id).toXml(doc, "fill-zones"));
 	page_el.appendChild(params.toXml(doc, "params"));
 	
 	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(page_id));
@@ -141,9 +142,14 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		
-		ZoneSet const zones(el.namedItem("zones").toElement(), m_zonePropFactory);
-		if (!zones.empty()) {
-			m_ptrSettings->setZones(page_id, zones);
+		ZoneSet const picture_zones(el.namedItem("zones").toElement(), m_pictureZonePropFactory);
+		if (!picture_zones.empty()) {
+			m_ptrSettings->setPictureZones(page_id, picture_zones);
+		}
+
+		ZoneSet const fill_zones(el.namedItem("fill-zones").toElement(), m_fillZonePropFactory);
+		if (!fill_zones.empty()) {
+			m_ptrSettings->setFillZones(page_id, fill_zones);
 		}
 
 		QDomElement const params_el(el.namedItem("params").toElement());

@@ -25,6 +25,7 @@
 #include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PictureZoneComparator.h"
+#include "FillZoneComparator.h"
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include "config.h"
@@ -440,16 +441,20 @@ OptionsWidget::applyDespeckleToAllPagesConfirmed()
 void
 OptionsWidget::reloadIfNecessary()
 {
-	ZoneSet saved_zones;
+	ZoneSet saved_picture_zones;
+	ZoneSet saved_fill_zones;
 	DespeckleLevel saved_despeckle_level = DESPECKLE_NORMAL;
 	
 	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(m_pageId));
 	if (output_params.get()) {
-		saved_zones = output_params->zones();
+		saved_picture_zones = output_params->pictureZones();
+		saved_fill_zones = output_params->fillZones();
 		saved_despeckle_level = output_params->outputImageParams().despeckleLevel();
 	}
 
-	if (!PictureZoneComparator::equal(saved_zones, m_ptrSettings->zonesForPage(m_pageId))) {
+	if (!PictureZoneComparator::equal(saved_picture_zones, m_ptrSettings->pictureZonesForPage(m_pageId))) {
+		emit reloadRequested();
+	} else if (!FillZoneComparator::equal(saved_fill_zones, m_ptrSettings->fillZonesForPage(m_pageId))) {
 		emit reloadRequested();
 	} else if (saved_despeckle_level != m_ptrSettings->getDespeckleLevel(m_pageId)) {
 		emit reloadRequested();

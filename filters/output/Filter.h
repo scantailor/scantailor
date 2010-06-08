@@ -25,7 +25,8 @@
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
-#include "ZonePropFactory.h"
+#include "PictureZonePropFactory.h"
+#include "FillZonePropFactory.h"
 
 class PageId;
 class PageSelectionAccessor;
@@ -78,7 +79,8 @@ private:
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
-	ZonePropFactory m_zonePropFactory;
+	PictureZonePropFactory m_pictureZonePropFactory;
+	FillZonePropFactory m_fillZonePropFactory;
 };
 
 } // namespace output

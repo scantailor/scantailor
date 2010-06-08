@@ -23,6 +23,7 @@
 #include "IntrusivePtr.h"
 #include "InteractionHandler.h"
 #include "InteractionState.h"
+#include "ImagePixmapUnion.h"
 #include <QTimer>
 #include <QWidget>
 #include <QAbstractScrollArea>
@@ -66,7 +67,7 @@ public:
 	 * \brief ImageViewBase constructor.
 	 *
 	 * \param image The image to display.
-	 * \param downscaled_image The downscaled version of \p image.
+	 * \param downscaled_version The downscaled version of \p image.
 	 *        If it's null, it will be created automatically.
 	 *        The exact scale doesn't matter.
 	 *        The whole idea of having a downscaled version is
@@ -81,10 +82,16 @@ public:
 	 *        be used for custom drawing or custom controls.
 	 */
 	ImageViewBase(
-		QImage const& image, QImage const& downscaled_image,
+		QImage const& image, ImagePixmapUnion const& downscaled_version,
 		ImagePresentation const& presentation, Margins const& margins = Margins());
 	
 	virtual ~ImageViewBase();
+
+	/**
+	 * The idea behind this accessor is being able to share a single
+	 * downscaled pixmap between multiple image views.
+	 */
+	QPixmap const& downscaledPixmap() const { return m_pixmap; }
 	
 	/**
 	 * \brief Enable or disable the high-quality transform.

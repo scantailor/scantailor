@@ -63,7 +63,8 @@ public:
 	 *
 	 * \param status For asynchronous task cancellation.
 	 * \param input The input image plus data produced by previous stages.
-	 * \param zones A set of manual zones.
+	 * \param picture_zones A set of manual picture zones.
+	 * \param fill_zones A set of manual fill zones.
 	 * \param auto_picture_mask If provided, the auto-detected picture mask
 	 *        will be written there.  It would only happen if automatic picture
 	 *        detection actually took place.  Otherwise, nothing will be
@@ -82,8 +83,10 @@ public:
 	 */
 	QImage process(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask = 0,
-		imageproc::BinaryImage* speckles_image = 0, DebugImages* dbg = 0) const;
+		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		imageproc::BinaryImage* auto_picture_mask = 0,
+		imageproc::BinaryImage* speckles_image = 0,
+		DebugImages* dbg = 0) const;
 	
 	/**
 	 * Returns the transformation from original to output image coordinates.
@@ -102,8 +105,10 @@ private:
 	
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask = 0,
-		imageproc::BinaryImage* speckles_image = 0, DebugImages* dbg = 0) const;
+		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		imageproc::BinaryImage* auto_picture_mask = 0,
+		imageproc::BinaryImage* speckles_image = 0,
+		DebugImages* dbg = 0) const;
 	
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
 	
@@ -154,9 +159,6 @@ private:
 	
 	static QSize calcLocalWindowSize(Dpi const& dpi);
 	
-	static void colorizeBitonal(
-		QImage& img, QRgb light_color, QRgb dark_color);
-	
 	static unsigned char calcDominantBackgroundGrayLevel(QImage const& img);
 	
 	static QImage normalizeIllumination(QImage const& gray_input, DebugImages* dbg);
@@ -168,6 +170,10 @@ private:
 	QImage transformAndNormalizeIllumination2(
 		QImage const& gray_input, DebugImages* dbg,
 		QImage const* morph_background = 0) const;
+
+	void applyFillZonesInPlace(QImage& img, ZoneSet const& zones) const;
+
+	void applyFillZonesInPlace(imageproc::BinaryImage& img, ZoneSet const& zones) const;
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;

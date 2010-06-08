@@ -16,33 +16,26 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERIALIZABLE_SPLINE_H_
-#define SERIALIZABLE_SPLINE_H_
+#ifndef FILL_ZONE_COMPARATOR_H_
+#define FILL_ZONE_COMPARATOR_H_
 
-#include <QVector>
-#include <QPointF>
-#include <QPolygonF>
+class ZoneSet;
+class Zone;
+class PropertySet;
 
-class EditableSpline;
-class QTransform;
-class QDomDocument;
-class QDomElement;
-class QString;
+namespace output
+{
 
-class SerializableSpline
+class FillZoneComparator
 {
 public:
-	SerializableSpline(EditableSpline const& spline);
+	static bool equal(ZoneSet const& lhs, ZoneSet const& rhs);
 
-	explicit SerializableSpline(QDomElement const& el);
+	static bool equal(Zone const& lhs, Zone const& rhs);
 
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-
-	SerializableSpline transformed(QTransform const& xform) const;
-
-	QPolygonF toPolygon() const { return QPolygonF(m_points); }
-private:
-	QVector<QPointF> m_points;
+	static bool equal(PropertySet const& lhs, PropertySet const& rhs);
 };
+
+} // namespace output
 
 #endif

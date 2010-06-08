@@ -17,6 +17,7 @@ SET(
 	ZoneCreationInteraction.cpp ZoneCreationInteraction.h
 	ZoneVertexDragInteraction.cpp ZoneVertexDragInteraction.h
 	ZoneContextMenuInteraction.cpp ZoneContextMenuInteraction.h
+	ZoneContextMenuItem.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

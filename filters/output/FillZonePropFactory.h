@@ -16,33 +16,20 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SERIALIZABLE_SPLINE_H_
-#define SERIALIZABLE_SPLINE_H_
+#ifndef OUTPUT_FILL_ZONE_PROP_FACTORY_H_
+#define OUTPUT_FILL_ZONE_PROP_FACTORY_H_
 
-#include <QVector>
-#include <QPointF>
-#include <QPolygonF>
+#include "PropertyFactory.h"
 
-class EditableSpline;
-class QTransform;
-class QDomDocument;
-class QDomElement;
-class QString;
+namespace output
+{
 
-class SerializableSpline
+class FillZonePropFactory : public PropertyFactory
 {
 public:
-	SerializableSpline(EditableSpline const& spline);
-
-	explicit SerializableSpline(QDomElement const& el);
-
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-
-	SerializableSpline transformed(QTransform const& xform) const;
-
-	QPolygonF toPolygon() const { return QPolygonF(m_points); }
-private:
-	QVector<QPointF> m_points;
+	FillZonePropFactory();
 };
+
+} // namespace output
 
 #endif

@@ -953,7 +953,8 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
         <source>Match size with other pages</source>
-        <translation>Выровнять размеры с другими страницами</translation>
+        <translation type="unfinished">Выровнять размеры
+с другими страницами</translation>
     </message>
     <message>
         <source>Align with other pages</source>

@@ -363,6 +363,7 @@ SET(
 	ContentSpanFinder.cpp ContentSpanFinder.h
 	PhysicalTransformation.cpp PhysicalTransformation.h
 	ImageTransformation.cpp ImageTransformation.h
+	ImagePixmapUnion.h
 	ImageViewBase.cpp ImageViewBase.h
 	BasicImageView.cpp BasicImageView.h
 	StageListView.cpp StageListView.h

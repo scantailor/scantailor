@@ -31,6 +31,7 @@
 #include "Zone.h"
 #include "ZoneSet.h"
 #include "PictureLayerProperty.h"
+#include "FillColorProperty.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
@@ -60,8 +61,13 @@
 #include <QRectF>
 #include <QPointF>
 #include <QPolygonF>
+#include <QPainter>
+#include <QColor>
+#include <QPen>
+#include <QBrush>
 #include <QtGlobal>
 #include <QDebug>
+#include <Qt>
 #include <vector>
 #include <algorithm>
 #include <assert.h>
@@ -249,11 +255,16 @@ OutputGenerator::toOutput() const
 QImage
 OutputGenerator::process(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask,
-	imageproc::BinaryImage* speckles_image, DebugImages* const dbg) const
+	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	imageproc::BinaryImage* auto_picture_mask,
+	imageproc::BinaryImage* speckles_image,
+	DebugImages* const dbg) const
 {
 	QImage image(
-		processImpl(status, input, zones, auto_picture_mask, speckles_image, dbg)
+		processImpl(
+			status, input, picture_zones, fill_zones,
+			auto_picture_mask, speckles_image, dbg
+		)
 	);
 	assert(!image.isNull());
 	
@@ -475,13 +486,17 @@ OutputGenerator::modifyBinarizationMask(
 QImage
 OutputGenerator::processImpl(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& zones, imageproc::BinaryImage* auto_picture_mask,
-	imageproc::BinaryImage* speckles_image, DebugImages* const dbg) const
+	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	imageproc::BinaryImage* auto_picture_mask,
+	imageproc::BinaryImage* speckles_image,
+	DebugImages* const dbg) const
 {
 	RenderParams const render_params(m_colorParams);
 	
 	if (!render_params.whiteMargins()) {
-		return processAsIs(input, status, dbg);
+		QImage out(processAsIs(input, status, dbg));
+		applyFillZonesInPlace(out, fill_zones);
+		return out;
 	}
 	
 	// The whole image minus the part cut off by the split line.
@@ -603,6 +618,7 @@ OutputGenerator::processImpl(
 			);
 		}
 		
+		applyFillZonesInPlace(dst, fill_zones);
 		return dst.toQImage();
 	}
 	
@@ -638,7 +654,7 @@ OutputGenerator::processImpl(
 
 		status.throwIfCancelled();
 
-		modifyBinarizationMask(bw_mask, small_margins_rect, zones);
+		modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);
 		if (dbg) {
 			dbg->add(bw_mask, "bw_mask with zones");
 		}
@@ -729,6 +745,7 @@ OutputGenerator::processImpl(
 		drawOver(dst, dst_rect, maybe_normalized, src_rect);
 	}
 	
+	applyFillZonesInPlace(dst, fill_zones);
 	return dst;
 }
 
@@ -1124,19 +1141,6 @@ OutputGenerator::calcLocalWindowSize(Dpi const& dpi)
 	return size_pixels;
 }
 
-void
-OutputGenerator::colorizeBitonal(
-	QImage& img, QRgb const light_color, QRgb const dark_color)
-{
-	if (qGray(img.color(0)) < qGray(img.color(1))) {
-		img.setColor(0, dark_color);
-		img.setColor(1, light_color);
-	} else {
-		img.setColor(0, light_color);
-		img.setColor(1, dark_color);
-	}
-}
-
 unsigned char
 OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 {
@@ -1176,6 +1180,55 @@ OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 	
 	assert(!"Unreachable");
 	return 0;
+}
+
+void
+OutputGenerator::applyFillZonesInPlace(
+	QImage& img, ZoneSet const& zones) const
+{
+	if (zones.empty()) {
+		return;
+	}
+
+	QTransform const xform(toOutput());
+	QImage canvas(img.convertToFormat(QImage::Format_ARGB32_Premultiplied));
+	
+	{
+		QPainter painter(&canvas);
+		painter.setRenderHint(QPainter::Antialiasing, true);
+		painter.setPen(Qt::NoPen);
+
+		BOOST_FOREACH(Zone const& zone, zones) {
+			QColor const color(zone.properties().locateOrDefault<FillColorProperty>()->color());
+			QPolygonF const poly(zone.spline().transformed(xform).toPolygon());
+			painter.setBrush(color);
+			painter.drawPolygon(poly, Qt::WindingFill);
+		}
+	}
+
+	if (img.format() == QImage::Format_Indexed8 && img.isGrayscale()) {
+		img = toGrayscale(canvas);
+	} else {
+		img = canvas.convertToFormat(img.format());
+	}
+}
+
+void
+OutputGenerator::applyFillZonesInPlace(
+	imageproc::BinaryImage& img, ZoneSet const& zones) const
+{
+	if (zones.empty()) {
+		return;
+	}
+
+	QTransform const xform(toOutput());
+
+	BOOST_FOREACH(Zone const& zone, zones) {
+		QColor const color(zone.properties().locateOrDefault<FillColorProperty>()->color());
+		BWColor const bw_color = qGray(color.rgb()) < 128 ? BLACK : WHITE;
+		QPolygonF const poly(zone.spline().transformed(xform).toPolygon());
+		PolygonRasterizer::fill(img, bw_color, poly, Qt::WindingFill);
+	}
 }
 
 } // namespace output

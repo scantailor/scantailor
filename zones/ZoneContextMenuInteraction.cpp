@@ -21,6 +21,7 @@
 #include "ZoneInteractionContext.h"
 #include "ImageViewBase.h"
 #include "EditableZoneSet.h"
+#include "QtSignalForwarder.h"
 #include <QRectF>
 #include <QPolygonF>
 #include <QMenu>
@@ -31,7 +32,10 @@
 #include <QSignalMapper>
 #include <QCursor>
 #include <QMessageBox>
+#include <QDebug>
 #include <boost/foreach.hpp>
+#include <boost/bind.hpp>
+#include <boost/ref.hpp>
 #include <vector>
 #include <assert.h>
 
@@ -51,6 +55,31 @@ ZoneContextMenuInteraction*
 ZoneContextMenuInteraction::create(
 	ZoneInteractionContext& context, InteractionState& interaction)
 {
+	return create(
+		context, interaction,
+		boost::bind(&ZoneContextMenuInteraction::defaultMenuCustomizer, _1, _2)
+	);
+}
+
+ZoneContextMenuInteraction*
+ZoneContextMenuInteraction::create(
+	ZoneInteractionContext& context, InteractionState& interaction,
+	MenuCustomizer const& menu_customizer)
+{
+	std::vector<Zone> selectable_zones(zonesUnderMouse(context));	
+
+	if (selectable_zones.empty()) {
+		return 0;
+	} else {
+		return new ZoneContextMenuInteraction(
+			context, interaction, menu_customizer, selectable_zones
+		);
+	}
+}
+
+std::vector<ZoneContextMenuInteraction::Zone>
+ZoneContextMenuInteraction::zonesUnderMouse(ZoneInteractionContext& context)
+{
 	QTransform const from_screen(context.imageView().widgetToImage());
 	QPointF const image_mouse_pos(
 		from_screen.map(context.imageView().mapFromGlobal(QCursor::pos()) + QPointF(0.5, 0.5))
@@ -67,21 +96,16 @@ ZoneContextMenuInteraction::create(
 		}
 	}
 
-	if (selectable_zones.empty()) {
-		return 0;
-	} else {
-		return new ZoneContextMenuInteraction(context, interaction, selectable_zones);
-	}
+	return selectable_zones;
 }
 
-
 ZoneContextMenuInteraction::ZoneContextMenuInteraction(
-	ZoneInteractionContext& context,
-	InteractionState& interaction, std::vector<Zone>& selectable_zones)
+	ZoneInteractionContext& context, InteractionState& interaction,
+	MenuCustomizer const& menu_customizer, std::vector<Zone>& selectable_zones)
 :	m_rContext(context),
 	m_ptrMenu(new QMenu(&context.imageView())),
 	m_highlightedZoneIdx(-1),
-	m_switchToDefaultStatePreventer(1)
+	m_menuItemTriggered(false)
 {
 	m_selectableZones.swap(selectable_zones);
 	std::sort(m_selectableZones.begin(), m_selectableZones.end(), OrderByArea());
@@ -96,11 +120,7 @@ ZoneContextMenuInteraction::ZoneContextMenuInteraction(
 	QColor color;
 
 	QSignalMapper* hover_map = new QSignalMapper(this);
-	QSignalMapper* prop_trigger_map = new QSignalMapper(this);
-	QSignalMapper* del_trigger_map = new QSignalMapper(this);
 	connect(hover_map, SIGNAL(mapped(int)), SLOT(highlightItem(int)));
-	connect(prop_trigger_map, SIGNAL(mapped(int)), SLOT(propertiesRequest(int)));
-	connect(del_trigger_map, SIGNAL(mapped(int)), SLOT(deleteRequest(int)));
 
 	QPixmap pixmap;
 
@@ -116,22 +136,34 @@ ZoneContextMenuInteraction::ZoneContextMenuInteraction(
 			pixmap.fill(color);
 		}
 
-		QAction* action = m_ptrMenu->addAction(pixmap, tr("Properties"));
-		prop_trigger_map->setMapping(action, i);
-		hover_map->setMapping(action, i);
-		connect(action, SIGNAL(triggered()), prop_trigger_map, SLOT(map()));
-		connect(action, SIGNAL(hovered()), hover_map, SLOT(map()));
+		StandardMenuItems const std_items(
+			propertiesMenuItemFor(*it),
+			deleteMenuItemFor(*it)
+		);
 
-		action = m_ptrMenu->addAction(pixmap, tr("Delete"));
-		del_trigger_map->setMapping(action, i);
-		hover_map->setMapping(action, i);
-		connect(action, SIGNAL(triggered()), del_trigger_map, SLOT(map()));
-		connect(action, SIGNAL(hovered()), hover_map, SLOT(map()));
+		BOOST_FOREACH(ZoneContextMenuItem const& item, menu_customizer(*it, std_items)) {
+			QAction* action = m_ptrMenu->addAction(pixmap, item.label());
+			new QtSignalForwarder(
+				action, SIGNAL(triggered()),
+				boost::bind(
+					&ZoneContextMenuInteraction::menuItemTriggered,
+					this, boost::ref(interaction), item.callback()
+				)
+			);
+			
+			hover_map->setMapping(action, i);
+			connect(action, SIGNAL(hovered()), hover_map, SLOT(map()));
+		}
 
 		m_ptrMenu->addSeparator();
 	}
 
-	connect(m_ptrMenu.get(), SIGNAL(aboutToHide()), SLOT(menuAboutToHide()), Qt::QueuedConnection);
+	// The queued connection is used to ensure it gets called *after*
+	// QAction::triggered().
+	connect(
+		m_ptrMenu.get(), SIGNAL(aboutToHide()),
+		SLOT(menuAboutToHide()), Qt::QueuedConnection
+	);
 
 	highlightItem(0);
 	m_ptrMenu->popup(QCursor::pos());
@@ -157,35 +189,77 @@ ZoneContextMenuInteraction::onPaint(QPainter& painter, InteractionState const&)
 void
 ZoneContextMenuInteraction::menuAboutToHide()
 {
-	maybeSwitchToDefaultState();
+	if (m_menuItemTriggered) {
+		return;
+	}
+
+	InteractionHandler* next_handler = m_rContext.createDefaultInteraction();
+	if (next_handler) {
+		makePeerPreceeder(*next_handler);
+	}
+
+	unlink();
+	m_rContext.imageView().update();
+	deleteLater();
 }
 
 void
-ZoneContextMenuInteraction::propertiesRequest(int const zone_idx)
+ZoneContextMenuInteraction::menuItemTriggered(
+	InteractionState& interaction, ZoneContextMenuItem::Callback const& callback)
 {
-	++m_switchToDefaultStatePreventer;
-
+	m_menuItemTriggered = true;
 	m_visualizer.switchToStrokeMode();
-	m_rContext.showPropertiesCommand(m_selectableZones[zone_idx]);
+	
+	InteractionHandler* next_handler = callback(interaction);
+	if (next_handler) {
+		makePeerPreceeder(*next_handler);
+	}
 
-	maybeSwitchToDefaultState();
+	unlink();
+	m_rContext.imageView().update();
+	deleteLater();
 }
 
-void
-ZoneContextMenuInteraction::deleteRequest(int const zone_idx)
+InteractionHandler*
+ZoneContextMenuInteraction::propertiesRequest(EditableZoneSet::Zone const& zone)
 {
-	++m_switchToDefaultStatePreventer;
+	m_rContext.showPropertiesCommand(zone);
+	return m_rContext.createDefaultInteraction();
+}
 
+InteractionHandler*
+ZoneContextMenuInteraction::deleteRequest(EditableZoneSet::Zone const& zone)
+{
 	QMessageBox::StandardButton const btn = QMessageBox::question(
 		&m_rContext.imageView(), tr("Delete confirmation"), tr("Really delete this zone?"),
 		QMessageBox::Yes|QMessageBox::No
 	);
 	if (btn == QMessageBox::Yes) {
-		m_rContext.zones().removeZone(m_selectableZones[zone_idx].spline());
+		m_rContext.zones().removeZone(zone.spline());
 		m_rContext.zones().commit();
 	}
 
-	maybeSwitchToDefaultState();
+	return m_rContext.createDefaultInteraction();
+}
+
+ZoneContextMenuItem
+ZoneContextMenuInteraction::deleteMenuItemFor(
+	EditableZoneSet::Zone const& zone)
+{
+	return ZoneContextMenuItem(
+		tr("Delete"),
+		boost::bind(&ZoneContextMenuInteraction::deleteRequest, this, zone)
+	);
+}
+
+ZoneContextMenuItem
+ZoneContextMenuInteraction::propertiesMenuItemFor(
+	EditableZoneSet::Zone const& zone)
+{
+	return ZoneContextMenuItem(
+		tr("Properties"),
+		boost::bind(&ZoneContextMenuInteraction::propertiesRequest, this, zone)
+	);
 }
 
 void
@@ -200,22 +274,30 @@ ZoneContextMenuInteraction::highlightItem(int const zone_idx)
 	m_rContext.imageView().update();
 }
 
-void
-ZoneContextMenuInteraction::maybeSwitchToDefaultState()
+std::vector<ZoneContextMenuItem>
+ZoneContextMenuInteraction::defaultMenuCustomizer(
+	EditableZoneSet::Zone const& zone, StandardMenuItems const& std_items)
 {
-	if (--m_switchToDefaultStatePreventer != 0) {
-		assert(m_switchToDefaultStatePreventer > 0);
-		return;
-	}
-
-	makePeerPreceeder(*m_rContext.createDefaultInteraction());
-	m_rContext.imageView().update();
-	deleteLater();
-	unlink();
+	std::vector<ZoneContextMenuItem> items;
+	items.reserve(2);
+	items.push_back(std_items.propertiesItem);
+	items.push_back(std_items.deleteItem);
+	return items;
 }
 
 
-/*====================== ContextMenuHandler::Visualizer =========================*/
+/*========================== StandardMenuItem =========================*/
+
+ZoneContextMenuInteraction::StandardMenuItems::StandardMenuItems(
+	ZoneContextMenuItem const& properties_item,
+	ZoneContextMenuItem const& delete_item)
+:	propertiesItem(properties_item),
+	deleteItem(delete_item)
+{
+}
+
+
+/*============================= Visualizer ============================*/
 
 void
 ZoneContextMenuInteraction::Visualizer::switchToFillMode(QColor const& color)

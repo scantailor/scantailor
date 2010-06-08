@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 */
 
 #include "OutputParams.h"
-#include "ZonePropFactory.h"
+#include "PictureZonePropFactory.h"
+#include "FillZonePropFactory.h"
 #include <QDomDocument>
 #include <QDomElement>
 
@@ -29,12 +30,14 @@ OutputParams::OutputParams(
 	OutputFileParams const& output_file_params,
 	OutputFileParams const& automask_file_params,
 	OutputFileParams const& speckles_file_params,
-	ZoneSet const& zones)
+	ZoneSet const& picture_zones,
+	ZoneSet const& fill_zones)
 :	m_outputImageParams(output_image_params),
 	m_outputFileParams(output_file_params),
 	m_automaskFileParams(automask_file_params),
 	m_specklesFileParams(speckles_file_params),
-	m_zones(zones)
+	m_pictureZones(picture_zones),
+	m_fillZones(fill_zones)
 {
 }
 
@@ -43,7 +46,8 @@ OutputParams::OutputParams(QDomElement const& el)
 	m_outputFileParams(el.namedItem("file").toElement()),
 	m_automaskFileParams(el.namedItem("automask").toElement()),
 	m_specklesFileParams(el.namedItem("speckles").toElement()),
-	m_zones(el.namedItem("zones").toElement(), ZonePropFactory())
+	m_pictureZones(el.namedItem("zones").toElement(), PictureZonePropFactory()),
+	m_fillZones(el.namedItem("fill-zones").toElement(), FillZonePropFactory())
 {
 }
 
@@ -55,7 +59,8 @@ OutputParams::toXml(QDomDocument& doc, QString const& name) const
 	el.appendChild(m_outputFileParams.toXml(doc, "file"));
 	el.appendChild(m_automaskFileParams.toXml(doc, "automask"));
 	el.appendChild(m_specklesFileParams.toXml(doc, "speckles"));
-	el.appendChild(m_zones.toXml(doc, "zones"));
+	el.appendChild(m_pictureZones.toXml(doc, "zones"));
+	el.appendChild(m_fillZones.toXml(doc, "fill-zones"));
 	return el;
 }
 
