@@ -6,12 +6,12 @@
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="36"/>
         <source>Beep when finished</source>
-        <translation type="unfinished">終了時にビープ音を鳴らす</translation>
+        <translation>終了時にビープ音を鳴らす</translation>
     </message>
 </context>
 <context>
@@ -19,7 +19,7 @@
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックするとその部分の色を抽出します。ESC を押すとキャンセルします。</translation>
     </message>
 </context>
 <context>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="19"/>
@@ -58,7 +58,7 @@
     <message>
         <location filename="../ui/ErrorWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ErrorWidget.ui" line="54"/>
@@ -272,7 +272,7 @@
         <location filename="../MainWindow.cpp" line="1488"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
     </message>
     <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
@@ -303,7 +303,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../MainWindow.cpp" line="1677"/>
         <source>Images not in project (%1)</source>
-        <translation>プロジェクトに含まない画像 (%1)</translation>
+        <translation>プロジェクトに含まれない画像 (%1)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1701"/>
@@ -342,7 +342,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="161"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
-        <translation type="unfinished"></translation>
+        <translation>Home, End, PgUp（または Q）, PgDown（または W）キーでページを移れます。</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="190"/>
@@ -444,22 +444,22 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="321"/>
         <source>First Page</source>
-        <translation type="unfinished"></translation>
+        <translation>最初のページ</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="324"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="329"/>
         <source>Last Page</source>
-        <translation type="unfinished"></translation>
+        <translation>最後のページ</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="332"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="458"/>
@@ -477,7 +477,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="19"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="52"/>
@@ -555,7 +555,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="19"/>
@@ -670,7 +670,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="20"/>
@@ -794,7 +794,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="20"/>
@@ -860,7 +860,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
         <source>Match size with other pages</source>
-        <translation type="unfinished"></translation>
+        <translation>サイズを他のページに合わせる</translation>
     </message>
     <message>
         <source>Align with other pages</source>
@@ -941,7 +941,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="20"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="26"/>
@@ -983,22 +983,22 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="14"/>
         <source>Zone Properties</source>
-        <translation type="unfinished">領域のプロパティ</translation>
+        <translation>領域のプロパティ</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="20"/>
         <source>Subtract from all layers</source>
-        <translation type="unfinished">全てのレイヤーから除く</translation>
+        <translation>全てのレイヤーから除く</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation type="unfinished">自動レイヤーに加える</translation>
+        <translation>自動レイヤーに加える</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
         <source>Subtract from auto layer</source>
-        <translation type="unfinished">自動レイヤーから除く</translation>
+        <translation>自動レイヤーから除く</translation>
     </message>
 </context>
 <context>
@@ -1180,7 +1180,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="72"/>
         <source>Corresponding output files will be deleted, while input files will remain.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ファイルは残されるものの、対応する出力ファイルは削除されます。</translation>
     </message>
     <message>
         <source>Files will remain on disk</source>
@@ -1192,7 +1192,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="19"/>
@@ -1246,28 +1246,28 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished">形状</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="23"/>
         <source>System load</source>
-        <translation type="unfinished"></translation>
+        <translation>システム負荷</translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="46"/>
         <location filename="../ui/SystemLoadWidget.ui" line="73"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation type="unfinished"></translation>
+        <translation>最小</translation>
     </message>
     <message>
         <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>通常</translation>
     </message>
 </context>
 <context>
@@ -1387,7 +1387,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="62"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
-        <translation type="unfinished">Ctrl+マウスホイールで回転できます。Ctrl+Shift+マウスホイールでより細かく回転できます。</translation>
+        <translation>Ctrl+マウスホイールで回転できます。Ctrl+Shift+マウスホイールでより細かく回転できます。</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
@@ -1446,7 +1446,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/FillZoneEditor.cpp" line="137"/>
         <source>Pick color</source>
-        <translation type="unfinished"></translation>
+        <translation>色を抽出</translation>
     </message>
 </context>
 <context>
@@ -1505,7 +1505,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="491"/>
         <source>Fill Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>塗り潰し領域</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="492"/>
@@ -1522,22 +1522,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="64"/>
         <source>Natural order</source>
-        <translation type="unfinished"></translation>
+        <translation>通常の順序</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="65"/>
         <source>Order by increasing width</source>
-        <translation type="unfinished"></translation>
+        <translation>幅の狭い順</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="66"/>
         <source>Order by increasing height</source>
-        <translation type="unfinished"></translation>
+        <translation>高さの低い順</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="76"/>
         <source>Margins</source>
-        <translation type="unfinished">余白</translation>
+        <translation>余白</translation>
     </message>
 </context>
 <context>
@@ -1598,7 +1598,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/UnremoveButton.cpp" line="38"/>
         <source>Restore removed page.</source>
-        <translation type="unfinished"></translation>
+        <translation>削除したページを復元</translation>
     </message>
 </context>
 <context>
@@ -1606,17 +1606,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="53"/>
         <source>Natural order</source>
-        <translation type="unfinished"></translation>
+        <translation>通常の順序</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="54"/>
         <source>Order by increasing width</source>
-        <translation type="unfinished"></translation>
+        <translation>幅の狭い順</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="55"/>
         <source>Order by increasing height</source>
-        <translation type="unfinished"></translation>
+        <translation>高さの低い順</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="65"/>
