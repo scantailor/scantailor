@@ -64,8 +64,11 @@ Thumbnail::paintOverImage(
 	QTransform const orig_to_presentation(
 		m_origXform.transformBack() * imageXform().transform()
 	);
+	QTransform const presentation_to_thumb(
+		image_to_display * thumb_to_display.inverted()
+	);
 	QTransform const orig_to_thumb(
-		orig_to_presentation * image_to_display * thumb_to_display.inverted()
+		orig_to_presentation * presentation_to_thumb
 	);
 	
 	// We work in thumbnail coordinates because we want to adjust
@@ -88,14 +91,18 @@ Thumbnail::paintOverImage(
 	QPainterPath content_outline;
 	content_outline.addPolygon(PolygonUtils::round(inner_rect));
 	
+	QPolygonF const orig_image_outline(
+		m_origXform.transform().map(m_origXform.origRect())
+	);
+
 	QPainterPath page_outline;
 	page_outline.addPolygon(
 		PolygonUtils::round(
-			orig_to_thumb.map(m_origXform.resultingCropArea())
+			orig_to_thumb.map(orig_image_outline.intersected(m_outerRect))
 		)
 	);
 	
-	painter.setRenderHint(QPainter::Antialiasing, false);
+	painter.setRenderHint(QPainter::Antialiasing, true);
 	
 	// Clear parts of the thumbnail that don't belong to the image
 	// but belong to outer_rect.
