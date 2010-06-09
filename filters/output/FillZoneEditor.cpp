@@ -45,6 +45,20 @@
 namespace output
 {
 
+class FillZoneEditor::MenuCustomizer
+{
+private:
+	typedef ZoneContextMenuInteraction::StandardMenuItems StdMenuItems;
+public:
+	MenuCustomizer(FillZoneEditor* editor) : m_pEditor(editor) {}
+
+	std::vector<ZoneContextMenuItem> operator()(
+		EditableZoneSet::Zone const& zone, StdMenuItems const& std_items);
+private:
+	FillZoneEditor* m_pEditor;
+};
+
+
 FillZoneEditor::FillZoneEditor(
 	QImage const& image, ImagePixmapUnion const& downscaled_version,
 	QTransform const& orig_to_image, PageId const& page_id,
@@ -119,36 +133,6 @@ InteractionHandler*
 FillZoneEditor::createContextMenuInteraction(InteractionState& interaction)
 {
 	// Return a standard ZoneContextMenuInteraction but with a customized menu.
-
-	typedef ZoneContextMenuInteraction::StandardMenuItems StdMenuItems;
-
-	class MenuCustomizer
-	{
-	public:
-		MenuCustomizer(FillZoneEditor* editor) : m_pEditor(editor) {}
-
-		std::vector<ZoneContextMenuItem> operator()(
-			EditableZoneSet::Zone const& zone, StdMenuItems const& std_items) {
-			
-			std::vector<ZoneContextMenuItem> items;
-			items.reserve(2);
-			items.push_back(
-				ZoneContextMenuItem(
-					tr("Pick color"),
-					boost::bind(
-						&FillZoneEditor::createColorPickupInteraction,
-						m_pEditor, zone, _1
-					)
-				)
-			);
-			items.push_back(std_items.deleteItem);
-
-			return items;
-		}
-	private:
-		FillZoneEditor* m_pEditor;
-	};
-
 	return ZoneContextMenuInteraction::create(
 		m_context, interaction, MenuCustomizer(this)
 	);
@@ -220,6 +204,29 @@ FillZoneEditor::colorAdapterFor(QImage const& image)
 		default:
 			return &FillZoneEditor::toOpaque;
 	}
+}
+
+
+/*=========================== MenuCustomizer =========================*/
+
+std::vector<ZoneContextMenuItem>
+FillZoneEditor::MenuCustomizer::operator()(
+	EditableZoneSet::Zone const& zone, StdMenuItems const& std_items)
+{
+	std::vector<ZoneContextMenuItem> items;
+	items.reserve(2);
+	items.push_back(
+		ZoneContextMenuItem(
+			tr("Pick color"),
+			boost::bind(
+				&FillZoneEditor::createColorPickupInteraction,
+				m_pEditor, zone, _1
+			)
+		)
+	);
+	items.push_back(std_items.deleteItem);
+
+	return items;
 }
 
 } // namespace output

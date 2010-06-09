@@ -62,6 +62,8 @@ private slots:
 
 	void updateRequested();
 private:
+	class MenuCustomizer;
+
 	typedef QColor (*ColorAdapter)(QColor const&);
 
 	InteractionHandler* createContextMenuInteraction(InteractionState& interaction);
