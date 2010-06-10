@@ -2,6 +2,83 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ja_JP">
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="14"/>
+        <source>About Scan Tailor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="27"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="33"/>
+        <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recogrnition is out of scope of this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="87"/>
+        <source>Authors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="111"/>
+        <source>Lead Developer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="118"/>
+        <source>Joseph Artsimovich
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="129"/>
+        <source>Translators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="136"/>
+        <source>Mandor - Bulgarian
+Masahiro Kitagawa - Japanese
+Joseph Artsimovich - Russian
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>Contributors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="156"/>
+        <source>U235 - Picture auto-detection algorithm.
+Robert B. - Dewarping algorithm.
+Andrey Bergman - System load adjustment.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="169"/>
+        <source>Documentation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="176"/>
+        <source>denver 22
+phaedrus
+Taxman</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="203"/>
+        <source>License</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BatchProcessingLowerPanel</name>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
@@ -208,68 +285,68 @@
         <translation type="obsolete">終了時にビープ音を鳴らす</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="227"/>
-        <location filename="../MainWindow.cpp" line="530"/>
+        <location filename="../ui/MainWindow.ui" line="233"/>
+        <location filename="../MainWindow.cpp" line="532"/>
         <source>Save Project</source>
         <translation>プロジェクトを保存する</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="530"/>
+        <location filename="../MainWindow.cpp" line="532"/>
         <source>Save this project?</source>
         <translation>プロジェクトを保存しますか？</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="903"/>
+        <location filename="../MainWindow.cpp" line="905"/>
         <source>Insert before ...</source>
         <translation>前に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="906"/>
+        <location filename="../MainWindow.cpp" line="908"/>
         <source>Insert after ...</source>
         <translation>後に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="912"/>
+        <location filename="../MainWindow.cpp" line="914"/>
         <source>Remove from project ...</source>
         <translation>プロジェクトから取り除く…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="929"/>
+        <location filename="../MainWindow.cpp" line="931"/>
         <source>Insert here ...</source>
         <translation>ここに挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1220"/>
-        <location filename="../MainWindow.cpp" line="1288"/>
+        <location filename="../MainWindow.cpp" line="1222"/>
+        <location filename="../MainWindow.cpp" line="1290"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor プロジェクト</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1287"/>
+        <location filename="../MainWindow.cpp" line="1289"/>
         <source>Open Project</source>
         <translation>プロジェクトを開く</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1305"/>
-        <location filename="../MainWindow.cpp" line="1314"/>
-        <location filename="../MainWindow.cpp" line="1592"/>
-        <location filename="../MainWindow.cpp" line="1623"/>
-        <location filename="../MainWindow.cpp" line="1700"/>
+        <location filename="../MainWindow.cpp" line="1307"/>
+        <location filename="../MainWindow.cpp" line="1316"/>
+        <location filename="../MainWindow.cpp" line="1605"/>
+        <location filename="../MainWindow.cpp" line="1636"/>
+        <location filename="../MainWindow.cpp" line="1713"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1306"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
         <source>Unable to open the project file.</source>
         <translation>プロジェクトファイルを開けませんでした。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1315"/>
+        <location filename="../MainWindow.cpp" line="1317"/>
         <source>The project file is broken.</source>
         <translation>プロジェクトファイルは破損しています。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1488"/>
+        <location filename="../MainWindow.cpp" line="1501"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
@@ -280,33 +357,33 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1521"/>
+        <location filename="../MainWindow.cpp" line="1534"/>
         <source>Unnamed</source>
         <translation>名前なし</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1526"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>%1 - Scan Tailor %2</source>
         <translation>%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1593"/>
-        <location filename="../MainWindow.cpp" line="1624"/>
+        <location filename="../MainWindow.cpp" line="1606"/>
+        <location filename="../MainWindow.cpp" line="1637"/>
         <source>Error saving the project file!</source>
         <translation>プロジェクトファイルを保存できません！</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1671"/>
+        <location filename="../MainWindow.cpp" line="1684"/>
         <source>File to insert</source>
         <translation>挿入するファイル</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1677"/>
+        <location filename="../MainWindow.cpp" line="1690"/>
         <source>Images not in project (%1)</source>
         <translation>プロジェクトに含まれない画像 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1701"/>
+        <location filename="../MainWindow.cpp" line="1714"/>
         <source>Error opening the image file.</source>
         <translation>画像ファイルを開けません！</translation>
     </message>
@@ -315,7 +392,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1741"/>
+        <location filename="../MainWindow.cpp" line="1754"/>
         <source>Remove</source>
         <translation>取り除く</translation>
     </message>
@@ -331,7 +408,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>メインウインドウ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="135"/>
+        <location filename="../ui/MainWindow.ui" line="134"/>
         <source>Keep current page in view.</source>
         <translation>現在のページを常に表示します。</translation>
     </message>
@@ -340,134 +417,144 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">PgUp, PgDown または Q, W キーでページを移れます。</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="161"/>
+        <location filename="../ui/MainWindow.ui" line="160"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
         <translation>Home, End, PgUp（または Q）, PgDown（または W）キーでページを移れます。</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="190"/>
+        <location filename="../ui/MainWindow.ui" line="189"/>
         <source>Tools</source>
         <translation>ツール</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="198"/>
+        <location filename="../ui/MainWindow.ui" line="197"/>
         <source>File</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="222"/>
+        <location filename="../ui/MainWindow.ui" line="211"/>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="228"/>
         <source>Debug</source>
         <translation>デバッグ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="230"/>
+        <location filename="../ui/MainWindow.ui" line="236"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="235"/>
+        <location filename="../ui/MainWindow.ui" line="241"/>
         <source>Save Project As ...</source>
         <translation>プロジェクトを別名で保存…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="240"/>
-        <location filename="../ui/MainWindow.ui" line="289"/>
+        <location filename="../ui/MainWindow.ui" line="246"/>
+        <location filename="../ui/MainWindow.ui" line="295"/>
         <source>Next Page</source>
         <translation>次ページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="243"/>
+        <location filename="../ui/MainWindow.ui" line="249"/>
         <source>PgDown</source>
         <translation>PgDown</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="251"/>
-        <location filename="../ui/MainWindow.ui" line="278"/>
+        <location filename="../ui/MainWindow.ui" line="257"/>
+        <location filename="../ui/MainWindow.ui" line="284"/>
         <source>Previous Page</source>
         <translation>前ページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="254"/>
+        <location filename="../ui/MainWindow.ui" line="260"/>
         <source>PgUp</source>
         <translation>PgUp</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="262"/>
+        <location filename="../ui/MainWindow.ui" line="268"/>
         <source>New Project ...</source>
         <translation>新規プロジェクト...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="265"/>
+        <location filename="../ui/MainWindow.ui" line="271"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="270"/>
+        <location filename="../ui/MainWindow.ui" line="276"/>
         <source>Open Project ...</source>
         <translation>プロジェクトを開く...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="273"/>
+        <location filename="../ui/MainWindow.ui" line="279"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="281"/>
+        <location filename="../ui/MainWindow.ui" line="287"/>
         <source>Q</source>
         <translation>Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="292"/>
+        <location filename="../ui/MainWindow.ui" line="298"/>
         <source>W</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="300"/>
+        <location filename="../ui/MainWindow.ui" line="306"/>
         <source>Close Project</source>
         <translation>プロジェクトを閉じる…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="303"/>
+        <location filename="../ui/MainWindow.ui" line="309"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="308"/>
+        <location filename="../ui/MainWindow.ui" line="314"/>
         <source>Quit</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="311"/>
+        <location filename="../ui/MainWindow.ui" line="317"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="321"/>
+        <location filename="../ui/MainWindow.ui" line="327"/>
         <source>First Page</source>
         <translation>最初のページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="324"/>
+        <location filename="../ui/MainWindow.ui" line="330"/>
         <source>Home</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="329"/>
+        <location filename="../ui/MainWindow.ui" line="335"/>
         <source>Last Page</source>
         <translation>最後のページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="332"/>
+        <location filename="../ui/MainWindow.ui" line="338"/>
         <source>End</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="458"/>
+        <location filename="../ui/MainWindow.ui" line="343"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="460"/>
         <source>Stop batch processing</source>
         <translation>一括処理を停止</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="316"/>
+        <location filename="../ui/MainWindow.ui" line="322"/>
         <source>Settings ...</source>
         <translation>設定...</translation>
     </message>
@@ -1444,7 +1531,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::FillZoneEditor</name>
     <message>
-        <location filename="../filters/output/FillZoneEditor.cpp" line="137"/>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="220"/>
         <source>Pick color</source>
         <translation>色を抽出</translation>
     </message>
