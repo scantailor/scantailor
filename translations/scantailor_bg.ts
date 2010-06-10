@@ -19,7 +19,7 @@
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Цъкнете върху област за избор на цвета й или ESC за отказ.</translation>
     </message>
 </context>
 <context>
@@ -989,22 +989,22 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="14"/>
         <source>Zone Properties</source>
-        <translation type="unfinished">Свойства на зоната</translation>
+        <translation>Свойства на зоната</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="20"/>
         <source>Subtract from all layers</source>
-        <translation type="unfinished">Изваждане от всички слоеве</translation>
+        <translation>Изваждане от всички слоеве</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation type="unfinished">Добавяне към автоматичния слой</translation>
+        <translation>Добавяне към автоматичния слой</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
         <source>Subtract from auto layer</source>
-        <translation type="unfinished">Изваждане от автоматичния слой</translation>
+        <translation>Изваждане от автоматичния слой</translation>
     </message>
 </context>
 <context>
@@ -1456,7 +1456,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/FillZoneEditor.cpp" line="137"/>
         <source>Pick color</source>
-        <translation type="unfinished"></translation>
+        <translation>Изберете цвят</translation>
     </message>
 </context>
 <context>
@@ -1515,7 +1515,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/Task.cpp" line="491"/>
         <source>Fill Zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Запълване на зони</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="492"/>
