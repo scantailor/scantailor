@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>icons/appicon-about.png</file>
     <file>icons/trashed-small.png</file>
     <file>icons/plus-16.png</file>
     <file>icons/trashed-big.png</file>

@@ -78,6 +78,7 @@
 #include "LoadFileTask.h"
 #include "CompositeCacheDrivenTask.h"
 #include "ScopedIncDec.h"
+#include "ui_AboutDialog.h"
 #include "ui_RemovePagesDialog.h"
 #include "ui_BatchProcessingLowerPanel.h"
 #include "config.h"
@@ -171,6 +172,7 @@ MainWindow::MainWindow()
 	connect(actionNextPage, SIGNAL(triggered(bool)), SLOT(goNextPage()));
 	connect(actionPrevPageQ, SIGNAL(triggered(bool)), this, SLOT(goPrevPage()));
 	connect(actionNextPageW, SIGNAL(triggered(bool)), this, SLOT(goNextPage()));
+	connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(showAboutDialog()));
 	
 	connect(
 		filterList->selectionModel(),
@@ -1355,6 +1357,17 @@ void
 MainWindow::openSettingsDialog()
 {
 	SettingsDialog* dialog = new SettingsDialog(this);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowModality(Qt::WindowModal);
+	dialog->show();
+}
+
+void
+MainWindow::showAboutDialog()
+{
+	Ui::AboutDialog ui;
+	QDialog* dialog = new QDialog(this);
+	ui.setupUi(dialog);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->show();
