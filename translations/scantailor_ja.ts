@@ -6,38 +6,38 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="14"/>
         <source>About Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor について</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="27"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recogrnition is out of scope of this project.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor はスキャンされたページを対話的にポストプロセッシングするツールです。ページ分割・傾き補正・余白の追加／除去などの操作ができます。スキャンされた生データから、印刷したり PDF や DJVU ファイルにまとめたりするのに向いたページを作ることができます。スキャン処理および光学文字認識はこのプロジェクトの対象範囲外です。</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="87"/>
         <source>Authors</source>
-        <translation type="unfinished"></translation>
+        <translation>作者</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="111"/>
         <source>Lead Developer</source>
-        <translation type="unfinished"></translation>
+        <translation>主開発者</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="118"/>
         <source>Joseph Artsimovich
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="129"/>
         <source>Translators</source>
-        <translation type="unfinished"></translation>
+        <translation>翻訳者</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="136"/>
@@ -45,12 +45,15 @@
 Masahiro Kitagawa - Japanese
 Joseph Artsimovich - Russian
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Svetoslav Sashkov, Mandor - ブルガリア語
+北川雅裕 - 日本語
+Joseph Artsimovich - ロシア語
+</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="149"/>
         <source>Contributors</source>
-        <translation type="unfinished"></translation>
+        <translation>貢献者</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="156"/>
@@ -58,24 +61,27 @@ Joseph Artsimovich - Russian
 Robert B. - Dewarping algorithm.
 Andrey Bergman - System load adjustment.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>U235 - 画像自動選択アルゴリズム
+Robert B. - 歪み補正アルゴリズム
+Andrey Bergman - システム負荷調整
+</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="169"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメント化</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="176"/>
         <source>denver 22
 phaedrus
 Taxman</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="203"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス</translation>
     </message>
 </context>
 <context>
@@ -434,7 +440,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="211"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="228"/>
@@ -546,7 +552,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="343"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="460"/>
