@@ -133,7 +133,7 @@ font-weight: bold;</string>
            <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>Mandor - Bulgarian
+              <string>Svetoslav Sashkov, Mandor - Bulgarian
 Masahiro Kitagawa - Japanese
 Joseph Artsimovich - Russian
 </string>
@@ -361,6 +361,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>

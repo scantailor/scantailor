@@ -41,7 +41,7 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="136"/>
-        <source>Mandor - Bulgarian
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
 Masahiro Kitagawa - Japanese
 Joseph Artsimovich - Russian
 </source>

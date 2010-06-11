@@ -42,11 +42,21 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="136"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Masahiro Kitagawa - Japanese
+Joseph Artsimovich - Russian
+</source>
+        <translation>Svetoslav Sashkov, Mandor - Болгарский
+Masahiro Kitagawa - Японский
+Иосиф Арцимович - Русский
+</translation>
+    </message>
+    <message>
         <source>Mandor - Bulgarian
 Masahiro Kitagawa - Japanese
 Joseph Artsimovich - Russian
 </source>
-        <translation>Mandor - Болгарский
+        <translation type="obsolete">Mandor - Болгарский
 Masahiro Kitagawa - Японский
 Иосиф Арцимович - Русский
 </translation>
