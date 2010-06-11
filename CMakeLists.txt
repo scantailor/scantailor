@@ -22,6 +22,13 @@ ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
 ENABLE_TESTING()
 
+# An undocumented side-effect of CONFIGURE_FILE() is that it makes
+# the whole project depend on the file we are parsing / copying.
+CONFIGURE_FILE(
+	"${PROJECT_SOURCE_DIR}/version.h"
+	"${PROJECT_BINARY_DIR}/.version.h" COPYONLY
+)
+
 # Prevent this leftover from old builds to be used in favour
 # of the one in ${PROJECT_SOURCE_DIR}
 IF(NOT "${PROJECT_BINARY_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}")
