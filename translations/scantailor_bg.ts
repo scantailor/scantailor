@@ -6,38 +6,39 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="14"/>
         <source>About Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>За програмата Scan Tailor</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="27"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>За програмата</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recogrnition is out of scope of this project.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor е интерактивен инструмент за пост-обработка на сканирани страници. Той извършва операции като разрязване на страници, корекция на наклона, добавяне/премахване на полета и др. Вие му подавате необработени сканове, а в резултат получавате страници, готови за печат или пакетиране в PDF или DJVU файлове. Сканирането и оптичното разпознаване на символи не влизат в обхвата на този проект.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="87"/>
         <source>Authors</source>
-        <translation type="unfinished"></translation>
+        <translation>Автори</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="111"/>
         <source>Lead Developer</source>
-        <translation type="unfinished"></translation>
+        <translation>Главен разработчик</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="118"/>
         <source>Joseph Artsimovich
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Йосиф Арцимович
+</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="129"/>
         <source>Translators</source>
-        <translation type="unfinished"></translation>
+        <translation>Преводачи</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="136"/>
@@ -45,12 +46,15 @@
 Masahiro Kitagawa - Japanese
 Joseph Artsimovich - Russian
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Светослав Сашков, Mandor - Български
+Masahiro Kitagawa - Японски
+Йосиф Арцимович - Руски
+</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="149"/>
         <source>Contributors</source>
-        <translation type="unfinished"></translation>
+        <translation>Благодарности</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="156"/>
@@ -58,24 +62,29 @@ Joseph Artsimovich - Russian
 Robert B. - Dewarping algorithm.
 Andrey Bergman - System load adjustment.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>U235 - Алгоритъм за автоматично откриване на картинки.
+Robert B. - Алгоритъм за премахване на геометрични изкривявания.
+Andrey Bergman - Настройка натоварването на системата.
+</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="169"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Документация</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="176"/>
         <source>denver 22
 phaedrus
 Taxman</source>
-        <translation type="unfinished"></translation>
+        <translation>denver 22
+phaedrus
+Taxman</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="203"/>
         <source>License</source>
-        <translation type="unfinished"></translation>
+        <translation>Лиценз</translation>
     </message>
 </context>
 <context>
@@ -440,7 +449,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="211"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Помощ</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="228"/>
@@ -552,7 +561,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="343"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>За програмата</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="460"/>
