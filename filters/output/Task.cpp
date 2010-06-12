@@ -457,6 +457,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 				m_pageId, m_ptrSettings
 			)
 		);
+		QObject::connect(
+			picture_zone_editor.get(), SIGNAL(invalidateThumbnail(PageId const&)),
+			opt_widget, SIGNAL(invalidateThumbnail(PageId const&))
+		);
 	}
 
 	std::auto_ptr<QWidget> fill_zone_editor(
@@ -464,6 +468,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 			m_outputImage, downscaled_output_pixmap,
 			m_imageToVirt, m_pageId, m_ptrSettings
 		)
+	);
+	QObject::connect(
+		fill_zone_editor.get(), SIGNAL(invalidateThumbnail(PageId const&)),
+		opt_widget, SIGNAL(invalidateThumbnail(PageId const&))
 	);
 
 	std::auto_ptr<QWidget> despeckle_view;

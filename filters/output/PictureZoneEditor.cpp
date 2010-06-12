@@ -331,6 +331,8 @@ PictureZoneEditor::commitZones()
 	}
 	
 	m_ptrSettings->setPictureZones(m_pageId, zones);
+
+	emit invalidateThumbnail(m_pageId);
 }
 
 void

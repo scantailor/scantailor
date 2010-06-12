@@ -159,6 +159,8 @@ FillZoneEditor::commitZones()
 	}
 	
 	m_ptrSettings->setFillZones(m_pageId, zones);
+	
+	emit invalidateThumbnail(m_pageId);
 }
 
 void

@@ -55,6 +55,8 @@ public:
 		IntrusivePtr<Settings> const& settings);
 	
 	virtual ~FillZoneEditor();
+signals:
+	void invalidateThumbnail(PageId const& page_id);
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private slots:
