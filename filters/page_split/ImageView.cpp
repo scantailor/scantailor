@@ -287,17 +287,15 @@ void
 ImageView::handleMoveRequest(int line_idx, int handle_idx, QPointF const& pos)
 {
 	QRectF const valid_area(getOccupiedWidgetRect());
-	QPointF const bound_widget_pos(
-		qBound(valid_area.left(), pos.x(), valid_area.right()), pos.y()
-	);
-
-	double const x = widgetToVirtual().map(bound_widget_pos).x();
+	double const x = qBound(valid_area.left(), pos.x(), valid_area.right());
+	QPointF const wpt(x, handle_idx == 0 ? valid_area.top() : valid_area.bottom());
+	QPointF const vpt(widgetToVirtual().map(wpt));
 
 	QLineF virt_line(virtualCutterLine(line_idx));
 	if (handle_idx == 0) {
-		virt_line.setP1(QPointF(x, virt_line.p1().y()));
+		virt_line.setP1(vpt);
 	} else {
-		virt_line.setP2(QPointF(x, virt_line.p2().y()));
+		virt_line.setP2(vpt);
 	}
 
 	m_virtLayout.setCutterLine(line_idx, virt_line);
