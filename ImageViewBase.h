@@ -212,7 +212,13 @@ public:
 	 * points.  To zoom to a specific point, for example the mouse position,
 	 * call setWidgetFocalPointWithoutMoving() first.
 	 */
-	void zoom(double zoom);
+	void setZoomLevel(double zoom);
+
+	/**
+	 * \brief Returns the current zoom level.
+	 * \see setZoomLevel()
+	 */
+	double zoomLevel() const { return m_zoom; }
 
 	/**
 	 * The image is considered ideally positioned when as little as possible

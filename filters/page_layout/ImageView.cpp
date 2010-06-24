@@ -582,7 +582,7 @@ ImageView::updatePresentationTransform(FitMode const fit_mode)
 	if (fit_mode == DONT_FIT) {
 		updateTransformPreservingScale(ImagePresentation(imageToVirtual(), m_outerRect));
 	} else {
-		zoom(1.0);
+		setZoomLevel(1.0);
 		updateTransformAndFixFocalPoint(
 			ImagePresentation(imageToVirtual(), m_outerRect), CENTER_IF_FITS
 		);

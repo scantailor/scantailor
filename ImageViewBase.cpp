@@ -320,7 +320,7 @@ ImageViewBase::adjustAndSetWidgetFocalPoint(QPointF const& widget_fp)
 }
 
 void
-ImageViewBase::zoom(double zoom)
+ImageViewBase::setZoomLevel(double zoom)
 {
 	if (m_zoom != zoom) {
 		m_zoom = zoom;

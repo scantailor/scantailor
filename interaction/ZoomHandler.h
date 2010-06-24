@@ -48,7 +48,6 @@ private:
 	ImageViewBase& m_rImageView;
 	boost::function<bool(InteractionState const&)> m_interactionPermitter;
 	InteractionState::Captor m_interaction;
-	double m_zoom;
 	Focus m_focus;
 };
 
