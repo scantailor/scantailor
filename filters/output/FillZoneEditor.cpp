@@ -30,6 +30,7 @@
 #include "Settings.h"
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
+#include "OutputMargins.h"
 #include <QImage>
 #include <QPointer>
 #include <QPainter>
@@ -65,7 +66,8 @@ FillZoneEditor::FillZoneEditor(
 	IntrusivePtr<Settings> const& settings)
 :	ImageViewBase(
 		image, downscaled_version,
-		ImagePresentation(QTransform(), QRectF(image.rect()))
+		ImagePresentation(QTransform(), QRectF(image.rect())),
+		OutputMargins()
 	),
 	m_colorAdapter(colorAdapterFor(image)),
 	m_context(*this, m_zones),

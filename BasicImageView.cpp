@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,8 +22,12 @@
 #include "Dpm.h"
 #include "Dpi.h"
 
-BasicImageView::BasicImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(image, downscaled_image, ImagePresentation(QTransform(), QRectF(image.rect()))),
+BasicImageView::BasicImageView(
+	QImage const& image, ImagePixmapUnion const& downscaled_image, Margins const& margins)
+:	ImageViewBase(
+		image, downscaled_image,
+		ImagePresentation(QTransform(), QRectF(image.rect())), margins
+	),
 	m_dragHandler(*this),
 	m_zoomHandler(*this)
 {

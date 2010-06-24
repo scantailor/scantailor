@@ -20,6 +20,7 @@ SET(
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h
 	OutputGenerator.cpp OutputGenerator.h
+	OutputMargins.h
 	Settings.cpp Settings.h
 	Thumbnail.cpp Thumbnail.h
 	Utils.cpp Utils.h

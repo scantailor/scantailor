@@ -25,6 +25,7 @@
 #include "BackgroundTask.h"
 #include "ImageViewBase.h"
 #include "BasicImageView.h"
+#include "OutputMargins.h"
 #include "ProcessingIndicationWidget.h"
 #include "DebugImages.h"
 #include "TabbedDebugImages.h"
@@ -206,7 +207,9 @@ DespeckleView::despeckleDone(
 	removeImageViewWidget();
 
 	std::auto_ptr<QWidget> widget(
-		new BasicImageView(visualization.image(), visualization.downscaledImage())
+		new BasicImageView(
+			visualization.image(), visualization.downscaledImage(), OutputMargins()
+		)
 	);
 
 	if (dbg && !dbg->empty()) {

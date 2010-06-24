@@ -16,29 +16,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ImageView.h"
-#include "ImageView.h.moc"
-#include "ImagePresentation.h"
-#include "OutputMargins.h"
+#ifndef OUTPUT_OUTPUT_MARGINS_H_
+#define OUTPUT_OUTPUT_MARGINS_H_
+
+#include "Margins.h"
 
 namespace output
 {
 
-ImageView::ImageView(QImage const& image, QImage const& downscaled_image)
-:	ImageViewBase(
-		image, downscaled_image,
-		ImagePresentation(QTransform(), QRectF(image.rect())),
-		OutputMargins()
-	),
-	m_dragHandler(*this),
-	m_zoomHandler(*this)
+/**
+ * Having margins on the Output stage is useful when creating zones
+ * that are meant to cover a corner or an edge of a page.
+ * We use the same margins on all tabs to preserve their geometrical
+ * one-to-one relationship.
+ */
+class OutputMargins : public Margins
 {
-	rootInteractionHandler().makeLastFollower(m_dragHandler);
-	rootInteractionHandler().makeLastFollower(m_zoomHandler);
-}
-
-ImageView::~ImageView()
-{
-}
+public:
+	OutputMargins() : Margins(10.0, 10.0, 10.0, 10.0) {}
+};
 
 } // namespace output
+
+#endif
