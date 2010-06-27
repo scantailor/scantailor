@@ -549,6 +549,7 @@ SET(
 	"~$"
 	"\\\\.pcs$"
 	"TODO.txt"
+	"CMakeLists.txt.user"
 	"/doxygen/"
 	"${CMAKE_BINARY_DIR}"
 )
