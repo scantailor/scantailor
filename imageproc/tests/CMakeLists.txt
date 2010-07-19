@@ -21,6 +21,7 @@ SET(
 	TestSEDM.cpp
 	TestLU.cpp
 	TestLM.cpp
+	TestMatrixCalc.cpp
 	Utils.cpp Utils.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

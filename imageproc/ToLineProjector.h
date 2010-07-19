@@ -16,20 +16,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_IMAGE_VIEW_TAB_H_
-#define OUTPUT_IMAGE_VIEW_TAB_H_
+#ifndef IMAGEPROC_TO_LINE_PROJECTOR_H_
+#define IMAGEPROC_TO_LINE_PROJECTOR_H_
 
-namespace output
+#include "VecNT.h"
+#include <QPointF>
+#include <QLineF>
+
+namespace imageproc
 {
 
-enum ImageViewTab {
-	TAB_OUTPUT,
-	TAB_PICTURE_ZONES,
-	TAB_FILL_ZONES,
-	TAB_DEWARPING,
-	TAB_DESPECKLING
+class ToLineProjector
+{
+public:
+	ToLineProjector(QLineF const& line);
+
+	double projectionScalar(QPointF const& pt) const;
+
+	QPointF projectionPoint(QPointF const& pt) const;
+private:
+	QPointF m_origin;
+	QPointF m_vec;
+	Vec2d m_mat;
 };
 
-} // namespace output
+} // namespace imageproc
 
 #endif

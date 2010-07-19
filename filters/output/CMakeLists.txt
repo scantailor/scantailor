@@ -46,6 +46,7 @@ SET(
 	DespeckleView.cpp DespeckleView.h
 	DespeckleVisualization.cpp DespeckleVisualization.h
 	DespeckleLevel.cpp DespeckleLevel.h
+	DewarpingView.cpp DewarpingView.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

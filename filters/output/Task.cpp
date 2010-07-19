@@ -40,6 +40,7 @@
 #include "DespeckleView.h"
 #include "DespeckleVisualization.h"
 #include "DespeckleLevel.h"
+#include "DewarpingView.h"
 #include "ImageId.h"
 #include "PageId.h"
 #include "Dpi.h"
@@ -77,6 +78,7 @@ public:
 		std::auto_ptr<DebugImages> dbg_img,
 		ColorParams const& color_params,
 		QTransform const& image_to_virt,
+		QRectF const& virt_content_rect,
 		QPolygonF const& virt_display_area,
 		PageId const& page_id,
 		QImage const& orig_image,
@@ -95,6 +97,7 @@ private:
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	ColorParams m_colorParams;
 	QTransform m_imageToVirt;
+	QRectF m_virtContentRect;
 	QPolygonF m_virtDisplayArea;
 	PageId m_pageId;
 	QImage m_origImage;
@@ -350,7 +353,8 @@ Task::process(
 	return FilterResultPtr(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_ptrDbg, params.colorParams(),
-			generator.toOutput(), QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
+			generator.toOutput(), generator.outputContentRect(),
+			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
 			m_pageId, data.origImage(), out_img, automask_img,
 			despeckle_state, despeckle_visualization,
 			m_batchProcessing, m_debug
@@ -397,6 +401,7 @@ Task::UiUpdater::UiUpdater(
 	std::auto_ptr<DebugImages> dbg_img,
 	ColorParams const& color_params,
 	QTransform const& image_to_virt,
+	QRectF const& virt_content_rect,
 	QPolygonF const& virt_display_area,
 	PageId const& page_id,
 	QImage const& orig_image,
@@ -410,6 +415,7 @@ Task::UiUpdater::UiUpdater(
 	m_ptrDbg(dbg_img),
 	m_colorParams(color_params),
 	m_imageToVirt(image_to_virt),
+	m_virtContentRect(virt_content_rect),
 	m_virtDisplayArea(virt_display_area),
 	m_pageId(page_id),
 	m_origImage(orig_image),
@@ -474,6 +480,13 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		opt_widget, SIGNAL(invalidateThumbnail(PageId const&))
 	);
 
+	std::auto_ptr<QWidget> dewarping_view(
+		new DewarpingView(
+			m_outputImage, downscaled_output_pixmap,
+			m_imageToVirt, m_virtContentRect
+		)
+	);
+
 	std::auto_ptr<QWidget> despeckle_view;
 	if (m_colorParams.colorMode() == ColorParams::COLOR_GRAYSCALE) {
 		despeckle_view.reset(
@@ -497,6 +510,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	tab_widget->addTab(image_view.release(), tr("Output"), TAB_OUTPUT);
 	tab_widget->addTab(picture_zone_editor.release(), tr("Picture Zones"), TAB_PICTURE_ZONES);
 	tab_widget->addTab(fill_zone_editor.release(), tr("Fill Zones"), TAB_FILL_ZONES);
+	tab_widget->addTab(dewarping_view.release(), tr("Dewarping"), TAB_DEWARPING);
 	tab_widget->addTab(despeckle_view.release(), tr("Despeckling"), TAB_DESPECKLING);
 	tab_widget->setCurrentTab(opt_widget->lastTab());
 

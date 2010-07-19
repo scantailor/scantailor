@@ -49,6 +49,13 @@ SET(
 	LocalMinMaxGeneric.h
 	SeedFillGeneric.cpp SeedFillGeneric.h
 	FindPeaksGeneric.h
+	XSpline.cpp XSpline.h
+	MatrixCalc.h
+	HomographicTransform.h
+	CylindricalSurfaceDewarper.cpp CylindricalSurfaceDewarper.h
+	ToLineProjector.cpp ToLineProjector.h
+	PolylineIntersector.cpp PolylineIntersector.h
+	ReverseArcLengthMapper.cpp ReverseArcLengthMapper.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

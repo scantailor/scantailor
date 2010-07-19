@@ -16,20 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_IMAGE_VIEW_TAB_H_
-#define OUTPUT_IMAGE_VIEW_TAB_H_
+#include "ToLineProjector.h"
 
-namespace output
+namespace imageproc
 {
 
-enum ImageViewTab {
-	TAB_OUTPUT,
-	TAB_PICTURE_ZONES,
-	TAB_FILL_ZONES,
-	TAB_DEWARPING,
-	TAB_DESPECKLING
-};
+ToLineProjector::ToLineProjector(QLineF const& line)
+:	m_origin(line.p1()),
+	m_vec(line.p2() - line.p1()),
+	m_mat(m_vec)
+{
+	// At*A*x = At*b
+	// x = (At*A)-1 * At
+	m_mat /= m_mat.dot(m_mat);
+}
 
-} // namespace output
+double
+ToLineProjector::projectionScalar(QPointF const& pt) const
+{
+	Vec2d const b(pt - m_origin);
+	return m_mat.dot(b);
+}
 
-#endif
+QPointF
+ToLineProjector::projectionPoint(QPointF const& pt) const
+{
+	return m_origin + m_vec * projectionScalar(pt);
+}
+
+} // namespace imageproc

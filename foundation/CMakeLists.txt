@@ -16,6 +16,8 @@ SET(
 	PropertySet.cpp PropertySet.h
 	PerformanceTimer.cpp PerformanceTimer.h
 	QtSignalForwarder.cpp QtSignalForwarder.h
+	StaticPool.h
+	VecNT.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
