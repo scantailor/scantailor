@@ -84,14 +84,26 @@ ReverseArcLengthMapper::map(double arc_len, Hint& hint)
 			return m_samples.front().x;
 	}
 
-	// TODO: make use of hint
-
 	if (arc_len < 0) {
 		// Beyond the first sample.
+		hint.update(0);
 		return interpolateBySegment(arc_len, 0);
 	} else if (arc_len > m_samples.back().arcLen) {
 		// Beyond the last sample.
-		return interpolateBySegment(arc_len, m_samples.size() - 2);
+		hint.update(m_samples.size() - 2);
+		return interpolateBySegment(arc_len, hint.m_lastSegment);
+	}
+
+	// Check in the answer is in the segment provided by hint,
+	// or in an adjacent one.
+	if (checkSegment(arc_len, hint.m_lastSegment)) {
+		return interpolateBySegment(arc_len, hint.m_lastSegment);
+	} else if (checkSegment(arc_len, hint.m_lastSegment + hint.m_direction)) {
+		hint.update(hint.m_lastSegment + hint.m_direction);
+		return interpolateBySegment(arc_len, hint.m_lastSegment);
+	} else if (checkSegment(arc_len, hint.m_lastSegment - hint.m_direction)) {
+		hint.update(hint.m_lastSegment - hint.m_direction);
+		return interpolateBySegment(arc_len, hint.m_lastSegment);
 	}
 
 	// Do a binary search.
@@ -111,7 +123,22 @@ ReverseArcLengthMapper::map(double arc_len, Hint& hint)
 		}
 	}
 
+	hint.update(left_idx);
 	return interpolateBySegment(arc_len, left_idx);
+}
+
+bool
+ReverseArcLengthMapper::checkSegment(double arc_len, int segment) const
+{
+	assert(m_samples.size() > 1); // Enforced by the caller.
+
+	if (segment < 0 || segment >= int(m_samples.size()) - 1) {
+		return false;
+	}
+
+	double const left_arc_len = m_samples[segment].arcLen;
+	double const right_arc_len = m_samples[segment + 1].arcLen;
+	return (arc_len - left_arc_len) * (arc_len - right_arc_len) <= 0;
 }
 
 double
