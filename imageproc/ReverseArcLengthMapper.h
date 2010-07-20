@@ -72,7 +72,8 @@ public:
 	 *
 	 * This works even for arc length beyond the first or last samples.
 	 * When interpolation is impossible, the closest sample is returned.
-	 * If no samples are present, zero is returned.
+	 * If no samples are present, zero is returned.  Providing the same
+	 * hint on consecutive calls to this function improves performance. 
 	 */
 	double map(double arc_len, Hint& hint);
 private:
@@ -83,6 +84,8 @@ private:
 
 		Sample(double x, double arc_len) : x(x), arcLen(arc_len) {}
 	};
+
+	bool checkSegment(double arc_len, int segment) const;
 
 	double interpolateBySegment(double arc_len, int segment) const;
 
