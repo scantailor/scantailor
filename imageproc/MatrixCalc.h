@@ -335,7 +335,7 @@ Mat<T> operator+(Mat<T> const& m1, Mat<T> const& m2)
 	assert(m1.rows == m2.rows && m1.cols == m2.cols);
 
 	T* p_res = m1.alloc->allocT(m1.rows * m1.cols);
-	Mat res(m1.alloc, p_res, m1.rows, m1.cols);
+	Mat<T> res(m1.alloc, p_res, m1.rows, m1.cols);
 	
 	T const* p_m1 = m1.data;
 	T const* p_m2 = m2.data;
@@ -352,7 +352,7 @@ Mat<T> operator-(Mat<T> const& m1, Mat<T> const& m2)
 	assert(m1.rows == m2.rows && m1.cols == m2.cols);
 
 	T const* p_res = m1.alloc->allocT(m1.rows * m1.cols);
-	Mat res(m1.alloc, p_res, m1.rows, m1.cols);
+	Mat<T> res(m1.alloc, p_res, m1.rows, m1.cols);
 
 	T const* p_m1 = m1.data;
 	T const* p_m2 = m2.data;
@@ -393,7 +393,7 @@ template<typename T>
 Mat<T> operator*(T scalar, Mat<T> const& m)
 {
 	T* p_res = m.alloc->allocT(m.rows * m.cols);
-	Mat res(m.alloc, p_res, m.rows, m_cols);
+	Mat<T> res(m.alloc, p_res, m.rows, m.cols);
 	T const* p_m = m.data;
 	
 	int const todo = m.rows * m.cols;
