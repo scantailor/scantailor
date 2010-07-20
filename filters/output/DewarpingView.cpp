@@ -124,12 +124,12 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 	for (int j = 0; j < num_vert_grid_lines; ++j) {
 		double const x = j / (num_vert_grid_lines - 1.0);
 		CylindricalSurfaceDewarper::Generatrix const gtx(dewarper.mapGeneratrix(x, state));
-		QPointF const gtx_p0(gtx.imgLine.pointAt(gtx.pln2img(Vec1d(0))[0]));
-		QPointF const gtx_p1(gtx.imgLine.pointAt(gtx.pln2img(Vec1d(1))[0]));
+		QPointF const gtx_p0(gtx.imgLine.pointAt(gtx.pln2img(0)));
+		QPointF const gtx_p1(gtx.imgLine.pointAt(gtx.pln2img(1)));
 		painter.drawLine(gtx_p0, gtx_p1);
 		for (int i = 0; i < num_hor_grid_lines; ++i) {
 			double const y = i / (num_hor_grid_lines - 1.0);
-			curves[i].push_back(gtx.imgLine.pointAt(gtx.pln2img(Vec1d(y))[0]));
+			curves[i].push_back(gtx.imgLine.pointAt(gtx.pln2img(y)));
 		}
 	}
 
