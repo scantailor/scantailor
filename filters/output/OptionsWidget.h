@@ -25,15 +25,18 @@
 #include "PageId.h"
 #include "PageSelectionAccessor.h"
 #include "ColorParams.h"
-#include "ImageViewTab.h"
+#include "DewarpingMode.h"
+#include "DepthPerception.h"
 #include "DespeckleLevel.h"
 #include "Dpi.h"
+#include "ImageViewTab.h"
 #include <set>
 
 namespace output
 {
 
 class Settings;
+class DewarpingParams;
 
 class OptionsWidget
 	: public FilterOptionsWidget, private Ui::OutputOptionsWidget
@@ -50,8 +53,12 @@ public:
 	void postUpdateUI();
 
 	ImageViewTab lastTab() const { return m_lastTab; }
+
+	DepthPerception const& depthPerception() const { return m_depthPerception; }
 signals:
 	void despeckleLevelChanged(DespeckleLevel level, bool* handled);
+
+	void depthPerceptionChanged(double val);
 public slots:
 	void tabChanged(ImageViewTab tab);
 private slots:
@@ -60,20 +67,14 @@ private slots:
 	void applyColorsButtonClicked();
 	
 	void dpiChanged(std::set<PageId> const& pages, Dpi const& dpi);
-	
-	void dpiChangedForAllPages(Dpi const& dpi);
 
 	void applyColorsConfirmed(std::set<PageId> const& pages);
-	
-	void applyColorsToAllPagesConfirmed();
 
 	void colorModeChanged(int idx);
 	
 	void whiteMarginsToggled(bool checked);
 	
 	void equalizeIlluminationToggled(bool checked);
-
-	void dewarpToggled(bool checked);
 	
 	void setLighterThreshold();
 	
@@ -95,7 +96,15 @@ private slots:
 
 	void applyDespeckleConfirmed(std::set<PageId> const& pages);
 
-	void applyDespeckleToAllPagesConfirmed();
+	void changeDewarpingButtonClicked();
+
+	void dewarpingChanged(std::set<PageId> const& pages, DewarpingMode const& mode);
+
+	void applyDepthPerceptionButtonClicked();
+
+	void applyDepthPerceptionConfirmed(std::set<PageId> const& pages);
+
+	void depthPerceptionChangedSlot(int val);
 private:
 	void handleDespeckleLevelChange(DespeckleLevel level);
 
@@ -104,12 +113,16 @@ private:
 	void updateDpiDisplay();
 
 	void updateColorsDisplay();
+
+	void updateDewarpingDisplay();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	PageSelectionAccessor m_pageSelectionAccessor;
 	PageId m_pageId;
 	Dpi m_outputDpi;
 	ColorParams m_colorParams;
+	DepthPerception m_depthPerception;
+	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;
 	ImageViewTab m_lastTab;
 	int m_ignoreThresholdChanges;

@@ -58,6 +58,12 @@ ReverseArcLengthMapper::addSample(double x, double fx)
 	m_prevFX = fx;
 }
 
+double
+ReverseArcLengthMapper::totalArcLength() const
+{
+	return m_samples.size() < 2 ? 0.0 : m_samples.back().arcLen;
+}
+
 void
 ReverseArcLengthMapper::normalizeRange(double total_arc_len)
 {
@@ -75,7 +81,7 @@ ReverseArcLengthMapper::normalizeRange(double total_arc_len)
 }
 
 double
-ReverseArcLengthMapper::map(double arc_len, Hint& hint)
+ReverseArcLengthMapper::map(double arc_len, Hint& hint) const
 {
 	switch (m_samples.size()) {
 		case 0:

@@ -21,6 +21,9 @@
 
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "DewarpingMode.h"
+#include "DistortionModel.h"
+#include "DepthPerception.h"
 #include "DespeckleLevel.h"
 #include <QSize>
 #include <QRect>
@@ -42,9 +45,17 @@ public:
 	OutputImageParams(QSize const& out_image_size,
 		QRect const& content_rect, ImageTransformation const& xform,
 		Dpi const& dpi, ColorParams const& color_params,
-		DespeckleLevel const despeckle_level);
+		DewarpingMode const& dewarping_mode,
+		DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception, DespeckleLevel despeckle_level);
 	
 	explicit OutputImageParams(QDomElement const& el);
+
+	DewarpingMode const& dewarpingMode() const { return m_dewarpingMode; }
+
+	DistortionModel const& distortionModel() const { return m_distortionModel; }
+
+	DepthPerception const& depthPerception() const { return m_depthPerception; }
 
 	DespeckleLevel despeckleLevel() const { return m_despeckleLevel; }
 	
@@ -97,6 +108,15 @@ private:
 	
 	/** Non-geometric parameters used to generate the output image. */
 	ColorParams m_colorParams;
+
+	/** Two curves and two lines connecting their endpoints.  Used for dewarping. */
+	DistortionModel m_distortionModel;
+
+	/** \see imageproc::CylindricalSurfaceDewarper */
+	DepthPerception m_depthPerception;
+
+	/** Off / Auto / Manual */
+	DewarpingMode m_dewarpingMode;
 
 	/** Despeckle level of the output image. */
 	DespeckleLevel m_despeckleLevel;

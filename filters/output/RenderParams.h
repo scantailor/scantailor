@@ -49,17 +49,12 @@ public:
 		return (m_mask & (NEED_BINARIZATION|MIXED_OUTPUT))
 				== NEED_BINARIZATION;
 	}
-	
-	bool dewarp() const {
-		return (m_mask & DEWARP) != 0;
-	}
 private:
 	enum {
 		WHITE_MARGINS = 1,
 		NORMALIZE_ILLUMINATION = 2,
 		NEED_BINARIZATION = 4,
-		DEWARP = 8,
-		MIXED_OUTPUT = 16
+		MIXED_OUTPUT = 8
 	};
 	
 	int m_mask;

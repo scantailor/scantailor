@@ -84,7 +84,9 @@ CacheDrivenTask::process(
 			);
 			OutputImageParams const new_output_image_params(
 				generator.outputImageSize(), generator.outputContentRect(),
-				xform, params.outputDpi(), params.colorParams(), params.despeckleLevel()
+				xform, params.outputDpi(), params.colorParams(),
+				params.dewarpingMode(), params.distortionModel(),
+				params.depthPerception(), params.despeckleLevel()
 			);
 
 			if (!stored_output_params->outputImageParams().matches(new_output_image_params)) {
@@ -134,7 +136,7 @@ CacheDrivenTask::process(
 				)
 			);
 		} else {
-			Dpi const out_dpi(m_ptrSettings->getDpi(page_info.id()));
+			Dpi const out_dpi(m_ptrSettings->getParams(page_info.id()).outputDpi());
 			
 			QTransform tmp_xform(xform.transform());
 			tmp_xform *= Utils::scaleFromToDpi(

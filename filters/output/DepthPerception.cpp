@@ -16,36 +16,44 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
-
-class QString;
-class QDomDocument;
-class QDomElement;
+#include "DepthPerception.h"
+#include "../../Utils.h"
+#include <QtGlobal>
 
 namespace output
 {
 
-class BlackWhiteOptions
+DepthPerception::DepthPerception()
+:	m_value(defaultValue())
 {
-public:
-	BlackWhiteOptions();
+}
+
+DepthPerception::DepthPerception(double value)
+:	m_value(qBound(minValue(), value, maxValue()))
+{
+}
+
+DepthPerception::DepthPerception(QString const& from_string)
+{
+	bool ok = false;
+	m_value = from_string.toDouble(&ok);
+	if (!ok) {
+		m_value = defaultValue();
+	} else {
+		m_value = qBound(minValue(), m_value, maxValue());
+	}
+}
 	
-	BlackWhiteOptions(QDomElement const& el);
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
-private:
-	int m_thresholdAdjustment;
-};
+QString
+DepthPerception::toString() const
+{
+	return Utils::doubleToString(m_value);
+}
+
+void
+DepthPerception::setValue(double value)
+{
+	m_value = qBound(minValue(), value, maxValue());
+}
 
 } // namespace output
-
-#endif

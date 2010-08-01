@@ -32,12 +32,18 @@ OutputImageParams::OutputImageParams(
 	QSize const& out_image_size, QRect const& content_rect,
 	ImageTransformation const& xform,
 	Dpi const& dpi, ColorParams const& color_params,
+	DewarpingMode const& dewarping_mode,
+	DistortionModel const& distortion_model,
+	DepthPerception const& depth_perception,
 	DespeckleLevel const despeckle_level)
 :	m_size(out_image_size),
 	m_contentRect(content_rect),
 	m_partialXform(xform.transform()),
 	m_dpi(dpi),
 	m_colorParams(color_params),
+	m_distortionModel(distortion_model),
+	m_depthPerception(depth_perception),
+	m_dewarpingMode(dewarping_mode),
 	m_despeckleLevel(despeckle_level)
 {
 }
@@ -48,6 +54,9 @@ OutputImageParams::OutputImageParams(QDomElement const& el)
 	m_partialXform(el.namedItem("partial-xform").toElement()),
 	m_dpi(XmlUnmarshaller::dpi(el.namedItem("dpi").toElement())),
 	m_colorParams(el.namedItem("color-params").toElement()),
+	m_distortionModel(el.namedItem("distortion-model").toElement()),
+	m_depthPerception(el.attribute("depthPerception")),
+	m_dewarpingMode(el.attribute("dewarpingMode")),
 	m_despeckleLevel(despeckleLevelFromString(el.attribute("despeckleLevel")))
 {
 }
@@ -63,6 +72,9 @@ OutputImageParams::toXml(QDomDocument& doc, QString const& name) const
 	el.appendChild(m_partialXform.toXml(doc, "partial-xform"));
 	el.appendChild(marshaller.dpi(m_dpi, "dpi"));
 	el.appendChild(m_colorParams.toXml(doc, "color-params"));
+	el.appendChild(m_distortionModel.toXml(doc, "distortion-model"));
+	el.setAttribute("depthPerception", m_depthPerception.toString());
+	el.setAttribute("dewarpingMode", m_dewarpingMode.toString());
 	el.setAttribute("despeckleLevel", despeckleLevelToString(m_despeckleLevel));
 	
 	return el;
@@ -90,6 +102,17 @@ OutputImageParams::matches(OutputImageParams const& other) const
 	if (!colorParamsMatch(m_colorParams, m_despeckleLevel,
 			other.m_colorParams, other.m_despeckleLevel)) {
 		return false;
+	}
+
+	if (m_dewarpingMode != other.m_dewarpingMode) {
+		return false;
+	} else if (m_dewarpingMode != DewarpingMode::OFF) {
+		if (!m_distortionModel.matches(other.m_distortionModel)) {
+			return false;
+		}
+		if (m_depthPerception.value() != other.m_depthPerception.value()) {
+			return false;
+		}
 	}
 	
 	return true;

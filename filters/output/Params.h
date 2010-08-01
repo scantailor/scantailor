@@ -21,6 +21,9 @@
 
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "DewarpingMode.h"
+#include "DistortionModel.h"
+#include "DepthPerception.h"
 #include "DespeckleLevel.h"
 
 class QDomDocument;
@@ -32,16 +35,35 @@ namespace output
 class Params
 {
 public:
-	Params(Dpi const& output_dpi, ColorParams const& color_params,
-		DespeckleLevel despeckle_level);
+	Params();
 	
 	Params(QDomElement const& el);
 	
 	Dpi const& outputDpi() const { return m_dpi; }
+
+	void setOutputDpi(Dpi const& dpi) { m_dpi = dpi; }
 	
 	ColorParams const& colorParams() const { return m_colorParams; }
 
+	void setColorParams(ColorParams const& params) { m_colorParams = params; }
+
+	DewarpingMode const& dewarpingMode() const { return m_dewarpingMode; }
+
+	void setDewarpingMode(DewarpingMode const& mode) { m_dewarpingMode = mode; }
+
+	DistortionModel const& distortionModel() const { return m_distortionModel; }
+
+	void setDistortionModel(DistortionModel const& model) { m_distortionModel = model; }
+
+	DepthPerception const& depthPerception() const { return m_depthPerception; }
+
+	void setDepthPerception(DepthPerception depth_perception) {
+		m_depthPerception = depth_perception;
+	}
+
 	DespeckleLevel despeckleLevel() const { return m_despeckleLevel; }
+
+	void setDespeckleLevel(DespeckleLevel level) { m_despeckleLevel = level; }
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
@@ -51,6 +73,9 @@ private:
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
+	DistortionModel m_distortionModel;
+	DepthPerception m_depthPerception;
+	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;
 };
 

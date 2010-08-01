@@ -30,11 +30,9 @@ namespace output
 {
 
 Settings::Settings()
-:	m_defaultDpi(600, 600),
-	m_defaultDespeckleLevel(DESPECKLE_CAUTIOUS)
+:	m_defaultPictureZoneProps(initialPictureZoneProps()),
+	m_defaultFillZoneProps(initialFillZoneProps())
 {
-	m_defaultPictureZoneProps.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
-	m_defaultFillZoneProps.locateOrCreate<FillColorProperty>()->setColor(Qt::white);
 }
 
 Settings::~Settings()
@@ -46,10 +44,12 @@ Settings::clear()
 {
 	QMutexLocker const locker(&m_mutex);
 	
-	m_defaultDpi = Dpi(600, 600);
-	m_defaultColorParams = ColorParams();
-	m_perPageDpi.clear();
-	m_perPageColorParams.clear();
+	initialPictureZoneProps().swap(m_defaultPictureZoneProps);
+	initialFillZoneProps().swap(m_defaultFillZoneProps);
+	m_perPageParams.clear();
+	m_perPageOutputParams.clear();
+	m_perPagePictureZones.clear();
+	m_perPageFillZones.clear();
 }
 
 Params
@@ -57,77 +57,33 @@ Settings::getParams(PageId const& page_id) const
 {
 	QMutexLocker const locker(&m_mutex);
 	
-	return Params(
-		getDpiLocked(page_id), getColorParamsLocked(page_id),
-		getDespeckleLevelLocked(page_id)
-	);
+	PerPageParams::const_iterator const it(m_perPageParams.find(page_id));
+	if (it != m_perPageParams.end()) {
+		return it->second;
+	} else {
+		return Params();
+	}
 }
 
 void
 Settings::setParams(PageId const& page_id, Params const& params)
 {
 	QMutexLocker const locker(&m_mutex);
-	
-	setDpiLocked(page_id, params.outputDpi());
-	setColorParamsLocked(page_id, params.colorParams());
-	setDespeckleLevelLocked(page_id, params.despeckleLevel());
+	Utils::mapSetValue(m_perPageParams, page_id, params);
 }
 
-ColorParams
-Settings::getColorParams(PageId const& page_id) const
+void
+Settings::setColorParams(PageId const& page_id, ColorParams const& prms)
 {
 	QMutexLocker const locker(&m_mutex);
-	return getColorParamsLocked(page_id);
-}
 
-ColorParams
-Settings::getColorParamsLocked(PageId const& page_id) const
-{
-	PerPageColorParams::const_iterator const it(m_perPageColorParams.find(page_id));
-	if (it != m_perPageColorParams.end()) {
-		return it->second;
+	PerPageParams::iterator const it(m_perPageParams.lower_bound(page_id));
+	if (it == m_perPageParams.end() || m_perPageParams.key_comp()(page_id, it->first)) {
+		Params params;
+		params.setColorParams(prms);
+		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
 	} else {
-		return m_defaultColorParams;
-	}
-}
-
-void
-Settings::setColorParams(PageId const& page_id, ColorParams const& params)
-{
-	QMutexLocker const locker(&m_mutex);
-	setColorParamsLocked(page_id, params);
-}
-
-void
-Settings::setColorParamsLocked(PageId const& page_id, ColorParams const& params)
-{
-	Utils::mapSetValue(m_perPageColorParams, page_id, params);
-}
-
-void
-Settings::setColorParamsForAllPages(ColorParams const& params)
-{
-	QMutexLocker const locker(&m_mutex);
-	
-	m_defaultColorParams = params;
-	m_perPageColorParams.clear();
-}
-
-Dpi
-Settings::getDpi(PageId const& page_id) const
-{
-	QMutexLocker const locker(&m_mutex);
-	return getDpiLocked(page_id);
-}
-
-Dpi
-Settings::getDpiLocked(PageId const& page_id) const
-{
-	PerPageDpi::const_iterator const it(m_perPageDpi.find(page_id));
-	if (it != m_perPageDpi.end()) {
-		return it->second;
-	} else {
-		return m_defaultDpi;
+		it->second.setColorParams(prms);
 	}
 }
 
@@ -135,39 +91,59 @@ void
 Settings::setDpi(PageId const& page_id, Dpi const& dpi)
 {
 	QMutexLocker const locker(&m_mutex);
-	setDpiLocked(page_id, dpi);
-}
 
-void
-Settings::setDpiLocked(PageId const& page_id, Dpi const& dpi)
-{
-	Utils::mapSetValue(m_perPageDpi, page_id, dpi);
-}
-
-void
-Settings::setDpiForAllPages(Dpi const& dpi)
-{
-	QMutexLocker const locker(&m_mutex);
-	
-	m_defaultDpi = dpi;
-	m_perPageDpi.clear();
-}
-
-DespeckleLevel
-Settings::getDespeckleLevel(PageId const& page_id) const
-{
-	QMutexLocker const locker(&m_mutex);
-	return getDespeckleLevelLocked(page_id);
-}
-
-DespeckleLevel
-Settings::getDespeckleLevelLocked(PageId const& page_id) const
-{
-	PerPageDespeckleLevel::const_iterator const it(m_perPageDespeckleLevel.find(page_id));
-	if (it != m_perPageDespeckleLevel.end()) {
-		return it->second;
+	PerPageParams::iterator const it(m_perPageParams.lower_bound(page_id));
+	if (it == m_perPageParams.end() || m_perPageParams.key_comp()(page_id, it->first)) {
+		Params params;
+		params.setOutputDpi(dpi);
+		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
 	} else {
-		return m_defaultDespeckleLevel;
+		it->second.setOutputDpi(dpi);
+	}
+}
+
+void
+Settings::setDewarpingMode(PageId const& page_id, DewarpingMode const& mode)
+{
+	QMutexLocker const locker(&m_mutex);
+
+	PerPageParams::iterator const it(m_perPageParams.lower_bound(page_id));
+	if (it == m_perPageParams.end() || m_perPageParams.key_comp()(page_id, it->first)) {
+		Params params;
+		params.setDewarpingMode(mode);
+		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
+	} else {
+		it->second.setDewarpingMode(mode);
+	}
+}
+
+void
+Settings::setDistortionModel(PageId const& page_id, DistortionModel const& model)
+{
+	QMutexLocker const locker(&m_mutex);
+
+	PerPageParams::iterator const it(m_perPageParams.lower_bound(page_id));
+	if (it == m_perPageParams.end() || m_perPageParams.key_comp()(page_id, it->first)) {
+		Params params;
+		params.setDistortionModel(model);
+		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
+	} else {
+		it->second.setDistortionModel(model);
+	}
+}
+
+void
+Settings::setDepthPerception(PageId const& page_id, DepthPerception const& depth_perception)
+{
+	QMutexLocker const locker(&m_mutex);
+
+	PerPageParams::iterator const it(m_perPageParams.lower_bound(page_id));
+	if (it == m_perPageParams.end() || m_perPageParams.key_comp()(page_id, it->first)) {
+		Params params;
+		params.setDepthPerception(depth_perception);
+		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
+	} else {
+		it->second.setDepthPerception(depth_perception);
 	}
 }
 
@@ -175,22 +151,15 @@ void
 Settings::setDespeckleLevel(PageId const& page_id, DespeckleLevel level)
 {
 	QMutexLocker const locker(&m_mutex);
-	setDespeckleLevelLocked(page_id, level);
-}
 
-void
-Settings::setDespeckleLevelLocked(PageId const& page_id, DespeckleLevel level)
-{
-	Utils::mapSetValue(m_perPageDespeckleLevel, page_id, level);
-}
-
-void
-Settings::setDespeckleLevelForAllPages(DespeckleLevel level)
-{
-	QMutexLocker const locker(&m_mutex);
-	
-	m_defaultDespeckleLevel = level;
-	m_perPageDespeckleLevel.clear();
+	PerPageParams::iterator const it(m_perPageParams.lower_bound(page_id));
+	if (it == m_perPageParams.end() || m_perPageParams.key_comp()(page_id, it->first)) {
+		Params params;
+		params.setDespeckleLevel(level);
+		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
+	} else {
+		it->second.setDespeckleLevel(level);
+	}
 }
 
 std::auto_ptr<OutputParams>
@@ -286,6 +255,22 @@ Settings::setDefaultFillZoneProperties(PropertySet const& props)
 {
 	QMutexLocker const locker(&m_mutex);
 	m_defaultFillZoneProps = props;
+}
+
+PropertySet
+Settings::initialPictureZoneProps()
+{
+	PropertySet props;
+	props.locateOrCreate<PictureLayerProperty>()->setLayer(PictureLayerProperty::PAINTER2);
+	return props;
+}
+
+PropertySet
+Settings::initialFillZoneProps()
+{
+	PropertySet props;
+	props.locateOrCreate<FillColorProperty>()->setColor(Qt::white);
+	return props;
 }
 
 } // namespace output

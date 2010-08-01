@@ -30,6 +30,7 @@
 #include "EditableZoneSet.h"
 #include "ZoomHandler.h"
 #include "DragHandler.h"
+#include "ImagePixmapUnion.h"
 #include "imageproc/BinaryImage.h"
 #include <QTransform>
 #include <QPoint>
@@ -52,7 +53,7 @@ class PictureZoneEditor : public ImageViewBase, private InteractionHandler
 	Q_OBJECT
 public:
 	PictureZoneEditor(
-		QImage const& image, QImage const& downscaled_image,
+		QImage const& image, ImagePixmapUnion const& downscaled_image,
 		imageproc::BinaryImage const& picture_mask,
 		QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 		PageId const& page_id, IntrusivePtr<Settings> const& settings);

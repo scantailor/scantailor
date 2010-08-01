@@ -16,34 +16,53 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
+#ifndef OUTPUT_DISTORTION_MODEL_H_
+#define OUTPUT_DISTORTION_MODEL_H_
 
-class QString;
+#include "Curve.h"
+
 class QDomDocument;
 class QDomElement;
+class QString;
+class QRectF;
+class QTransform;
 
 namespace output
 {
 
-class BlackWhiteOptions
+class DistortionModel
 {
 public:
-	BlackWhiteOptions();
-	
-	BlackWhiteOptions(QDomElement const& el);
-	
+	DistortionModel();
+
+	DistortionModel(QDomElement const& el);
+
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
+
+	bool isValid() const;
+
+	void setTopCurve(Curve const& curve) { m_topCurve = curve; }
+
+	void setBottomCurve(Curve const& curve) { m_bottomCurve = curve; }
+
+	Curve const& topCurve() const { return m_topCurve; }
+
+	Curve const& bottomCurve() const { return m_bottomCurve; }
+
+	bool matches(DistortionModel const& other) const;
+
+	/**
+	 * \brief Returns the bounding box of the shape formed by two curves
+	 *        and vertical segments connecting them.
+	 *
+	 * \param transform Transforms from the original image coordinates
+	 *        where curve points are defined, to the desired coordinate
+	 *        system, for example to output image coordinates.
+	 */
+	QRectF boundingBox(QTransform const& transform) const;
 private:
-	int m_thresholdAdjustment;
+	Curve m_topCurve;
+	Curve m_bottomCurve;
 };
 
 } // namespace output

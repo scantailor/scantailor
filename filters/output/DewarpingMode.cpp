@@ -16,36 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
-
-class QString;
-class QDomDocument;
-class QDomElement;
+#include "DewarpingMode.h"
+#include <assert.h>
 
 namespace output
 {
 
-class BlackWhiteOptions
+DewarpingMode::DewarpingMode(QString const& str)
 {
-public:
-	BlackWhiteOptions();
+	if (str == "auto") {
+		m_mode = AUTO;
+	} else if (str == "manual") {
+		m_mode = MANUAL;
+	} else {
+		m_mode = OFF;
+	}
+}
 	
-	BlackWhiteOptions(QDomElement const& el);
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
-private:
-	int m_thresholdAdjustment;
-};
+QString
+DewarpingMode::toString() const
+{
+	switch (m_mode) {
+		case OFF:
+			return "off";
+		case AUTO:
+			return "auto";
+		case MANUAL:
+			return "manual";
+	}
+
+	assert(!"Unreachable");
+	return QString();
+}
 
 } // namespace output
-
-#endif

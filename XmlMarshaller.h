@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,11 @@ class QPolygonF;
 class QRect;
 class QRectF;
 
+namespace imageproc
+{
+	class CubicBSpline;
+}
+
 class XmlMarshaller
 {
 public:
@@ -60,6 +65,8 @@ public:
 	QDomElement polygonF(QPolygonF const& poly, QString const& name);
 	
 	QDomElement margins(Margins const& margins, QString const& name);
+
+	QDomElement bspline(imageproc::CubicBSpline const& bspline, QString const& name);
 private:
 	QDomDocument m_doc;
 };

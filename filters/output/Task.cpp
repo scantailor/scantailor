@@ -40,6 +40,8 @@
 #include "DespeckleView.h"
 #include "DespeckleVisualization.h"
 #include "DespeckleLevel.h"
+#include "DewarpingMode.h"
+#include "DistortionModel.h"
 #include "DewarpingView.h"
 #include "ImageId.h"
 #include "PageId.h"
@@ -84,6 +86,7 @@ public:
 		QImage const& orig_image,
 		QImage const& output_image,
 		BinaryImage const& picture_mask,
+		DistortionModel const& distortion_model,
 		DespeckleState const& despeckle_state,
 		DespeckleVisualization const& despeckle_visualization,
 		bool batch, bool debug);
@@ -105,6 +108,7 @@ private:
 	QImage m_outputImage;
 	QImage m_downscaledOutputImage;
 	BinaryImage m_pictureMask;
+	DistortionModel m_distortionModel;
 	DespeckleState m_despeckleState;
 	DespeckleVisualization m_despeckleVisualization;
 	DespeckleLevel m_despeckleLevel;
@@ -171,7 +175,9 @@ Task::process(
 	
 	OutputImageParams const new_output_image_params(
 		generator.outputImageSize(), generator.outputContentRect(),
-		data.xform(), params.outputDpi(), params.colorParams(), params.despeckleLevel()
+		data.xform(), params.outputDpi(), params.colorParams(),
+		params.dewarpingMode(), params.distortionModel(),
+		params.depthPerception(), params.despeckleLevel()
 	);
 
 	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
@@ -282,6 +288,9 @@ Task::process(
 
 		out_img = generator.process(
 			status, data, new_picture_zones, new_fill_zones,
+			params.dewarpingMode() != DewarpingMode::OFF
+			? params.distortionModel() : DistortionModel(),
+			params.depthPerception(),
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
@@ -356,7 +365,7 @@ Task::process(
 			generator.toOutput(), generator.outputContentRect(),
 			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
 			m_pageId, data.origImage(), out_img, automask_img,
-			despeckle_state, despeckle_visualization,
+			params.distortionModel(), despeckle_state, despeckle_visualization,
 			m_batchProcessing, m_debug
 		)
 	);
@@ -407,6 +416,7 @@ Task::UiUpdater::UiUpdater(
 	QImage const& orig_image,
 	QImage const& output_image,
 	BinaryImage const& picture_mask,
+	DistortionModel const& distortion_model,
 	DespeckleState const& despeckle_state,
 	DespeckleVisualization const& despeckle_visualization,
 	bool const batch, bool const debug)
@@ -423,6 +433,7 @@ Task::UiUpdater::UiUpdater(
 	m_outputImage(output_image),
 	m_downscaledOutputImage(ImageView::createDownscaledImage(output_image)),
 	m_pictureMask(picture_mask),
+	m_distortionModel(distortion_model),
 	m_despeckleState(despeckle_state),
 	m_despeckleVisualization(despeckle_visualization),
 	m_batchProcessing(batch),
@@ -450,6 +461,20 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	);
 	QPixmap const downscaled_output_pixmap(image_view->downscaledPixmap());
 
+	std::auto_ptr<ImageViewBase> dewarping_view(
+		new DewarpingView(
+			m_origImage, m_downscaledOrigImage,
+			m_imageToVirt, m_virtDisplayArea, m_virtContentRect,
+			m_pageId, m_ptrSettings, m_distortionModel,
+			opt_widget->depthPerception()
+		)
+	);
+	QPixmap const downscaled_orig_pixmap(dewarping_view->downscaledPixmap());
+	QObject::connect(
+		opt_widget, SIGNAL(depthPerceptionChanged(double)),
+		dewarping_view.get(), SLOT(depthPerceptionChanged(double))
+	);
+
 	std::auto_ptr<QWidget> picture_zone_editor;
 	if (m_pictureMask.isNull()) {
 		picture_zone_editor.reset(
@@ -458,7 +483,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	} else {
 		picture_zone_editor.reset(
 			new PictureZoneEditor(
-				m_origImage, m_downscaledOrigImage, m_pictureMask,
+				m_origImage, downscaled_orig_pixmap, m_pictureMask,
 				m_imageToVirt, m_virtDisplayArea,
 				m_pageId, m_ptrSettings
 			)
@@ -478,13 +503,6 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	QObject::connect(
 		fill_zone_editor.get(), SIGNAL(invalidateThumbnail(PageId const&)),
 		opt_widget, SIGNAL(invalidateThumbnail(PageId const&))
-	);
-
-	std::auto_ptr<QWidget> dewarping_view(
-		new DewarpingView(
-			m_outputImage, downscaled_output_pixmap,
-			m_imageToVirt, m_virtContentRect
-		)
 	);
 
 	std::auto_ptr<QWidget> despeckle_view;

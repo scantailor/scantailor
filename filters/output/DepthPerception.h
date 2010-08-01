@@ -16,34 +16,39 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
+#ifndef OUTPUT_DEPTH_PERCEPTION_H_
+#define OUTPUT_DEPTH_PERCEPTION_H_
 
-class QString;
-class QDomDocument;
-class QDomElement;
+#include <QString>
 
 namespace output
 {
 
-class BlackWhiteOptions
+/**
+ * \see imageproc::CylindricalSurfaceDewarper
+ */
+class DepthPerception
 {
 public:
-	BlackWhiteOptions();
+	DepthPerception();
+
+	DepthPerception(double value);
+
+	explicit DepthPerception(QString const& from_string);
 	
-	BlackWhiteOptions(QDomElement const& el);
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
+	QString toString() const;
+
+	void setValue(double value);
+
+	double value() const { return m_value; }
+
+	static double minValue() { return 1.0; }
+
+	static double defaultValue() { return 2.0; }
+
+	static double maxValue() { return 3.0; }
 private:
-	int m_thresholdAdjustment;
+	double m_value;
 };
 
 } // namespace output

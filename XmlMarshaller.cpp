@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "Margins.h"
 #include "Dpi.h"
 #include "Utils.h"
+#include "imageproc/CubicBSpline.h"
+#include <boost/foreach.hpp>
 #include <QPointF>
 #include <QLineF>
 #include <QRect>
@@ -148,5 +150,21 @@ XmlMarshaller::margins(Margins const& margins, QString const& name)
 	el.setAttribute("right", Utils::doubleToString(margins.right()));
 	el.setAttribute("top", Utils::doubleToString(margins.top()));
 	el.setAttribute("bottom", Utils::doubleToString(margins.bottom()));
+	return el;
+}
+
+QDomElement
+XmlMarshaller::bspline(imageproc::CubicBSpline const& bspline, QString const& name)
+{
+	if (bspline.controlPoints().empty()) {
+		return QDomElement();
+	}
+
+	QDomElement el(m_doc.createElement(name));
+	
+	BOOST_FOREACH(QPointF const& pt, bspline.controlPoints()) {
+		el.appendChild(pointF(pt, "point"));
+	}
+	
 	return el;
 }

@@ -16,34 +16,28 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
+#ifndef OUTPUT_DEWARPING_MODE_H_
+#define OUTPUT_DEWARPING_MODE_H_
 
-class QString;
-class QDomDocument;
-class QDomElement;
+#include <QString>
 
 namespace output
 {
 
-class BlackWhiteOptions
+class DewarpingMode
 {
 public:
-	BlackWhiteOptions();
+	enum Mode { OFF, AUTO, MANUAL };
+
+	DewarpingMode(Mode mode = OFF) : m_mode(mode) {}
+
+	explicit DewarpingMode(QString const& str);
 	
-	BlackWhiteOptions(QDomElement const& el);
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
+	QString toString() const;
+
+	operator Mode() const { return m_mode; }
 private:
-	int m_thresholdAdjustment;
+	Mode m_mode;
 };
 
 } // namespace output
