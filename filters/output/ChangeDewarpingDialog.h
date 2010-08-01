@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph_a@mail.ru>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,39 +16,42 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_APPLYCOLORSDIALOG_H_
-#define OUTPUT_APPLYCOLORSDIALOG_H_
+#ifndef OUTPUT_CHANGE_DEWARPING_DIALOG_H_
+#define OUTPUT_CHANGE_DEWARPING_DIALOG_H_
 
-#include "ui_OutputApplyColorsDialog.h"
+#include "ui_OutputChangeDewarpingDialog.h"
+#include "DewarpingMode.h"
 #include "PageId.h"
 #include "PageSequence.h"
 #include "IntrusivePtr.h"
 #include <QDialog>
+#include <QString>
 #include <set>
 
 class PageSelectionAccessor;
-class QButtonGroup;
 
 namespace output
 {
 
-class ApplyColorsDialog : public QDialog, private Ui::OutputApplyColorsDialog
+class ChangeDewarpingDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ApplyColorsDialog(QWidget* parent, PageId const& page_id,
+	ChangeDewarpingDialog(
+		QWidget* parent, PageId const& cur_page, DewarpingMode const& mode,
 		PageSelectionAccessor const& page_selection_accessor);
 	
-	virtual ~ApplyColorsDialog();
+	virtual ~ChangeDewarpingDialog();
 signals:
-	void accepted(std::set<PageId> const& pages);
+	void accepted(std::set<PageId> const& pages, DewarpingMode const& mode);
 private slots:
 	void onSubmit();
 private:
+	Ui::OutputChangeDewarpingDialog ui;
 	PageSequence m_pages;
 	std::set<PageId> m_selectedPages;
 	PageId m_curPage;
-	QButtonGroup* m_pScopeGroup;
+	DewarpingMode m_mode;
 };
 
 } // namespace output

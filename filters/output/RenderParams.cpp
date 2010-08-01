@@ -31,9 +31,6 @@ RenderParams::RenderParams(ColorParams const& cp)
 		case ColorParams::BLACK_AND_WHITE:
 			m_mask |= WHITE_MARGINS|NORMALIZE_ILLUMINATION
 					|NEED_BINARIZATION;
-			if (cp.blackWhiteOptions().dewarp()) {
-				m_mask |= DEWARP;
-			}
 			break;
 		case ColorParams::COLOR_GRAYSCALE: {
 			ColorGrayscaleOptions const opt(

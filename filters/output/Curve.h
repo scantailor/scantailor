@@ -16,34 +16,54 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
+#ifndef OUTPUT_CURVE_H_
+#define OUTPUT_CURVE_H_
 
-class QString;
+#include <QPointF>
+#include "imageproc/CubicBSpline.h"
+#include <vector>
+
 class QDomDocument;
 class QDomElement;
+class QString;
 
 namespace output
 {
 
-class BlackWhiteOptions
+class Curve
 {
 public:
-	BlackWhiteOptions();
-	
-	BlackWhiteOptions(QDomElement const& el);
-	
+	Curve();
+
+	Curve(std::vector<QPointF> const& polyline);
+
+	Curve(imageproc::CubicBSpline const& bspline);
+
+	Curve(QDomElement const& el);
+
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
+
+	bool isValid() const;
+
+	bool matches(Curve const& other) const;
+
+	imageproc::CubicBSpline const& bspline() const { return m_bspline; }
+
+	std::vector<QPointF> const& polyline() const { return m_polyline; }
 private:
-	int m_thresholdAdjustment;
+	struct CloseEnough;
+
+	static std::vector<QPointF> deserializePolyline(QDomElement const& el);
+
+	static QDomElement serializePolyline(
+		std::vector<QPointF> const& polyline, QDomDocument& doc, QString const& name);
+
+	static bool approxPolylineMatch(
+		std::vector<QPointF> const& polyline1,
+		std::vector<QPointF> const& polyline2);
+
+	imageproc::CubicBSpline m_bspline;
+	std::vector<QPointF> m_polyline;
 };
 
 } // namespace output

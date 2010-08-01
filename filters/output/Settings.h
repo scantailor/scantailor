@@ -25,6 +25,8 @@
 #include "Dpi.h"
 #include "ColorParams.h"
 #include "OutputParams.h"
+#include "DewarpingMode.h"
+#include "DistortionModel.h"
 #include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PropertySet.h"
@@ -50,24 +52,18 @@ public:
 	Params getParams(PageId const& page_id) const;
 	
 	void setParams(PageId const& page_id, Params const& params);
-	
-	ColorParams getColorParams(PageId const& page_id) const;
-	
-	void setColorParams(PageId const& page_id, ColorParams const& params);
-	
-	void setColorParamsForAllPages(ColorParams const& params);
-	
-	Dpi getDpi(PageId const& page_id) const;
-	
-	void setDpi(PageId const& page_id, Dpi const& dpi);
-	
-	void setDpiForAllPages(Dpi const& dpi);
 
-	DespeckleLevel getDespeckleLevel(PageId const& page_id) const;
+	void setColorParams(PageId const& page_id, ColorParams const& prms);
+
+	void setDpi(PageId const& page_id, Dpi const& dpi);
+
+	void setDewarpingMode(PageId const& page_id, DewarpingMode const& mode);
+
+	void setDistortionModel(PageId const& page_id, DistortionModel const& model);
+
+	void setDepthPerception(PageId const& page_id, DepthPerception const& depth_perception);
 
 	void setDespeckleLevel(PageId const& page_id, DespeckleLevel level);
-
-	void setDespeckleLevelForAllPages(DespeckleLevel level);
 	
 	std::auto_ptr<OutputParams> getOutputParams(PageId const& page_id) const;
 	
@@ -95,37 +91,21 @@ public:
 
 	void setDefaultFillZoneProperties(PropertySet const& props);
 private:
-	typedef std::map<PageId, Dpi> PerPageDpi;
-	typedef std::map<PageId, DespeckleLevel> PerPageDespeckleLevel;
-	typedef std::map<PageId, ColorParams> PerPageColorParams;
+	typedef std::map<PageId, Params> PerPageParams;
 	typedef std::map<PageId, OutputParams> PerPageOutputParams;
 	typedef std::map<PageId, ZoneSet> PerPageZones;
 	
-	Dpi getDpiLocked(PageId const& page_id) const;
-	
-	void setDpiLocked(PageId const& page_id, Dpi const& dpi);
+	static PropertySet initialPictureZoneProps();
 
-	DespeckleLevel getDespeckleLevelLocked(PageId const& page_id) const;
+	static PropertySet initialFillZoneProps();
 
-	void setDespeckleLevelLocked(PageId const& page_id, DespeckleLevel level);
-	
-	ColorParams getColorParamsLocked(PageId const& page_id) const;
-	
-	void setColorParamsLocked(
-		PageId const& page_id, ColorParams const& params);
-	
 	mutable QMutex m_mutex;
-	PerPageDpi m_perPageDpi;
-	PerPageDespeckleLevel m_perPageDespeckleLevel;
-	PerPageColorParams m_perPageColorParams;
+	PerPageParams m_perPageParams;
 	PerPageOutputParams m_perPageOutputParams;
 	PerPageZones m_perPagePictureZones;
 	PerPageZones m_perPageFillZones;
-	Dpi m_defaultDpi;
-	ColorParams m_defaultColorParams;
 	PropertySet m_defaultPictureZoneProps;
 	PropertySet m_defaultFillZoneProps;
-	DespeckleLevel m_defaultDespeckleLevel;
 };
 
 } // namespace output

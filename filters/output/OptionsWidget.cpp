@@ -19,9 +19,11 @@
 #include "OptionsWidget.h"
 #include "OptionsWidget.h.moc"
 #include "ChangeDpiDialog.h"
+#include "ChangeDewarpingDialog.h"
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
 #include "Params.h"
+#include "DistortionModel.h"
 #include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PictureZoneComparator.h"
@@ -30,6 +32,7 @@
 #include "ScopedIncDec.h"
 #include "config.h"
 #include <boost/foreach.hpp>
+#include <QtGlobal>
 #include <QVariant>
 #include <QColorDialog>
 #include <QToolTip>
@@ -54,9 +57,8 @@ OptionsWidget::OptionsWidget(
 {
 	setupUi(this);
 
-#if !defined(ENABLE_DEWARPING)
-	dewarpPanel->hide();
-#endif
+	depthPerceptionSlider->setMinimum(qRound(DepthPerception::minValue() * 10));
+	depthPerceptionSlider->setMaximum(qRound(DepthPerception::maxValue() * 10));
 	
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
@@ -70,7 +72,9 @@ OptionsWidget::OptionsWidget(
 	);
 	thresholdSlider->setToolTip(QString::number(thresholdSlider->value()));
 	
+	updateDpiDisplay();
 	updateColorsDisplay();
+	updateDewarpingDisplay();
 	
 	connect(
 		changeDpiButton, SIGNAL(clicked()),
@@ -87,10 +91,6 @@ OptionsWidget::OptionsWidget(
 	connect(
 		equalizeIlluminationCB, SIGNAL(clicked(bool)),
 		this, SLOT(equalizeIlluminationToggled(bool))
-	);
-	connect(
-		dewarpCB, SIGNAL(clicked(bool)),
-		this, SLOT(dewarpToggled(bool))
 	);
 	connect(
 		lighterThresholdLink, SIGNAL(linkActivated(QString const&)),
@@ -118,6 +118,16 @@ OptionsWidget::OptionsWidget(
 	);
 
 	connect(
+		changeDewarpingButton, SIGNAL(clicked()),
+		this, SLOT(changeDewarpingButtonClicked())
+	);
+
+	connect(
+		applyDepthPerceptionButton, SIGNAL(clicked()),
+		this, SLOT(applyDepthPerceptionButtonClicked())
+	);
+
+	connect(
 		despeckleOffBtn, SIGNAL(clicked()),
 		this, SLOT(despeckleOffSelected())
 	);
@@ -137,6 +147,11 @@ OptionsWidget::OptionsWidget(
 		applyDespeckleButton, SIGNAL(clicked()),
 		this, SLOT(applyDespeckleButtonClicked())
 	);
+
+	connect(
+		depthPerceptionSlider, SIGNAL(valueChanged(int)),
+		this, SLOT(depthPerceptionChangedSlot(int))
+	);
 }
 
 OptionsWidget::~OptionsWidget()
@@ -150,9 +165,12 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 	m_pageId = page_id;
 	m_outputDpi = params.outputDpi();
 	m_colorParams = params.colorParams();
+	m_dewarpingMode = params.dewarpingMode();
+	m_depthPerception = params.depthPerception();
 	m_despeckleLevel = params.despeckleLevel();
 	updateDpiDisplay();
 	updateColorsDisplay();
+	updateDewarpingDisplay();
 }
 
 void
@@ -164,6 +182,9 @@ void
 OptionsWidget::tabChanged(ImageViewTab const tab)
 {
 	m_lastTab = tab;
+	updateDpiDisplay();
+	updateColorsDisplay();
+	updateDewarpingDisplay();
 	reloadIfNecessary();
 }
 
@@ -203,16 +224,6 @@ OptionsWidget::equalizeIlluminationToggled(bool const checked)
 }
 
 void
-OptionsWidget::dewarpToggled(bool const checked)
-{
-	BlackWhiteOptions opt(m_colorParams.blackWhiteOptions());
-	opt.setDewarp(checked);
-	m_colorParams.setBlackWhiteOptions(opt);
-	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
-	emit reloadRequested();
-}
-
-void
 OptionsWidget::setLighterThreshold()
 {
 	thresholdSlider->setValue(thresholdSlider->value() - 1);
@@ -244,12 +255,8 @@ OptionsWidget::bwThresholdChanged()
 	// Show the tooltip immediately.
 	QPoint const center(thresholdSlider->rect().center());
 	QPoint tooltip_pos(thresholdSlider->mapFromGlobal(QCursor::pos()));
-	if (tooltip_pos.x() < 0 || tooltip_pos.x() >= thresholdSlider->width()) {
-		tooltip_pos.setX(center.x());
-	}
-	if (tooltip_pos.y() < 0 || tooltip_pos.y() >= thresholdSlider->height()) {
-		tooltip_pos.setY(center.y());
-	}
+	tooltip_pos.setY(center.y());
+	tooltip_pos.setX(qBound(0, tooltip_pos.x(), thresholdSlider->width()));
 	tooltip_pos = thresholdSlider->mapToGlobal(tooltip_pos);
 	QToolTip::showText(tooltip_pos, tooltip_text, thresholdSlider);
 	
@@ -283,10 +290,6 @@ OptionsWidget::changeDpiButtonClicked()
 		dialog, SIGNAL(accepted(std::set<PageId> const&, Dpi const&)),
 		this, SLOT(dpiChanged(std::set<PageId> const&, Dpi const&))
 	);
-	connect(
-		dialog, SIGNAL(acceptedForAllPages(Dpi const&)),
-		this, SLOT(dpiChangedForAllPages(Dpi const&))
-	);
 	dialog->show();
 }
 
@@ -301,18 +304,12 @@ OptionsWidget::applyColorsButtonClicked()
 		dialog, SIGNAL(accepted(std::set<PageId> const&)),
 		this, SLOT(applyColorsConfirmed(std::set<PageId> const&))
 	);
-	connect(
-		dialog, SIGNAL(acceptedForAllPages()),
-		this, SLOT(applyColorsToAllPagesConfirmed())
-	);
 	dialog->show();
 }
 
 void
 OptionsWidget::dpiChanged(std::set<PageId> const& pages, Dpi const& dpi)
 {
-	updateDpiDisplay();
-	
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setDpi(page_id, dpi);
 		emit invalidateThumbnail(page_id);
@@ -320,19 +317,9 @@ OptionsWidget::dpiChanged(std::set<PageId> const& pages, Dpi const& dpi)
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		m_outputDpi = dpi;
+		updateDpiDisplay();
 		emit reloadRequested();
 	}
-}
-
-void
-OptionsWidget::dpiChangedForAllPages(Dpi const& dpi)
-{
-	m_outputDpi = dpi;
-	updateDpiDisplay();
-
-	m_ptrSettings->setDpiForAllPages(dpi);
-	emit invalidateAllThumbnails();
-	emit reloadRequested();
 }
 
 void
@@ -346,15 +333,6 @@ OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 	if (pages.find(m_pageId) != pages.end()) {
 		emit reloadRequested();
 	}
-}
-
-void
-OptionsWidget::applyColorsToAllPagesConfirmed()
-{
-	m_ptrSettings->setColorParamsForAllPages(m_colorParams);
-	emit invalidateAllThumbnails();
-
-	emit reloadRequested();
 }
 
 void
@@ -410,10 +388,6 @@ OptionsWidget::applyDespeckleButtonClicked()
 		dialog, SIGNAL(accepted(std::set<PageId> const&)),
 		this, SLOT(applyDespeckleConfirmed(std::set<PageId> const&))
 	);
-	connect(
-		dialog, SIGNAL(acceptedForAllPages()),
-		this, SLOT(applyDespeckleToAllPagesConfirmed())
-	);
 	dialog->show();
 }
 
@@ -431,11 +405,84 @@ OptionsWidget::applyDespeckleConfirmed(std::set<PageId> const& pages)
 }
 
 void
-OptionsWidget::applyDespeckleToAllPagesConfirmed()
+OptionsWidget::changeDewarpingButtonClicked()
 {
-	m_ptrSettings->setDespeckleLevelForAllPages(m_despeckleLevel);
-	emit invalidateAllThumbnails();
-	emit reloadRequested();
+	ChangeDewarpingDialog* dialog = new ChangeDewarpingDialog(
+		this, m_pageId, m_dewarpingMode, m_pageSelectionAccessor
+	);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	connect(
+		dialog, SIGNAL(accepted(std::set<PageId> const&, DewarpingMode const&)),
+		this, SLOT(dewarpingChanged(std::set<PageId> const&, DewarpingMode const&))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::dewarpingChanged(std::set<PageId> const& pages, DewarpingMode const& mode)
+{
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		m_ptrSettings->setDewarpingMode(page_id, mode);
+		emit invalidateThumbnail(page_id);
+	}
+	
+	if (pages.find(m_pageId) != pages.end()) {
+		if (m_dewarpingMode != mode) {
+			m_dewarpingMode = mode;
+			m_lastTab = TAB_OUTPUT; // Switch to Output after reloading.
+			updateDpiDisplay();
+			updateColorsDisplay();
+			updateDewarpingDisplay();
+			emit reloadRequested();
+		}
+	}
+}
+
+void
+OptionsWidget::applyDepthPerceptionButtonClicked()
+{
+	ApplyColorsDialog* dialog = new ApplyColorsDialog(
+		this, m_pageId, m_pageSelectionAccessor
+	);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowTitle(tr("Apply Depth Perception"));
+	connect(
+		dialog, SIGNAL(accepted(std::set<PageId> const&)),
+		this, SLOT(applyDepthPerceptionConfirmed(std::set<PageId> const&))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::applyDepthPerceptionConfirmed(std::set<PageId> const& pages)
+{
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		m_ptrSettings->setDepthPerception(page_id, m_depthPerception);
+		emit invalidateThumbnail(page_id);
+	}
+	
+	if (pages.find(m_pageId) != pages.end()) {
+		emit reloadRequested();
+	}
+}
+
+void
+OptionsWidget::depthPerceptionChangedSlot(int val)
+{
+	m_depthPerception.setValue(0.1 * val);
+	QString const tooltip_text(QString::number(m_depthPerception.value()));
+	depthPerceptionSlider->setToolTip(tooltip_text);
+
+	// Show the tooltip immediately.
+	QPoint const center(depthPerceptionSlider->rect().center());
+	QPoint tooltip_pos(depthPerceptionSlider->mapFromGlobal(QCursor::pos()));
+	tooltip_pos.setY(center.y());
+	tooltip_pos.setX(qBound(0, tooltip_pos.x(), depthPerceptionSlider->width()));
+	tooltip_pos = depthPerceptionSlider->mapToGlobal(tooltip_pos);
+	QToolTip::showText(tooltip_pos, tooltip_text, depthPerceptionSlider);
+
+	// Propagate the signal.
+	emit depthPerceptionChanged(m_depthPerception.value());
 }
 
 void
@@ -443,21 +490,44 @@ OptionsWidget::reloadIfNecessary()
 {
 	ZoneSet saved_picture_zones;
 	ZoneSet saved_fill_zones;
-	DespeckleLevel saved_despeckle_level = DESPECKLE_NORMAL;
+	DewarpingMode saved_dewarping_mode;
+	DistortionModel saved_distortion_model;
+	DepthPerception saved_depth_perception;
+	DespeckleLevel saved_despeckle_level = DESPECKLE_CAUTIOUS;
 	
 	std::auto_ptr<OutputParams> output_params(m_ptrSettings->getOutputParams(m_pageId));
 	if (output_params.get()) {
 		saved_picture_zones = output_params->pictureZones();
 		saved_fill_zones = output_params->fillZones();
+		saved_dewarping_mode = output_params->outputImageParams().dewarpingMode();
+		saved_distortion_model = output_params->outputImageParams().distortionModel();
+		saved_depth_perception = output_params->outputImageParams().depthPerception();
 		saved_despeckle_level = output_params->outputImageParams().despeckleLevel();
 	}
 
 	if (!PictureZoneComparator::equal(saved_picture_zones, m_ptrSettings->pictureZonesForPage(m_pageId))) {
 		emit reloadRequested();
+		return;
 	} else if (!FillZoneComparator::equal(saved_fill_zones, m_ptrSettings->fillZonesForPage(m_pageId))) {
 		emit reloadRequested();
-	} else if (saved_despeckle_level != m_ptrSettings->getDespeckleLevel(m_pageId)) {
+		return;
+	}
+
+	Params const params(m_ptrSettings->getParams(m_pageId));
+
+	if (saved_despeckle_level != params.despeckleLevel()) {
 		emit reloadRequested();
+		return;
+	}
+
+	if (saved_dewarping_mode == DewarpingMode::OFF && params.dewarpingMode() == DewarpingMode::OFF) {
+		// In this case the following two checks don't matter.
+	} else if (!saved_distortion_model.matches(params.distortionModel())) {
+		emit reloadRequested();
+		return;
+	} else if (saved_depth_perception.value() != params.depthPerception().value()) {
+		emit reloadRequested();
+		return;
 	}
 }
 
@@ -507,13 +577,11 @@ OptionsWidget::updateColorsDisplay()
 		equalizeIlluminationCB->setEnabled(opt.whiteMargins());
 	}
 	
+	modePanel->setVisible(m_lastTab != TAB_DEWARPING);
 	bwOptions->setVisible(bw_options_visible);
-	despecklePanel->setVisible(bw_options_visible);
-	if (bw_options_visible) {
-		dewarpCB->setChecked(
-			m_colorParams.blackWhiteOptions().dewarp()
-		);
+	despecklePanel->setVisible(bw_options_visible && m_lastTab != TAB_DEWARPING);
 
+	if (bw_options_visible) {
 		switch (m_despeckleLevel) {
 			case DESPECKLE_OFF:
 				despeckleOffBtn->setChecked(true);
@@ -536,6 +604,28 @@ OptionsWidget::updateColorsDisplay()
 	}
 	
 	colorModeSelector->blockSignals(false);
+}
+
+void
+OptionsWidget::updateDewarpingDisplay()
+{
+	depthPerceptionPanel->setVisible(m_lastTab == TAB_DEWARPING);
+
+	switch (m_dewarpingMode) {
+		case DewarpingMode::OFF:
+			dewarpingStatusLabel->setText(tr("Off"));
+			break;
+		case DewarpingMode::AUTO:
+			dewarpingStatusLabel->setText(tr("Auto"));
+			break;
+		case DewarpingMode::MANUAL:
+			dewarpingStatusLabel->setText(tr("Manual"));
+			break;
+	}
+
+	depthPerceptionSlider->blockSignals(true);
+	depthPerceptionSlider->setValue(qRound(m_depthPerception.value() * 10));
+	depthPerceptionSlider->blockSignals(false);
 }
 
 } // namespace output

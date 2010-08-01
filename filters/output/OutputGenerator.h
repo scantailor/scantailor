@@ -22,12 +22,15 @@
 #include "imageproc/Connectivity.h"
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "DepthPerception.h"
 #include "DespeckleLevel.h"
 #include <QSize>
 #include <QRect>
 #include <QTransform>
 #include <QColor>
+#include <QPointF>
 #include <QPolygonF>
+#include <vector>
 #include <stdint.h>
 
 class TaskStatus;
@@ -48,6 +51,8 @@ namespace imageproc
 namespace output
 {
 
+class DistortionModel;
+
 class OutputGenerator
 {
 public:
@@ -65,6 +70,7 @@ public:
 	 * \param input The input image plus data produced by previous stages.
 	 * \param picture_zones A set of manual picture zones.
 	 * \param fill_zones A set of manual fill zones.
+	 * \param distortion_model A curved rectangle.
 	 * \param auto_picture_mask If provided, the auto-detected picture mask
 	 *        will be written there.  It would only happen if automatic picture
 	 *        detection actually took place.  Otherwise, nothing will be
@@ -84,6 +90,8 @@ public:
 	QImage process(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
@@ -100,24 +108,57 @@ public:
 	 */
 	QRect outputContentRect() const;
 private:
-	QImage processAsIs(FilterData const& input,
-		TaskStatus const& status, DebugImages* dbg = 0) const;
+	QImage processAsIs(
+		FilterData const& input, TaskStatus const& status,
+		DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception,
+		DebugImages* dbg = 0) const;
 	
 	QImage processImpl(
+		TaskStatus const& status, FilterData const& input,
+		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception,
+		imageproc::BinaryImage* auto_picture_mask = 0,
+		imageproc::BinaryImage* speckles_image = 0,
+		DebugImages* dbg = 0) const;
+
+	QImage processWithoutDewarping(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
+
+	QImage processWithDewarping(
+		TaskStatus const& status, FilterData const& input,
+		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception,
+		imageproc::BinaryImage* auto_picture_mask = 0,
+		imageproc::BinaryImage* speckles_image = 0,
+		DebugImages* dbg = 0) const;
 	
+	QImage dewarp(
+		QTransform const& orig_to_src, QImage const& src,
+		QTransform const& src_to_output, DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception, QColor const& bg_color,
+		QRect* modified_content_rect = 0) const;
+
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
 	
 	static QSize to300dpi(QSize const& size, Dpi const& source_dpi);
 	
+	static QImage convertToRGBorRGBA(QImage const& src);
+
+	static void fillMarginsInPlace(
+		QImage& image, QRect const& content_rect, QColor const& color);
+
 	static QImage normalizeIlluminationGray(
 		TaskStatus const& status,
 		QImage const& input, QPolygonF const& area_to_consider,
-		QTransform const& xform, QRect const& target_rect, DebugImages* dbg);
+		QTransform const& xform, QRect const& target_rect,
+		imageproc::GrayImage* background = 0, DebugImages* dbg = 0);
 	
 	static imageproc::GrayImage detectPictures(
 		imageproc::GrayImage const& input_300dpi, TaskStatus const& status,
@@ -135,6 +176,13 @@ private:
 	imageproc::BinaryThreshold adjustThreshold(
 		imageproc::BinaryThreshold threshold) const;
 	
+	imageproc::BinaryThreshold calcBinarizationThreshold(
+		QImage const& image, imageproc::BinaryImage const& mask) const;
+
+	imageproc::BinaryThreshold calcBinarizationThreshold(
+		QImage const& image, QPolygonF const& crop_area,
+		imageproc::BinaryImage const* mask = 0) const;
+
 	imageproc::BinaryImage binarize(
 		QImage const& image, imageproc::BinaryImage const& mask) const;
 	
@@ -162,7 +210,7 @@ private:
 	static unsigned char calcDominantBackgroundGrayLevel(QImage const& img);
 	
 	static QImage normalizeIllumination(QImage const& gray_input, DebugImages* dbg);
-	
+
 	QImage transformAndNormalizeIllumination(
 		QImage const& gray_input, DebugImages* dbg,
 		QImage const* morph_background = 0) const;
@@ -174,6 +222,10 @@ private:
 	void applyFillZonesInPlace(QImage& img, ZoneSet const& zones) const;
 
 	void applyFillZonesInPlace(imageproc::BinaryImage& img, ZoneSet const& zones) const;
+
+	QTransform origToRectInUncroppedSpace(QRect const& rect) const;
+
+	QTransform rectInUncroppedSpaceToOutput(QRect const& rect) const;
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;

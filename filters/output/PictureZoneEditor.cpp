@@ -96,7 +96,7 @@ private:
 
 
 PictureZoneEditor::PictureZoneEditor(
-	QImage const& image, QImage const& downscaled_image,
+	QImage const& image, ImagePixmapUnion const& downscaled_image,
 	imageproc::BinaryImage const& picture_mask,
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	PageId const& page_id, IntrusivePtr<Settings> const& settings)

@@ -26,14 +26,34 @@
 namespace imageproc
 {
 
+/**
+ * \brief Projects points onto a line (not a line segment).
+ *
+ * Projecting means finding the point on a line that is closest
+ * to the given point.
+ */
 class ToLineProjector
 {
 public:
+	/**
+	 * \brief Initializes line projector.
+	 *
+	 * Behaviour is undefined if the line is actually a point.
+	 */
 	ToLineProjector(QLineF const& line);
 
-	double projectionScalar(QPointF const& pt) const;
-
+	/**
+	 * \brief Finds the projection point.
+	 */
 	QPointF projectionPoint(QPointF const& pt) const;
+
+	/**
+	 * Solves the equation of:\n
+	 * line.p1() + x * line.p2() = p\n
+	 * for x, where p would be the projection point.
+	 * This function is faster than projectionPoint().
+	 */
+	double projectionScalar(QPointF const& pt) const;
 private:
 	QPointF m_origin;
 	QPointF m_vec;

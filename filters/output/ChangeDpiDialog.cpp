@@ -156,9 +156,7 @@ ChangeDpiDialog::onSubmit()
 	if (thisPageRB->isChecked()) {
 		pages.insert(m_curPage);
 	} else if (allPagesRB->isChecked()) {
-		emit acceptedForAllPages(Dpi(dpi, dpi));
-		accept();
-		return;
+		m_pages.selectAll().swap(pages);
 	} else if (thisPageAndFollowersRB->isChecked()) {
 		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include "Dpi.h"
 #include "OrthogonalRotation.h"
 #include "Margins.h"
+#include "imageproc/CubicBSpline.h"
 #include <QString>
 #include <QSize>
 #include <QSizeF>
@@ -139,4 +140,24 @@ XmlUnmarshaller::polygonF(QDomElement const& el)
 	}
 	
 	return poly;
+}
+
+imageproc::CubicBSpline
+XmlUnmarshaller::bspline(QDomElement const& el)
+{
+	imageproc::CubicBSpline bspline;
+
+	QString const point_tag_name("point");
+	QDomNode node(el.firstChild());
+	for (; !node.isNull(); node = node.nextSibling()) {
+		if (!node.isElement()) {
+			continue;
+		}
+		if (node.nodeName() != point_tag_name) {
+			continue;
+		}
+		bspline.appendControlPoint(pointF(node.toElement()));
+	}
+
+	return bspline;
 }

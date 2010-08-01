@@ -25,14 +25,12 @@ namespace output
 {
 
 BlackWhiteOptions::BlackWhiteOptions()
-:	m_thresholdAdjustment(0),
-	m_dewarp(false)
+:	m_thresholdAdjustment(0)
 {
 }
 
 BlackWhiteOptions::BlackWhiteOptions(QDomElement const& el)
-:	m_thresholdAdjustment(el.attribute("thresholdAdj").toInt()),
-	m_dewarp(el.attribute("dewarp") == "1")
+:	m_thresholdAdjustment(el.attribute("thresholdAdj").toInt())
 {
 }
 
@@ -41,7 +39,6 @@ BlackWhiteOptions::toXml(QDomDocument& doc, QString const& name) const
 {
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("thresholdAdj", m_thresholdAdjustment);
-	el.setAttribute("dewarp", m_dewarp ? "1" : "0");
 	return el;
 }
 
@@ -49,10 +46,6 @@ bool
 BlackWhiteOptions::operator==(BlackWhiteOptions const& other) const
 {
 	if (m_thresholdAdjustment != other.m_thresholdAdjustment) {
-		return false;
-	}
-	
-	if (m_dewarp != other.m_dewarp) {
 		return false;
 	}
 	

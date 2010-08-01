@@ -45,8 +45,6 @@ public:
 	virtual ~ChangeDpiDialog();
 signals:
 	void accepted(std::set<PageId> const& pages, Dpi const& dpi);
-
-	void acceptedForAllPages(Dpi const& dpi);
 private slots:
 	void dpiSelectionChanged(int index);
 	

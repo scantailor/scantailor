@@ -16,36 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_BLACK_WHITE_OPTIONS_H_
-#define OUTPUT_BLACK_WHITE_OPTIONS_H_
+#ifndef IMAGEPROC_RASTER_DEWARPER_H_
+#define IMAGEPROC_RASTER_DEWARPER_H_
 
-class QString;
-class QDomDocument;
-class QDomElement;
+class QImage;
+class QSize;
+class QRect;
+class QColor;
 
-namespace output
+namespace imageproc
 {
 
-class BlackWhiteOptions
+class CylindricalSurfaceDewarper;
+
+class RasterDewarper
 {
 public:
-	BlackWhiteOptions();
-	
-	BlackWhiteOptions(QDomElement const& el);
-	
-	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-	
-	int thresholdAdjustment() const { return m_thresholdAdjustment; }
-	
-	void setThresholdAdjustment(int val) { m_thresholdAdjustment = val; }
-		
-	bool operator==(BlackWhiteOptions const& other) const;
-	
-	bool operator!=(BlackWhiteOptions const& other) const;
-private:
-	int m_thresholdAdjustment;
+	static QImage dewarp(
+		QImage const& src, QSize const& dst_size,
+		CylindricalSurfaceDewarper const& distortion_model,
+		QRect const& model_domain, QColor const& background_color
+	);
 };
 
-} // namespace output
+} // namespace imageproc
 
 #endif

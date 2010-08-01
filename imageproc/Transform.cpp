@@ -276,6 +276,10 @@ static void transformGeneric(
 			assert(top_fraction + bottom_fraction + (src_bottom - src_top - 1) * 32 == static_cast<unsigned>(src32_bottom - src32_top));
 			
 			unsigned const src_area = (src32_bottom - src32_top) * (src32_right - src32_left);
+			if (src_area == 0) {
+				dst_line[dx] = background_color;
+				continue;
+			}
 			
 			StorageUnit const* src_line = &src_data[src_top * src_stride];
 			

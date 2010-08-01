@@ -16,56 +16,74 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ApplyColorsDialog.h"
-#include "ApplyColorsDialog.h.moc"
+#include "ChangeDewarpingDialog.h"
+#include "ChangeDewarpingDialog.h.moc"
 #include "PageSelectionAccessor.h"
-#include <QButtonGroup>
+#include "QtSignalForwarder.h"
+#include <boost/function.hpp>
+#include <boost/lambda/lambda.hpp>
 
 namespace output
 {
 
-ApplyColorsDialog::ApplyColorsDialog(
-	QWidget* parent, PageId const& cur_page,
+ChangeDewarpingDialog::ChangeDewarpingDialog(
+	QWidget* parent, PageId const& cur_page, DewarpingMode const& mode,
 	PageSelectionAccessor const& page_selection_accessor)
 :	QDialog(parent),
 	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
 	m_curPage(cur_page),
-	m_pScopeGroup(new QButtonGroup(this))
+	m_mode(mode)
 {
-	setupUi(this);
-	m_pScopeGroup->addButton(thisPageRB);
-	m_pScopeGroup->addButton(allPagesRB);
-	m_pScopeGroup->addButton(thisPageAndFollowersRB);
-	m_pScopeGroup->addButton(selectedPagesRB);
+	using namespace boost::lambda;
+
+	ui.setupUi(this);
 	if (m_selectedPages.size() <= 1) {
-		selectedPagesWidget->setEnabled(false);
+		ui.selectedPagesWidget->setEnabled(false);
 	}
+
+	switch (mode) {
+		case DewarpingMode::OFF:
+			ui.offRB->setChecked(true);
+			break;
+		case DewarpingMode::AUTO:
+			ui.autoRB->setChecked(true);
+			break;
+		case DewarpingMode::MANUAL:
+			ui.manualRB->setChecked(true);
+			break;
+	}
+
+	// No, we don't leak memory here.
+	new QtSignalForwarder(ui.offRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::OFF);
+	new QtSignalForwarder(ui.autoRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::AUTO);
+	new QtSignalForwarder(ui.manualRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::MANUAL);
 	
-	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }
 
-ApplyColorsDialog::~ApplyColorsDialog()
+ChangeDewarpingDialog::~ChangeDewarpingDialog()
 {
 }
 
 void
-ApplyColorsDialog::onSubmit()
-{	
+ChangeDewarpingDialog::onSubmit()
+{
 	std::set<PageId> pages;
 	
-	// thisPageRB is intentionally not handled.
-	if (allPagesRB->isChecked()) {
+	if (ui.thisPageRB->isChecked()) {
+		pages.insert(m_curPage);
+	} else if (ui.allPagesRB->isChecked()) {
 		m_pages.selectAll().swap(pages);
-	} else if (thisPageAndFollowersRB->isChecked()) {
+	} else if (ui.thisPageAndFollowersRB->isChecked()) {
 		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
-	} else if (selectedPagesRB->isChecked()) {
-		emit accepted(m_selectedPages);
+	} else if (ui.selectedPagesRB->isChecked()) {
+		emit accepted(m_selectedPages, m_mode);
 		accept();
 		return;
 	}
 	
-	emit accepted(pages);
+	emit accepted(pages, m_mode);
 	
 	// We assume the default connection from accepted() to accept()
 	// was removed.

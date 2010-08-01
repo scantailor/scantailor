@@ -220,7 +220,7 @@ template<typename OT>
 VecNT<N, T>::VecNT(VecNT<N, OT> const& other)
 {
 	for (size_t i = 0; i < N; ++i) {
-		m_data[i] = static_cast<T>(other.m_data[i]);
+		m_data[i] = static_cast<T>(other[i]);
 	}
 }
 
@@ -276,7 +276,7 @@ VecNT<N, T>&
 VecNT<N, T>::operator=(VecNT<N, OT> const& other)
 {
 	for (size_t i = 0; i < N; ++i) {
-		m_data[i] = static_cast<T>(other.m_data[i]);
+		m_data[i] = static_cast<T>(other[i]);
 	}
 }
 
@@ -295,7 +295,7 @@ VecNT<N, T>&
 VecNT<N, T>::operator+=(VecNT const& other)
 {
 	for (size_t i = 0; i < N; ++i) {
-		m_data[i] += other.m_data[i];
+		m_data[i] += other[i];
 	}
 	return *this;
 }
@@ -315,7 +315,7 @@ VecNT<N, T>&
 VecNT<N, T>::operator-=(VecNT<N, T> const& other)
 {
 	for (size_t i = 0; i < N; ++i) {
-		m_data[i] -= other.m_data[i];
+		m_data[i] -= other[i];
 	}
 	return *this;
 }
@@ -343,7 +343,7 @@ VecNT<N, T>::dot(VecNT const& other) const
 {
 	T sum = T();
 	for (size_t i = 0; i < N; ++i) {
-		sum += m_data[i] * other.m_data[i];
+		sum += m_data[i] * other[i];
 	}
 	return sum;
 }

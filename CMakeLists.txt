@@ -301,8 +301,6 @@ IF(MSVC)
 	OPTION(ENABLE_CRASH_REPORTER "Enable crash reporter (only for official builds)" OFF)
 ENDIF(MSVC)
 
-OPTION(ENABLE_DEWARPING "Enable experimental dewarping support" OFF)
-
 # Prepare config.h
 IF(WIN32)
 	SET(TRANSLATIONS_DIR_REL "translations")
@@ -416,7 +414,7 @@ SET(
 	AtomicFileOverwriter.cpp AtomicFileOverwriter.h
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
-	Undistort.cpp Undistort.h
+	#Undistort.cpp Undistort.h
 	ThreadPriority.cpp ThreadPriority.h
 	SystemLoadWidget.cpp SystemLoadWidget.h
 	FileNameDisambiguator.cpp FileNameDisambiguator.h
@@ -439,11 +437,12 @@ SET(
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h
 	filter_dc/PageOrientationCollector.h
+	config.h.in
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
 
-SOURCE_GROUP("Version Header" FILES version.h)
+SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
 
 SET(win32_resource_file)
 IF(WIN32)

@@ -8,6 +8,5 @@
 
 #cmakedefine ENABLE_CRASH_REPORTER
 #cmakedefine ENABLE_OPENGL
-#cmakedefine ENABLE_DEWARPING
 
 #endif

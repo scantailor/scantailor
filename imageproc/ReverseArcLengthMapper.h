@@ -55,17 +55,27 @@ public:
 	/**
 	 * \brief Adds an x -> f(x) sample.
 	 *
-	 * Note that samples must be added in order of increasing arguments.
+	 * Note that x value of every sample has to be bigger than that
+	 * of the previous one.
 	 */
 	void addSample(double x, double fx);
+
+	/**
+	 * \brief Returns the total arc length from the first to the last sample.
+	 */
+	double totalArcLength() const;
 
 	/**
 	 * \brief Scales arc lengths at every sample so that the
 	 *        total arc length becomes equal to the given value.
 	 *
 	 * Obviously, this should be done after all samples have been added.
+	 * After calling this function, totalArcLength() will be returning
+	 * the new value.
 	 */
 	void normalizeRange(double total_arc_len);
+
+	
 
 	/**
 	 * \brief Maps from arc length to the corresponding function argument.
@@ -75,7 +85,7 @@ public:
 	 * If no samples are present, zero is returned.  Providing the same
 	 * hint on consecutive calls to this function improves performance. 
 	 */
-	double map(double arc_len, Hint& hint);
+	double map(double arc_len, Hint& hint) const;
 private:
 	struct Sample
 	{

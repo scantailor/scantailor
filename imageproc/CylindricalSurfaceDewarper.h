@@ -52,19 +52,23 @@ public:
 	};
 
 	/**
-	 * \param cam_dist_rel The physical distance from the camera to the plane
-	 *        formed by the endpoints of our two directrixes, divided by the
-	 *        physical distance between those two directrixes.  For scans,
-	 *        use a fake value like 3.5.  Keep in mind though, that when using
-	 *        fake values, they have to be reduced if one or both of directrixes
-	 *        are in the middle of content.
+	 * \param depth_perception The distance from the camera to the plane formed
+	 *        by two outer generatrixes, in some unknown units :)
+	 *        This model assumes that plane is perpendicular to the camera direction.
+	 *        In practice, just use values between 1 and 3.
 	 */
 	CylindricalSurfaceDewarper(
 		std::vector<QPointF> const& img_directrix1,
 		std::vector<QPointF> const& img_directrix2,
-		double cam_dist_rel);
+		double depth_perception);
 
-	Generatrix mapGeneratrix(double x, State& state);
+	/**
+	 * \brief Returns the arc length of a directrix, assuming its
+	 *        chord length is one.
+	 */
+	double directrixArcLength() const { return m_directrixArcLength; }
+
+	Generatrix mapGeneratrix(double x, State& state) const;
 private:
 	class CoupledPolylinesIterator;
 	
@@ -90,8 +94,9 @@ private:
 
 	HomographicTransform<2, double> m_pln2img;
 	HomographicTransform<2, double> m_img2pln;
-	double m_camDistRel;
+	double m_depthPerception;
 	double m_plnStraightLineY;
+	double m_directrixArcLength;
 	ReverseArcLengthMapper m_reverseArcLengthMapper;
 	PolylineIntersector m_imgDirectrix1Intersector;
 	PolylineIntersector m_imgDirectrix2Intersector;

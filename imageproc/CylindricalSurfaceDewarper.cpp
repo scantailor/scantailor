@@ -66,13 +66,14 @@ private:
 
 CylindricalSurfaceDewarper::CylindricalSurfaceDewarper(
 	std::vector<QPointF> const& img_directrix1,
-	std::vector<QPointF> const& img_directrix2, double cam_dist_rel)
+	std::vector<QPointF> const& img_directrix2, double depth_perception)
 :	m_pln2img(calcPlnToImgHomography(img_directrix1, img_directrix2)),
 	m_img2pln(m_pln2img.inv()),
-	m_camDistRel(cam_dist_rel),
+	m_depthPerception(depth_perception),
 	m_plnStraightLineY(
 		calcPlnStraightLineY(img_directrix1, img_directrix2, m_pln2img, m_img2pln)
 	),
+	m_directrixArcLength(1.0),
 	m_imgDirectrix1Intersector(img_directrix1),
 	m_imgDirectrix2Intersector(img_directrix2)
 {
@@ -80,7 +81,7 @@ CylindricalSurfaceDewarper::CylindricalSurfaceDewarper(
 }
 
 CylindricalSurfaceDewarper::Generatrix
-CylindricalSurfaceDewarper::mapGeneratrix(double x, State& state)
+CylindricalSurfaceDewarper::mapGeneratrix(double x, State& state) const
 {
 	double const pln_x = m_reverseArcLengthMapper.map(x, state.m_arcLengthHint);
 	
@@ -266,34 +267,24 @@ CylindricalSurfaceDewarper::initReverseArcLengthMapper(
 	double pln_x;
 	while (it.next(img_curve1_pt, img_curve2_pt, pln_x)) {
 		QLineF const img_generatrix(img_curve1_pt, img_curve2_pt);
-		Vec2d const img_straight_line_pt(m_pln2img(Vec2d(pln_x, m_plnStraightLineY)));
 		Vec2d const img_line1_pt(m_pln2img(Vec2d(pln_x, 0)));
 		Vec2d const img_line2_pt(m_pln2img(Vec2d(pln_x, 1)));
-		double const y1 = QLineF(img_curve1_pt, img_straight_line_pt).length();
-		double const y2 = QLineF(img_line1_pt, img_straight_line_pt).length();
-		double const y3 = QLineF(img_curve2_pt, img_straight_line_pt).length();
-		double const y4 = QLineF(img_line2_pt, img_straight_line_pt).length();
 		
-		// We can calculate our generatrix depth based on either one of directrixes,
-		// and in an ideal world we would get identical results.  In real world,
-		// we calculate both, as long as they are reliable, and average them.
-		double elevation = 0;
-		if (y1 > 1.0) {
-			double const e1 = m_camDistRel * (1 - y2/y1);
-			elevation += 0.5 * qBound(-0.5, e1, 0.5);
-		} else {
-			elevation += 0.5 * prev_elevation;
-		}
-		if (y3 > 1.0) {
-			double const e2 = m_camDistRel * (1 - y4/y3);
-			elevation += 0.5 * qBound(-0.5, e2, 0.5);
-		} else {
-			elevation += 0.5 * prev_elevation;
-		}
+		ToLineProjector const projector(img_generatrix);
+		double const y1 = projector.projectionScalar(img_line1_pt);
+		double const y2 = projector.projectionScalar(img_line2_pt);
+
+		double elevation = m_depthPerception * (1.0 - (y2 - y1));
+		elevation = qBound(-0.5, elevation, 0.5);
+		
+		// FIXME: ensure that pln_x is greater than the previous one.
 
 		m_reverseArcLengthMapper.addSample(pln_x, elevation);
 		prev_elevation = elevation;
 	}
+
+	// Needs to go before normalizeRange().
+	m_directrixArcLength = m_reverseArcLengthMapper.totalArcLength();
 
 	// Scale arc lengths to the range of [0, 1].
 	m_reverseArcLengthMapper.normalizeRange(1);

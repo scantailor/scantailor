@@ -26,15 +26,18 @@
 namespace imageproc
 {
 
+template<size_t N, typename T> class HomographicTransform;
+
 template<size_t N, typename T>
-class HomographicTransform
+class HomographicTransformBase
 {
+public:
 	typedef VecNT<N, T> Vec;
 	typedef VecNT<(N+1)*(N+1), T> Mat;
-public:
-	explicit HomographicTransform(Mat const& mat) : m_mat(mat) {}
 
-	HomographicTransform inv() const;
+	explicit HomographicTransformBase(Mat const& mat) : m_mat(mat) {}
+
+	HomographicTransform<N, T> inv() const;
 
 	Vec operator()(Vec const& from) const;
 
@@ -43,19 +46,42 @@ private:
 	Mat m_mat;
 };
 
+
+template<size_t N, typename T>
+class HomographicTransform : public HomographicTransformBase<N, T>
+{
+public:
+	explicit HomographicTransform(Mat const& mat) : HomographicTransformBase<N, T>(mat) {}
+};
+
+
+/** An optimized, both in terms of API and performance, 1D version. */
+template<typename T>
+class HomographicTransform<1, T> : public HomographicTransformBase<1, T>
+{
+public:
+	explicit HomographicTransform(Mat const& mat) : HomographicTransformBase<1, T>(mat) {}
+
+	T operator()(T from) const;
+
+	// Prevent it's shadowing by the above one.
+	using HomographicTransformBase<1, T>::operator();
+};
+
+
 template<size_t N, typename T>
 HomographicTransform<N, T>
-HomographicTransform<N, T>::inv() const
+HomographicTransformBase<N, T>::inv() const
 {
 	MatrixCalc<T, 4*(N+1)*(N+1), N+1> mc;
 	Mat inv_mat;
 	mc(N+1, N+1, m_mat).inv().write(inv_mat);
-	return HomographicTransform(inv_mat);
+	return HomographicTransform<N, T>(inv_mat);
 }
 
 template<size_t N, typename T>
-typename HomographicTransform<N, T>::Vec
-HomographicTransform<N, T>::operator()(Vec const& from) const
+typename HomographicTransformBase<N, T>::Vec
+HomographicTransformBase<N, T>::operator()(Vec const& from) const
 {
 	MatrixCalc<T, N+1, 1> mc;
 	VecNT<N+1, T> const hsrc(from, T(1));
@@ -64,6 +90,15 @@ HomographicTransform<N, T>::operator()(Vec const& from) const
 	VecNT<N, T> res(&hdst[0]);
 	res /= hdst[N];
 	return res;
+}
+
+template<typename T>
+T
+HomographicTransform<1, T>::operator()(T from) const
+{
+	// Optimized version for 1D case.
+	T const* m = mat();
+	return (from * m[0] + m[2]) / (from * m[1] + m[3]);
 }
 
 } // namespace imageproc
