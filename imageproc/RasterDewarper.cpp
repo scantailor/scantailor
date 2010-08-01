@@ -547,6 +547,7 @@ RasterDewarper::dewarp(
 				);
 			}
 			break;
+		default:;
 	}
 
 	// Generic case: convert to either RGB32 or ARGB32.

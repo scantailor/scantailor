@@ -51,7 +51,8 @@ template<size_t N, typename T>
 class HomographicTransform : public HomographicTransformBase<N, T>
 {
 public:
-	explicit HomographicTransform(Mat const& mat) : HomographicTransformBase<N, T>(mat) {}
+	explicit HomographicTransform(
+		typename HomographicTransformBase<N, T>::Mat const& mat) : HomographicTransformBase<N, T>(mat) {}
 };
 
 
@@ -60,7 +61,9 @@ template<typename T>
 class HomographicTransform<1, T> : public HomographicTransformBase<1, T>
 {
 public:
-	explicit HomographicTransform(Mat const& mat) : HomographicTransformBase<1, T>(mat) {}
+	explicit HomographicTransform(
+		typename HomographicTransformBase<1, T>::Mat const& mat)
+			: HomographicTransformBase<1, T>(mat) {}
 
 	T operator()(T from) const;
 
@@ -97,7 +100,7 @@ T
 HomographicTransform<1, T>::operator()(T from) const
 {
 	// Optimized version for 1D case.
-	T const* m = mat();
+	T const* m = this->mat();
 	return (from * m[0] + m[2]) / (from * m[1] + m[3]);
 }
 

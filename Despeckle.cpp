@@ -101,6 +101,11 @@ Settings::get(Despeckle::Level const level, Dpi const& dpi)
 	int const min_dpi = std::min(dpi.horizontal(), dpi.vertical());
 	double const dpi_factor = min_dpi / 300.0;
 
+	// To silence compiler's warnings.
+	settings.minRelativeParentWeight = 0;
+	settings.pixelsToSqDist = 0;
+	settings.bigObjectThreshold = 0;
+
 	switch (level) {
 		case Despeckle::CAUTIOUS:
 			settings.minRelativeParentWeight = 0.125 * dpi_factor;
