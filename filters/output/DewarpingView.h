@@ -22,7 +22,7 @@
 #include "ImageViewBase.h"
 #include "ImagePixmapUnion.h"
 #include "InteractionHandler.h"
-#include "InteractiveBSpline.h"
+#include "InteractiveXSpline.h"
 #include "DragHandler.h"
 #include "ZoomHandler.h"
 #include "DistortionModel.h"
@@ -32,8 +32,7 @@
 #include <QTransform>
 #include <QPointF>
 #include <QRectF>
-
-class QPolygonF;
+#include <QPolygonF>
 
 namespace output
 {
@@ -56,9 +55,9 @@ public slots:
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
-	void paintBSpline(
+	void paintXSpline(
 		QPainter& painter, InteractionState const& interaction,
-		InteractiveBSpline const& ispline);
+		InteractiveXSpline const& ispline);
 
 	void curveModified(int curve_idx);
 
@@ -68,12 +67,15 @@ private:
 
 	QPointF widgetToSource(QPointF const& pt) const;
 
+	QPolygonF virtMarginArea(int margin_idx) const;
+
 	PageId m_pageId;
+	QPolygonF m_virtDisplayArea;
 	DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	IntrusivePtr<Settings> m_ptrSettings;
-	InteractiveBSpline m_topSpline;
-	InteractiveBSpline m_bottomSpline;
+	InteractiveXSpline m_topSpline;
+	InteractiveXSpline m_bottomSpline;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
 	

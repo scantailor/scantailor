@@ -16,31 +16,33 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef INTERACTIVE_BSPLINE_H_
-#define INTERACTIVE_BSPLINE_H_
+#ifndef INTERACTIVE_XSPLINE_H_
+#define INTERACTIVE_XSPLINE_H_
 
-#include "imageproc/CubicBSpline.h"
+#include "XSpline.h"
 #include "DraggablePoint.h"
 #include "ObjectDragHandler.h"
 #include "InteractionState.h"
 #include "VecNT.h"
 #include <QPointF>
+#include <QCoreApplication>
 #include <boost/function.hpp>
-#include <list>
+#include <boost/scoped_array.hpp>
 #include <stddef.h>
 
-class InteractiveBSpline : public InteractionHandler
+class InteractiveXSpline : public InteractionHandler
 {
+	Q_DECLARE_TR_FUNCTIONS(InteractiveXSpline)
 public:
 	typedef boost::function<QPointF (QPointF const&)> Transform;
 	typedef boost::function<void()> ModifiedCallback;
 	typedef boost::function<void()> DragFinishedCallback;
 
-	InteractiveBSpline();
+	InteractiveXSpline();
 
-	void setSpline(imageproc::CubicBSpline const& spline);
+	void setSpline(imageproc::XSpline const& spline);
 
-	imageproc::CubicBSpline const& spline() const { return m_spline; }
+	imageproc::XSpline const& spline() const { return m_spline; }
 
 	void setStorageTransform(Transform const& from_storage, Transform const& to_storage);
 
@@ -51,39 +53,43 @@ public:
 	/**
 	 * \brief Returns true if the curve is a proximity leader.
 	 *
-	 * If requested, the point on the curve closest to the cursor
-	 * (in widget coordinates) is returned.
+	 * \param state Interaction state, used to tell whether
+	 *              the curve is the proximity leader.
+	 * \param pt If provided, the point on the curve closest to
+	 *           the cursor will be written there.
+	 * \param t If provided, the splie's T parameter corresponding
+	 *          to the point closest to the cursor will be written there.
+	 * \return true if the curve is the proximity leader.
 	 */
-	bool curveHighlighted(InteractionState const& state, QPointF* pt) const;
+	bool curveIsProximityLeader(
+		InteractionState const& state, QPointF* pt = 0, double* t = 0) const;
 protected:
 	virtual void onProximityUpdate(
 		QPointF const& screen_mouse_pos, InteractionState& interaction);
 
 	virtual void onMouseMoveEvent(
 		QMouseEvent* event, InteractionState& interaction);
+
+	virtual void onMousePressEvent(
+		QMouseEvent* event, InteractionState& interaction);
+
+	virtual void onKeyPressEvent(
+		QKeyEvent* event, InteractionState& interaction);
 private:
 	struct NoOp;
 	struct IdentTransform;
 
-	struct BezierSegment
+	struct ControlPoint
 	{
-		DraggablePoint point[4];
-		ObjectDragHandler handler[4];
+		DraggablePoint point;
+		ObjectDragHandler handler;
 
-		BezierSegment() {}
-
-		// Fake copy construction as construction without copying.
-		// Necessary because ObjectDragHandler is non copyable.
-		BezierSegment(BezierSegment const&) {}
+		ControlPoint() {}
 	};
 
-	typedef std::list<BezierSegment> SegmentList;
+	QPointF controlPointPosition(int idx) const;
 
-	QPointF bezierPointPosition(
-		SegmentList::const_iterator it, size_t bezier_point_idx) const;
-
-	void bezierPointMoveRequest(
-		SegmentList::iterator it, size_t bezier_point_idx, QPointF const& pos);
+	void controlPointMoveRequest(int idx, QPointF const& pos);
 
 	void dragFinished();
 
@@ -93,10 +99,12 @@ private:
 	DragFinishedCallback m_dragFinishedCallback;
 	Transform m_fromStorage;
 	Transform m_toStorage;
-	imageproc::CubicBSpline m_spline;
-	SegmentList m_bezierSegments;
+	imageproc::XSpline m_spline;
+	boost::scoped_array<ControlPoint> m_controlPoints;
 	InteractionState::Captor m_curveProximity;
-	QPointF m_curveProximityPoint;
+	QPointF m_curveProximityPointStorage;
+	QPointF m_curveProximityPointScreen;
+	double m_curveProximityT;
 	bool m_lastProximity;
 };
 

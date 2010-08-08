@@ -47,14 +47,14 @@ Curve::Curve(std::vector<QPointF> const& polyline)
 {
 }
 
-Curve::Curve(imageproc::CubicBSpline const& bspline)
-:	m_bspline(bspline),
-	m_polyline(bspline.toPolyline())
+Curve::Curve(imageproc::XSpline const& xspline)
+:	m_xspline(xspline),
+	m_polyline(xspline.toPolyline())
 {
 }
 
 Curve::Curve(QDomElement const& el)
-:	m_bspline(XmlUnmarshaller::bspline(el.namedItem("bspline").toElement())),
+:	m_xspline(deserializeXSpline(el.namedItem("xspline").toElement())),
 	m_polyline(deserializePolyline(el.namedItem("polyline").toElement()))
 {
 }
@@ -66,10 +66,8 @@ Curve::toXml(QDomDocument& doc, QString const& name) const
 		return QDomElement();
 	}
 
-	XmlMarshaller marshaller(doc);
-
 	QDomElement el(doc.createElement(name));
-	el.appendChild(marshaller.bspline(m_bspline, "bspline"));
+	el.appendChild(serializeXSpline(m_xspline, doc, "xspline"));
 	el.appendChild(serializePolyline(m_polyline, doc, "polyline"));
 	return el;
 }
@@ -148,6 +146,52 @@ Curve::approxPolylineMatch(
 	}
 
 	return true;
+}
+
+QDomElement
+Curve::serializeXSpline(
+	imageproc::XSpline const& xspline, QDomDocument& doc, QString const& name)
+{
+	if (xspline.numControlPoints() == 0) {
+		return QDomElement();
+	}
+
+	QDomElement el(doc.createElement(name));
+	XmlMarshaller marshaller(doc);
+
+	int const num_control_points = xspline.numControlPoints();
+	for (int i = 0; i < num_control_points; ++i) {
+		QPointF const pt(xspline.controlPointPosition(i));
+		el.appendChild(marshaller.pointF(pt, "point"));
+	}
+	
+	return el;
+}
+
+
+imageproc::XSpline
+Curve::deserializeXSpline(QDomElement const& el)
+{
+	imageproc::XSpline xspline;
+
+	QString const point_tag_name("point");
+	QDomNode node(el.firstChild());
+	for (; !node.isNull(); node = node.nextSibling()) {
+		if (!node.isElement()) {
+			continue;
+		}
+		if (node.nodeName() != point_tag_name) {
+			continue;
+		}
+		xspline.appendControlPoint(XmlUnmarshaller::pointF(node.toElement()), 1);
+	}
+
+	if (xspline.numControlPoints() > 0) {
+		xspline.setControlPointWeight(0, 0);
+		xspline.setControlPointWeight(xspline.numControlPoints() - 1, 0);
+	}
+
+	return xspline;
 }
 
 } // namespace output

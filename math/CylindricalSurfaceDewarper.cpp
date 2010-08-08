@@ -20,6 +20,7 @@
 #include "ToLineProjector.h"
 #include "MatrixCalc.h"
 #include "VecNT.h"
+#include "NumericTraits.h"
 #include <QLineF>
 #include <QtGlobal>
 #include <QDebug>
@@ -27,9 +28,6 @@
 #include <algorithm>
 #include <math.h>
 #include <assert.h>
-
-namespace imageproc
-{
 
 class CylindricalSurfaceDewarper::CoupledPolylinesIterator
 {
@@ -216,8 +214,8 @@ CylindricalSurfaceDewarper::fourPoint2DHomography(
 	H[8] = 1.0;
 
 	MatrixCalc<double> mc;
-	mc(8, 8, A).solve(mc(8, 1, B)).write(H);
-	mc(3, 3, H).trans().write(H);
+	mc(A, 8, 8).solve(mc(B, 8, 1)).write(H);
+	mc(H, 3, 3).trans().write(H);
 
 	return HomographicTransform<2, double>(H);
 }
@@ -249,8 +247,8 @@ CylindricalSurfaceDewarper::threePoint1DHomography(std::vector<std::pair<double,
 	H[3] = 1.0;
 
 	MatrixCalc<double> mc;
-	mc(3, 3, A).solve(mc(3, 1, B)).write(H);
-	mc(2, 2, H).trans().write(H);
+	mc(A, 3, 3).solve(mc(B, 3, 1)).write(H);
+	mc(H, 2, 2).trans().write(H);
 
 	return HomographicTransform<1, double>(H);
 }
@@ -264,8 +262,16 @@ CylindricalSurfaceDewarper::initReverseArcLengthMapper(
 	CoupledPolylinesIterator it(img_directrix1, img_directrix2, m_pln2img, m_img2pln);
 	QPointF img_curve1_pt;
 	QPointF img_curve2_pt;
+	double prev_pln_x = NumericTraits<double>::min();
 	double pln_x;
 	while (it.next(img_curve1_pt, img_curve2_pt, pln_x)) {
+		if (pln_x <= prev_pln_x) {
+			// This means our surface has an S-like shape.
+			// We don't support that, and to make ReverseArcLength happy,
+			// we have to skip such points.
+			continue;
+		}
+
 		QLineF const img_generatrix(img_curve1_pt, img_curve2_pt);
 		Vec2d const img_line1_pt(m_pln2img(Vec2d(pln_x, 0)));
 		Vec2d const img_line2_pt(m_pln2img(Vec2d(pln_x, 1)));
@@ -276,11 +282,10 @@ CylindricalSurfaceDewarper::initReverseArcLengthMapper(
 
 		double elevation = m_depthPerception * (1.0 - (y2 - y1));
 		elevation = qBound(-0.5, elevation, 0.5);
-		
-		// FIXME: ensure that pln_x is greater than the previous one.
 
 		m_reverseArcLengthMapper.addSample(pln_x, elevation);
 		prev_elevation = elevation;
+		prev_pln_x = pln_x;
 	}
 
 	// Needs to go before normalizeRange().
@@ -390,5 +395,3 @@ CylindricalSurfaceDewarper::CoupledPolylinesIterator::advance2()
 	m_nextImgPt2 = *m_seq2It;
 	m_nextPlnX2 = m_img2pln(m_nextImgPt2)[0];
 }
-
-} // namespace imageproc

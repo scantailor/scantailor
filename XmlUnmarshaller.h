@@ -32,11 +32,6 @@ class QRect;
 class QRectF;
 class QPolygonF;
 
-namespace imageproc
-{
-	class CubicBSpline;
-}
-
 class XmlUnmarshaller
 {
 public:
@@ -61,8 +56,6 @@ public:
 	static QRectF rectF(QDomElement const& el);
 	
 	static QPolygonF polygonF(QDomElement const& el);
-
-	static imageproc::CubicBSpline bspline(QDomElement const& el);
 };
 
 #endif

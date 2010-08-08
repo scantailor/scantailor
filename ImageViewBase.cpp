@@ -644,6 +644,13 @@ ImageViewBase::resizeEvent(QResizeEvent* event)
 	}
 }
 
+void
+ImageViewBase::enterEvent(QEvent* event)
+{
+	viewport()->setFocus();
+	QAbstractScrollArea::enterEvent(event);
+}
+
 /**
  * Called when any of the transformations change.
  */

@@ -22,9 +22,12 @@
 #include "OutputMargins.h"
 #include "Curve.h"
 #include "VecNT.h"
-#include "imageproc/CubicBSpline.h"
-#include "imageproc/MatrixCalc.h"
-#include "imageproc/CylindricalSurfaceDewarper.h"
+#include "MatrixCalc.h"
+#include "NumericTraits.h"
+#include "ToLineProjector.h"
+#include "XSpline.h"
+#include "CylindricalSurfaceDewarper.h"
+#include "imageproc/Constants.h"
 #include <QCursor>
 #include <QLineF>
 #include <QPolygonF>
@@ -58,53 +61,48 @@ DewarpingView::DewarpingView(
 		OutputMargins()
 	),
 	m_pageId(page_id),
+	m_virtDisplayArea(virt_display_area),
 	m_distortionModel(distortion_model),
 	m_depthPerception(depth_perception),
 	m_ptrSettings(settings),
 	m_dragHandler(*this),
-	m_zoomHandler(*this)
-	
+	m_zoomHandler(*this)	
 {
 	setMouseTracking(true);
 
 	QPolygonF const source_content_rect(virtualToImage().map(virt_content_rect));
 
-	double const step = 1.0 / 3.0;
-	CubicBSpline top_spline(m_distortionModel.topCurve().bspline());
-	CubicBSpline bottom_spline(m_distortionModel.bottomCurve().bspline());
-	if (!top_spline.isValid()) {
-		CubicBSpline().swap(top_spline);
-		top_spline.makeValid();
-
+	XSpline top_spline(m_distortionModel.topCurve().xspline());
+	XSpline bottom_spline(m_distortionModel.bottomCurve().xspline());
+	if (top_spline.numControlPoints() < 2) {
 		QLineF const top_line(source_content_rect[0], source_content_rect[1]);
-		
-		boost::array<QPointF, 4> top_bezier_segment;
-		for (int i = 0; i < 4; ++i) {
-			top_bezier_segment[i] = top_line.pointAt(i * step);
-		}
+		XSpline new_top_spline;
 
-		top_spline.setBezierSegment(0, top_bezier_segment);
+		new_top_spline.appendControlPoint(top_line.p1(), 0);
+		new_top_spline.appendControlPoint(top_line.pointAt(1.0/3.0), 1);
+		new_top_spline.appendControlPoint(top_line.pointAt(2.0/3.0), 1);
+		new_top_spline.appendControlPoint(top_line.p2(), 0);
+
+		top_spline.swap(new_top_spline);
 	}
-	if (!bottom_spline.isValid()) {
-		CubicBSpline().swap(bottom_spline);
-		bottom_spline.makeValid();
-
+	if (bottom_spline.numControlPoints() < 2) {
 		QLineF const bottom_line(source_content_rect[3], source_content_rect[2]);
+		XSpline new_bottom_spline;
 
-		boost::array<QPointF, 4> bottom_bezier_segment;
-		for (int i = 0; i < 4; ++i) {
-			bottom_bezier_segment[i] = bottom_line.pointAt(i * step);
-		}
+		new_bottom_spline.appendControlPoint(bottom_line.p1(), 0);
+		new_bottom_spline.appendControlPoint(bottom_line.pointAt(1.0/3.0), 1);
+		new_bottom_spline.appendControlPoint(bottom_line.pointAt(2.0/3.0), 1);
+		new_bottom_spline.appendControlPoint(bottom_line.p2(), 0);
 
-		bottom_spline.setBezierSegment(0, bottom_bezier_segment);
+		bottom_spline.swap(new_bottom_spline);
 	}
 	
 	m_topSpline.setSpline(top_spline);
 	m_bottomSpline.setSpline(bottom_spline);
 	
-	InteractiveBSpline* splines[2] = { &m_topSpline, &m_bottomSpline };
+	InteractiveXSpline* splines[2] = { &m_topSpline, &m_bottomSpline };
 	int curve_idx = -1;
-	BOOST_FOREACH(InteractiveBSpline* spline, splines) {
+	BOOST_FOREACH(InteractiveXSpline* spline, splines) {
 		++curve_idx;
 		spline->setModifiedCallback(boost::bind(&DewarpingView::curveModified, this, curve_idx));
 		spline->setDragFinishedCallback(boost::bind(&DewarpingView::dragFinished, this));
@@ -138,14 +136,22 @@ DewarpingView::depthPerceptionChanged(double val)
 void
 DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 {
-	painter.setWorldTransform(imageToVirtual() * painter.worldTransform());
 	painter.setRenderHint(QPainter::Antialiasing);
+
+	painter.setPen(Qt::NoPen);
+	painter.setBrush(QColor(0xff, 0xff, 0xff, 150)); // Translucent white.
+	painter.drawPolygon(virtMarginArea(0)); // Left margin.
+	painter.drawPolygon(virtMarginArea(1)); // Right margin.
+
+	painter.setWorldTransform(imageToVirtual() * painter.worldTransform());
 	painter.setBrush(Qt::NoBrush);
 
 	QPen blue_strokes(QColor(0x00, 0x00, 0xff));
 	blue_strokes.setCosmetic(true);
-	blue_strokes.setWidthF(1.5);
+	blue_strokes.setWidthF(1.2);
+
 	painter.setPen(blue_strokes);
+	painter.setBrush(Qt::NoBrush);
 	
 	int const num_vert_grid_lines = 30;
 	int const num_hor_grid_lines = 30;
@@ -168,78 +174,88 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 			curves[i].push_back(gtx.imgLine.pointAt(gtx.pln2img(y)));
 		}
 	}
+	
 	BOOST_FOREACH(QVector<QPointF> const& curve, curves) {
 		painter.drawPolyline(curve);
 	}
 
-	paintBSpline(painter, interaction, m_topSpline);
-	paintBSpline(painter, interaction, m_bottomSpline);
-}
+	paintXSpline(painter, interaction, m_topSpline);
+	paintXSpline(painter, interaction, m_bottomSpline);
+#if 0
+	painter.setWorldTransform(QTransform());
 
-void
-DewarpingView::paintBSpline(
-	QPainter& painter, InteractionState const& interaction,
-	InteractiveBSpline const& ispline)
-{
-	CubicBSpline const& spline = ispline.spline();
-	assert(spline.isValid());
-
-	painter.save();
-	painter.setWorldTransform(imageToVirtual() * virtualToWidget());
-
-	int const num_segments = spline.numSegments();
-	std::vector<QPointF> bezier_points;
-	bezier_points.reserve(num_segments * 4);
-
-	QPainterPath path;
-	
-	// Process the first point.
-	boost::array<QPointF, 4> bezier_segment(spline.toBezierSegment(0));
-	path.moveTo(bezier_segment[0]);
-	bezier_points.push_back(bezier_segment[0]);
-
-	QPen tangent_pen(QColor(0x0e0061));
-	tangent_pen.setWidthF(1.0);
-	tangent_pen.setCosmetic(true);
-	painter.setPen(tangent_pen);
-
-	// Loop over segments.
-	for (int seg = 0;;) {
-		path.cubicTo(bezier_segment[1], bezier_segment[2], bezier_segment[3]);
-		bezier_points.push_back(bezier_segment[1]);
-		bezier_points.push_back(bezier_segment[2]);
-		bezier_points.push_back(bezier_segment[3]);
-
-		painter.drawLine(bezier_segment[0], bezier_segment[1]);
-		painter.drawLine(bezier_segment[2], bezier_segment[3]);
-
-		if (++seg >= num_segments) {
-			break;
-		}
-		bezier_segment = spline.toBezierSegment(seg);
+	std::vector<QPointF> data_points;
+	for (int i = 0; i < 36; ++i) {
+		data_points.push_back(QPointF(200 + 100*cos(i*10*constants::DEG2RAD), 200 + 100*sin(i*10*constants::DEG2RAD)));
 	}
+	painter.drawPolyline(QVector<QPointF>::fromStdVector(data_points));
 
-	QPen curve_pen(Qt::blue);
-	curve_pen.setWidthF(1.5);
-	curve_pen.setCosmetic(true);
-	painter.setPen(curve_pen);
-	painter.drawPath(path);
+	XSpline xspline;
+	xspline.appendControlPoint(data_points.front(), 0);
+	for (int i = 0; i < 5; ++i) {
+		xspline.appendControlPoint(QPointF(0, 0), 1);
+	}
+	xspline.appendControlPoint(data_points.back(), 0);
 
-	// Drawing cosmetic points in transformed coordinates seems unreliable,
-	// so let's draw them in widget coordinates.
-	painter.setWorldMatrixEnabled(false);
+	boost::dynamic_bitset<> fixed_points(xspline.numControlPoints());
+	fixed_points.set(0);
+	fixed_points.set(fixed_points.size() - 1);
+	xspline.fit(data_points, &fixed_points);
+
+	painter.drawPolyline(QVector<QPointF>::fromStdVector(xspline.toPolyline()));
 
 	QPen point_pen(Qt::red);
 	point_pen.setWidthF(4.0);
 	point_pen.setCosmetic(true);
 	painter.setPen(point_pen);
 
-	BOOST_FOREACH(QPointF const& pt, bezier_points) {
-		painter.drawPoint(sourceToWidget(pt));
+	for (int i = 0; i < xspline.numControlPoints(); ++i) {
+		painter.drawPoint(xspline.controlPointPosition(i));
+	}
+#endif
+}
+
+void
+DewarpingView::paintXSpline(
+	QPainter& painter, InteractionState const& interaction,
+	InteractiveXSpline const& ispline)
+{
+	XSpline const& spline = ispline.spline();
+
+	painter.save();
+	painter.setBrush(Qt::NoBrush);
+
+#if 0 // No point in drawing the curve itself - we already draw the grid.
+	painter.setWorldTransform(imageToVirtual() * virtualToWidget());
+	
+	QPen curve_pen(Qt::blue);
+	curve_pen.setWidthF(1.5);
+	curve_pen.setCosmetic(true);
+	painter.setPen(curve_pen);
+	
+	std::vector<QPointF> const polyline(spline.toPolyline());
+	painter.drawPolyline(&polyline[0], polyline.size());
+#endif
+
+	// Drawing cosmetic points in transformed coordinates seems unreliable,
+	// so let's draw them in widget coordinates.
+	painter.setWorldMatrixEnabled(false);
+
+	QPen existing_point_pen(Qt::red);
+	existing_point_pen.setWidthF(4.0);
+	existing_point_pen.setCosmetic(true);
+	painter.setPen(existing_point_pen);
+
+	int const num_control_points = spline.numControlPoints();
+	for (int i = 0; i < num_control_points; ++i) {
+		painter.drawPoint(sourceToWidget(spline.controlPointPosition(i)));
 	}
 
 	QPointF pt;
-	if (ispline.curveHighlighted(interaction, &pt)) {
+	if (ispline.curveIsProximityLeader(interaction, &pt)) {
+		QPen new_point_pen(existing_point_pen);
+		new_point_pen.setColor(QColor(0x00ffff));
+		painter.setPen(new_point_pen);
 		painter.drawPoint(pt);
 	}
 
@@ -261,29 +277,81 @@ void
 DewarpingView::dragFinished()
 {
 	m_ptrSettings->setDistortionModel(m_pageId, m_distortionModel);
-#if 0
-	qDebug() << "top_spline:";
-	for (int i = 0; i < 4; ++i) {
-		qDebug() << m_topSpline.controlPointPosition(i);
-	}
-
-	qDebug() << "bottom_spline:";
-	for (int i = 0; i < 4; ++i) {
-		qDebug() << m_bottomSpline.controlPointPosition(i);
-	}
-#endif
 }
 
+/** Source image coordinates to widget coordinates. */
 QPointF
 DewarpingView::sourceToWidget(QPointF const& pt) const
 {
 	return virtualToWidget().map(imageToVirtual().map(pt));
 }
 
+/** Widget coordinates to source image coordinates. */
 QPointF
 DewarpingView::widgetToSource(QPointF const& pt) const
 {
 	return virtualToImage().map(widgetToVirtual().map(pt));
+}
+
+QPolygonF
+DewarpingView::virtMarginArea(int margin_idx) const
+{
+	XSpline const& top_spline = m_topSpline.spline();
+	XSpline const& bottom_spline = m_bottomSpline.spline();
+	
+	QLineF vert_boundary; // From top to bottom, that's important!
+
+	if (margin_idx == 0) { // Left margin.
+		vert_boundary.setP1(top_spline.eval(0));
+		vert_boundary.setP2(bottom_spline.eval(0));
+	} else { // Right margin.
+		vert_boundary.setP1(top_spline.eval(1));
+		vert_boundary.setP2(bottom_spline.eval(1));
+	}
+
+	vert_boundary = imageToVirtual().map(vert_boundary);
+	
+	QLineF normal;
+	if (margin_idx == 0) { // Left margin.
+		normal = QLineF(vert_boundary.p2(), vert_boundary.p1()).normalVector();
+	} else { // Right margin.
+		normal = vert_boundary.normalVector();
+	}
+	
+	// Project every vertex in the m_virtDisplayArea polygon
+	// to vert_line and to its normal, keeping track min and max values. 
+	double min = NumericTraits<double>::max();
+	double max = NumericTraits<double>::min();
+	double normal_max = max;
+	ToLineProjector const vert_line_projector(vert_boundary);
+	ToLineProjector const normal_projector(normal);
+	BOOST_FOREACH(QPointF const& pt, m_virtDisplayArea) {
+		double const p1 = vert_line_projector.projectionScalar(pt);
+		if (p1 < min) {
+			min = p1;
+		}
+		if (p1 > max) {
+			max = p1;
+		}
+
+		double const p2 = normal_projector.projectionScalar(pt);
+		if (p2 > normal_max) {
+			normal_max = p2;
+		}
+	}
+
+	// Workaround clipping bugs in QPolygon::intersected().
+	min -= 1.0;
+	max += 1.0;
+	normal_max += 1.0;
+
+	QPolygonF poly;
+	poly << vert_boundary.pointAt(min);
+	poly << vert_boundary.pointAt(max);
+	poly << vert_boundary.pointAt(max) + normal.pointAt(normal_max) - normal.p1();
+	poly << vert_boundary.pointAt(min) + normal.pointAt(normal_max) - normal.p1();
+
+	return m_virtDisplayArea.intersected(poly);
 }
 
 } // namespace output

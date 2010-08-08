@@ -16,49 +16,46 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_POLYLINE_INTERSECTOR_H_
-#define IMAGEPROC_POLYLINE_INTERSECTOR_H_
+#ifndef TO_LINE_PROJECTOR_H_
+#define TO_LINE_PROJECTOR_H_
 
 #include "VecNT.h"
 #include <QPointF>
 #include <QLineF>
-#include <vector>
 
-namespace imageproc
-{
-
-class PolylineIntersector
+/**
+ * \brief Projects points onto a line (not a line segment).
+ *
+ * Projecting means finding the point on a line that is closest
+ * to the given point.
+ */
+class ToLineProjector
 {
 public:
-	class Hint
-	{
-		friend class PolylineIntersector;
-	public:
-		Hint();
-	private:
-		void update(int new_segment);
+	/**
+	 * \brief Initializes line projector.
+	 *
+	 * If line endpoints match, all points will
+	 * be projected to that point.
+	 */
+	ToLineProjector(QLineF const& line);
 
-		int m_lastSegment;
-		int m_direction;
-	};
-	
-	PolylineIntersector(std::vector<QPointF> const& polyline);
+	/**
+	 * \brief Finds the projection point.
+	 */
+	QPointF projectionPoint(QPointF const& pt) const;
 
-	QPointF intersect(QLineF const& line, Hint& hint) const;
+	/**
+	 * Solves the equation of:\n
+	 * line.p1() + x * line.p2() = p\n
+	 * for x, where p would be the projection point.
+	 * This function is faster than projectionPoint().
+	 */
+	double projectionScalar(QPointF const& pt) const;
 private:
-	bool intersectsSegment(QLineF const& normal, int segment) const;
-
-	bool intersectsSpan(QLineF const& normal, QLineF const& span) const;
-
-	QPointF intersectWithSegment(QLineF const& line, int segment) const;
-
-	bool tryIntersectingOutsideOfPolyline(
-		QLineF const& line, QPointF& intersection, Hint& hint) const;
-
-	std::vector<QPointF> m_polyline;
-	int m_numSegments;
+	QPointF m_origin;
+	QPointF m_vec;
+	Vec2d m_mat;
 };
-
-} // namespace imageproc
 
 #endif

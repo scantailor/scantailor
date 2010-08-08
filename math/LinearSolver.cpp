@@ -16,28 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_RASTER_DEWARPER_H_
-#define IMAGEPROC_RASTER_DEWARPER_H_
+#include "LinearSolver.h"
 
-class CylindricalSurfaceDewarper;
-class QImage;
-class QSize;
-class QRect;
-class QColor;
-
-namespace imageproc
+LinearSolver::LinearSolver(size_t rows_AB, size_t cols_A_rows_X, size_t cols_BX)
+:	m_rowsAB(rows_AB),
+	m_colsArowsX(cols_A_rows_X),
+	m_colsBX(cols_BX)
 {
-
-class RasterDewarper
-{
-public:
-	static QImage dewarp(
-		QImage const& src, QSize const& dst_size,
-		CylindricalSurfaceDewarper const& distortion_model,
-		QRect const& model_domain, QColor const& background_color
-	);
-};
-
-} // namespace imageproc
-
-#endif
+	if (m_rowsAB < m_colsArowsX) {
+		throw std::runtime_error("LinearSolver: can's solve underdetermined systems");
+	}
+}

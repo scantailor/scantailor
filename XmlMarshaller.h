@@ -34,11 +34,6 @@ class QPolygonF;
 class QRect;
 class QRectF;
 
-namespace imageproc
-{
-	class CubicBSpline;
-}
-
 class XmlMarshaller
 {
 public:
@@ -65,8 +60,6 @@ public:
 	QDomElement polygonF(QPolygonF const& poly, QString const& name);
 	
 	QDomElement margins(Margins const& margins, QString const& name);
-
-	QDomElement bspline(imageproc::CubicBSpline const& bspline, QString const& name);
 private:
 	QDomDocument m_doc;
 };

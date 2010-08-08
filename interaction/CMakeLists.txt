@@ -13,7 +13,7 @@ SET(
 	DragHandler.cpp DragHandler.h
 	DragWatcher.cpp DragWatcher.h
 	ZoomHandler.cpp ZoomHandler.h
-	InteractiveBSpline.cpp InteractiveBSpline.h
+	InteractiveXSpline.cpp InteractiveXSpline.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

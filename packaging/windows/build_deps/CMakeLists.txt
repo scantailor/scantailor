@@ -32,44 +32,55 @@ INCLUDE(../../../cmake/ToNativePath.cmake)
 ST_SET_DEFAULT_BUILD_TYPE(Release)
 ST_SET_DEFAULT_GCC_FLAGS()
 
-GET_FILENAME_COMPONENT(outer_dir "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
+GET_FILENAME_COMPONENT(source_outer_dir "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
+GET_FILENAME_COMPONENT(build_outer_dir "${PROJECT_BINARY_DIR}/.." ABSOLUTE)
 
-FILE(GLOB jpeg_dirs "${outer_dir}/jpeg-[0-9]*")
-FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
-FILE(GLOB qt_dirs2 "C:/Qt/4.*.*")
-FILE(GLOB qt_dirs3 "C:/Qt/20*/qt")
-FILE(GLOB boost_dirs "${outer_dir}/boost_1_[0-9]*_[0-9]*")
-FILE(GLOB boost_jam_dirs "${outer_dir}/boost-jam-*")
+FILE(GLOB jpeg_dirs1 "${build_outer_dir}/jpeg-[0-9]*")
+FILE(GLOB jpeg_dirs2 "${source_outer_dir}/jpeg-[0-9]*")
+FILE(GLOB zlib_dirs1 "${build_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB zlib_dirs2 "${source_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB png_dirs1 "${build_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB png_dirs2 "${source_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB tiff_dirs1 "${build_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB tiff_dirs2 "${source_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-4.[0-9]*")
+FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-4.[0-9]*")
+FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-4.[0-9]*")
+FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-4.[0-9]*")
+FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
+FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
+FILE(GLOB boost_dirs1 "${build_outer_dir}/boost_1_[0-9]*_[0-9]*")
+FILE(GLOB boost_dirs2 "${source_outer_dir}/boost_1_[0-9]*_[0-9]*")
+FILE(GLOB boost_jam_dirs1 "${build_outer_dir}/boost-jam-*")
+FILE(GLOB boost_jam_dirs2 "${source_outer_dir}/boost-jam-*")
 
 FIND_PATH(
-	JPEG_DIR jpeglib.h HINTS ${jpeg_dirs}
+	JPEG_DIR jpeglib.h HINTS ${jpeg_dirs1} ${jpeg_dirs2}
 	DOC "Path to jpeg source directory."
 )
 FIND_PATH(
-	ZLIB_DIR zlib.h HINTS ${zlib_dirs}
+	ZLIB_DIR zlib.h HINTS ${zlib_dirs1} ${zlib_dirs2}
 	DOC "Path to zlib source directory."
 )
 FIND_PATH(
-	PNG_DIR png.h HINTS ${png_dirs}
+	PNG_DIR png.h HINTS ${png_dirs1} ${png_dirs2}
 	DOC "Path to libpng source directory."
 )
 FIND_PATH(
-	TIFF_DIR libtiff/tiff.h HINTS ${tiff_dirs}
+	TIFF_DIR libtiff/tiff.h HINTS ${tiff_dirs1} ${tiff_dirs2}
 	DOC "Path to top-level tiff source directory."
 )
 FIND_PATH(
-	QT_DIR projects.pro HINTS ${qt_dirs} ${qt_dirs2} ${qt_dirs3}
+	QT_DIR projects.pro HINTS ${qt_dirs1} ${qt_dirs2}
+	${qt_dirs3} ${qt_dirs4} ${qt_dirs5} ${qt_dirs6}
 	DOC "Path to top-level Qt source directory."
 )
 FIND_PATH(
-	BOOST_DIR boost/foreach.hpp HINTS ${boost_dirs}
+	BOOST_DIR boost/foreach.hpp HINTS ${boost_dirs1} ${boost_dirs2}
 	DOC "Path to top-level Boost source directory."
 )
 FIND_PROGRAM(
-	BJAM_EXECUTABLE bjam HINTS ${boost_jam_dirs}
+	BJAM_EXECUTABLE bjam HINTS ${boost_jam_dirs1} ${boost_jam_dirs2}
 	DOC "Path to a directory containing bjam executable."
 )
 
@@ -366,5 +377,7 @@ ADD_DEPENDENCIES(Qt zlib jpeg png tiff boost)
 
 # If you have multiple versions of Qt installed, this script
 # can easily pick the wrong one.
-MESSAGE("QT_DIR is ${QT_DIR}")
-MESSAGE("Make sure that's correct!")
+MESSAGE(STATUS "----------------------------")
+MESSAGE(STATUS "QT_DIR is ${QT_DIR}")
+MESSAGE(STATUS "Check it's the one you want.")
+MESSAGE(STATUS "----------------------------")

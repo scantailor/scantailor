@@ -21,7 +21,6 @@
 #include "Margins.h"
 #include "Dpi.h"
 #include "Utils.h"
-#include "imageproc/CubicBSpline.h"
 #include <boost/foreach.hpp>
 #include <QPointF>
 #include <QLineF>
@@ -150,21 +149,5 @@ XmlMarshaller::margins(Margins const& margins, QString const& name)
 	el.setAttribute("right", Utils::doubleToString(margins.right()));
 	el.setAttribute("top", Utils::doubleToString(margins.top()));
 	el.setAttribute("bottom", Utils::doubleToString(margins.bottom()));
-	return el;
-}
-
-QDomElement
-XmlMarshaller::bspline(imageproc::CubicBSpline const& bspline, QString const& name)
-{
-	if (bspline.controlPoints().empty()) {
-		return QDomElement();
-	}
-
-	QDomElement el(m_doc.createElement(name));
-	
-	BOOST_FOREACH(QPointF const& pt, bspline.controlPoints()) {
-		el.appendChild(pointF(pt, "point"));
-	}
-	
 	return el;
 }

@@ -70,15 +70,20 @@ IF(CMAKE_COMPILER_IS_GNUCC)
 	ST_SET_DEFAULT_GCC_FLAGS()
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
-GET_FILENAME_COMPONENT(outer_dir "${PROJECT_SOURCE_DIR}/.." ABSOLUTE)
+GET_FILENAME_COMPONENT(source_outer_dir "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
+GET_FILENAME_COMPONENT(build_outer_dir "${PROJECT_BINARY_DIR}/.." ABSOLUTE)
 
 IF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
-	FILE(GLOB qt_dirs "${outer_dir}/qt-win-*-4.[0-9]*")
-	FILE(GLOB qt_dirs2 "C:/Qt/4.*.*")
-	FILE(GLOB qt_dirs3 "C:/Qt/20*/qt")
+	FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-4.[0-9]*")
+	FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-4.[0-9]*")
+	FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-4.[0-9]*")
+	FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-4.[0-9]*")
+	FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
+	FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
 	FIND_PROGRAM(
 		QT_QMAKE_EXECUTABLE qmake
-		PATHS dummy_dir ${qt_dirs} ${qt_dirs2} ${qt_dirs3}
+		PATHS dummy_dir ${qt_dirs1} ${qt_dirs2} ${qt_dirs3}
+		${qt_dirs4} ${qt_dirs5} ${qt_dirs6}
 		PATH_SUFFIXES bin
 	)
 ENDIF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
@@ -102,15 +107,20 @@ ENDIF()
 OPTION(ENABLE_OPENGL "OpenGL may be used for UI acceleration" ${use_opengl})
 
 
-FILE(GLOB jpeg_dirs "${outer_dir}/jpeg-[0-9]*")
-FILE(GLOB zlib_dirs "${outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB png_dirs "${outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB tiff_dirs "${outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB boost_dirs "${outer_dir}/boost_1_[0-9]*_[0-9]*")
+FILE(GLOB jpeg_dirs1 "${build_outer_dir}/jpeg-[0-9]*")
+FILE(GLOB jpeg_dirs2 "${source_outer_dir}/jpeg-[0-9]*")
+FILE(GLOB zlib_dirs1 "${build_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB zlib_dirs2 "${source_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB png_dirs1 "${build_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB png_dirs2 "${source_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB tiff_dirs1 "${build_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB tiff_dirs2 "${source_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB boost_dirs1 "${build_outer_dir}/boost_1_[0-9]*_[0-9]*")
+FILE(GLOB boost_dirs2 "${source_outer_dir}/boost_1_[0-9]*_[0-9]*")
 
 FIND_PATH(
 	JPEG_INCLUDE_DIR jpeglib.h
-	PATHS /usr/local/include /usr/include ${jpeg_dirs}
+	PATHS /usr/local/include /usr/include ${jpeg_dirs1} ${jpeg_dirs2}
 	DOC "Path to libjpeg headers."
 )
 IF(NOT JPEG_INCLUDE_DIR)
@@ -123,14 +133,14 @@ ENDIF(NOT JPEG_INCLUDE_DIR)
 
 FIND_LIBRARY(
 	JPEG_LIBRARY NAMES jpeg libjpeg.lib
-	PATHS /usr/local/lib /usr/lib ${jpeg_dirs}
+	PATHS /usr/local/lib /usr/lib ${jpeg_dirs1} ${jpeg_dirs2}
 	DOC "Path to jpeg library."
 )
 INCLUDE_DIRECTORIES("${JPEG_INCLUDE_DIR}")
 
 FIND_PATH(
 	ZLIB_INCLUDE_DIR zlib.h
-	PATHS /usr/local/include /usr/include ${zlib_dirs}
+	PATHS /usr/local/include /usr/include ${zlib_dirs1} ${zlib_dirs2}
 	DOC "Path to zlib headers."
 )
 IF(NOT ZLIB_INCLUDE_DIR)
@@ -143,14 +153,14 @@ ENDIF(NOT ZLIB_INCLUDE_DIR)
 
 FIND_LIBRARY(
 	ZLIB_LIBRARY NAMES z libz.lib
-	PATHS /usr/local/lib /usr/lib ${zlib_dirs}
+	PATHS /usr/local/lib /usr/lib ${zlib_dirs1} ${zlib_dirs2}
 	DOC "Path to zlib library."
 )
 INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
 
 FIND_PATH(
 	PNG_INCLUDE_DIR png.h
-	PATHS /usr/local/include /usr/include ${png_dirs}
+	PATHS /usr/local/include /usr/include ${png_dirs1} ${png_dirs2}
 	DOC "Path to libpng headers."
 )
 IF(NOT PNG_INCLUDE_DIR)
@@ -163,14 +173,14 @@ ENDIF(NOT PNG_INCLUDE_DIR)
 
 FIND_LIBRARY(
 	PNG_LIBRARY NAMES png libpng.lib
-	PATHS /usr/local/lib /usr/lib ${png_dirs}
+	PATHS /usr/local/lib /usr/lib ${png_dirs1} ${png_dirs2}
 	DOC "PAth to png library."
 )
 INCLUDE_DIRECTORIES("${PNG_INCLUDE_DIR}")
 
 FIND_PATH(
 	TIFF_INCLUDE_DIR tiff.h
-	PATHS /usr/local/include /usr/include ${tiff_dirs}
+	PATHS /usr/local/include /usr/include ${tiff_dirs1} ${tiff_dirs2}
 	PATH_SUFFIXES libtiff
 	DOC "Path to libtiff headers."
 )
@@ -184,7 +194,7 @@ ENDIF(NOT TIFF_INCLUDE_DIR)
 
 FIND_LIBRARY(
 	TIFF_LIBRARY tiff libtiff.lib
-	PATHS /usr/local/lib /usr/lib ${tiff_dirs}
+	PATHS /usr/local/lib /usr/lib ${tiff_dirs1} ${tiff_dirs2}
 	PATH_SUFFIXES libtiff
 	DOC "Path to tiff library."
 )
@@ -192,7 +202,7 @@ INCLUDE_DIRECTORIES("${TIFF_INCLUDE_DIR}")
 
 IF(WIN32)
 	FIND_PATH(
-		BOOST_ROOT boost-build.jam PATHS ${boost_dirs}
+		BOOST_ROOT boost-build.jam PATHS ${boost_dirs1} ${boost_dirs2}
 		DOC "Path to top-level Boost source directory."
 	)
 	SET(Boost_USE_STATIC_LIBS ON)
@@ -266,7 +276,7 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(. foundation interaction zones ${QT_INCLUDES})
+INCLUDE_DIRECTORIES(. foundation math interaction zones ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
 SET(EXTRA_LIBS)
@@ -314,6 +324,7 @@ CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
 # crash_reporter is included unconditionally to collect translation sources from there.
 ADD_SUBDIRECTORY(crash_reporter)
 ADD_SUBDIRECTORY(foundation)
+ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(imageproc)
 ADD_SUBDIRECTORY(interaction)
 ADD_SUBDIRECTORY(zones)
@@ -474,7 +485,7 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output
-	zones interaction imageproc foundation
+	zones interaction imageproc math foundation
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)

@@ -16,15 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_HOMOGRAPHIC_TRANSFORM_H_
-#define IMAGEPROC_HOMOGRAPHIC_TRANSFORM_H_
+#ifndef HOMOGRAPHIC_TRANSFORM_H_
+#define HOMOGRAPHIC_TRANSFORM_H_
 
 #include "VecNT.h"
 #include "MatrixCalc.h"
 #include <stddef.h>
-
-namespace imageproc
-{
 
 template<size_t N, typename T> class HomographicTransform;
 
@@ -76,9 +73,9 @@ template<size_t N, typename T>
 HomographicTransform<N, T>
 HomographicTransformBase<N, T>::inv() const
 {
-	MatrixCalc<T, 4*(N+1)*(N+1), N+1> mc;
+	StaticMatrixCalc<T, 4*(N+1)*(N+1), N+1> mc;
 	Mat inv_mat;
-	mc(N+1, N+1, m_mat).inv().write(inv_mat);
+	mc(m_mat, N+1, N+1).inv().write(inv_mat);
 	return HomographicTransform<N, T>(inv_mat);
 }
 
@@ -86,10 +83,10 @@ template<size_t N, typename T>
 typename HomographicTransformBase<N, T>::Vec
 HomographicTransformBase<N, T>::operator()(Vec const& from) const
 {
-	MatrixCalc<T, N+1, 1> mc;
+	StaticMatrixCalc<T, N+1, 1> mc;
 	VecNT<N+1, T> const hsrc(from, T(1));
 	VecNT<N+1, T> hdst;
-	(mc(N+1, N+1, m_mat)*mc(N+1, 1, hsrc)).write(hdst);
+	(mc(m_mat, N+1, N+1)*mc(hsrc, N+1, 1)).write(hdst);
 	VecNT<N, T> res(&hdst[0]);
 	res /= hdst[N];
 	return res;
@@ -103,7 +100,5 @@ HomographicTransform<1, T>::operator()(T from) const
 	T const* m = this->mat();
 	return (from * m[0] + m[2]) / (from * m[1] + m[3]);
 }
-
-} // namespace imageproc
 
 #endif

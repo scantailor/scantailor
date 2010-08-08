@@ -16,13 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_REVERSE_ARC_LENGTH_MAPPER_H_
-#define IMAGEPROC_REVERSE_ARC_LENGTH_MAPPER_H_
+#ifndef REVERSE_ARC_LENGTH_MAPPER_H_
+#define REVERSE_ARC_LENGTH_MAPPER_H_
 
 #include <vector>
-
-namespace imageproc
-{
 
 /**
  * \brief Maps from arc length to function argument.
@@ -75,8 +72,6 @@ public:
 	 */
 	void normalizeRange(double total_arc_len);
 
-	
-
 	/**
 	 * \brief Maps from arc length to the corresponding function argument.
 	 *
@@ -102,7 +97,5 @@ private:
 	std::vector<Sample> m_samples;
 	double m_prevFX;
 };
-
-} // namespace imageproc
 
 #endif

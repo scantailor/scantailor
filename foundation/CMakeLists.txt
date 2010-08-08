@@ -17,6 +17,8 @@ SET(
 	PerformanceTimer.cpp PerformanceTimer.h
 	QtSignalForwarder.cpp QtSignalForwarder.h
 	StaticPool.h
+	DynamicPool.h
+	NumericTraits.h
 	VecNT.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})

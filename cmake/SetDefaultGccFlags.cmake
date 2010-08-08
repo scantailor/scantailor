@@ -16,12 +16,16 @@ MACRO(ST_SET_DEFAULT_GCC_FLAGS)
 			SET(gc_sections_ldflags_ "-Wl,--gc-sections")
 		ENDIF(gc_sections_supported_)		
 		
-		CHECK_CXX_ACCEPTS_FLAG("-fvisibility=hidden" visibility_supported_)
-		IF(visibility_supported_)
-			SET(visibility_cflags_ "-fvisibility=hidden")
-		ELSE(visibility_supported_)
-			SET(visibility_cflags_ "")
-		ENDIF(visibility_supported_)
+		# GCC on Windows doesn't support -fvisibility, but doesn't reject it either,
+		# printing warnings instead.
+		IF(NOT WIN32)
+			CHECK_CXX_ACCEPTS_FLAG("-fvisibility=hidden" visibility_supported_)
+			IF(visibility_supported_)
+				SET(visibility_cflags_ "-fvisibility=hidden")
+			ELSE(visibility_supported_)
+				SET(visibility_cflags_ "")
+			ENDIF(visibility_supported_)
+		ENDIF()
 		
 		IF(NOT COMPILER_FLAGS_OVERRIDDEN)
 			# Flags common for all build configurations.

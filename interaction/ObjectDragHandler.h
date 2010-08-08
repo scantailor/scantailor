@@ -24,6 +24,7 @@
 #include "InteractionState.h"
 #include "DraggableObject.h"
 #include <QPointF>
+#include <QPointF>
 
 class QPainter;
 class QCursor;
@@ -48,6 +49,8 @@ public:
 	bool interactionInProgress(InteractionState const& interaction) const;
 
 	bool proximityLeader(InteractionState const& interaction) const;
+
+	void forceEnterDragState(InteractionState& interaction, QPoint widget_mouse_pos);
 protected:
 	virtual void onPaint(
 		QPainter& painter, InteractionState const& interaction);

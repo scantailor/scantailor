@@ -17,6 +17,7 @@
 */
 
 #include "PageLayout.h"
+#include "NumericTraits.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
 #include "imageproc/PolygonUtils.h"
@@ -28,7 +29,6 @@
 #include <QDomDocument>
 #include <boost/foreach.hpp>
 #include <algorithm>
-#include <limits>
 #include <math.h>
 #include <assert.h>
 
@@ -206,8 +206,8 @@ PageLayout::inscribedCutterLine(int idx) const
 	QPointF const origin(raw_line.p1());
 	QPointF const line_vec(raw_line.p2() - origin);
 	
-	double min_proj = std::numeric_limits<double>::max();
-	double max_proj = std::numeric_limits<double>::min();
+	double min_proj = NumericTraits<double>::max();
+	double max_proj = NumericTraits<double>::min();
 	QPointF min_pt;
 	QPointF max_pt;
 
@@ -421,8 +421,8 @@ PageLayout::extendToCover(QLineF const& line, QPolygonF const& poly)
 	QPointF const origin(unit_line.p1());
 	QPointF const unit_vec(unit_line.p2() - origin);
 	
-	double min = std::numeric_limits<double>::max();
-	double max = std::numeric_limits<double>::min();
+	double min = NumericTraits<double>::max();
+	double max = NumericTraits<double>::min();
 
 	BOOST_FOREACH(QPointF pt, poly) {
 		pt -= origin;

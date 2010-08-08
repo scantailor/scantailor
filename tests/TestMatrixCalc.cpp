@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(test1)
 	double x[3];
 
 	MatrixCalc<double> mc;
-	mc(3, 3, A).trans().solve(mc(3, 1, B)).write(x);
+	mc(A, 3, 3).trans().solve(mc(B, 3, 1)).write(x);
 
 	for (int i = 0; i < 3; ++i) {
 		BOOST_REQUIRE_CLOSE(x[i], control[i], 1e-6);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(test2)
 	double x[3];
 
 	MatrixCalc<double> mc;
-	mc(3, 5, A).trans().solve(mc(5, 1, B)).write(x);
+	mc(A, 3, 5).trans().solve(mc(B, 5, 1)).write(x);
 
 	for (int i = 0; i < 3; ++i) {
 		BOOST_REQUIRE_CLOSE(x[i], control[i], 1e-6);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(test2)
 
 	// Now make the system inconsistent.
 	B[4] += 1.0;
-	BOOST_CHECK_THROW(mc(3, 5, A).trans().solve(mc(5, 1, B)), std::runtime_error);
+	BOOST_CHECK_THROW(mc(A, 3, 5).trans().solve(mc(B, 5, 1)), std::runtime_error);
 
 }
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE(test3)
 	double inv[9];
 
 	MatrixCalc<double> mc;
-	mc(3, 3, A).trans().inv().transWrite(inv);
+	mc(A, 3, 3).trans().inv().transWrite(inv);
 
 	for (int i = 0; i < 9; ++i) {
 		BOOST_REQUIRE_CLOSE(inv[i], control[i], 1e-6);
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(test4)
 	double mul[8];
 
 	MatrixCalc<double> mc;
-	(mc(3, 4, A).trans()*(mc(2, 3, B).trans())).transWrite(mul);
+	(mc(A, 3, 4).trans()*(mc(B, 2, 3).trans())).transWrite(mul);
 
 	for (int i = 0; i < 8; ++i) {
 		BOOST_REQUIRE_CLOSE(mul[i], control[i], 1e-6);

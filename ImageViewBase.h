@@ -248,6 +248,8 @@ protected:
 	virtual void contextMenuEvent(QContextMenuEvent* event);
 
 	virtual void resizeEvent(QResizeEvent* event);
+
+	virtual void enterEvent(QEvent* event);
 	
 	/**
 	 * Returns the maximum viewport size (as if scrollbars are hidden)

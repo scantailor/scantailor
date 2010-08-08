@@ -135,6 +135,11 @@ public:
 
 	VecNT& operator/=(T scalar);
 
+	/**
+	 * \brief Sums elements in the vector.
+	 */
+	T sum() const;
+
 	T dot(VecNT const& other) const;
 
 	T squaredNorm() const { return dot(*this); }
@@ -335,6 +340,17 @@ VecNT<N, T>&
 VecNT<N, T>::operator/=(T scalar)
 {
 	return (*this *= (T(1) / scalar));
+}
+
+template<size_t N, typename T>
+T
+VecNT<N, T>::sum() const
+{
+	T sum = T();
+	for (size_t i = 0; i < N; ++i) {
+		sum += m_data[i];
+	}
+	return sum;
 }
 
 template<size_t N, typename T>

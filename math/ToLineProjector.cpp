@@ -17,18 +17,28 @@
 */
 
 #include "ToLineProjector.h"
-
-namespace imageproc
-{
+#include <stdexcept>
+#include <string>
+#include <limits>
+#include <cmath>
 
 ToLineProjector::ToLineProjector(QLineF const& line)
 :	m_origin(line.p1()),
 	m_vec(line.p2() - line.p1()),
 	m_mat(m_vec)
 {
+	using namespace std;
+
 	// At*A*x = At*b
-	// x = (At*A)-1 * At
-	m_mat /= m_mat.dot(m_mat);
+	double const AtA = m_mat.dot(m_mat);
+
+	if (abs(AtA) > numeric_limits<double>::epsilon()) {
+		// x = (At*A)-1 * At
+		m_mat /= AtA;
+	} else {
+		m_mat[0] = 0;
+		m_mat[1] = 0;
+	}
 }
 
 double
@@ -44,4 +54,3 @@ ToLineProjector::projectionPoint(QPointF const& pt) const
 	return m_origin + m_vec * projectionScalar(pt);
 }
 
-} // namespace imageproc

@@ -17,6 +17,7 @@
 */
 
 #include "DistortionModel.h"
+#include "NumericTraits.h"
 #include <QRectF>
 #include <QPointF>
 #include <QTransform>
@@ -24,7 +25,6 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <boost/foreach.hpp>
-#include <limits>
 
 namespace output
 {
@@ -81,9 +81,9 @@ DistortionModel::matches(DistortionModel const& other) const
 QRectF
 DistortionModel::boundingBox(QTransform const& transform) const
 {
-	double top = std::numeric_limits<double>::max();
+	double top = NumericTraits<double>::max();
 	double left = top;
-	double bottom = std::numeric_limits<double>::min();
+	double bottom = NumericTraits<double>::min();
 	double right = bottom;
 
 	BOOST_FOREACH(QPointF pt, m_topCurve.polyline()) {

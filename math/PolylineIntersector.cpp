@@ -20,9 +20,6 @@
 #include "ToLineProjector.h"
 #include <math.h>
 
-namespace imageproc
-{
-
 PolylineIntersector::Hint::Hint()
 :	m_lastSegment(0),
 	m_direction(1)
@@ -160,5 +157,3 @@ PolylineIntersector::tryIntersectingOutsideOfPolyline(
 
 	return true;
 }
-
-} // namespace imageproc

@@ -20,7 +20,7 @@
 #define OUTPUT_CURVE_H_
 
 #include <QPointF>
-#include "imageproc/CubicBSpline.h"
+#include "XSpline.h"
 #include <vector>
 
 class QDomDocument;
@@ -37,7 +37,7 @@ public:
 
 	Curve(std::vector<QPointF> const& polyline);
 
-	Curve(imageproc::CubicBSpline const& bspline);
+	Curve(imageproc::XSpline const& xspline);
 
 	Curve(QDomElement const& el);
 
@@ -47,7 +47,7 @@ public:
 
 	bool matches(Curve const& other) const;
 
-	imageproc::CubicBSpline const& bspline() const { return m_bspline; }
+	imageproc::XSpline const& xspline() const { return m_xspline; }
 
 	std::vector<QPointF> const& polyline() const { return m_polyline; }
 private:
@@ -58,11 +58,16 @@ private:
 	static QDomElement serializePolyline(
 		std::vector<QPointF> const& polyline, QDomDocument& doc, QString const& name);
 
+	static imageproc::XSpline deserializeXSpline(QDomElement const& el);
+
+	static QDomElement serializeXSpline(
+		imageproc::XSpline const& xspline, QDomDocument& doc, QString const& name);
+
 	static bool approxPolylineMatch(
 		std::vector<QPointF> const& polyline1,
 		std::vector<QPointF> const& polyline2);
 
-	imageproc::CubicBSpline m_bspline;
+	imageproc::XSpline m_xspline;
 	std::vector<QPointF> m_polyline;
 };
 

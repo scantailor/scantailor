@@ -33,6 +33,7 @@
 #include "ZoneSet.h"
 #include "PictureLayerProperty.h"
 #include "FillColorProperty.h"
+#include "CylindricalSurfaceDewarper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
@@ -53,7 +54,6 @@
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
 #include "imageproc/PolygonRasterizer.h"
-#include "imageproc/CylindricalSurfaceDewarper.h"
 #include "imageproc/RasterDewarper.h"
 #include "config.h"
 #include <boost/foreach.hpp>

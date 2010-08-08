@@ -66,6 +66,14 @@ ObjectDragHandler::proximityLeader(InteractionState const& interaction) const
 }
 
 void
+ObjectDragHandler::forceEnterDragState(
+	InteractionState& interaction, QPoint widget_mouse_pos)
+{
+	interaction.capture(m_interaction);
+	m_pObj->dragInitiated(QPointF(0.5, 0.5) + widget_mouse_pos);
+}
+
+void
 ObjectDragHandler::onPaint(
 	QPainter& painter, InteractionState const& interaction)
 {
@@ -91,9 +99,8 @@ ObjectDragHandler::onMousePressEvent(
 	}
 
 	if (interaction.proximityLeader(m_interaction)) {
-		QPointF const screen_mouse_pos(QPointF(0.5, 0.5) + event->pos());
 		interaction.capture(m_interaction);
-		m_pObj->dragInitiated(event->pos());
+		m_pObj->dragInitiated(QPointF(0.5, 0.5) + event->pos());
 	}
 }
 
@@ -102,9 +109,8 @@ ObjectDragHandler::onMouseReleaseEvent(
 	QMouseEvent* event, InteractionState& interaction)
 {
 	if (event->button() == Qt::LeftButton && interaction.capturedBy(m_interaction)) {
-		QPointF const screen_mouse_pos(QPointF(0.5, 0.5) + event->pos());
 		m_interaction.release();
-		m_pObj->dragFinished(screen_mouse_pos);
+		m_pObj->dragFinished(QPointF(0.5, 0.5) + event->pos());
 	}
 }
 
@@ -113,7 +119,6 @@ ObjectDragHandler::onMouseMoveEvent(
 	QMouseEvent* event, InteractionState& interaction)
 {
 	if (interaction.capturedBy(m_interaction)) {
-		QPointF const screen_mouse_pos(QPointF(0.5, 0.5) + event->pos());
-		m_pObj->dragContinuation(event->pos());
+		m_pObj->dragContinuation(QPointF(0.5, 0.5) + event->pos());
 	}
 }

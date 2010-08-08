@@ -21,9 +21,6 @@
 #include <math.h>
 #include <assert.h>
 
-namespace imageproc
-{
-
 ReverseArcLengthMapper::Hint::Hint()
 :	m_lastSegment(0),
 	m_direction(1)
@@ -163,5 +160,3 @@ ReverseArcLengthMapper::interpolateBySegment(double arc_len, int segment) const
 	double const x = x0 + (arc_len - a0) * (x1 - x0) / (a1 - a0);
 	return x;
 }
-
-} // namespace imageproc
