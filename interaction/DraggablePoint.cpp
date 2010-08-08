@@ -1,6 +1,6 @@
 /*
 	Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -51,12 +51,11 @@ DraggablePoint::proximity(QPointF const& mouse_pos)
 void
 DraggablePoint::dragInitiated(QPointF const& mouse_pos)
 {
-	m_initialPointPos = pointPosition();
-	m_initialMousePos = mouse_pos;
+	m_pointRelativeToMouse = pointPosition() - mouse_pos;
 }
 
 void
 DraggablePoint::dragContinuation(QPointF const& mouse_pos)
 {
-	pointMoveRequest(m_initialMousePos + (mouse_pos - m_initialMousePos));
+	pointMoveRequest(mouse_pos + m_pointRelativeToMouse);
 }

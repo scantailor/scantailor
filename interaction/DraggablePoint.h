@@ -1,6 +1,6 @@
  /*
 	Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -74,8 +74,7 @@ protected:
 private:
 	PositionCallback m_positionCallback;
 	MoveRequestCallback m_moveRequestCallback;
-	QPointF m_initialPointPos;
-	QPointF m_initialMousePos;
+	QPointF m_pointRelativeToMouse;
 	double m_hitAreaRadius;
 	int m_proximityPriority;
 };
