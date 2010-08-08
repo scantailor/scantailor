@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="documentMode">
       <bool>true</bool>
@@ -97,8 +97,8 @@ font-weight: bold;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>442</width>
-            <height>288</height>
+            <width>425</width>
+            <height>300</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -134,6 +134,7 @@ font-weight: bold;</string>
             <widget class="QLabel" name="label_8">
              <property name="text">
               <string>Svetoslav Sashkov, Mandor - Bulgarian
+Stefan Birkner - German
 Masahiro Kitagawa - Japanese
 Joseph Artsimovich - Russian
 </string>
@@ -361,6 +362,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
