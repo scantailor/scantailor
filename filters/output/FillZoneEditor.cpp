@@ -31,6 +31,7 @@
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
 #include "OutputMargins.h"
+#include <QTransform>
 #include <QImage>
 #include <QPointer>
 #include <QPainter>
@@ -62,8 +63,9 @@ private:
 
 FillZoneEditor::FillZoneEditor(
 	QImage const& image, ImagePixmapUnion const& downscaled_version,
-	QTransform const& orig_to_image, PageId const& page_id,
-	IntrusivePtr<Settings> const& settings)
+	boost::function<QPointF(QPointF const&)> const& orig_to_image,
+	boost::function<QPointF(QPointF const&)> const& image_to_orig,
+	PageId const& page_id, IntrusivePtr<Settings> const& settings)
 :	ImageViewBase(
 		image, downscaled_version,
 		ImagePresentation(QTransform(), QRectF(image.rect())),
@@ -75,7 +77,7 @@ FillZoneEditor::FillZoneEditor(
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_origToImage(orig_to_image),
-	m_imageToOrig(orig_to_image.inverted()),
+	m_imageToOrig(image_to_orig),
 	m_pageId(page_id),
 	m_ptrSettings(settings)
 {

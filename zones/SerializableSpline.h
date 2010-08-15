@@ -22,6 +22,7 @@
 #include <QVector>
 #include <QPointF>
 #include <QPolygonF>
+#include <boost/function.hpp>
 
 class EditableSpline;
 class QTransform;
@@ -39,6 +40,9 @@ public:
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
 	SerializableSpline transformed(QTransform const& xform) const;
+
+	SerializableSpline transformed(
+		boost::function<QPointF(QPointF const&)> const& xform) const;
 
 	QPolygonF toPolygon() const { return QPolygonF(m_points); }
 private:

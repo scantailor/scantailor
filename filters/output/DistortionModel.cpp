@@ -17,6 +17,7 @@
 */
 
 #include "DistortionModel.h"
+#include "CylindricalSurfaceDewarper.h"
 #include "NumericTraits.h"
 #include <QRectF>
 #include <QPointF>
@@ -76,6 +77,29 @@ DistortionModel::matches(DistortionModel const& other) const
 	}
 
 	return true;
+}
+
+QRectF
+DistortionModel::modelDomain(
+	CylindricalSurfaceDewarper const& dewarper,
+	QTransform const& to_output, QRectF const& output_content_rect) const
+{
+	QRectF model_domain(boundingBox(to_output));
+
+	// We not only uncurl the lines, but also stretch them in curved areas.
+	// Because we don't want to reach out of the content box, we shrink
+	// the model domain vertically, rather than stretching it horizontally.
+	double const vert_scale = 1.0 / dewarper.directrixArcLength();
+
+	// When scaling model_domain, we want the following point to remain where it is.
+	QPointF const scale_origin(output_content_rect.center());
+	
+	double const new_upper_part = (scale_origin.y() - model_domain.top()) * vert_scale;
+	double const new_height = model_domain.height() * vert_scale;
+	model_domain.setTop(scale_origin.y() - new_upper_part);
+	model_domain.setHeight(new_height);
+
+	return model_domain;
 }
 
 QRectF

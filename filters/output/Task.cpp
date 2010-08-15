@@ -43,6 +43,7 @@
 #include "DewarpingMode.h"
 #include "DistortionModel.h"
 #include "DewarpingView.h"
+#include "DewarpingPointMapper.h"
 #include "ImageId.h"
 #include "PageId.h"
 #include "Dpi.h"
@@ -56,6 +57,9 @@
 #include "ImageLoader.h"
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
+#include "math/CylindricalSurfaceDewarper.h"
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 #include <QImage>
 #include <QString>
 #include <QObject>
@@ -78,9 +82,9 @@ public:
 	UiUpdater(IntrusivePtr<Filter> const& filter,
 		IntrusivePtr<Settings> const& settings,
 		std::auto_ptr<DebugImages> dbg_img,
-		ColorParams const& color_params,
+		Params const& params,
 		QTransform const& image_to_virt,
-		QRectF const& virt_content_rect,
+		QRect const& virt_content_rect,
 		QPolygonF const& virt_display_area,
 		PageId const& page_id,
 		QImage const& orig_image,
@@ -98,9 +102,9 @@ private:
 	IntrusivePtr<Filter> m_ptrFilter;
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<DebugImages> m_ptrDbg;
-	ColorParams m_colorParams;
+	Params m_params;
 	QTransform m_imageToVirt;
-	QRectF m_virtContentRect;
+	QRect m_virtContentRect;
 	QPolygonF m_virtDisplayArea;
 	PageId m_pageId;
 	QImage m_origImage;
@@ -361,7 +365,7 @@ Task::process(
 
 	return FilterResultPtr(
 		new UiUpdater(
-			m_ptrFilter, m_ptrSettings, m_ptrDbg, params.colorParams(),
+			m_ptrFilter, m_ptrSettings, m_ptrDbg, params,
 			generator.toOutput(), generator.outputContentRect(),
 			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
 			m_pageId, data.origImage(), out_img, automask_img,
@@ -408,9 +412,9 @@ Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	std::auto_ptr<DebugImages> dbg_img,
-	ColorParams const& color_params,
+	Params const& params,
 	QTransform const& image_to_virt,
-	QRectF const& virt_content_rect,
+	QRect const& virt_content_rect,
 	QPolygonF const& virt_display_area,
 	PageId const& page_id,
 	QImage const& orig_image,
@@ -423,7 +427,7 @@ Task::UiUpdater::UiUpdater(
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrDbg(dbg_img),
-	m_colorParams(color_params),
+	m_params(params),
 	m_imageToVirt(image_to_virt),
 	m_virtContentRect(virt_content_rect),
 	m_virtDisplayArea(virt_display_area),
@@ -494,10 +498,32 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		);
 	}
 
+	// It turns out we never need to update the original<->output
+	// mapping at run time.  If dewarping is turned on or off from
+	// the left panel, there will be a complete reload.  If we change
+	// the dewarping grid from the Dewarping tab, complete reload
+	// will happen when we switch to another tab.
+	boost::function<QPointF(QPointF const&)> orig_to_output;
+	boost::function<QPointF(QPointF const&)> output_to_orig;
+	if (m_params.dewarpingMode() != DewarpingMode::OFF && m_params.distortionModel().isValid()) {
+		boost::shared_ptr<DewarpingPointMapper> mapper(
+			new DewarpingPointMapper(
+				m_params.distortionModel(), m_params.depthPerception().value(),
+				m_imageToVirt, m_virtContentRect
+			)
+		);
+		orig_to_output = boost::bind(&DewarpingPointMapper::mapToDewarpedSpace, mapper, _1);
+		output_to_orig = boost::bind(&DewarpingPointMapper::mapToWarpedSpace, mapper, _1);
+	} else {
+		typedef QPointF (QTransform::*MapPointFunc)(QPointF const&) const;
+		orig_to_output = boost::bind((MapPointFunc)&QTransform::map, m_imageToVirt, _1);
+		output_to_orig = boost::bind((MapPointFunc)&QTransform::map, m_imageToVirt.inverted(), _1);
+	}
+
 	std::auto_ptr<QWidget> fill_zone_editor(
 		new FillZoneEditor(
 			m_outputImage, downscaled_output_pixmap,
-			m_imageToVirt, m_pageId, m_ptrSettings
+			orig_to_output, output_to_orig, m_pageId, m_ptrSettings
 		)
 	);
 	QObject::connect(
@@ -506,7 +532,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	);
 
 	std::auto_ptr<QWidget> despeckle_view;
-	if (m_colorParams.colorMode() == ColorParams::COLOR_GRAYSCALE) {
+	if (m_params.colorParams().colorMode() == ColorParams::COLOR_GRAYSCALE) {
 		despeckle_view.reset(
 			new ErrorWidget(tr("Despeckling can't be done in Color / Grayscale mode."))
 		);

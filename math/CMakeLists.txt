@@ -8,7 +8,7 @@ SET(
 	MatrixCalc.h
 	HomographicTransform.h
 	ToLineProjector.cpp ToLineProjector.h
-	ReverseArcLengthMapper.cpp ReverseArcLengthMapper.h
+	ArcLengthMapper.cpp ArcLengthMapper.h
 	PolylineIntersector.cpp PolylineIntersector.h
 	XSpline.cpp XSpline.h
 	CylindricalSurfaceDewarper.cpp CylindricalSurfaceDewarper.h

@@ -21,7 +21,8 @@
 
 #include "HomographicTransform.h"
 #include "PolylineIntersector.h"
-#include "ReverseArcLengthMapper.h"
+#include "ArcLengthMapper.h"
+#include <boost/array.hpp>
 #include <vector>
 #include <utility>
 #include <QPointF>
@@ -36,7 +37,7 @@ public:
 	private:
 		PolylineIntersector::Hint m_intersectionHint1;
 		PolylineIntersector::Hint m_intersectionHint2;
-		ReverseArcLengthMapper::Hint m_arcLengthHint;
+		ArcLengthMapper::Hint m_arcLengthHint;
 	};
 
 	struct Generatrix
@@ -65,7 +66,23 @@ public:
 	 */
 	double directrixArcLength() const { return m_directrixArcLength; }
 
-	Generatrix mapGeneratrix(double x, State& state) const;
+	Generatrix mapGeneratrix(double crv_x, State& state) const;
+
+	/**
+	 * Transforms a point from warped image coordinates
+	 * to dewarped normalized coordinates.  See comments
+	 * in the beginning of the *.cpp file for more information
+	 * about coordinate systems we work with.
+	 */
+	QPointF mapToDewarpedSpace(QPointF const& img_pt) const;
+
+	/**
+	 * Transforms a point from dewarped normalized coordinates
+	 * to warped image coordinates.  See comments in the beginning
+	 * of the *.cpp file for more information about coordinate
+	 * systems we owork with.
+	 */
+	QPointF mapToWarpedSpace(QPointF const& crv_pt) const;
 private:
 	class CoupledPolylinesIterator;
 	
@@ -80,12 +97,12 @@ private:
 		HomographicTransform<2, double> img2pln);
 
 	static HomographicTransform<2, double> fourPoint2DHomography(
-		std::vector<std::pair<QPointF, QPointF> > const& points);
+		boost::array<std::pair<QPointF, QPointF>, 4> const& pairs);
 
 	static HomographicTransform<1, double> threePoint1DHomography(
-		std::vector<std::pair<double, double> > const& pairs);
+		boost::array<std::pair<double, double>, 3> const& pairs);
 
-	void initReverseArcLengthMapper(
+	void initArcLengthMapper(
 		std::vector<QPointF> const& img_directrix1,
 		std::vector<QPointF> const& img_directrix2);
 
@@ -94,7 +111,7 @@ private:
 	double m_depthPerception;
 	double m_plnStraightLineY;
 	double m_directrixArcLength;
-	ReverseArcLengthMapper m_reverseArcLengthMapper;
+	ArcLengthMapper m_arcLengthMapper;
 	PolylineIntersector m_imgDirectrix1Intersector;
 	PolylineIntersector m_imgDirectrix2Intersector;
 };

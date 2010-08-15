@@ -34,6 +34,7 @@
 #include "PictureLayerProperty.h"
 #include "FillColorProperty.h"
 #include "CylindricalSurfaceDewarper.h"
+#include "DewarpingPointMapper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
@@ -57,6 +58,8 @@
 #include "imageproc/RasterDewarper.h"
 #include "config.h"
 #include <boost/foreach.hpp>
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 #include <QImage>
 #include <QSize>
 #include <QPoint>
@@ -157,6 +160,21 @@ void reserveBlackAndWhite(QSize size, int stride, PixelType* data)
 		for (int x = 0; x < width; ++x) {
 			line[x] = reserveBlackAndWhite<PixelType>(line[x]);
 		}
+	}
+}
+
+void reserveBlackAndWhite(QImage& img)
+{
+	assert(img.depth() == 8 || img.depth() == 24 || img.depth() == 32);
+	switch (img.format()) {
+		case QImage::Format_Indexed8:
+			reserveBlackAndWhite(img.size(), img.bytesPerLine(), img.bits());
+			break;
+		case QImage::Format_RGB32:
+		case QImage::Format_ARGB32:
+			reserveBlackAndWhite(img.size(), img.bytesPerLine()/4, (uint32_t*)img.bits());
+			break;
+		default:; // Should not happen.
 	}
 }
 
@@ -288,73 +306,6 @@ QRect
 OutputGenerator::outputContentRect() const
 {
 	return QRect(m_contentRect.topLeft() - m_cropRect.topLeft(), m_contentRect.size());
-}
-
-QImage
-OutputGenerator::processAsIs(
-	FilterData const& input, TaskStatus const& status,
-	DistortionModel const& distortion_model,
-	DepthPerception const& depth_perception,
-	DebugImages* const dbg) const
-{
-	uint8_t const dominant_gray = reserveBlackAndWhite<uint8_t>(
-		calcDominantBackgroundGrayLevel(input.grayImage())
-	);
-	
-	status.throwIfCancelled();
-	
-	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
-	
-	QImage out;
-
-	if (input.origImage().allGray()) {
-		if (m_cropRect.isEmpty()) {
-			QImage image(1, 1, QImage::Format_Indexed8);
-			image.setColorTable(createGrayscalePalette());
-			image.fill(dominant_gray);
-			return image;
-		}
-
-		if (distortion_model.isValid()) {
-			out = dewarp(
-				QTransform(), input.grayImage(), toOutput(),
-				distortion_model, depth_perception, bg_color
-			);
-		} else {
-			out = transformToGray(
-				input.grayImage(), m_toUncropped, m_cropRect, bg_color
-			);
-		}
-	} else {
-		if (m_cropRect.isEmpty()) {
-			QImage image(1, 1, QImage::Format_RGB32);
-			image.fill(bg_color.rgb());
-			return image;
-		}
-		
-		if (distortion_model.isValid()) {
-			out = dewarp(
-				QTransform(), input.origImage(), toOutput(),
-				distortion_model, depth_perception, bg_color
-			);
-		} else {
-			out = transform(input.origImage(), m_toUncropped, m_cropRect, bg_color);
-		}
-	}
-
-	assert(out.depth() == 8 || out.depth() == 24 || out.depth() == 32);
-	switch (out.format()) {
-		case QImage::Format_Indexed8:
-			reserveBlackAndWhite(out.size(), out.bytesPerLine(), out.bits());
-			break;
-		case QImage::Format_RGB32:
-		case QImage::Format_ARGB32:
-			reserveBlackAndWhite(out.size(), out.bytesPerLine()/4, (uint32_t*)out.bits());
-			break;
-		default:; // Should not happen.
-	}
-
-	return out;
 }
 
 QImage
@@ -518,15 +469,16 @@ OutputGenerator::processImpl(
 {
 	RenderParams const render_params(m_colorParams);
 
-	if (!render_params.whiteMargins()) {
-		QImage out(processAsIs(input, status, distortion_model, depth_perception, dbg));
-		applyFillZonesInPlace(out, fill_zones);
-		return out;
-	} else if (distortion_model.isValid()) {
+	if (distortion_model.isValid()) {
 		return processWithDewarping(
 			status, input, picture_zones, fill_zones,
 			distortion_model, depth_perception,
 			auto_picture_mask, speckles_image, dbg
+		);
+	} else if (!render_params.whiteMargins()) {
+		return processAsIs(
+			input, status, fill_zones, distortion_model,
+			depth_perception, dbg
 		);
 	} else {
 		return processWithoutDewarping(
@@ -534,6 +486,49 @@ OutputGenerator::processImpl(
 			auto_picture_mask, speckles_image, dbg
 		);
 	}
+}
+
+QImage
+OutputGenerator::processAsIs(
+	FilterData const& input, TaskStatus const& status,
+	ZoneSet const& fill_zones,
+	DistortionModel const& distortion_model,
+	DepthPerception const& depth_perception,
+	DebugImages* const dbg) const
+{
+	uint8_t const dominant_gray = reserveBlackAndWhite<uint8_t>(
+		calcDominantBackgroundGrayLevel(input.grayImage())
+	);
+	
+	status.throwIfCancelled();
+	
+	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
+	
+	QImage out;
+
+	if (input.origImage().allGray()) {
+		if (m_cropRect.isEmpty()) {
+			QImage image(1, 1, QImage::Format_Indexed8);
+			image.setColorTable(createGrayscalePalette());
+			image.fill(dominant_gray);
+			return image;
+		}
+
+		out = transformToGray(input.grayImage(), m_toUncropped, m_cropRect, bg_color);
+	} else {
+		if (m_cropRect.isEmpty()) {
+			QImage image(1, 1, QImage::Format_RGB32);
+			image.fill(bg_color.rgb());
+			return image;
+		}
+		
+		out = transform(input.origImage(), m_toUncropped, m_cropRect, bg_color);
+	}
+
+	applyFillZonesInPlace(out, fill_zones);
+	reserveBlackAndWhite(out);
+
+	return out;
 }
 
 QImage
@@ -845,6 +840,7 @@ OutputGenerator::processWithDewarping(
 	// Original image, but:
 	// 1. In a format we can handle, that is grayscale, RGB32, ARGB32
 	// 2. With illumination normalized over the content area, if required.
+	// 3. With margins filled with white, if required.
 	QImage normalized_original;
 
 	// The output we would get if dewarping was turned off, except always grayscale.
@@ -906,35 +902,38 @@ OutputGenerator::processWithDewarping(
 	}
 
 	status.throwIfCancelled();
-	
-	uint8_t const dominant_gray = reserveBlackAndWhite<uint8_t>(
-		calcDominantBackgroundGrayLevel(input.grayImage())
-	);
+
+	if (render_params.whiteMargins()) {
+		// Fill everything except the content area in normalized_original to white.
+		QPolygonF const orig_content_poly(
+			m_toUncropped.inverted().map(QRectF(m_contentRect))
+		);
+		fillMarginsInPlace(normalized_original, orig_content_poly, Qt::white);
+		if (dbg) {
+			dbg->add(normalized_original, "white margins");
+		}
+	}
 	
 	status.throwIfCancelled();
-	
-	QRect shrunk_output_content_rect;
 
-	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
+	QColor bg_color(Qt::white);
+	if (!render_params.whiteMargins()) {
+		uint8_t const dominant_gray = reserveBlackAndWhite<uint8_t>(
+			calcDominantBackgroundGrayLevel(input.grayImage())
+		);
+		bg_color = QColor(dominant_gray, dominant_gray, dominant_gray);
+	}
+
 	QImage dewarped(
 		dewarp(
 			QTransform(), normalized_original, toOutput(),
-			distortion_model, depth_perception, bg_color,
-			&shrunk_output_content_rect
+			distortion_model, depth_perception, bg_color
 		)
 	);
+	normalized_original = QImage(); // Save memory.
 	if (dbg) {
 		dbg->add(dewarped, "dewarped");
 	}
-
-	status.throwIfCancelled();
-
-	// XXX: Determining top and bottom content box boundaries is problematic.
-	// For now, don't clear them.
-	shrunk_output_content_rect.setTop(0);
-	shrunk_output_content_rect.setBottom(dewarped.rect().bottom());
-
-	fillMarginsInPlace(dewarped, shrunk_output_content_rect, Qt::white);
 
 	status.throwIfCancelled();
 
@@ -954,6 +953,16 @@ OutputGenerator::processWithDewarping(
 	if (m_cropRect.isEmpty()) {
 		return BinaryImage(target_size, WHITE).toQImage();
 	}
+
+	boost::shared_ptr<DewarpingPointMapper> mapper(
+		new DewarpingPointMapper(
+			distortion_model, depth_perception.value(),
+			toOutput(), outputContentRect()
+		)
+	);
+	boost::function<QPointF(QPointF const&)> const orig_to_output(
+		boost::bind(&DewarpingPointMapper::mapToDewarpedSpace, mapper, _1)
+	);
 
 	if (render_params.binaryOutput()) {	
 		BinaryThreshold const unmasked_bw_threshold(
@@ -989,7 +998,7 @@ OutputGenerator::processWithDewarping(
 			speckles_image, m_dpi, status, dbg
 		);
 
-		// TODO: fill zones
+		applyFillZonesInPlace(dewarped_bw_content, fill_zones, orig_to_output);
 
 		return dewarped_bw_content.toQImage();
 	}
@@ -1098,9 +1107,34 @@ OutputGenerator::processWithDewarping(
 		}
 	}
 
-	// TODO: fill zones
-	
+	applyFillZonesInPlace(dewarped, fill_zones, orig_to_output);
+
 	return dewarped;
+}
+
+CylindricalSurfaceDewarper
+OutputGenerator::createDewarper(
+	DistortionModel const& distortion_model,
+	QTransform const& distortion_model_to_target, double depth_perception)
+{
+	if (distortion_model_to_target.isIdentity()) {
+		return CylindricalSurfaceDewarper(
+			distortion_model.topCurve().polyline(),
+			distortion_model.bottomCurve().polyline(), depth_perception
+		);
+	}
+
+	std::vector<QPointF> top_polyline(distortion_model.topCurve().polyline());
+	std::vector<QPointF> bottom_polyline(distortion_model.bottomCurve().polyline());
+	BOOST_FOREACH(QPointF& pt, top_polyline) {
+		pt = distortion_model_to_target.map(pt);
+	}
+	BOOST_FOREACH(QPointF& pt, bottom_polyline) {
+		pt = distortion_model_to_target.map(pt);
+	}
+	return CylindricalSurfaceDewarper(
+		top_polyline, bottom_polyline, depth_perception
+	);
 }
 
 /**
@@ -1118,59 +1152,22 @@ QImage
 OutputGenerator::dewarp(
 	QTransform const& orig_to_src, QImage const& src,
 	QTransform const& src_to_output, DistortionModel const& distortion_model,
-	DepthPerception const& depth_perception, QColor const& bg_color,
-	QRect* modified_content_rect) const
+	DepthPerception const& depth_perception, QColor const& bg_color) const
 {
-	std::auto_ptr<CylindricalSurfaceDewarper> cyl_dewarper;
-	if (orig_to_src.isIdentity()) {
-		cyl_dewarper.reset(
-			new CylindricalSurfaceDewarper(
-				distortion_model.topCurve().polyline(),
-				distortion_model.bottomCurve().polyline(), depth_perception.value()
-			)
-		);
-	} else {
-		std::vector<QPointF> top_polyline(distortion_model.topCurve().polyline());
-		std::vector<QPointF> bottom_polyline(distortion_model.bottomCurve().polyline());
-		BOOST_FOREACH(QPointF& pt, top_polyline) {
-			pt = orig_to_src.map(pt);
-		}
-		BOOST_FOREACH(QPointF& pt, bottom_polyline) {
-			pt = orig_to_src.map(pt);
-		}
-		cyl_dewarper.reset(
-			new CylindricalSurfaceDewarper(
-				top_polyline, bottom_polyline, depth_perception.value()
-			)
-		);
-	}
-	
+	CylindricalSurfaceDewarper const dewarper(
+		createDewarper(distortion_model, orig_to_src, depth_perception.value())
+	);
+
 	// Model domain is a rectangle in output image coordinates that
 	// will be mapped to our curved quadrilateral.
-	QRect model_domain(distortion_model.boundingBox(orig_to_src * src_to_output).toRect());
-	
-	// We not only uncurl the lines, but also stretch them in curved areas.
-	// Because we don't want to reach out of the content box, we shrink
-	// the model domain vertically, rather than stretching it horizontally.
-	double const vert_scale = 1.0 / cyl_dewarper->directrixArcLength();
-	// When scaling model_domain, we want the following point to remain where it is.
-	QRect output_content_rect(outputContentRect());
-	QPoint const scale_origin(output_content_rect.center());
-	int new_upper_part = qRound((scale_origin.y() - model_domain.top()) * vert_scale);
-	int new_height = qRound(model_domain.height() * vert_scale);
-	model_domain.setTop(scale_origin.y() - new_upper_part);
-	model_domain.setHeight(new_height);
-
-	if (modified_content_rect) {
-		new_upper_part = qRound((scale_origin.y() - output_content_rect.top()) * vert_scale);
-		new_height = qRound(output_content_rect.height() * vert_scale);
-		output_content_rect.setTop(scale_origin.y() - new_upper_part);
-		output_content_rect.setHeight(new_height);
-		*modified_content_rect = output_content_rect;
-	}
+	QRect const model_domain(
+		distortion_model.modelDomain(
+			dewarper, orig_to_src * src_to_output, outputContentRect()
+		).toRect()
+	);
 
 	return RasterDewarper::dewarp(
-		src, m_cropRect.size(), *cyl_dewarper, model_domain, bg_color
+		src, m_cropRect.size(), dewarper, model_domain, bg_color
 	);
 }
 
@@ -1205,48 +1202,38 @@ OutputGenerator::convertToRGBorRGBA(QImage const& src)
 
 void
 OutputGenerator::fillMarginsInPlace(
-	QImage& image, QRect const& content_rect, QColor const& color)
+	QImage& image, QPolygonF const& content_poly, QColor const& color)
 {
-	if (content_rect.contains(image.rect())) {
-		return;
-	}
-
 	if (image.format() == QImage::Format_Indexed8 && image.isGrayscale()) {
 		PolygonRasterizer::grayFillExcept(
-			image, qGray(color.rgb()), QRectF(content_rect), Qt::OddEvenFill
+			image, qGray(color.rgb()), content_poly, Qt::WindingFill
 		);
 		return;
 	}
 
 	assert(image.format() == QImage::Format_RGB32 || image.format() == QImage::Format_ARGB32);
 
-	// Having QRectF rather than QRect is important here, because
-	// rect.right() - rect.left() == rect.width()
-	// in case of QRectF, but == rect.width() - 1, in case of QRect.
-	QRectF const outer_rect(image.rect());
-	QRectF const inner_rect(content_rect);
+	if (image.format() == QImage::Format_ARGB32) {
+		image = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+	}
 
-	QPainter painter(&image);
-	painter.setBrush(color);
-	painter.setPen(Qt::NoPen);
-	
-	QRectF rect(outer_rect);
-	rect.setRight(inner_rect.left());
-	painter.drawRect(rect);
+	{
+		QPainter painter(&image);
+		painter.setRenderHint(QPainter::Antialiasing);
+		painter.setBrush(color);
+		painter.setPen(Qt::NoPen);
 
-	rect = outer_rect;
-	rect.setLeft(inner_rect.right());
-	painter.drawRect(rect);
+		QPainterPath outer_path;
+		outer_path.addRect(image.rect());
+		QPainterPath inner_path;
+		inner_path.addPolygon(content_poly);
 
-	rect = inner_rect;
-	rect.setTop(outer_rect.top());
-	rect.setBottom(inner_rect.top());
-	painter.drawRect(rect);
+		painter.drawPath(outer_path.subtracted(inner_path));
+	}
 
-	rect = inner_rect;
-	rect.setTop(inner_rect.bottom());
-	rect.setBottom(outer_rect.bottom());
-	painter.drawRect(rect);
+	if (image.format() == QImage::Format_ARGB32_Premultiplied) {
+		image = image.convertToFormat(QImage::Format_ARGB32);
+	}
 }
 
 GrayImage
@@ -1698,13 +1685,13 @@ OutputGenerator::calcDominantBackgroundGrayLevel(QImage const& img)
 
 void
 OutputGenerator::applyFillZonesInPlace(
-	QImage& img, ZoneSet const& zones) const
+	QImage& img, ZoneSet const& zones,
+	boost::function<QPointF(QPointF const&)> const& orig_to_output) const
 {
 	if (zones.empty()) {
 		return;
 	}
 
-	QTransform const xform(toOutput());
 	QImage canvas(img.convertToFormat(QImage::Format_ARGB32_Premultiplied));
 	
 	{
@@ -1714,7 +1701,7 @@ OutputGenerator::applyFillZonesInPlace(
 
 		BOOST_FOREACH(Zone const& zone, zones) {
 			QColor const color(zone.properties().locateOrDefault<FillColorProperty>()->color());
-			QPolygonF const poly(zone.spline().transformed(xform).toPolygon());
+			QPolygonF const poly(zone.spline().transformed(orig_to_output).toPolygon());
 			painter.setBrush(color);
 			painter.drawPolygon(poly, Qt::WindingFill);
 		}
@@ -1727,22 +1714,48 @@ OutputGenerator::applyFillZonesInPlace(
 	}
 }
 
+/**
+ * A simplified version of the above, using toOutput() for translation
+ * from original image to output image coordinates.
+ */
+void
+OutputGenerator::applyFillZonesInPlace(QImage& img, ZoneSet const& zones) const
+{
+	typedef QPointF (QTransform::*MapPointFunc)(QPointF const&) const;
+	applyFillZonesInPlace(
+		img, zones, boost::bind((MapPointFunc)&QTransform::map, toOutput(), _1)
+	);
+}
+
 void
 OutputGenerator::applyFillZonesInPlace(
-	imageproc::BinaryImage& img, ZoneSet const& zones) const
+	imageproc::BinaryImage& img, ZoneSet const& zones,
+	boost::function<QPointF(QPointF const&)> const& orig_to_output) const
 {
 	if (zones.empty()) {
 		return;
 	}
 
-	QTransform const xform(toOutput());
-
 	BOOST_FOREACH(Zone const& zone, zones) {
 		QColor const color(zone.properties().locateOrDefault<FillColorProperty>()->color());
 		BWColor const bw_color = qGray(color.rgb()) < 128 ? BLACK : WHITE;
-		QPolygonF const poly(zone.spline().transformed(xform).toPolygon());
+		QPolygonF const poly(zone.spline().transformed(orig_to_output).toPolygon());
 		PolygonRasterizer::fill(img, bw_color, poly, Qt::WindingFill);
 	}
+}
+
+/**
+ * A simplified version of the above, using toOutput() for translation
+ * from original image to output image coordinates.
+ */
+void
+OutputGenerator::applyFillZonesInPlace(
+	imageproc::BinaryImage& img, ZoneSet const& zones) const
+{
+	typedef QPointF (QTransform::*MapPointFunc)(QPointF const&) const;
+	applyFillZonesInPlace(
+		img, zones, boost::bind((MapPointFunc)&QTransform::map, toOutput(), _1)
+	);
 }
 
 QTransform

@@ -16,28 +16,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef REVERSE_ARC_LENGTH_MAPPER_H_
-#define REVERSE_ARC_LENGTH_MAPPER_H_
+#ifndef ARC_LENGTH_MAPPER_H_
+#define ARC_LENGTH_MAPPER_H_
 
 #include <vector>
 
 /**
- * \brief Maps from arc length to function argument.
+ * \brief Maps from x to arclen(f(x)) and back.
  *
  * Suppose we have a discrete function where we only know its
  * values for a given set of arguments.  This class provides a way
- * to calculate the function's argument corresponding to a certain
- * arc length.  We consider the arc length between two adjacent samples
+ * to calculate the both arc length corresponding to an arbitrary x,
+ * and x corresponding to an arbitrary arc length.
+ * We consider the arc length between two adjacent samples
  * to be monotonously increasing, that is we consider adjacent samples
  * to be connected by straight lines.
  */
-class ReverseArcLengthMapper
+class ArcLengthMapper
 {
 	// Member-wise copying is OK.
 public:
 	class Hint
 	{
-		friend class ReverseArcLengthMapper;
+		friend class ArcLengthMapper;
 	public:
 		Hint();
 	private:
@@ -47,7 +48,7 @@ public:
 		int m_direction;
 	};
 	
-	ReverseArcLengthMapper();
+	ArcLengthMapper();
 
 	/**
 	 * \brief Adds an x -> f(x) sample.
@@ -80,7 +81,9 @@ public:
 	 * If no samples are present, zero is returned.  Providing the same
 	 * hint on consecutive calls to this function improves performance. 
 	 */
-	double map(double arc_len, Hint& hint) const;
+	double arcLenToX(double arc_len, Hint& hint) const;
+
+	double xToArcLen(double x, Hint& hint) const;
 private:
 	struct Sample
 	{
@@ -90,9 +93,13 @@ private:
 		Sample(double x, double arc_len) : x(x), arcLen(arc_len) {}
 	};
 
-	bool checkSegment(double arc_len, int segment) const;
+	bool checkSegmentForArcLen(double arc_len, int segment) const;
 
-	double interpolateBySegment(double arc_len, int segment) const;
+	bool checkSegmentForX(double x, int segment) const;
+
+	double interpolateArcLenInSegment(double arc_len, int segment) const;
+
+	double interpolateXInSegment(double x, int segment) const;
 
 	std::vector<Sample> m_samples;
 	double m_prevFX;

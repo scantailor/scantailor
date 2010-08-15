@@ -32,8 +32,9 @@
 #include "EditableZoneSet.h"
 #include "ZoomHandler.h"
 #include "DragHandler.h"
-#include <QTransform>
+#include <boost/function.hpp>
 #include <QPoint>
+#include <QPointF>
 #include <QColor>
 
 class InteractionState;
@@ -51,8 +52,9 @@ class FillZoneEditor : public ImageViewBase, private InteractionHandler
 public:
 	FillZoneEditor(
 		QImage const& image, ImagePixmapUnion const& downscaled_version,
-		QTransform const& orig_to_image, PageId const& page_id,
-		IntrusivePtr<Settings> const& settings);
+		boost::function<QPointF(QPointF const&)> const& orig_to_image,
+		boost::function<QPointF(QPointF const&)> const& image_to_orig,
+		PageId const& page_id, IntrusivePtr<Settings> const& settings);
 	
 	virtual ~FillZoneEditor();
 signals:
@@ -92,8 +94,8 @@ private:
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;	
 
-	QTransform m_origToImage;
-	QTransform m_imageToOrig;
+	boost::function<QPointF(QPointF const&)> m_origToImage;
+	boost::function<QPointF(QPointF const&)> m_imageToOrig;
 	PageId m_pageId;
 	IntrusivePtr<Settings> m_ptrSettings;
 };

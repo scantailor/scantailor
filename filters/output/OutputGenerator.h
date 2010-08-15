@@ -24,6 +24,7 @@
 #include "ColorParams.h"
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
+#include <boost/function.hpp>
 #include <QSize>
 #include <QRect>
 #include <QTransform>
@@ -36,6 +37,7 @@
 class TaskStatus;
 class DebugImages;
 class ImageTransformation;
+class CylindricalSurfaceDewarper;
 class FilterData;
 class ZoneSet;
 class QSize;
@@ -108,12 +110,6 @@ public:
 	 */
 	QRect outputContentRect() const;
 private:
-	QImage processAsIs(
-		FilterData const& input, TaskStatus const& status,
-		DistortionModel const& distortion_model,
-		DepthPerception const& depth_perception,
-		DebugImages* dbg = 0) const;
-	
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
@@ -121,6 +117,13 @@ private:
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
+		DebugImages* dbg = 0) const;
+
+	QImage processAsIs(
+		FilterData const& input, TaskStatus const& status,
+		ZoneSet const& fill_zones,
+		DistortionModel const& distortion_model,
+		DepthPerception const& depth_perception,
 		DebugImages* dbg = 0) const;
 
 	QImage processWithoutDewarping(
@@ -139,11 +142,14 @@ private:
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
 	
+	static CylindricalSurfaceDewarper createDewarper(
+		DistortionModel const& distortion_model,
+		QTransform const& distortion_model_to_target, double depth_perception);
+
 	QImage dewarp(
 		QTransform const& orig_to_src, QImage const& src,
 		QTransform const& src_to_output, DistortionModel const& distortion_model,
-		DepthPerception const& depth_perception, QColor const& bg_color,
-		QRect* modified_content_rect = 0) const;
+		DepthPerception const& depth_perception, QColor const& bg_color) const;
 
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
 	
@@ -152,7 +158,7 @@ private:
 	static QImage convertToRGBorRGBA(QImage const& src);
 
 	static void fillMarginsInPlace(
-		QImage& image, QRect const& content_rect, QColor const& color);
+		QImage& image, QPolygonF const& content_poly, QColor const& color);
 
 	static QImage normalizeIlluminationGray(
 		TaskStatus const& status,
@@ -219,7 +225,13 @@ private:
 		QImage const& gray_input, DebugImages* dbg,
 		QImage const* morph_background = 0) const;
 
+	void applyFillZonesInPlace(QImage& img, ZoneSet const& zones,
+		boost::function<QPointF(QPointF const&)> const& orig_to_output) const;
+
 	void applyFillZonesInPlace(QImage& img, ZoneSet const& zones) const;
+
+	void applyFillZonesInPlace(imageproc::BinaryImage& img, ZoneSet const& zones,
+		boost::function<QPointF(QPointF const&)> const& orig_to_output) const;
 
 	void applyFillZonesInPlace(imageproc::BinaryImage& img, ZoneSet const& zones) const;
 
