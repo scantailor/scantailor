@@ -6,6 +6,7 @@ SET(
 	sources
 	NonCopyable.h IntrusivePtr.h RefCountable.h
 	AlignedArray.h
+	FastQueue.h
 	SafeDeletingQObjectPtr.h
 	ScopedIncDec.h ScopedDecInc.h
 	Span.h VirtualFunction.h FlagOps.h

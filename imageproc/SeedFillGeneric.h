@@ -20,9 +20,9 @@
 #define IMAGEPROC_SEEDFILL_GENERIC_H_
 
 #include "Connectivity.h"
+#include "FastQueue.h"
 #include <QSize>
 #include <vector>
-#include <queue>
 #include <assert.h>
 
 namespace imageproc
@@ -95,7 +95,7 @@ void seedFillSingleLine(
 template<typename T, typename SpreadOp, typename MaskOp>
 inline void processNeighbor(
 	SpreadOp spread_op, MaskOp mask_op,
-	std::queue<Position<T> >& queue, T const this_val,
+	FastQueue<Position<T> >& queue, T const this_val,
 	T* const neighbor, T const* const neighbor_mask,
 	Position<T> const& base_pos, int const x_delta, int const y_delta)
 {
@@ -111,7 +111,7 @@ inline void processNeighbor(
 template<typename T, typename SpreadOp, typename MaskOp>
 void spread4(
 	SpreadOp spread_op, MaskOp mask_op,
-	std::queue<Position<T> >& queue,
+	FastQueue<Position<T> >& queue,
 	HTransition const* h_transitions,
 	VTransition const* v_transitions,
 	int const seed_stride, int const mask_stride)
@@ -159,7 +159,7 @@ void spread4(
 template<typename T, typename SpreadOp, typename MaskOp>
 void spread8(
 	SpreadOp spread_op, MaskOp mask_op,
-	std::queue<Position<T> >& queue,
+	FastQueue<Position<T> >& queue,
 	HTransition const* h_transitions,
 	VTransition const* v_transitions,
 	int const seed_stride, int const mask_stride)
@@ -272,7 +272,7 @@ void seedFill4(
 	seed_line -= seed_stride;
 	mask_line -= mask_stride;
 
-	std::queue<Position<T> > queue;
+	FastQueue<Position<T> > queue;
 	std::vector<HTransition> h_transitions;
 	std::vector<VTransition> v_transitions;
 	initHorTransitions(h_transitions, w);
@@ -410,7 +410,7 @@ void seedFill8(
 		prev_line = seed_line;
 	}
 
-	std::queue<Position<T> > queue;
+	FastQueue<Position<T> > queue;
 	std::vector<HTransition> h_transitions;
 	std::vector<VTransition> v_transitions;
 	initHorTransitions(h_transitions, w);
