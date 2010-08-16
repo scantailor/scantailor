@@ -21,7 +21,8 @@
 
 #include "NonCopyable.h"
 #include <boost/intrusive/list.hpp>
-#include  <boost/type_traits/alignment_of.hpp>
+#include <boost/type_traits/alignment_of.hpp>
+#include <boost/foreach.hpp>
 #include <stddef.h>
 #include <assert.h>
 
