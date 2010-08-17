@@ -22,8 +22,8 @@
 #include <QSize>
 #include <QImage>
 #include <QDebug>
+#include <algorithm>
 #include <stdexcept>
-#include <queue>
 #include <vector>
 #include <stdint.h>
 #include <string.h>
