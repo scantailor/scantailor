@@ -24,6 +24,7 @@
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/foreach.hpp>
 #include <stddef.h>
+#include <stdint.h>
 #include <assert.h>
 
 template<typename T>
