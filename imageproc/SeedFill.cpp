@@ -539,7 +539,7 @@ void seedFillGrayInPlace(
 	}
 	
 	seedFillGenericInPlace(
-		&std::min<uint8_t>, &std::max<uint8_t>, connectivity,
+		&darkest, &lightest, connectivity,
 		seed.data(), seed.stride(), seed.size(),
 		mask.data(), mask.stride()
 	);
