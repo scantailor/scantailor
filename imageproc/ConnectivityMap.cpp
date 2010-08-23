@@ -26,7 +26,6 @@
 #include <QDebug>
 #include <algorithm>
 #include <stdexcept>
-#include <queue>
 #include <assert.h>
 
 namespace imageproc
@@ -344,7 +343,7 @@ ConnectivityMap::spreadMin4()
 	prev_line = line;
 	line -= stride;
 	
-	std::queue<uint32_t*> queue;
+	FastQueue<uint32_t*> queue;
 	
 	// Bottom to top.
 	for (int y = height - 1; y >= 0; --y) {
@@ -412,7 +411,7 @@ ConnectivityMap::spreadMin8()
 	prev_line = line;
 	line -= stride;
 	
-	std::queue<uint32_t*> queue;
+	FastQueue<uint32_t*> queue;
 	
 	// Bottom to top.
 	for (int y = height - 1; y >= 0; --y) {
@@ -453,7 +452,7 @@ ConnectivityMap::spreadMin8()
 
 void
 ConnectivityMap::processNeighbor(
-	std::queue<uint32_t*>& queue,
+	FastQueue<uint32_t*>& queue,
 	uint32_t const this_val, uint32_t* neighbor)
 {
 	// *neighbor + 1 will overflow if *neighbor == BACKGROUND,
@@ -465,7 +464,7 @@ ConnectivityMap::processNeighbor(
 }
 
 void
-ConnectivityMap::processQueue4(std::queue<uint32_t*>& queue)
+ConnectivityMap::processQueue4(FastQueue<uint32_t*>& queue)
 {
 	int const stride = m_stride;
 	
@@ -494,7 +493,7 @@ ConnectivityMap::processQueue4(std::queue<uint32_t*>& queue)
 }
 
 void
-ConnectivityMap::processQueue8(std::queue<uint32_t*>& queue)
+ConnectivityMap::processQueue8(FastQueue<uint32_t*>& queue)
 {
 	int const stride = m_stride;
 	

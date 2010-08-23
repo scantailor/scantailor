@@ -20,11 +20,11 @@
 #define IMAGEPROC_CONNECTIVITY_MAP_H_
 
 #include "Connectivity.h"
+#include "FastQueue.h"
 #include <QSize>
 #include <QColor>
 #include <Qt>
 #include <vector>
-#include <queue>
 #include <stdint.h>
 
 class QImage;
@@ -180,12 +180,12 @@ private:
 	void spreadMin8();
 	
 	void processNeighbor(
-		std::queue<uint32_t*>& queue,
+		FastQueue<uint32_t*>& queue,
 		uint32_t this_val, uint32_t* neighbor);
 
-	void processQueue4(std::queue<uint32_t*>& queue);
+	void processQueue4(FastQueue<uint32_t*>& queue);
 	
-	void processQueue8(std::queue<uint32_t*>& queue);
+	void processQueue8(FastQueue<uint32_t*>& queue);
 	
 	void markUsedIds(std::vector<uint32_t>& used_map) const;
 	

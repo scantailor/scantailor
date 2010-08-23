@@ -19,11 +19,11 @@
 #include "InfluenceMap.h"
 #include "BinaryImage.h"
 #include "ConnectivityMap.h"
+#include "FastQueue.h"
 #include "BitOps.h"
 #include <QImage>
 #include <QColor>
 #include <algorithm>
-#include <queue>
 #include <stdexcept>
 #include <assert.h>
 
@@ -112,7 +112,7 @@ InfluenceMap::init(
 	m_pData = &m_data[0] + width + 1;
 	m_maxLabel = cmap.maxLabel();
 	
-	std::queue<Cell*> queue;
+	FastQueue<Cell*> queue;
 	
 	Cell* cell = &m_data[0];
 	uint32_t const* label = cmap.paddedData();
