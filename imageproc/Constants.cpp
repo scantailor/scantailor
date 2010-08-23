@@ -24,6 +24,8 @@ namespace imageproc
 namespace constants
 {
 
+double const SQRT_2 = 1.4142135623730950488016887242097;
+
 double const PI = 3.141592653589793;
 
 double const DEG2RAD = PI / 180.0;

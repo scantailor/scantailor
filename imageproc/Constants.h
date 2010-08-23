@@ -27,6 +27,8 @@ namespace constants
 
 extern double const PI;
 
+extern double const SQRT_2;
+
 /**
  * angle_rad = angle_deg * RED2RAD
  */

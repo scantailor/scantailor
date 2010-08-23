@@ -34,6 +34,7 @@
 #include "PictureLayerProperty.h"
 #include "FillColorProperty.h"
 #include "CylindricalSurfaceDewarper.h"
+#include "TextLineTracer.h"
 #include "DewarpingPointMapper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
@@ -56,6 +57,8 @@
 #include "imageproc/AdjustBrightness.h"
 #include "imageproc/PolygonRasterizer.h"
 #include "imageproc/RasterDewarper.h"
+#include "imageproc/ConnectivityMap.h"
+#include "imageproc/InfluenceMap.h"
 #include "config.h"
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
@@ -790,6 +793,11 @@ OutputGenerator::processWithDewarping(
 	imageproc::BinaryImage* speckles_image,
 	DebugImages* dbg) const
 {
+	QSize const target_size(m_cropRect.size().expandedTo(QSize(1, 1)));
+	if (m_cropRect.isEmpty()) {
+		return BinaryImage(target_size, WHITE).toQImage();
+	}
+
 	RenderParams const render_params(m_colorParams);
 	
 	// The whole image minus the part cut off by the split line.
@@ -845,9 +853,14 @@ OutputGenerator::processWithDewarping(
 
 	// The output we would get if dewarping was turned off, except always grayscale.
 	// Used for automatic picture detection and binarization threshold calculation.
+	// This image corresponds to the area of normalize_illumination_rect above.
 	QImage warped_gray_output;
-	// TODO: it should be possible to use a lower resolution image here.
-	// After all, we already do picture detection at a reduced resolution.
+
+	// Picture mask (white indicate a picture) in the same coordinates as
+	// warped_gray_output.  Only built for Mixed mode.
+	BinaryImage warped_bw_mask;
+
+	BinaryThreshold bw_threshold(128);
 
 	if (!render_params.normalizeIllumination()) {
 		if (color_original) {
@@ -899,15 +912,128 @@ OutputGenerator::processWithDewarping(
 				dbg->add(normalized_original, "norm_illum_color");
 			}
 		}
+
+		//if (dbg) {
+		//	dbg->add(GVF(warped_gray_output.bits(), warped_gray_output.bytesPerLine(), warped_gray_output.size(), false, 0.2, 20).visualized(), "GVF");
+		//}
 	}
 
 	status.throwIfCancelled();
 
+	if (render_params.binaryOutput()) {
+		bw_threshold = calcBinarizationThreshold(
+			warped_gray_output, normalize_illumination_crop_area
+		);
+
+		status.throwIfCancelled();
+
+	} else if (render_params.mixedOutput()) {
+
+		estimateBinarizationMask(
+			status, GrayImage(warped_gray_output),
+			normalize_illumination_rect,
+			small_margins_rect, dbg
+		).swap(warped_bw_mask);
+		if (dbg) {
+			dbg->add(warped_bw_mask, "warped_bw_mask");
+		}
+
+		status.throwIfCancelled();
+
+		if (auto_picture_mask) {
+			if (auto_picture_mask->size() != target_size) {
+				BinaryImage(target_size).swap(*auto_picture_mask);
+			}
+			auto_picture_mask->fill(BLACK);
+
+			if (!m_contentRect.isEmpty()) {
+				QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
+				QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, warped_bw_mask, src_rect.topLeft());
+			}
+		}
+
+		status.throwIfCancelled();
+
+		modifyBinarizationMask(warped_bw_mask, small_margins_rect, picture_zones);
+		if (dbg) {
+			dbg->add(warped_bw_mask, "warped_bw_mask with zones");
+		}
+
+		status.throwIfCancelled();
+
+		// For Mixed output, we mask out pictures when calculating binarization threshold.
+		bw_threshold = calcBinarizationThreshold(
+			warped_gray_output, normalize_illumination_crop_area, &warped_bw_mask
+		);
+		
+		status.throwIfCancelled();
+	}
+
+	bool const auto_dewarping = true; // XXX
+	if (!auto_dewarping) {
+		warped_gray_output = QImage(); // Save memory.
+	} else {
+		BinaryImage warped_bw_output(warped_gray_output, bw_threshold);
+		warped_gray_output = QImage(); // Save memory.
+
+		QRect const content_rect(
+			m_contentRect.translated(-normalize_illumination_rect.topLeft())
+		);
+		warped_bw_output.fillFrame(warped_bw_output.rect(), content_rect, WHITE);
+
+		if (dbg) {
+			dbg->add(warped_bw_output, "warped_bw_output");
+		}
+#if 0
+		VectorizedInfluenceMap vmap(InfluenceMap(ConnectivityMap(warped_bw_output, CONN8)));
+		if (dbg) {
+			dbg->add(vmap.visualized(), "vmap");
+		}
+
+		BinaryImage image(warped_bw_output.width() + 1, warped_bw_output.height() + 1, WHITE);
+
+		{
+			uint32_t* const data = image.data();
+			int const stride = image.wordsPerLine();
+			uint32_t const msb = uint32_t(1) << 31;
+
+			BOOST_FOREACH(VectorizedInfluenceMap::Node const& node, vmap.nodes()) {
+				for (int i = 0; i < 4; ++i) {
+					int const edge = node.edges[i];
+					if (edge == -1) {
+						break;
+					}
+
+					ManhattanPath const& path = vmap.edges()[edge];
+					QPointF const vec(path.endPos() - path.startPos());
+					if (fabs(vec.x()) < fabs(vec.y())) {
+						// Too vertical.
+						continue;
+					}
+
+					BOOST_FOREACH(QPoint pt, path) {
+						data[pt.y() * stride + (pt.x() >> 5)] |= msb >> (pt.x() & 31);
+					}
+				}
+			}
+
+			if (dbg) {
+				dbg->add(image, "filtered_vmap");
+			}
+		}
+
+		rasterOp<RopOr<RopSrc, RopDst> >(warped_bw_output, warped_bw_output.rect(), image, QPoint(1, 1));
+		if (dbg) {
+			dbg->add(warped_bw_output, "combined");
+		}
+#endif
+		TextLineTracer::trace(warped_bw_output, status, dbg);
+	}
+
 	if (render_params.whiteMargins()) {
 		// Fill everything except the content area in normalized_original to white.
-		QPolygonF const orig_content_poly(
-			m_toUncropped.inverted().map(QRectF(m_contentRect))
-		);
+		QPolygonF const orig_content_poly(m_toUncropped.inverted().map(QRectF(m_contentRect)));
 		fillMarginsInPlace(normalized_original, orig_content_poly, Qt::white);
 		if (dbg) {
 			dbg->add(normalized_original, "white margins");
@@ -948,12 +1074,6 @@ OutputGenerator::processWithDewarping(
 		}
 	}
 
-	QSize const target_size(m_cropRect.size().expandedTo(QSize(1, 1)));
-
-	if (m_cropRect.isEmpty()) {
-		return BinaryImage(target_size, WHITE).toQImage();
-	}
-
 	boost::shared_ptr<DewarpingPointMapper> mapper(
 		new DewarpingPointMapper(
 			distortion_model, depth_perception.value(),
@@ -965,16 +1085,7 @@ OutputGenerator::processWithDewarping(
 	);
 
 	if (render_params.binaryOutput()) {	
-		BinaryThreshold const unmasked_bw_threshold(
-			calcBinarizationThreshold(
-				warped_gray_output, normalize_illumination_crop_area
-			)
-		);
-		warped_gray_output = QImage(); // Save memory.
-
-		status.throwIfCancelled();
-
-		BinaryImage dewarped_bw_content(dewarped_and_maybe_smoothed, unmasked_bw_threshold);
+		BinaryImage dewarped_bw_content(dewarped_and_maybe_smoothed, bw_threshold);
 		dewarped_and_maybe_smoothed = QImage(); // Save memory.
 		if (dbg) {
 			dbg->add(dewarped_bw_content, "dewarped_bw_content");
@@ -1004,37 +1115,6 @@ OutputGenerator::processWithDewarping(
 	}
 
 	if (render_params.mixedOutput()) {
-		BinaryImage warped_bw_mask(
-			estimateBinarizationMask(
-				status, GrayImage(warped_gray_output),
-				normalize_illumination_rect,
-				small_margins_rect, dbg
-			)
-		);
-		if (dbg) {
-			dbg->add(warped_bw_mask, "warped_bw_mask");
-		}
-		
-		if (auto_picture_mask) {
-			if (auto_picture_mask->size() != target_size) {
-				BinaryImage(target_size).swap(*auto_picture_mask);
-			}
-			auto_picture_mask->fill(BLACK);
-
-			if (!m_contentRect.isEmpty()) {
-				QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
-				QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
-				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, warped_bw_mask, src_rect.topLeft());
-			}
-		}
-
-		status.throwIfCancelled();
-
-		modifyBinarizationMask(warped_bw_mask, small_margins_rect, picture_zones);
-		if (dbg) {
-			dbg->add(warped_bw_mask, "warped_bw_mask with zones");
-		}
-
 		status.throwIfCancelled();
 
 		// Dewarp the B/W mask.
@@ -1051,17 +1131,7 @@ OutputGenerator::processWithDewarping(
 
 		status.throwIfCancelled();
 
-		// For Mixed output, we mask out pictures when calculating binarization threshold.
-		BinaryThreshold const masked_bw_threshold(
-			calcBinarizationThreshold(
-				warped_gray_output, normalize_illumination_crop_area, &warped_bw_mask
-			)
-		);
-		warped_gray_output = QImage(); // Save memory.
-
-		status.throwIfCancelled();
-
-		BinaryImage dewarped_bw_content(dewarped_and_maybe_smoothed, masked_bw_threshold);
+		BinaryImage dewarped_bw_content(dewarped_and_maybe_smoothed, bw_threshold);
 		dewarped_and_maybe_smoothed = QImage(); // Save memory.
 		if (dbg) {
 			dbg->add(dewarped_bw_content, "dewarped_bw_content");
