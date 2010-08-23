@@ -72,7 +72,7 @@ UnremoveButton::onProximityUpdate(
 void
 UnremoveButton::onMousePressEvent(QMouseEvent* event, InteractionState& interaction)
 {
-	if (!interaction.captured()) {
+	if (!interaction.captured() && interaction.proximityLeader(m_proximityInteraction)) {
 		event->accept();
 		m_clickCallback();
 	}
