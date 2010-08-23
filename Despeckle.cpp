@@ -20,6 +20,7 @@
 #include "TaskStatus.h"
 #include "DebugImages.h"
 #include "Dpi.h"
+#include "FastQueue.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/Connectivity.h"
@@ -28,7 +29,6 @@
 #include <QImage>
 #include <QDebug>
 #include <vector>
-#include <queue>
 #include <map>
 #include <limits>
 #include <algorithm>
@@ -912,7 +912,7 @@ Despeckle::despeckleInPlace(
 	}
 	
 	// Labels of components that are to be retained.
-	std::queue<uint32_t> ok_labels;
+	FastQueue<uint32_t> ok_labels;
 	ok_labels.push(unified_big_component);
 	
 	while (!ok_labels.empty()) {
