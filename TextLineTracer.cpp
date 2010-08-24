@@ -82,7 +82,7 @@ struct TextLineTracer::Connection
 {
 	uint32_t lesserLabel;
 	uint32_t greaterLabel;
-	uint32_t distSq;
+	mutable uint32_t distSq;
 
 	Connection(uint32_t label0, uint32_t label1, uint32_t sqdist) {
 		if (label0 < label1) {
