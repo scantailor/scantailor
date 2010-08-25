@@ -554,40 +554,25 @@ ProjectPages::removePagesImpl(std::set<PageId> const& to_remove, bool& modified)
 	for (int i = 0; i < num_old_images; ++i) {
 		ImageDesc image(m_images[i]);
 
-		if (image.numLogicalPages == 1) {
-			if (to_remove.find(PageId(image.id, PageId::SINGLE_PAGE)) == to_remove_end) {
-				new_images.push_back(image);
-				new_total_logical_pages += image.numLogicalPages;
-			} else {
-				modified = true;
-			}
+		if (to_remove.find(PageId(image.id, PageId::SINGLE_PAGE)) != to_remove_end) {
+			image.numLogicalPages = 0;
+			modified = true;
 		} else {
-			assert(image.numLogicalPages == 2);
-
-			int subpages_to_remove = 0;
-			if (to_remove.find(PageId(image.id, PageId::SINGLE_PAGE)) != to_remove_end) {
-				subpages_to_remove = 2;
-			} else {
-				if (to_remove.find(PageId(image.id, PageId::LEFT_PAGE)) != to_remove_end) {
-					image.leftHalfRemoved = true;
-					--image.numLogicalPages;
-					++subpages_to_remove;
-				}
-				if (to_remove.find(PageId(image.id, PageId::RIGHT_PAGE)) != to_remove_end) {
-					image.rightHalfRemoved = true;
-					--image.numLogicalPages;
-					++subpages_to_remove;
-				}
-			}
-
-			if (subpages_to_remove < 2) {
-				new_images.push_back(image);
-				new_total_logical_pages += new_images.back().numLogicalPages;
-			}
-
-			if (subpages_to_remove > 0) {
+			if (to_remove.find(PageId(image.id, PageId::LEFT_PAGE)) != to_remove_end) {
+				image.leftHalfRemoved = true;
+				--image.numLogicalPages;
 				modified = true;
 			}
+			if (to_remove.find(PageId(image.id, PageId::RIGHT_PAGE)) != to_remove_end) {
+				image.rightHalfRemoved = true;
+				--image.numLogicalPages;
+				modified = true;
+			}
+		}
+
+		if (image.numLogicalPages > 0) {
+			new_images.push_back(image);
+			new_total_logical_pages += new_images.back().numLogicalPages;
 		}
 	}
 
