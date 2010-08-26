@@ -16,7 +16,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recogrnition is out of scope of this project.</source>
-        <translation>Scan Tailor ist ein interaktives Werkzeug zur Bildnachverarbeitung gescannter Seiten. Es führt Operationen wie das Aufteilen von Seiten, Verzerrungskorrektur, Hinzufügen/Entfernen von Stegen (Rändern), usw. durch. Sie übergeben dem Programm unbearbeitete Scans und erhalten Seiten zurück, die zum Drucken oder Zusammensetzen einer PDF- oder DJVU-Datei aufbereitet sind. Das Scannen selbst und Texterkennung (OCR) liegen außerhalb des Rahmens dieses Projekts.</translation>
+        <translation type="unfinished">Scan Tailor ist ein interaktives Werkzeug zur Bildnachverarbeitung gescannter Seiten. Es führt Operationen wie das Aufteilen von Seiten, Ausrichten, Hinzufügen/Entfernen von Stegen (Rändern), usw. durch. Sie übergeben dem Programm unbearbeitete Scans und erhalten Seiten zurück, die zum Drucken oder Zusammensetzen einer PDF- oder DJVU-Datei aufbereitet sind. Das Scannen selbst und Texterkennung (OCR) liegen außerhalb des Rahmens dieses Projekts.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="87"/>
@@ -117,7 +117,7 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="19"/>
         <source>Deskew</source>
-        <translation>Entzerren</translation>
+        <translation>Ausrichten</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="40"/>
@@ -573,7 +573,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="17"/>
         <source>Fix Orientation</source>
-        <translation>Ausrichtung korrigieren</translation>
+        <translation>Seite drehen</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="23"/>
@@ -1400,7 +1400,7 @@ Benutzeroberläche verwenden</translation>
     <message>
         <location filename="../filters/deskew/Filter.cpp" line="52"/>
         <source>Deskew</source>
-        <translation>Entzerren</translation>
+        <translation>Ausrichten</translation>
     </message>
 </context>
 <context>
@@ -1429,7 +1429,7 @@ Benutzeroberläche verwenden</translation>
     <message>
         <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
         <source>Fix Orientation</source>
-        <translation>Ausrichtung korrigieren</translation>
+        <translation>Seiten drehen</translation>
     </message>
 </context>
 <context>
@@ -1665,5 +1665,3 @@ Benutzeroberläche verwenden</translation>
     </message>
 </context>
 </TS>
-
- 	  	 
