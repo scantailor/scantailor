@@ -20,6 +20,7 @@
 #include "NumericTraits.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "ToLineProjector.h"
 #include "imageproc/PolygonUtils.h"
 #include <QPolygonF>
 #include <QSizeF>
@@ -269,9 +270,15 @@ PageLayout::singlePageOutline() const
 	QLineF const line1(extendToCover(m_cutter1, m_uncutOutline));
 	QLineF line2(extendToCover(m_cutter2, m_uncutOutline));
 	ensureSameDirection(line1, line2);
+	QLineF const reverse_line1(line1.p2(), line1.p1());
+	QLineF const reverse_line2(line2.p2(), line2.p1());
 	
 	QPolygonF poly;
-	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
+	poly << line1.p1();
+	maybeAddIntersectionPoint(poly, line1.normalVector(), line2.normalVector());
+	poly << line2.p1() << line2.p2();
+	maybeAddIntersectionPoint(poly, reverse_line1.normalVector(), reverse_line2.normalVector());
+	poly << line1.p2();
 
 	return PolygonUtils::round(m_uncutOutline).intersected(PolygonUtils::round(poly));
 }
@@ -294,9 +301,15 @@ PageLayout::leftPageOutline() const
 	QLineF const line1(m_uncutOutline[0], m_uncutOutline[3]);
 	QLineF line2(extendToCover(m_cutter1, m_uncutOutline));
 	ensureSameDirection(line1, line2);
+	QLineF const reverse_line1(line1.p2(), line1.p1());
+	QLineF const reverse_line2(line2.p2(), line2.p1());
 	
 	QPolygonF poly;
-	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
+	poly << line1.p1();
+	maybeAddIntersectionPoint(poly, line1.normalVector(), line2.normalVector());
+	poly << line2.p1() << line2.p2();
+	maybeAddIntersectionPoint(poly, reverse_line1.normalVector(), reverse_line2.normalVector());
+	poly << line1.p2();
 
 	return PolygonUtils::round(m_uncutOutline).intersected(PolygonUtils::round(poly));
 }
@@ -319,9 +332,15 @@ PageLayout::rightPageOutline() const
 	QLineF const line1(m_uncutOutline[1], m_uncutOutline[2]);
 	QLineF line2(extendToCover(m_cutter1, m_uncutOutline));
 	ensureSameDirection(line1, line2);
+	QLineF const reverse_line1(line1.p2(), line1.p1());
+	QLineF const reverse_line2(line2.p2(), line2.p1());
 	
 	QPolygonF poly;
-	poly << line1.p1() << line2.p1() << line2.p2() << line1.p2();
+	poly << line1.p1();
+	maybeAddIntersectionPoint(poly, line1.normalVector(), line2.normalVector());
+	poly << line2.p1() << line2.p2();
+	maybeAddIntersectionPoint(poly, reverse_line1.normalVector(), reverse_line2.normalVector());
+	poly << line1.p2();
 
 	return PolygonUtils::round(m_uncutOutline).intersected(PolygonUtils::round(poly));
 }
@@ -417,27 +436,21 @@ PageLayout::extendToCover(QLineF const& line, QPolygonF const& poly)
 
 	// Project every vertex of the polygon onto the line and take extremas.
 
-	QLineF const unit_line(line.unitVector());
-	QPointF const origin(unit_line.p1());
-	QPointF const unit_vec(unit_line.p2() - origin);
-	
 	double min = NumericTraits<double>::max();
 	double max = NumericTraits<double>::min();
+	ToLineProjector const projector(line);
 
-	BOOST_FOREACH(QPointF pt, poly) {
-		pt -= origin;
-		double const dot = pt.x() * unit_vec.x() + pt.y() * unit_vec.y();
-		if (dot <= min) {
-			min = dot;
+	BOOST_FOREACH(QPointF const& pt, poly) {
+		double const scalar = projector.projectionScalar(pt);
+		if (scalar < min) {
+			min = scalar;
 		}
-		if (dot >= max) {
-			max = dot;
+		if (scalar > max) {
+			max = scalar;
 		}
 	}
 
-	QPointF const p1(origin + unit_vec * min);
-	QPointF const p2(origin + unit_vec * max);
-	return QLineF(p1, p2);
+	return QLineF(line.pointAt(min), line.pointAt(max));
 }
 
 /**
@@ -453,6 +466,31 @@ PageLayout::ensureSameDirection(QLineF const& line1, QLineF& line2)
 	double const dot = v1.x() * v2.x() + v1.y() * v2.y();
 	if (dot < 0.0) {
 		line2 = QLineF(line2.p2(), line2.p1());
+	}
+}
+
+/**
+ * Add the intersection point between \p line1 and \p line2
+ * to \p poly, provided they intersect at all and the intersection
+ * point is "between" line1.p1() and line2.p1().  We consider a point
+ * to be between two other points by projecting it to the line between
+ * those two points and checking if the projected point is between them.
+ * When finding the intersection point, we treat \p line1 and \p line2
+ * as lines, not line segments.
+ */
+void
+PageLayout::maybeAddIntersectionPoint(
+	QPolygonF& poly, QLineF const& line1, QLineF const& line2)
+{
+	QPointF intersection;
+	if (line1.intersect(line2, &intersection) == QLineF::NoIntersection) {
+		return;
+	}
+
+	ToLineProjector const projector(QLineF(line1.p1(), line2.p1()));
+	double const p = projector.projectionScalar(intersection);
+	if (p > 0.0 && p < 1.0) {
+		poly << intersection;
 	}
 }
 
