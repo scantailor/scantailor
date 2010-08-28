@@ -176,6 +176,9 @@ private:
 	static QLineF extendToCover(QLineF const& line, QPolygonF const& poly);
 
 	static void ensureSameDirection(QLineF const& line1, QLineF& line2);
+
+	static void maybeAddIntersectionPoint(
+		QPolygonF& poly, QLineF const& line1, QLineF const& line2);
 	
 	/**
 	 * This polygon always corresponds to a rectangle, unless it's empty.

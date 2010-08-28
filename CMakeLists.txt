@@ -266,7 +266,7 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(. foundation interaction zones ${QT_INCLUDES})
+INCLUDE_DIRECTORIES(. foundation math interaction zones ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
 SET(EXTRA_LIBS)
@@ -316,6 +316,7 @@ CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
 # crash_reporter is included unconditionally to collect translation sources from there.
 ADD_SUBDIRECTORY(crash_reporter)
 ADD_SUBDIRECTORY(foundation)
+ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(imageproc)
 ADD_SUBDIRECTORY(interaction)
 ADD_SUBDIRECTORY(zones)
@@ -475,7 +476,7 @@ ADD_EXECUTABLE(
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output
-	zones interaction imageproc foundation
+	zones interaction imageproc math foundation
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)

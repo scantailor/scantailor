@@ -6,6 +6,7 @@ SET(
 	sources
 	NonCopyable.h IntrusivePtr.h RefCountable.h
 	AlignedArray.h
+	NumericTraits.h
 	FastQueue.h
 	SafeDeletingQObjectPtr.h
 	ScopedIncDec.h ScopedDecInc.h
@@ -17,6 +18,7 @@ SET(
 	PropertySet.cpp PropertySet.h
 	PerformanceTimer.cpp PerformanceTimer.h
 	QtSignalForwarder.cpp QtSignalForwarder.h
+	VecNT.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
