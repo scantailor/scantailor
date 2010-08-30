@@ -257,7 +257,9 @@
 #ifndef uint8_t
 # if (UCHAR_MAX == UINT8_MAX) || defined (S_SPLINT_S)
     typedef unsigned char uint8_t;
+#   ifndef UINT8_C
 #   define UINT8_C(v) ((uint8_t) v)
+#   endif
 # else
 #   error "Platform not supported"
 # endif
@@ -272,7 +274,9 @@
 #ifndef int8_t
 # if (SCHAR_MAX == INT8_MAX) || defined (S_SPLINT_S)
     typedef signed char int8_t;
+#   ifndef INT8_C
 #   define INT8_C(v) ((int8_t) v)
+#   endif
 # else
 #   error "Platform not supported"
 # endif
@@ -287,10 +291,14 @@
 # ifndef PRINTF_INT16_MODIFIER
 #  define PRINTF_INT16_MODIFIER ""
 # endif
+# ifndef UINT16_C
 # define UINT16_C(v) ((uint16_t) (v))
+# endif
 #elif (USHRT_MAX == UINT16_MAX)
   typedef unsigned short uint16_t;
+# ifndef UINT16_C
 # define UINT16_C(v) ((uint16_t) (v))
+# endif
 # ifndef PRINTF_INT16_MODIFIER
 #  define PRINTF_INT16_MODIFIER "h"
 # endif
@@ -308,13 +316,17 @@
 #ifndef int16_t
 #if (INT_MAX == INT16_MAX) || defined (S_SPLINT_S)
   typedef signed int int16_t;
+# ifndef INT16_C
 # define INT16_C(v) ((int16_t) (v))
+# endif
 # ifndef PRINTF_INT16_MODIFIER
 #  define PRINTF_INT16_MODIFIER ""
 # endif
 #elif (SHRT_MAX == INT16_MAX)
   typedef signed short int16_t;
+# ifndef INT16_C
 # define INT16_C(v) ((int16_t) (v))
+# endif
 # ifndef PRINTF_INT16_MODIFIER
 #  define PRINTF_INT16_MODIFIER "h"
 # endif
@@ -329,7 +341,9 @@
 #ifndef uint32_t
 #if (ULONG_MAX == UINT32_MAX) || defined (S_SPLINT_S)
   typedef unsigned long uint32_t;
+# ifndef UINT32_C
 # define UINT32_C(v) v ## UL
+# endif
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER "l"
 # endif
@@ -338,10 +352,14 @@
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER ""
 # endif
+# ifndef UINT32_C
 # define UINT32_C(v) v ## U
+# endif
 #elif (USHRT_MAX == UINT32_MAX)
   typedef unsigned short uint32_t;
+# ifndef UINT32_C
 # define UINT32_C(v) ((unsigned short) (v))
+# endif
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER ""
 # endif
@@ -359,19 +377,25 @@
 #ifndef int32_t
 #if (LONG_MAX == INT32_MAX) || defined (S_SPLINT_S)
   typedef signed long int32_t;
+# ifndef INT32_C
 # define INT32_C(v) v ## L
+# endif
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER "l"
 # endif
 #elif (INT_MAX == INT32_MAX)
   typedef signed int int32_t;
+# ifndef INT32_C
 # define INT32_C(v) v
+# endif
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER ""
 # endif
 #elif (SHRT_MAX == INT32_MAX)
   typedef signed short int32_t;
+# ifndef INT32_C
 # define INT32_C(v) ((short) (v))
+# endif
 # ifndef PRINTF_INT32_MODIFIER
 #  define PRINTF_INT32_MODIFIER ""
 # endif
@@ -393,8 +417,12 @@
 #  define stdint_int64_defined
    typedef long long int64_t;
    typedef unsigned long long uint64_t;
+#  ifndef UINT64_C
 #  define UINT64_C(v) v ## ULL
+#  endif
+#  ifndef  INT64_C
 #  define  INT64_C(v) v ## LL
+#  endif
 #  ifndef PRINTF_INT64_MODIFIER
 #   define PRINTF_INT64_MODIFIER "ll"
 #  endif
@@ -406,8 +434,12 @@
 #  define stdint_int64_defined
    __extension__ typedef long long int64_t;
    __extension__ typedef unsigned long long uint64_t;
+#  ifndef UINT64_C
 #  define UINT64_C(v) v ## ULL
+#  endif
+#  ifndef  INT64_C
 #  define  INT64_C(v) v ## LL
+#  endif
 #  ifndef PRINTF_INT64_MODIFIER
 #   define PRINTF_INT64_MODIFIER "ll"
 #  endif
@@ -415,8 +447,12 @@
 #  define stdint_int64_defined
    typedef long long int64_t;
    typedef unsigned long long uint64_t;
+#  ifndef UINT64_C
 #  define UINT64_C(v) v ## ULL
+#  endif
+#  ifndef  INT64_C
 #  define  INT64_C(v) v ## LL
+#  endif
 #  ifndef PRINTF_INT64_MODIFIER
 #   define PRINTF_INT64_MODIFIER "ll"
 #  endif
@@ -424,8 +460,12 @@
 #  define stdint_int64_defined
    typedef __int64 int64_t;
    typedef unsigned __int64 uint64_t;
+#  ifndef UINT64_C
 #  define UINT64_C(v) v ## UI64
+#  endif
+#  ifndef  INT64_C
 #  define  INT64_C(v) v ## I64
+#  endif
 #  ifndef PRINTF_INT64_MODIFIER
 #   define PRINTF_INT64_MODIFIER "I64"
 #  endif
@@ -488,11 +528,21 @@
 #ifdef stdint_int64_defined
   typedef int64_t intmax_t;
   typedef uint64_t uintmax_t;
+# ifndef  INTMAX_MAX
 # define  INTMAX_MAX   INT64_MAX
+# endif
+# ifndef  INTMAX_MIN
 # define  INTMAX_MIN   INT64_MIN
+# endif
+# ifndef UINTMAX_MAX
 # define UINTMAX_MAX  UINT64_MAX
+# endif
+# ifndef UINTMAX_C
 # define UINTMAX_C(v) UINT64_C(v)
+# endif
+# ifndef  INTMAX_C
 # define  INTMAX_C(v)  INT64_C(v)
+# endif
 # ifndef PRINTF_INTMAX_MODIFIER
 #   define PRINTF_INTMAX_MODIFIER PRINTF_INT64_MODIFIER
 # endif
@@ -505,10 +555,18 @@
 #else
   typedef int32_t intmax_t;
   typedef uint32_t uintmax_t;
+# ifndef  INTMAX_MAX
 # define  INTMAX_MAX   INT32_MAX
+# endif
+# ifndef UINTMAX_MAX
 # define UINTMAX_MAX  UINT32_MAX
+# endif
+# ifndef UINTMAX_C
 # define UINTMAX_C(v) UINT32_C(v)
+# endif
+# ifndef  INTMAX_C
 # define  INTMAX_C(v)  INT32_C(v)
+# endif
 # ifndef PRINTF_INTMAX_MODIFIER
 #   define PRINTF_INTMAX_MODIFIER PRINTF_INT32_MODIFIER
 # endif
