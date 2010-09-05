@@ -381,6 +381,16 @@ VecNT<N, T> operator-(VecNT<N, T> const& lhs, VecNT<N, T> const& rhs)
 }
 
 template<size_t N, typename T>
+VecNT<N, T> operator-(VecNT<N, T> const& vec)
+{
+	VecNT<N, T> res(vec);
+	for (size_t i = 0; i < N; ++i) {
+		res[i] = -res[i];
+	}
+	return res;
+}
+
+template<size_t N, typename T>
 VecNT<N, T> operator*(VecNT<N, T> const& vec, T scalar)
 {
 	VecNT<N, T> res(vec);

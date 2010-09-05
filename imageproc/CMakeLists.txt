@@ -51,6 +51,7 @@ SET(
 	FindPeaksGeneric.h
 	RasterDewarper.cpp RasterDewarper.h
 	ColorMixer.h
+	ColorForId.h
 )
 
 SOURCE_GROUP(Sources FILES ${sources})

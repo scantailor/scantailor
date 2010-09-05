@@ -20,8 +20,11 @@
 #define TEXT_LINE_TRACER_H_
 
 #include "imageproc/InfluenceMap.h"
+#include "FastQueue.h"
 #include <QPoint>
+#include <QLineF>
 #include <vector>
+#include <list>
 #include <set>
 #include <stdint.h>
 
@@ -32,6 +35,7 @@ class DebugImages;
 namespace imageproc
 {
 	class BinaryImage;
+	class ConnectivityMap;
 }
 
 class TextLineTracer
@@ -44,22 +48,62 @@ private:
 	struct BoundingBox;
 	struct Component;
 	struct Connection;
+	class CompPriorityQueue;
+
+	static void calcBoundingBoxes(
+		imageproc::ConnectivityMap const& cmap, std::vector<Component>& components);
+
+	static void subdivideLongComponents(
+		imageproc::ConnectivityMap& cmap, std::vector<Component>& components);
+
+	static int calcMedianCompHeight(std::vector<Component> const& components);
 
 	static void findVoronoiConnections(
 		imageproc::InfluenceMap const& imap, std::set<Connection>& connections);
-
-	static QImage overlay(QImage const& background, imageproc::BinaryImage const& overlay);
 
 	static inline void processPossibleConnection(
 		std::set<Connection>& connections,
 		imageproc::InfluenceMap::Cell const& cell1,
 		imageproc::InfluenceMap::Cell const& cell2);
 
-	static QImage visualizeConnections(
-		QImage const& background, std::set<Connection> const& connections,
-		std::vector<Component> const& components);
+	static void labelEdgeComponents(
+		std::vector<Component>& components,
+		imageproc::InfluenceMap const& imap, int x, int flag);
 
-	static void labelGroup(std::vector<Component>& components, Component& comp, uint32_t label);
+	template<typename BetterX>
+	static QLineF estimateVerticalCutter(
+		imageproc::InfluenceMap const& imap, std::vector<Component>& components,
+		int flag, int median_comp_height, BetterX better_x);
+
+	static void connectEndpoints(
+		std::vector<Component>& components, std::list<std::vector<uint32_t> >& lines);
+
+	static void propagateLengthFrom(
+		Component& comp, std::vector<Component>& components, CompPriorityQueue& queue);
+
+	static void propagateLengthFromTo(
+		QPoint vec_from_prev, double vec_from_prev_len, Component const& from_comp,
+		QPoint comp_center, Component& to_comp, CompPriorityQueue& queue);
+
+	static void propagateMaxCurvatureFrom(
+		Component& comp, std::vector<Component>& components, CompPriorityQueue& queue);
+
+	static void propagateMaxCurvatureFromTo(
+		QPointF normal_from_prev, Component const& from_comp,
+		QPoint comp_center, Component& to_comp, CompPriorityQueue& queue);
+
+	static QImage overlay(QImage const& background, imageproc::BinaryImage const& overlay);
+
+	static QImage visualizeLeftRightComponents(
+		std::vector<Component> const& components,
+		imageproc::InfluenceMap const& imap);
+
+	static QImage visualizeCutters(
+		QImage const& background, QLineF const& cutter1, QLineF const& cutter2);
+
+	static QImage visualizeConnections(
+		QImage const& background, std::list<std::vector<uint32_t> > const& lines,
+		std::vector<Component> const& components);
 };
 
 #endif
