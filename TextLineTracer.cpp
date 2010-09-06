@@ -30,6 +30,7 @@
 #include "imageproc/InfluenceMap.h"
 #include "imageproc/ColorForId.h"
 #include <QPoint>
+#include <QPointF>
 #include <QSize>
 #include <QRect>
 #include <QRectF>
@@ -288,7 +289,12 @@ TextLineTracer::trace(
 	std::list<std::vector<uint32_t> > lines;
 	connectEndpoints(components, lines);
 	if (dbg) {
-		dbg->add(visualizeConnections(input.toQImage(), lines, components), "connections");
+		dbg->add(
+			visualizeTracedLinesAndCutters(
+				input.toQImage(), lines, components, left_cutter, right_cutter
+			),
+			"traced_lines"
+		);
 	}
 }
 
@@ -646,7 +652,22 @@ TextLineTracer::estimateVerticalCutter(
 		}
 	}
 
-	return line;
+
+	// Extend the line to cover the whole image, and possibly more.
+
+	ToLineProjector const projector(line);
+	QPolygonF poly;
+	poly << QPointF(0, 0) << QPointF(0, w) << QPointF(w, h) << QPointF(0, h);
+	
+	double p_min = NumericTraits<double>::max();
+	double p_max = NumericTraits<double>::min();
+	BOOST_FOREACH(QPointF const& pt, poly) {
+		double const p = projector.projectionScalar(pt);
+		p_min = std::min(p_min, p);
+		p_max = std::max(p_max, p);
+	}
+
+	return QLineF(line.pointAt(p_min), line.pointAt(p_max));
 }
 
 void
@@ -978,63 +999,47 @@ QImage
 TextLineTracer::visualizeCutters(
 	QImage const& background, QLineF const& cutter1, QLineF const& cutter2)
 {
-	ToLineProjector const proj1(cutter1);
-	ToLineProjector const proj2(cutter2);
-	QPolygonF const poly(QRectF(background.rect()));
-	
-	double p1_min = NumericTraits<double>::max();
-	double p1_max = NumericTraits<double>::min();
-	double p2_min = NumericTraits<double>::max();
-	double p2_max = NumericTraits<double>::min();
-	BOOST_FOREACH(QPointF pt, poly) {
-		double const p1 = proj1.projectionScalar(pt);
-		double const p2 = proj2.projectionScalar(pt);
-		p1_min = std::min(p1, p1_min);
-		p1_max = std::max(p1, p1_max);
-		p2_min = std::min(p2, p2_min);
-		p2_max = std::max(p2, p2_max);
-	}
-
 	QImage canvas(background.convertToFormat(QImage::Format_ARGB32_Premultiplied));
 	QPainter painter(&canvas);
 	painter.setRenderHint(QPainter::Antialiasing);
 	
-	QPen pen(Qt::blue);
+	QPen pen(QColor(0, 0, 255, 180));
 	pen.setWidthF(5.0);
 	painter.setPen(pen);
 
-	painter.drawLine(cutter1.pointAt(p1_min), cutter1.pointAt(p1_max));
-	painter.drawLine(cutter2.pointAt(p2_min), cutter2.pointAt(p2_max));
+	painter.drawLine(cutter1);
+	painter.drawLine(cutter2);
 
 	return canvas;
 }
 
 QImage
-TextLineTracer::visualizeConnections(
+TextLineTracer::visualizeTracedLinesAndCutters(
 	QImage const& background, std::list<std::vector<uint32_t> > const& lines,
-	std::vector<Component> const& components)
+	std::vector<Component> const& components, QLineF const& cutter1, QLineF const& cutter2)
 {
 	QImage canvas(background.convertToFormat(QImage::Format_ARGB32_Premultiplied));
 	QPainter painter(&canvas);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	QPen pen;
+	QPen pen(QColor(255, 0, 0, 180));
 	pen.setWidthF(10.0);
+	painter.setPen(pen);
 	
 	QVector<QPointF> polyline;
 	BOOST_FOREACH(std::vector<uint32_t> const& line, lines) {
-		QColor color(colorForId(components[line.front()].label));
-		color.setAlphaF(0.7);
-		pen.setColor(color);
-		painter.setPen(pen);
-
 		polyline.clear();
 		BOOST_FOREACH(uint32_t label, line) {
 			polyline.push_back(components[label].bbox.centerF());
 		}
-
 		painter.drawPolyline(polyline);
 	}
+
+	pen.setColor(QColor(0, 0, 255, 180));
+	painter.setPen(pen);
+
+	painter.drawLine(cutter1);
+	painter.drawLine(cutter2);
 
 	return canvas;
 }

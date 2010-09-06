@@ -101,9 +101,9 @@ private:
 	static QImage visualizeCutters(
 		QImage const& background, QLineF const& cutter1, QLineF const& cutter2);
 
-	static QImage visualizeConnections(
+	static QImage visualizeTracedLinesAndCutters(
 		QImage const& background, std::list<std::vector<uint32_t> > const& lines,
-		std::vector<Component> const& components);
+		std::vector<Component> const& components, QLineF const& cutter1, QLineF const& cutter2);
 };
 
 #endif
