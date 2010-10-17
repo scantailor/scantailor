@@ -82,7 +82,7 @@ QImage toGrayscale(QImage const& src);
  *        clipped to 255 (white).
  * \return A grayscale image, or a null image, if \p src was null.
  */
-QImage stretchGrayRange(QImage const& src, double black_clip_fraction = 0.0,
+GrayImage stretchGrayRange(GrayImage const& src, double black_clip_fraction = 0.0,
 	double white_clip_fraction = 0.0);
 
 /**

@@ -171,15 +171,15 @@ QImage toGrayscale(QImage const& src)
 	}
 }
 
-QImage stretchGrayRange(
-	QImage const& src,
+GrayImage stretchGrayRange(
+	GrayImage const& src,
 	double const black_clip_fraction, double const white_clip_fraction)
 {
 	if (src.isNull()) {
-		return QImage();
+		return src;
 	}
 	
-	QImage dst(toGrayscale(src));
+	GrayImage dst(src);
 	
 	int const width = dst.width();
 	int const height = dst.height();
@@ -226,10 +226,10 @@ QImage stretchGrayRange(
 		}
 	}
 	
-	uint8_t* line = dst.bits();
-	int const bpl = dst.bytesPerLine();
+	uint8_t* line = dst.data();
+	int const stride = dst.stride();
 	
-	for (int y = 0; y < height; ++y, line += bpl) {
+	for (int y = 0; y < height; ++y, line += stride) {
 		for (int x = 0; x < width; ++x) {
 			line[x] = gray_mapping[line[x]];
 		}
