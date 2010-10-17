@@ -427,6 +427,7 @@ SET(
 	Despeckle.cpp Despeckle.h
 	#Undistort.cpp Undistort.h
 	TextLineTracer.cpp TextLineTracer.h
+	TextLineTracer2.cpp TextLineTracer2.h
 	ThreadPriority.cpp ThreadPriority.h
 	SystemLoadWidget.cpp SystemLoadWidget.h
 	FileNameDisambiguator.cpp FileNameDisambiguator.h

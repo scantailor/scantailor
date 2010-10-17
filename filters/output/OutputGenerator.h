@@ -160,7 +160,7 @@ private:
 	static void fillMarginsInPlace(
 		QImage& image, QPolygonF const& content_poly, QColor const& color);
 
-	static QImage normalizeIlluminationGray(
+	static imageproc::GrayImage normalizeIlluminationGray(
 		TaskStatus const& status,
 		QImage const& input, QPolygonF const& area_to_consider,
 		QTransform const& xform, QRect const& target_rect,

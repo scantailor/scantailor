@@ -35,6 +35,7 @@
 #include "FillColorProperty.h"
 #include "CylindricalSurfaceDewarper.h"
 #include "TextLineTracer.h"
+#include "TextLineTracer2.h"
 #include "DewarpingPointMapper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
@@ -311,7 +312,7 @@ OutputGenerator::outputContentRect() const
 	return QRect(m_contentRect.topLeft() - m_cropRect.topLeft(), m_contentRect.size());
 }
 
-QImage
+GrayImage
 OutputGenerator::normalizeIlluminationGray(
 	TaskStatus const& status,
 	QImage const& input, QPolygonF const& area_to_consider,
@@ -854,7 +855,7 @@ OutputGenerator::processWithDewarping(
 	// The output we would get if dewarping was turned off, except always grayscale.
 	// Used for automatic picture detection and binarization threshold calculation.
 	// This image corresponds to the area of normalize_illumination_rect above.
-	QImage warped_gray_output;
+	GrayImage warped_gray_output;
 
 	// Picture mask (white indicate a picture) in the same coordinates as
 	// warped_gray_output.  Only built for Mixed mode.
@@ -972,63 +973,24 @@ OutputGenerator::processWithDewarping(
 
 	bool const auto_dewarping = true; // XXX
 	if (!auto_dewarping) {
-		warped_gray_output = QImage(); // Save memory.
+		warped_gray_output = GrayImage(); // Save memory.
 	} else {
+#if 0
 		BinaryImage warped_bw_output(warped_gray_output, bw_threshold);
-		warped_gray_output = QImage(); // Save memory.
+		warped_gray_output = GrayImage(); // Save memory.
 
 		QRect const content_rect(
 			m_contentRect.translated(-normalize_illumination_rect.topLeft())
 		);
 		warped_bw_output.fillFrame(warped_bw_output.rect(), content_rect, WHITE);
-
 		if (dbg) {
 			dbg->add(warped_bw_output, "warped_bw_output");
 		}
-#if 0
-		VectorizedInfluenceMap vmap(InfluenceMap(ConnectivityMap(warped_bw_output, CONN8)));
-		if (dbg) {
-			dbg->add(vmap.visualized(), "vmap");
-		}
 
-		BinaryImage image(warped_bw_output.width() + 1, warped_bw_output.height() + 1, WHITE);
-
-		{
-			uint32_t* const data = image.data();
-			int const stride = image.wordsPerLine();
-			uint32_t const msb = uint32_t(1) << 31;
-
-			BOOST_FOREACH(VectorizedInfluenceMap::Node const& node, vmap.nodes()) {
-				for (int i = 0; i < 4; ++i) {
-					int const edge = node.edges[i];
-					if (edge == -1) {
-						break;
-					}
-
-					ManhattanPath const& path = vmap.edges()[edge];
-					QPointF const vec(path.endPos() - path.startPos());
-					if (fabs(vec.x()) < fabs(vec.y())) {
-						// Too vertical.
-						continue;
-					}
-
-					BOOST_FOREACH(QPoint pt, path) {
-						data[pt.y() * stride + (pt.x() >> 5)] |= msb >> (pt.x() & 31);
-					}
-				}
-			}
-
-			if (dbg) {
-				dbg->add(image, "filtered_vmap");
-			}
-		}
-
-		rasterOp<RopOr<RopSrc, RopDst> >(warped_bw_output, warped_bw_output.rect(), image, QPoint(1, 1));
-		if (dbg) {
-			dbg->add(warped_bw_output, "combined");
-		}
+		TextLineTracer::trace(warped_bw_output, m_dpi, status, dbg);
+#else
+		TextLineTracer2::trace(warped_gray_output, m_dpi, status, dbg);
 #endif
-		TextLineTracer::trace(warped_bw_output, status, dbg);
 	}
 
 	if (render_params.whiteMargins()) {
