@@ -98,7 +98,7 @@ font-weight: bold;</string>
             <x>0</x>
             <y>0</y>
             <width>425</width>
-            <height>300</height>
+            <height>313</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -115,7 +115,7 @@ font-weight: bold;</string>
            <item>
             <widget class="QLabel" name="label_5">
              <property name="text">
-              <string>Joseph Artsimovich
+              <string notr="true">Joseph Artsimovich
 </string>
              </property>
             </widget>
@@ -133,9 +133,10 @@ font-weight: bold;</string>
            <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>Svetoslav Sashkov, Mandor - Bulgarian
+              <string notr="true">Svetoslav Sashkov, Mandor - Bulgarian
 Stefan Birkner - German
 Masahiro Kitagawa - Japanese
+Patrick Pascal - French
 Joseph Artsimovich - Russian
 </string>
              </property>
@@ -362,6 +363,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
