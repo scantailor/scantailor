@@ -40,8 +40,8 @@ latest stable version.
    Because libtiff is updated rarely, but vulnerabilities in it are found often,
    it's better to patch it right away.  In that case, take it from here:
    http://packages.debian.org/source/sid/tiff
-   There you will find both the original libtiff and a patch for it.
-   The process of applying this patch is described later in this document.
+   There you will find both the original libtiff and a set of patches for it.
+   The process of patching libtiff is described later in this document.
    If you aren't going to distribute your Scan Tailor build and aren't going
    to open files from untrusted sources, then you don't really need patching it.
 6. Qt 4.x.x (tested with 4.5.0)
@@ -189,16 +189,11 @@ latest stable version.
 
                                Patching libtiff
 
-These instructions assume you've got the patch file from Debian:
+These instructions assume you've got Debian's patches for libtiff from:
 http://packages.debian.org/source/sid/tiff
-There you will find both the original libtiff sources and a separate patch
-in .diff.gz format.  Note that debian packages the original source archive
-inside another archive.  Extract the inner one and uncompress it to the
-build directory (C:\build).  The patch they distribute is not a simple one.
-It brings more patches that need to be applied in a specific order.
-Fortunately, we have a CMake script that simplifies things a lot.
-
-Here are the instructions:
+There you will find both the original libtiff sources (filename like
+tiff_3.9.4.orig.tar.gz) and a patch set for it (filename like
+tiff_3.9.4-5.debian.tar.gz).  Download both and follow the instructions:
 
 1. Get the command line patch utility from here:
    http://gnuwin32.sourceforge.net/packages/patch.htm
@@ -206,9 +201,17 @@ Here are the instructions:
    Better use the version with the installer.  In that case CMake will
    find the location of patch.exe by itself.
 
-2. Download and uncompress the patch.  Uncompressed it will have the .diff
-   extension.  Better copy it to the build directory (C:\build) to allow CMake
-   to find it automatically.
+2. Extract the original libtiff sources into C:\build to get a directory
+   structure like this:
+   C:\build
+     | tiff-3.9.4
+     +-- build
+       | config
+       | contrib
+       | ...
+
+   Then extract the patchset inside the tiff directory, to get the "debian"
+   directory on the same level as "build", "config" and "contrib".
 
 3. Create another subdirectory under C:\build
    Call it "tiff-patch-dir".
@@ -240,4 +243,4 @@ Here are the instructions:
 
    If no errors were reported, you have successfully patched your libtiff.
    If you ever need to patch it again, first revert it to the original version,
-   the one from the .tar.gz file.
+   the one from the .tar.gz file and delete the "debian" subdirectory.
