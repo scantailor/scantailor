@@ -98,7 +98,7 @@ font-weight: bold;</string>
             <x>0</x>
             <y>0</y>
             <width>425</width>
-            <height>326</height>
+            <height>339</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -139,6 +139,7 @@ Angelo Gemmi - Italian
 Masahiro Kitagawa - Japanese
 Patrick Pascal - French
 Joseph Artsimovich - Russian
+Davidson Wang - Traditional Chinese
 </string>
              </property>
             </widget>
@@ -364,6 +365,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
