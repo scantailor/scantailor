@@ -927,6 +927,10 @@ MainWindow::pageContextMenuRequested(
 void
 MainWindow::pastLastPageContextMenuRequested(QPoint const& screen_pos)
 {
+	if (!isProjectLoaded()) {
+		return;
+	}
+
 	QMenu menu;
 	menu.addAction(QIcon(":/icons/insert-here-16.png"), tr("Insert here ..."));
 	
