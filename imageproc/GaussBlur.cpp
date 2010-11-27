@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C) 2007-2010  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     Based on code from the GIMP project,
     Copyright (C) 1995 Spencer Kimball and Peter Mattis
@@ -20,7 +20,7 @@
 */
 
 #include "GaussBlur.h"
-#include "Grayscale.h"
+#include "GrayImage.h"
 #include "Constants.h"
 #include <QImage>
 #include <QDebug>
@@ -115,26 +115,30 @@ static void find_iir_constants(
 	}
 }
 
-static QImage gaussBlurGrayToGray(QImage const& src, double const std_dev)
-{
+GrayImage gaussBlur(GrayImage const& src, double h_sigma, double v_sigma)
+{	
+	if (src.isNull()) {
+		return src;
+	}
+
 	int const width = src.width();
 	int const height = src.height();
 	
 	std::vector<double> val_p(std::max(width, height), 0);
 	std::vector<double> val_m(std::max(width, height), 0);
 	
+	// IIR parameters.
 	double n_p[5], n_m[5], d_p[5], d_m[5], bd_p[5], bd_m[5];
-	find_iir_constants(n_p, n_m, d_p, d_m, bd_p, bd_m, std_dev);
 	
-	QImage dst(width, height, QImage::Format_Indexed8);
-	dst.setColorTable(createGrayscalePalette());
+	GrayImage dst(src.size());
 	
-	unsigned char const* const src_data = src.bits();
-	unsigned char* const dst_data = dst.bits();
-	int const src_bpl = src.bytesPerLine();
-	int const dst_bpl = dst.bytesPerLine();
+	unsigned char const* const src_data = src.data();
+	unsigned char* const dst_data = dst.data();
+	int const src_bpl = src.stride();
+	int const dst_bpl = dst.stride();
 	
 	// Vertical pass.
+	find_iir_constants(n_p, n_m, d_p, d_m, bd_p, bd_m, v_sigma);
 	for (int x = 0; x < width; ++x) {
 		memset(&val_p[0], 0, height * sizeof(double));
 		memset(&val_m[0], 0, height * sizeof(double));
@@ -168,6 +172,7 @@ static QImage gaussBlurGrayToGray(QImage const& src, double const std_dev)
 	}
 	
 	// Horizontal pass.
+	find_iir_constants(n_p, n_m, d_p, d_m, bd_p, bd_m, h_sigma);
 	unsigned char* dst_line = dst_data;
 	for (int y = 0; y < height; ++y, dst_line += dst_bpl) {
 		memset(&val_p[0], 0, width * sizeof(double));
@@ -201,23 +206,6 @@ static QImage gaussBlurGrayToGray(QImage const& src, double const std_dev)
 	}
 	
 	return dst;
-}
-
-QImage gaussBlurGray(QImage const& src, double radius)
-{
-	if (src.isNull()) {
-		return QImage();
-	}
-	
-	if (radius < 1.0) {
-		// This algorithm doesn't work for radiused less than one.
-		radius = 1.0;
-	}
-	radius += 1.0; // Include the center pixel.
-	
-	double const std_dev = sqrt((radius * radius) / (-2.0 * log(1.0 / 255.0)));
-	
-	return gaussBlurGrayToGray(toGrayscale(src), std_dev);
 }
 
 } // namespace imageproc

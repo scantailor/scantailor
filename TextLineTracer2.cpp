@@ -156,7 +156,7 @@ TextLineTracer2::trace(
 	int const downscaled_width = downscaled.width();
 	int const downscaled_height = downscaled.height();
 
-	GrayImage blurred(gaussBlurGray(stretchGrayRange(downscaled).toQImage(), 25));
+	GrayImage blurred(gaussBlur(stretchGrayRange(downscaled), 17, 7));
 	if (dbg) {
 		dbg->add(blurred.toQImage(), "blurred");
 	}

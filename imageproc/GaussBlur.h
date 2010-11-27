@@ -19,12 +19,12 @@
 #ifndef IMAGEPROC_GAUSSBLUR_H_
 #define IMAGEPROC_GAUSSBLUR_H_
 
-class QImage;
-
 namespace imageproc
 {
 
-QImage gaussBlurGray(QImage const& src, double radius);
+class GrayImage;
+
+GrayImage gaussBlur(GrayImage const& src, double h_sigma, double v_sigma);
 
 } // namespace imageproc
 
