@@ -446,14 +446,16 @@ QT4_AUTOMOC(${sources})
 
 SOURCE_GROUP("Version Header" FILES version.h)
 
-# There seems to be a bug in either gcc or boost that makes page sorting either crash
-# or go into infinite loop.  It's reproducible on a very simple test case on at least
-# gcc 4.4.3 and gcc 4.4.4.  It's not reproducible on gcc 4.5.1.
-# Adding -fno-strict-aliasing seems to fix it.
-SET_SOURCE_FILES_PROPERTIES(
-	ThumbnailSequence.cpp PROPERTIES
-	COMPILE_FLAGS "-fno-strict-aliasing"
-)
+IF(CMAKE_COMPILER_IS_GNUCXX)
+	# There seems to be a bug in either gcc or boost that makes page sorting either crash
+	# or go into infinite loop.  It's reproducible on a very simple test case on at least
+	# gcc 4.4.3 and gcc 4.4.4.  It's not reproducible on gcc 4.5.1.
+	# Adding -fno-strict-aliasing seems to fix it.
+	SET_SOURCE_FILES_PROPERTIES(
+		ThumbnailSequence.cpp PROPERTIES
+		COMPILE_FLAGS "-fno-strict-aliasing"
+	)
+ENDIF()
 
 SET(win32_resource_file)
 IF(WIN32)
