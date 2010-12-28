@@ -242,9 +242,14 @@ ELSE(MINGW)
 	MESSAGE(FATAL_ERROR "Unsupported platform.  MinGW and MSVC are supported.")
 ENDIF(MINGW)
 
+SET(boost_64bit_flags "")
+IF(CMAKE_SIZEOF_VOID_P EQUALS 8)
+	LIST(APPEND boost_64bit_flags "architecture=x86" "address-model=64")
+ENDIF()
+
 ADD_CUSTOM_TARGET(
 	boost "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
-	threading=multi link=static variant=debug,release
+	threading=multi link=static variant=debug,release ${boost_64bit_flags}
 	define=_BIND_TO_CURRENT_VCLIBS_VERSION=1
 	stage
 	WORKING_DIRECTORY "${BOOST_DIR}"
@@ -321,14 +326,14 @@ ELSEIF(MSVC)
 	ELSEIF(MSVC80)
 		SET(platform win32-msvc2005)
 		SET(force_frame_pointer TRUE)
-	ELSEIF(MSVC10)
-		SET(platform win32-msvc2010)
-		SET(force_frame_pointer TRUE)
-	ELSE(MSVC60 OR MSVC70)
-		#MSVC90 or above
+	ELSEIF(MSVC90)
 		SET(platform win32-msvc2008)
 		SET(force_frame_pointer TRUE)
-	ENDIF(MSVC60 OR MSVC70)
+	ELSE()
+		# Visual Studio 2010 or above.
+		SET(platform win32-msvc2010)
+		SET(force_frame_pointer TRUE)
+	ENDIF()
 ELSE(MINGW)
 	MESSAGE(FATAL_ERROR "Unsupported platform.")
 ENDIF(MINGW)
@@ -357,7 +362,6 @@ ENDIF()
 # and saving code.  Qt's TIFF plugin has way too many limitations.
 SET(build_qt_fname "${CMAKE_CURRENT_BINARY_DIR}/build-qt.bat")
 STRING(SUBSTRING ${QT_DIR_NATIVE} 0 2 qt_drive)
-STRING(SUBSTRING ${PROJECT_SOURCE_DIR} 0 2 build_drive)
 FILE(
 	WRITE "${build_qt_fname}"
 	"${qt_drive}\n"
@@ -374,7 +378,6 @@ FILE(
 	" -D _BIND_TO_CURRENT_VCLIBS_VERSION=1"
 	"\n"
 	"${make_command}\n"
-	${build_drive}
 )
 
 ADD_CUSTOM_TARGET(Qt ALL "${build_qt_fname}")
