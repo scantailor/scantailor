@@ -243,7 +243,9 @@ public:
 	}
 
 	void reposition(EdgeNodeIdx edge_node_idx) {
-		PriorityQueue::reposition(m_rEdgeNodes[edge_node_idx].heapIdx);
+		PriorityQueue<EdgeNodeIdx, ShortestPathQueue>::reposition(
+			m_rEdgeNodes[edge_node_idx].heapIdx
+		);
 	}
 private:
 	std::vector<EdgeNode>& m_rEdgeNodes;

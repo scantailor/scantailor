@@ -69,9 +69,10 @@ void gaussBlurGeneric(OutputConverter out_conv, T* data, int data_stride,
 
 	int const width = size.width();
 	int const height = size.height();
-	
-	boost::scoped_array<float> val_p(new float[std::max(width, height)]);
-	boost::scoped_array<float> val_m(new float[std::max(width, height)]);
+	int const width_height_max = width > height ? width : height;
+
+	boost::scoped_array<float> val_p(new float[width_height_max]);
+	boost::scoped_array<float> val_m(new float[width_height_max]);
 	boost::scoped_array<float> intermediate_image(new float[width * height]);
 	int const intermediate_stride = width;
 
