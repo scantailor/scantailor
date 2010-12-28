@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2010  Joseph Artsimovich <joseph.artsimovich@gmail.com>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     Based on code from the GIMP project,
     Copyright (C) 1995 Spencer Kimball and Peter Mattis
@@ -22,52 +22,32 @@
 #include "GaussBlur.h"
 #include "GrayImage.h"
 #include "Constants.h"
-#include <QImage>
-#include <QDebug>
-#include <vector>
-#include <algorithm>
+#include <stdint.h>
 #include <math.h>
-#include <string.h>
 
 namespace imageproc
 {
 
-static void transfer_pixels(
-	double const* src1, double const* src2,
-	unsigned char* dest, int const dest_step, int const count)
+namespace gauss_blur_impl
 {
-	for (int i = 0; i < count; ++i) {
-		int sum = (int)floor(*src1 + *src2 + 0.5);
-		if (sum > 255) {
-			sum = 255;
-		} else if (sum < 0) {
-			sum = 0;
-		}
-		*dest = (unsigned char)sum;
-		
-		++src1;
-		++src2;
-		dest += dest_step;
-	}
-}
 
-static void find_iir_constants(
-	double* n_p, double *n_m, double *d_p,
-        double* d_m, double *bd_p, double *bd_m, double std_dev)
+void find_iir_constants(
+	float* n_p, float *n_m, float *d_p,
+	float* d_m, float *bd_p, float *bd_m, float std_dev)
 {
 	/*  The constants used in the implemenation of a casual sequence
 	 *  using a 4th order approximation of the gaussian operator
 	 */
 	
-	const double div = sqrt(2.0 * constants::PI) * std_dev;
-	const double x0 = -1.783 / std_dev;
-	const double x1 = -1.723 / std_dev;
-	const double x2 = 0.6318 / std_dev;
-	const double x3 = 1.997  / std_dev;
-	const double x4 = 1.6803 / div;
-	const double x5 = 3.735 / div;
-	const double x6 = -0.6803 / div;
-	const double x7 = -0.2598 / div;
+	const float div = sqrt(2.0 * constants::PI) * std_dev;
+	const float x0 = -1.783 / std_dev;
+	const float x1 = -1.723 / std_dev;
+	const float x2 = 0.6318 / std_dev;
+	const float x3 = 1.997  / std_dev;
+	const float x4 = 1.6803 / div;
+	const float x5 = 3.735 / div;
+	const float x6 = -0.6803 / div;
+	const float x7 = -0.2598 / div;
 	
 	n_p [0] = x4 + x6;
 	n_p [1] = (exp(x1)*(x7*sin(x3)-(x6+2*x4)*cos(x3)) +
@@ -96,9 +76,9 @@ static void find_iir_constants(
 		n_m[i] = n_p[i] - d_p[i] * n_p[0];
 	}
 	
-	double sum_n_p = 0.0;
-	double sum_n_m = 0.0;
-	double sum_d = 0.0;
+	float sum_n_p = 0.0;
+	float sum_n_m = 0.0;
+	float sum_d = 0.0;
 	
 	for (int i = 0; i <= 4; i++) {
 		sum_n_p += n_p[i];
@@ -106,8 +86,8 @@ static void find_iir_constants(
 		sum_d += d_p[i];
 	}
 	
-	double const a = sum_n_p / (1.0 + sum_d);
-	double const b = sum_n_m / (1.0 + sum_d);
+	float const a = sum_n_p / (1.0 + sum_d);
+	float const b = sum_n_m / (1.0 + sum_d);
 	
 	for (int i = 0; i <= 4; i++) {
 		bd_p[i] = d_p[i] * a;
@@ -115,97 +95,21 @@ static void find_iir_constants(
 	}
 }
 
-GrayImage gaussBlur(GrayImage const& src, double h_sigma, double v_sigma)
+} // namespace gauss_blur_impl
+
+GrayImage gaussBlur(GrayImage const& src, float h_sigma, float v_sigma)
 {	
 	if (src.isNull()) {
 		return src;
 	}
 
-	int const width = src.width();
-	int const height = src.height();
-	
-	std::vector<double> val_p(std::max(width, height), 0);
-	std::vector<double> val_m(std::max(width, height), 0);
-	
-	// IIR parameters.
-	double n_p[5], n_m[5], d_p[5], d_m[5], bd_p[5], bd_m[5];
-	
-	GrayImage dst(src.size());
-	
-	unsigned char const* const src_data = src.data();
-	unsigned char* const dst_data = dst.data();
-	int const src_bpl = src.stride();
-	int const dst_bpl = dst.stride();
-	
-	// Vertical pass.
-	find_iir_constants(n_p, n_m, d_p, d_m, bd_p, bd_m, v_sigma);
-	for (int x = 0; x < width; ++x) {
-		memset(&val_p[0], 0, height * sizeof(double));
-		memset(&val_m[0], 0, height * sizeof(double));
-		
-		unsigned char const* sp_p = src_data + x;
-		unsigned char const* sp_m = sp_p + (height - 1) * src_bpl;
-		double* vp = &val_p[0];
-		double* vm = &val_m[0] + height - 1;
-		unsigned char const initial_p = sp_p[0];
-		unsigned char const initial_m = sp_m[0];
-		
-		for (int y = 0; y < height; ++y) {
-			int const terms = std::min(y, 4);
-			int i = 0;
-			int sp_off = 0;
-			for (; i <= terms; ++i, sp_off += src_bpl) {
-				*vp += n_p[i] * sp_p[-sp_off] - d_p[i] * vp[-i];
-				*vm += n_m[i] * sp_m[sp_off] - d_m[i] * vm[i];
-			}
-			for (; i <= 4; ++i) {
-				*vp += (n_p[i] - bd_p[i]) * initial_p;
-				*vm += (n_m[i] - bd_m[i]) * initial_m;
-			}
-			sp_p += src_bpl;
-			sp_m -= src_bpl;
-			++vp;
-			--vm;
-		}
-		
-		transfer_pixels(&val_p[0], &val_m[0], dst_data + x, dst_bpl, height);
-	}
-	
-	// Horizontal pass.
-	find_iir_constants(n_p, n_m, d_p, d_m, bd_p, bd_m, h_sigma);
-	unsigned char* dst_line = dst_data;
-	for (int y = 0; y < height; ++y, dst_line += dst_bpl) {
-		memset(&val_p[0], 0, width * sizeof(double));
-		memset(&val_m[0], 0, width * sizeof(double));
-		
-		unsigned char const* sp_p = dst_line;
-		unsigned char const* sp_m = dst_line + width - 1;
-		double* vp = &val_p[0];
-		double* vm = &val_m[0] + width - 1;
-		unsigned char const initial_p = sp_p[0];
-		unsigned char const initial_m = sp_m[0];
-		
-		for (int x = 0; x < width; ++x) {
-			int const terms = std::min(x, 4);
-			int i = 0;
-			for (; i <= terms; ++i) {
-				*vp += n_p[i] * sp_p[-i] - d_p[i] * vp[-i];
-				*vm += n_m[i] * sp_m[i] - d_m[i] * vm[i];
-			}
-			for (; i <= 4; ++i) {
-				*vp += (n_p[i] - bd_p[i]) * initial_p;
-				*vm += (n_m[i] - bd_m[i]) * initial_m;
-			}
-			++sp_p;
-			--sp_m;
-			++vp;
-			--vm;
-		}
-		
-		transfer_pixels(&val_p[0], &val_m[0], dst_line, 1, width);
-	}
-	
-	return dst;
+	GrayImage tmp(src);
+	gaussBlurGeneric(
+		RoundAndClipValueConv<uint8_t>(), tmp.data(), tmp.stride(),
+		tmp.size(), h_sigma, v_sigma
+	);
+
+	return tmp;
 }
 
 } // namespace imageproc

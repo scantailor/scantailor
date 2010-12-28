@@ -23,6 +23,7 @@ SET(
 	VecNT.h
 	PriorityQueue.h
 	Grid.h
+	ValueConv.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
