@@ -47,11 +47,22 @@ public:
 
 	/**
 	 * Solves the equation of:\n
-	 * line.p1() + x * line.p2() = p\n
+	 * line.p1() + x * (line.p2() - line.p1()) = p\n
 	 * for x, where p would be the projection point.
 	 * This function is faster than projectionPoint().
 	 */
 	double projectionScalar(QPointF const& pt) const;
+
+	/**
+	 * Returns the distance from \p pt to the projection point.
+	 */
+	double projectionDist(QPointF const& pt) const;
+
+	/**
+	 * Returns the squared distance from \p pt to the projection point.
+	 * This function is faster than projectionDist().
+	 */
+	double projectionSqDist(QPointF const& pt) const;
 private:
 	QPointF m_origin;
 	QPointF m_vec;
