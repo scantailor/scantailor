@@ -21,6 +21,7 @@ SET(
 	DynamicPool.h
 	NumericTraits.h
 	VecNT.h
+	PriorityQueue.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
