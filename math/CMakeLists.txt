@@ -7,6 +7,7 @@ SET(
 	LinearSolver.cpp LinearSolver.h
 	MatrixCalc.h
 	HomographicTransform.h
+	SidesOfLine.cpp SidesOfLine.h
 	ToLineProjector.cpp ToLineProjector.h
 	ArcLengthMapper.cpp ArcLengthMapper.h
 	PolylineIntersector.cpp PolylineIntersector.h
