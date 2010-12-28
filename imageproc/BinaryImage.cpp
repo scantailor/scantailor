@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -601,6 +601,45 @@ BinaryImage::toQImage() const
 		}
 		src_line += src_wpl;
 		dst_line += dst_wpl;
+	}
+	
+	return dst;
+}
+
+QImage
+BinaryImage::toAlphaMask(QColor const& color) const
+{
+	if (isNull()) {
+		return QImage();
+	}
+
+	int const alpha = color.alpha();
+	int const red = (color.red() * alpha + 128) / 255;
+	int const green = (color.green() * alpha + 128) / 255;
+	int const blue = (color.blue() * alpha + 128) / 255;
+	uint32_t const colors[] = {
+		0, // replaces white
+		qRgba(red, green, blue, alpha) // replaces black
+	};
+	
+	int const width = m_width;
+	int const height = m_height;
+
+	QImage dst(width, height, QImage::Format_ARGB32_Premultiplied);
+	assert(dst.bytesPerLine() % 4 == 0);
+	
+	int const dst_stride = dst.bytesPerLine() / 4;
+	uint32_t* dst_line = (uint32_t*)dst.bits();
+	
+	uint32_t const* src_line = data();
+	int const src_stride = m_wpl;
+	
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; ++x) {
+			dst_line[x] = colors[(src_line[x >> 5] >> (31 - (x & 31))) & 1];
+		}
+		src_line += src_stride;
+		dst_line += dst_stride;
 	}
 	
 	return dst;

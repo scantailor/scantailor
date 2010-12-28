@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "BinaryThreshold.h"
 #include <QRect>
 #include <QSize>
+#include <QColor>
 #include <stdint.h>
 
 class QImage;
@@ -239,6 +240,13 @@ public:
 	 * \brief Convert to a QImage with Format_Mono.
 	 */
 	QImage toQImage() const;
+
+	/**
+	 * \brief Convert to an ARGB32_Premultiplied image, where white pixels become transparent.
+	 *
+	 * Opaque (black) pixels take the specified color.  Colors with alpha channel are supported.
+	 */
+	QImage toAlphaMask(QColor const& color) const;
 private:
 	class SharedData;
 	
