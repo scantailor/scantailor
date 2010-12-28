@@ -55,6 +55,8 @@ public:
 
 	DistortionModel const& distortionModel() const { return m_distortionModel; }
 
+	void setDistortionModel(DistortionModel const& model) { m_distortionModel = model; }
+
 	DepthPerception const& depthPerception() const { return m_depthPerception; }
 
 	DespeckleLevel despeckleLevel() const { return m_despeckleLevel; }

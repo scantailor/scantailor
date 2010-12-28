@@ -36,10 +36,10 @@
       <item>
        <widget class="QRadioButton" name="autoRB">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
-         <string>Auto (not yet implemented)</string>
+         <string>Auto (experimental)</string>
         </property>
        </widget>
       </item>

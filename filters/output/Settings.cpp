@@ -113,6 +113,11 @@ Settings::setDewarpingMode(PageId const& page_id, DewarpingMode const& mode)
 		params.setDewarpingMode(mode);
 		m_perPageParams.insert(it, PerPageParams::value_type(page_id, params));
 	} else {
+		if (mode == DewarpingMode::MANUAL && it->second.dewarpingMode() != DewarpingMode::MANUAL) {
+			// Because we can't yet generate an X-spline based on a polyline,
+			// we have to reset the distortion model as well.  Otherwise it would be uneditable.
+			it->second.setDistortionModel(DistortionModel());
+		}
 		it->second.setDewarpingMode(mode);
 	}
 }

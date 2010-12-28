@@ -24,6 +24,7 @@
 #include "ColorParams.h"
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
+#include "DewarpingMode.h"
 #include <boost/function.hpp>
 #include <QSize>
 #include <QRect>
@@ -92,7 +93,8 @@ public:
 	QImage process(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
-		DistortionModel const& distortion_model,
+		DewarpingMode dewarping_mode,
+		DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
@@ -113,7 +115,8 @@ private:
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
-		DistortionModel const& distortion_model,
+		DewarpingMode dewarping_mode,
+		DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
@@ -122,7 +125,6 @@ private:
 	QImage processAsIs(
 		FilterData const& input, TaskStatus const& status,
 		ZoneSet const& fill_zones,
-		DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception,
 		DebugImages* dbg = 0) const;
 
@@ -136,7 +138,8 @@ private:
 	QImage processWithDewarping(
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
-		DistortionModel const& distortion_model,
+		DewarpingMode dewarping_mode,
+		DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,

@@ -426,8 +426,10 @@ SET(
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
 	#Undistort.cpp Undistort.h
+	DetectVertContentBounds.cpp DetectVertContentBounds.h
 	TextLineTracer.cpp TextLineTracer.h
-	TextLineTracer2.cpp TextLineTracer2.h
+	TextLineRefiner.cpp TextLineRefiner.h
+	TowardsLineTracer.cpp TowardsLineTracer.h
 	ThreadPriority.cpp ThreadPriority.h
 	SystemLoadWidget.cpp SystemLoadWidget.h
 	FileNameDisambiguator.cpp FileNameDisambiguator.h

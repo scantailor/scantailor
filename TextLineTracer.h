@@ -16,94 +16,127 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEXT_LINE_TRACER_H_
-#define TEXT_LINE_TRACER_H_
+#ifndef TEXT_LINE_TRACER3_H_
+#define TEXT_LINE_TRACER3_H_
 
-#include "imageproc/InfluenceMap.h"
-#include "FastQueue.h"
+#include "Grid.h"
 #include <QPoint>
+#include <QPointF>
 #include <QLineF>
 #include <vector>
 #include <list>
+#include <deque>
+#include <memory>
 #include <set>
+#include <utility>
 #include <stdint.h>
 
+class Dpi;
 class QImage;
+class QColor;
+class QRect;
 class TaskStatus;
 class DebugImages;
 
 namespace imageproc
 {
 	class BinaryImage;
+	class GrayImage;
 	class ConnectivityMap;
 }
 
 class TextLineTracer
 {
 public:
-	static void trace(
-		imageproc::BinaryImage const& input,
+	static std::list<std::vector<QPointF> > trace(
+		imageproc::GrayImage const& input, Dpi const& dpi,
+		QRect const& content_rect,
 		TaskStatus const& status, DebugImages* dbg = 0);
 private:
-	struct BoundingBox;
-	struct Component;
-	struct Connection;
-	class CompPriorityQueue;
+	class CentroidCalculator;
+	struct Region;
+	struct GridNode;
+	struct RegionGrowingPosition;
+	class RegionGrowingQueue;
+	struct Edge;
+	struct EdgeConnection;
+	struct EdgeNode;
+	class ShortestPathQueue;
 
-	static void calcBoundingBoxes(
-		imageproc::ConnectivityMap const& cmap, std::vector<Component>& components);
+	typedef uint32_t RegionIdx;
+	typedef uint32_t EdgeNodeIdx;
 
-	static void subdivideLongComponents(
-		imageproc::ConnectivityMap& cmap, std::vector<Component>& components);
+	static imageproc::GrayImage downscale(imageproc::GrayImage const& input, Dpi const& dpi);
 
-	static int calcMedianCompHeight(std::vector<Component> const& components);
+	static void segmentBlurredTextLines(
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask,
+		std::list<std::vector<QPointF> >& out, DebugImages* dbg);
 
-	static void findVoronoiConnections(
-		imageproc::InfluenceMap const& imap, std::set<Connection>& connections);
+	static void labelAndGrowRegions(
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage region_seeds,
+		imageproc::BinaryImage const& thick_mask, std::vector<Region>& regions,
+		std::set<Edge>& edges, DebugImages* dbg);
 
-	static inline void processPossibleConnection(
-		std::set<Connection>& connections,
-		imageproc::InfluenceMap::Cell const& cell1,
-		imageproc::InfluenceMap::Cell const& cell2);
+	static void extractEdegeNodePaths(
+		std::vector<std::vector<uint32_t> >& edge_node_paths,
+		std::vector<EdgeNode> const& edge_nodes,
+		std::vector<Region> const& regions);
 
-	static void labelEdgeComponents(
-		std::vector<Component>& components,
-		imageproc::InfluenceMap const& imap, int x, int flag);
+	static void edgeSequencesToPolylines(
+		std::vector<std::vector<EdgeNodeIdx> > const& edge_node_paths,
+		std::vector<EdgeNode> const& edge_nodes, std::vector<Region> const& regions,
+		std::list<std::vector<QPointF> >& polylines);
 
-	template<typename BetterX>
-	static QLineF estimateVerticalCutter(
-		imageproc::InfluenceMap const& imap, std::vector<Component>& components,
-		int flag, int median_comp_height, BetterX better_x);
+	static RegionIdx findConnectingRegion(Edge const& edge1, Edge const& edge2);
 
-	static void connectEndpoints(
-		std::vector<Component>& components, std::list<std::vector<uint32_t> >& lines);
+	static bool isCurvatureConsistent(std::vector<QPointF> const& polyline);
 
-	static void propagateLengthFrom(
-		Component& comp, std::vector<Component>& components, CompPriorityQueue& queue);
+	static void filterCurves(std::list<std::vector<QPointF> >& polylines);
 
-	static void propagateLengthFromTo(
-		QPoint vec_from_prev, double vec_from_prev_len, Component const& from_comp,
-		QPoint comp_center, Component& to_comp, CompPriorityQueue& queue);
+	static void pickTopBottomLines(std::list<std::vector<QPointF> >& polylines);
 
-	static void propagateMaxCurvatureFrom(
-		Component& comp, std::vector<Component>& components, CompPriorityQueue& queue);
+	static void makeLeftToRight(std::vector<QPointF>& polyline);
 
-	static void propagateMaxCurvatureFromTo(
-		QPointF normal_from_prev, Component const& from_comp,
-		QPoint comp_center, Component& to_comp, CompPriorityQueue& queue);
+	static void extendOrTrimPolyline(
+		std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const right_bound,
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
 
-	static QImage overlay(QImage const& background, imageproc::BinaryImage const& overlay);
+	static bool trimFront(std::deque<QPointF>& polyline, QLineF const& bound);
 
-	static QImage visualizeLeftRightComponents(
-		std::vector<Component> const& components,
-		imageproc::InfluenceMap const& imap);
+	static bool trimBack(std::deque<QPointF>& polyline, QLineF const& bound);
 
-	static QImage visualizeCutters(
-		QImage const& background, QLineF const& cutter1, QLineF const& cutter2);
+	static void growFront(
+		std::deque<QPointF>& polyline, QLineF const& bound,
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
 
-	static QImage visualizeTracedLinesAndCutters(
-		QImage const& background, std::list<std::vector<uint32_t> > const& lines,
-		std::vector<Component> const& components, QLineF const& cutter1, QLineF const& cutter2);
+	static void growBack(
+		std::deque<QPointF>& polyline, QLineF const& bound,
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
+
+	static void intersectFront(
+		std::deque<QPointF>& polyline, QLineF const& bound);
+
+	static void intersectBack(
+		std::deque<QPointF>& polyline, QLineF const& bound);
+
+	static void intersectWithVerticalBoundaries(
+		std::vector<QPointF>& polylines, QLineF const& left_bound, QLineF const& right_bound);
+
+	static void sanitizeBinaryImage(imageproc::BinaryImage& image, QRect const& content_rect);
+
+	static QImage visualizeVerticalBounds(
+		QImage const& background, std::pair<QLineF, QLineF> const& bounds);
+
+	static QImage visualizeRegions(Grid<GridNode> const& grid);
+
+	static QImage visualizePolylines(
+		QImage const& background, std::list<std::vector<QPointF> > const& polylines,
+		std::pair<QLineF, QLineF> const* vert_bounds = 0);
+
+	static QImage visualizeExtendedPolylines(
+		QImage const& blurred, imageproc::BinaryImage const&  thick_mask,
+		std::list<std::vector<QPointF> > const& polylines,
+		QLineF const& left_bound, QLineF const& right_bound);
 };
 
 #endif

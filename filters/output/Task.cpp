@@ -90,7 +90,6 @@ public:
 		QImage const& orig_image,
 		QImage const& output_image,
 		BinaryImage const& picture_mask,
-		DistortionModel const& distortion_model,
 		DespeckleState const& despeckle_state,
 		DespeckleVisualization const& despeckle_visualization,
 		bool batch, bool debug);
@@ -112,7 +111,6 @@ private:
 	QImage m_outputImage;
 	QImage m_downscaledOutputImage;
 	BinaryImage m_pictureMask;
-	DistortionModel m_distortionModel;
 	DespeckleState m_despeckleState;
 	DespeckleVisualization m_despeckleVisualization;
 	DespeckleLevel m_despeckleLevel;
@@ -151,7 +149,7 @@ Task::process(
 {
 	status.throwIfCancelled();
 	
-	Params const params(m_ptrSettings->getParams(m_pageId));
+	Params params(m_ptrSettings->getParams(m_pageId));
 	RenderParams const render_params(params.colorParams());
 	QString const out_file_path(m_outFileNameGen.filePathFor(m_pageId));
 	QFileInfo const out_file_info(out_file_path);
@@ -177,7 +175,7 @@ Task::process(
 		data.xform(), content_rect_phys, page_rect_phys
 	);
 	
-	OutputImageParams const new_output_image_params(
+	OutputImageParams new_output_image_params(
 		generator.outputImageSize(), generator.outputContentRect(),
 		data.xform(), params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
@@ -290,15 +288,29 @@ Task::process(
 		automask_img = BinaryImage();
 		speckles_img = BinaryImage();
 
+		DistortionModel distortion_model;
+		if (params.dewarpingMode() == DewarpingMode::MANUAL) {
+			distortion_model = params.distortionModel();
+		}
+		// OutputGenerator will write a new distortion model
+		// there, if dewarping mode is AUTO.
+
 		out_img = generator.process(
 			status, data, new_picture_zones, new_fill_zones,
-			params.dewarpingMode() != DewarpingMode::OFF
-			? params.distortionModel() : DistortionModel(),
+			params.dewarpingMode(), distortion_model,
 			params.depthPerception(),
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
 		);
+
+		if (params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid()) {
+			// A new distortion model was generated.
+			// We need to save it to be able to modify it manually.
+			params.setDistortionModel(distortion_model);
+			m_ptrSettings->setParams(m_pageId, params);
+			new_output_image_params.setDistortionModel(distortion_model);
+		}
 
 		if (write_speckles_file && speckles_img.isNull()) {
 			// Even if despeckling didn't actually take place, we still need
@@ -369,7 +381,7 @@ Task::process(
 			generator.toOutput(), generator.outputContentRect(),
 			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
 			m_pageId, data.origImage(), out_img, automask_img,
-			params.distortionModel(), despeckle_state, despeckle_visualization,
+			despeckle_state, despeckle_visualization,
 			m_batchProcessing, m_debug
 		)
 	);
@@ -420,7 +432,6 @@ Task::UiUpdater::UiUpdater(
 	QImage const& orig_image,
 	QImage const& output_image,
 	BinaryImage const& picture_mask,
-	DistortionModel const& distortion_model,
 	DespeckleState const& despeckle_state,
 	DespeckleVisualization const& despeckle_visualization,
 	bool const batch, bool const debug)
@@ -437,7 +448,6 @@ Task::UiUpdater::UiUpdater(
 	m_outputImage(output_image),
 	m_downscaledOutputImage(ImageView::createDownscaledImage(output_image)),
 	m_pictureMask(picture_mask),
-	m_distortionModel(distortion_model),
 	m_despeckleState(despeckle_state),
 	m_despeckleVisualization(despeckle_visualization),
 	m_batchProcessing(batch),
@@ -469,8 +479,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		new DewarpingView(
 			m_origImage, m_downscaledOrigImage,
 			m_imageToVirt, m_virtDisplayArea, m_virtContentRect,
-			m_pageId, m_ptrSettings, m_distortionModel,
-			opt_widget->depthPerception()
+			m_pageId, m_ptrSettings, m_params.dewarpingMode(),
+			m_params.distortionModel(), opt_widget->depthPerception()
 		)
 	);
 	QPixmap const downscaled_orig_pixmap(dewarping_view->downscaledPixmap());

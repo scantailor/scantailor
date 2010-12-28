@@ -35,7 +35,6 @@
 #include "FillColorProperty.h"
 #include "CylindricalSurfaceDewarper.h"
 #include "TextLineTracer.h"
-#include "TextLineTracer2.h"
 #include "DewarpingPointMapper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
@@ -277,7 +276,8 @@ QImage
 OutputGenerator::process(
 	TaskStatus const& status, FilterData const& input,
 	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
-	DistortionModel const& distortion_model,
+	DewarpingMode dewarping_mode,
+	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
@@ -286,7 +286,7 @@ OutputGenerator::process(
 	QImage image(
 		processImpl(
 			status, input, picture_zones, fill_zones,
-			distortion_model, depth_perception,
+			dewarping_mode, distortion_model, depth_perception,
 			auto_picture_mask, speckles_image, dbg
 		)
 	);
@@ -465,7 +465,8 @@ QImage
 OutputGenerator::processImpl(
 	TaskStatus const& status, FilterData const& input,
 	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
-	DistortionModel const& distortion_model,
+	DewarpingMode dewarping_mode,
+	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
@@ -473,16 +474,16 @@ OutputGenerator::processImpl(
 {
 	RenderParams const render_params(m_colorParams);
 
-	if (distortion_model.isValid()) {
+	if (dewarping_mode == DewarpingMode::AUTO ||
+		(dewarping_mode == DewarpingMode::MANUAL && distortion_model.isValid())) {
 		return processWithDewarping(
 			status, input, picture_zones, fill_zones,
-			distortion_model, depth_perception,
+			dewarping_mode, distortion_model, depth_perception,
 			auto_picture_mask, speckles_image, dbg
 		);
 	} else if (!render_params.whiteMargins()) {
 		return processAsIs(
-			input, status, fill_zones, distortion_model,
-			depth_perception, dbg
+			input, status, fill_zones, depth_perception, dbg
 		);
 	} else {
 		return processWithoutDewarping(
@@ -496,7 +497,6 @@ QImage
 OutputGenerator::processAsIs(
 	FilterData const& input, TaskStatus const& status,
 	ZoneSet const& fill_zones,
-	DistortionModel const& distortion_model,
 	DepthPerception const& depth_perception,
 	DebugImages* const dbg) const
 {
@@ -788,7 +788,8 @@ QImage
 OutputGenerator::processWithDewarping(
 	TaskStatus const& status, FilterData const& input,
 	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
-	DistortionModel const& distortion_model,
+	DewarpingMode dewarping_mode,
+	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
@@ -863,6 +864,11 @@ OutputGenerator::processWithDewarping(
 
 	BinaryThreshold bw_threshold(128);
 
+	QTransform norm_illum_to_original(m_toUncropped.inverted());
+	norm_illum_to_original.translate(
+		normalize_illumination_rect.left(), normalize_illumination_rect.top()
+	);
+
 	if (!render_params.normalizeIllumination()) {
 		if (color_original) {
 			normalized_original = convertToRGBorRGBA(input.origImage());
@@ -880,14 +886,10 @@ OutputGenerator::processWithDewarping(
 		);
 
 		status.throwIfCancelled();
-
-		QTransform background_to_original(m_toUncropped.inverted());
-		background_to_original.translate(
-			normalize_illumination_rect.left(), normalize_illumination_rect.top()
-		);
+		
 		// Transform warped_gray_background to original image coordinates.
 		warped_gray_background = transformToGray(
-			warped_gray_background.toQImage(), background_to_original,
+			warped_gray_background.toQImage(), norm_illum_to_original,
 			input.origImage().rect(), Qt::black, /*weak_background=*/true
 		);
 		if (dbg) {
@@ -904,7 +906,7 @@ OutputGenerator::processWithDewarping(
 
 		status.throwIfCancelled();
 
-		if (!color_original) {
+		if (!color_original || render_params.binaryOutput()) {
 			normalized_original = warped_gray_background;
 		} else {
 			normalized_original = convertToRGBorRGBA(input.origImage());
@@ -913,10 +915,6 @@ OutputGenerator::processWithDewarping(
 				dbg->add(normalized_original, "norm_illum_color");
 			}
 		}
-
-		//if (dbg) {
-		//	dbg->add(GVF(warped_gray_output.bits(), warped_gray_output.bytesPerLine(), warped_gray_output.size(), false, 0.2, 20).visualized(), "GVF");
-		//}
 	}
 
 	status.throwIfCancelled();
@@ -971,27 +969,27 @@ OutputGenerator::processWithDewarping(
 		status.throwIfCancelled();
 	}
 
-	bool const auto_dewarping = true; // XXX
-	if (!auto_dewarping) {
-		warped_gray_output = GrayImage(); // Save memory.
-	} else {
-#if 0
-		BinaryImage warped_bw_output(warped_gray_output, bw_threshold);
-		warped_gray_output = GrayImage(); // Save memory.
-
+	if (dewarping_mode == DewarpingMode::AUTO) {
 		QRect const content_rect(
 			m_contentRect.translated(-normalize_illumination_rect.topLeft())
 		);
-		warped_bw_output.fillFrame(warped_bw_output.rect(), content_rect, WHITE);
-		if (dbg) {
-			dbg->add(warped_bw_output, "warped_bw_output");
+		std::list<std::vector<QPointF> > polylines(
+			TextLineTracer::trace(warped_gray_output, m_dpi, content_rect, status, dbg)
+		);
+
+		BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+			BOOST_FOREACH(QPointF& pt, polyline) {
+				pt = norm_illum_to_original.map(pt);
+			}
 		}
 
-		TextLineTracer::trace(warped_bw_output, m_dpi, status, dbg);
-#else
-		TextLineTracer2::trace(warped_gray_output, m_dpi, status, dbg);
-#endif
+		if (polylines.size() >= 2) {
+			distortion_model.setTopCurve(Curve(polylines.front()));
+			distortion_model.setBottomCurve(Curve(polylines.back()));
+		}
 	}
+
+	warped_gray_output = GrayImage(); // Save memory.
 
 	if (render_params.whiteMargins()) {
 		// Fill everything except the content area in normalized_original to white.

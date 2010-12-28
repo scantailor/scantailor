@@ -25,6 +25,7 @@
 #include "InteractiveXSpline.h"
 #include "DragHandler.h"
 #include "ZoomHandler.h"
+#include "DewarpingMode.h"
 #include "DistortionModel.h"
 #include "DepthPerception.h"
 #include "Settings.h"
@@ -46,6 +47,7 @@ public:
 		QTransform const& source_to_virt, QPolygonF const& virt_display_area,
 		QRectF const& virt_content_rect, PageId const& page_id,
 		IntrusivePtr<Settings> const& settings,
+		DewarpingMode dewarping_mode,
 		DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception);
 	
@@ -71,6 +73,7 @@ private:
 
 	PageId m_pageId;
 	QPolygonF m_virtDisplayArea;
+	DewarpingMode m_dewarpingMode;
 	DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	IntrusivePtr<Settings> m_ptrSettings;
@@ -78,7 +81,6 @@ private:
 	InteractiveXSpline m_bottomSpline;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
-	
 };
 
 } // namespace output

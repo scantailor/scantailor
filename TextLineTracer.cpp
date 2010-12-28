@@ -17,1134 +17,1321 @@
 */
 
 #include "TextLineTracer.h"
+#include "TextLineRefiner.h"
+#include "DetectVertContentBounds.h"
+#include "TowardsLineTracer.h"
+#include "Dpi.h"
 #include "TaskStatus.h"
 #include "DebugImages.h"
 #include "NumericTraits.h"
-#include "FastQueue.h"
-#include "VecNT.h"
 #include "MatrixCalc.h"
+#include "VecNT.h"
+#include "Grid.h"
+#include "PriorityQueue.h"
+#include "SidesOfLine.h"
 #include "ToLineProjector.h"
+#include "PerformanceTimer.h"
 #include "imageproc/BinaryImage.h"
-#include "imageproc/Connectivity.h"
+#include "imageproc/BinaryThreshold.h"
+#include "imageproc/Binarize.h"
+#include "imageproc/Grayscale.h"
+#include "imageproc/GrayImage.h"
+#include "imageproc/Scale.h"
+#include "imageproc/Constants.h"
+#include "imageproc/GaussBlur.h"
+#include "imageproc/Morphology.h"
+#include "imageproc/MorphGradientDetect.h"
+#include "imageproc/RasterOp.h"
+#include "imageproc/GrayRasterOp.h"
+#include "imageproc/RasterOpGeneric.h"
+#include "imageproc/SeedFill.h"
+#include "imageproc/FindPeaksGeneric.h"
 #include "imageproc/ConnectivityMap.h"
-#include "imageproc/InfluenceMap.h"
 #include "imageproc/ColorForId.h"
-#include <QPoint>
-#include <QPointF>
-#include <QSize>
-#include <QRect>
-#include <QRectF>
-#include <QPolygonF>
-#include <QVector>
+#include <QTransform>
 #include <QImage>
 #include <QPainter>
-#include <QColor>
+#include <QBrush>
 #include <QPen>
-#include <QDebug>
+#include <QColor>
+#include <QtGlobal>
+#include <boost/scoped_array.hpp>
 #include <boost/foreach.hpp>
-#include <vector>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/if.hpp>
+#include <algorithm>
 #include <set>
 #include <map>
-#include <functional>
-#include <algorithm>
-#include <iterator>
-#include <stdexcept>
+#include <deque>
+#include <utility>
+#include <stdlib.h>
 #include <math.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <assert.h>
 
 using namespace imageproc;
 
-struct TextLineTracer::BoundingBox
+namespace
 {
-	int top;
-	int left;
-	int bottom;
-	int right;
 
-	BoundingBox() {
-		top = left = NumericTraits<int>::max();
-		bottom = right = NumericTraits<int>::min();
+	uint8_t darkest(uint8_t lhs, uint8_t rhs) {
+		return lhs < rhs ? lhs : rhs;
 	}
 
-	int width() const { return right - left + 1; }
-
-	int height() const { return bottom - top + 1; }
-
-	int square() const { return width() * height(); }
-
-	void extend(int x, int y) {
-		top = std::min(top, y);
-		left = std::min(left, x);
-		bottom = std::max(bottom, y);
-		right = std::max(right, x);
+	uint8_t lightest(uint8_t lhs, uint8_t rhs) {
+		return lhs > rhs ? lhs : rhs;
 	}
 
-	QPoint center() const { return QPoint(left + width()/2, top + height()/2); }
-
-	QPointF centerF() const { return QPointF(0.5*(left + right + 1), 0.5*(top + bottom + 1)); }
-};
-
-struct TextLineTracer::Component
-{
-	enum { LEFTMOST_BIT_POS = 0, RIGHTMOST_BIT_POS = 1 };
-	enum Flag {
-		LEFTMOST    = 1 << LEFTMOST_BIT_POS,
-		RIGHTMOST   = 1 << RIGHTMOST_BIT_POS,
-		ENCOUNTERED = 1 << 2,
-		THROWN_AWAY = 1 << 3,
-		IN_QUEUE    = 1 << 4,
-		FINALIZED   = 1 << 5,
-	};
-
-	std::vector<uint32_t> connectedLabels;
-	BoundingBox bbox;
-	uint32_t label;
-	union {
-		uint32_t startLabel;
-		int closestEdgePointX;
-		int minY;
-	};
-	union {
-		uint32_t prevInPath;
-		int closestEdgePointY;
-		int maxY;
-	};
-	union {
-		uint32_t priorityIndex;
-		int edgeX;
-	};
-	union {
-		float pathCost;
-		float distToEdge;
-	};
-	int flags;
-
-	Component() : startLabel(0), prevInPath(0), priorityIndex(~uint32_t(0)),
-		pathCost(NumericTraits<float>::max()), flags(0) {}
-
-	bool higherPriority(Component& other) const {
-		return pathCost < other.pathCost;
-	}
-};
-
-struct TextLineTracer::Connection
-{
-	uint32_t lesserLabel;
-	uint32_t greaterLabel;
-	mutable uint32_t distSq;
-
-	Connection(uint32_t label0, uint32_t label1, uint32_t sqdist) {
-		if (label0 < label1) {
-			lesserLabel = label0;
-			greaterLabel = label1;
-		} else {
-			lesserLabel = label1;
-			greaterLabel = label0;
-		}
-		distSq = sqdist;
+	uint8_t darker(uint8_t color) {
+		return color == 0 ? 0 : color - 1;
 	}
 
-	bool operator<(Connection const& rhs) const {
-		if (lesserLabel != rhs.lesserLabel) {
-			return lesserLabel < rhs.lesserLabel;
-		} else {
-			return greaterLabel < rhs.greaterLabel;
-		}
-	}
+}
 
-	bool goodConnection(std::vector<Component> const& components) const {
-		BoundingBox const& bbox1 = components[lesserLabel].bbox;
-		BoundingBox const& bbox2 = components[greaterLabel].bbox;
-
-		//int const min_square = std::min(bbox1.square(), bbox2.square());
-		//int const y_delta = bbox1.center().y() - bbox2.center().y();
-		
-		//return y_delta * y_delta <= min_square;
-#if 1
-		if (bbox1.top > bbox2.bottom) {
-			return false;
-		}
-
-		if (bbox2.top > bbox1.bottom) {
-			return false;
-		}
-
-		return true;
-#endif
-	}
-};
-
-class TextLineTracer::CompPriorityQueue
+class TextLineTracer::CentroidCalculator
 {
 public:
-	void reserve(size_t capacity) { m_index.reserve(capacity); }
+	CentroidCalculator() : m_sumX(0), m_sumY(0), m_numSamples(0) {}
 
-	bool empty() const { return m_index.empty(); }
+	void processSample(int x, int y) {
+		m_sumX += x;
+		m_sumY += y;
+		++m_numSamples;
+	}
 
-	Component* front() { return m_index.front(); }
-
-	void push(Component* obj);
-
-	void pop();
-
-	void erase(Component* obj);
-
-	void reposition(Component* obj);
+	Vec2f centroid() const {
+		if (m_numSamples == 0) {
+			return Vec2f(0, 0);
+		} else {
+			float const r_num_samples = 1.0f / m_numSamples;
+			return Vec2f(float(m_sumX) * r_num_samples, float(m_sumY) * r_num_samples);
+		}
+	}
 private:
-	static size_t parent(size_t idx) { return (idx - 1) / 2; }
-
-	static size_t left(size_t idx) { return idx * 2 + 1; }
-
-	static size_t right(size_t idx) { return idx * 2 + 2; }
-
-	void bubbleUp(size_t idx);
-
-	void bubbleDown(size_t idx);
-
-	std::vector<Component*> m_index;
+	int m_sumX;
+	int m_sumY;
+	int m_numSamples;
 };
 
-void
+struct TextLineTracer::Region
+{
+	Vec2f centroid;
+	std::vector<RegionIdx> connectedRegions;
+	bool leftmost;
+	bool rightmost;
+
+	Region() : leftmost(false), rightmost(false) {}
+};
+
+struct TextLineTracer::GridNode
+{
+	static uint32_t const INVALID_REGION_IDX = (uint32_t(1) << 24) - 1;
+
+	uint32_t grayLevel:8;
+	uint32_t regionIdx:23;
+	uint32_t finalized:1;
+
+	GridNode() {}
+
+	GridNode(uint8_t gray_level, RegionIdx region_idx, uint32_t fin)
+		: grayLevel(gray_level), regionIdx(region_idx), finalized(fin) {}
+};
+
+struct TextLineTracer::RegionGrowingPosition
+{
+	uint32_t gridOffset;
+	uint32_t order;
+
+	RegionGrowingPosition(uint32_t grid_offset, uint32_t ord)
+		: gridOffset(grid_offset), order(ord) {}
+};
+
+class TextLineTracer::RegionGrowingQueue :
+	public PriorityQueue<RegionGrowingPosition, RegionGrowingQueue>
+{
+public:
+	RegionGrowingQueue(GridNode const* grid_data) : m_pGridData(grid_data) {}
+
+	bool higherThan(RegionGrowingPosition const& lhs, RegionGrowingPosition const& rhs) const {
+		GridNode const* lhs_node = m_pGridData + lhs.gridOffset;
+		GridNode const* rhs_node = m_pGridData + rhs.gridOffset;
+		if (lhs_node->grayLevel < rhs_node->grayLevel) {
+			return true;
+		} else if (lhs_node->grayLevel == rhs_node->grayLevel) {
+			return lhs.order < rhs.order;
+		} else {
+			return false;
+		}
+	}
+
+	void setIndex(RegionGrowingPosition, size_t) {}
+private:
+	GridNode const* m_pGridData;
+};
+
+/**
+ * Edge is an bidirectional connection between two regions.
+ * Geometrically it can be viewed as a connection between their centroids.
+ * Note that centroids are calculated based on region seeds, not on full
+ * region areas.
+ */
+struct TextLineTracer::Edge
+{
+	RegionIdx lesserRegionIdx;
+	RegionIdx greaterRegionIdx;
+
+	Edge(RegionIdx region_idx1, RegionIdx region_idx2) {
+		if (region_idx1 < region_idx2) {
+			lesserRegionIdx = region_idx1;
+			greaterRegionIdx = region_idx2;
+		} else {
+			lesserRegionIdx = region_idx2;
+			greaterRegionIdx = region_idx1;
+		}
+	}
+
+	bool operator<(Edge const& rhs) const {
+		if (lesserRegionIdx < rhs.lesserRegionIdx) {
+			return true;
+		} else if (lesserRegionIdx > rhs.lesserRegionIdx) {
+			return false;
+		} else {
+			return greaterRegionIdx < rhs.greaterRegionIdx;
+		}
+	}
+};
+
+/**
+ * A connection between two edges.
+ */
+struct TextLineTracer::EdgeConnection
+{
+	EdgeNodeIdx edgeNodeIdx;
+	float cost;
+
+	EdgeConnection(EdgeNodeIdx idx, float cost) : edgeNodeIdx(idx), cost(cost) {}
+};
+
+/**
+ * A node in a graph that represents a connection between two regions.
+ */
+struct TextLineTracer::EdgeNode
+{
+	Edge edge;
+	std::vector<EdgeConnection> connectedEdges;
+	float pathCost;
+	EdgeNodeIdx prevEdgeNodeIdx;
+	RegionIdx leftmostRegionIdx;
+	uint32_t heapIdx;
+
+	EdgeNode(Edge const& edg) : edge(edg), pathCost(NumericTraits<float>::max()),
+		prevEdgeNodeIdx(~EdgeNodeIdx(0)), leftmostRegionIdx(~RegionIdx(0)), heapIdx(~uint32_t(0)) {}
+};
+
+class TextLineTracer::ShortestPathQueue : public PriorityQueue<EdgeNodeIdx, ShortestPathQueue>
+{
+public:
+	ShortestPathQueue(std::vector<EdgeNode>& edge_nodes) : m_rEdgeNodes(edge_nodes) {}
+
+	bool higherThan(EdgeNodeIdx lhs, EdgeNodeIdx rhs) const {
+		EdgeNode const& lhs_node = m_rEdgeNodes[lhs];
+		EdgeNode const& rhs_node = m_rEdgeNodes[rhs];
+		return lhs_node.pathCost < rhs_node.pathCost;
+	}
+
+	void setIndex(EdgeNodeIdx edge_node_idx, uint32_t heap_idx) {
+		m_rEdgeNodes[edge_node_idx].heapIdx = heap_idx;
+	}
+
+	void reposition(EdgeNodeIdx edge_node_idx) {
+		PriorityQueue::reposition(m_rEdgeNodes[edge_node_idx].heapIdx);
+	}
+private:
+	std::vector<EdgeNode>& m_rEdgeNodes;
+};
+
+
+std::list<std::vector<QPointF> >
 TextLineTracer::trace(
-	imageproc::BinaryImage const& input,
+	GrayImage const& input, Dpi const& dpi, QRect const& content_rect,
 	TaskStatus const& status, DebugImages* dbg)
 {
-	ConnectivityMap cmap(input, CONN8);
+	using namespace boost::lambda;
+
+	GrayImage downscaled(downscale(input, dpi));
 	if (dbg) {
-		dbg->add(cmap.visualized(), "cmap");
+		dbg->add(downscaled, "downscaled");
 	}
 
-	std::vector<Component> components;
-	calcBoundingBoxes(cmap, components);
+	int const downscaled_width = downscaled.width();
+	int const downscaled_height = downscaled.height();
 
-	// We subdivide long connected components into multiple
-	// vertical stripes for the following reasons:
-	// 1. Two words with letters glued together in the curved
-	//    area might have a significant vertical shift in relation
-	//    to each other, which might prevent a connection between
-	//    them to be formed.
-	// 2. We want to detect not just text lines, but also various
-	//    solid lines.
-	subdivideLongComponents(cmap, components);
+	double const downscale_x_factor = double(downscaled_width) / input.width();
+	double const downscale_y_factor = double(downscaled_height) / input.height();
+	QTransform to_orig;
+	to_orig.scale(1.0 / downscale_x_factor, 1.0 / downscale_y_factor);
+
+	QRect const downscaled_content_rect(to_orig.inverted().mapRect(content_rect));
+	Dpi const downscaled_dpi(
+		qRound(dpi.horizontal() * downscale_x_factor),
+		qRound(dpi.vertical() * downscale_y_factor)
+	);
+
+	BinaryImage binarized(binarizeWolf(downscaled, QSize(31, 31)));
 	if (dbg) {
-		dbg->add(cmap.visualized(), "more_segments");
+		dbg->add(binarized, "binarized");
 	}
 
-	for (uint32_t label = 0; label < components.size(); ++label) {
-		components[label].label = label;
+	// detectVertContentBounds() is sensitive to clutter and speckles, so let's try to remove it.
+	sanitizeBinaryImage(binarized, downscaled_content_rect);
+	if (dbg) {
+		dbg->add(binarized, "sanitized");
 	}
 
-	int const median_comp_height = calcMedianCompHeight(components);
+	std::pair<QLineF, QLineF> const vert_bounds(detectVertContentBounds(binarized));
+	if (dbg) {
+		dbg->add(visualizeVerticalBounds(binarized.toQImage(), vert_bounds), "vert_bounds");
+	}
+	binarized.release();
 
-	InfluenceMap imap(cmap);
+	GrayImage blurred(gaussBlur(stretchGrayRange(downscaled), 17, 5));
+	if (dbg) {
+		dbg->add(blurred.toQImage(), "blurred");
+	}
+
+	GrayImage eroded(erodeGray(blurred, QSize(31, 31)));
+	rasterOpGeneric(
+		eroded.data(), eroded.stride(), eroded.size(),
+		blurred.data(), blurred.stride(),
+		if_then_else(_1 > _2 + 8, _1 = uint8_t(0), _1 = uint8_t(255))
+	);
+	BinaryImage thick_mask(eroded);
+	eroded = GrayImage();
+	if (dbg) {
+		dbg->add(thick_mask, "thick_mask");
+	}
+
+	std::list<std::vector<QPointF> > polylines;
+	segmentBlurredTextLines(blurred, thick_mask, polylines, dbg);
+
+	filterCurves(polylines);
+	if (dbg) {
+		dbg->add(visualizePolylines(downscaled.toQImage(), polylines), "filtered_lines");
+	}
+
+	if (!dbg) {
+		// In debugging, we want to extend / refine all lines, so we pick the
+		// top / bottom ones later.
+		pickTopBottomLines(polylines);
+	}
+
+	if (polylines.size() >= 2 || dbg) {
+		BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+			extendOrTrimPolyline(polyline, vert_bounds.first, vert_bounds.second, blurred, thick_mask);
+		}
+		if (dbg) {
+			dbg->add(
+				visualizeExtendedPolylines(
+					blurred.toQImage(), thick_mask, polylines,
+					vert_bounds.first, vert_bounds.second
+				),
+				"extended_polylines"
+			);
+		}
+
+		TextLineRefiner refiner(downscaled, Dpi(200, 200), dbg);
+		refiner.refine(polylines, /*iterations=*/100, dbg, &downscaled.toQImage());
+	}
+
+	if (dbg) {
+		pickTopBottomLines(polylines);
+		dbg->add(visualizePolylines(downscaled.toQImage(), polylines), "representative_lines");
+	}
+
+	// Fix endpoints at the vertical boundaries.
+	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+		intersectWithVerticalBoundaries(polyline, vert_bounds.first, vert_bounds.second);
+	}
+
+	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+		makeLeftToRight(polyline);
+	}
+
+	if (dbg) {
+		dbg->add(visualizePolylines(downscaled.toQImage(), polylines, &vert_bounds), "final_lines");
+	}
+
+	// Transform back to original coordinates.
+	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+		BOOST_FOREACH(QPointF& pt, polyline) {
+			pt = to_orig.map(pt);
+		}
+	}
+
+	return polylines;
+}
+
+GrayImage
+TextLineTracer::downscale(GrayImage const& input, Dpi const& dpi)
+{
+	// Downscale to 200 DPI.
+	QSize downscaled_size(input.size());
+	if (dpi.horizontal() < 180 || dpi.horizontal() > 220 || dpi.vertical() < 180 || dpi.vertical() > 220) {
+		downscaled_size.setWidth(std::max<int>(1, input.width() * 200 / dpi.horizontal()));
+		downscaled_size.setHeight(std::max<int>(1, input.height() * 200 / dpi.vertical()));
+	}
+
+	return scaleToGray(input, downscaled_size);
+}
+
+void
+TextLineTracer::segmentBlurredTextLines(
+	GrayImage const& blurred, BinaryImage const& thick_mask,
+	std::list<std::vector<QPointF> >& out, DebugImages* dbg)
+{
+	int const width = blurred.width();
+	int const height = blurred.height();
+
+	BinaryImage region_seeds(
+		findPeaksGeneric<uint8_t>(
+			&darkest, &lightest, &darker, QSize(31, 15), 255,
+			blurred.data(), blurred.stride(), blurred.size()
+		)
+	);
+	
+	// We don't want peaks outside of the thick mask.
+	// This mostly happens on pictures.
+	region_seeds = seedFill(thick_mask, region_seeds, CONN8);
+
+	// We really don't want two region seeds close to each other.
+	// Even though the peak_neighbourhood parameter we pass to findPeaksGeneric()
+	// will suppress nearby weaker peaks, but it won't suppress a nearby peak
+	// if it has has exactly the same value.  Therefore, we dilate those peaks.
+	// Note that closeBrick() wouldn't handle cases like:
+	// x
+	//    x
+	region_seeds = dilateBrick(region_seeds, QSize(9, 9));
+	if (dbg) {
+		dbg->add(region_seeds, "region_seeds");
+	}
+
+	std::vector<Region> regions;
+	std::set<Edge> edges;
+
+	labelAndGrowRegions(blurred, region_seeds.release(), thick_mask, regions, edges, dbg);
+
+	std::vector<EdgeNode> edge_nodes;
+	std::map<Edge, uint32_t> edge_to_index;
+	edge_nodes.reserve(edges.size());
+
+	// Populate ConnComp::connectedRagions and edge_nodes.
+	BOOST_FOREACH(Edge const& edge, edges) {
+		edge_to_index[edge] = edge_nodes.size();
+		edge_nodes.push_back(EdgeNode(edge));
+
+		regions[edge.lesserRegionIdx].connectedRegions.push_back(edge.greaterRegionIdx);
+		regions[edge.greaterRegionIdx].connectedRegions.push_back(edge.lesserRegionIdx);
+	}
+
+	float const cos_threshold = cos(15 * constants::DEG2RAD);
+	float const cos_sq_threshold = cos_threshold * cos_threshold;
+
+	uint32_t const num_regions = regions.size();
+
+	// Populate EdgeNode::connectedEdges
+	for (RegionIdx region_idx = 1; region_idx < num_regions; ++region_idx) {
+		Region const& region = regions[region_idx];
+		size_t const num_connected_regions = region.connectedRegions.size();
+		for (size_t i = 0; i < num_connected_regions; ++i) {
+			RegionIdx const region1_idx = region.connectedRegions[i];
+			assert(region1_idx != region_idx);
+			Edge const edge1(region_idx, region1_idx);
+			uint32_t const edge1_node_idx = edge_to_index[edge1];
+			EdgeNode& edge1_node = edge_nodes[edge1_node_idx];
+			Vec2f const vec1(regions[region1_idx].centroid - region.centroid);
+
+			for (size_t j = i + 1; j < num_connected_regions; ++j) {
+				RegionIdx const region2_idx = region.connectedRegions[j];
+				assert(region2_idx != region_idx && region2_idx != region1_idx);
+				Edge const edge2(region_idx, region2_idx);
+				uint32_t const edge2_node_idx = edge_to_index[edge2];
+				EdgeNode& edge2_node = edge_nodes[edge2_node_idx];
+				Vec2f const vec2(regions[region2_idx].centroid - region.centroid);
+				
+				float const dot = vec1.dot(vec2);
+				float const cos_sq = (fabs(dot) * -dot) / (vec1.squaredNorm() * vec2.squaredNorm());
+				float const cost = std::max<float>(1.0f - cos_sq, 0);
+
+				if (cos_sq > cos_sq_threshold) {
+					edge1_node.connectedEdges.push_back(EdgeConnection(edge2_node_idx, cost));
+					edge2_node.connectedEdges.push_back(EdgeConnection(edge1_node_idx, cost));
+				}
+			}
+		}
+	}
+	
+	ShortestPathQueue queue(edge_nodes);
+	uint32_t const num_edge_nodes = edge_nodes.size();
+
+	// Put leftmost nodes in the queue with the path cost of zero.
+	for (uint32_t edge_node_idx = 0; edge_node_idx < num_edge_nodes; ++edge_node_idx) {
+		EdgeNode& edge_node = edge_nodes[edge_node_idx];
+		RegionIdx const region1_idx = edge_node.edge.lesserRegionIdx;
+		RegionIdx const region2_idx = edge_node.edge.greaterRegionIdx;
+
+		if (regions[region1_idx].leftmost) {
+			edge_node.pathCost = 0;
+			edge_node.leftmostRegionIdx = region1_idx;
+			queue.push(edge_node_idx);
+		} else if (regions[region2_idx].leftmost) {
+			edge_node.pathCost = 0;
+			edge_node.leftmostRegionIdx = region2_idx;
+			queue.push(edge_node_idx);
+		}
+	}
+
+	while (!queue.empty()) {
+		uint32_t const edge_node_idx = queue.front();
+		queue.pop();
+
+		EdgeNode& edge_node = edge_nodes[edge_node_idx];
+		edge_node.heapIdx = ~uint32_t(0);
+
+		BOOST_FOREACH(EdgeConnection const& connection, edge_node.connectedEdges) {
+			EdgeNode& edge_node2 = edge_nodes[connection.edgeNodeIdx];
+			float const new_path_cost = std::max<float>(
+				edge_node.pathCost, connection.cost
+			) + 0.001 * connection.cost;
+			if (new_path_cost < edge_node2.pathCost) {
+				edge_node2.pathCost = new_path_cost;
+				edge_node2.prevEdgeNodeIdx = edge_node_idx;
+				edge_node2.leftmostRegionIdx = edge_node.leftmostRegionIdx;
+				if (edge_node2.heapIdx == ~uint32_t(0)) {
+					queue.push(connection.edgeNodeIdx);
+				} else {
+					queue.reposition(connection.edgeNodeIdx);
+				}
+			}
+		}
+	}
+
+	std::vector<std::vector<EdgeNodeIdx> > edge_node_paths;
+	extractEdegeNodePaths(edge_node_paths, edge_nodes, regions);
+
+	// Visualize refined graph.
+	if (dbg) {
+		QImage canvas(blurred.toQImage().convertToFormat(QImage::Format_ARGB32_Premultiplied));
+		{
+			QPainter painter(&canvas);
+			
+			// Visualize connections.
+			painter.setRenderHint(QPainter::Antialiasing);
+			QPen pen(Qt::blue);
+			pen.setWidthF(2.0);
+			painter.setPen(pen);
+			BOOST_FOREACH(std::vector<uint32_t> const& path, edge_node_paths) {
+				BOOST_FOREACH(uint32_t const edge_node_idx, path) {
+					Edge const& edge = edge_nodes[edge_node_idx].edge;
+					painter.drawLine(
+						regions[edge.lesserRegionIdx].centroid,
+						regions[edge.greaterRegionIdx].centroid
+					);
+				}
+			}
+
+			// Visualize peaks.
+			painter.setPen(Qt::NoPen);
+			QColor color;
+			BOOST_FOREACH(Region const& region, regions) {
+				if (region.leftmost && region.rightmost) {
+					color = Qt::green;
+				} else if (region.leftmost) {
+					color = Qt::magenta;
+				} else if (region.rightmost) {
+					color = Qt::cyan;
+				} else {
+					color = Qt::yellow;
+				}
+				painter.setBrush(color);
+				QRectF rect(0, 0, 15, 15);
+				rect.moveCenter(region.centroid);
+				painter.drawEllipse(rect);
+			}
+		}
+		dbg->add(canvas, "refined_graph");
+	}
+
+	edgeSequencesToPolylines(edge_node_paths, edge_nodes, regions, out);
+}
+
+void
+TextLineTracer::labelAndGrowRegions(
+	GrayImage const& blurred, BinaryImage region_seeds,
+	BinaryImage const& thick_mask, std::vector<Region>& regions,
+	std::set<Edge>& edges, DebugImages* dbg)
+{
+	int const width = blurred.width();
+	int const height = blurred.height();
+
+	BinaryImage eroded(erodeBrick(region_seeds, QSize(3, 3)));
+	rasterOp<RopXor<RopSrc, RopDst> >(region_seeds, eroded.release());
+	if (dbg) {
+		dbg->add(region_seeds, "region_seed_edges");
+	}
+
+	Grid<GridNode> grid(width, height, /*padding=*/1);
+	grid.initPadding(GridNode(0, 0, 1));
+	
+	GridNode* const grid_data = grid.data();
+	int const grid_stride = grid.stride();
+	
+	RegionGrowingQueue queue(grid.data());
+
+	ConnectivityMap cmap(region_seeds, CONN8);
+
+	std::vector<CentroidCalculator> centroid_calculators(cmap.maxLabel());
+
+	int const cmap_stride = cmap.stride();
+	uint32_t* cmap_line = cmap.paddedData();
+
+	uint8_t const* blurred_line = blurred.data();
+	int const blurred_stride = blurred.stride();
+
+	// Populate the grid from connectivity map, also find region centroids.
+	uint32_t grid_offset = 0;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x, ++grid_offset) {
+			GridNode* node = grid_data + grid_offset;
+			node->grayLevel = blurred_line[x];
+			
+			uint32_t const label = cmap_line[x];
+			
+			if (label == 0) {
+				node->regionIdx = GridNode::INVALID_REGION_IDX;
+				node->finalized = 0;
+			} else {
+				// Label 0 stands for background in ConnectivityMap.
+				node->regionIdx = label - 1;
+				node->finalized = 1;
+				queue.push(RegionGrowingPosition(grid_offset, 0));
+				
+				centroid_calculators[label - 1].processSample(x, y);
+			}
+		}
+
+		blurred_line += blurred_stride;
+		cmap_line += cmap_stride;
+		grid_offset += 2;
+	}
+
 	cmap = ConnectivityMap(); // Save memory.
 
-	if (imap.maxLabel() == 0) {
-		// No regions in the map.
-		return;
+	int const nbh_offsets[] = { -grid_stride, -1, 1, grid_stride };
+
+	uint32_t iteration = 0;
+	while (!queue.empty()) {
+		++iteration;
+
+		uint32_t const offset = queue.front().gridOffset;
+		queue.pop();
+
+		GridNode const* node = grid_data + offset;
+		RegionIdx const region_idx = node->regionIdx;
+
+		// Spread this value to 4-connected neighbours.
+		for (int i = 0; i < 4; ++i) {
+			uint32_t const nbh_offset = offset + nbh_offsets[i];
+			GridNode* nbh = grid_data + nbh_offset;
+			if (!nbh->finalized) {
+				nbh->finalized = 1;
+				nbh->regionIdx = region_idx;
+				queue.push(RegionGrowingPosition(nbh_offset, iteration));
+			}
+		}
 	}
+
+	uint32_t const num_regions = centroid_calculators.size();
+	regions.resize(num_regions);
+	
+	for (uint32_t i = 0; i < num_regions; ++i) {
+		Region& region = regions[i];
+		region.centroid = centroid_calculators[i].centroid();
+	}
+
+	// Mark regions as leftmost / rightmost.
+	GridNode const* grid_line = grid.data();
+	for (int y = 0; y < height; ++y, grid_line += grid_stride) {
+		regions[grid_line[0].regionIdx].leftmost = true;
+		regions[grid_line[width - 1].regionIdx].rightmost = true;
+	}
+	
+	// Process horizontal connections between regions.
+	grid_line = grid.data();
+	uint32_t const* thick_mask_line = thick_mask.data();
+	int const thick_mask_stride = thick_mask.wordsPerLine();
+	for (int y = 0; y < height; ++y) {
+		for (int x = 1; x < width; ++x) {
+			uint32_t const mask1 = thick_mask_line[x >> 5] >> (31 - (x & 31));
+			uint32_t const mask2 = thick_mask_line[(x - 1) >> 5] >> (31 - ((x - 1) & 31));
+			if (mask1 & mask2 & 1) {
+				GridNode const* node1 = grid_line + x;
+				GridNode const* node2 = node1 - 1;
+				if (node1->regionIdx != node2->regionIdx) {
+					edges.insert(Edge(node1->regionIdx, node2->regionIdx));
+				}
+			}
+		}
+
+		grid_line += grid_stride;
+		thick_mask_line += thick_mask_stride;
+	}
+
+	uint32_t const msb = uint32_t(1) << 31;
+
+	// Process vertical connections between regions.
+	grid_line = grid.data();
+	thick_mask_line = thick_mask.data();
+	for (int x = 0; x < width; ++x) {
+		grid_line = grid.data() + x;
+		uint32_t const* mask_word = thick_mask_line + (x >> 5);
+		uint32_t const mask = msb >> (x & 31);
+		
+		for (int y = 1; y < height; ++y) {
+			grid_line += grid_stride;
+			mask_word += thick_mask_stride;
+
+			if (mask_word[0] & mask_word[-thick_mask_stride] & mask) {
+				GridNode const* node1 = grid_line;
+				GridNode const* node2 = grid_line - grid_stride;
+				if (node1->regionIdx != node2->regionIdx) {
+					edges.insert(Edge(node1->regionIdx, node2->regionIdx));
+				}
+			}
+		}
+	}
+
 	if (dbg) {
-		dbg->add(overlay(imap.visualized(), input), "voronoi");
+		// Visualize regions and seeds.
+		QImage visualized_regions(
+			visualizeRegions(grid).convertToFormat(QImage::Format_ARGB32_Premultiplied)
+		);
+
+		QImage canvas(visualized_regions);
+		{
+			QPainter painter(&canvas);
+
+			painter.setOpacity(0.7);
+			painter.drawImage(0, 0, blurred);
+
+			painter.setOpacity(1.0);
+			painter.drawImage(0, 0, region_seeds.toAlphaMask(Qt::blue));
+		}
+		dbg->add(canvas, "regions");
+
+		// Visualize region connectivity.
+		canvas = visualized_regions;
+		visualized_regions = QImage();
+		{
+			QPainter painter(&canvas);
+			painter.setOpacity(0.3);
+			painter.drawImage(0, 0, thick_mask.toQImage());
+			
+			// Visualize connections.
+			painter.setOpacity(1.0);
+			painter.setRenderHint(QPainter::Antialiasing);
+			QPen pen(Qt::blue);
+			pen.setWidthF(2.0);
+			painter.setPen(pen);
+			BOOST_FOREACH(Edge const& edge, edges) {
+				painter.drawLine(
+					regions[edge.lesserRegionIdx].centroid,
+					regions[edge.greaterRegionIdx].centroid
+				);
+			}
+
+			// Visualize nodes.
+			painter.setPen(Qt::NoPen);
+			QColor color;
+			BOOST_FOREACH(Region const& region, regions) {
+				if (region.leftmost && region.rightmost) {
+					color = Qt::green;
+				} else if (region.leftmost) {
+					color = Qt::magenta;
+				} else if (region.rightmost) {
+					color = Qt::cyan;
+				} else {
+					color = Qt::yellow;
+				}
+				painter.setBrush(color);
+				QRectF rect(0, 0, 15, 15);
+				rect.moveCenter(region.centroid);
+				painter.drawEllipse(rect);
+			}
+		}
+		dbg->add(canvas, "connectivity");
+	}
+}
+
+void
+TextLineTracer::extractEdegeNodePaths(
+	std::vector<std::vector<uint32_t> >& edge_node_paths,
+	std::vector<EdgeNode> const& edge_nodes,
+	std::vector<Region> const& regions)
+{
+	uint32_t const num_edge_nodes = edge_nodes.size();
+
+	std::map<RegionIdx, EdgeNodeIdx> best_incoming_paths; // rightmost region -> rightmost EdgeNode index
+	
+	for (uint32_t rightmost_edge_node_idx = 0; rightmost_edge_node_idx < num_edge_nodes; ++rightmost_edge_node_idx) {
+		EdgeNode const& edge_node = edge_nodes[rightmost_edge_node_idx];
+		
+		uint32_t rightmost_region_idx;
+
+		if (regions[edge_node.edge.lesserRegionIdx].rightmost) {
+			rightmost_region_idx = edge_node.edge.lesserRegionIdx;
+		} else if (regions[edge_node.edge.greaterRegionIdx].rightmost) {
+			rightmost_region_idx = edge_node.edge.greaterRegionIdx;
+		} else {
+			continue;
+		}
+
+		uint32_t const leftmost_region_idx = edge_node.leftmostRegionIdx;
+		if (leftmost_region_idx == ~RegionIdx(0)) {
+			// No path reached this node.
+			continue; 
+		}
+
+		std::map<RegionIdx, EdgeNodeIdx>::iterator it(best_incoming_paths.find(rightmost_region_idx));
+		if (it == best_incoming_paths.end()) {
+			best_incoming_paths[rightmost_region_idx] = rightmost_edge_node_idx;
+		} else {
+			float const old_cost = edge_nodes[it->second].pathCost;
+			float const new_cost = edge_nodes[rightmost_edge_node_idx].pathCost;
+			if (new_cost < old_cost) {
+				it->second = rightmost_edge_node_idx;
+			}
+		}
 	}
 
-	std::set<Connection> connections;
-	findVoronoiConnections(imap, connections);
+	std::map<RegionIdx, EdgeNodeIdx> best_outgoing_paths; // leftmost region -> rightmost EdgeNode index
+	
+	typedef std::map<RegionIdx, EdgeNodeIdx>::value_type KV;
+	BOOST_FOREACH(KV const& kv, best_incoming_paths) {
+		uint32_t const leftmost_region_idx = edge_nodes[kv.second].leftmostRegionIdx;
+		uint32_t const rightmost_edge_node_idx = kv.second;
 
-	// Remove "bad" connections, and while at it, populate connectedLabels lists.
-	std::set<Connection>::iterator it(connections.begin());
-	while (it != connections.end()) {
-		if (true) { //it->goodConnection(components)) {
-			components[it->lesserLabel].connectedLabels.push_back(it->greaterLabel);
-			components[it->greaterLabel].connectedLabels.push_back(it->lesserLabel);
+		std::map<RegionIdx, EdgeNodeIdx>::iterator it(
+			best_outgoing_paths.find(leftmost_region_idx)
+		);
+		if (it == best_outgoing_paths.end()) {
+			best_outgoing_paths[leftmost_region_idx] = rightmost_edge_node_idx;
+		} else {
+			float const existing_cost = edge_nodes[it->second].pathCost;
+			float const new_cost = edge_nodes[rightmost_edge_node_idx].pathCost;
+			if (new_cost < existing_cost) {
+				it->second = rightmost_edge_node_idx;
+			}
+		}
+	}
+	
+	// Follow by EdgeNode::prevEdgeNode from rightmost edges to leftmost ones.
+	typedef std::map<RegionIdx, EdgeNodeIdx>::value_type LR;
+	BOOST_FOREACH (LR const& lr, best_outgoing_paths) {
+	
+		edge_node_paths.push_back(std::vector<uint32_t>());
+		std::vector<uint32_t>& path = edge_node_paths.back();
+		
+		uint32_t edge_node_idx = lr.second;
+		for (;;) {
+			path.push_back(edge_node_idx);
+
+			EdgeNode const& edge_node = edge_nodes[edge_node_idx];
+			if (edge_node.edge.lesserRegionIdx == lr.first || edge_node.edge.greaterRegionIdx == lr.first) {
+				break; // We are done!
+			}
+
+			edge_node_idx = edge_node.prevEdgeNodeIdx;
+		}
+	}
+}
+
+void
+TextLineTracer::edgeSequencesToPolylines(
+	std::vector<std::vector<EdgeNodeIdx> > const& edge_node_paths,
+	std::vector<EdgeNode> const& edge_nodes, std::vector<Region> const& regions,
+	std::list<std::vector<QPointF> >& polylines)
+{
+	BOOST_FOREACH(std::vector<EdgeNodeIdx> const& edge_node_path, edge_node_paths) {
+		if (edge_node_path.empty()) {
+			continue;
+		}
+		
+		polylines.push_back(std::vector<QPointF>());
+		std::vector<QPointF>& polyline = polylines.back();
+
+		if (edge_node_path.size() == 1) {
+			Edge const& edge = edge_nodes[edge_node_path.front()].edge;
+			polyline.push_back(regions[edge.lesserRegionIdx].centroid);
+			polyline.push_back(regions[edge.greaterRegionIdx].centroid);
+			continue;
+		}
+
+		std::vector<RegionIdx> region_indexes;
+
+		// This one will be written later.
+		region_indexes.push_back(0);
+
+		std::vector<EdgeNodeIdx>::const_iterator it(edge_node_path.begin());
+		std::vector<EdgeNodeIdx>::const_iterator const end(edge_node_path.end());
+		for (;;) {
+			EdgeNodeIdx const edge_node1_idx = *it;
+			++it;
+			if (it == end) {
+				break;
+			}
+			EdgeNodeIdx const edge_node2_idx = *it;
+			
+			RegionIdx const connecting_region_idx = findConnectingRegion(
+				edge_nodes[edge_node1_idx].edge, edge_nodes[edge_node2_idx].edge
+			);
+			assert(connecting_region_idx != ~RegionIdx(0));
+
+			region_indexes.push_back(connecting_region_idx);
+		}
+
+		Edge const& first_edge = edge_nodes[edge_node_path.front()].edge;
+		if (first_edge.lesserRegionIdx == region_indexes[1]) {
+			region_indexes[0] = first_edge.greaterRegionIdx;
+		} else {
+			region_indexes[0] = first_edge.lesserRegionIdx;
+		}
+
+		Edge const& last_edge = edge_nodes[edge_node_path.back()].edge;
+		if (last_edge.lesserRegionIdx == region_indexes.back()) {
+			region_indexes.push_back(last_edge.greaterRegionIdx);
+		} else {
+			region_indexes.push_back(last_edge.lesserRegionIdx);
+		}
+
+		BOOST_FOREACH(RegionIdx region_idx, region_indexes) {
+			polyline.push_back(regions[region_idx].centroid);
+		}
+	}
+}
+
+TextLineTracer::RegionIdx
+TextLineTracer::findConnectingRegion(Edge const& edge1, Edge const& edge2)
+{
+	RegionIdx const edge1_regions[] = { edge1.lesserRegionIdx, edge1.greaterRegionIdx };
+	RegionIdx const edge2_regions[] = { edge2.lesserRegionIdx, edge2.greaterRegionIdx };
+
+	BOOST_FOREACH(RegionIdx idx1, edge1_regions) {
+		BOOST_FOREACH(RegionIdx idx2, edge2_regions) {
+			if (idx1 == idx2) {
+				return idx1;
+			}
+		}
+	}
+
+	return ~RegionIdx(0);
+}
+
+void
+TextLineTracer::sanitizeBinaryImage(BinaryImage& image, QRect const& content_rect)
+{
+	// Kill connected components touching the borders.
+	BinaryImage seed(image.size(), WHITE);
+	seed.fillExcept(seed.rect().adjusted(1, 1, -1, -1), BLACK);
+
+	BinaryImage touching_border(seedFill(seed.release(), image, CONN8));
+	rasterOp<RopSubtract<RopDst, RopSrc> >(image, touching_border);
+
+	// TODO: maybe do despeckling here?
+
+	image.fillExcept(content_rect, WHITE);
+}
+
+/**
+ * Returns false if the curve contains both significant convexities and concavities.
+ */
+bool
+TextLineTracer::isCurvatureConsistent(std::vector<QPointF> const& polyline)
+{
+	size_t const num_nodes = polyline.size();
+	
+	if (num_nodes <= 1) {
+		// Even though we can't say anything about curvature in this case,
+		// we don't like such gegenerate curves, so we reject them.
+		return false;
+	} else if (num_nodes == 2) {
+		// These are fine.
+		return true;
+	}
+
+	// Threshold angle between a polyline segment and a normal to the previous one.
+	float const cos_threshold = cos((90.0f - 6.0f) * constants::DEG2RAD);
+	float const cos_sq_threshold = cos_threshold * cos_threshold;
+	bool significant_positive = false;
+	bool significant_negative = false;
+
+	Vec2f prev_normal(polyline[1] - polyline[0]);
+	std::swap(prev_normal[0], prev_normal[1]);
+	prev_normal[0] = -prev_normal[0];
+	float prev_normal_sqlen = prev_normal.squaredNorm();
+
+	for (size_t i = 1; i < num_nodes - 1; ++i) {
+		Vec2f const next_segment(polyline[i + 1] - polyline[i]);
+		float const next_segment_sqlen = next_segment.squaredNorm();
+
+		float cos_sq = 0;
+		float const sqlen_mult = prev_normal_sqlen * next_segment_sqlen;
+		if (sqlen_mult > std::numeric_limits<float>::epsilon()) {
+			float const dot = prev_normal.dot(next_segment);
+			cos_sq = fabs(dot) * dot / sqlen_mult;
+		}
+
+		if (fabs(cos_sq) >= cos_sq_threshold) {
+			if (cos_sq > 0) {
+				significant_positive = true;
+			} else {
+				significant_negative = true;
+			}
+		}
+
+		prev_normal[0] = -next_segment[1];
+		prev_normal[1] = next_segment[0];
+		prev_normal_sqlen = next_segment_sqlen;
+	}
+
+	return !(significant_positive && significant_positive);
+}
+
+void
+TextLineTracer::filterCurves(std::list<std::vector<QPointF> >& polylines)
+{
+	std::list<std::vector<QPointF> >::iterator it(polylines.begin());
+	std::list<std::vector<QPointF> >::iterator const end(polylines.end());	
+	while (it != end) {
+		if (isCurvatureConsistent(*it)) {
 			++it;
 		} else {
-			connections.erase(it++);
-		}
-	}
-
-	// Label some components as leftmost, rightmost or both.
-	labelEdgeComponents(components, imap, 0, Component::LEFTMOST);
-	labelEdgeComponents(components, imap, imap.size().width() - 1, Component::RIGHTMOST);
-	if (dbg) {
-		dbg->add(visualizeLeftRightComponents(components, imap), "endpoints");
-	}
-
-	// Estimate vertical boundaries.
-	QLineF const left_cutter(
-		estimateVerticalCutter(
-			imap, components, Component::LEFTMOST, median_comp_height, std::less<int>()
-		)
-	);
-	QLineF const right_cutter(
-		estimateVerticalCutter(
-			imap, components, Component::RIGHTMOST, median_comp_height, std::greater<int>()
-		)
-	);
-	if (dbg) {
-		dbg->add(visualizeCutters(input.toQImage(), left_cutter, right_cutter), "vert_cutters");
-	}
-
-	std::list<std::vector<uint32_t> > lines;
-	connectEndpoints(components, lines);
-	if (dbg) {
-		dbg->add(
-			visualizeTracedLinesAndCutters(
-				input.toQImage(), lines, components, left_cutter, right_cutter
-			),
-			"traced_lines"
-		);
-	}
-}
-
-void
-TextLineTracer::calcBoundingBoxes(
-	imageproc::ConnectivityMap const& cmap, std::vector<Component>& components)
-{
-	components.resize(cmap.maxLabel() + 1);
-
-	int const w = cmap.size().width();
-	int const h = cmap.size().height();
-	uint32_t const* cmap_line = cmap.data();
-	int const cmap_stride = cmap.stride();
-
-	for (int y = 0; y < h; ++y, cmap_line += cmap_stride) {
-		for (int x = 0; x < w; ++x) {
-			uint32_t const label = cmap_line[x];
-			if (label) {
-				components[label].bbox.extend(x, y);
-			}
+			polylines.erase(it++);
 		}
 	}
 }
 
 void
-TextLineTracer::subdivideLongComponents(
-	imageproc::ConnectivityMap& cmap, std::vector<Component>& components)
+TextLineTracer::pickTopBottomLines(std::list<std::vector<QPointF> >& polylines)
 {
-	uint32_t* cmap_data = cmap.data();
-	int const cmap_stride = cmap.stride();
-	uint32_t const initial_max_label = cmap.maxLabel();
-	uint32_t new_label = initial_max_label;
-
-	for (uint32_t label = 1; label <= initial_max_label; ++label) {
-		Component& comp = components[label];
-		int const width = comp.bbox.width();
-		int const height = comp.bbox.height();
-		
-		int const target_segment_length = std::max<int>(30, height); // XXX: make 30 dpi-dependent.
-		if (target_segment_length * 2 > width) {
-			// No point in subdividing.
-			continue;
-		}
-
-		int num_segments = width / target_segment_length;
-		assert(num_segments >= 2);
-
-		int const segment_length = width / num_segments;
-		assert(segment_length > 0);
-
-		// Give new labels to pixels within each segment, except the first one.
-		int left = comp.bbox.left + width - (num_segments - 1) * segment_length;
-		if (left == comp.bbox.left) {
-			// We don't want any components to remain without any pixels.
-			--num_segments;
-			left += segment_length;
-		}
-		
-		uint32_t* const cmap_top_line = cmap_data + comp.bbox.top * cmap_stride;
-		for (; left <= comp.bbox.right; left += segment_length) {
-			++new_label;
-			
-			uint32_t* cmap_line = cmap_top_line + left;
-			bool new_label_used = false;
-			for (int y = comp.bbox.top; y <= comp.bbox.bottom; ++y, cmap_line += cmap_stride) {
-				for (int off = 0; off < segment_length; ++off) {
-					if (cmap_line[off] == label) {
-						cmap_line[off] = new_label;
-						new_label_used = true;
-					}
-				}
-			}
-
-			if (!new_label_used) {
-				// We don't want any components to remain without any pixels.
-				--new_label;
-			}
-		}
-	}
-
-	cmap.setMaxLabel(new_label);
-	
-	components.clear();
-	calcBoundingBoxes(cmap, components);
-}
-
-int
-TextLineTracer::calcMedianCompHeight(std::vector<Component> const& components)
-{
-	std::vector<int> heights;
-	heights.reserve(components.size());
-	
-	uint32_t const num_components = components.size();
-	for (uint32_t label = 1; label < num_components; ++label) {
-		heights.push_back(components[label].bbox.height());
-	}
-
-	if (heights.empty()) {
-		return 0;
-	}
-
-	std::vector<int>::iterator mid(heights.begin() + heights.size()/2);
-	std::nth_element(heights.begin(), mid, heights.end());
-	return *mid;
-}
-
-void
-TextLineTracer::findVoronoiConnections(InfluenceMap const& imap, std::set<Connection>& connections)
-{
-	InfluenceMap::Cell const* imap_line = imap.data();
-	int const imap_stride = imap.stride();
-	InfluenceMap::Cell const* imap_prev_line = imap_line - imap_stride;
-
-	int const w = imap.size().width();
-	int const h = imap.size().height();
-
-	for (int y = 0; y < h; ++y) {
-		
-		for (int x = 0; x < w; ++x) {
-			InfluenceMap::Cell const& tl = imap_prev_line[x - 1];
-			InfluenceMap::Cell const& tr = imap_prev_line[x];
-			InfluenceMap::Cell const& bl = imap_line[x - 1];
-			InfluenceMap::Cell const& br = imap_line[x];
-
-			processPossibleConnection(connections, tl, tr);
-			processPossibleConnection(connections, tr, br);
-			processPossibleConnection(connections, br, bl);
-			processPossibleConnection(connections, bl, tl);
-		}
-
-		imap_prev_line = imap_line;
-		imap_line += imap_stride;
-	}
-}
-
-void
-TextLineTracer::processPossibleConnection(
-	std::set<Connection>& connections,
-	imageproc::InfluenceMap::Cell const& cell1,
-	imageproc::InfluenceMap::Cell const& cell2)
-{
-	if (cell1.label == cell2.label || cell1.label == 0 || cell2.label == 0) {
+	if (polylines.size() < 2) {
+		polylines.clear();
 		return;
 	}
 
-	uint32_t const sqdist = cell1.distSq + cell2.distSq + 1;
-	Connection const conn(cell1.label, cell2.label, sqdist);
-	std::set<Connection>::iterator it(connections.lower_bound(conn));
-	if (it == connections.end() || conn < *it) {
-		connections.insert(it, conn);
-	} else if (sqdist < it->distSq) {
-		it->distSq = sqdist;
-	}
-}
+	typedef std::list<std::vector<QPointF> >::iterator Iter;
+	
+	std::pair<Iter, Iter> best_pair(polylines.end(), polylines.end());
+	float best_value = -1;
 
-void
-TextLineTracer::labelEdgeComponents(
-	std::vector<Component>& components, imageproc::InfluenceMap const& imap,
-	int const x, int const flag)
-{
-	int const h = imap.size().height();
-	int const imap_stride = imap.stride();
-	InfluenceMap::Cell const* const imap_start_cell = imap.data() + x;
-	InfluenceMap::Cell const* imap_cell;
-
-	// Initialization.
-	imap_cell = imap_start_cell;
-	for (int y = 0; y < h; ++y, imap_cell += imap_stride) {
-		uint32_t const label = imap_cell->label;
-		Component& comp = components[label];
-		comp.flags &= ~(flag|Component::ENCOUNTERED);
-		comp.distToEdge = NumericTraits<float>::max();
-	}
-
-	// Initial tagging plus finding the closest point on the edge.
-	imap_cell = imap_start_cell;
-	for (int y = 0; y < h; ++y, imap_cell += imap_stride) {
-		uint32_t const label = imap_cell->label;
-		Component& comp = components[label];
-		comp.flags |= flag;
-		QPoint const dv(comp.bbox.center() - QPoint(x, y));
-		float const dist = sqrt(double(dv.x()*dv.x() + dv.y()*dv.y()));
-		if (dist < comp.distToEdge) {
-			comp.distToEdge = dist;
-			comp.closestEdgePointX = x;
-			comp.closestEdgePointY = y;
+	for (Iter it1(polylines.begin()); it1 != polylines.end(); ++it1) {
+		QPointF line1_left_endpoint(it1->front());
+		QPointF line1_right_endpoint(it1->back());
+		if (line1_left_endpoint.x() > line1_right_endpoint.x()) {
+			std::swap(line1_left_endpoint, line1_right_endpoint);
 		}
-	}
 
-	// If a line of text has lots of whitespace before or after it,
-	// not only the first/last letter, but one or more adjacent ones
-	// may be tagged on the previous step.  Here we detect and untag them.
-	imap_cell = imap_start_cell;
-	for (int y = 0; y < h; ++y, imap_cell += imap_stride) {
-		uint32_t const label = imap_cell->label;
-		Component& comp = components[label];
-		if (comp.flags & Component::ENCOUNTERED) {
-			continue;
-		}
-		comp.flags |= Component::ENCOUNTERED;
-
-		QPoint const comp_center(comp.bbox.center());
-		BOOST_FOREACH(uint32_t label2, comp.connectedLabels) {
-			Component& comp2 = components[label2];
-			if (!(comp2.flags & flag)) {
-				continue; // Already untagged.
-			}
-			QPoint const dv(comp2.bbox.center() - comp_center);
-			float const comp_comp2_dist = sqrt(double(dv.x()*dv.x() + dv.y()*dv.y()));
-			if (comp.distToEdge + comp_comp2_dist < comp2.distToEdge) {
-				// Distance to edge through another component is shorter then a direct distance!
-				comp2.flags &= ~flag;
-			}
-		}
-	}
-}
-
-template<typename BetterX>
-QLineF
-TextLineTracer::estimateVerticalCutter(
-	imageproc::InfluenceMap const& imap, std::vector<Component>& components,
-	int const flag, int median_comp_height, BetterX better_x)
-{
-	// Initialization.
-	int const initial_x = (flag == Component::LEFTMOST)
-		? NumericTraits<int>::max() : NumericTraits<int>::min();
-	BOOST_FOREACH(Component& comp, components) {
-		comp.edgeX = initial_x;
-		comp.minY = NumericTraits<int>::max();
-		comp.maxY = NumericTraits<int>::min();
-		comp.flags &= ~(Component::ENCOUNTERED|Component::THROWN_AWAY);
-	}
-
-	int const w = imap.size().width();
-	int const h = imap.size().height();
-	int const imap_stride = imap.stride();
-	InfluenceMap::Cell const* imap_line = imap.data();
-
-	std::vector<size_t> edge_comp_labels;
-
-	for (int y = 0; y < h; ++y, imap_line += imap_stride) {
-		for (int x = 0; x < w; ++x) {
-			InfluenceMap::Cell const& cell = imap_line[x];
-			if (cell.distSq != 0) {
+		for (Iter it2(polylines.begin()); it2 != polylines.end(); ++it2) {
+			if (it2 == it1) {
 				continue;
 			}
 
-			uint32_t const label = imap_line[x].label;
-			Component& comp = components[label];
-			if (!(comp.flags & flag)) {
+			QPointF line2_left_endpoint(it2->front());
+			QPointF line2_right_endpoint(it2->back());
+			if (line2_left_endpoint.x() > line2_right_endpoint.x()) {
+				std::swap(line2_left_endpoint, line2_right_endpoint);
+			}
+
+			float const dy1 = float(line2_left_endpoint.y() - line1_left_endpoint.y());
+			float const dy2 = float(line2_right_endpoint.y() - line1_right_endpoint.y());
+			if (dy1 < 0 || dy2 < 0) {
 				continue;
 			}
 
-			if (!(comp.flags & Component::ENCOUNTERED)) {
-				edge_comp_labels.push_back(label);
-				comp.flags |= Component::ENCOUNTERED;
-			}
-
-			if (x == comp.edgeX) {
-				comp.minY = std::min<int>(y, comp.minY);
-				comp.maxY = std::max<int>(y, comp.maxY);
-			} else if (better_x(x, comp.edgeX)) {
-				comp.edgeX = x; 
-				comp.minY = y;
-				comp.maxY = y;
+			float const value = dy1 * dy1 + dy2 * dy2;
+			if (value > best_value) {
+				best_value = value;
+				best_pair = std::pair<Iter, Iter>(it1, it2);
 			}
 		}
 	}
-	
-	std::vector<double> At;
-	std::vector<double> b;
-	std::vector<double> x(2, 0.0);
 
-	uint32_t const num_components = components.size();
-	QLineF line;
-
-	int const max_iterations = 4;
-	for (int iteration = 0; iteration < max_iterations; ++iteration) {
-
-		At.clear();
-		BOOST_FOREACH(uint32_t label, edge_comp_labels) {
-			Component const& comp = components[label];
-			if (comp.flags & Component::THROWN_AWAY) {
-				continue;
-			}
-			At.push_back(comp.edgeX);
-			At.push_back(comp.minY);
-			At.push_back(comp.edgeX);
-			At.push_back(comp.maxY);
-		}
-
-		if (At.empty()) {
-			return QLineF();
-		}
-
-		b.resize(At.size()/2, 1.0);
-
-		// At*A*x = At*b
-		// x = (At*A)-1*At*b
-
-		try {
-			DynamicMatrixCalc<double> mc;
-			(
-				(mc(&At[0], 2, b.size())*mc(&At[0], 2, b.size()).trans()).inv() *
-				mc(&At[0], 2, b.size()) * mc(&b[0], b.size(), 1)
-			).write(&x[0]);
-		} catch (std::runtime_error const&) {
-			break;
-		}
-
-		// Ax + By = 1  |  A = x[0], B = x[1]
-		if (fabs(x[0]) < fabs(x[1])) { // |A| < |B|
-			double const x1 = 0;
-			double const x2 = 1;
-			double const y1 = (1 - x[0]*x1) / x[1];
-			double const y2 = (1 - x[0]*x2) / x[1];
-			line.setLine(x1, y1, x2, y2);
-		} else {
-			double const y1 = 0;
-			double const y2 = 1;
-			double const x1 = (1 - x[1]*y1) / x[0];
-			double const x2 = (1 - x[1]*y1) / x[0];
-			line.setLine(x1, y1, x2, y2);
-		}
-
-		Vec2d outward_normal(line.normalVector().p2() - line.p1());
-		if (better_x(-outward_normal[0], outward_normal[0])) {
-			// It points inward -> flip it.
-			outward_normal = -outward_normal;
-		}
-		outward_normal /= sqrt(outward_normal.squaredNorm()); // XXX: prevent possible division by zero
-
-		ToLineProjector const projector(line);
-
-		double max_dist_from_line = 0;
-		size_t const At_size = At.size();
-		for (size_t i = 0; i < At_size; i += 2) {
-			QPointF const pt(At[i], At[i+1]);
-			QPointF const proj(projector.projectionPoint(pt));
-			double const dist = outward_normal.dot(pt - proj);
-			max_dist_from_line = std::max(max_dist_from_line, dist);
-			if (dist < -median_comp_height*2) {
-				// Throw away this sample.  Actually two samples,
-				// as that's home much each component contributes.
-				uint32_t const label = edge_comp_labels[i/4];
-				components[label].flags |= Component::THROWN_AWAY;
-			}
-		}
-
-		line.translate(outward_normal * max_dist_from_line);
-
-		if (edge_comp_labels.size()*4 == At_size) {
-			// No samples were thrown away - no need to do more iterations.
-			break;
-		}
+	std::list<std::vector<QPointF> > new_polylines;
+	if (best_pair.first != polylines.end()) {
+		new_polylines.splice(new_polylines.end(), polylines, best_pair.first);
+		new_polylines.splice(new_polylines.end(), polylines, best_pair.second);
 	}
-
-
-	// Extend the line to cover the whole image, and possibly more.
-
-	ToLineProjector const projector(line);
-	QPolygonF poly;
-	poly << QPointF(0, 0) << QPointF(0, w) << QPointF(w, h) << QPointF(0, h);
-	
-	double p_min = NumericTraits<double>::max();
-	double p_max = NumericTraits<double>::min();
-	BOOST_FOREACH(QPointF const& pt, poly) {
-		double const p = projector.projectionScalar(pt);
-		p_min = std::min(p_min, p);
-		p_max = std::max(p_max, p);
-	}
-
-	return QLineF(line.pointAt(p_min), line.pointAt(p_max));
+	polylines.swap(new_polylines);
 }
 
 void
-TextLineTracer::connectEndpoints(
-	std::vector<Component>& components, std::list<std::vector<uint32_t> >& lines)
+TextLineTracer::makeLeftToRight(std::vector<QPointF>& polyline)
 {
-	CompPriorityQueue queue;
-	queue.reserve(components.size());
+	assert(polyline.size() >= 2);
 
-	// Initialization.
-	uint32_t const num_components = components.size();
-	for (uint32_t label = 1; label < num_components; ++label) {
-		Component& comp = components[label];
-		comp.prevInPath = 0;
-		comp.pathCost = NumericTraits<float>::max();
-		comp.priorityIndex = ~uint32_t(0);
-		comp.flags &= ~(Component::IN_QUEUE|Component::FINALIZED);
-		if (comp.flags & Component::LEFTMOST) {
-			comp.pathCost = 0;
-			comp.flags |= Component::FINALIZED;
-		}
-	}
-
-	// Start from LEFTMOST components.
-	// Note that we can't merge this loop with the previous one,
-	// as otherwise propagateLengthFrom() might act on unititialized components.
-	for (uint32_t label = 1; label < num_components; ++label) {
-		Component& comp = components[label];
-		if (comp.flags & Component::LEFTMOST) {
-			propagateLengthFrom(comp, components, queue);
-		}
-	}
-
-	// Path length propagation.
-	while (!queue.empty()) {
-		Component& comp = *queue.front();
-		queue.pop();
-		comp.flags &= ~Component::IN_QUEUE;
-		comp.flags |= Component::FINALIZED;
-		
-		propagateLengthFrom(comp, components, queue);
-	}
-
-	// Clear connectedLabels for all components and rebuild them
-	// only for paths that reach all the way from a leftmost
-	// to a rightmost point.
-	BOOST_FOREACH(Component& comp, components) {
-		comp.connectedLabels.clear();
-	}
-	for (uint32_t label = 1; label < num_components; ++label) {
-		Component* comp = &components[label];
-		if (!(comp->flags & Component::RIGHTMOST)) {
-			continue;
-		}
-
-		for (Component* prev_comp; comp->prevInPath; comp = prev_comp) {
-			prev_comp = &components[comp->prevInPath];
-			prev_comp->connectedLabels.push_back(comp->label);
-			// We only really need unidirectional connections.
-		}
-	}
-
-	// Initialize another pass of shortest-path-in-a-graph.
-	// This time the cost function will be the maximum cosine
-	// of an angle in a path.
-	BOOST_FOREACH(Component& comp, components) {
-		comp.startLabel = 0;
-		comp.prevInPath = 0;
-		comp.pathCost = NumericTraits<float>::max();
-		comp.priorityIndex = ~uint32_t(0);
-		comp.flags &= ~(Component::IN_QUEUE|Component::FINALIZED);
-		if (comp.flags & Component::LEFTMOST) {
-			comp.startLabel = comp.label;
-			comp.pathCost = 0;
-			comp.flags |= Component::FINALIZED;
-		}
-	}
-
-	assert(queue.empty());
-
-	// Start from LEFTMOST components.
-	// Note that we can't merge this loop with the previous one,
-	// as otherwise propagateMaxCurvatureFrom() might act on unititialized components.
-	for (uint32_t label = 1; label < num_components; ++label) {
-		Component& comp = components[label];
-		if (comp.flags & Component::LEFTMOST) {
-			propagateMaxCurvatureFrom(comp, components, queue);
-		}
-	}
-
-	// Max curvature propagation.
-	while (!queue.empty()) {
-		Component& comp = *queue.front();
-		queue.pop();
-		comp.flags &= ~Component::IN_QUEUE;
-		comp.flags |= Component::FINALIZED;
-		
-		propagateMaxCurvatureFrom(comp, components, queue);
-	}
-
-	std::map<uint32_t, uint32_t> best_paths; // start label -> end label
-
-	for (uint32_t endpoint_label = 1; endpoint_label < num_components; ++endpoint_label) {
-		Component& endpoint_comp = components[endpoint_label];
-		if (!(endpoint_comp.flags & Component::RIGHTMOST)) {
-			continue;
-		}
-
-		uint32_t& best_endpoint = best_paths[endpoint_comp.startLabel];
-		if (best_endpoint == 0 || endpoint_comp.pathCost < components[best_endpoint].pathCost) {
-			best_endpoint = endpoint_label;
-		}
-	}
-
-	// Trace entries of best_path from endpoint to startpoint.
-	lines.clear();
-	typedef std::map<uint32_t, uint32_t>::value_type KeyValue;
-	BOOST_FOREACH(KeyValue const& kv, best_paths) {
-		Component* comp = &components[kv.second];
-		lines.push_back(std::vector<uint32_t>());
-		std::vector<uint32_t>& line = lines.back();
-		for (Component* prev_comp; comp->prevInPath; comp = prev_comp) {
-			prev_comp = &components[comp->prevInPath];
-			line.push_back(comp->label);
-		}
-		line.push_back(comp->label);
+	if (polyline.front().x() > polyline.back().x()) {
+		std::reverse(polyline.begin(), polyline.end());
 	}
 }
 
 void
-TextLineTracer::propagateLengthFrom(
-	Component& comp, std::vector<Component>& components, CompPriorityQueue& queue)
+TextLineTracer::extendOrTrimPolyline(
+	std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const right_bound,
+	GrayImage const& blurred, BinaryImage const& thick_mask)
 {
-	QPoint const comp_center(comp.bbox.center());
-	QPoint vec_from_prev(0, 0);
-	if (comp.prevInPath) {
-		vec_from_prev = comp_center - components[comp.prevInPath].bbox.center();
+	assert(polyline.size() >= 2);
+
+	QLineF front_bound(left_bound);
+	QLineF back_bound(right_bound);
+	if (polyline.front().x() > polyline.back().x()) {
+		std::swap(front_bound, back_bound);
 	}
-	int const vec_from_prev_sqlen = vec_from_prev.x()*vec_from_prev.x() + vec_from_prev.y()*vec_from_prev.y();
-	double const vec_from_prev_len = sqrt(double(vec_from_prev_sqlen));
 
-	BOOST_FOREACH(uint32_t level1_nbh_label, comp.connectedLabels) {
-		Component& level1_nbh_comp = components[level1_nbh_label];
-		propagateLengthFromTo(vec_from_prev, vec_from_prev_len, comp, comp_center, level1_nbh_comp, queue);
+	std::deque<QPointF> new_polyline(polyline.begin(), polyline.end());
 
-		// We allow connections not only with direct neighbors, but also with neighbors' neighbors.
-		// This helps to jump over punctuation marks for instance.
-		BOOST_FOREACH(uint32_t level2_nbh_label, level1_nbh_comp.connectedLabels) {
-			Component& level2_nbh_comp = components[level2_nbh_label];
-			propagateLengthFromTo(vec_from_prev, vec_from_prev_len, comp, comp_center, level2_nbh_comp, queue);
-		}
+	// Note that the reason we do trimming is to dodge the possibility
+	// a snake would be attracted to some garbage on the other side of the line.
+
+	if (!trimFront(new_polyline, front_bound)) {
+		growFront(new_polyline, front_bound, blurred, thick_mask);
+	}
+	
+	if (!trimBack(new_polyline, back_bound)) {
+		growBack(new_polyline, back_bound, blurred, thick_mask);
+	}
+
+	polyline.clear();
+	polyline.insert(polyline.end(), new_polyline.begin(), new_polyline.end());
+}
+
+void
+TextLineTracer::growFront(
+	std::deque<QPointF>& polyline, QLineF const& bound,
+	GrayImage const& blurred, BinaryImage const& thick_mask)
+{
+	TowardsLineTracer tracer(blurred, thick_mask, bound, polyline.front());
+	while (QPointF const* pt = tracer.trace(40)) { // XXX: hardcoded constant
+		polyline.push_front(*pt);
 	}
 }
 
 void
-TextLineTracer::propagateLengthFromTo(
-	QPoint vec_from_prev, double const vec_from_prev_len, Component const& from_comp,
-	QPoint const comp_center, Component& to_comp, CompPriorityQueue& queue)
+TextLineTracer::growBack(
+	std::deque<QPointF>& polyline, QLineF const& bound,
+	GrayImage const& blurred, BinaryImage const& thick_mask)
 {
-	if (to_comp.flags & Component::FINALIZED) {
-		return;
+	TowardsLineTracer tracer(blurred, thick_mask, bound, polyline.back());
+	while (QPointF const* pt = tracer.trace(40)) { // XXX: hardcoded constant
+		polyline.push_back(*pt);
+	}
+}
+
+bool
+TextLineTracer::trimFront(std::deque<QPointF>& polyline, QLineF const& bound)
+{
+	if (sidesOfLine(bound, polyline.front(), polyline.back()) >= 0) {
+		// Doesn't need trimming.
+		return false;
 	}
 
-	uint32_t const from_label = from_comp.label;
-	uint32_t const to_label = to_comp.label;
-
-	if (to_label == from_label) {
-		return;
+	while (polyline.size() > 2 && sidesOfLine(bound, polyline.front(), polyline[1]) > 0) {
+		polyline.pop_front();
 	}
-
-	QPoint const vec_to_next(to_comp.bbox.center() - comp_center);
-	int const vec_to_next_sqlen = vec_to_next.x()*vec_to_next.x() + vec_to_next.y()*vec_to_next.y();
-	double const vec_to_next_len = sqrt(double(vec_to_next_sqlen));
 	
-	if (vec_to_next_len > 300) { // XXX: adjust for DPI
-		return;
+	intersectFront(polyline, bound);
+	
+	return true;
+}
+
+bool
+TextLineTracer::trimBack(std::deque<QPointF>& polyline, QLineF const& bound)
+{
+	if (sidesOfLine(bound, polyline.front(), polyline.back()) >= 0) {
+		// Doesn't need trimming.
+		return false;
+	}
+
+	while (polyline.size() > 2 && sidesOfLine(bound, polyline[polyline.size() - 2], polyline.back()) > 0) {
+		polyline.pop_back();
 	}
 	
-	// Cosine of the angle between vec_from_prev and vec_to_next, but not yet.
-	double cos = vec_from_prev.x()*vec_to_next.x() + vec_from_prev.y()*vec_to_next.y();
-	if (from_comp.prevInPath != 0) { // Skip this branch if vec_from_prev is fake.
-		cos /= vec_from_prev_len*vec_to_next_len;
-		// Now it's finally the real cosine.
-		assert(cos > -1.001 && cos < 1.001); 
+	intersectBack(polyline, bound);
+	
+	return true;
+}
 
-		if (cos < 0.9) {
-			// The angle is too sharp.  We don't allow that.
-			if (to_comp.prevInPath == from_label) {
-				// Even though the continuation is too sharp,
-				// it's already connected to us.  Must be a residual
-				// of another path.  Fortunately, the Dijkstra algorithm
-				// we are using guarantees it won't propagate more than
-				// one hop.  We are going to just invalidate this hop.
-				to_comp.prevInPath = 0;
-				to_comp.pathCost = NumericTraits<float>::max();
-				if (to_comp.flags & Component::IN_QUEUE) {
-					to_comp.flags &= ~Component::IN_QUEUE;
-					queue.erase(&to_comp);
-				}
-			}
-			return;
-		}
-	}
+void
+TextLineTracer::intersectFront(
+	std::deque<QPointF>& polyline, QLineF const& bound)
+{
+	assert(polyline.size() >= 2);
 
-	float const new_cost = from_comp.pathCost + vec_to_next_len;
-	if (new_cost < to_comp.pathCost) {
-		to_comp.pathCost = new_cost;
-		to_comp.prevInPath = from_label;
-		if (to_comp.flags & Component::IN_QUEUE) {
-			queue.reposition(&to_comp);
-		} else {
-			queue.push(&to_comp);
-			to_comp.flags |= Component::IN_QUEUE;
-		}
+	QLineF const front_segment(polyline.front(), polyline[1]);
+	QPointF intersection;
+	if (bound.intersect(front_segment, &intersection) != QLineF::NoIntersection) {
+		polyline.front() = intersection;
 	}
 }
 
 void
-TextLineTracer::propagateMaxCurvatureFrom(
-	Component& comp, std::vector<Component>& components, CompPriorityQueue& queue)
+TextLineTracer::intersectBack(
+	std::deque<QPointF>& polyline, QLineF const& bound)
 {
-	QPoint const comp_center(comp.bbox.center());
-	QPointF normal_from_prev(0, 0);
-	if (comp.prevInPath) {
-		normal_from_prev = comp_center - components[comp.prevInPath].bbox.center();
-		normal_from_prev = QPointF(-normal_from_prev.y(), normal_from_prev.x());
-	}
-	double const normal_from_prev_len = sqrt(double(normal_from_prev.x()*normal_from_prev.x() + normal_from_prev.y()*normal_from_prev.y()));
-	if (normal_from_prev_len) {
-		normal_from_prev /= normal_from_prev_len;
-	}
+	assert(polyline.size() >= 2);
 
-	BOOST_FOREACH(uint32_t nbh_label, comp.connectedLabels) {
-		Component& nbh_comp = components[nbh_label];
-		propagateMaxCurvatureFromTo(normal_from_prev, comp, comp_center, nbh_comp, queue);
+	QLineF const back_segment(polyline[polyline.size() - 2], polyline.back());
+	QPointF intersection;
+	if (bound.intersect(back_segment, &intersection) != QLineF::NoIntersection) {
+		polyline.back() = intersection;
 	}
 }
 
 void
-TextLineTracer::propagateMaxCurvatureFromTo(
-	QPointF normal_from_prev, Component const& from_comp,
-	QPoint comp_center, Component& to_comp, CompPriorityQueue& queue)
+TextLineTracer::intersectWithVerticalBoundaries(
+	std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const& right_bound)
 {
-	if (to_comp.flags & Component::FINALIZED) {
-		return;
+	assert(polyline.size() >= 2);
+
+	QLineF front_bound(left_bound);
+	QLineF back_bound(right_bound);
+	if (polyline.front().x() > polyline.back().x()) {
+		std::swap(front_bound, back_bound);
 	}
 
-	uint32_t const from_label = from_comp.label;
-	uint32_t const to_label = to_comp.label;
+	std::deque<QPointF> new_polyline(polyline.begin(), polyline.end());
 
-	QPointF const vec_to_next(to_comp.bbox.center() - comp_center);
-	double const vec_to_next_len = sqrt(double(vec_to_next.x()*vec_to_next.x() + vec_to_next.y()*vec_to_next.y()));
-	
-	double cos = normal_from_prev.x()*vec_to_next.x() + normal_from_prev.y()*vec_to_next.y();
-	if (cos != 0) {
-		cos /= vec_to_next_len;
+	if (!trimFront(new_polyline, front_bound)) {
+		intersectFront(new_polyline, front_bound);
 	}
-	
-	assert(cos >= -1.001 && cos <= 1.001);
 
-	float const new_cost = std::max<float>(from_comp.pathCost, fabs(cos));
-
-	if (new_cost < to_comp.pathCost) {
-		to_comp.pathCost = new_cost;
-		to_comp.prevInPath = from_label;
-		to_comp.startLabel = from_comp.startLabel;
-		if (to_comp.flags & Component::IN_QUEUE) {
-			queue.reposition(&to_comp);
-		} else {
-			queue.push(&to_comp);
-			to_comp.flags |= Component::IN_QUEUE;
-		}
+	if (!trimBack(new_polyline, back_bound)) {
+		intersectBack(new_polyline, back_bound);
 	}
-}
 
-
-
-QImage
-TextLineTracer::overlay(QImage const& background, imageproc::BinaryImage const& overlay)
-{
-	QImage layer1(background.convertToFormat(QImage::Format_ARGB32_Premultiplied));
-	QImage layer2(background.size(), QImage::Format_ARGB32_Premultiplied);
-	layer2.fill(0xff000000); // black.
-	layer2.setAlphaChannel(overlay.inverted().toQImage());
-	
-	QPainter painter(&layer1);
-	painter.drawImage(layer1.rect(), layer2);
-	return layer1;
+	polyline.clear();
+	polyline.insert(polyline.end(), new_polyline.begin(), new_polyline.end());
 }
 
 QImage
-TextLineTracer::visualizeLeftRightComponents(
-	std::vector<Component> const& components, imageproc::InfluenceMap const& imap)
+TextLineTracer::visualizeVerticalBounds(
+	QImage const& background, std::pair<QLineF, QLineF> const& bounds)
 {
-	int const w = imap.size().width();
-	int const h = imap.size().height();
+	QImage canvas(background.convertToFormat(QImage::Format_RGB32));
 
-	QImage image(w, h, QImage::Format_RGB32);
-	image.fill(0xffffffff); // white
-	uint32_t* image_line = (uint32_t*)image.bits();
-	int const image_stride = image.bytesPerLine() / 4;
-
-	InfluenceMap::Cell const* imap_line = imap.data();
-	int const imap_stride = imap.stride();
-
-	static uint32_t const colors[2][2] = {
-		{ 0xff000000, 0xff00ff00 },
-		{ 0xff0000ff, 0xffff0000 }
-	};
-
-	for (int y = 0; y < h; ++y, imap_line += imap_stride, image_line += image_stride) {
-		for (int x = 0; x < w; ++x) {
-			InfluenceMap::Cell const& cell = imap_line[x];
-			if (cell.distSq) {
-				continue;
-			}
-
-			Component const& comp = components[cell.label];
-			int const leftmost = (comp.flags >> Component::LEFTMOST_BIT_POS) & 1;
-			int const rightmost = (comp.flags >> Component::RIGHTMOST_BIT_POS) & 1;
-			image_line[x] = colors[leftmost][rightmost];
-		}
-	}
-
-	return image;
-}
-
-QImage
-TextLineTracer::visualizeCutters(
-	QImage const& background, QLineF const& cutter1, QLineF const& cutter2)
-{
-	QImage canvas(background.convertToFormat(QImage::Format_ARGB32_Premultiplied));
 	QPainter painter(&canvas);
 	painter.setRenderHint(QPainter::Antialiasing);
-	
-	QPen pen(QColor(0, 0, 255, 180));
-	pen.setWidthF(5.0);
+	QPen pen(Qt::blue);
+	pen.setWidthF(2.0);
 	painter.setPen(pen);
+	painter.setOpacity(0.7);
 
-	painter.drawLine(cutter1);
-	painter.drawLine(cutter2);
+	painter.drawLine(bounds.first);
+	painter.drawLine(bounds.second);
 
 	return canvas;
 }
 
 QImage
-TextLineTracer::visualizeTracedLinesAndCutters(
-	QImage const& background, std::list<std::vector<uint32_t> > const& lines,
-	std::vector<Component> const& components, QLineF const& cutter1, QLineF const& cutter2)
+TextLineTracer::visualizeRegions(Grid<GridNode> const& grid)
 {
-	QImage canvas(background.convertToFormat(QImage::Format_ARGB32_Premultiplied));
-	QPainter painter(&canvas);
-	painter.setRenderHint(QPainter::Antialiasing);
+	int const width = grid.width();
+	int const height = grid.height();
 
-	QPen pen(QColor(255, 0, 0, 180));
-	pen.setWidthF(10.0);
-	painter.setPen(pen);
-	
-	QVector<QPointF> polyline;
-	BOOST_FOREACH(std::vector<uint32_t> const& line, lines) {
-		polyline.clear();
-		BOOST_FOREACH(uint32_t label, line) {
-			polyline.push_back(components[label].bbox.centerF());
+	GridNode const* grid_line = grid.data();
+	int const grid_stride = grid.stride();
+
+	QImage canvas(width, height, QImage::Format_ARGB32_Premultiplied);
+	uint32_t* canvas_line = (uint32_t*)canvas.bits();
+	int const canvas_stride = canvas.bytesPerLine() / 4;
+
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			uint32_t const region_idx = grid_line[x].regionIdx;
+			if (region_idx == GridNode::INVALID_REGION_IDX) {
+				canvas_line[x] = 0; // transparent
+			} else {
+				canvas_line[x] = colorForId(region_idx).rgba();
+			}
 		}
-		painter.drawPolyline(polyline);
+		grid_line += grid_stride;
+		canvas_line += canvas_stride;
 	}
-
-	pen.setColor(QColor(0, 0, 255, 180));
-	painter.setPen(pen);
-
-	painter.drawLine(cutter1);
-	painter.drawLine(cutter2);
 
 	return canvas;
 }
 
-
-/*======================== CompPriorityQueue ========================*/
-
-void
-TextLineTracer::CompPriorityQueue::push(Component* obj)
+QImage
+TextLineTracer::visualizePolylines(
+	QImage const& background, std::list<std::vector<QPointF> > const& polylines,
+	std::pair<QLineF, QLineF> const* vert_bounds)
 {
-	size_t const idx = m_index.size();
-	m_index.push_back(obj);
-	obj->priorityIndex = idx;
-	bubbleUp(idx);
-}
+	QImage canvas(background.convertToFormat(QImage::Format_ARGB32_Premultiplied));
+	QPainter painter(&canvas);
+	painter.setRenderHint(QPainter::Antialiasing);
+	QPen pen(Qt::blue);
+	pen.setWidthF(3.0);
+	painter.setPen(pen);
 
-void
-TextLineTracer::CompPriorityQueue::pop()
-{
-	assert(!empty());
-
-	m_index.front() = m_index.back();
-	m_index.pop_back();
-	if (!empty()) {
-		bubbleDown(0);
-	}
-}
-
-void
-TextLineTracer::CompPriorityQueue::erase(Component* obj)
-{
-	assert(m_index[obj->priorityIndex] == obj);
-	m_index[obj->priorityIndex] = m_index.back();
-	m_index[obj->priorityIndex]->priorityIndex = obj->priorityIndex;
-	m_index.pop_back();
-	reposition(m_index[obj->priorityIndex]);
-}
-
-void
-TextLineTracer::CompPriorityQueue::reposition(Component* obj)
-{
-	assert(m_index[obj->priorityIndex] == obj);
-	bubbleDown(obj->priorityIndex);
-	assert(m_index[obj->priorityIndex] == obj);
-	bubbleUp(obj->priorityIndex);
-	assert(m_index[obj->priorityIndex] == obj);
-}
-
-void
-TextLineTracer::CompPriorityQueue::bubbleUp(size_t idx)
-{
-	// Iteratively swap the element with its parent,
-	// if it's greater than the parent.
-
-	assert(idx < m_index.size());
-
-	Component* const obj = m_index[idx];
-
-	while (idx > 0) {
-		size_t const parent_idx = parent(idx);
-		if (!obj->higherPriority(*m_index[parent_idx])) {
-			break;
+	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
+		if (!polyline.empty()) {
+			painter.drawPolyline(&polyline[0], polyline.size());
 		}
-		m_index[idx] = m_index[parent_idx];
-		m_index[idx]->priorityIndex = idx;
-		idx = parent_idx;
 	}
 
-	m_index[idx] = obj;
-	obj->priorityIndex = idx;
+	if (vert_bounds) {
+		painter.drawLine(vert_bounds->first);
+		painter.drawLine(vert_bounds->second);
+	}
+
+	return canvas;
 }
 
-void
-TextLineTracer::CompPriorityQueue::bubbleDown(size_t idx)
+QImage
+TextLineTracer::visualizeExtendedPolylines(
+	QImage const& blurred, imageproc::BinaryImage const&  thick_mask,
+	std::list<std::vector<QPointF> > const& polylines,
+	QLineF const& left_bound, QLineF const& right_bound)
 {
-	size_t const len = m_index.size();
-	assert(idx < len);
+	QImage canvas(blurred.convertToFormat(QImage::Format_ARGB32_Premultiplied));
+	QPainter painter(&canvas);
+	painter.drawImage(0, 0, thick_mask.toAlphaMask(QColor(255, 0, 0, 20)));
+	
+	painter.setRenderHint(QPainter::Antialiasing);
 
-	Component* const obj = m_index[idx];
-
-	// While any child is greater than the element itself,
-	// swap it with the greatest child.
-
-	for (;;) {
-		size_t const lft = left(idx);
-		size_t const rgt = right(idx);
-		size_t best_child;
-
-		if(rgt < len) {
-			best_child = m_index[lft]->higherPriority(*m_index[rgt]) ? lft : rgt;
-		} else if (lft < len) {
-			best_child = lft;
-		} else {
-			break;
+	// Draw polylines.
+	QPen pen(Qt::blue);
+	pen.setWidthF(3.0);
+	painter.setPen(pen);
+	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
+		if (!polyline.empty()) {
+			painter.drawPolyline(&polyline[0], polyline.size());
 		}
-        
-		if (m_index[best_child]->higherPriority(*obj)) {
-			m_index[idx] = m_index[best_child];
-			m_index[idx]->priorityIndex = idx;
-            idx = best_child;
-		} else {
-			break;
-		}
-    }
+	}
 
-	m_index[idx] = obj;
-	obj->priorityIndex = idx;
+	// Draw vertical bounds.
+	painter.drawLine(left_bound);
+	painter.drawLine(right_bound);
+
+	// Draw polyline nodes.
+	painter.setPen(Qt::NoPen);
+	QBrush brush(Qt::yellow);
+	painter.setBrush(brush);
+	painter.setOpacity(0.7);
+	QRectF rect(0, 0, 15, 15);
+	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
+		BOOST_FOREACH(QPointF const& pt, polyline) {
+			rect.moveCenter(pt);
+			painter.drawEllipse(rect);
+		}
+	}
+
+	return canvas;
 }

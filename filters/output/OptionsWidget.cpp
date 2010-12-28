@@ -522,10 +522,12 @@ OptionsWidget::reloadIfNecessary()
 
 	if (saved_dewarping_mode == DewarpingMode::OFF && params.dewarpingMode() == DewarpingMode::OFF) {
 		// In this case the following two checks don't matter.
-	} else if (!saved_distortion_model.matches(params.distortionModel())) {
+	} else if (saved_depth_perception.value() != params.depthPerception().value()) {
 		emit reloadRequested();
 		return;
-	} else if (saved_depth_perception.value() != params.depthPerception().value()) {
+	} else if (saved_dewarping_mode == DewarpingMode::AUTO && params.dewarpingMode() == DewarpingMode::AUTO) {
+		// The check below doesn't matter in this case.
+	} else if (!saved_distortion_model.matches(params.distortionModel())) {
 		emit reloadRequested();
 		return;
 	}
