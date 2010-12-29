@@ -124,16 +124,42 @@ struct TextLineTracer::Region
 
 struct TextLineTracer::GridNode
 {
-	static uint32_t const INVALID_REGION_IDX = (uint32_t(1) << 24) - 1;
+private:
 
-	uint32_t grayLevel:8;
-	uint32_t regionIdx:23;
-	uint32_t finalized:1;
+public:
+	static uint32_t const INVALID_REGION_IDX = 0x7FFFFF;
 
-	GridNode() {}
+	GridNode() : m_data() {}
 
-	GridNode(uint8_t gray_level, RegionIdx region_idx, uint32_t fin)
-		: grayLevel(gray_level), regionIdx(region_idx), finalized(fin) {}
+	GridNode(uint8_t gray_level, RegionIdx region_idx, uint32_t finalized)
+		: m_data((finalized << 31) | (region_idx << 8) | uint32_t(gray_level)) {}
+
+	uint8_t grayLevel() const { return static_cast<uint8_t>(m_data & 0xff); }
+
+	void setGrayLevel(uint8_t gray_level) {
+		m_data = (m_data & ~GRAY_LEVEL_MASK) | uint32_t(gray_level);
+	}
+
+	uint32_t regionIdx() const { return (m_data & REGION_IDX_MASK) >> 8; }
+
+	void setRegionIdx(uint32_t region_idx) {
+		assert((region_idx & ~INVALID_REGION_IDX) == 0);
+		m_data = (m_data & ~REGION_IDX_MASK) | (region_idx << 8);
+	}
+
+	uint32_t finalized() const { return (m_data & FINALIZED_MASK) >> 31; }
+
+	void setFinalized(uint32_t finalized) {
+		assert(finalized <= 1);
+		m_data = (m_data & ~FINALIZED_MASK) | (finalized << 31);
+	}
+private:
+	// Layout (MSB to LSB): [finalized: 1 bit][region idx: 23 bits][gray level: 8 bits]
+	static uint32_t const GRAY_LEVEL_MASK = 0x000000FF;
+	static uint32_t const REGION_IDX_MASK = 0x7FFFFF00;
+	static uint32_t const FINALIZED_MASK  = 0x80000000;
+
+	uint32_t m_data;
 };
 
 struct TextLineTracer::RegionGrowingPosition
@@ -154,9 +180,9 @@ public:
 	bool higherThan(RegionGrowingPosition const& lhs, RegionGrowingPosition const& rhs) const {
 		GridNode const* lhs_node = m_pGridData + lhs.gridOffset;
 		GridNode const* rhs_node = m_pGridData + rhs.gridOffset;
-		if (lhs_node->grayLevel < rhs_node->grayLevel) {
+		if (lhs_node->grayLevel() < rhs_node->grayLevel()) {
 			return true;
-		} else if (lhs_node->grayLevel == rhs_node->grayLevel) {
+		} else if (lhs_node->grayLevel() == rhs_node->grayLevel()) {
 			return lhs.order < rhs.order;
 		} else {
 			return false;
@@ -603,17 +629,17 @@ TextLineTracer::labelAndGrowRegions(
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x, ++grid_offset) {
 			GridNode* node = grid_data + grid_offset;
-			node->grayLevel = blurred_line[x];
+			node->setGrayLevel(blurred_line[x]);
 			
 			uint32_t const label = cmap_line[x];
 			
 			if (label == 0) {
-				node->regionIdx = GridNode::INVALID_REGION_IDX;
-				node->finalized = 0;
+				node->setRegionIdx(GridNode::INVALID_REGION_IDX);
+				node->setFinalized(0);
 			} else {
 				// Label 0 stands for background in ConnectivityMap.
-				node->regionIdx = label - 1;
-				node->finalized = 1;
+				node->setRegionIdx(label - 1);
+				node->setFinalized(1);
 				queue.push(RegionGrowingPosition(grid_offset, 0));
 				
 				centroid_calculators[label - 1].processSample(x, y);
@@ -637,15 +663,15 @@ TextLineTracer::labelAndGrowRegions(
 		queue.pop();
 
 		GridNode const* node = grid_data + offset;
-		RegionIdx const region_idx = node->regionIdx;
+		RegionIdx const region_idx = node->regionIdx();
 
 		// Spread this value to 4-connected neighbours.
 		for (int i = 0; i < 4; ++i) {
 			uint32_t const nbh_offset = offset + nbh_offsets[i];
 			GridNode* nbh = grid_data + nbh_offset;
-			if (!nbh->finalized) {
-				nbh->finalized = 1;
-				nbh->regionIdx = region_idx;
+			if (!nbh->finalized()) {
+				nbh->setFinalized(1);
+				nbh->setRegionIdx(region_idx);
 				queue.push(RegionGrowingPosition(nbh_offset, iteration));
 			}
 		}
@@ -662,8 +688,8 @@ TextLineTracer::labelAndGrowRegions(
 	// Mark regions as leftmost / rightmost.
 	GridNode const* grid_line = grid.data();
 	for (int y = 0; y < height; ++y, grid_line += grid_stride) {
-		regions[grid_line[0].regionIdx].leftmost = true;
-		regions[grid_line[width - 1].regionIdx].rightmost = true;
+		regions[grid_line[0].regionIdx()].leftmost = true;
+		regions[grid_line[width - 1].regionIdx()].rightmost = true;
 	}
 	
 	// Process horizontal connections between regions.
@@ -677,8 +703,8 @@ TextLineTracer::labelAndGrowRegions(
 			if (mask1 & mask2 & 1) {
 				GridNode const* node1 = grid_line + x;
 				GridNode const* node2 = node1 - 1;
-				if (node1->regionIdx != node2->regionIdx) {
-					edges.insert(Edge(node1->regionIdx, node2->regionIdx));
+				if (node1->regionIdx() != node2->regionIdx()) {
+					edges.insert(Edge(node1->regionIdx(), node2->regionIdx()));
 				}
 			}
 		}
@@ -704,8 +730,8 @@ TextLineTracer::labelAndGrowRegions(
 			if (mask_word[0] & mask_word[-thick_mask_stride] & mask) {
 				GridNode const* node1 = grid_line;
 				GridNode const* node2 = grid_line - grid_stride;
-				if (node1->regionIdx != node2->regionIdx) {
-					edges.insert(Edge(node1->regionIdx, node2->regionIdx));
+				if (node1->regionIdx() != node2->regionIdx()) {
+					edges.insert(Edge(node1->regionIdx(), node2->regionIdx()));
 				}
 			}
 		}
@@ -1256,7 +1282,7 @@ TextLineTracer::visualizeRegions(Grid<GridNode> const& grid)
 
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
-			uint32_t const region_idx = grid_line[x].regionIdx;
+			uint32_t const region_idx = grid_line[x].regionIdx();
 			if (region_idx == GridNode::INVALID_REGION_IDX) {
 				canvas_line[x] = 0; // transparent
 			} else {
