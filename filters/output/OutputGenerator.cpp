@@ -986,6 +986,15 @@ OutputGenerator::processWithDewarping(
 		if (polylines.size() >= 2) {
 			distortion_model.setTopCurve(Curve(polylines.front()));
 			distortion_model.setBottomCurve(Curve(polylines.back()));
+		} else {
+			// Use a simple rectangular grid if we failed to trace 2 text lines.
+			std::vector<QPointF> top_polyline, bottom_polyline;
+			top_polyline.push_back(content_rect.topLeft());
+			top_polyline.push_back(content_rect.topRight());
+			bottom_polyline.push_back(content_rect.bottomLeft());
+			bottom_polyline.push_back(content_rect.bottomRight());
+			distortion_model.setTopCurve(Curve(top_polyline));
+			distortion_model.setBottomCurve(Curve(bottom_polyline));
 		}
 	}
 
