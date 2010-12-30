@@ -164,10 +164,10 @@ private:
 
 struct TextLineTracer::RegionGrowingPosition
 {
-	uint32_t gridOffset;
+	int gridOffset;
 	uint32_t order;
 
-	RegionGrowingPosition(uint32_t grid_offset, uint32_t ord)
+	RegionGrowingPosition(int grid_offset, uint32_t ord)
 		: gridOffset(grid_offset), order(ord) {}
 };
 
@@ -625,7 +625,7 @@ TextLineTracer::labelAndGrowRegions(
 	int const blurred_stride = blurred.stride();
 
 	// Populate the grid from connectivity map, also find region centroids.
-	uint32_t grid_offset = 0;
+	int grid_offset = 0;
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x, ++grid_offset) {
 			GridNode* node = grid_data + grid_offset;
@@ -659,7 +659,7 @@ TextLineTracer::labelAndGrowRegions(
 	while (!queue.empty()) {
 		++iteration;
 
-		uint32_t const offset = queue.front().gridOffset;
+		int const offset = queue.front().gridOffset;
 		queue.pop();
 
 		GridNode const* node = grid_data + offset;
@@ -667,7 +667,7 @@ TextLineTracer::labelAndGrowRegions(
 
 		// Spread this value to 4-connected neighbours.
 		for (int i = 0; i < 4; ++i) {
-			uint32_t const nbh_offset = offset + nbh_offsets[i];
+			int const nbh_offset = offset + nbh_offsets[i];
 			GridNode* nbh = grid_data + nbh_offset;
 			if (!nbh->finalized()) {
 				nbh->setFinalized(1);
