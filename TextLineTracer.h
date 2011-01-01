@@ -91,7 +91,11 @@ private:
 
 	static bool isCurvatureConsistent(std::vector<QPointF> const& polyline);
 
-	static void filterCurves(std::list<std::vector<QPointF> >& polylines);
+	static bool isInsideBounds(
+		QPointF const& pt, QLineF const& left_bound, QLineF const& right_bound);
+
+	static void filterCurves(std::list<std::vector<QPointF> >& polylines,
+		QLineF const& left_bound, QLineF const& right_bound);
 
 	static void pickTopBottomLines(std::list<std::vector<QPointF> >& polylines);
 

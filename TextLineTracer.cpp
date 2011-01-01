@@ -341,7 +341,7 @@ TextLineTracer::trace(
 	std::list<std::vector<QPointF> > polylines;
 	segmentBlurredTextLines(blurred, thick_mask, polylines, dbg);
 
-	filterCurves(polylines);
+	filterCurves(polylines, vert_bounds.first, vert_bounds.second);
 	if (dbg) {
 		dbg->add(visualizePolylines(downscaled.toQImage(), polylines), "filtered_lines");
 	}
@@ -1033,16 +1033,46 @@ TextLineTracer::isCurvatureConsistent(std::vector<QPointF> const& polyline)
 	return !(significant_positive && significant_positive);
 }
 
+bool
+TextLineTracer::isInsideBounds(
+	QPointF const& pt, QLineF const& left_bound, QLineF const& right_bound)
+{
+	QPointF left_normal_inside(left_bound.normalVector().p2() - left_bound.p1());
+	if (left_normal_inside.x() < 0) {
+		left_normal_inside = -left_normal_inside;
+	}
+	QPointF const left_vec(pt - left_bound.p1());
+	if (left_normal_inside.x() * left_vec.x() + left_normal_inside.y() * left_vec.y() < 0) {
+		return false;
+	}
+
+	QPointF right_normal_inside(right_bound.normalVector().p2() - right_bound.p1());
+	if (right_normal_inside.x() > 0) {
+		right_normal_inside = -right_normal_inside;
+	}
+	QPointF const right_vec(pt - right_bound.p1());
+	if (right_normal_inside.x() * right_vec.x() + right_normal_inside.y() * right_vec.y() < 0) {
+		return false;
+	}
+
+	return true;
+}
+
 void
-TextLineTracer::filterCurves(std::list<std::vector<QPointF> >& polylines)
+TextLineTracer::filterCurves(
+	std::list<std::vector<QPointF> >& polylines,
+	QLineF const& left_bound, QLineF const& right_bound)
 {
 	std::list<std::vector<QPointF> >::iterator it(polylines.begin());
 	std::list<std::vector<QPointF> >::iterator const end(polylines.end());	
 	while (it != end) {
-		if (isCurvatureConsistent(*it)) {
-			++it;
-		} else {
+		if (!isInsideBounds(it->front(), left_bound, right_bound) &&
+			!isInsideBounds(it->back(), left_bound, right_bound)) {
 			polylines.erase(it++);
+		} else if (!isCurvatureConsistent(*it)) {
+			polylines.erase(it++);
+		} else {
+			++it;
 		}
 	}
 }
