@@ -65,11 +65,11 @@ SequentialColumnProcessor::process(int x, VertRange const& range)
 
 	if (m_path.empty()) {
 		m_leadingTop = QPoint(x, range.top);
+		m_leadingBottom = QPoint(x, range.bottom);
 		m_path.push_front(m_leadingTop);
-		
-		if (range.top != range.bottom) {
-			m_leadingBottom = QPoint(x, range.bottom);
-			m_path.push_front(m_leadingBottom);
+
+		if (range.top != range.bottom) { // We don't want zero length segments in m_path.
+			m_path.push_back(m_leadingBottom);
 		}
 	} else {
 		if (range.top < m_path.front().y()) {
