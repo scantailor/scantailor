@@ -987,15 +987,7 @@ OutputGenerator::processWithDewarping(
 			distortion_model.setTopCurve(Curve(polylines.front()));
 			distortion_model.setBottomCurve(Curve(polylines.back()));
 		} else {
-			// Use a simple rectangular grid if we failed to trace 2 text lines.
-			QPolygonF const poly(m_toUncropped.inverted().map(QRectF(m_contentRect)));
-			std::vector<QPointF> top_polyline, bottom_polyline;
-			top_polyline.push_back(poly[0]); // top-left
-			top_polyline.push_back(poly[1]); // top-right
-			bottom_polyline.push_back(poly[3]); // bottom-left
-			bottom_polyline.push_back(poly[2]); // bottom-right
-			distortion_model.setTopCurve(Curve(top_polyline));
-			distortion_model.setBottomCurve(Curve(bottom_polyline));
+			setupTrivialDistortionModel(distortion_model);
 		}
 	}
 
@@ -1020,12 +1012,20 @@ OutputGenerator::processWithDewarping(
 		bg_color = QColor(dominant_gray, dominant_gray, dominant_gray);
 	}
 
-	QImage dewarped(
-		dewarp(
+	QImage dewarped;
+	try {
+		dewarped = dewarp(
 			QTransform(), normalized_original, toOutput(),
 			distortion_model, depth_perception, bg_color
-		)
-	);
+		);
+	} catch (std::runtime_error const&) {
+		// Probably an impossible distortion model.  Let's fall back to a trivial one.
+		setupTrivialDistortionModel(distortion_model);
+		dewarped = dewarp(
+			QTransform(), normalized_original, toOutput(),
+			distortion_model, depth_perception, bg_color
+		);
+	}
 	normalized_original = QImage(); // Save memory.
 	if (dbg) {
 		dbg->add(dewarped, "dewarped");
@@ -1150,6 +1150,23 @@ OutputGenerator::processWithDewarping(
 	applyFillZonesInPlace(dewarped, fill_zones, orig_to_output);
 
 	return dewarped;
+}
+
+/**
+ * Set up a distortion model corresponding to the content rect,
+ * which will result in no distortion correction.
+ */
+void
+OutputGenerator::setupTrivialDistortionModel(DistortionModel& distortion_model) const
+{
+	QPolygonF const poly(m_toUncropped.inverted().map(QRectF(m_contentRect)));
+	std::vector<QPointF> top_polyline, bottom_polyline;
+	top_polyline.push_back(poly[0]); // top-left
+	top_polyline.push_back(poly[1]); // top-right
+	bottom_polyline.push_back(poly[3]); // bottom-left
+	bottom_polyline.push_back(poly[2]); // bottom-right
+	distortion_model.setTopCurve(Curve(top_polyline));
+	distortion_model.setBottomCurve(Curve(bottom_polyline));
 }
 
 CylindricalSurfaceDewarper

@@ -145,6 +145,8 @@ private:
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
 	
+	void setupTrivialDistortionModel(DistortionModel& distortion_model) const;
+
 	static CylindricalSurfaceDewarper createDewarper(
 		DistortionModel const& distortion_model,
 		QTransform const& distortion_model_to_target, double depth_perception);

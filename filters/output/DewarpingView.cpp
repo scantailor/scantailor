@@ -42,6 +42,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <vector>
+#include <stdexcept>
 
 namespace output
 {
@@ -168,28 +169,48 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 	
 	int const num_vert_grid_lines = 30;
 	int const num_hor_grid_lines = 30;
-	std::vector<QVector<QPointF> > curves(num_hor_grid_lines);
 
-	CylindricalSurfaceDewarper dewarper(
-		m_distortionModel.topCurve().polyline(),
-		m_distortionModel.bottomCurve().polyline(), m_depthPerception.value()
-	);
-	CylindricalSurfaceDewarper::State state;
+	bool valid_model = m_distortionModel.isValid();
 
-	for (int j = 0; j < num_vert_grid_lines; ++j) {
-		double const x = j / (num_vert_grid_lines - 1.0);
-		CylindricalSurfaceDewarper::Generatrix const gtx(dewarper.mapGeneratrix(x, state));
-		QPointF const gtx_p0(gtx.imgLine.pointAt(gtx.pln2img(0)));
-		QPointF const gtx_p1(gtx.imgLine.pointAt(gtx.pln2img(1)));
-		painter.drawLine(gtx_p0, gtx_p1);
-		for (int i = 0; i < num_hor_grid_lines; ++i) {
-			double const y = i / (num_hor_grid_lines - 1.0);
-			curves[i].push_back(gtx.imgLine.pointAt(gtx.pln2img(y)));
+	if (valid_model) {
+		try {
+			std::vector<QVector<QPointF> > curves(num_hor_grid_lines);
+
+			CylindricalSurfaceDewarper dewarper(
+				m_distortionModel.topCurve().polyline(),
+				m_distortionModel.bottomCurve().polyline(), m_depthPerception.value()
+			);
+			CylindricalSurfaceDewarper::State state;
+
+			for (int j = 0; j < num_vert_grid_lines; ++j) {
+				double const x = j / (num_vert_grid_lines - 1.0);
+				CylindricalSurfaceDewarper::Generatrix const gtx(dewarper.mapGeneratrix(x, state));
+				QPointF const gtx_p0(gtx.imgLine.pointAt(gtx.pln2img(0)));
+				QPointF const gtx_p1(gtx.imgLine.pointAt(gtx.pln2img(1)));
+				painter.drawLine(gtx_p0, gtx_p1);
+				for (int i = 0; i < num_hor_grid_lines; ++i) {
+					double const y = i / (num_hor_grid_lines - 1.0);
+					curves[i].push_back(gtx.imgLine.pointAt(gtx.pln2img(y)));
+				}
+			}
+
+			BOOST_FOREACH(QVector<QPointF> const& curve, curves) {
+				painter.drawPolyline(curve);
+			}
+		} catch (std::runtime_error const&) {
+			// Still probably a bad model, even though DistortionModel::isValid() was true.
+			valid_model = false;
 		}
-	}
-	
-	BOOST_FOREACH(QVector<QPointF> const& curve, curves) {
-		painter.drawPolyline(curve);
+	} // valid_model
+
+	if (!valid_model) {
+		// Just draw the frame.
+		Curve const& top_curve = m_distortionModel.topCurve();
+		Curve const& bottom_curve = m_distortionModel.bottomCurve();
+		painter.drawLine(top_curve.polyline().front(), bottom_curve.polyline().front());
+		painter.drawLine(top_curve.polyline().back(), bottom_curve.polyline().back());
+		painter.drawPolyline(QVector<QPointF>::fromStdVector(top_curve.polyline()));
+		painter.drawPolyline(QVector<QPointF>::fromStdVector(bottom_curve.polyline()));
 	}
 
 	if (m_dewarpingMode != DewarpingMode::AUTO) {

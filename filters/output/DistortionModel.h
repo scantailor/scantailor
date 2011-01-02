@@ -39,7 +39,11 @@ public:
 	DistortionModel(QDomElement const& el);
 
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
-
+	
+	/**
+	 * Returns true if the model is not null and in addition meets certain
+	 * criteria, like being curve endpoints forming a convex quadrilateral.
+	 */
 	bool isValid() const;
 
 	void setTopCurve(Curve const& curve) { m_topCurve = curve; }

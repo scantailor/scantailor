@@ -19,6 +19,7 @@
 #include "DistortionModel.h"
 #include "CylindricalSurfaceDewarper.h"
 #include "NumericTraits.h"
+#include "VecNT.h"
 #include <QRectF>
 #include <QPointF>
 #include <QTransform>
@@ -26,6 +27,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <boost/foreach.hpp>
+#include <algorithm>
 
 namespace output
 {
@@ -56,7 +58,49 @@ DistortionModel::toXml(QDomDocument& doc, QString const& name) const
 bool
 DistortionModel::isValid() const
 {
-	return m_topCurve.isValid() && m_bottomCurve.isValid();
+	if (!m_topCurve.isValid() || !m_bottomCurve.isValid()) {
+		return false;
+	}
+
+	Vec2d const poly[4] = {
+		m_topCurve.polyline().front(),
+		m_topCurve.polyline().back(),
+		m_bottomCurve.polyline().back(),
+		m_bottomCurve.polyline().front()
+	};
+
+	double min_dot = NumericTraits<double>::max();
+	double max_dot = NumericTraits<double>::min();
+
+	for (int i = 0; i < 4; ++i) {
+		Vec2d const cur(poly[i]);
+		Vec2d const prev(poly[(i + 3) & 3]);
+		Vec2d const next(poly[(i + 1) & 3]);
+		
+		Vec2d prev_normal(cur - prev);
+		std::swap(prev_normal[0], prev_normal[1]);
+		prev_normal[0] = -prev_normal[0];
+
+		double const dot = prev_normal.dot(next - cur);
+		if (dot < min_dot) {
+			min_dot = dot;
+		}
+		if (dot > max_dot) {
+			max_dot = dot;
+		}
+	}
+
+	if (min_dot * max_dot <= 0) {
+		// Not convex.
+		return false;
+	}
+
+	if (fabs(min_dot) < 0.01 || fabs(max_dot) < 0.01) {
+		// Too close - possible problems with calculating homography.
+		return false;
+	}
+
+	return true;
 }
 
 bool
