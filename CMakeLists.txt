@@ -223,24 +223,22 @@ ENDIF(NOT Boost_FOUND)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
+SET(EXTRA_LIBS "")
+
 IF(UNIX)
 	# We need to manually use XRender.
-	FIND_PATH(
-		X11_INCLUDE_PATH extensions/Xrender.h
-		PATHS /usr/local /usr
-		PATH_SUFFIXES include/X11 X11/include
-		DOC "The path to extensions/Xrender.h."
-	)
-	IF (NOT X11_INCLUDE_PATH)
+	INCLUDE(FindX11)
+	IF(NOT X11_Xrender_FOUND)
 		MESSAGE(
 			FATAL_ERROR
 			"Could not find Xrender.h\n"
 			"You may need to install a package called\n"
 			"libxrender-dev or libXrender-dev or similarly."
 		)
-	ENDIF(NOT X11_INCLUDE_PATH)
+	ENDIF()
 
-	INCLUDE_DIRECTORIES("${X11_INCLUDE_PATH}")
+	INCLUDE_DIRECTORIES("${X11_Xrender_INCLUDE_PATH}")
+	LIST(APPEND EXTRA_LIBS ${X11_Xrender_LIB})
 
 	FindPthreads()
 	IF(PTHREADS_FOUND)
@@ -279,7 +277,6 @@ ENDIF(WIN32)
 INCLUDE_DIRECTORIES(. foundation math interaction zones ${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
-SET(EXTRA_LIBS)
 IF(WIN32)
 	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
 	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
