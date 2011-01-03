@@ -875,8 +875,12 @@ OutputGenerator::processWithDewarping(
 		} else {
 			normalized_original = input.grayImage();
 		}
-		// No illumination normalization means no picture detection and
-		// no binarization, so we don't bother building warped_gray_output.
+		if (dewarping_mode == DewarpingMode::AUTO) {
+			warped_gray_output = transformToGray(
+				input.grayImage(), m_toUncropped, normalize_illumination_rect,
+				Qt::white, /*weak_background=*/true
+			);
+		} // Otherwise we just don't need it.
 	} else {
 		GrayImage warped_gray_background;
 		warped_gray_output = normalizeIlluminationGray(
