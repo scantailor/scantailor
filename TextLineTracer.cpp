@@ -319,7 +319,6 @@ TextLineTracer::trace(
 	if (dbg) {
 		dbg->add(visualizeVerticalBounds(binarized.toQImage(), vert_bounds), "vert_bounds");
 	}
-	binarized.release();
 
 	GrayImage blurred(gaussBlur(stretchGrayRange(downscaled), 17, 5));
 	if (dbg) {
@@ -354,7 +353,10 @@ TextLineTracer::trace(
 
 	if (polylines.size() >= 2 || dbg) {
 		BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-			extendOrTrimPolyline(polyline, vert_bounds.first, vert_bounds.second, blurred, thick_mask);
+			extendOrTrimPolyline(
+				polyline, vert_bounds.first, vert_bounds.second,
+				binarized, blurred, thick_mask
+			);
 		}
 		if (dbg) {
 			dbg->add(
@@ -1147,7 +1149,7 @@ TextLineTracer::makeLeftToRight(std::vector<QPointF>& polyline)
 void
 TextLineTracer::extendOrTrimPolyline(
 	std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const right_bound,
-	GrayImage const& blurred, BinaryImage const& thick_mask)
+	BinaryImage const& content, GrayImage const& blurred, BinaryImage const& thick_mask)
 {
 	assert(polyline.size() >= 2);
 
@@ -1163,11 +1165,11 @@ TextLineTracer::extendOrTrimPolyline(
 	// a snake would be attracted to some garbage on the other side of the line.
 
 	if (!trimFront(new_polyline, front_bound)) {
-		growFront(new_polyline, front_bound, blurred, thick_mask);
+		growFront(new_polyline, front_bound, content, blurred, thick_mask);
 	}
 	
 	if (!trimBack(new_polyline, back_bound)) {
-		growBack(new_polyline, back_bound, blurred, thick_mask);
+		growBack(new_polyline, back_bound, content, blurred, thick_mask);
 	}
 
 	polyline.clear();
@@ -1177,10 +1179,11 @@ TextLineTracer::extendOrTrimPolyline(
 void
 TextLineTracer::growFront(
 	std::deque<QPointF>& polyline, QLineF const& bound,
-	GrayImage const& blurred, BinaryImage const& thick_mask)
+	BinaryImage const& content, GrayImage const& blurred,
+	BinaryImage const& thick_mask)
 {
-	TowardsLineTracer tracer(blurred, thick_mask, bound, polyline.front());
-	while (QPointF const* pt = tracer.trace(40)) { // XXX: hardcoded constant
+	TowardsLineTracer tracer(content, blurred, thick_mask, bound, polyline.front().toPoint());
+	while (QPoint const* pt = tracer.trace(40)) { // XXX: hardcoded constant
 		polyline.push_front(*pt);
 	}
 }
@@ -1188,10 +1191,11 @@ TextLineTracer::growFront(
 void
 TextLineTracer::growBack(
 	std::deque<QPointF>& polyline, QLineF const& bound,
-	GrayImage const& blurred, BinaryImage const& thick_mask)
+	BinaryImage const& content, GrayImage const& blurred,
+	BinaryImage const& thick_mask)
 {
-	TowardsLineTracer tracer(blurred, thick_mask, bound, polyline.back());
-	while (QPointF const* pt = tracer.trace(40)) { // XXX: hardcoded constant
+	TowardsLineTracer tracer(content, blurred, thick_mask, bound, polyline.back().toPoint());
+	while (QPoint const* pt = tracer.trace(40)) { // XXX: hardcoded constant
 		polyline.push_back(*pt);
 	}
 }

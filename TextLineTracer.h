@@ -103,7 +103,8 @@ private:
 
 	static void extendOrTrimPolyline(
 		std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const right_bound,
-		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
+		imageproc::BinaryImage const& content, imageproc::GrayImage const& blurred,
+		imageproc::BinaryImage const& thick_mask);
 
 	static bool trimFront(std::deque<QPointF>& polyline, QLineF const& bound);
 
@@ -111,11 +112,15 @@ private:
 
 	static void growFront(
 		std::deque<QPointF>& polyline, QLineF const& bound,
-		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
+		imageproc::BinaryImage const& content,
+		imageproc::GrayImage const& blurred,
+		imageproc::BinaryImage const& thick_mask);
 
 	static void growBack(
 		std::deque<QPointF>& polyline, QLineF const& bound,
-		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
+		imageproc::BinaryImage const& content,
+		imageproc::GrayImage const& blurred,
+		imageproc::BinaryImage const& thick_mask);
 
 	static void intersectFront(
 		std::deque<QPointF>& polyline, QLineF const& bound);

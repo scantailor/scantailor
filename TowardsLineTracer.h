@@ -19,9 +19,11 @@
 #ifndef TOWARDS_LINE_TRACER_H_
 #define TOWARDS_LINE_TRACER_H_
 
+#include "VecNT.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include <QPointF>
+#include <QPoint>
 #include <QLineF>
 #include <stdint.h>
 
@@ -32,32 +34,31 @@ class TowardsLineTracer
 {
 public:
 	TowardsLineTracer(
-		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& mask,
-		QLineF const& line, QPointF const& initial_pos);
+		imageproc::BinaryImage const& content, imageproc::GrayImage const& blurred,
+		imageproc::BinaryImage const& mask, QLineF const& line, QPoint const& initial_pos);
 
-	QPointF const* trace(qreal max_dist);
+	QPoint const* trace(qreal max_dist);
 private:
 	struct Neighbour
 	{
-		qreal fdx;
-		qreal fdy;
-		int dx;
-		int dy;
+		QPoint vec;
+		Vec2f vecF;
+		int contentLineOffset;
 		int blurredPixelOffset;
 		int maskLineOffset;
 	};
 
 	void setupNeighbours();
 
+	imageproc::BinaryImage m_content;
+	uint32_t const* m_pContentData;
 	imageproc::GrayImage m_blurred;
 	uint8_t const* m_pBlurredData;
-	int const m_blurredStride;
 	imageproc::BinaryImage m_mask;
 	uint32_t const* m_pMaskData;
-	int const m_maskStride;
 	QLineF m_line;
-	QPointF m_normalTowardsLine;
-	QPointF m_lastPos;
+	Vec2f m_normalTowardsLine;
+	QPoint m_lastOutputPos;
 	Neighbour m_neighbours[8];
 	bool m_finished;
 };
