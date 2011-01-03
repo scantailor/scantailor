@@ -320,36 +320,22 @@ SequentialColumnProcessor::interpolateSegments(std::vector<Segment> const& segme
 	assert(accum_weight != 0);
 	accum_vec /= accum_weight;
 
-	QPoint reference_pt;
-	int const best_x = m_leadingTop.x();
+	QLineF line(m_path.front(), accum_vec);
+	Vec2d normal(-accum_vec[1], accum_vec[0]);
+	if ((m_leftOrRight == RIGHT) != (normal[0] < 0)) {
+		normal = -normal;
+	}
+	// normal now points *inside* the image, towards the other bound.
 	
 	// Now find the vertex in m_path through which our line should pass.
-	if (m_path.size() < 3) {
-		reference_pt = (accum_vec[0] > 0) == (m_leftOrRight == RIGHT) ? m_leadingTop : m_leadingBottom;
-	} else {
-		// Initialize reference_pt with either front or back of m_path, whichever is farther from best_x.
-		if (abs(m_path.front().x() - best_x) > abs(m_path.back().x() - best_x)) {
-			reference_pt = m_path.front();
-		} else {
-			reference_pt = m_path.back();
-		}
-		std::deque<QPoint>::const_iterator prev_it(m_path.begin());
-		std::deque<QPoint>::const_iterator cur_it(prev_it);
-		++cur_it;
-		std::deque<QPoint>::const_iterator next_it(cur_it);
-		++next_it;
-		std::deque<QPoint>::const_iterator const end(m_path.end());
-		for (; next_it != end; prev_it = cur_it, cur_it = next_it, ++next_it) {
-			QLineF const line(*cur_it, QPointF(*cur_it) + accum_vec);
-			if (sidesOfLine(line, *prev_it, *next_it) >= 0) {
-				if (abs(cur_it->x() - best_x) < abs(reference_pt.x() - best_x)) {
-					reference_pt = *cur_it;
-				}
-			}
+	BOOST_FOREACH(QPoint const& pt, m_path) {
+		if (normal.dot(pt - line.p1()) < 0) {
+			line.setP1(pt);
+			line.setP2(line.p1() + accum_vec);
 		}
 	}
 
-	return QLineF(reference_pt, QPointF(reference_pt) + accum_vec);
+	return line;
 }
 
 QImage
