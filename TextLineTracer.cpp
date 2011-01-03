@@ -315,7 +315,7 @@ TextLineTracer::trace(
 		dbg->add(binarized, "sanitized");
 	}
 
-	std::pair<QLineF, QLineF> const vert_bounds(detectVertContentBounds(binarized));
+	std::pair<QLineF, QLineF> const vert_bounds(detectVertContentBounds(binarized, dbg));
 	if (dbg) {
 		dbg->add(visualizeVerticalBounds(binarized.toQImage(), vert_bounds), "vert_bounds");
 	}
@@ -971,10 +971,14 @@ TextLineTracer::sanitizeBinaryImage(BinaryImage& image, QRect const& content_rec
 	seed.fillExcept(seed.rect().adjusted(1, 1, -1, -1), BLACK);
 
 	BinaryImage touching_border(seedFill(seed.release(), image, CONN8));
-	rasterOp<RopSubtract<RopDst, RopSrc> >(image, touching_border);
+	rasterOp<RopSubtract<RopDst, RopSrc> >(image, touching_border.release());
 
-	// TODO: maybe do despeckling here?
+	// Poor man's despeckle.
+	BinaryImage content_seeds(openBrick(image, QSize(2, 3), WHITE));
+	rasterOp<RopOr<RopSrc, RopDst> >(content_seeds, openBrick(image, QSize(3, 2), WHITE));
+	image = seedFill(content_seeds.release(), image, CONN8);
 
+	// Clear margins.
 	image.fillExcept(content_rect, WHITE);
 }
 
