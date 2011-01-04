@@ -74,12 +74,17 @@ private:
 
 	static void segmentBlurredTextLines(
 		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask,
-		std::list<std::vector<QPointF> >& out, DebugImages* dbg);
+		std::list<std::vector<QPointF> >& out, QLineF const& left_bound,
+		QLineF const& right_bound, DebugImages* dbg);
 
 	static void labelAndGrowRegions(
 		imageproc::GrayImage const& blurred, imageproc::BinaryImage region_seeds,
 		imageproc::BinaryImage const& thick_mask, std::vector<Region>& regions,
-		std::set<Edge>& edges, DebugImages* dbg);
+		std::set<Edge>& edges, QLineF const& left_bound, QLineF const& right_bound, DebugImages* dbg);
+
+	static void markEdgeRegions(
+		std::vector<Region>& regions, Grid<GridNode> const& grid,
+		QLineF const& left_bound, QLineF const& right_bound);
 
 	static void extractEdegeNodePaths(
 		std::vector<std::vector<uint32_t> >& edge_node_paths,

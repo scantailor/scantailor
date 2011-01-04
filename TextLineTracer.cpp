@@ -130,9 +130,6 @@ struct TextLineTracer::Region
 
 struct TextLineTracer::GridNode
 {
-private:
-
-public:
 	static uint32_t const INVALID_REGION_IDX = 0x7FFFFF;
 
 	GridNode() : m_data() {}
@@ -344,7 +341,10 @@ TextLineTracer::trace(
 	}
 
 	std::list<std::vector<QPointF> > polylines;
-	segmentBlurredTextLines(blurred, thick_mask, polylines, dbg);
+	segmentBlurredTextLines(
+		blurred, thick_mask, polylines,
+		vert_bounds.first, vert_bounds.second, dbg
+	);
 
 	if (polylines.size() < 2 && !dbg) {
 		polylines.clear();
@@ -412,7 +412,8 @@ TextLineTracer::downscale(GrayImage const& input, Dpi const& dpi)
 void
 TextLineTracer::segmentBlurredTextLines(
 	GrayImage const& blurred, BinaryImage const& thick_mask,
-	std::list<std::vector<QPointF> >& out, DebugImages* dbg)
+	std::list<std::vector<QPointF> >& out, QLineF const& left_bound,
+	QLineF const& right_bound, DebugImages* dbg)
 {
 	int const width = blurred.width();
 	int const height = blurred.height();
@@ -443,7 +444,10 @@ TextLineTracer::segmentBlurredTextLines(
 	std::vector<Region> regions;
 	std::set<Edge> edges;
 
-	labelAndGrowRegions(blurred, region_seeds.release(), thick_mask, regions, edges, dbg);
+	labelAndGrowRegions(
+		blurred, region_seeds.release(), thick_mask, regions,
+		edges, left_bound, right_bound, dbg
+	);
 
 	std::vector<EdgeNode> edge_nodes;
 	std::map<Edge, uint32_t> edge_to_index;
@@ -593,7 +597,7 @@ void
 TextLineTracer::labelAndGrowRegions(
 	GrayImage const& blurred, BinaryImage region_seeds,
 	BinaryImage const& thick_mask, std::vector<Region>& regions,
-	std::set<Edge>& edges, DebugImages* dbg)
+	std::set<Edge>& edges, QLineF const& left_bound, QLineF const& right_bound, DebugImages* dbg)
 {
 	int const width = blurred.width();
 	int const height = blurred.height();
@@ -684,14 +688,10 @@ TextLineTracer::labelAndGrowRegions(
 	}
 
 	// Mark regions as leftmost / rightmost.
-	GridNode const* grid_line = grid.data();
-	for (int y = 0; y < height; ++y, grid_line += grid_stride) {
-		regions[grid_line[0].regionIdx()].leftmost = true;
-		regions[grid_line[width - 1].regionIdx()].rightmost = true;
-	}
+	markEdgeRegions(regions, grid, left_bound, right_bound);
 	
 	// Process horizontal connections between regions.
-	grid_line = grid.data();
+	GridNode const* grid_line = grid.data();
 	uint32_t const* thick_mask_line = thick_mask.data();
 	int const thick_mask_stride = thick_mask.wordsPerLine();
 	for (int y = 0; y < height; ++y) {
@@ -794,6 +794,41 @@ TextLineTracer::labelAndGrowRegions(
 			}
 		}
 		dbg->add(canvas, "connectivity");
+	}
+}
+
+/**
+ * Goes along the vertical bounds and marks regions they pass through
+ * as leftmost or rightmost (could even be both).
+ */
+void
+TextLineTracer::markEdgeRegions(
+	std::vector<Region>& regions, Grid<GridNode> const& grid,
+	QLineF const& left_bound, QLineF const& right_bound)
+{
+	int const width = grid.width();
+	int const height = grid.height();
+
+	GridNode const* grid_line = grid.data();
+	int const grid_stride = grid.stride();
+
+	for (int y = 0; y < height; ++y, grid_line += grid_stride) {
+		QLineF const hor_line(QPointF(0, y), QPointF(width, y));
+		
+		int left_x = 0;
+		QPointF left_intersection;
+		if (hor_line.intersect(left_bound, &left_intersection) != QLineF::NoIntersection) {
+			left_x = qBound<int>(0, qRound(left_intersection.x()), width - 1);
+		}
+
+		int right_x = width - 1;
+		QPointF right_intersection;
+		if (hor_line.intersect(right_bound, &right_intersection) != QLineF::NoIntersection) {
+			right_x = qBound<int>(0, qRound(right_intersection.x()), width - 1);
+		}
+
+		regions[grid_line[left_x].regionIdx()].leftmost = true;
+		regions[grid_line[right_x].regionIdx()].rightmost = true;
 	}
 }
 
