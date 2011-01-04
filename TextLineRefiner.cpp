@@ -335,9 +335,9 @@ TextLineRefiner::evolveSnake(Snake& snake) const
 
 	static float const rib_length_adjusters[] = { 0, 0.5, -0.5 };
 
-	float const elasticity_weight = 0.1f;
+	float const elasticity_weight = 0.3f;
 	float const bending_weight = 6.0f;
-	float const thickness_weight = 0.4f;
+	float const thickness_weight = 0.8f;
 	float const top_external_weight = 0.3f;
 	float const bottom_external_weight = 0.8f;
 	// By setting bottom weight higher than top weight, we are trying
