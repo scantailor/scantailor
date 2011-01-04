@@ -35,6 +35,7 @@ class Dpi;
 class QImage;
 class QColor;
 class QRect;
+class QRectF;
 class TaskStatus;
 class DebugImages;
 
@@ -62,6 +63,9 @@ private:
 	struct EdgeConnection;
 	struct EdgeNode;
 	class ShortestPathQueue;
+	struct TracedCurve;
+	struct RansacModel;
+	class RansacAlgo;
 
 	typedef uint32_t RegionIdx;
 	typedef uint32_t EdgeNodeIdx;
@@ -94,10 +98,13 @@ private:
 	static bool isInsideBounds(
 		QPointF const& pt, QLineF const& left_bound, QLineF const& right_bound);
 
-	static void filterCurves(std::list<std::vector<QPointF> >& polylines,
+	static void filterOutOfBoundsCurves(std::list<std::vector<QPointF> >& polylines,
 		QLineF const& left_bound, QLineF const& right_bound);
 
-	static void pickTopBottomLines(std::list<std::vector<QPointF> >& polylines);
+	static void filterEdgyCurves(std::list<std::vector<QPointF> >& polylines);
+
+	static void pickRepresentativeLines(std::list<std::vector<QPointF> >& polylines,
+		QRectF const& image_rect, QLineF const& left_bound, QLineF const& right_bound);
 
 	static void makeLeftToRight(std::vector<QPointF>& polyline);
 

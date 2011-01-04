@@ -30,7 +30,11 @@
 #include "PriorityQueue.h"
 #include "SidesOfLine.h"
 #include "ToLineProjector.h"
+#include "PolylineIntersector.h"
+#include "CylindricalSurfaceDewarper.h"
 #include "PerformanceTimer.h"
+#include "filters/output/Curve.h"  // TODO: move these to global namespace
+#include "filters/output/DistortionModel.h" 
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
 #include "imageproc/Binarize.h"
@@ -50,6 +54,7 @@
 #include "imageproc/ColorForId.h"
 #include <QTransform>
 #include <QImage>
+#include <QRect>
 #include <QPainter>
 #include <QBrush>
 #include <QPen>
@@ -65,6 +70,7 @@
 #include <map>
 #include <deque>
 #include <utility>
+#include <stdexcept>
 #include <stdlib.h>
 #include <math.h>
 
@@ -340,54 +346,44 @@ TextLineTracer::trace(
 	std::list<std::vector<QPointF> > polylines;
 	segmentBlurredTextLines(blurred, thick_mask, polylines, dbg);
 
-	filterCurves(polylines, vert_bounds.first, vert_bounds.second);
-	if (dbg) {
-		dbg->add(visualizePolylines(downscaled.toQImage(), polylines), "filtered_lines");
+	if (polylines.size() < 2 && !dbg) {
+		polylines.clear();
+		return polylines;
 	}
 
-	if (!dbg) {
-		// In debugging, we want to extend / refine all lines, so we pick the
-		// top / bottom ones later.
-		pickTopBottomLines(polylines);
-	}
+	filterOutOfBoundsCurves(polylines, vert_bounds.first, vert_bounds.second);
 
-	if (polylines.size() >= 2 || dbg) {
-		BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-			extendOrTrimPolyline(
-				polyline, vert_bounds.first, vert_bounds.second,
-				binarized, blurred, thick_mask
-			);
-		}
-		if (dbg) {
-			dbg->add(
-				visualizeExtendedPolylines(
-					blurred.toQImage(), thick_mask, polylines,
-					vert_bounds.first, vert_bounds.second
-				),
-				"extended_polylines"
-			);
-		}
-
-		TextLineRefiner refiner(downscaled, Dpi(200, 200), dbg);
-		refiner.refine(polylines, /*iterations=*/100, dbg, &downscaled.toQImage());
-	}
-
-	if (dbg) {
-		pickTopBottomLines(polylines);
-		dbg->add(visualizePolylines(downscaled.toQImage(), polylines), "representative_lines");
-	}
-
-	// Fix endpoints at the vertical boundaries.
 	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-		intersectWithVerticalBoundaries(polyline, vert_bounds.first, vert_bounds.second);
+		extendOrTrimPolyline(
+			polyline, vert_bounds.first, vert_bounds.second,
+			binarized, blurred, thick_mask
+		);
+	}
+	if (dbg) {
+		dbg->add(
+			visualizeExtendedPolylines(
+				blurred.toQImage(), thick_mask, polylines,
+				vert_bounds.first, vert_bounds.second
+			),
+			"extended_polylines"
+		);
+	}
+
+	TextLineRefiner refiner(downscaled, Dpi(200, 200), dbg);
+	refiner.refine(polylines, /*iterations=*/100, dbg, &downscaled.toQImage());
+
+	filterEdgyCurves(polylines);
+	if (dbg) {
+		dbg->add(visualizePolylines(downscaled, polylines), "edgy_curves_removed");
 	}
 
 	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
 		makeLeftToRight(polyline);
 	}
 
+	pickRepresentativeLines(polylines, blurred.rect(), vert_bounds.first, vert_bounds.second);
 	if (dbg) {
-		dbg->add(visualizePolylines(downscaled.toQImage(), polylines, &vert_bounds), "final_lines");
+		dbg->add(visualizePolylines(downscaled.toQImage(), polylines, &vert_bounds), "representative_lines");
 	}
 
 	// Transform back to original coordinates.
@@ -1065,7 +1061,7 @@ TextLineTracer::isInsideBounds(
 }
 
 void
-TextLineTracer::filterCurves(
+TextLineTracer::filterOutOfBoundsCurves(
 	std::list<std::vector<QPointF> >& polylines,
 	QLineF const& left_bound, QLineF const& right_bound)
 {
@@ -1075,8 +1071,6 @@ TextLineTracer::filterCurves(
 		if (!isInsideBounds(it->front(), left_bound, right_bound) &&
 			!isInsideBounds(it->back(), left_bound, right_bound)) {
 			polylines.erase(it++);
-		} else if (!isCurvatureConsistent(*it)) {
-			polylines.erase(it++);
 		} else {
 			++it;
 		}
@@ -1084,56 +1078,175 @@ TextLineTracer::filterCurves(
 }
 
 void
-TextLineTracer::pickTopBottomLines(std::list<std::vector<QPointF> >& polylines)
+TextLineTracer::filterEdgyCurves(std::list<std::vector<QPointF> >& polylines)
 {
-	if (polylines.size() < 2) {
+	std::list<std::vector<QPointF> >::iterator it(polylines.begin());
+	std::list<std::vector<QPointF> >::iterator const end(polylines.end());	
+	while (it != end) {
+		if (!isCurvatureConsistent(*it)) {
+			polylines.erase(it++);
+		} else {
+			++it;
+		}
+	}
+}
+
+struct TextLineTracer::TracedCurve
+{
+	std::vector<QPointF> polyline;
+	std::vector<QPointF> extendedPolyline;
+	double yCenter;
+
+	TracedCurve(std::vector<QPointF> const& polyline,
+		std::vector<QPointF> const& extended_polyline, double y_center)
+		: polyline(polyline), extendedPolyline(extended_polyline), yCenter(y_center) {}
+
+	bool operator<(TracedCurve const& rhs) const { return yCenter < rhs.yCenter; }
+};
+
+struct TextLineTracer::RansacModel
+{
+	TracedCurve const* topCurve;
+	TracedCurve const* bottomCurve; 
+	double totalError;
+
+	RansacModel() : topCurve(0), bottomCurve(0), totalError(NumericTraits<double>::max()) {}
+
+	bool isValid() const { return topCurve && bottomCurve; }
+};
+
+class TextLineTracer::RansacAlgo
+{
+public:
+	RansacAlgo(std::vector<TracedCurve> const& all_curves)
+		: m_rAllCurves(all_curves) {}
+
+	void buildAndAssessModel(
+		TracedCurve const* top_curve, TracedCurve const* bottom_curve, double scale);
+
+	RansacModel& bestModel() { return m_bestModel; }
+
+	RansacModel const& bestModel() const { return m_bestModel; }
+private:
+	RansacModel m_bestModel;
+	std::vector<TracedCurve> const& m_rAllCurves;
+};
+
+void
+TextLineTracer::RansacAlgo::buildAndAssessModel(
+	TracedCurve const* top_curve, TracedCurve const* bottom_curve, double scale)
+try {
+	using namespace output;
+
+	DistortionModel model;
+	model.setTopCurve(Curve(top_curve->extendedPolyline));
+	model.setBottomCurve(Curve(bottom_curve->extendedPolyline));
+	if (!model.isValid()) {
+		return;
+	}
+
+	double const depth_perception = 2.0; // Doesn't matter much here.
+	CylindricalSurfaceDewarper const dewarper(
+		top_curve->extendedPolyline, bottom_curve->extendedPolyline, depth_perception
+	);
+
+	double error = 0;
+	BOOST_FOREACH(TracedCurve const& curve, m_rAllCurves) {
+		double mean = 0;
+		double sqmean = 0;
+		BOOST_FOREACH(QPointF const& pt, curve.polyline) {
+			// TODO: add another signature with hint for efficiency.
+			double const y = dewarper.mapToDewarpedSpace(pt).y() * scale;
+			mean += y;
+			sqmean += y * y;
+		}
+		mean /= curve.polyline.size();
+		sqmean /= curve.polyline.size();
+		double const stddev = sqrt(sqmean - mean * mean);
+		error += stddev;
+	}
+
+	if (error < m_bestModel.totalError) {
+		m_bestModel.topCurve = top_curve;
+		m_bestModel.bottomCurve = bottom_curve;
+		m_bestModel.totalError = error;
+	}
+} catch (std::runtime_error const&) {
+	// Probably CylindricalSurfaceDewarper didn't like something.
+}
+
+void
+TextLineTracer::pickRepresentativeLines(
+	std::list<std::vector<QPointF> >& polylines, QRectF const& image_rect,
+	QLineF const& left_bound, QLineF const& right_bound)
+{
+	int const num_curves = polylines.size();
+
+	if (num_curves < 2) {
 		polylines.clear();
 		return;
 	}
 
-	typedef std::list<std::vector<QPointF> >::iterator Iter;
+	std::vector<TracedCurve> ordered_curves;
+	ordered_curves.reserve(num_curves);
+
+	// First, sort them top to bottom.
+	// For this purpose, calculate where they intersect this line:
+	QLineF const mid_vert_line(
+		0.5 * (image_rect.topLeft() + image_rect.topRight()),
+		0.5 * (image_rect.bottomLeft() + image_rect.bottomRight())
+	);
+	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
+		std::vector<QPointF> extended_polyline(polyline);
+		intersectWithVerticalBoundaries(extended_polyline, left_bound, right_bound);
+		
+		PolylineIntersector const intersector(polyline);
+		PolylineIntersector::Hint hint;
+		QPointF const intersection(intersector.intersect(mid_vert_line, hint));
+
+		ordered_curves.push_back(TracedCurve(polyline, extended_polyline, intersection.y()));
+	}
+	std::sort(ordered_curves.begin(), ordered_curves.end());
+
+	// Select the best pair using RANSAC.
+	RansacAlgo ransac(ordered_curves);
+
+	// First let's try to combine each of the 3 top-most lines
+	// with each of the 3 bottom-most ones.
+	for (int i = 0; i < std::min<int>(3, num_curves); ++i) {
+		for (int j = std::max<int>(0, num_curves - 3); j < num_curves; ++j) {
+			if (i < j) {
+				double const scale = ordered_curves[j].yCenter - ordered_curves[i].yCenter + 1;
+				// The +1 thing just prevents it from being zero.
+				assert(scale > 0);
+				ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j], scale);
+			}
+		}
+	}
+
+	// Continue by throwing in some random pairs of lines.
+	qsrand(0); // Repeatablity is important.
+	int random_pairs_remaining = 10;
+	while (random_pairs_remaining-- > 0) {
+		int i = qrand() % num_curves;
+		int j = qrand() % num_curves;
+		if (i > j) {
+			std::swap(i, j);
+		}
+		if (i < j) {
+			double const scale = ordered_curves[j].yCenter - ordered_curves[i].yCenter + 1;
+			// The +1 thing just prevents it from being zero.
+			assert(scale > 0);
+			ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j], scale);
+		}
+	}
 	
-	std::pair<Iter, Iter> best_pair(polylines.end(), polylines.end());
-	float best_value = -1;
-
-	for (Iter it1(polylines.begin()); it1 != polylines.end(); ++it1) {
-		QPointF line1_left_endpoint(it1->front());
-		QPointF line1_right_endpoint(it1->back());
-		if (line1_left_endpoint.x() > line1_right_endpoint.x()) {
-			std::swap(line1_left_endpoint, line1_right_endpoint);
-		}
-
-		for (Iter it2(polylines.begin()); it2 != polylines.end(); ++it2) {
-			if (it2 == it1) {
-				continue;
-			}
-
-			QPointF line2_left_endpoint(it2->front());
-			QPointF line2_right_endpoint(it2->back());
-			if (line2_left_endpoint.x() > line2_right_endpoint.x()) {
-				std::swap(line2_left_endpoint, line2_right_endpoint);
-			}
-
-			float const dy1 = float(line2_left_endpoint.y() - line1_left_endpoint.y());
-			float const dy2 = float(line2_right_endpoint.y() - line1_right_endpoint.y());
-			if (dy1 < 0 || dy2 < 0) {
-				continue;
-			}
-
-			float const value = dy1 * dy1 + dy2 * dy2;
-			if (value > best_value) {
-				best_value = value;
-				best_pair = std::pair<Iter, Iter>(it1, it2);
-			}
-		}
+	if (ransac.bestModel().isValid()) {
+		std::list<std::vector<QPointF> > new_polylines;
+		new_polylines.push_back(ransac.bestModel().topCurve->extendedPolyline);
+		new_polylines.push_back(ransac.bestModel().bottomCurve->extendedPolyline);
+		polylines.swap(new_polylines);
 	}
-
-	std::list<std::vector<QPointF> > new_polylines;
-	if (best_pair.first != polylines.end()) {
-		new_polylines.splice(new_polylines.end(), polylines, best_pair.first);
-		new_polylines.splice(new_polylines.end(), polylines, best_pair.second);
-	}
-	polylines.swap(new_polylines);
 }
 
 void
