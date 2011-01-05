@@ -86,9 +86,9 @@ public:
 
 	Mat trans() const;
 
-	void write(T* buf) const;
+	Mat write(T* buf) const;
 
-	void transWrite(T* buf) const;
+	Mat transWrite(T* buf) const;
 private:
 	Mat(AbstractAllocator<T>* alloc, T const* data, int rows, int cols)
 		: alloc(alloc), data(data), rows(rows), cols(cols) {}
@@ -184,17 +184,19 @@ Mat<T>::trans() const
 }
 
 template<typename T>
-void
+Mat<T>
 Mat<T>::write(T* buf) const
 {
 	int const todo = rows * cols;
 	for (int i = 0; i < todo; ++i) {
 		buf[i] = data[i];
 	}
+
+	return *this;
 }
 
 template<typename T>
-void
+Mat<T>
 Mat<T>::transWrite(T* buf) const
 {
 	T* p_trans = buf;
@@ -206,6 +208,8 @@ Mat<T>::transWrite(T* buf) const
 			p_src += rows;
 		}
 	}
+
+	return *this;
 }
 
 template<typename T>
@@ -215,14 +219,13 @@ Mat<T> operator+(Mat<T> const& m1, Mat<T> const& m2)
 
 	T* p_res = m1.alloc->allocT(m1.rows * m1.cols);
 	Mat<T> res(m1.alloc, p_res, m1.rows, m1.cols);
-	
-	T const* p_m1 = m1.data;
-	T const* p_m2 = m2.data;
-	
+
 	int const todo = m1.rows * m1.cols;
 	for (int i = 0; i < todo; ++i) {
-		res.data[i] = m1.data[i] + m2.data[i];
+		p_res[i] = m1.data[i] + m2.data[i];
 	}
+
+	return res;
 }
 
 template<typename T>
@@ -230,16 +233,15 @@ Mat<T> operator-(Mat<T> const& m1, Mat<T> const& m2)
 {
 	assert(m1.rows == m2.rows && m1.cols == m2.cols);
 
-	T const* p_res = m1.alloc->allocT(m1.rows * m1.cols);
+	T* p_res = m1.alloc->allocT(m1.rows * m1.cols);
 	Mat<T> res(m1.alloc, p_res, m1.rows, m1.cols);
-
-	T const* p_m1 = m1.data;
-	T const* p_m2 = m2.data;
 	
 	int const todo = m1.rows * m1.cols;
 	for (int i = 0; i < todo; ++i) {
-		res.data[i] = m1.data[i] - m2.data[i];
+		p_res[i] = m1.data[i] - m2.data[i];
 	}
+
+	return res;
 }
 
 template<typename T>
