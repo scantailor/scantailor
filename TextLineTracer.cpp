@@ -1130,13 +1130,13 @@ struct TextLineTracer::TracedCurve
 {
 	std::vector<QPointF> polyline;
 	std::vector<QPointF> extendedPolyline;
-	double yCenter;
+	QPointF centerPoint;
 
 	TracedCurve(std::vector<QPointF> const& polyline,
-		std::vector<QPointF> const& extended_polyline, double y_center)
-		: polyline(polyline), extendedPolyline(extended_polyline), yCenter(y_center) {}
+		std::vector<QPointF> const& extended_polyline, QPointF const& center_point)
+		: polyline(polyline), extendedPolyline(extended_polyline), centerPoint(center_point) {}
 
-	bool operator<(TracedCurve const& rhs) const { return yCenter < rhs.yCenter; }
+	bool operator<(TracedCurve const& rhs) const { return centerPoint.y() < rhs.centerPoint.y(); }
 };
 
 struct TextLineTracer::RansacModel
@@ -1157,19 +1157,22 @@ public:
 		: m_rAllCurves(all_curves) {}
 
 	void buildAndAssessModel(
-		TracedCurve const* top_curve, TracedCurve const* bottom_curve, double scale);
+		TracedCurve const* top_curve, TracedCurve const* bottom_curve);
 
 	RansacModel& bestModel() { return m_bestModel; }
 
 	RansacModel const& bestModel() const { return m_bestModel; }
 private:
+	double calcReferenceHeight(
+		CylindricalSurfaceDewarper const& dewarper, QPointF const& loc);
+
 	RansacModel m_bestModel;
 	std::vector<TracedCurve> const& m_rAllCurves;
 };
 
 void
 TextLineTracer::RansacAlgo::buildAndAssessModel(
-	TracedCurve const* top_curve, TracedCurve const* bottom_curve, double scale)
+	TracedCurve const* top_curve, TracedCurve const* bottom_curve)
 try {
 	using namespace output;
 
@@ -1187,18 +1190,57 @@ try {
 
 	double error = 0;
 	BOOST_FOREACH(TracedCurve const& curve, m_rAllCurves) {
-		double mean = 0;
-		double sqmean = 0;
-		BOOST_FOREACH(QPointF const& pt, curve.polyline) {
+		size_t const polyline_size = curve.polyline.size();
+		double const r_reference_height = 1.0 / calcReferenceHeight(dewarper, curve.centerPoint);
+
+		// We are going to approximate the dewarped polyline by a straight line
+		// using linear least-squares: At*A*x = At*B -> x = (At*A)-1 * At*B
+		std::vector<double> At;
+		At.reserve(polyline_size * 2);
+		std::vector<double> B;
+		B.reserve(polyline_size);
+
+		BOOST_FOREACH(QPointF const& warped_pt, curve.polyline) {
 			// TODO: add another signature with hint for efficiency.
-			double const y = dewarper.mapToDewarpedSpace(pt).y() * scale;
-			mean += y;
-			sqmean += y * y;
+			QPointF const dewarped_pt(dewarper.mapToDewarpedSpace(warped_pt));
+
+			// ax + b = y  <-> x * a + 1 * b = y 
+			At.push_back(dewarped_pt.x());
+			At.push_back(1);
+			B.push_back(dewarped_pt.y());
 		}
-		mean /= curve.polyline.size();
-		sqmean /= curve.polyline.size();
-		double const stddev = sqrt(sqmean - mean * mean);
-		error += stddev;
+
+		DynamicMatrixCalc<double> mc;
+		
+		// A = Att
+		boost::scoped_array<double> A(new double[polyline_size * 2]);
+		mc(&At[0], 2, polyline_size).transWrite(&A[0]);
+
+		try {
+			boost::scoped_array<double> errvec(new double[polyline_size]);
+			double ab[2]; // As in "y = ax + b".
+
+			// errvec = B - A * (At*A)-1 * At * B
+			// ab = (At*A)-1 * At * B
+			(
+				mc(&B[0], polyline_size, 1) - mc(&A[0], polyline_size, 2)
+				*((mc(&At[0], 2, polyline_size)*mc(&A[0], polyline_size, 2)).inv()
+				*mc(&At[0], 2, polyline_size)*mc(&B[0], polyline_size, 1)).write(ab)
+			).write(&errvec[0]);
+
+			double sum_abs_err = 0;
+			for (size_t i = 0; i < polyline_size; ++i) {
+				sum_abs_err += fabs(errvec[i]) * r_reference_height;
+			}
+
+			// Penalty for not being straight.
+			error += sum_abs_err / polyline_size;
+
+			// TODO: penalty for not being horizontal.
+		} catch (std::runtime_error const&) {
+			// Strictly vertical line?
+			error += 1000;
+		}
 	}
 
 	if (error < m_bestModel.totalError) {
@@ -1208,6 +1250,18 @@ try {
 	}
 } catch (std::runtime_error const&) {
 	// Probably CylindricalSurfaceDewarper didn't like something.
+}
+
+double
+TextLineTracer::RansacAlgo::calcReferenceHeight(
+	CylindricalSurfaceDewarper const& dewarper, QPointF const& loc)
+{
+	// TODO: ideally, we would use the counterpart of CylindricalSurfaceDewarper::mapGeneratrix(),
+	// that would map it the other way, and which doesn't currently exist.
+
+	QPointF const pt1(dewarper.mapToDewarpedSpace(loc + QPointF(0.0, -10)));
+	QPointF const pt2(dewarper.mapToDewarpedSpace(loc + QPointF(0.0, 10)));
+	return fabs(pt1.y() - pt2.y());
 }
 
 void
@@ -1239,7 +1293,7 @@ TextLineTracer::pickRepresentativeLines(
 		PolylineIntersector::Hint hint;
 		QPointF const intersection(intersector.intersect(mid_vert_line, hint));
 
-		ordered_curves.push_back(TracedCurve(polyline, extended_polyline, intersection.y()));
+		ordered_curves.push_back(TracedCurve(polyline, extended_polyline, intersection));
 	}
 	std::sort(ordered_curves.begin(), ordered_curves.end());
 
@@ -1251,10 +1305,7 @@ TextLineTracer::pickRepresentativeLines(
 	for (int i = 0; i < std::min<int>(3, num_curves); ++i) {
 		for (int j = std::max<int>(0, num_curves - 3); j < num_curves; ++j) {
 			if (i < j) {
-				double const scale = ordered_curves[j].yCenter - ordered_curves[i].yCenter + 1;
-				// The +1 thing just prevents it from being zero.
-				assert(scale > 0);
-				ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j], scale);
+				ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j]);
 			}
 		}
 	}
@@ -1269,10 +1320,7 @@ TextLineTracer::pickRepresentativeLines(
 			std::swap(i, j);
 		}
 		if (i < j) {
-			double const scale = ordered_curves[j].yCenter - ordered_curves[i].yCenter + 1;
-			// The +1 thing just prevents it from being zero.
-			assert(scale > 0);
-			ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j], scale);
+			ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j]);
 		}
 	}
 	
