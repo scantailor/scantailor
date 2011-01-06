@@ -699,6 +699,65 @@ zur Auswahl mehrerer Seiten.</translation>
     </message>
 </context>
 <context>
+    <name>OutputChangeDewarpingDialog</name>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
+        <source>Apply Dewarping Mode</source>
+        <translation>Seitenkrümmung entfernen</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
+        <source>Mode</source>
+        <translation>Methode</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
+        <source>Off</source>
+        <translation>Aus</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
+        <source>Auto (experimental)</source>
+        <translation>Automatisch (experimentell)</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <source>Manual</source>
+        <translation>Manuell</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <source>Scope</source>
+        <translation>Anwenden auf</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <source>This page only</source>
+        <translation>nur diese Seite</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <source>All pages</source>
+        <translation>alle Seiten</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <source>This page and the following ones</source>
+        <translation>diese und die folgenden Seiten</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <source>Selected pages</source>
+        <translation>ausgewählte Seiten</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation>Verwenden Sie Strg+Mausklick/Shift+Mausklick
+zur Auswahl mehrerer Seiten.</translation>
+    </message>
+</context>
+<context>
     <name>OutputChangeDpiDialog</name>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
