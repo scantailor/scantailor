@@ -86,7 +86,7 @@ private:
 template<typename Node>
 Grid<Node>::Grid(int width, int height, int padding)
 :	m_storage(new Node[(width + padding*2) * (height + padding*2)]),
-	m_pData(m_storage.get() + width + padding*2 + padding),
+	m_pData(m_storage.get() + (width + padding*2)*padding + padding),
 	m_width(width),
 	m_height(height),
 	m_stride(width + padding*2),
