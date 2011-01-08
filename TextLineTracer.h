@@ -82,6 +82,10 @@ private:
 		imageproc::BinaryImage const& thick_mask, std::vector<Region>& regions,
 		std::set<Edge>& edges, QLineF const& left_bound, QLineF const& right_bound, DebugImages* dbg);
 
+	static void initRegions(std::vector<Region>& regions, imageproc::BinaryImage const& region_seeds);
+
+	static void distanceDrivenRegionGrowth(Grid<GridNode>& region_grid);
+
 	static void markEdgeRegions(
 		std::vector<Region>& regions, Grid<GridNode> const& grid,
 		QLineF const& left_bound, QLineF const& right_bound);

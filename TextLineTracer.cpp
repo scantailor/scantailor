@@ -104,12 +104,15 @@ public:
 		++m_numSamples;
 	}
 
-	Vec2f centroid() const {
+	QPoint centroid() const {
 		if (m_numSamples == 0) {
-			return Vec2f(0, 0);
+			return QPoint(0, 0);
 		} else {
-			float const r_num_samples = 1.0f / m_numSamples;
-			return Vec2f(float(m_sumX) * r_num_samples, float(m_sumY) * r_num_samples);
+			int const half_num_samples = m_numSamples >> 1;
+			return QPoint(
+				(m_sumX + half_num_samples) / m_numSamples,
+				(m_sumY + half_num_samples) / m_numSamples
+			);
 		}
 	}
 private:
@@ -120,22 +123,24 @@ private:
 
 struct TextLineTracer::Region
 {
-	Vec2f centroid;
+	QPoint centroid;
 	std::vector<RegionIdx> connectedRegions;
 	bool leftmost;
 	bool rightmost;
 
 	Region() : leftmost(false), rightmost(false) {}
+
+	Region(QPoint const& ctroid) : centroid(ctroid), leftmost(false), rightmost(false) {}
 };
 
 struct TextLineTracer::GridNode
 {
-	static uint32_t const INVALID_REGION_IDX = 0x7FFFFF;
+	static uint32_t const INVALID_LABEL = 0;
 
 	GridNode() : m_data() {}
 
-	GridNode(uint8_t gray_level, RegionIdx region_idx, uint32_t finalized)
-		: m_data((finalized << 31) | (region_idx << 8) | uint32_t(gray_level)) {}
+	GridNode(uint8_t gray_level, uint32_t label, uint32_t finalized)
+		: m_data((finalized << 31) | (label << 8) | uint32_t(gray_level)) {}
 
 	uint8_t grayLevel() const { return static_cast<uint8_t>(m_data & 0xff); }
 
@@ -143,12 +148,19 @@ struct TextLineTracer::GridNode
 		m_data = (m_data & ~GRAY_LEVEL_MASK) | uint32_t(gray_level);
 	}
 
-	uint32_t regionIdx() const { return (m_data & REGION_IDX_MASK) >> 8; }
+	uint32_t label() const { return (m_data & LABEL_MASK) >> 8; }
 
-	void setRegionIdx(uint32_t region_idx) {
-		assert((region_idx & ~INVALID_REGION_IDX) == 0);
-		m_data = (m_data & ~REGION_IDX_MASK) | (region_idx << 8);
+	void setLabel(uint32_t label) {
+		m_data = (m_data & ~LABEL_MASK) | (label << 8);
 	}
+
+	bool validLabel() const { return label() != 0; }
+
+	bool validRegion() const { return label() != 0; }
+
+	RegionIdx regionIdx() const { return label() - 1; }
+
+	void setRegionIdx(RegionIdx idx) { setLabel(idx + 1); }
 
 	uint32_t finalized() const { return (m_data & FINALIZED_MASK) >> 31; }
 
@@ -159,7 +171,7 @@ struct TextLineTracer::GridNode
 private:
 	// Layout (MSB to LSB): [finalized: 1 bit][region idx: 23 bits][gray level: 8 bits]
 	static uint32_t const GRAY_LEVEL_MASK = 0x000000FF;
-	static uint32_t const REGION_IDX_MASK = 0x7FFFFF00;
+	static uint32_t const LABEL_MASK      = 0x7FFFFF00;
 	static uint32_t const FINALIZED_MASK  = 0x80000000;
 
 	uint32_t m_data;
@@ -442,8 +454,9 @@ TextLineTracer::segmentBlurredTextLines(
 	}
 
 	std::vector<Region> regions;
-	std::set<Edge> edges;
+	initRegions(regions, region_seeds);
 
+	std::set<Edge> edges;
 	labelAndGrowRegions(
 		blurred, region_seeds.release(), thick_mask, regions,
 		edges, left_bound, right_bound, dbg
@@ -468,7 +481,7 @@ TextLineTracer::segmentBlurredTextLines(
 	uint32_t const num_regions = regions.size();
 
 	// Populate EdgeNode::connectedEdges
-	for (RegionIdx region_idx = 1; region_idx < num_regions; ++region_idx) {
+	for (RegionIdx region_idx = 0; region_idx < num_regions; ++region_idx) {
 		Region const& region = regions[region_idx];
 		size_t const num_connected_regions = region.connectedRegions.size();
 		for (size_t i = 0; i < num_connected_regions; ++i) {
@@ -602,61 +615,51 @@ TextLineTracer::labelAndGrowRegions(
 	int const width = blurred.width();
 	int const height = blurred.height();
 
-	BinaryImage eroded(erodeBrick(region_seeds, QSize(3, 3)));
-	rasterOp<RopXor<RopSrc, RopDst> >(region_seeds, eroded.release());
-	if (dbg) {
-		dbg->add(region_seeds, "region_seed_edges");
-	}
-
 	Grid<GridNode> grid(width, height, /*padding=*/1);
 	grid.initPadding(GridNode(0, 0, 1));
-	
+	// Interior initialized with GridNode() is OK with us.
+
 	GridNode* const grid_data = grid.data();
+	GridNode* grid_line = grid_data;
 	int const grid_stride = grid.stride();
 	
-	RegionGrowingQueue queue(grid.data());
-
-	ConnectivityMap cmap(region_seeds, CONN8);
-
-	std::vector<CentroidCalculator> centroid_calculators(cmap.maxLabel());
-
-	int const cmap_stride = cmap.stride();
-	uint32_t* cmap_line = cmap.paddedData();
-
 	uint8_t const* blurred_line = blurred.data();
 	int const blurred_stride = blurred.stride();
 
-	// Populate the grid from connectivity map, also find region centroids.
+	uint32_t const* thick_mask_line = thick_mask.data();
+	int const thick_mask_stride = thick_mask.wordsPerLine();
+
+	// Copy gray level from blurred into the grid and mark
+	// areas outside of thick_mask as finalized.
 	int grid_offset = 0;
 	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x, ++grid_offset) {
-			GridNode* node = grid_data + grid_offset;
+		for (int x = 0; x < width; ++x) {
+			GridNode* node = grid_line + x;
 			node->setGrayLevel(blurred_line[x]);
-			
-			uint32_t const label = cmap_line[x];
-			
-			if (label == 0) {
-				node->setRegionIdx(GridNode::INVALID_REGION_IDX);
-				node->setFinalized(0);
-			} else {
-				// Label 0 stands for background in ConnectivityMap.
-				node->setRegionIdx(label - 1);
-				node->setFinalized(1);
-				queue.push(RegionGrowingPosition(grid_offset, 0));
-				
-				centroid_calculators[label - 1].processSample(x, y);
-			}
+			node->setFinalized(~(thick_mask_line[x >> 5] >> (31 - (x & 31))) & uint32_t(1));
 		}
-
+		grid_line += grid_stride;
 		blurred_line += blurred_stride;
-		cmap_line += cmap_stride;
-		grid_offset += 2;
+		thick_mask_line += thick_mask_stride;
 	}
 
-	cmap = ConnectivityMap(); // Save memory.
+	RegionGrowingQueue queue(grid.data());
+
+	// Put region centroids into the queue.
+	RegionIdx const num_regions = regions.size();
+	for (RegionIdx region_idx = 0; region_idx < num_regions; ++region_idx) {
+		Region const& region = regions[region_idx];
+		int const grid_offset = grid_stride * region.centroid.y() + region.centroid.x();
+		GridNode* node = grid_data + grid_offset;
+		node->setRegionIdx(region_idx);
+		node->setFinalized(1);
+		queue.push(RegionGrowingPosition(grid_offset, 0));
+	}
 
 	int const nbh_offsets[] = { -grid_stride, -1, 1, grid_stride };
+	QPoint const nbh_vectors[] = { QPoint(0, -1), QPoint(-1, 0), QPoint(1, 0), QPoint(0, 1) };
 
+	// Grow regions, but only within thick_mask.
 	uint32_t iteration = 0;
 	while (!queue.empty()) {
 		++iteration;
@@ -665,7 +668,7 @@ TextLineTracer::labelAndGrowRegions(
 		queue.pop();
 
 		GridNode const* node = grid_data + offset;
-		RegionIdx const region_idx = node->regionIdx();
+		uint32_t const label = node->label();
 
 		// Spread this value to 4-connected neighbours.
 		for (int i = 0; i < 4; ++i) {
@@ -673,27 +676,20 @@ TextLineTracer::labelAndGrowRegions(
 			GridNode* nbh = grid_data + nbh_offset;
 			if (!nbh->finalized()) {
 				nbh->setFinalized(1);
-				nbh->setRegionIdx(region_idx);
+				nbh->setLabel(label);
 				queue.push(RegionGrowingPosition(nbh_offset, iteration));
 			}
 		}
 	}
 
-	uint32_t const num_regions = centroid_calculators.size();
-	regions.resize(num_regions);
-	
-	for (uint32_t i = 0; i < num_regions; ++i) {
-		Region& region = regions[i];
-		region.centroid = centroid_calculators[i].centroid();
-	}
+	distanceDrivenRegionGrowth(grid);
 
 	// Mark regions as leftmost / rightmost.
 	markEdgeRegions(regions, grid, left_bound, right_bound);
 	
 	// Process horizontal connections between regions.
-	GridNode const* grid_line = grid.data();
-	uint32_t const* thick_mask_line = thick_mask.data();
-	int const thick_mask_stride = thick_mask.wordsPerLine();
+	grid_line = grid_data;
+	thick_mask_line = thick_mask.data();
 	for (int y = 0; y < height; ++y) {
 		for (int x = 1; x < width; ++x) {
 			uint32_t const mask1 = thick_mask_line[x >> 5] >> (31 - (x & 31));
@@ -701,7 +697,7 @@ TextLineTracer::labelAndGrowRegions(
 			if (mask1 & mask2 & 1) {
 				GridNode const* node1 = grid_line + x;
 				GridNode const* node2 = node1 - 1;
-				if (node1->regionIdx() != node2->regionIdx()) {
+				if (node1->regionIdx() != node2->regionIdx() && node1->validRegion() && node2->validRegion()) {
 					edges.insert(Edge(node1->regionIdx(), node2->regionIdx()));
 				}
 			}
@@ -714,7 +710,7 @@ TextLineTracer::labelAndGrowRegions(
 	uint32_t const msb = uint32_t(1) << 31;
 
 	// Process vertical connections between regions.
-	grid_line = grid.data();
+	grid_line = grid_data;
 	thick_mask_line = thick_mask.data();
 	for (int x = 0; x < width; ++x) {
 		grid_line = grid.data() + x;
@@ -728,7 +724,7 @@ TextLineTracer::labelAndGrowRegions(
 			if (mask_word[0] & mask_word[-thick_mask_stride] & mask) {
 				GridNode const* node1 = grid_line;
 				GridNode const* node2 = grid_line - grid_stride;
-				if (node1->regionIdx() != node2->regionIdx()) {
+				if (node1->regionIdx() != node2->regionIdx() && node1->validRegion() && node2->validRegion()) {
 					edges.insert(Edge(node1->regionIdx(), node2->regionIdx()));
 				}
 			}
@@ -797,6 +793,230 @@ TextLineTracer::labelAndGrowRegions(
 	}
 }
 
+void
+TextLineTracer::initRegions(std::vector<Region>& regions, imageproc::BinaryImage const& region_seeds)
+{
+	int const width = region_seeds.width();
+	int const height = region_seeds.height();
+
+	ConnectivityMap cmap(region_seeds, CONN8);
+
+	// maxLabel() instead of maxLabel() + 1 because label 0 won't be used.
+	std::vector<CentroidCalculator> centroid_calculators(cmap.maxLabel());
+
+	// Calculate centroids.
+	int const cmap_stride = cmap.stride();
+	uint32_t* cmap_line = cmap.paddedData();
+	for (int y = 0; y < height; ++y, cmap_line += cmap_stride) {
+		for (int x = 0; x < width; ++x) {
+			uint32_t const label = cmap_line[x];
+			if (label) {
+				centroid_calculators[label - 1].processSample(x, y);
+			}
+		}
+	}
+
+	uint32_t const num_regions = centroid_calculators.size();
+	regions.reserve(centroid_calculators.size());
+	
+	BOOST_FOREACH(CentroidCalculator const& calc, centroid_calculators) {
+		regions.push_back(Region(calc.centroid()));
+	}
+}
+
+namespace
+{
+
+struct ProximityRegion
+{
+	int xOrigin;
+	int xMaybeLeader; // The point where this region may become the closest one.
+};
+
+}
+
+void
+TextLineTracer::distanceDrivenRegionGrowth(Grid<GridNode>& region_grid)
+{
+	// Here we are using the following distance transform algorithm:
+	// Meijster, A., Roerdink, J., and Hesselink, W. 2000.
+	// A general algorithm for computing distance transforms in linear time.
+	// http://dissertations.ub.rug.nl/FILES/faculties/science/2004/a.meijster/c2.pdf
+
+	int const width = region_grid.width();
+	int const height = region_grid.height();
+	
+	GridNode* const region_data = region_grid.data();
+	int const region_stride = region_grid.stride();
+
+	Grid<uint32_t> sqdist_grid(width, height, /*padding=*/0);
+	uint32_t* const sqdist_data = sqdist_grid.data();
+	int const sqdist_stride = sqdist_grid.stride();
+
+	// We pretend the vertical distances are greater than they are.
+	// This gives horizontal growing a preference.
+	static const uint32_t vert_scale = 3;
+	static uint32_t const INF_SQDIST = ~uint32_t(0);
+
+	// Horizontal pass.
+	// For each node, calculate the scaled distance to the closest
+	// point in the same column, that already belongs to a region.
+	for (int x = 0; x < width; ++x) {
+		GridNode* p_region = region_data + x;
+		uint32_t* p_sqdist = sqdist_data + x;
+
+		// Go down up to the first valid region.
+		int y = 0;
+		for (; y < height && !p_region->validRegion(); ++y) {
+			*p_sqdist = INF_SQDIST;
+			p_region += region_stride;
+			p_sqdist += sqdist_stride;
+		}
+		if (y == height) {
+			continue;
+		}
+
+		uint32_t vs_plus_2dvs = vert_scale; // (vert_scale + 2 * real_vert_dist * vert_scale)
+		uint32_t dvs_squared = 0; // (real_vert_dist * vert_scale)^2
+		uint32_t closest_label = 0;
+
+		// Continue going down.
+		for (; y < height; ++y) {
+			if (p_region->validRegion()) {
+				*p_sqdist = 0;
+				dvs_squared = 0;
+				vs_plus_2dvs = vert_scale;
+				closest_label = p_region->label();
+			} else {
+				// vs + 2*(d*vs + vs) = 2*vs + (vs + 2*d*vs)
+				vs_plus_2dvs += 2*vert_scale;
+				
+				// (d*vs + vs)^2 = (d*vs)^2 + 2*d*vs*vs + vs*vs = (d*vs)^2 + vs*(vs + 2*d*vs)
+				dvs_squared += vert_scale * vs_plus_2dvs;
+				*p_sqdist = dvs_squared;
+				p_region->setLabel(closest_label);
+			}
+
+			p_region += region_stride;
+			p_sqdist += sqdist_stride;
+		}
+
+		--y;
+		p_region -= region_stride;
+		p_sqdist -= sqdist_stride;
+
+		// Go back up to the first valid region.
+		for (; y >= 0 && *p_sqdist != 0; --y) {
+			p_region -= region_stride;
+			p_sqdist -= sqdist_stride;
+		}
+
+		for (; y >= 0; --y) {
+			if (*p_sqdist == 0) {
+				dvs_squared = 0;
+				vs_plus_2dvs = vert_scale;
+				closest_label = p_region->label();
+			} else {
+				// vs + 2*(d*vs + vs) = 2*vs + (vs + 2*d*vs)
+				vs_plus_2dvs += 2*vert_scale;
+				
+				// (d*vs + vs)^2 = (d*vs)^2 + 2*d*vs*vs + vs*vs = (d*vs)^2 + vs*(vs + 2*d*vs)
+				dvs_squared += vert_scale * vs_plus_2dvs;
+				if (dvs_squared < *p_sqdist) {
+					*p_sqdist = dvs_squared;
+					p_region->setLabel(closest_label);
+				}
+			}
+
+			p_region -= region_stride;
+			p_sqdist -= sqdist_stride;
+		}
+	}
+
+	class SqDistCalc
+	{
+	public:
+		SqDistCalc(uint32_t const* vert_sqdists) : m_vertSqdists(vert_sqdists) {}
+
+		uint32_t operator()(int elevated_x, int ground_x) const {
+			uint32_t const dx = elevated_x - ground_x;
+			return dx*dx + m_vertSqdists[elevated_x];
+		}
+	private:
+		uint32_t const* m_vertSqdists;
+	};
+
+	boost::scoped_array<uint32_t> orig_labels(new uint32_t[width]);
+	boost::scoped_array<ProximityRegion> prx_regs(new ProximityRegion[width]);
+	
+	// Horizontal pass.
+	GridNode* region_line = region_data;
+	uint32_t* sqdist_line = sqdist_data;
+	for (int y = 0; y < height; ++y) {
+		SqDistCalc const sqdist(sqdist_line);
+
+		ProximityRegion* next_reg = prx_regs.get();
+		next_reg->xOrigin = 0;
+		next_reg->xMaybeLeader = 0;
+
+		for (int x = 1; x < width; ++x) {
+			while (sqdist_line[next_reg->xOrigin] == INF_SQDIST || (sqdist_line[x] != INF_SQDIST &&
+				sqdist(next_reg->xOrigin, next_reg->xMaybeLeader) > sqdist(x, next_reg->xMaybeLeader))) {
+				
+				// This means next_reg will never win over a ProximityRegion with xOrigin == x
+				// and therefore can be discarded.
+				
+				if (next_reg != prx_regs.get()) {
+					--next_reg;
+				} else {
+					next_reg->xOrigin = x;
+					break;
+				}
+			}
+
+			int const next_x = next_reg->xOrigin;
+			if (x != next_x) {
+				if (sqdist_line[x] != INF_SQDIST) {
+					// Calculate where a ProximityRegion with xOrigin at x will
+					// take over next_reg.  Note that it can't turn out it's
+					// already taken over, as that's handled by the loop above.
+					int x_take_over = 0;
+					
+					if (sqdist_line[next_x] != INF_SQDIST) {
+						x_take_over = x * x - next_x * next_x + sqdist_line[x] - sqdist_line[next_x];
+						x_take_over /= (x - next_x) * 2;
+						++x_take_over;
+					}
+					
+					if ((unsigned)x_take_over < (unsigned)width) {
+						// The above if also handles the case when x_take_over < 0.
+						++next_reg;
+						next_reg->xOrigin = x;
+						next_reg->xMaybeLeader = x_take_over;
+					}
+				}
+			}
+		}
+		
+		// Create a copy of labels for this line.
+		for (int x = 0; x < width; ++x) {
+			orig_labels[x] = region_line[x].label();
+		}
+		
+		for (int x = width - 1; x >= 0; --x) {
+			assert(next_reg->xOrigin >= 0 && next_reg->xOrigin < width);
+			region_line[x].setLabel(orig_labels[next_reg->xOrigin]);
+			if (next_reg->xMaybeLeader == x) {
+				--next_reg;
+			}
+		}
+
+		region_line += region_stride;
+		sqdist_line += sqdist_stride;
+	}
+}
+
+
 /**
  * Goes along the vertical bounds and marks regions they pass through
  * as leftmost or rightmost (could even be both).
@@ -820,15 +1040,20 @@ TextLineTracer::markEdgeRegions(
 		if (hor_line.intersect(left_bound, &left_intersection) != QLineF::NoIntersection) {
 			left_x = qBound<int>(0, qRound(left_intersection.x()), width - 1);
 		}
+		GridNode const& left_node = grid_line[left_x];
+		if (left_node.validRegion()) {
+			regions[left_node.regionIdx()].leftmost = true;
+		}
 
 		int right_x = width - 1;
 		QPointF right_intersection;
 		if (hor_line.intersect(right_bound, &right_intersection) != QLineF::NoIntersection) {
 			right_x = qBound<int>(0, qRound(right_intersection.x()), width - 1);
 		}
-
-		regions[grid_line[left_x].regionIdx()].leftmost = true;
-		regions[grid_line[right_x].regionIdx()].rightmost = true;
+		GridNode const& right_node = grid_line[right_x];
+		if (right_node.validRegion()) {
+			regions[right_node.regionIdx()].rightmost = true;
+		}
 	}
 }
 
@@ -1516,11 +1741,11 @@ TextLineTracer::visualizeRegions(Grid<GridNode> const& grid)
 
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
-			uint32_t const region_idx = grid_line[x].regionIdx();
-			if (region_idx == GridNode::INVALID_REGION_IDX) {
+			uint32_t const label = grid_line[x].label();
+			if (label == GridNode::INVALID_LABEL) {
 				canvas_line[x] = 0; // transparent
 			} else {
-				canvas_line[x] = colorForId(region_idx).rgba();
+				canvas_line[x] = colorForId(label).rgba();
 			}
 		}
 		grid_line += grid_stride;
