@@ -52,12 +52,12 @@ Joseph Artsimovich - Russisch
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="153"/>
         <source>Contributors</source>
         <translation>Mitwirkende</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="156"/>
+        <location filename="../ui/AboutDialog.ui" line="160"/>
         <source>U235 - Picture auto-detection algorithm.
 Robert B. - Dewarping algorithm.
 Andrey Bergman - System load adjustment.
@@ -67,12 +67,12 @@ Robert B. - Dewarping-Algorithmus.
 Andrey Bergman - Einstellen der Systemauslastung.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="169"/>
+        <location filename="../ui/AboutDialog.ui" line="173"/>
         <source>Documentation</source>
         <translation>Dokumentation</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="176"/>
+        <location filename="../ui/AboutDialog.ui" line="180"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -81,7 +81,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="203"/>
+        <location filename="../ui/AboutDialog.ui" line="207"/>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
@@ -315,80 +315,80 @@ Taxman</translation>
         <translation>Aus dem Projekt entfernen ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="931"/>
+        <location filename="../MainWindow.cpp" line="935"/>
         <source>Insert here ...</source>
         <translation>Hier einfügen ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1222"/>
-        <location filename="../MainWindow.cpp" line="1290"/>
+        <location filename="../MainWindow.cpp" line="1226"/>
+        <location filename="../MainWindow.cpp" line="1294"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan-Tailor-Projekte</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1289"/>
+        <location filename="../MainWindow.cpp" line="1293"/>
         <source>Open Project</source>
         <translation>Projekt öffnen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1307"/>
-        <location filename="../MainWindow.cpp" line="1316"/>
-        <location filename="../MainWindow.cpp" line="1605"/>
-        <location filename="../MainWindow.cpp" line="1636"/>
-        <location filename="../MainWindow.cpp" line="1713"/>
+        <location filename="../MainWindow.cpp" line="1311"/>
+        <location filename="../MainWindow.cpp" line="1320"/>
+        <location filename="../MainWindow.cpp" line="1609"/>
+        <location filename="../MainWindow.cpp" line="1640"/>
+        <location filename="../MainWindow.cpp" line="1717"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1312"/>
         <source>Unable to open the project file.</source>
         <translation>Die Projektdatei kann nicht geöffnet werden.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1317"/>
+        <location filename="../MainWindow.cpp" line="1321"/>
         <source>The project file is broken.</source>
         <translation>Die Projektdatei ist beschädigt.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1501"/>
+        <location filename="../MainWindow.cpp" line="1505"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Ausgabe ist noch nicht möglich, da die schlußendliche Größe der Seiten noch nicht bekannt ist.
 Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt auswählen“ oder „Stege (Ränder)“.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1534"/>
+        <location filename="../MainWindow.cpp" line="1538"/>
         <source>Unnamed</source>
         <translation>Unbenannt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1543"/>
         <source>%1 - Scan Tailor %2</source>
         <translation>%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1606"/>
-        <location filename="../MainWindow.cpp" line="1637"/>
+        <location filename="../MainWindow.cpp" line="1610"/>
+        <location filename="../MainWindow.cpp" line="1641"/>
         <source>Error saving the project file!</source>
         <translation>Beim Speichern der Projektdatei ist ein Fehler aufgetreten!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1684"/>
+        <location filename="../MainWindow.cpp" line="1688"/>
         <source>File to insert</source>
         <translation>Einzufügende Datei</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1690"/>
+        <location filename="../MainWindow.cpp" line="1694"/>
         <source>Images not in project (%1)</source>
         <translation>Bilder befinden sich nicht im Projekt (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1714"/>
+        <location filename="../MainWindow.cpp" line="1718"/>
         <source>Error opening the image file.</source>
         <translation>Beim Öffnen der Bilddatei ist ein Fehler aufgetreten.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1754"/>
+        <location filename="../MainWindow.cpp" line="1758"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
@@ -815,6 +815,7 @@ zur Auswahl mehrerer Seiten.</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="382"/>
         <source>Change ...</source>
         <translation>Ändern ...</translation>
     </message>
@@ -834,8 +835,7 @@ zur Auswahl mehrerer Seiten.</translation>
         <translation>Helligkeit angleichen</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="281"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="393"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="496"/>
         <source>No despeckling</source>
         <translation>Kein Despeckling</translation>
     </message>
@@ -845,35 +845,36 @@ zur Auswahl mehrerer Seiten.</translation>
         <translation>Dewarp</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="344"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="526"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="299"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="629"/>
         <source>Apply To ...</source>
         <translation>Anwenden auf ...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="369"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="472"/>
         <source>Despeckling</source>
         <translation>Despeckling</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="418"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="521"/>
         <source>Cautious despeckling</source>
         <translation>Behutsames Despeckling</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="473"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="524"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="550"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="576"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="547"/>
         <source>Normal despeckling</source>
         <translation>Normales Despeckling</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="470"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="573"/>
         <source>Aggressive despeckling</source>
         <translation>Offensives Despeckling</translation>
     </message>
@@ -1524,7 +1525,7 @@ Benutzeroberläche verwenden</translation>
 <context>
     <name>output::FillZoneEditor</name>
     <message>
-        <location filename="../filters/output/FillZoneEditor.cpp" line="220"/>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
         <source>Pick color</source>
         <translation>Farbe wählen</translation>
     </message>
@@ -1540,22 +1541,22 @@ Benutzeroberläche verwenden</translation>
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
         <translation>Schwarzweiß</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
         <translation>Farbe/Graustufen</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
         <translation>Gemischt</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="386"/>
         <source>Apply Despeckling Level</source>
         <translation>Despeckling-Grad anwenden</translation>
     </message>
@@ -1563,32 +1564,32 @@ Benutzeroberläche verwenden</translation>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="450"/>
+        <location filename="../filters/output/Task.cpp" line="495"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Bildbereiche stehen nur im Gemischten Modus zur Verfügung.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="472"/>
+        <location filename="../filters/output/Task.cpp" line="547"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Despeckling kann im Farb-/Graustufenmodes nicht durchgeführt werden.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="489"/>
+        <location filename="../filters/output/Task.cpp" line="564"/>
         <source>Output</source>
         <translation>Ausgabe</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="490"/>
+        <location filename="../filters/output/Task.cpp" line="565"/>
         <source>Picture Zones</source>
         <translation>Bildbereiche</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="491"/>
+        <location filename="../filters/output/Task.cpp" line="566"/>
         <source>Fill Zones</source>
         <translation>Bereiche füllen</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="492"/>
+        <location filename="../filters/output/Task.cpp" line="568"/>
         <source>Despeckling</source>
         <translation>Despeckling</translation>
     </message>
