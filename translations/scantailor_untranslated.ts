@@ -30,30 +30,32 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="118"/>
-        <source>Joseph Artsimovich
-</source>
+        <source>Joseph Artsimovich</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="129"/>
+        <location filename="../ui/AboutDialog.ui" line="135"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+               Stefan Birkner - German
+               Angelo Gemmi - Italian
+               Masahiro Kitagawa - Japanese
+               Patrick Pascal - French
+               Joseph Artsimovich - Russian
+               Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="128"/>
         <source>Translators</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="136"/>
-        <source>Svetoslav Sashkov, Mandor - Bulgarian
-Masahiro Kitagawa - Japanese
-Joseph Artsimovich - Russian
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="151"/>
         <source>Contributors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="156"/>
+        <location filename="../ui/AboutDialog.ui" line="158"/>
         <source>U235 - Picture auto-detection algorithm.
 Robert B. - Dewarping algorithm.
 Andrey Bergman - System load adjustment.
@@ -61,19 +63,19 @@ Andrey Bergman - System load adjustment.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="169"/>
+        <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Documentation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="176"/>
+        <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>denver 22
 phaedrus
 Taxman</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="203"/>
+        <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>License</source>
         <translation type="unfinished"></translation>
     </message>
@@ -269,6 +271,24 @@ Taxman</source>
     </message>
 </context>
 <context>
+    <name>InteractiveXSpline</name>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <source>Click to create a new control point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <source>This point can be dragged.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <source>Drag this point or delete it by pressing Del or D.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LoadFileTask</name>
     <message>
         <location filename="../LoadFileTask.cpp" line="136"/>
@@ -306,79 +326,79 @@ Taxman</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="931"/>
+        <location filename="../MainWindow.cpp" line="935"/>
         <source>Insert here ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1222"/>
-        <location filename="../MainWindow.cpp" line="1290"/>
+        <location filename="../MainWindow.cpp" line="1226"/>
+        <location filename="../MainWindow.cpp" line="1294"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1289"/>
+        <location filename="../MainWindow.cpp" line="1293"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1307"/>
-        <location filename="../MainWindow.cpp" line="1316"/>
-        <location filename="../MainWindow.cpp" line="1605"/>
-        <location filename="../MainWindow.cpp" line="1636"/>
-        <location filename="../MainWindow.cpp" line="1713"/>
+        <location filename="../MainWindow.cpp" line="1311"/>
+        <location filename="../MainWindow.cpp" line="1320"/>
+        <location filename="../MainWindow.cpp" line="1609"/>
+        <location filename="../MainWindow.cpp" line="1640"/>
+        <location filename="../MainWindow.cpp" line="1717"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1312"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1317"/>
+        <location filename="../MainWindow.cpp" line="1321"/>
         <source>The project file is broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1501"/>
+        <location filename="../MainWindow.cpp" line="1505"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1534"/>
+        <location filename="../MainWindow.cpp" line="1538"/>
         <source>Unnamed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1543"/>
         <source>%1 - Scan Tailor %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1606"/>
-        <location filename="../MainWindow.cpp" line="1637"/>
+        <location filename="../MainWindow.cpp" line="1610"/>
+        <location filename="../MainWindow.cpp" line="1641"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1684"/>
+        <location filename="../MainWindow.cpp" line="1688"/>
         <source>File to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1690"/>
+        <location filename="../MainWindow.cpp" line="1694"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1714"/>
+        <location filename="../MainWindow.cpp" line="1718"/>
         <source>Error opening the image file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1754"/>
+        <location filename="../MainWindow.cpp" line="1758"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
@@ -686,6 +706,64 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
 </context>
 <context>
+    <name>OutputChangeDewarpingDialog</name>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
+        <source>Apply Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
+        <source>Auto (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <source>Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <source>Scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <source>This page only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <source>All pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <source>Selected pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>OutputChangeDpiDialog</name>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
@@ -742,6 +820,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="382"/>
         <source>Change ...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -761,46 +840,51 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="281"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="393"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="324"/>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="407"/>
+        <source>Depth perception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="496"/>
         <source>No despeckling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="303"/>
-        <source>Dewarp</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="344"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="526"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="299"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="629"/>
         <source>Apply To ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="369"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="472"/>
         <source>Despeckling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="418"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="521"/>
         <source>Cautious despeckling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="473"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="524"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="550"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="576"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="547"/>
         <source>Normal despeckling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="470"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="573"/>
         <source>Aggressive despeckling</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1433,9 +1517,17 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>output::DewarpingView</name>
+    <message>
+        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
+        <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>output::FillZoneEditor</name>
     <message>
-        <location filename="../filters/output/FillZoneEditor.cpp" line="220"/>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
         <source>Pick color</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1451,55 +1543,80 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="386"/>
         <source>Apply Despeckling Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="448"/>
+        <source>Apply Depth Perception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="618"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="621"/>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="624"/>
+        <source>Manual</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="450"/>
+        <location filename="../filters/output/Task.cpp" line="495"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="472"/>
+        <location filename="../filters/output/Task.cpp" line="547"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="489"/>
+        <location filename="../filters/output/Task.cpp" line="564"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="490"/>
+        <location filename="../filters/output/Task.cpp" line="565"/>
         <source>Picture Zones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="491"/>
+        <location filename="../filters/output/Task.cpp" line="566"/>
         <source>Fill Zones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="492"/>
+        <location filename="../filters/output/Task.cpp" line="567"/>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="568"/>
         <source>Despeckling</source>
         <translation type="unfinished"></translation>
     </message>
