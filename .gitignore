@@ -1,3 +1,4 @@
 CMakeLists.txt.user*
 CMakeFiles
 *.qm
+*.h.moc
