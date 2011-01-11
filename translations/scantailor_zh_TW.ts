@@ -53,7 +53,7 @@
                Masahiro Kitagawa - Japanese
                Patrick Pascal - French
                Joseph Artsimovich - Russian
-               Davidson Wang - Traditional Chinese</source>
+               Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="149"/>
