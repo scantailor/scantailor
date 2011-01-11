@@ -28,33 +28,32 @@
         <source>Lead Developer</source>
         <translation>Chefentwickler</translation>
     </message>
-
     <message>
         <location filename="../ui/AboutDialog.ui" line="118"/>
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="129"/>
+        <location filename="../ui/AboutDialog.ui" line="128"/>
         <source>Translators</source>
         <translation>Übersetzer</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="136"/>
+        <location filename="../ui/AboutDialog.ui" line="135"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
-Stefan Birkner - German
-Angelo Gemmi - Italian
-Masahiro Kitagawa - Japanese
-Patrick Pascal - French
-Joseph Artsimovich - Russian
-Davidson Wang - Traditional Chinese</source>
+               Stefan Birkner - German
+               Angelo Gemmi - Italian
+               Masahiro Kitagawa - Japanese
+               Patrick Pascal - French
+               Joseph Artsimovich - Russian
+               Davidson Wang - Traditional Chinese</source>
         <translation>Svetoslav Sashkov, Mandor - Bulgarisch
-Stefan Birkner - Deutsch
-Angelo Gemmi - Italienisch
-Masahiro Kitagawa - Japanisch
-Patrick Pascal - Französisch
-Joseph Artsimovich - Russisch
-Davidson Wang - Chinesisch (Langzeichen)</translation>
+               Stefan Birkner - Deutsch
+               Angelo Gemmi - Italienisch
+               Masahiro Kitagawa - Japanisch
+               Patrick Pascal - Französisch
+               Joseph Artsimovich - Russisch
+               Davidson Wang - Chinesisch (Langzeichen)</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="153"/>
