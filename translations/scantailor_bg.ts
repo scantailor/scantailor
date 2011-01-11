@@ -30,8 +30,7 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="118"/>
-        <source>Joseph Artsimovich
-</source>
+        <source>Joseph Artsimovich</source>
         <translation>Йосиф Арцимович
 </translation>
     </message>
@@ -41,15 +40,21 @@
         <translation>Преводачи</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="136"/>
+        <location filename="../ui/AboutDialog.ui" line="135"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
-Masahiro Kitagawa - Japanese
-Joseph Artsimovich - Russian
-</source>
+               Stefan Birkner - German
+               Angelo Gemmi - Italian
+               Masahiro Kitagawa - Japanese
+               Patrick Pascal - French
+               Joseph Artsimovich - Russian
+               Davidson Wang - Traditional Chinese</source>
         <translation>Светослав Сашков, Mandor - Български
-Masahiro Kitagawa - Японски
-Йосиф Арцимович - Руски
-</translation>
+               Stefan Birkner - German
+               Angelo Gemmi - Italian
+               Masahiro Kitagawa - Японски
+               Patrick Pascal - French
+               Йосиф Арцимович - Руски
+               Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="149"/>
