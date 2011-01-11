@@ -115,8 +115,7 @@ font-weight: bold;</string>
            <item>
             <widget class="QLabel" name="label_5">
              <property name="text">
-              <string>Joseph Artsimovich
-</string>
+              <string>Joseph Artsimovich</string>
              </property>
             </widget>
            </item>
@@ -134,13 +133,12 @@ font-weight: bold;</string>
             <widget class="QLabel" name="label_8">
              <property name="text">
               <string>Svetoslav Sashkov, Mandor - Bulgarian
-Stefan Birkner - German
-Angelo Gemmi - Italian
-Masahiro Kitagawa - Japanese
-Patrick Pascal - French
-Joseph Artsimovich - Russian
-Davidson Wang - Traditional Chinese
-</string>
+               Stefan Birkner - German
+               Angelo Gemmi - Italian
+               Masahiro Kitagawa - Japanese
+               Patrick Pascal - French
+               Joseph Artsimovich - Russian
+               Davidson Wang - Traditional Chinese</string>
              </property>
             </widget>
            </item>
