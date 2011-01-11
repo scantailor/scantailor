@@ -115,7 +115,7 @@ font-weight: bold;</string>
            <item>
             <widget class="QLabel" name="label_5">
              <property name="text">
-              <string notr="true">Joseph Artsimovich
+              <string>Joseph Artsimovich
 </string>
              </property>
             </widget>
@@ -133,7 +133,7 @@ font-weight: bold;</string>
            <item>
             <widget class="QLabel" name="label_8">
              <property name="text">
-              <string notr="true">Svetoslav Sashkov, Mandor - Bulgarian
+              <string>Svetoslav Sashkov, Mandor - Bulgarian
 Stefan Birkner - German
 Angelo Gemmi - Italian
 Masahiro Kitagawa - Japanese
