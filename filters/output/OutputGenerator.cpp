@@ -1163,7 +1163,18 @@ OutputGenerator::processWithDewarping(
 void
 OutputGenerator::setupTrivialDistortionModel(DistortionModel& distortion_model) const
 {
-	QPolygonF const poly(m_toUncropped.inverted().map(QRectF(m_contentRect)));
+	
+	QPolygonF poly;
+	if (!m_contentRect.isEmpty()) {
+		poly = QRectF(m_contentRect);
+	} else {
+		poly << m_contentRect.topLeft() + QPointF(-0.5, -0.5);
+		poly << m_contentRect.topLeft() + QPointF(0.5, -0.5);
+		poly << m_contentRect.topLeft() + QPointF(0.5, 0.5);
+		poly << m_contentRect.topLeft() + QPointF(-0.5, 0.5);
+	}
+	poly = m_toUncropped.inverted().map(poly);
+	
 	std::vector<QPointF> top_polyline, bottom_polyline;
 	top_polyline.push_back(poly[0]); // top-left
 	top_polyline.push_back(poly[1]); // top-right
@@ -1226,6 +1237,11 @@ OutputGenerator::dewarp(
 			dewarper, orig_to_src * src_to_output, outputContentRect()
 		).toRect()
 	);
+	if (model_domain.isEmpty()) {
+		GrayImage out(src.size());
+		out.fill(0xff); // white
+		return out;
+	}
 
 	return RasterDewarper::dewarp(
 		src, m_cropRect.size(), dewarper, model_domain, bg_color

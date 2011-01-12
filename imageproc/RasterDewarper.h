@@ -22,7 +22,7 @@
 class CylindricalSurfaceDewarper;
 class QImage;
 class QSize;
-class QRect;
+class QRectF;
 class QColor;
 
 namespace imageproc
@@ -34,7 +34,7 @@ public:
 	static QImage dewarp(
 		QImage const& src, QSize const& dst_size,
 		CylindricalSurfaceDewarper const& distortion_model,
-		QRect const& model_domain, QColor const& background_color
+		QRectF const& model_domain, QColor const& background_color
 	);
 };
 

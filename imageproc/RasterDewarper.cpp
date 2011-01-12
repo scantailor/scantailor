@@ -49,7 +49,7 @@ void dewarpGeneric(
 	int const src_stride, PixelType* const dst_data,
 	QSize const dst_size, int const dst_stride,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, PixelType const bg_color)
+	QRectF const& model_domain, PixelType const bg_color)
 {
 	int const src_width = src_size.width();
 	int const src_height = src_size.height();
@@ -96,7 +96,7 @@ void dewarpGeneric(
 	int const src_stride, PixelType* const dst_data,
 	QSize const dst_size, int const dst_stride,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, PixelType const bg_color)
+	QRectF const& model_domain, PixelType const bg_color)
 {
 	int const src_width = src_size.width();
 	int const src_height = src_size.height();
@@ -414,7 +414,7 @@ void dewarpGeneric(
 	int const src_stride, PixelType* const dst_data,
 	QSize const dst_size, int const dst_stride,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, PixelType const bg_color)
+	QRectF const& model_domain, PixelType const bg_color)
 {
 	int const src_width = src_size.width();
 	int const src_height = src_size.height();
@@ -469,7 +469,7 @@ typedef unsigned MixingWeight;
 QImage dewarpGrayscale(
 	QImage const& src, QSize const& dst_size,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, QColor const& bg_color)
+	QRectF const& model_domain, QColor const& bg_color)
 {
 	GrayImage dst(dst_size);
 	uint8_t const bg_sample = qGray(bg_color.rgb());
@@ -485,7 +485,7 @@ QImage dewarpGrayscale(
 QImage dewarpRgb(
 	QImage const& src, QSize const& dst_size,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, QColor const& bg_color)
+	QRectF const& model_domain, QColor const& bg_color)
 {
 	QImage dst(dst_size, QImage::Format_RGB32);
 	dst.fill(bg_color.rgb());
@@ -500,7 +500,7 @@ QImage dewarpRgb(
 QImage dewarpArgb(
 	QImage const& src, QSize const& dst_size,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, QColor const& bg_color)
+	QRectF const& model_domain, QColor const& bg_color)
 {
 	QImage dst(dst_size, QImage::Format_ARGB32);
 	dst.fill(bg_color.rgba());
@@ -518,8 +518,12 @@ QImage
 RasterDewarper::dewarp(
 	QImage const& src, QSize const& dst_size,
 	CylindricalSurfaceDewarper const& distortion_model,
-	QRect const& model_domain, QColor const& bg_color)
+	QRectF const& model_domain, QColor const& bg_color)
 {
+	if (model_domain.isEmpty()) {
+		throw std::invalid_argument("RasterDewarper: model_domain is empty.");
+	}
+
 	switch (src.format()) {
 		case QImage::Format_Invalid:
 			return QImage();
