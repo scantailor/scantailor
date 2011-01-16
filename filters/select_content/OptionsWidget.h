@@ -26,6 +26,8 @@
 #include "Dependencies.h"
 #include "PhysSizeCalc.h"
 #include "PageId.h"
+#include "PageSelectionAccessor.h"
+#include "Params.h"
 #include <QSizeF>
 #include <QRectF>
 #include <memory>
@@ -70,7 +72,8 @@ public:
 		AutoManualMode m_mode;
 	};
 	
-	OptionsWidget(IntrusivePtr<Settings> const& settings);
+	OptionsWidget(IntrusivePtr<Settings> const& settings,
+		PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~OptionsWidget();
 	
@@ -80,6 +83,10 @@ public:
 public slots:
 	void manualContentRectSet(QRectF const& content_rect);
 private slots:
+	void showApplyToDialog();
+
+	void applySelection(std::set<PageId> const& pages);
+
 	void modeChanged(bool auto_mode);
 private:
 	void updateModeIndication(AutoManualMode const mode);
@@ -88,6 +95,7 @@ private:
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	UiData m_uiData;
+	PageSelectionAccessor m_pageSelectionAccessor;
 	PageId m_pageId;
 	int m_ignoreAutoManualToggle;
 };

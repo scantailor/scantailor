@@ -13,6 +13,7 @@ SET(
 	ImageView.cpp ImageView.h
 	Filter.cpp Filter.h
 	OptionsWidget.cpp OptionsWidget.h
+	ApplyDialog.cpp ApplyDialog.h
 	ContentBoxFinder.cpp ContentBoxFinder.h
 	Task.cpp Task.h
 	CacheDrivenTask.cpp CacheDrivenTask.h

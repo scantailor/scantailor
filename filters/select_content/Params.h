@@ -39,6 +39,8 @@ public:
 	Params(QRectF const& rect, QSizeF const& size_mm,
 		Dependencies const& deps, AutoManualMode mode);
 	
+	Params(Dependencies const& deps);
+	
 	Params(QDomElement const& filter_el);
 	
 	~Params();

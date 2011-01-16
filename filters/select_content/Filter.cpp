@@ -39,11 +39,14 @@
 namespace select_content
 {
 
-Filter::Filter()
+Filter::Filter(
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings),
 	m_selectedPageOrder(0)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
+	m_ptrOptionsWidget.reset(
+		new OptionsWidget(m_ptrSettings, page_selection_accessor)
+	);
 
 	typedef PageOrderOption::ProviderPtr ProviderPtr;
 

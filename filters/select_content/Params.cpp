@@ -35,6 +35,11 @@ Params::Params(
 {
 }
 
+Params::Params(Dependencies const& deps)
+:	m_deps(deps)
+{
+}
+
 Params::Params(QDomElement const& filter_el)
 :	m_contentRect(
 		XmlUnmarshaller::rectF(

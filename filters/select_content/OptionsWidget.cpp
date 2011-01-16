@@ -18,20 +18,26 @@
 
 #include "OptionsWidget.h"
 #include "OptionsWidget.h.moc"
+#include "ApplyDialog.h"
 #include "Settings.h"
 #include "Params.h"
 #include "ScopedIncDec.h"
+#include <boost/foreach.hpp>
 
 namespace select_content
 {
 
-OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+OptionsWidget::OptionsWidget(
+	IntrusivePtr<Settings> const& settings,
+	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
+	m_pageSelectionAccessor(page_selection_accessor),
 	m_ignoreAutoManualToggle(0)
 {
 	setupUi(this);
 	
 	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+	connect(applyToBtn, SIGNAL(clicked()), this, SLOT(showApplyToDialog()));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -108,6 +114,37 @@ OptionsWidget::commitCurrentParams()
 	m_ptrSettings->setPageParams(m_pageId, params);
 }
 
+void
+OptionsWidget::showApplyToDialog()
+{
+	ApplyDialog* dialog = new ApplyDialog(
+		this, m_pageId, m_pageSelectionAccessor
+	);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	connect(
+		dialog, SIGNAL(applySelection(std::set<PageId> const&)),
+		this, SLOT(applySelection(std::set<PageId> const&))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::applySelection(std::set<PageId> const& pages)
+{
+	if (pages.empty()) {
+		return;
+	}
+	
+	Params const params(
+		m_uiData.contentRect(), m_uiData.contentSizeMM(),
+		m_uiData.dependencies(), m_uiData.mode()
+	);
+
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		m_ptrSettings->setPageParams(page_id, params);
+		emit invalidateThumbnail(page_id);
+	}
+}
 
 /*========================= OptionsWidget::UiData ======================*/
 

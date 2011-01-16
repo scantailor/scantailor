@@ -92,7 +92,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	Dependencies const deps(data.xform().resultingCropArea());
 	
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	if (params.get() && !params->dependencies().matches(deps)) {
+	if (params.get() && !params->dependencies().matches(deps) && params->mode() == MODE_AUTO) {
 		params.reset();
 	}
 	
@@ -101,14 +101,14 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 	if (params.get()) {
 		ui_data.setContentRect(params->contentRect());
-		ui_data.setDependencies(params->dependencies());
+		ui_data.setDependencies(deps);
 		ui_data.setMode(params->mode());
 
 		if (params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty()) {
 			// Backwards compatibilty: put the missing data where it belongs.
 			Params const new_params(
 				ui_data.contentRect(), ui_data.contentSizeMM(),
-				params->dependencies(), params->mode()
+				deps, params->mode()
 			);
 			m_ptrSettings->setPageParams(m_pageId, new_params);
 		}

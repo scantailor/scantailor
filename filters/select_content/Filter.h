@@ -30,6 +30,7 @@
 #include <vector>
 
 class PageId;
+class PageSelectionAccessor;
 class QString;
 
 namespace page_layout
@@ -51,7 +52,7 @@ class Filter : public AbstractFilter
 	DECLARE_NON_COPYABLE(Filter)
 	Q_DECLARE_TR_FUNCTIONS(select_content::Filter)
 public:
-	Filter();
+	Filter(PageSelectionAccessor const& page_selection_accessor);
 	
 	virtual ~Filter();
 	
