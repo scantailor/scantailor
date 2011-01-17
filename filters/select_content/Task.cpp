@@ -104,14 +104,11 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		ui_data.setDependencies(deps);
 		ui_data.setMode(params->mode());
 
-		if (params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty()) {
-			// Backwards compatibilty: put the missing data where it belongs.
-			Params const new_params(
-				ui_data.contentRect(), ui_data.contentSizeMM(),
-				deps, params->mode()
-			);
-			m_ptrSettings->setPageParams(m_pageId, new_params);
-		}
+		Params const new_params(
+			ui_data.contentRect(), ui_data.contentSizeMM(),
+			deps, params->mode()
+		);
+		m_ptrSettings->setPageParams(m_pageId, new_params);
 	} else {
 		QRectF const content_rect(
 			ContentBoxFinder::findContentBox(
