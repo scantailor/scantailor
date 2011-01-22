@@ -19,6 +19,7 @@
 #include "Settings.h"
 #include "Utils.h"
 #include <QMutexLocker>
+#include <boost/foreach.hpp>
 
 namespace deskew
 {
@@ -62,6 +63,15 @@ Settings::getPageParams(PageId const& page_id) const
 		return std::auto_ptr<Params>(new Params(it->second));
 	} else {
 		return std::auto_ptr<Params>();
+	}
+}
+
+void
+Settings::setDegress(std::set<PageId> const& pages, Params const& params)
+{
+	QMutexLocker const locker(&m_mutex);
+	BOOST_FOREACH(PageId const& page, pages) {
+		Utils::mapSetValue(m_perPageParams, page, params);
 	}
 }
 

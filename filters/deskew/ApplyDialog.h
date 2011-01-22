@@ -1,7 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
     Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -16,43 +15,40 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DESKEW_SETTINGS_H_
-#define DESKEW_SETTINGS_H_
+#ifndef DESKEW_APPLYDIALOG_H_
+#define DESKEW_APPLYDIALOG_H_
 
-#include "RefCountable.h"
-#include "NonCopyable.h"
+#include "ui_DeskewApplyDialog.h"
 #include "PageId.h"
-#include "Params.h"
-#include <QMutex>
-#include <memory>
-#include <map>
+#include "PageSequence.h"
+#include "IntrusivePtr.h"
+#include <QDialog>
 #include <set>
+
+class QButtonGroup;
+class PageSelectionAccessor;
 
 namespace deskew
 {
 
-class Settings : public RefCountable
+class ApplyDialog : public QDialog, private Ui::DeskewApplyDialog
 {
-	DECLARE_NON_COPYABLE(Settings)
+	Q_OBJECT
 public:
-	Settings();
+	ApplyDialog(QWidget* parent, PageId const& cur_page,
+		PageSelectionAccessor const& page_selection_accessor);
 	
-	virtual ~Settings();
-	
-	void clear();
-	
-	void setPageParams(PageId const& page_id, Params const& params);
-	
-	void clearPageParams(PageId const& page_id);
-	
-	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
-	
-	void setDegress(std::set<PageId> const& pages, Params const& params);
+	virtual ~ApplyDialog();
+signals:
+	void appliedTo(std::set<PageId> const& pages);
+	void appliedToAllPages(std::set<PageId> const& pages);
+private slots:
+	void onSubmit();
 private:
-	typedef std::map<PageId, Params> PerPageParams;
-	
-	mutable QMutex m_mutex;
-	PerPageParams m_perPageParams;
+	PageSequence m_pages;
+	PageId m_curPage;
+	std::set<PageId> m_selectedPages;
+	QButtonGroup* m_pScopeGroup;
 };
 
 } // namespace deskew

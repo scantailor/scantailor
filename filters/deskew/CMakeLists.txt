@@ -19,6 +19,7 @@ SET(
 	CacheDrivenTask.cpp CacheDrivenTask.h
 	Dependencies.cpp Dependencies.h
 	Params.cpp Params.h
+	ApplyDialog.cpp ApplyDialog.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

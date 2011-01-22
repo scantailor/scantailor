@@ -36,10 +36,10 @@
 namespace deskew
 {
 
-Filter::Filter()
+Filter::Filter(PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings));
+	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings, page_selection_accessor));
 }
 
 Filter::~Filter()

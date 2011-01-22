@@ -23,16 +23,20 @@
 #include <QString>
 #include <Qt>
 #include <math.h>
+#include "ApplyDialog.h"
+#include <boost/foreach.hpp>
 
 namespace deskew
 {
 
 double const OptionsWidget::MAX_ANGLE = 45.0;
 
-OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
+OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings,
+						PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
 	m_ignoreAutoManualToggle(0),
-	m_ignoreSpinBoxChanges(0)
+	m_ignoreSpinBoxChanges(0),
+	m_pageSelectionAccessor(page_selection_accessor)
 {
 	setupUi(this);
 	angleSpinBox->setSuffix(QChar(0x00B0)); // the degree symbol
@@ -45,10 +49,65 @@ OptionsWidget::OptionsWidget(IntrusivePtr<Settings> const& settings)
 		this, SLOT(spinBoxValueChanged(double))
 	);
 	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+	connect(
+		applyDeskewBtn, SIGNAL(clicked()),
+		this, SLOT(showDeskewDialog())
+	);
 }
 
 OptionsWidget::~OptionsWidget()
 {
+}
+
+void
+OptionsWidget::showDeskewDialog()
+{
+	ApplyDialog* dialog = new ApplyDialog(
+		this, m_pageId, m_pageSelectionAccessor
+	);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowTitle(tr("Apply Deskew"));
+	connect(
+		dialog, SIGNAL(appliedTo(std::set<PageId> const&)),
+		this, SLOT(appliedTo(std::set<PageId> const&))
+	);
+	connect(
+		dialog, SIGNAL(appliedToAllPages(std::set<PageId> const&)),
+		this, SLOT(appliedToAllPages(std::set<PageId> const&))
+	);
+	dialog->show();
+}
+
+void
+OptionsWidget::appliedTo(std::set<PageId> const& pages)
+{
+	if (pages.empty()) {
+		return;
+	}
+	
+	Params const params(
+		m_uiData.effectiveDeskewAngle(),
+		m_uiData.dependencies(), m_uiData.mode()
+	);
+	m_ptrSettings->setDegress(pages, params);
+	BOOST_FOREACH(PageId const& page_id, pages) {
+		emit invalidateThumbnail(page_id);
+	}
+}
+
+void
+OptionsWidget::appliedToAllPages(std::set<PageId> const& pages)
+{
+	if (pages.empty()) {
+		return;
+	}
+	
+	Params const params(
+		m_uiData.effectiveDeskewAngle(),
+		m_uiData.dependencies(), m_uiData.mode()
+	);
+	m_ptrSettings->setDegress(pages, params);
+	emit invalidateAllThumbnails();
 }
 
 void

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>DeskewOptionsWidget</class>
- <widget class="QWidget" name="DeskewOptionsWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="DeskewOptionsWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,24 +10,24 @@
     <height>238</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Deskew</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout">
         <item>
          <spacer>
-          <property name="orientation" >
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>20</height>
@@ -35,40 +36,40 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="autoBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="autoBtn">
+          <property name="text">
            <string>Auto</string>
           </property>
-          <property name="checkable" >
+          <property name="checkable">
            <bool>true</bool>
           </property>
-          <property name="checked" >
+          <property name="checked">
            <bool>true</bool>
           </property>
-          <property name="autoExclusive" >
+          <property name="autoExclusive">
            <bool>true</bool>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="manualBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="manualBtn">
+          <property name="text">
            <string>Manual</string>
           </property>
-          <property name="checkable" >
+          <property name="checkable">
            <bool>true</bool>
           </property>
-          <property name="autoExclusive" >
+          <property name="autoExclusive">
            <bool>true</bool>
           </property>
          </widget>
         </item>
         <item>
          <spacer>
-          <property name="orientation" >
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>1</width>
             <height>20</height>
@@ -79,13 +80,13 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout">
         <item>
          <spacer>
-          <property name="orientation" >
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
             <height>20</height>
@@ -94,24 +95,61 @@
          </spacer>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="angleSpinBox" >
-          <property name="alignment" >
+         <widget class="QDoubleSpinBox" name="angleSpinBox">
+          <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
-          <property name="singleStep" >
+          <property name="singleStep">
            <double>0.010000000000000</double>
           </property>
          </widget>
         </item>
         <item>
          <spacer>
-          <property name="orientation" >
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
             <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <spacer name="horizontalSpacer_9">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>38</width>
+            <height>18</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="applyDeskewBtn">
+          <property name="text">
+           <string>Apply To ...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>28</width>
+            <height>18</height>
            </size>
           </property>
          </spacer>
@@ -123,10 +161,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
