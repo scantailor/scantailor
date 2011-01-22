@@ -104,11 +104,23 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		ui_data.setDependencies(deps);
 		ui_data.setMode(params->mode());
 
-		Params const new_params(
-			ui_data.contentRect(), ui_data.contentSizeMM(),
-			deps, params->mode()
-		);
-		m_ptrSettings->setPageParams(m_pageId, new_params);
+		if (!params->dependencies().matches(deps)) {
+			QRectF content_rect = ui_data.contentRect();
+			QPointF new_center= deps.rotatedPageOutline().boundingRect().center();
+			QPointF old_center = params->dependencies().rotatedPageOutline().boundingRect().center();
+
+			content_rect.translate(new_center - old_center);
+			ui_data.setContentRect(content_rect);
+		}
+
+		if (params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty() || !params->dependencies().matches(deps)) {
+			// Backwards compatibilty: put the missing data where it belongs.
+			Params const new_params(
+				ui_data.contentRect(), ui_data.contentSizeMM(),
+				deps, params->mode()
+			);
+			m_ptrSettings->setPageParams(m_pageId, new_params);
+		}
 	} else {
 		QRectF const content_rect(
 			ContentBoxFinder::findContentBox(
