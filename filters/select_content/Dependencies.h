@@ -46,6 +46,8 @@ public:
 	
 	~Dependencies();
 	
+	QPolygonF const& rotatedPageOutline() const { return m_rotatedPageOutline; }
+	
 	bool matches(Dependencies const& other) const;
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
