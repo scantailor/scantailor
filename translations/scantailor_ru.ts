@@ -152,7 +152,7 @@ Taxman</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ко всем страницам</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
@@ -195,7 +195,7 @@ Taxman</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
         <source>Apply To ...</source>
-        <translation type="unfinished">Применить к ...</translation>
+        <translation>Применить к ...</translation>
     </message>
 </context>
 <context>
@@ -1586,7 +1586,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ко всем страницам</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
@@ -1844,7 +1844,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
         <source>Apply Deskew</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Применить наклон</translation>
     </message>
 </context>
 <context>
