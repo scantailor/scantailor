@@ -71,5 +71,3 @@ English or Russian please.</source>
     </message>
 </context>
 </TS>
-
- 	  	 

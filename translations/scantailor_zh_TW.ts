@@ -15,31 +15,54 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
-        <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recogrnition is out of scope of this project.</source>
-        <translation></translation>
+        <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="87"/>
+        <location filename="../ui/AboutDialog.ui" line="101"/>
         <source>Authors</source>
         <translation>作者群</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="111"/>
+        <location filename="../ui/AboutDialog.ui" line="125"/>
         <source>Lead Developer</source>
         <translation>主要開發成員</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="118"/>
+        <location filename="../ui/AboutDialog.ui" line="132"/>
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="129"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Translators</source>
         <translation>翻譯人員</translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="135"/>
+        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
                Stefan Birkner - German
                Angelo Gemmi - Italian
@@ -47,7 +70,7 @@
                Patrick Pascal - French
                Joseph Artsimovich - Russian
                Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished">Svetoslav Sashkov, Mandor - Bulgarian
+        <translation type="obsolete">Svetoslav Sashkov, Mandor - Bulgarian
                Stefan Birkner - German
                Angelo Gemmi - Italian
                Masahiro Kitagawa - Japanese
@@ -56,28 +79,27 @@
                Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
         <source>Contributors</source>
         <translation>貢獻者</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="156"/>
         <source>U235 - Picture auto-detection algorithm.
 Robert B. - Dewarping algorithm.
 Andrey Bergman - System load adjustment.
 </source>
-        <translation>U235 - Picture 自動偵測演算法.
+        <translation type="obsolete">U235 - Picture 自動偵測演算法.
 Robert B. - Dewarping 演算法.
 Andrey Bergman - 系統負載調整.
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="169"/>
+        <location filename="../ui/AboutDialog.ui" line="190"/>
         <source>Documentation</source>
         <translation>文件製作</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="176"/>
+        <location filename="../ui/AboutDialog.ui" line="197"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -86,7 +108,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="203"/>
+        <location filename="../ui/AboutDialog.ui" line="224"/>
         <source>License</source>
         <translation>版權</translation>
     </message>
@@ -113,26 +135,64 @@ Taxman</translation>
     </message>
 </context>
 <context>
+    <name>DeskewApplyDialog</name>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="20"/>
+        <source>Apply to</source>
+        <translation type="unfinished">套用到</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
+        <source>This page only (already applied)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
+        <source>All pages</source>
+        <translation type="unfinished">所有頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished">本頁及以下的頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="59"/>
+        <source>Selected pages</source>
+        <translation type="unfinished">選擇的頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished">使用 Ctrl或Shift+滑鼠左鍵來選擇多個頁面.</translation>
+    </message>
+</context>
+<context>
     <name>DeskewOptionsWidget</name>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="14"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="19"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="20"/>
         <source>Deskew</source>
         <translation>糾偏</translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="40"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="41"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="56"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="57"/>
         <source>Manual</source>
         <translation>手動</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
+        <source>Apply To ...</source>
+        <translation type="unfinished">套用到...</translation>
     </message>
 </context>
 <context>
@@ -282,6 +342,24 @@ Taxman</translation>
     </message>
 </context>
 <context>
+    <name>InteractiveXSpline</name>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <source>Click to create a new control point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <source>This point can be dragged.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <source>Drag this point or delete it by pressing Del or D.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LoadFileTask</name>
     <message>
         <location filename="../LoadFileTask.cpp" line="136"/>
@@ -320,80 +398,80 @@ Taxman</translation>
         <translation>從專案中移除...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="931"/>
+        <location filename="../MainWindow.cpp" line="935"/>
         <source>Insert here ...</source>
         <translation>在此插入...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1222"/>
-        <location filename="../MainWindow.cpp" line="1290"/>
+        <location filename="../MainWindow.cpp" line="1226"/>
+        <location filename="../MainWindow.cpp" line="1294"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor 專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1289"/>
+        <location filename="../MainWindow.cpp" line="1293"/>
         <source>Open Project</source>
         <translation>開啟專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1307"/>
-        <location filename="../MainWindow.cpp" line="1316"/>
-        <location filename="../MainWindow.cpp" line="1605"/>
-        <location filename="../MainWindow.cpp" line="1636"/>
-        <location filename="../MainWindow.cpp" line="1713"/>
+        <location filename="../MainWindow.cpp" line="1311"/>
+        <location filename="../MainWindow.cpp" line="1320"/>
+        <location filename="../MainWindow.cpp" line="1610"/>
+        <location filename="../MainWindow.cpp" line="1641"/>
+        <location filename="../MainWindow.cpp" line="1718"/>
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1312"/>
         <source>Unable to open the project file.</source>
         <translation>無法開啟專案檔.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1317"/>
+        <location filename="../MainWindow.cpp" line="1321"/>
         <source>The project file is broken.</source>
         <translation>專案檔已毀損.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1501"/>
+        <location filename="../MainWindow.cpp" line="1506"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>目前無法輸出,因為沒有指定輸出的頁面範圍.
 請使用批次處理中的&quot;內容選擇&quot;或&quot;邊界&quot;項目來偵測與指定範圍.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1534"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Unnamed</source>
         <translation>未命名</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1544"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1606"/>
-        <location filename="../MainWindow.cpp" line="1637"/>
+        <location filename="../MainWindow.cpp" line="1611"/>
+        <location filename="../MainWindow.cpp" line="1642"/>
         <source>Error saving the project file!</source>
         <translation>儲存時發生錯誤!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1684"/>
+        <location filename="../MainWindow.cpp" line="1689"/>
         <source>File to insert</source>
         <translation>插入檔案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1690"/>
+        <location filename="../MainWindow.cpp" line="1695"/>
         <source>Images not in project (%1)</source>
         <translation>專案外的圖片 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1714"/>
+        <location filename="../MainWindow.cpp" line="1719"/>
         <source>Error opening the image file.</source>
         <translation>開啟影像時發生錯誤.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1754"/>
+        <location filename="../MainWindow.cpp" line="1759"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
@@ -702,6 +780,64 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
 </context>
 <context>
+    <name>OutputChangeDewarpingDialog</name>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
+        <source>Apply Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
+        <source>Mode</source>
+        <translation type="unfinished">模式</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
+        <source>Auto (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <source>Manual</source>
+        <translation type="unfinished">手動</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <source>Scope</source>
+        <translation type="unfinished">範圍</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <source>This page only</source>
+        <translation type="unfinished">只有這一頁</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <source>All pages</source>
+        <translation type="unfinished">所有頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished">本頁及以下的頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <source>Selected pages</source>
+        <translation type="unfinished">選擇的頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished">使用 Ctrl或Shift+滑鼠左鍵來選擇多個頁面.</translation>
+    </message>
+</context>
+<context>
     <name>OutputChangeDpiDialog</name>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
@@ -758,6 +894,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="419"/>
         <source>Change ...</source>
         <translation>變更...</translation>
     </message>
@@ -777,56 +914,65 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation>等化亮度</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="281"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="393"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <source>Depth perception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
         <source>No despeckling</source>
         <translation>不進行雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="303"/>
         <source>Dewarp</source>
-        <translation>消除彎曲變形</translation>
+        <translation type="obsolete">消除彎曲變形</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="344"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="526"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="336"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="484"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="666"/>
         <source>Apply To ...</source>
         <translation>套用到...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="369"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="509"/>
         <source>Despeckling</source>
         <translation>雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="418"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="558"/>
         <source>Cautious despeckling</source>
         <translation>輕微的雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="473"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="561"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="587"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="613"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="584"/>
         <source>Normal despeckling</source>
         <translation>普通的雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="470"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
         <source>Aggressive despeckling</source>
         <translation>強力的雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="237"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="274"/>
         <source>Thinner</source>
         <translation>較細的</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="269"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="306"/>
         <source>Thicker</source>
         <translation>較粗的</translation>
     </message>
@@ -1222,6 +1368,61 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>SelectContentApplyDialog</name>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="17"/>
+        <source>Select Content</source>
+        <translation type="unfinished">選擇內容</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
+        <source>Apply to</source>
+        <translation type="unfinished">套用到</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
+        <source>This page only (already applied)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
+        <source>All pages</source>
+        <translation type="unfinished">所有頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished">本頁及以下的頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
+        <source>Every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
+        <translation type="unfinished">所有其他頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="206"/>
+        <source>The current page will be included.</source>
+        <translation type="unfinished">將會包含目前的頁面.</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="125"/>
+        <source>Selected pages</source>
+        <translation type="unfinished">選擇的頁面</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished">使用 Ctrl或Shift+滑鼠左鍵來選擇多個頁面.</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
+        <source>Every other selected page</source>
+        <translation type="unfinished">所有其他選擇的頁面</translation>
+    </message>
+</context>
+<context>
     <name>SelectContentOptionsWidget</name>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="13"/>
@@ -1242,6 +1443,16 @@ p, li { white-space: pre-wrap; }
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="54"/>
         <source>Manual</source>
         <translation>手動</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
+        <source>Scope</source>
+        <translation type="unfinished">範圍</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
+        <source>Apply to ...</source>
+        <translation type="unfinished">套用到...</translation>
     </message>
 </context>
 <context>
@@ -1411,6 +1622,14 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>deskew::OptionsWidget</name>
+    <message>
+        <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
+        <source>Apply Deskew</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
@@ -1457,9 +1676,17 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>output::DewarpingView</name>
+    <message>
+        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
+        <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>output::FillZoneEditor</name>
     <message>
-        <location filename="../filters/output/FillZoneEditor.cpp" line="220"/>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
         <source>Pick color</source>
         <translation>挑選顏色</translation>
     </message>
@@ -1475,55 +1702,80 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
         <translation>單色(黑白)</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
         <translation>彩色 / 灰階</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
         <translation>混合</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
         <source>Apply Despeckling Level</source>
         <translation>套用雜點清除</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <source>Apply Depth Perception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <source>Auto</source>
+        <translation type="unfinished">自動</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <source>Manual</source>
+        <translation type="unfinished">手動</translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="450"/>
+        <location filename="../filters/output/Task.cpp" line="495"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>圖形範圍只能在混合模式中.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="472"/>
+        <location filename="../filters/output/Task.cpp" line="547"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>雜點清除無法在 彩色/灰階 模式中使用.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="489"/>
+        <location filename="../filters/output/Task.cpp" line="564"/>
         <source>Output</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="490"/>
+        <location filename="../filters/output/Task.cpp" line="565"/>
         <source>Picture Zones</source>
         <translation>圖片區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="491"/>
+        <location filename="../filters/output/Task.cpp" line="566"/>
         <source>Fill Zones</source>
         <translation>填滿區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="492"/>
+        <location filename="../filters/output/Task.cpp" line="567"/>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="568"/>
         <source>Despeckling</source>
         <translation>雜點清除</translation>
     </message>
@@ -1613,24 +1865,32 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>select_content::ApplyDialog</name>
+    <message>
+        <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished">無法進行動作: 超過一個以上的群組被選取.</translation>
+    </message>
+</context>
+<context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="53"/>
+        <location filename="../filters/select_content/Filter.cpp" line="56"/>
         <source>Natural order</source>
         <translation>自然排序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="54"/>
+        <location filename="../filters/select_content/Filter.cpp" line="57"/>
         <source>Order by increasing width</source>
         <translation>寬度遞增排序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="55"/>
+        <location filename="../filters/select_content/Filter.cpp" line="58"/>
         <source>Order by increasing height</source>
         <translation>高度遞增排序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="65"/>
+        <location filename="../filters/select_content/Filter.cpp" line="68"/>
         <source>Select Content</source>
         <translation>選擇內容</translation>
     </message>

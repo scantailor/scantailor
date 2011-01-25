@@ -14,33 +14,60 @@
         <translation>a proposito di...</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recogrnition is out of scope of this project.</source>
-        <translation>Scan Tailor è uno strumento di post-elaborazione per pagine scansionate. Effettua operazioni quali la suddivisione a metà delle pagine, la correzione dell'angolatura, l'aggiunta/rimozione dei margini, ed altro. Voi gli fornite una scansione grezza, e ne ottenete pagine pronte per essere assemblate in un PDF o in un file DJVU. La scansione ed il riconoscimento ottico dei caratteri esulano dallo scopo di questo progetto.</translation>
+        <translation type="obsolete">Scan Tailor è uno strumento di post-elaborazione per pagine scansionate. Effettua operazioni quali la suddivisione a metà delle pagine, la correzione dell&apos;angolatura, l&apos;aggiunta/rimozione dei margini, ed altro. Voi gli fornite una scansione grezza, e ne ottenete pagine pronte per essere assemblate in un PDF o in un file DJVU. La scansione ed il riconoscimento ottico dei caratteri esulano dallo scopo di questo progetto.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="87"/>
+        <location filename="../ui/AboutDialog.ui" line="33"/>
+        <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="101"/>
         <source>Authors</source>
         <translation>Autori</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="111"/>
+        <location filename="../ui/AboutDialog.ui" line="125"/>
         <source>Lead Developer</source>
         <translation>Sviluppatore Capo</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="118"/>
+        <location filename="../ui/AboutDialog.ui" line="132"/>
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="129"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Translators</source>
         <translation>Traduttori</translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="135"/>
+        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
                Stefan Birkner - German
                Angelo Gemmi - Italian
@@ -48,7 +75,7 @@
                Patrick Pascal - French
                Joseph Artsimovich - Russian
                Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished">Svetoslav Sashkov, Mandor - Bulgarian
+        <translation type="obsolete">Svetoslav Sashkov, Mandor - Bulgarian
                Stefan Birkner - German
                Angelo Gemmi - Italian
                Masahiro Kitagawa - Japanese
@@ -57,28 +84,27 @@
                Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
         <source>Contributors</source>
         <translation>Contributori</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="156"/>
         <source>U235 - Picture auto-detection algorithm.
 Robert B. - Dewarping algorithm.
 Andrey Bergman - System load adjustment.
 </source>
-        <translation>U235 - Algoritmo di autorilevamento dell'immagine.
+        <translation type="obsolete">U235 - Algoritmo di autorilevamento dell&apos;immagine.
 Robert B. - Algoritmo di correzione deformazioni.
 Andrey Bergman - regolazione carico di sistema.
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="169"/>
+        <location filename="../ui/AboutDialog.ui" line="190"/>
         <source>Documentation</source>
         <translation>Documentazione</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="176"/>
+        <location filename="../ui/AboutDialog.ui" line="197"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -87,7 +113,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="203"/>
+        <location filename="../ui/AboutDialog.ui" line="224"/>
         <source>License</source>
         <translation>Licenza</translation>
     </message>
@@ -110,30 +136,68 @@ Taxman</translation>
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation>Clicca su di un'area per prelevarne il suo proprio colore, o ESC per cancellare.</translation>
+        <translation>Clicca su di un&apos;area per prelevarne il suo proprio colore, o ESC per cancellare.</translation>
+    </message>
+</context>
+<context>
+    <name>DeskewApplyDialog</name>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="20"/>
+        <source>Apply to</source>
+        <translation type="unfinished">Applica a</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
+        <source>This page only (already applied)</source>
+        <translation type="unfinished">Solo questa pagina (già applicato)</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
+        <source>All pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="59"/>
+        <source>Selected pages</source>
+        <translation type="unfinished">Pagine selezionate</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished">Usa Ctrl+Click / Shift+Click per selezionare più pagine.</translation>
     </message>
 </context>
 <context>
     <name>DeskewOptionsWidget</name>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="13"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="14"/>
         <source>Form</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="19"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="20"/>
         <source>Deskew</source>
         <translation>Raddrizza</translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="40"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="41"/>
         <source>Auto</source>
         <translation>Automatico</translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="56"/>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="57"/>
         <source>Manual</source>
         <translation>Manuale</translation>
+    </message>
+    <message>
+        <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
+        <source>Apply To ...</source>
+        <translation type="unfinished">Applica a...</translation>
     </message>
 </context>
 <context>
@@ -287,6 +351,24 @@ Taxman</translation>
     </message>
 </context>
 <context>
+    <name>InteractiveXSpline</name>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <source>Click to create a new control point.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <source>This point can be dragged.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <source>Drag this point or delete it by pressing Del or D.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LoadFileTask</name>
     <message>
         <location filename="../LoadFileTask.cpp" line="136"/>
@@ -329,90 +411,90 @@ Taxman</translation>
         <translation>Rimuovi dal progetto...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="931"/>
+        <location filename="../MainWindow.cpp" line="935"/>
         <source>Insert here ...</source>
         <translation>Inserisci qui ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1222"/>
-        <location filename="../MainWindow.cpp" line="1290"/>
+        <location filename="../MainWindow.cpp" line="1226"/>
+        <location filename="../MainWindow.cpp" line="1294"/>
         <source>Scan Tailor Projects</source>
         <translation>Progetto Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1289"/>
+        <location filename="../MainWindow.cpp" line="1293"/>
         <source>Open Project</source>
         <translation>Apri progetto</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1307"/>
-        <location filename="../MainWindow.cpp" line="1316"/>
-        <location filename="../MainWindow.cpp" line="1605"/>
-        <location filename="../MainWindow.cpp" line="1636"/>
-        <location filename="../MainWindow.cpp" line="1713"/>
+        <location filename="../MainWindow.cpp" line="1311"/>
+        <location filename="../MainWindow.cpp" line="1320"/>
+        <location filename="../MainWindow.cpp" line="1610"/>
+        <location filename="../MainWindow.cpp" line="1641"/>
+        <location filename="../MainWindow.cpp" line="1718"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1312"/>
         <source>Unable to open the project file.</source>
         <translation>Impossibile aprire il file del progetto.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1317"/>
+        <location filename="../MainWindow.cpp" line="1321"/>
         <source>The project file is broken.</source>
         <translation>Il file del progetto è danneggiato.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1501"/>
+        <location filename="../MainWindow.cpp" line="1506"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Non è ancora possibile produrre i file di output, in quanto la dimensione finale delle pagine non è ancora nota.
-Per determinarla, avvia l'elaborazione automatica a &quot;Seleziona contenuto&quot; o &quot;Margini&quot;.</translation>
+Per determinarla, avvia l&apos;elaborazione automatica a &quot;Seleziona contenuto&quot; o &quot;Margini&quot;.</translation>
     </message>
     <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation type="obsolete">Non è ancora possibile produrre i file di output, in quanto la dimensione finale delle pagine non è ancora nota.
-Per determinarla, avvia l'elaborazione automatica a &quot; o &quot; Conformazione pagina&quot;.</translation>
+Per determinarla, avvia l&apos;elaborazione automatica a &quot; o &quot; Conformazione pagina&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1534"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Unnamed</source>
         <translation>Senza nome</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1544"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1606"/>
-        <location filename="../MainWindow.cpp" line="1637"/>
+        <location filename="../MainWindow.cpp" line="1611"/>
+        <location filename="../MainWindow.cpp" line="1642"/>
         <source>Error saving the project file!</source>
         <translation>Errore nel salvataggio del file del progetto!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1684"/>
+        <location filename="../MainWindow.cpp" line="1689"/>
         <source>File to insert</source>
         <translation>File da inserire</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1690"/>
+        <location filename="../MainWindow.cpp" line="1695"/>
         <source>Images not in project (%1)</source>
         <translation>Immagini non nel progetto (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1714"/>
+        <location filename="../MainWindow.cpp" line="1719"/>
         <source>Error opening the image file.</source>
-        <translation>Errore nell'apertura del file immagine.</translation>
+        <translation>Errore nell&apos;apertura del file immagine.</translation>
     </message>
     <message>
         <source>%1 (page %2)</source>
         <translation type="obsolete">%1 (pagina %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1754"/>
+        <location filename="../MainWindow.cpp" line="1759"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
@@ -571,7 +653,7 @@ Per determinarla, avvia l'elaborazione automatica a &quot; o &quot; Conformazion
     <message>
         <location filename="../MainWindow.cpp" line="460"/>
         <source>Stop batch processing</source>
-        <translation>Arresta l'elaborazione automatica</translation>
+        <translation>Arresta l&apos;elaborazione automatica</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="322"/>
@@ -730,6 +812,64 @@ Per determinarla, avvia l'elaborazione automatica a &quot; o &quot; Conformazion
     </message>
 </context>
 <context>
+    <name>OutputChangeDewarpingDialog</name>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
+        <source>Apply Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
+        <source>Mode</source>
+        <translation type="unfinished">Modalità</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
+        <source>Auto (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <source>Manual</source>
+        <translation type="unfinished">Manuale</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <source>Scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <source>This page only</source>
+        <translation type="unfinished">Solo questa pagina</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <source>All pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <source>Selected pages</source>
+        <translation type="unfinished">Pagine selezionate</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished">Usa Ctrl+Click / Shift+Click per selezionare più pagine.</translation>
+    </message>
+</context>
+<context>
     <name>OutputChangeDpiDialog</name>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
@@ -786,6 +926,7 @@ Per determinarla, avvia l'elaborazione automatica a &quot; o &quot; Conformazion
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="419"/>
         <source>Change ...</source>
         <translation>Cambia...</translation>
     </message>
@@ -805,46 +946,55 @@ Per determinarla, avvia l'elaborazione automatica a &quot; o &quot; Conformazion
         <translation>Equalizza illuminazione</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="281"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="393"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <source>Depth perception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
         <source>No despeckling</source>
         <translation>No despeckling</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="303"/>
         <source>Dewarp</source>
-        <translation>Elimina curvatura</translation>
+        <translation type="obsolete">Elimina curvatura</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="344"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="526"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="336"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="484"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="666"/>
         <source>Apply To ...</source>
         <translation>Applica a...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="369"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="509"/>
         <source>Despeckling</source>
         <translation>Despeckling</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="418"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="558"/>
         <source>Cautious despeckling</source>
         <translation>Despeckling prudente</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="447"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="473"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="561"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="587"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="613"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="584"/>
         <source>Normal despeckling</source>
         <translation>НDespeckling normale</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="470"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
         <source>Aggressive despeckling</source>
         <translation>Despeckling agressivo</translation>
     </message>
@@ -853,12 +1003,12 @@ Per determinarla, avvia l'elaborazione automatica a &quot; o &quot; Conformazion
         <translation type="obsolete">Despeckle</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="237"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="274"/>
         <source>Thinner</source>
         <translation>Più sottile</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="269"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="306"/>
         <source>Thicker</source>
         <translation>Più spesso</translation>
     </message>
@@ -1299,6 +1449,61 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     </message>
 </context>
 <context>
+    <name>SelectContentApplyDialog</name>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="17"/>
+        <source>Select Content</source>
+        <translation type="unfinished">Seleziona contenuto</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
+        <source>Apply to</source>
+        <translation type="unfinished">Applica a</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
+        <source>This page only (already applied)</source>
+        <translation type="unfinished">Solo questa pagina (già applicato)</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
+        <source>All pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
+        <source>This page and the following ones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
+        <source>Every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
+        <translation type="unfinished">Ogni altra pagina</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="206"/>
+        <source>The current page will be included.</source>
+        <translation type="unfinished">La pagina corrente sarà inmclusa.</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="125"/>
+        <source>Selected pages</source>
+        <translation type="unfinished">Pagine selezionate</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
+        <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
+        <translation type="unfinished">Usa Ctrl+Click / Shift+Click per selezionare più pagine.</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
+        <source>Every other selected page</source>
+        <translation type="unfinished">Ogni altra pagina selezionata</translation>
+    </message>
+</context>
+<context>
     <name>SelectContentOptionsWidget</name>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="13"/>
@@ -1319,6 +1524,16 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="54"/>
         <source>Manual</source>
         <translation>Manuale</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
+        <source>Scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
+        <source>Apply to ...</source>
+        <translation type="unfinished">Applica a...</translation>
     </message>
 </context>
 <context>
@@ -1341,7 +1556,7 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     <message>
         <location filename="../ui/SettingsDialog.ui" line="20"/>
         <source>Use 3D acceleration for user interface</source>
-        <translation>Utilizza accelerazione 3D per l'interfaccia utente</translation>
+        <translation>Utilizza accelerazione 3D per l&apos;interfaccia utente</translation>
     </message>
 </context>
 <context>
@@ -1422,7 +1637,7 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="208"/>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
-        <translation>Unisci il primo e l'ultimo punto per completare la zona.  ESC per cancellare.</translation>
+        <translation>Unisci il primo e l&apos;ultimo punto per completare la zona.  ESC per cancellare.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="211"/>
@@ -1503,7 +1718,15 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
         <source>Drag this handle to rotate the image.</source>
-        <translation>Trascina questo per ruotare l'immagine.</translation>
+        <translation>Trascina questo per ruotare l&apos;immagine.</translation>
+    </message>
+</context>
+<context>
+    <name>deskew::OptionsWidget</name>
+    <message>
+        <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
+        <source>Apply Deskew</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1511,7 +1734,7 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more that one group is selected.</source>
-        <translation>Impossibile effettuare l'azione: più di un gruppo selezionato.</translation>
+        <translation>Impossibile effettuare l&apos;azione: più di un gruppo selezionato.</translation>
     </message>
 </context>
 <context>
@@ -1553,9 +1776,17 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     </message>
 </context>
 <context>
+    <name>output::DewarpingView</name>
+    <message>
+        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
+        <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>output::FillZoneEditor</name>
     <message>
-        <location filename="../filters/output/FillZoneEditor.cpp" line="220"/>
+        <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
         <source>Pick color</source>
         <translation>Seleziona colore</translation>
     </message>
@@ -1571,55 +1802,80 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="61"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
         <translation>Bianco e nero</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="62"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
         <translation>Colore / Scala di grigi</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
         <translation>Misto</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="408"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
         <source>Apply Despeckling Level</source>
         <translation>Applica livello di despeckling</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <source>Apply Depth Perception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <source>Auto</source>
+        <translation type="unfinished">Automatico</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <source>Manual</source>
+        <translation type="unfinished">Manuale</translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="450"/>
+        <location filename="../filters/output/Task.cpp" line="495"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Le zone immagini sonop disponibili solo nella  modalità mista.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="472"/>
+        <location filename="../filters/output/Task.cpp" line="547"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Il despeckling non può essere attuato in modalità colore / scala di grigi.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="489"/>
+        <location filename="../filters/output/Task.cpp" line="564"/>
         <source>Output</source>
         <translation>Output</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="490"/>
+        <location filename="../filters/output/Task.cpp" line="565"/>
         <source>Picture Zones</source>
         <translation>Zone immagini</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="491"/>
+        <location filename="../filters/output/Task.cpp" line="566"/>
         <source>Fill Zones</source>
         <translation>Zone di riempimento</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="492"/>
+        <location filename="../filters/output/Task.cpp" line="567"/>
+        <source>Dewarping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/Task.cpp" line="568"/>
         <source>Despeckling</source>
         <translation>Despeckling</translation>
     </message>
@@ -1721,24 +1977,32 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     </message>
 </context>
 <context>
+    <name>select_content::ApplyDialog</name>
+    <message>
+        <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished">Impossibile effettuare l&apos;azione: più di un gruppo selezionato.</translation>
+    </message>
+</context>
+<context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="53"/>
+        <location filename="../filters/select_content/Filter.cpp" line="56"/>
         <source>Natural order</source>
         <translation>Ordine naturale</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="54"/>
+        <location filename="../filters/select_content/Filter.cpp" line="57"/>
         <source>Order by increasing width</source>
         <translation>Ordina per larghezza crescente</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="55"/>
+        <location filename="../filters/select_content/Filter.cpp" line="58"/>
         <source>Order by increasing height</source>
         <translation>Ordina per altezza crescente</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="65"/>
+        <location filename="../filters/select_content/Filter.cpp" line="68"/>
         <source>Select Content</source>
         <translation>Seleziona contenuto</translation>
     </message>
