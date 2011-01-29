@@ -82,7 +82,7 @@ LinearSolver::solve(T const* A, T* X, T const* B, T* tbuffer, size_t* pbuffer) c
 {
 	using namespace std; // To catch different overloads of abs()
 
-	T const epsilon(numeric_limits<T>::epsilon() * 100);
+	T const epsilon(sqrt(numeric_limits<T>::epsilon()));
 
 	size_t const num_elements_A = m_rowsAB * m_colsArowsX;
 
