@@ -46,17 +46,20 @@ public:
 		QImage const& image, ImagePixmapUnion const& downscaled_image,
 		QTransform const& source_to_virt, QPolygonF const& virt_display_area,
 		QRectF const& virt_content_rect, PageId const& page_id,
-		IntrusivePtr<Settings> const& settings,
 		DewarpingMode dewarping_mode,
 		DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception);
 	
 	virtual ~DewarpingView();
+signals:
+	void distortionModelChanged(DistortionModel const& model);
 public slots:
 	void depthPerceptionChanged(double val);	
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
+	static void initNewSpline(imageproc::XSpline& spline, QPointF const& p1, QPointF const& p2);
+
 	void paintXSpline(
 		QPainter& painter, InteractionState const& interaction,
 		InteractiveXSpline const& ispline);
@@ -76,7 +79,6 @@ private:
 	DewarpingMode m_dewarpingMode;
 	DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
-	IntrusivePtr<Settings> m_ptrSettings;
 	InteractiveXSpline m_topSpline;
 	InteractiveXSpline m_bottomSpline;
 	DragHandler m_dragHandler;
