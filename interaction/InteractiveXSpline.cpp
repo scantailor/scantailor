@@ -215,23 +215,34 @@ InteractiveXSpline::controlPointMoveRequest(int idx, QPointF const& pos)
 {
 	QPointF const storage_pt(m_toStorage(pos));
 
-	if (idx == 0 || idx == m_spline.numControlPoints() - 1) {
+	int const num_control_points = m_spline.numControlPoints();
+	if (idx > 0 && idx < num_control_points - 1) {
+		// A midpoint - just move it.
+		m_spline.moveControlPoint(idx, storage_pt);
+	} else {
 		// An endpoint was moved.  Instead of moving it on its own,
 		// we are going to rotate and / or scale all of the points
 		// relative to the opposite endpoint.
-		int const origin_idx = idx == 0 ? m_spline.numControlPoints() - 1 : 0;
+		int const origin_idx = idx == 0 ? num_control_points - 1 : 0;
 		QPointF const origin(m_spline.controlPointPosition(origin_idx));
 		QPointF const old_pos(m_spline.controlPointPosition(idx));
-		Vec4d const mat(rotationAndScale(old_pos - origin, storage_pt - origin));
-		int const num_control_points = m_spline.numControlPoints();
-		for (int i = 0; i < num_control_points; ++i) {
-			Vec2d pt(m_spline.controlPointPosition(i) - origin);
-			MatrixCalc<double> mc;
-			(mc(mat, 2, 2)*mc(pt, 2, 1)).write(pt);
-			m_spline.moveControlPoint(i, pt + origin);
+		if (Vec2d(old_pos - origin).squaredNorm() > 1.0) {
+			// rotationAndScale() would throw an exception if old_pos == origin.
+			Vec4d const mat(rotationAndScale(old_pos - origin, storage_pt - origin));
+			for (int i = 0; i < num_control_points; ++i) {
+				Vec2d pt(m_spline.controlPointPosition(i) - origin);
+				MatrixCalc<double> mc;
+				(mc(mat, 2, 2)*mc(pt, 2, 1)).write(pt);
+				m_spline.moveControlPoint(i, pt + origin);
+			}
+		} else {
+			// Move the endpoint and distribute midpoints uniformly.
+			QLineF const line(origin, storage_pt);
+			double const scale = 1.0 / (num_control_points - 1);
+			for (int i = 0; i < num_control_points; ++i) {
+				m_spline.moveControlPoint(i, line.pointAt(i * scale));
+			}
 		}
-	} else {
-		m_spline.moveControlPoint(idx, storage_pt);
 	}
 
 	m_modifiedCallback();
