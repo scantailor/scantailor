@@ -1650,7 +1650,7 @@ Benutzeroberläche verwenden</translation>
     <name>fix_orientation::ApplyDialog</name>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Ausführung nicht möglich, da mehr als eine Gruppe ausgewählt ist.</translation>
     </message>
 </context>
@@ -1885,7 +1885,7 @@ Benutzeroberläche verwenden</translation>
     <name>select_content::ApplyDialog</name>
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation type="unfinished">Ausführung nicht möglich, da mehr als eine Gruppe ausgewählt ist.</translation>
     </message>
 </context>

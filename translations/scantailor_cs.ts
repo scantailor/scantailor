@@ -1334,7 +1334,7 @@ Vyjměte je z projektu.</translation>
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Nelze provést: je vybrána více než jedna skupina.</translation>
     </message>
 </context>
@@ -1520,7 +1520,7 @@ Vyjměte je z projektu.</translation>
 <context>
     <name>select_content::ApplyDialog</name>
     <message>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Nelze provést: je vybrána více než jedna skupina.</translation>
     </message>
 </context>

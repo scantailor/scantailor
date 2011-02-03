@@ -1733,7 +1733,7 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     <name>fix_orientation::ApplyDialog</name>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Impossibile effettuare l&apos;azione: più di un gruppo selezionato.</translation>
     </message>
 </context>
@@ -1980,7 +1980,7 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     <name>select_content::ApplyDialog</name>
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation type="unfinished">Impossibile effettuare l&apos;azione: più di un gruppo selezionato.</translation>
     </message>
 </context>

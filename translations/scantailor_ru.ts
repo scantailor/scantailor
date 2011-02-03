@@ -1863,7 +1863,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Невозможно: выбрано несколько групп страниц.</translation>
     </message>
 </context>
@@ -2190,7 +2190,7 @@ p, li { white-space: pre-wrap; }
     <name>select_content::ApplyDialog</name>
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation type="unfinished">Невозможно: выбрано несколько групп страниц.</translation>
     </message>
 </context>
