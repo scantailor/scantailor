@@ -70,7 +70,7 @@ bool
 OutputFileParams::matches(OutputFileParams const& other) const
 {
 	return isValid() && other.isValid() &&
-			m_size == other.m_size && m_mtime == other.m_mtime;
+			m_size == other.m_size/* && m_mtime == other.m_mtime*/;
 }
 
 } // namespace output
