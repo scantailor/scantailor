@@ -20,7 +20,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor はスキャンされたページを対話的にポストプロセッシングするツールです。ページ分割・傾き補正・余白の追加／除去などの操作ができます。スキャンされた生データから、印刷したり PDF や DJVU ファイルにまとめたりするのに向いたページを作ることができます。スキャン処理および光学文字認識はこのプロジェクトの対象範囲外です。</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="101"/>
@@ -52,7 +52,13 @@ Patrick Pascal - French
 Daniel Koć - Polish
 Joseph Artsimovich - Russian
 Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Svetoslav Sashkov, Mandor - ブルガリア語
+Stefan Birkner - ドイツ語
+Angelo Gemmi - イタリア語
+北川雅裕 - 日本語
+Patrick Pascal - フランス語
+Joseph Artsimovich - ロシア語
+Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="173"/>
@@ -75,12 +81,12 @@ p, li { white-space: pre-wrap; }
                Joseph Artsimovich - Russian
                Davidson Wang - Traditional Chinese</source>
         <translation type="obsolete">Svetoslav Sashkov, Mandor - ブルガリア語
-               Stefan Birkner - German
-               Angelo Gemmi - Italian
+               Stefan Birkner - ドイツ語
+               Angelo Gemmi - イタリア語
                北川雅裕 - 日本語
-               Patrick Pascal - French
+               Patrick Pascal - フランス語
                Joseph Artsimovich - ロシア語
-               Davidson Wang - Traditional Chinese</translation>
+               Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="166"/>
@@ -141,32 +147,32 @@ Taxman</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="20"/>
         <source>Apply to</source>
-        <translation type="unfinished">適用先...</translation>
+        <translation>適用先...</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished">このページのみ（適用済）</translation>
+        <translation>このページのみ（適用済）</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation type="unfinished">全ページ</translation>
+        <translation>全ページ</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">このページ以降</translation>
+        <translation>このページ以降</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="59"/>
         <source>Selected pages</source>
-        <translation type="unfinished">選択されたページ</translation>
+        <translation>選択されたページ</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
+        <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
     </message>
 </context>
 <context>
@@ -194,7 +200,7 @@ Taxman</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
         <source>Apply To ...</source>
-        <translation type="unfinished">適用先...</translation>
+        <translation>適用先...</translation>
     </message>
 </context>
 <context>
@@ -348,17 +354,17 @@ Taxman</source>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
         <source>Click to create a new control point.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリックすると新しいコントロールポイントを作成できます。</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>This point can be dragged.</source>
-        <translation type="unfinished"></translation>
+        <translation>このポイントはドラッグできます。</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
-        <translation type="unfinished"></translation>
+        <translation>このポイントはドラッグできます。Del または D を押すと削除できます。</translation>
     </message>
 </context>
 <context>
@@ -807,57 +813,57 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
         <source>Apply Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>歪み補正モードを適用</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
         <source>Mode</source>
-        <translation type="unfinished">モード</translation>
+        <translation>モード</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>オフ</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
         <source>Auto (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>自動（実験的）</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
         <source>Manual</source>
-        <translation type="unfinished">手動</translation>
+        <translation>手動</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
         <source>Scope</source>
-        <translation type="unfinished">適用範囲</translation>
+        <translation>適用範囲</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
         <source>This page only</source>
-        <translation type="unfinished">このページのみ</translation>
+        <translation>このページのみ</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
         <source>All pages</source>
-        <translation type="unfinished">全ページ</translation>
+        <translation>全ページ</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">このページ以降</translation>
+        <translation>このページ以降</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
         <source>Selected pages</source>
-        <translation type="unfinished">選択されたページ</translation>
+        <translation>選択されたページ</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
+        <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
     </message>
 </context>
 <context>
@@ -939,12 +945,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>歪み補正</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
         <source>Depth perception</source>
-        <translation type="unfinished"></translation>
+        <translation>距離感</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
@@ -1313,7 +1319,9 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
-        <translation>いくつかのファイルを読み込めませんでした。ファイル形式がサポートされていないか、ファイルが壊れています。これらをプロジェクトから取り除いてください。</translation>
+        <translation>いくつかのファイルを読み込めませんでした。
+ファイル形式がサポートされていないか、ファイルが壊れています。
+これらをプロジェクトから取り除いてください。</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="14"/>
@@ -1324,7 +1332,7 @@ You should remove them from the project.</source>
         <location filename="../ui/ProjectFilesDialog.ui" line="33"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="52"/>
         <source>Browse</source>
-        <translation>閲覧</translation>
+        <translation>参照</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="64"/>
@@ -1440,54 +1448,54 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="17"/>
         <source>Select Content</source>
-        <translation type="unfinished">版面を選択</translation>
+        <translation>版面を選択</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
         <source>Apply to</source>
-        <translation type="unfinished">適用先...</translation>
+        <translation>適用先...</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished">このページのみ（適用済）</translation>
+        <translation>このページのみ（適用済）</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation type="unfinished">全ページ</translation>
+        <translation>全ページ</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">このページ以降</translation>
+        <translation>このページ以降</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">1ページおき</translation>
+        <translation>1ページおき</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="206"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">現在のページは含まれます。</translation>
+        <translation>現在のページは含まれます。</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="125"/>
         <source>Selected pages</source>
-        <translation type="unfinished">選択されたページ</translation>
+        <translation>選択されたページ</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
+        <translation>Ctrl+クリック や Shift+クリック で複数ページを選択できます。</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">選択されたページで1ページおき</translation>
+        <translation>選択されたページで1ページおき</translation>
     </message>
 </context>
 <context>
@@ -1515,12 +1523,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
         <source>Scope</source>
-        <translation type="unfinished">適用範囲</translation>
+        <translation>適用範囲</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
         <source>Apply to ...</source>
-        <translation type="unfinished">適用先...</translation>
+        <translation>適用先...</translation>
     </message>
 </context>
 <context>
@@ -1713,7 +1721,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
         <source>Apply Deskew</source>
-        <translation type="unfinished"></translation>
+        <translation>傾き修正を適用</translation>
     </message>
 </context>
 <context>
@@ -1767,7 +1775,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/DewarpingView.cpp" line="78"/>
         <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動生成されたグリッドを変更する機能はまだ実装されていません。必要に応じて手動モードに切り替えてください。</translation>
     </message>
 </context>
 <context>
@@ -1811,22 +1819,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
         <source>Apply Depth Perception</source>
-        <translation type="unfinished"></translation>
+        <translation>遠近感を適用</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>オフ</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
         <source>Auto</source>
-        <translation type="unfinished">自動</translation>
+        <translation>自動</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
         <source>Manual</source>
-        <translation type="unfinished">手動</translation>
+        <translation>手動</translation>
     </message>
 </context>
 <context>
@@ -1859,7 +1867,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="567"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>歪み補正</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="568"/>
@@ -1960,7 +1968,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more that one group is selected.</source>
-        <translation type="unfinished">実行できません：複数のグループが選択されています。</translation>
+        <translation>実行できません：複数のグループが選択されています。</translation>
     </message>
 </context>
 <context>
