@@ -187,8 +187,8 @@ Curve::deserializeXSpline(QDomElement const& el)
 	}
 
 	if (xspline.numControlPoints() > 0) {
-		xspline.setControlPointWeight(0, 0);
-		xspline.setControlPointWeight(xspline.numControlPoints() - 1, 0);
+		xspline.setControlPointTension(0, 0);
+		xspline.setControlPointTension(xspline.numControlPoints() - 1, 0);
 	}
 
 	return xspline;

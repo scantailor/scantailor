@@ -30,6 +30,13 @@ public:
 	 */
 	Grid(int width, int height, int padding);
 
+	/**
+	 * \brief Creates a deep copy of another grid including padding.
+	 *
+	 * Stride is also preserved.
+	 */
+	Grid(Grid const& other);
+
 	void initPadding(Node const& padding_node);
 
 	void initInterior(Node const& interior_node);
@@ -92,6 +99,21 @@ Grid<Node>::Grid(int width, int height, int padding)
 	m_stride(width + padding*2),
 	m_padding(padding)
 {
+}
+
+template<typename Node>
+Grid<Node>::Grid(Grid const& other)
+:	m_storage(new Node[(other.stride() * (other.height() + other.padding() * 2))]),
+	m_pData(m_storage.get() + other.stride()*other.padding() + other.padding()),
+	m_width(other.width()),
+	m_height(other.height()),
+	m_stride(other.stride()),
+	m_padding(other.padding())
+{
+	int const len = m_stride * (m_height + m_padding * 2);
+	for (int i = 0; i < len; ++i) {
+		m_storage[i] = other.m_storage[i];
+	}
 }
 
 template<typename Node>

@@ -16,10 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCANTAILOR_VERSION_H_
-#define SCANTAILOR_VERSION_H_
+#ifndef SPFIT_POLYLINE_MODEL_SHAPE_H_
+#define SPFIT_POLYLINE_MODEL_SHAPE_H_
 
-#define VERSION "1.0.0beta9"
-#define VERSION_QUAD "" // Must be "x.x.x.x" or an empty string.
+#include "ModelShape.h"
+#include "SqDistApproximant.h"
+#include "XSpline.h"
+#include "VecNT.h"
+#include <QPointF>
+#include <QRectF>
+#include <vector>
+
+namespace spfit
+{
+
+class PolylineModelShape : public ModelShape
+{
+public:	
+	PolylineModelShape(std::vector<QPointF> const& polyline);
+
+	virtual QRectF boundingBox() const;
+
+	virtual SqDistApproximant localSqDistApproximant(QPointF const& pt, int flags = 0) const;
+private:
+	static SqDistApproximant calcApproximant(
+		Vec2d const& region_origin, Vec2d const& frenet_frame_origin,
+		Vec2d const& unit_tangent, Vec2f const& unit_normal, double curvature);
+
+	std::vector<imageproc::XSpline::PointAndDerivs> m_vertices;
+	QRectF m_boundingBox;
+};
+
+} // namespace spfit
 
 #endif

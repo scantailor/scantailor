@@ -193,6 +193,19 @@ OptionsWidget::tabChanged(ImageViewTab const tab)
 }
 
 void
+OptionsWidget::distortionModelChanged(DistortionModel const& model)
+{
+	m_ptrSettings->setDistortionModel(m_pageId, model);
+	
+	// Note that OFF remains OFF while AUTO becomes MANUAL.
+	if (m_dewarpingMode == DewarpingMode::AUTO) {
+		m_ptrSettings->setDewarpingMode(m_pageId, DewarpingMode::MANUAL);
+		m_dewarpingMode = DewarpingMode::MANUAL;
+		updateDewarpingDisplay();
+	}
+}
+
+void
 OptionsWidget::colorModeChanged(int const idx)
 {
 	int const mode = colorModeSelector->itemData(idx).toInt();
@@ -437,11 +450,29 @@ OptionsWidget::dewarpingChanged(std::set<PageId> const& pages, DewarpingMode con
 	if (pages.find(m_pageId) != pages.end()) {
 		if (m_dewarpingMode != mode) {
 			m_dewarpingMode = mode;
-			m_lastTab = TAB_OUTPUT; // Switch to Output after reloading.
-			updateDpiDisplay();
-			updateColorsDisplay();
-			updateDewarpingDisplay();
-			emit reloadRequested();
+			
+			// We reload when we switch to auto dewarping, even if we've just
+			// switched to manual, as we don't store the auto-generated distortion model.
+			// We also have to reload if we are currently on the "Fill Zones" tab,
+			// as it makes use of original <-> dewarped coordinate mapping,
+			// which is too hard to update without reloading.  For consistency,
+			// we reload not just on TAB_FILL_ZONES but on all tabs except TAB_DEWARPING.
+			// PS: the static original <-> dewarped mappings are constructed
+			// in Task::UiUpdater::updateUI().  Look for "new DewarpingPointMapper" there.
+			if (mode == DewarpingMode::AUTO || m_lastTab != TAB_DEWARPING) {
+				// Switch to the Output tab after reloading.
+				m_lastTab = TAB_OUTPUT; 
+
+				// These depend on the value of m_lastTab.
+				updateDpiDisplay();
+				updateColorsDisplay();
+				updateDewarpingDisplay();
+
+				emit reloadRequested();
+			} else {
+				// This one we have to call anyway, as it depends on m_dewarpingMode.
+				updateDewarpingDisplay();
+			}
 		}
 	}
 }
@@ -536,6 +567,9 @@ OptionsWidget::reloadIfNecessary()
 	} else if (saved_dewarping_mode == DewarpingMode::AUTO && params.dewarpingMode() == DewarpingMode::AUTO) {
 		// The check below doesn't matter in this case.
 	} else if (!saved_distortion_model.matches(params.distortionModel())) {
+		emit reloadRequested();
+		return;
+	} else if ((saved_dewarping_mode == DewarpingMode::OFF) != (params.dewarpingMode() == DewarpingMode::OFF)) {
 		emit reloadRequested();
 		return;
 	}

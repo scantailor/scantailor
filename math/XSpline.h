@@ -16,80 +16,150 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_XSPLINE_H_
-#define IMAGEPROC_XSPLINE_H_
+#ifndef XSPLINE_H_
+#define XSPLINE_H_
 
+#include "spfit/FittableSpline.h"
 #include "VirtualFunction.h"
-#include <boost/dynamic_bitset.hpp>
+#include "NumericTraits.h"
 #include <QPointF>
 #include <QLineF>
 #include <vector>
 
-namespace imageproc
+namespace imageproc // TODO: move it to the global namespace
 {
 
 /**
- * \brief An open, uniform X-Spline.
+ * \brief An open X-Spline.
+ *
+ * [1] Blanc, C., Schlick, C.: X-splines: a spline model designed for the end-user.
+ * http://scholar.google.com/scholar?cluster=2002168279173394147&hl=en&as_sdt=0,5
  */
-class XSpline
+class XSpline : public spfit::FittableSpline
 {
 public:
-	int numControlPoints() const;
+	struct PointAndDerivs
+	{
+		QPointF point;
+		QPointF firstDeriv;
+		QPointF secondDeriv;
 
+		double curvature() const;
+	};
+
+	virtual int numControlPoints() const;
+
+	/**
+	 * Returns the number of segments, that is spans between adjacent control points.
+	 * Because this class only deals with open splines, the number of segments
+	 * will always be max(0, numControlPoints() - 1).
+	 */
 	int numSegments() const;
 
-	void appendControlPoint(QPointF const& pos, double weight);
+	/**
+	 * \brief Appends a control point to the end of the spline.
+	 *
+	 * Tension values lie in the range of [-1, 1].
+	 * \li tension < 0 produces interpolating patches.
+	 * \li tension == 0 produces sharp angle interpolating patches.
+	 * \li tension > 0 produces approximating patches.
+	 */
+	void appendControlPoint(QPointF const& pos, double tension);
 
-	void insertControlPoint(int idx, QPointF const& pos, double weight);
+	/**
+	 * \brief Inserts a control at a specified position.
+	 *
+	 * \p idx is the position where the new control point will end up in.
+	 * The following control points will be shifted.
+	 */
+	void insertControlPoint(int idx, QPointF const& pos, double tension);
 
 	void eraseControlPoint(int idx);
 
-	QPointF controlPointPosition(int idx) const { return m_controlPoints[idx].pos; }
+	virtual QPointF controlPointPosition(int idx) const;
 
-	void moveControlPoint(int idx, QPointF const& pos);
+	virtual void moveControlPoint(int idx, QPointF const& pos);
 
-	void setControlPointWeight(int idx, double weight);
+	double controlPointTension(int idx) const;
 
-	QPointF eval(double t) const;
+	void setControlPointTension(int idx, double tension);
 
-	QPointF eval(int segment, double t) const;
+	/**
+	 * \brief Calculates a point on the spline at position t.
+	 *
+	 * \param t Position on a spline in the range of [0, 1].
+	 * \return Point on a spline.
+	 *
+	 * \note Calling this function with less then 2 control points
+	 *       leads to undefined behaviour.
+	 */
+	QPointF pointAt(double t) const;
+	
+	/**
+	 * \brief Calculates a point on the spline plus the first and the second derivatives at position t.
+	 */
+	PointAndDerivs pointAndDtsAt(double t) const;
 
+	/** \see spfit::FittableSpline::linearCombinationAt() */
+	virtual void linearCombinationAt(double t, std::vector<LinearCoefficient>& coeffs) const;
+	
+	/**
+	 * \brief Finds a point on the spline that's closest to a given point.
+	 *
+	 * \param to The point which we trying to minimize the distance to.
+	 * \param t If provided, the t value corresponding to the found point will be written there.
+	 * \param accuracy The maximum distance from the found point to the spline.
+	 * \return The closest point found.
+	 */
 	QPointF pointClosestTo(QPointF to, double* t, double accuracy = 0.2) const;
 
 	QPointF pointClosestTo(QPointF to, double accuracy = 0.2) const;
 
-	std::vector<QPointF> toPolyline(double accuracy = 0.2) const;
+	/** \see spfit::FittableSpline::sample() */
+	virtual void sample(
+		VirtualFunction2<void, QPointF, double>& sink,
+		SamplingParams const& params = SamplingParams()) const;
 
-	void fit(std::vector<QPointF> const& samples, boost::dynamic_bitset<> const* fixed_points = 0);
+	std::vector<QPointF> toPolyline(SamplingParams const& params = SamplingParams()) const;
 
 	void swap(XSpline& other) { m_controlPoints.swap(other.m_controlPoints); }
 private:
 	struct ControlPoint
 	{
 		QPointF pos;
-		double weight;
 
-		ControlPoint() : weight() {}
+		/**
+		 * Tension is in range of [-1 .. 1] and corresponds to sk as defined in section 5 of [1],
+		 * not to be confused with sk defined in section 4, which has a range of [0 .. 1].
+		 */
+		double tension;
 
-		ControlPoint(QPointF const& p, double w) : pos(p), weight(w) {}
+		ControlPoint() : tension(0) {}
+
+		ControlPoint(QPointF const& p, double tns) : pos(p), tension(tns) {}
 	};
 
-	static QPointF evalImpl(std::vector<ControlPoint> const& pts, double t);
+	struct TensionDerivedParams;
+	class GBlendFunc;
+	class HBlendFunc;
+	
+	QPointF pointAtImpl(int segment, double t) const;
 
-	void eval2Impl(double t, VirtualFunction2<void, int, double>& out) const;
+	int linearCombinationFor(LinearCoefficient* coeffs, int segment, double t) const;
 
-	void eval2Impl(int segment, double t, VirtualFunction2<void, int, double>& out) const;
+	PointAndDerivs pointAndDtsAtImpl(int segment, double t) const;
 
-	void maybeInsertMorePoints(
-		std::vector<QPointF>& polyline, double sq_accuracy,
-		int segment, double prev_t, QPointF const& prev_pt,
+	void maybeAddMoreSamples(
+		VirtualFunction2<void, QPointF, double>& sink,
+		double max_sqdist_to_spline, double max_sqdist_between_samples,
+		double r_num_segments, int segment,
+		double prev_t, QPointF const& prev_pt,
 		double next_t, QPointF const& next_pt) const;
 
 	static double sqDistToLine(QPointF const& pt, QLineF const& line);
 
 	std::vector<ControlPoint> m_controlPoints;
 };
-
 
 inline void swap(XSpline& o1, XSpline& o2)
 {

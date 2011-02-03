@@ -16,10 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCANTAILOR_VERSION_H_
-#define SCANTAILOR_VERSION_H_
+#ifndef SPFIT_MODEL_SHAPE_H_
+#define SPFIT_MODEL_SHAPE_H_
 
-#define VERSION "1.0.0beta9"
-#define VERSION_QUAD "" // Must be "x.x.x.x" or an empty string.
+#include "SqDistApproximant.h"
+#include <QPointF>
+#include <QRectF>
+
+namespace spfit
+{
+
+/**
+ * \brief A shape we are trying to fit a spline to.
+ *
+ * Could be a polyline or maybe a point cloud.
+ */
+class ModelShape
+{
+public:
+	enum Flags { SPLINE_HEAD = 1 << 0, SPLINE_TAIL = 1 << 1 };
+
+	virtual ~ModelShape() {}
+
+	virtual QRectF boundingBox() const = 0;
+
+	/**
+	 * Returns a function that approximates the squared distance to the model.
+	 * The function is only accurate in the neighbourhood of \p pt.
+	 */
+	virtual SqDistApproximant localSqDistApproximant(QPointF const& pt, int flags = 0) const = 0;
+};
+
+} // namespace spfit
 
 #endif

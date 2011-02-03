@@ -27,6 +27,8 @@
 #include "ToLineProjector.h"
 #include "XSpline.h"
 #include "CylindricalSurfaceDewarper.h"
+#include "spfit/SplineFitter.h"
+#include "spfit/PolylineModelShape.h"
 #include "imageproc/Constants.h"
 #include <QCursor>
 #include <QLineF>
@@ -53,7 +55,6 @@ DewarpingView::DewarpingView(
 	QImage const& image, ImagePixmapUnion const& downscaled_image,
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	QRectF const& virt_content_rect, PageId const& page_id,
-	IntrusivePtr<Settings> const& settings,
 	DewarpingMode dewarping_mode,
 	DistortionModel const& distortion_model,
 	DepthPerception const& depth_perception)
@@ -67,63 +68,66 @@ DewarpingView::DewarpingView(
 	m_dewarpingMode(dewarping_mode),
 	m_distortionModel(distortion_model),
 	m_depthPerception(depth_perception),
-	m_ptrSettings(settings),
 	m_dragHandler(*this),
 	m_zoomHandler(*this)	
 {
+	using namespace spfit;
+
 	setMouseTracking(true);
+	
+	QPolygonF const source_content_rect(virtualToImage().map(virt_content_rect));
 
-	if (dewarping_mode == DewarpingMode::AUTO) {
-		interactionState().setDefaultStatusTip(
-			tr("Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.")
-		);
-	} else {
-		QPolygonF const source_content_rect(virtualToImage().map(virt_content_rect));
-
-		XSpline top_spline(m_distortionModel.topCurve().xspline());
-		XSpline bottom_spline(m_distortionModel.bottomCurve().xspline());
-		if (top_spline.numControlPoints() < 2) {
-			QLineF const top_line(source_content_rect[0], source_content_rect[1]);
-			XSpline new_top_spline;
-
-			new_top_spline.appendControlPoint(top_line.p1(), 0);
-			new_top_spline.appendControlPoint(top_line.pointAt(1.0/3.0), 1);
-			new_top_spline.appendControlPoint(top_line.pointAt(2.0/3.0), 1);
-			new_top_spline.appendControlPoint(top_line.p2(), 0);
-
-			top_spline.swap(new_top_spline);
-		}
-		if (bottom_spline.numControlPoints() < 2) {
-			QLineF const bottom_line(source_content_rect[3], source_content_rect[2]);
-			XSpline new_bottom_spline;
-
-			new_bottom_spline.appendControlPoint(bottom_line.p1(), 0);
-			new_bottom_spline.appendControlPoint(bottom_line.pointAt(1.0/3.0), 1);
-			new_bottom_spline.appendControlPoint(bottom_line.pointAt(2.0/3.0), 1);
-			new_bottom_spline.appendControlPoint(bottom_line.p2(), 0);
-
-			bottom_spline.swap(new_bottom_spline);
-		}
+	XSpline top_spline(m_distortionModel.topCurve().xspline());
+	XSpline bottom_spline(m_distortionModel.bottomCurve().xspline());
+	if (top_spline.numControlPoints() < 2) {
+		std::vector<QPointF> const& polyline = m_distortionModel.topCurve().polyline();
 		
-		m_topSpline.setSpline(top_spline);
-		m_bottomSpline.setSpline(bottom_spline);
-		
-		InteractiveXSpline* splines[2] = { &m_topSpline, &m_bottomSpline };
-		int curve_idx = -1;
-		BOOST_FOREACH(InteractiveXSpline* spline, splines) {
-			++curve_idx;
-			spline->setModifiedCallback(boost::bind(&DewarpingView::curveModified, this, curve_idx));
-			spline->setDragFinishedCallback(boost::bind(&DewarpingView::dragFinished, this));
-			spline->setStorageTransform(
-				boost::bind(&DewarpingView::sourceToWidget, this, _1),
-				boost::bind(&DewarpingView::widgetToSource, this, _1)
-			);
-			makeLastFollower(*spline);
+		XSpline new_top_spline;
+		if (polyline.size() < 2) {
+			initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1]);
+		} else {
+			initNewSpline(new_top_spline, polyline.front(), polyline.back());
+			PolylineModelShape model_shape(polyline);
+			SplineFitter fitter(&new_top_spline, &model_shape);
+			fitter.fit();
 		}
 
-		m_distortionModel.setTopCurve(Curve(m_topSpline.spline()));
-		m_distortionModel.setBottomCurve(Curve(m_bottomSpline.spline()));
+		top_spline.swap(new_top_spline);
 	}
+	if (bottom_spline.numControlPoints() < 2) {
+		std::vector<QPointF> const& polyline = m_distortionModel.bottomCurve().polyline();
+
+		XSpline new_bottom_spline;
+		if (polyline.size() < 2) {
+			initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2]);
+		} else {
+			initNewSpline(new_bottom_spline, polyline.front(), polyline.back());
+			PolylineModelShape model_shape(polyline);
+			SplineFitter fitter(&new_bottom_spline, &model_shape);
+			fitter.fit();
+		}
+
+		bottom_spline.swap(new_bottom_spline);
+	}
+
+	m_topSpline.setSpline(top_spline);
+	m_bottomSpline.setSpline(bottom_spline);
+	
+	InteractiveXSpline* splines[2] = { &m_topSpline, &m_bottomSpline };
+	int curve_idx = -1;
+	BOOST_FOREACH(InteractiveXSpline* spline, splines) {
+		++curve_idx;
+		spline->setModifiedCallback(boost::bind(&DewarpingView::curveModified, this, curve_idx));
+		spline->setDragFinishedCallback(boost::bind(&DewarpingView::dragFinished, this));
+		spline->setStorageTransform(
+			boost::bind(&DewarpingView::sourceToWidget, this, _1),
+			boost::bind(&DewarpingView::widgetToSource, this, _1)
+		);
+		makeLastFollower(*spline);
+	}
+
+	m_distortionModel.setTopCurve(Curve(m_topSpline.spline()));
+	m_distortionModel.setBottomCurve(Curve(m_bottomSpline.spline()));
 
 	rootInteractionHandler().makeLastFollower(*this);
 	rootInteractionHandler().makeLastFollower(m_dragHandler);
@@ -135,10 +139,20 @@ DewarpingView::~DewarpingView()
 }
 
 void
+DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2)
+{
+	QLineF const line(p1, p2);
+	spline.appendControlPoint(line.p1(), 0);
+	spline.appendControlPoint(line.pointAt(1.0/4.0), 1);
+	spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
+	spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
+	spline.appendControlPoint(line.p2(), 0);
+}
+
+void
 DewarpingView::depthPerceptionChanged(double val)
 {
 	m_depthPerception.setValue(val);
-	m_ptrSettings->setDepthPerception(m_pageId, m_depthPerception);
 	update();
 }
 
@@ -156,11 +170,7 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 	painter.setBrush(Qt::NoBrush);
 
 	QPen grid_pen;
-	if (m_dewarpingMode == DewarpingMode::AUTO) { // Which currently means uneditable.
-		grid_pen.setColor(QColor(0x406dff));
-	} else {
-		grid_pen.setColor(Qt::blue);
-	}
+	grid_pen.setColor(Qt::blue);
 	grid_pen.setCosmetic(true);
 	grid_pen.setWidthF(1.2);
 
@@ -213,42 +223,8 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 		painter.drawPolyline(QVector<QPointF>::fromStdVector(bottom_curve.polyline()));
 	}
 
-	if (m_dewarpingMode != DewarpingMode::AUTO) {
-		paintXSpline(painter, interaction, m_topSpline);
-		paintXSpline(painter, interaction, m_bottomSpline);
-	}
-#if 0
-	painter.setWorldTransform(QTransform());
-
-	std::vector<QPointF> data_points;
-	for (int i = 0; i < 36; ++i) {
-		data_points.push_back(QPointF(200 + 100*cos(i*10*constants::DEG2RAD), 200 + 100*sin(i*10*constants::DEG2RAD)));
-	}
-	painter.drawPolyline(QVector<QPointF>::fromStdVector(data_points));
-
-	XSpline xspline;
-	xspline.appendControlPoint(data_points.front(), 0);
-	for (int i = 0; i < 5; ++i) {
-		xspline.appendControlPoint(QPointF(0, 0), 1);
-	}
-	xspline.appendControlPoint(data_points.back(), 0);
-
-	boost::dynamic_bitset<> fixed_points(xspline.numControlPoints());
-	fixed_points.set(0);
-	fixed_points.set(fixed_points.size() - 1);
-	xspline.fit(data_points, &fixed_points);
-
-	painter.drawPolyline(QVector<QPointF>::fromStdVector(xspline.toPolyline()));
-
-	QPen point_pen(Qt::red);
-	point_pen.setWidthF(4.0);
-	point_pen.setCosmetic(true);
-	painter.setPen(point_pen);
-
-	for (int i = 0; i < xspline.numControlPoints(); ++i) {
-		painter.drawPoint(xspline.controlPointPosition(i));
-	}
-#endif
+	paintXSpline(painter, interaction, m_topSpline);
+	paintXSpline(painter, interaction, m_bottomSpline);
 }
 
 void
@@ -312,7 +288,10 @@ DewarpingView::curveModified(int curve_idx)
 void
 DewarpingView::dragFinished()
 {
-	m_ptrSettings->setDistortionModel(m_pageId, m_distortionModel);
+	if (m_dewarpingMode == DewarpingMode::AUTO) {
+		m_dewarpingMode = DewarpingMode::MANUAL;
+	}
+	emit distortionModelChanged(m_distortionModel);
 }
 
 /** Source image coordinates to widget coordinates. */

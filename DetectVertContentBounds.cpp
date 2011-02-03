@@ -320,7 +320,7 @@ SequentialColumnProcessor::interpolateSegments(std::vector<Segment> const& segme
 	assert(accum_weight != 0);
 	accum_vec /= accum_weight;
 
-	QLineF line(m_path.front(), accum_vec);
+	QLineF line(m_path.front(), m_path.front() + accum_vec);
 	Vec2d normal(-accum_vec[1], accum_vec[0]);
 	if ((m_leftOrRight == RIGHT) != (normal[0] < 0)) {
 		normal = -normal;

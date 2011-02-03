@@ -23,6 +23,7 @@
 #include "StaticPool.h"
 #include "DynamicPool.h"
 #include "LinearSolver.h"
+#include "MatMNT.h"
 #include <stddef.h>
 #include <assert.h>
 
@@ -89,6 +90,10 @@ public:
 	Mat write(T* buf) const;
 
 	Mat transWrite(T* buf) const;
+
+	Mat operator-() const;
+
+	T const* rawData() const { return data; }
 private:
 	Mat(AbstractAllocator<T>* alloc, T const* data, int rows, int cols)
 		: alloc(alloc), data(data), rows(rows), cols(cols) {}
@@ -111,6 +116,11 @@ public:
 
 	mcalc::Mat<T> operator()(T const* data, int rows, int cols) {
 		return mcalc::Mat<T>(&m_alloc, data, rows, cols);
+	}
+
+	template<size_t M, size_t N>
+	mcalc::Mat<T> operator()(MatMNT<M, N, T> const& mat) {
+		return mcalc::Mat<T>(&m_alloc, mat.data(), mat.ROWS, mat.COLS);
 	}
 private:
 	Alloc m_alloc;
@@ -178,6 +188,10 @@ template<typename T>
 Mat<T>
 Mat<T>::trans() const
 {
+	if (cols == 1 || rows == 1) {
+		return *this;
+	}
+
 	T* p_trans = alloc->allocT(cols * rows);
 	transWrite(p_trans);
 	return Mat(alloc, p_trans, cols, rows);
@@ -210,6 +224,22 @@ Mat<T>::transWrite(T* buf) const
 	}
 
 	return *this;
+}
+
+/** Unary minus. */
+template<typename T>
+Mat<T>
+Mat<T>::operator-() const
+{
+	T* p_res = alloc->allocT(rows * cols);
+	Mat<T> res(alloc, p_res, rows, cols);
+
+	int const todo = rows * cols;
+	for (int i = 0; i < todo; ++i) {
+		p_res[i] = -data[i];
+	}
+
+	return res;
 }
 
 template<typename T>
@@ -275,12 +305,13 @@ Mat<T> operator*(T scalar, Mat<T> const& m)
 {
 	T* p_res = m.alloc->allocT(m.rows * m.cols);
 	Mat<T> res(m.alloc, p_res, m.rows, m.cols);
-	T const* p_m = m.data;
 	
 	int const todo = m.rows * m.cols;
 	for (int i = 0; i < todo; ++i) {
-		res.data[i] = m.data[i] * scalar;
+		p_res[i] = m.data[i] * scalar;
 	}
+
+	return res;
 }
 
 template<typename T>

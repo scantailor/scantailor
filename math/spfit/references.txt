@@ -1,0 +1,7 @@
+[1] Pottmann H, Leopoldseder S. A concept for parametric surface fitting which
+    avoids the parametrization problem.
+    http://scholar.google.com/scholar?cluster=7639013126651979063&hl=en&as_sdt=0,5&as_vis=1
+
+[2] W. Wang, H. Pottmann, Y. Liu, Fitting B-spline curves to point clouds by
+    squared distance minimization.
+    http://scholar.google.com/scholar?cluster=5549848162867282704&hl=en&as_sdt=0,5&as_vis=1

@@ -212,15 +212,25 @@ void areaMapGeneratrix(
 			}
 		}
 
+		if (f_src32_top < -32.0f * 10000.0f || f_src32_left < -32.0f * 10000.0f ||
+				f_src32_bottom > 32.0f * (float(sh) + 10000.f) ||
+				f_src32_right > 32.0f * (float(sw) + 10000.f)) {
+			// This helps to prevent integer overflows.
+			*p_dst = bg_color;
+			p_dst += dst_stride;
+			continue;
+		}
+
 		// Note: the code below is more or less the same as in transformGeneric()
 		// in imageproc/Transform.cpp
 
-		// Here we don't bother with floor() and ceil(),
-		// as we already operate on a sub-pixel level.
-		int src32_left = (int)f_src32_left;
-		int src32_top = (int)f_src32_top;
-		int src32_right = (int)f_src32_right;
-		int src32_bottom = (int)f_src32_bottom;
+		// Note that without using floor() and ceil()
+		// we can't guarantee that src_bottom >= src_top
+		// and src_right >= src_left.
+		int src32_left = (int)floor(f_src32_left);
+		int src32_right = (int)ceil(f_src32_right);
+		int src32_top = (int)floor(f_src32_top);
+		int src32_bottom = (int)ceil(f_src32_bottom);
 		int src_left = src32_left >> 5;
 		int src_right = (src32_right - 1) >> 5; // inclusive
 		int src_top = src32_top >> 5;

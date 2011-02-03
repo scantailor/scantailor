@@ -479,7 +479,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		new DewarpingView(
 			m_origImage, m_downscaledOrigImage,
 			m_imageToVirt, m_virtDisplayArea, m_virtContentRect,
-			m_pageId, m_ptrSettings, m_params.dewarpingMode(),
+			m_pageId, m_params.dewarpingMode(),
 			m_params.distortionModel(), opt_widget->depthPerception()
 		)
 	);
@@ -487,6 +487,10 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	QObject::connect(
 		opt_widget, SIGNAL(depthPerceptionChanged(double)),
 		dewarping_view.get(), SLOT(depthPerceptionChanged(double))
+	);
+	QObject::connect(
+		dewarping_view.get(), SIGNAL(distortionModelChanged(DistortionModel const&)),
+		opt_widget, SLOT(distortionModelChanged(DistortionModel const&))
 	);
 
 	std::auto_ptr<QWidget> picture_zone_editor;
@@ -508,11 +512,11 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		);
 	}
 
-	// It turns out we never need to update the original<->output
-	// mapping at run time.  If dewarping is turned on or off from
-	// the left panel, there will be a complete reload.  If we change
-	// the dewarping grid from the Dewarping tab, complete reload
-	// will happen when we switch to another tab.
+	// We make sure we never need to update the original <-> output
+	// mapping at run time, that is without reloading.
+	// In OptionsWidget::dewarpingChanged() we make sure to reload
+	// if we are on the "Fill Zones" tab, and if not, it will be reloaded
+	// anyway when another tab is selected.
 	boost::function<QPointF(QPointF const&)> orig_to_output;
 	boost::function<QPointF(QPointF const&)> output_to_orig;
 	if (m_params.dewarpingMode() != DewarpingMode::OFF && m_params.distortionModel().isValid()) {

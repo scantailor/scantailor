@@ -110,9 +110,9 @@ font-weight:bold;</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-38</y>
+            <y>0</y>
             <width>425</width>
-            <height>326</height>
+            <height>339</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -147,6 +147,7 @@ font-weight:bold;</string>
             <widget class="QLabel" name="label_8">
              <property name="text">
               <string>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
 Stefan Birkner - German
 Angelo Gemmi - Italian
 Masahiro Kitagawa - Japanese
@@ -382,6 +383,8 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
