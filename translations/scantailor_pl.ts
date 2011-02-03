@@ -20,7 +20,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor to interaktywne narzędzie do przetwarzania zeskanownych stron. Wykonuje takie operacje jak dzielenie stron, prostowanie, dodawanie/usuwanie marginesów i inne. Program pobiera surowe skany i zapisuje strony gotowe do druku lub złożenia w postaci pliku PDF lub DJVu. Skanowanie i rozpoznawanie pisma są poza zakresem działania tego programu.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="101"/>
@@ -37,8 +37,29 @@
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich</translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Davidson Wang - Traditional Chinese</source>
+        <translation>Svetoslav Sashkov, Mandor - bułgarski
+Petr Kovář - czeski
+Stefan Birkner - niemiecki
+Angelo Gemmi - włoski
+Masahiro Kitagawa - japoński
+Patrick Pascal - francuski
+Daniel Koć - polski
+Joseph Artsimovich - rosyjski
+Davidson Wang - tradycyjny chiński</translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <location filename="../ui/AboutDialog.ui" line="174"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -47,7 +68,14 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Algorytm automatycznego wykrywania grafik.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - Pierwsza generacja algorytmu prostowania stron.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - Regulacja obciążenia systemu.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
@@ -71,7 +99,6 @@ p, li { white-space: pre-wrap; }
         <translation>Tłumacze</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
 Stefan Birkner - German
 Angelo Gemmi - Italian
@@ -80,10 +107,17 @@ Patrick Pascal - French
 Daniel Koć - Polish
 Joseph Artsimovich - Russian
 Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Svetoslav Sashkov, Mandor - bułgarski
+Stefan Birkner - niemiecki
+Angelo Gemmi - włoski
+Masahiro Kitagawa - japoński
+Patrick Pascal - francuski
+Daniel Koć - polski
+Joseph Artsimovich - rosyjski
+Davidson Wang - tradycyjny chiński</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="167"/>
         <source>Contributors</source>
         <translation>Współtwórcy</translation>
     </message>
@@ -97,12 +131,12 @@ Robert B. - Algorytm prostowania stron.
 Andrey Bergman - Regulacja obciążenia systemu.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="191"/>
         <source>Documentation</source>
         <translation>Dokumentacja</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="197"/>
+        <location filename="../ui/AboutDialog.ui" line="198"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -111,7 +145,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="224"/>
+        <location filename="../ui/AboutDialog.ui" line="225"/>
         <source>License</source>
         <translation>Licencja</translation>
     </message>
@@ -142,32 +176,32 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="20"/>
         <source>Apply to</source>
-        <translation type="unfinished">Zastosuj do</translation>
+        <translation>Zastosuj do</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished">tylko bieżąca strona (już zastosowane)</translation>
+        <translation>tylko bieżąca strona (już zastosowane)</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation type="unfinished">wszystkie strony</translation>
+        <translation>wszystkie strony</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">ta strona i wszystkie kolejne</translation>
+        <translation>ta strona i wszystkie kolejne</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="59"/>
         <source>Selected pages</source>
-        <translation type="unfinished">wybrane strony</translation>
+        <translation>wybrane strony</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Użyj klawisza Ctrl z kółkiem myszki/Shift z kółkiem myszki aby wybrać wiele stron.</translation>
+        <translation>Użyj klawisza Ctrl z kółkiem myszki/Shift z kółkiem myszki aby wybrać wiele stron.</translation>
     </message>
 </context>
 <context>
@@ -195,7 +229,7 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
         <source>Apply To ...</source>
-        <translation type="unfinished">Zastosuj do...</translation>
+        <translation>Zastosuj do...</translation>
     </message>
 </context>
 <context>
@@ -1371,54 +1405,55 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="17"/>
         <source>Select Content</source>
-        <translation type="unfinished">Wybierz zawartość</translation>
+        <translation>Wybierz zawartość</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
         <source>Apply to</source>
-        <translation type="unfinished">Zastosuj do</translation>
+        <translation>Zastosuj do</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished">tylko bieżąca strona (już zastosowane)</translation>
+        <translation>tylko bieżąca strona (już zastosowane)</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation type="unfinished">wszystkie strony</translation>
+        <translation>wszystkie strony</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">ta strona i wszystkie kolejne</translation>
+        <translation>ta strona i wszystkie kolejne</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">wszystkie pozostałe strony</translation>
+        <translatorcomment>Wszystkie parzyste lub nieparzyste strony, w zależności czy bieżąca strona jest parzysta czy nieparzysta.</translatorcomment>
+        <translation>wszystkie pozostałe strony</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="206"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">Bez bieżącej strony.</translation>
+        <translation>Razem z bieżącą stroną.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="125"/>
         <source>Selected pages</source>
-        <translation type="unfinished">wybrane strony</translation>
+        <translation>wybrane strony</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Użyj klawisza Ctrl z kółkiem myszki/Shift z kółkiem myszki aby wybrać wiele stron.</translation>
+        <translation>Użyj klawisza Ctrl z kółkiem myszki/Shift z kółkiem myszki aby wybrać wiele stron.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">wszystkie pozostałe wybrane strony</translation>
+        <translation>wszystkie pozostałe wybrane strony</translation>
     </message>
 </context>
 <context>
@@ -1446,12 +1481,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
         <source>Scope</source>
-        <translation type="unfinished">Zakres</translation>
+        <translation>Zakres</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
         <source>Apply to ...</source>
-        <translation type="unfinished">Zastosuj do...</translation>
+        <translation>Zastosuj do...</translation>
     </message>
 </context>
 <context>
@@ -1625,7 +1660,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
         <source>Apply Deskew</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastosuj prostowanie</translation>
     </message>
 </context>
 <context>
@@ -1677,9 +1712,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::DewarpingView</name>
     <message>
-        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
         <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation>Korekta automatycznie utworzonej siatki nie jest jeszcze zaimplementowana. Jeśli to konieczne przełącz się do trybu ręcznego.</translation>
+        <translation type="obsolete">Korekta automatycznie utworzonej siatki nie jest jeszcze zaimplementowana. Jeśli to konieczne przełącz się do trybu ręcznego.</translation>
     </message>
 </context>
 <context>
@@ -1716,27 +1750,27 @@ p, li { white-space: pre-wrap; }
         <translation>mieszany</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
         <translation>Zastosuj poziom oczyszczania</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
         <translation>Zastosuj percepcję głębi</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
         <translation>wyłączone</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
         <source>Auto</source>
         <translation>automatyczne</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
         <source>Manual</source>
         <translation>ręczne</translation>
     </message>
@@ -1744,37 +1778,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="495"/>
+        <location filename="../filters/output/Task.cpp" line="499"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Obszary grafiki są dostępne tylko w trybie mieszanym.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="547"/>
+        <location filename="../filters/output/Task.cpp" line="551"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Oczyszczanie nie jest możliwe w trybie koloru/skali szarości.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="568"/>
         <source>Output</source>
         <translation>Wyjście</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="565"/>
+        <location filename="../filters/output/Task.cpp" line="569"/>
         <source>Picture Zones</source>
         <translation>Obszary grafiki</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="566"/>
+        <location filename="../filters/output/Task.cpp" line="570"/>
         <source>Fill Zones</source>
         <translation>Obszary wypełnienia</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="567"/>
+        <location filename="../filters/output/Task.cpp" line="571"/>
         <source>Dewarping</source>
         <translation>Prostowanie</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="572"/>
         <source>Despeckling</source>
         <translation>Oczyszczanie</translation>
     </message>
@@ -1868,7 +1902,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Niewykonalne: zaznaczono więcej niż jedną grupę.</translation>
+        <translation>Niewykonalne: zaznaczono więcej niż jedną grupę.</translation>
     </message>
 </context>
 <context>
