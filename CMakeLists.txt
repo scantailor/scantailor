@@ -372,6 +372,7 @@ SET(
 	ProjectCreationContext.cpp ProjectCreationContext.h
 	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	MainWindow.cpp MainWindow.h
+	ConsoleBatch.cpp ConsoleBatch.h
 	PageSelectionAccessor.cpp PageSelectionAccessor.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
 	PhysicalTransformation.cpp PhysicalTransformation.h

@@ -33,6 +33,13 @@
 #include <Qt>
 #include <string.h>
 
+#include "Dpi.h"
+#include "ImageInfo.h"
+#include "ImageFileInfo.h"
+
+#include "ConsoleBatch.h"
+
+
 #ifdef Q_WS_WIN
 // Import static plugins
 Q_IMPORT_PLUGIN(qjpeg)
@@ -177,9 +184,48 @@ int main(int argc, char** argv)
 	// Note that we use app.arguments() rather than argv,
 	// because the former is Unicode-safe under Windows.
 	QStringList const args(app.arguments());
-	if (args.size() > 1) {
-		main_wnd->openProject(args[1]);
+	if (args.size() <= 2) {
+		// no args => run gui
+		if (args.size() == 2) {
+			// one arg => open window with project file
+			main_wnd->openProject(args[1]);
+		}
+	} else if (args.size() > 2) {
+		// more arguments => run as a script
+		main_wnd->hide();
+		//std::vector<ImageInfo> images;
+		std::vector<ImageFileInfo> images;
+		QString odir("./");
+		Qt::LayoutDirection layout = Qt::LeftToRight;
+		bool left_half_removed = false;
+		bool right_half_removed = false;
+		int sub_pages = 1;
+
+		// create image list
+		for (int i=1; i<args.size(); i++) {
+			QFileInfo file(args[i]);
+			if (i==(args.size()-1)) {
+				if (file.isDir()) {
+					odir = file.filePath();
+				} else {
+					printf("Error: Last argument must be an existing directory\n");
+				}
+			} else {
+				ImageId const image_id(file.filePath());
+				ImageMetadata metadata;
+				metadata.setDpi(Dpi(300, 300));
+				std::vector<ImageMetadata> vMetadata;
+				vMetadata.push_back(metadata);
+				//ImageInfo image_info(image_id, metadata, sub_pages, left_half_removed, right_half_removed);
+				ImageFileInfo image_info(file, vMetadata);
+				images.push_back(image_info);
+			}
+		}
+		printf("Images: %d\n", (int)images.size());
+
+		ConsoleBatch *cbatch = new ConsoleBatch(main_wnd);
+		cbatch->process(images, odir, layout);
 	}
-	
+
 	return app.exec();
 }
