@@ -38,6 +38,8 @@
 #include "ImageFileInfo.h"
 
 #include "ConsoleBatch.h"
+#include "CommandLine.h"
+#include <iostream>
 
 
 #ifdef Q_WS_WIN
@@ -184,6 +186,12 @@ int main(int argc, char** argv)
 	// Note that we use app.arguments() rather than argv,
 	// because the former is Unicode-safe under Windows.
 	QStringList const args(app.arguments());
+	CommandLine::parse_cli(args);
+
+	QStringList params = CommandLine::options.keys();
+	// DEBUG:
+	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << CommandLine::options[params[i]].toAscii().constData() << "\n"; }
+
 	if (args.size() <= 2) {
 		// no args => run gui
 		if (args.size() == 2) {
