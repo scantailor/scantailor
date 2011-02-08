@@ -25,13 +25,35 @@
 #include <QMap>
 #include <QStringList>
 
+#include "ImageFileInfo.h"
+
+// CommandLine is a singleton simulation; if you create anywhere object CommandLine
+// you get always access to the same variables
 class CommandLine
 {
-	public:
-		static QMap<QString, QString> options;
+	static QMap<QString, QString> s_options;
+	static QString s_project_file;
+	static std::vector<ImageFileInfo> s_images;
+	static QString s_output_directory;
 
-		static void parse_cli(QStringList const& argv);
-		static void parse_cli(int argc, char **argv);
+	static void parse_cli(QStringList const& argv);
+	static void parse_cli(int argc, char **argv);
+
+	public:
+		CommandLine(QStringList const& argv) { CommandLine::parse_cli(argv); };
+		CommandLine(int argc, char **argv) { CommandLine::parse_cli(argc, argv); };
+
+		QMap<QString, QString> options() { return CommandLine::s_options; };
+		QString projectFile() { return CommandLine::s_project_file; };
+		std::vector<ImageFileInfo> images() { return CommandLine::s_images; };
+		QString outputDirectory() { return CommandLine::s_output_directory; };
+
+		QString & operator[](QString const& key) { return (QString &)CommandLine::s_options[key]; };
+		QString const operator[](QString const& key) const { return CommandLine::s_options.value(key); };
+
+		bool help() { return (CommandLine::s_options["help"] == "true"); };
+
+		void printHelp();
 };
 
 #endif
