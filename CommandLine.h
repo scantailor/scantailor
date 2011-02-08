@@ -26,7 +26,7 @@
 #include <QStringList>
 
 #include "Dpi.h"
-#include "ProjectPages.h"
+#include "filters/page_split/LayoutType.h"
 #include "ImageFileInfo.h"
 
 // CommandLine is a singleton simulation; if you create anywhere object CommandLine
@@ -57,7 +57,7 @@ class CommandLine
 		QString const operator[](QString const& key) const { return CommandLine::s_options.value(key); };
 
 		bool help() { return (CommandLine::s_options["help"] == "true"); };
-		ProjectPages::LayoutType layout();
+		page_split::LayoutType layout();
 		Qt::LayoutDirection layoutDirection();
 		void dpi(int &xdpi, int &ydpi) { CommandLine::getDpi(xdpi, ydpi); };
 

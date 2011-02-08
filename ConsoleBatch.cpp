@@ -154,7 +154,6 @@ ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& o
 	OutputFileNameGenerator out_filename_gen(disambiguator, output_dir, pages->layoutDirection());
 
 	CommandLine cli;
-	pages->setLayoutTypeForAllPages(cli.layout());
 
 	// simulate clicking on batch processing button one by one
 	PageSequence page_sequence = pages->toPageSequence(IMAGE_VIEW);

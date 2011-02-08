@@ -8,9 +8,9 @@
 #include "ImageId.h"
 #include "version.h"
 #include "CommandLine.h"
-#include "ProjectPages.h"
 #include "ImageFileInfo.h"
 #include "ImageMetadata.h"
+#include "filters/page_split/LayoutType.h"
 
 
 QMap<QString, QString> CommandLine::s_options;
@@ -124,7 +124,7 @@ CommandLine::printHelp()
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
 	std::cout << "\t--verbose, -v" << "\n";
-	std::cout << "\t--layout=, -l=<1|2>\t\t-- default: 1" << "\n";
+	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
 	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
@@ -133,12 +133,18 @@ CommandLine::printHelp()
 }
 
 
-ProjectPages::LayoutType
+page_split::LayoutType
 CommandLine::layout()
 {
-	ProjectPages::LayoutType lt = ProjectPages::ONE_PAGE_LAYOUT;
-	if (CommandLine::s_options["layout"] == "2")
-		lt = ProjectPages::TWO_PAGE_LAYOUT;
+	page_split::LayoutType lt = page_split::AUTO_LAYOUT_TYPE;
+
+	if (CommandLine::s_options["layout"] == "1")
+		lt = page_split::SINGLE_PAGE_UNCUT;
+	else if (CommandLine::s_options["layout"] == "1.5")
+		lt = page_split::PAGE_PLUS_OFFCUT;
+	else if (CommandLine::s_options["layout"] == "2")
+		lt = page_split::TWO_PAGES;
+
 	return lt;
 }
 
