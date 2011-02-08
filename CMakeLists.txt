@@ -20,6 +20,10 @@ PROJECT("Scan Tailor")
 # libraries it ships with!  It's harmless on other platforms.
 ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
+IF(DEBUG_CLI)
+	ADD_DEFINITIONS(-DDEBUG_CLI)
+ENDIF(DEBUG_CLI)
+
 ENABLE_TESTING()
 
 # An undocumented side-effect of CONFIGURE_FILE() is that it makes

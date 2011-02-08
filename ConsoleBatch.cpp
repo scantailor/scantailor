@@ -38,6 +38,7 @@
 #include <Qt>
 #include <QDebug>
 #include <vector>
+#include <iostream>
 #include <assert.h>
 
 #include "filters/fix_orientation/Filter.h"
@@ -175,10 +176,12 @@ ConsoleBatch::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const&
 {
 	m_ptrBatchQueue->processingFinished(task);
 
+#ifdef DEBUG_CLI
 	PageInfo const page(m_ptrBatchQueue->selectedPage());
 	if (!page.isNull()) {
-		printf("Finished: %s\n", page.imageId().filePath().toAscii().constData());
+		std::cout << "Finished: " << page.imageId().filePath().toAscii().constData() << "\n";
 	}
+#endif
 
 	if (isBatchProcessingInProgress()) {
 		// if all images were processed, shutdown
@@ -211,7 +214,9 @@ ConsoleBatch::stopBatchProcessing()
 		return;
 	}
 	
-	printf("Stopping...\n");
+#ifdef DEBUG_CLI
+	std::cout << "Stopping..." << "\n";
+#endif
 
 	m_ptrBatchQueue->cancelAndClear();
 	m_ptrBatchQueue.reset();
