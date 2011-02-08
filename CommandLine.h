@@ -53,6 +53,7 @@ class CommandLine
 		QString const operator[](QString const& key) const { return CommandLine::s_options.value(key); };
 
 		bool help() { return (CommandLine::s_options["help"] == "true"); };
+		Qt::LayoutDirection layoutDirection();
 
 		void printHelp();
 };

@@ -39,6 +39,7 @@ CommandLine::parse_cli(QStringList const& argv)
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
 	shortMap["help"] = "help";
+	shortMap["ld"] = "layout-direction";
 
 	// skip first argument (scantailor)
 	for (int i=1; i<argv.size(); i++) {
@@ -110,5 +111,19 @@ CommandLine::printHelp()
 	std::cout << "\n";
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
+	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t\t-- default lr" << "\n";
 	std::cout << "\n";
+}
+
+
+Qt::LayoutDirection
+CommandLine::layoutDirection()
+{
+	Qt::LayoutDirection l = Qt::LeftToRight;
+	QString ld = CommandLine::s_options["layout-direction"].toLower();
+
+	if (ld == "rl")
+		l = Qt::RightToLeft;
+
+	return l;
 }
