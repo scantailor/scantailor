@@ -40,6 +40,7 @@ class CommandLine
 	static void parse_cli(int argc, char **argv);
 
 	public:
+		CommandLine() {};
 		CommandLine(QStringList const& argv) { CommandLine::parse_cli(argv); };
 		CommandLine(int argc, char **argv) { CommandLine::parse_cli(argc, argv); };
 
