@@ -25,6 +25,7 @@
 #include <QMap>
 #include <QStringList>
 
+#include "Dpi.h"
 #include "ImageFileInfo.h"
 
 // CommandLine is a singleton simulation; if you create anywhere object CommandLine
@@ -38,6 +39,7 @@ class CommandLine
 
 	static void parse_cli(QStringList const& argv);
 	static void parse_cli(int argc, char **argv);
+	static void getDpi(int &xdpi, int &ydpi);
 
 	public:
 		CommandLine() {};
@@ -54,6 +56,7 @@ class CommandLine
 
 		bool help() { return (CommandLine::s_options["help"] == "true"); };
 		Qt::LayoutDirection layoutDirection();
+		void dpi(int &xdpi, int &ydpi) { CommandLine::getDpi(xdpi, ydpi); };
 
 		void printHelp();
 };

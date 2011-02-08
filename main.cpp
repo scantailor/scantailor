@@ -33,7 +33,6 @@
 #include <Qt>
 #include <string.h>
 
-#include "Dpi.h"
 #include "ImageInfo.h"
 #include "ImageFileInfo.h"
 
@@ -196,8 +195,8 @@ int main(int argc, char** argv)
 
 	if (cli.images().size() > 0) {
 		main_wnd->hide();
-		ConsoleBatch *cbatch = new ConsoleBatch(main_wnd);
-		cbatch->process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
+		ConsoleBatch cbatch(main_wnd);
+		cbatch.process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
 	}
 
 	return app.exec();

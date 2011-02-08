@@ -4,9 +4,11 @@
 #include <QRegExp>
 #include <QStringList>
 
+#include "Dpi.h"
 #include "ImageId.h"
 #include "CommandLine.h"
 #include "ImageFileInfo.h"
+#include "ImageMetadata.h"
 
 
 QMap<QString, QString> CommandLine::s_options;
@@ -75,7 +77,9 @@ CommandLine::parse_cli(QStringList const& argv)
 				// create ImageFileInfo and push to images
 				ImageId const image_id(file.filePath());
 				ImageMetadata metadata;
-				metadata.setDpi(Dpi(300, 300));
+				int xdpi, ydpi;
+				CommandLine::getDpi(xdpi, ydpi);
+				metadata.setDpi(Dpi(xdpi, ydpi));
 				std::vector<ImageMetadata> vMetadata;
 				vMetadata.push_back(metadata);
 				ImageFileInfo image_info(file, vMetadata);
@@ -111,7 +115,10 @@ CommandLine::printHelp()
 	std::cout << "\n";
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
-	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t\t-- default lr" << "\n";
+	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
+	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
+	std::cout << "\t\t--dpi-x=<number>" << "\n";
+	std::cout << "\t\t--dpi-y=<number>" << "\n";
 	std::cout << "\n";
 }
 
@@ -126,4 +133,22 @@ CommandLine::layoutDirection()
 		l = Qt::RightToLeft;
 
 	return l;
+}
+
+void
+CommandLine::getDpi(int &xdpi, int &ydpi)
+{
+	xdpi=300;
+	ydpi=300;
+
+	if (CommandLine::s_options["dpi-x"] != "") {
+		xdpi = CommandLine::s_options["dpi-x"].toInt();
+	}
+	if (CommandLine::s_options["dpi-y"] != "") {
+		ydpi = CommandLine::s_options["dpi-y"].toInt();
+	}
+	if (CommandLine::s_options["dpi"] != "") {
+		xdpi = CommandLine::s_options["dpi"].toInt();
+		ydpi = CommandLine::s_options["dpi"].toInt();
+	}
 }
