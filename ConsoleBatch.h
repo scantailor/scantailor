@@ -37,16 +37,12 @@
 #include "OutputFileNameGenerator.h"
 
 
-class ConsoleBatch :
-	public QObject
+class ConsoleBatch
 {
-	DECLARE_NON_COPYABLE(ConsoleBatch)
-	Q_OBJECT
-
 public:
 	ConsoleBatch(MainWindow* main_w);
 
-	//virtual ~ConsoleBatch();
+	virtual ~ConsoleBatch();
 
 	void process(
 			//std::vector<ImageInfo> const& images,
@@ -54,15 +50,10 @@ public:
 			QString                    const& output_dir,
 			Qt::LayoutDirection        const  layout);
 
-	bool isBatchProcessingInProgress() const;
-	void stopBatchProcessing();
-
 private:
 	bool batch;
 	bool debug;
 	MainWindow *main_wnd;
-	std::auto_ptr<WorkerThread> m_ptrWorkerThread;
-	std::auto_ptr<ProcessingTaskQueue> m_ptrBatchQueue;
 	IntrusivePtr<FileNameDisambiguator> disambiguator;
 
 	BackgroundTaskPtr createCompositeTask(
@@ -72,11 +63,6 @@ private:
 		PageInfo const& page,
 		IntrusivePtr<ProjectPages> const m_ptrPages,
 		int const last_filter_idx);
-
-private slots:
-	void filterResult(
-		BackgroundTaskPtr const& task,
-		FilterResultPtr   const& result);
 };
 
 #endif

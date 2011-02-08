@@ -3,3 +3,4 @@ CMakeFiles
 *.qm
 *.h.moc
 build/
+*~

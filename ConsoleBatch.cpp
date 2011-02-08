@@ -61,21 +61,20 @@
 #include "filters/output/CacheDrivenTask.h"
 
 #include "ConsoleBatch.h"
-#include "ConsoleBatch.h.moc"
+//#include "ConsoleBatch.h.moc"
+#include "CommandLine.h"
 
 
 ConsoleBatch::ConsoleBatch(MainWindow* main_w)
-:	batch(true), debug(true), main_wnd(main_w),
-	m_ptrWorkerThread(new WorkerThread()),
-	m_ptrBatchQueue(new ProcessingTaskQueue(ProcessingTaskQueue::SEQUENTIAL_ORDER)),
+:   batch(true), debug(true), main_wnd(main_w),
 	disambiguator(new FileNameDisambiguator)
+{};
+
+
+ConsoleBatch::~ConsoleBatch()
 {
-	connect(
-		m_ptrWorkerThread.get(),
-		SIGNAL(taskResult(BackgroundTaskPtr const&, FilterResultPtr const&)),
-		this, SLOT(filterResult(BackgroundTaskPtr const&, FilterResultPtr const&))
-	);
-};
+	delete(disambiguator);
+}
 
 
 BackgroundTaskPtr
@@ -138,7 +137,7 @@ ConsoleBatch::createCompositeTask(
 	
 	return BackgroundTaskPtr(
 		new LoadFileTask(
-			batch ? BackgroundTask::BATCH : BackgroundTask::INTERACTIVE,
+			BackgroundTask::BATCH,
 			page, m_ptrThumbnailCache, m_ptrPages, fix_orientation_task
 		)
 	);
@@ -149,77 +148,25 @@ ConsoleBatch::createCompositeTask(
 void
 ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& output_dir, Qt::LayoutDirection const layout)
 {
-	IntrusivePtr<ProjectPages>         pages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout));
-	StageSequence*                     stages          = new StageSequence(pages, PageSelectionAccessor(main_wnd));
+	IntrusivePtr<ProjectPages> pages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout));
+	StageSequence* stages = new StageSequence(pages, PageSelectionAccessor(main_wnd));
 	IntrusivePtr<ThumbnailPixmapCache> thumbnail_cache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
-	OutputFileNameGenerator            out_filename_gen(disambiguator, output_dir, pages->layoutDirection());
+	OutputFileNameGenerator out_filename_gen(disambiguator, output_dir, pages->layoutDirection());
 
-	// Create batch queue
+	CommandLine cli;
+	pages->setLayoutTypeForAllPages(cli.layout());
+
+	// simulate clicking on batch processing button one by one
 	PageSequence page_sequence = pages->toPageSequence(IMAGE_VIEW);
 	for (int j=0; j<stages->count(); j++) {
+		if (cli["verbose"] == "true")
+			std::cout << "Filter: " << j << "\n";
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
+			if (cli["verbose"] == "true")
+				std::cout << "\tProcessing: " << page.imageId().filePath().toAscii().constData() << "\n";
 			BackgroundTaskPtr bgTask = createCompositeTask(stages, thumbnail_cache, out_filename_gen, page, pages, j);
-			m_ptrBatchQueue->addProcessingTask(page, bgTask);
+			(*bgTask)();
 		}
 	}
-
-	// Start processing the first image
-	BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
-	m_ptrWorkerThread->performTask(task);
-}
-
-
-// remove finished task from queue and schedule new one
-void
-ConsoleBatch::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& result)
-{
-	m_ptrBatchQueue->processingFinished(task);
-
-#ifdef DEBUG_CLI
-	PageInfo const page(m_ptrBatchQueue->selectedPage());
-	if (!page.isNull()) {
-		std::cout << "Finished: " << page.imageId().filePath().toAscii().constData() << "\n";
-	}
-#endif
-
-	if (isBatchProcessingInProgress()) {
-		// if all images were processed, shutdown
-		if (m_ptrBatchQueue->allProcessed()) {
-			stopBatchProcessing();
-			return;
-		}
-
-		// schedule new one
-		BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
-		if (task) {
-			m_ptrWorkerThread->performTask(task);
-		}
-	}
-}
-
-
-bool
-ConsoleBatch::isBatchProcessingInProgress() const
-{
-	return m_ptrBatchQueue.get() != 0;
-}
-
-
-// shutdown
-void
-ConsoleBatch::stopBatchProcessing()
-{
-	if (!isBatchProcessingInProgress()) {
-		return;
-	}
-	
-#ifdef DEBUG_CLI
-	std::cout << "Stopping..." << "\n";
-#endif
-
-	m_ptrBatchQueue->cancelAndClear();
-	m_ptrBatchQueue.reset();
-
-	main_wnd->close();
 }

@@ -6,13 +6,16 @@
 
 #include "Dpi.h"
 #include "ImageId.h"
+#include "version.h"
 #include "CommandLine.h"
+#include "ProjectPages.h"
 #include "ImageFileInfo.h"
 #include "ImageMetadata.h"
 
 
 QMap<QString, QString> CommandLine::s_options;
 QString CommandLine::s_project_file = "";
+std::vector<QFileInfo> CommandLine::s_files;
 std::vector<ImageFileInfo> CommandLine::s_images;
 QString CommandLine::s_output_directory = ".";
 
@@ -35,12 +38,14 @@ CommandLine::parse_cli(QStringList const& argv)
 {
 	QRegExp rx("^--([^=]+)=(.*)$");
 	QRegExp rx_switch("^--([^=]+)$");
-	QRegExp rx_short("^-(.)$");
+	QRegExp rx_short("^-(.*)$");
 	QRegExp rx_project(".*\\.ScanTailor$", Qt::CaseInsensitive);
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
 	shortMap["help"] = "help";
+	shortMap["v"] = "verbose";
+	shortMap["l"] = "layout";
 	shortMap["ld"] = "layout-direction";
 
 	// skip first argument (scantailor)
@@ -64,6 +69,7 @@ CommandLine::parse_cli(QStringList const& argv)
 		} else {
 			// image and output directory
 			QFileInfo file(argv[i]);
+			CommandLine::s_files.push_back(file);
 			if (i==(argv.size()-1)) {
 				// output directory
 				if (file.isDir()) {
@@ -101,6 +107,7 @@ CommandLine::printHelp()
 {
 	std::cout << "\n";
 	std::cout << "Scan Tailor is a post-processing tool for scanned pages." << "\n";
+	std::cout << "Version: " << VERSION << "\n";
 	std::cout << "\n";
 	std::cout << "ScanTailor usage: " << "\n";
 	std::cout << "\t1) scantailor [options]" << "\n";
@@ -116,6 +123,8 @@ CommandLine::printHelp()
 	std::cout << "\n";
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
+	std::cout << "\t--verbose, -v" << "\n";
+	std::cout << "\t--layout=, -l=<1|2>\t\t-- default: 1" << "\n";
 	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
@@ -123,6 +132,15 @@ CommandLine::printHelp()
 	std::cout << "\n";
 }
 
+
+ProjectPages::LayoutType
+CommandLine::layout()
+{
+	ProjectPages::LayoutType lt = ProjectPages::ONE_PAGE_LAYOUT;
+	if (CommandLine::s_options["layout"] == "2")
+		lt = ProjectPages::TWO_PAGE_LAYOUT;
+	return lt;
+}
 
 Qt::LayoutDirection
 CommandLine::layoutDirection()

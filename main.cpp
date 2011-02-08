@@ -197,7 +197,8 @@ int main(int argc, char** argv)
 		main_wnd->hide();
 		ConsoleBatch cbatch(main_wnd);
 		cbatch.process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
+		main_wnd->close();
+	} else {
+		return app.exec();
 	}
-
-	return app.exec();
 }

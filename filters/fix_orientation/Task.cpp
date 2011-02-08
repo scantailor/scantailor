@@ -27,6 +27,7 @@
 #include "ImageView.h"
 #include "FilterUiInterface.h"
 #include <QImage>
+#include <iostream>
 
 namespace fix_orientation
 {
@@ -115,7 +116,6 @@ void
 Task::UiUpdater::updateUI(FilterUiInterface* ui)
 {
 	// This function is executed from the GUI thread.
-	
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
 	opt_widget->postUpdateUI(m_xform.preRotation());
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
