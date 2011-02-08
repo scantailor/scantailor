@@ -87,10 +87,11 @@ CommandLine::parse_cli(QStringList const& argv)
 			}
 		}
 	}
+
 #ifdef DEBUG_CLI
 	QStringList params = CommandLine::s_options.keys();
 	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << CommandLine::s_options[params[i]].toAscii().constData() << "\n"; }
-	printf("Images: %d\n", (int)CommandLine::s_images.size());
+	std::cout << "Images: " << CommandLine::s_images.size() << "\n";
 #endif
 }
 

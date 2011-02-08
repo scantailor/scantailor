@@ -30,6 +30,8 @@ public:
 	OrthogonalRotation() : m_degrees(0) {}
 	
 	int toDegrees() const { return m_degrees; }
+
+	void setDegree(int deg) { m_degrees = deg; };
 	
 	void nextClockwiseDirection();
 	
