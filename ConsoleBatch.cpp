@@ -155,9 +155,9 @@ ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& o
 
 	CommandLine cli;
 
-	// simulate clicking on batch processing button one by one
+	// it should be enough to run last two stages
 	PageSequence page_sequence = pages->toPageSequence(IMAGE_VIEW);
-	for (int j=0; j<stages->count(); j++) {
+	for (int j=4; j<stages->count(); j++) {
 		if (cli["verbose"] == "true")
 			std::cout << "Filter: " << j << "\n";
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {

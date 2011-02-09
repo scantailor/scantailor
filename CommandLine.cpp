@@ -124,7 +124,7 @@ CommandLine::printHelp()
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
 	std::cout << "\t--verbose, -v" << "\n";
-	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
+//	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
 	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
