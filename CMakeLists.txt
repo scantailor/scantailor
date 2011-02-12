@@ -56,6 +56,10 @@ IF("${VERSION_QUAD}" STREQUAL "${version_h_contents}")
 	MESSAGE(FATAL_ERROR "Failed to extract VERSION_QUAD from version.h")
 ENDIF()
 
+# This has to go quite early on, as otherwise we risk picking
+# up an identically named header from a system include path.
+INCLUDE_DIRECTORIES(. foundation math interaction zones)
+
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(FindBoost)
@@ -274,7 +278,7 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(. foundation math interaction zones ${QT_INCLUDES})
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
 SET(QJPEG_LIBRARIES "")
