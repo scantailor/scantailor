@@ -68,14 +68,14 @@
 ConsoleBatch::ConsoleBatch(MainWindow* main_w)
 :   batch(true), debug(true), main_wnd(main_w),
 	disambiguator(new FileNameDisambiguator)
-{};
+{}
 
-
+/*
 ConsoleBatch::~ConsoleBatch()
 {
 	delete(disambiguator);
 }
-
+*/
 
 BackgroundTaskPtr
 ConsoleBatch::createCompositeTask(

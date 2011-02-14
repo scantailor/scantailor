@@ -42,7 +42,7 @@ class ConsoleBatch
 public:
 	ConsoleBatch(MainWindow* main_w);
 
-	virtual ~ConsoleBatch();
+	//virtual ~ConsoleBatch();
 
 	void process(
 			//std::vector<ImageInfo> const& images,
