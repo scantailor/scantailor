@@ -41,7 +41,7 @@ class CommandLine
 
 	static void parse_cli(QStringList const& argv);
 	static void parse_cli(int argc, char **argv);
-	static void getDpi(int &xdpi, int &ydpi);
+	static Dpi getDpi(QString oname="dpi");
 
 	public:
 		CommandLine() {};
@@ -59,7 +59,8 @@ class CommandLine
 		bool help() { return (CommandLine::s_options["help"] == "true"); };
 		page_split::LayoutType layout();
 		Qt::LayoutDirection layoutDirection();
-		void dpi(int &xdpi, int &ydpi) { CommandLine::getDpi(xdpi, ydpi); };
+		Dpi dpi() { return CommandLine::getDpi(); };
+		Dpi outputDpi() { return CommandLine::getDpi("output-dpi"); };
 
 		void printHelp();
 };

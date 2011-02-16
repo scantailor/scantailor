@@ -83,9 +83,7 @@ CommandLine::parse_cli(QStringList const& argv)
 				// create ImageFileInfo and push to images
 				ImageId const image_id(file.filePath());
 				ImageMetadata metadata;
-				int xdpi, ydpi;
-				CommandLine::getDpi(xdpi, ydpi);
-				metadata.setDpi(Dpi(xdpi, ydpi));
+				metadata.setDpi(CommandLine::getDpi());
 				std::vector<ImageMetadata> vMetadata;
 				vMetadata.push_back(metadata);
 				ImageFileInfo image_info(file, vMetadata);
@@ -129,6 +127,9 @@ CommandLine::printHelp()
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
+	std::cout << "\t--output-dpi=<number>\t\t\t\t-- sets x and y output dpi. default: 300" << "\n";
+	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
+	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
 	std::cout << "\n";
 }
 
@@ -160,20 +161,22 @@ CommandLine::layoutDirection()
 	return l;
 }
 
-void
-CommandLine::getDpi(int &xdpi, int &ydpi)
+Dpi
+CommandLine::getDpi(QString oname)
 {
-	xdpi=300;
-	ydpi=300;
+	int xdpi=300;
+	int ydpi=300;
 
-	if (CommandLine::s_options["dpi-x"] != "") {
-		xdpi = CommandLine::s_options["dpi-x"].toInt();
+	if (CommandLine::s_options[oname+"-x"] != "") {
+		xdpi = CommandLine::s_options[oname+"-x"].toInt();
 	}
-	if (CommandLine::s_options["dpi-y"] != "") {
-		ydpi = CommandLine::s_options["dpi-y"].toInt();
+	if (CommandLine::s_options[oname+"-y"] != "") {
+		ydpi = CommandLine::s_options[oname+"-y"].toInt();
 	}
-	if (CommandLine::s_options["dpi"] != "") {
-		xdpi = CommandLine::s_options["dpi"].toInt();
-		ydpi = CommandLine::s_options["dpi"].toInt();
+	if (CommandLine::s_options[oname] != "") {
+		xdpi = CommandLine::s_options[oname].toInt();
+		ydpi = CommandLine::s_options[oname].toInt();
 	}
+
+	return Dpi(xdpi, ydpi);
 }

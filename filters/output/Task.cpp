@@ -70,6 +70,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 
+#include "CommandLine.h"
+
 using namespace imageproc;
 
 namespace output
@@ -148,6 +150,8 @@ Task::process(
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
 	status.throwIfCancelled();
+
+	CommandLine cli;
 	
 	Params params(m_ptrSettings->getParams(m_pageId));
 	RenderParams const render_params(params.colorParams());
@@ -170,8 +174,14 @@ Task::process(
 	bool const need_speckles_image = params.despeckleLevel() != DESPECKLE_OFF
 		&& params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
 	
+	Dpi outputDpi;
+	if (cli.images().size() > 0) {
+		outputDpi = cli.outputDpi();
+	} else {
+		outputDpi = params.outputDpi();
+	}
 	OutputGenerator const generator(
-		params.outputDpi(), params.colorParams(), params.despeckleLevel(),
+		outputDpi, params.colorParams(), params.despeckleLevel(),
 		data.xform(), content_rect_phys, page_rect_phys
 	);
 	
