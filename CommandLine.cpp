@@ -127,9 +127,10 @@ CommandLine::printHelp()
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
-	std::cout << "\t--output-dpi=<number>\t\t\t\t-- sets x and y output dpi. default: 300" << "\n";
+	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 300" << "\n";
 	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
 	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
+	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
 	std::cout << "\n";
 }
 
@@ -179,4 +180,17 @@ CommandLine::getDpi(QString oname)
 	}
 
 	return Dpi(xdpi, ydpi);
+}
+
+output::ColorParams::ColorMode
+CommandLine::colorMode()
+{
+	QString cm = CommandLine::s_options["color-mode"].toLower();
+	
+	if (cm == "color_grayscale")
+		return output::ColorParams::COLOR_GRAYSCALE;
+	else if (cm == "mixed")
+		return output::ColorParams::MIXED;
+
+	return output::ColorParams::BLACK_AND_WHITE;
 }

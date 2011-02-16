@@ -27,6 +27,7 @@
 
 #include "Dpi.h"
 #include "filters/page_split/LayoutType.h"
+#include "filters/output/ColorParams.h"
 #include "ImageFileInfo.h"
 
 // CommandLine is a singleton simulation; if you create anywhere object CommandLine
@@ -61,6 +62,7 @@ class CommandLine
 		Qt::LayoutDirection layoutDirection();
 		Dpi dpi() { return CommandLine::getDpi(); };
 		Dpi outputDpi() { return CommandLine::getDpi("output-dpi"); };
+		output::ColorParams::ColorMode colorMode();
 
 		void printHelp();
 };

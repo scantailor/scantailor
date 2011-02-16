@@ -175,19 +175,21 @@ Task::process(
 		&& params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
 	
 	Dpi outputDpi;
+	ColorParams colorParams=params.colorParams();
 	if (cli.images().size() > 0) {
 		outputDpi = cli.outputDpi();
+		colorParams.setColorMode(cli.colorMode());
 	} else {
 		outputDpi = params.outputDpi();
 	}
 	OutputGenerator const generator(
-		outputDpi, params.colorParams(), params.despeckleLevel(),
+		outputDpi, colorParams, params.despeckleLevel(),
 		data.xform(), content_rect_phys, page_rect_phys
 	);
 	
 	OutputImageParams new_output_image_params(
 		generator.outputImageSize(), generator.outputContentRect(),
-		data.xform(), params.outputDpi(), params.colorParams(),
+		data.xform(), outputDpi, colorParams,
 		params.dewarpingMode(), params.distortionModel(),
 		params.depthPerception(), params.despeckleLevel()
 	);
