@@ -146,15 +146,16 @@ Filter::createTask(
 {
 	CommandLine cli;
 
-	if (cli["rotate"] != "") {
+	if (cli["orientation"] != "") {
 		OrthogonalRotation rotation;
 
-		if (cli["rotate"] == "left") {
+		if (cli["orientation"] == "left") {
 			rotation.prevClockwiseDirection();
-		} else if (cli["rotate"] == "right") {
+		} else if (cli["orientation"] == "right") {
 			rotation.nextClockwiseDirection();
-		} else {
-			rotation.setDegree(cli["rotate"].toInt());
+		} else if (cli["orientation"] == "upsidedown") {
+			rotation.nextClockwiseDirection();
+			rotation.nextClockwiseDirection();
 		}
 
 		m_ptrSettings->applyRotation(page_id.imageId(), rotation);
