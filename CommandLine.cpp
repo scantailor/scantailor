@@ -127,6 +127,9 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
+	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
+	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
+	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
