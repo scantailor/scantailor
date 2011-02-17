@@ -28,7 +28,9 @@
 #include "Dpi.h"
 #include "filters/page_split/LayoutType.h"
 #include "filters/output/ColorParams.h"
+#include "filters/page_layout/Alignment.h"
 #include "ImageFileInfo.h"
+#include "Margins.h"
 
 // CommandLine is a singleton simulation; if you create anywhere object CommandLine
 // you get always access to the same variables
@@ -43,6 +45,8 @@ class CommandLine
 	static void parse_cli(QStringList const& argv);
 	static void parse_cli(int argc, char **argv);
 	static Dpi getDpi(QString oname="dpi");
+	static Margins getMargins();
+	static page_layout::Alignment getAlignment();
 
 	public:
 		CommandLine() {};
@@ -63,6 +67,8 @@ class CommandLine
 		Dpi dpi() { return CommandLine::getDpi(); };
 		Dpi outputDpi() { return CommandLine::getDpi("output-dpi"); };
 		output::ColorParams::ColorMode colorMode();
+		Margins margins() { return CommandLine::getMargins(); };
+		page_layout::Alignment alignment() { return CommandLine::getAlignment(); };
 
 		void printHelp();
 };
