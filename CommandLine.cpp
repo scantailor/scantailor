@@ -131,6 +131,8 @@ CommandLine::printHelp()
 	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
 	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
+	std::cout << "\t--white-margins\t\t\t\t-- default: false" << "\n";
+	std::cout << "\t--normalize-illumination\t\t\t-- default: false" << "\n";
 	std::cout << "\n";
 }
 

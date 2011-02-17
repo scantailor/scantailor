@@ -179,6 +179,12 @@ Task::process(
 	if (cli.images().size() > 0) {
 		outputDpi = cli.outputDpi();
 		colorParams.setColorMode(cli.colorMode());
+		ColorGrayscaleOptions cgo;
+		if (cli["white-margins"] == "true")
+			cgo.setWhiteMargins(true);
+		if (cli["normalize-illumination"] == "true")
+			cgo.setNormalizeIllumination(true);
+		colorParams.setColorGrayscaleOptions(cgo);
 	} else {
 		outputDpi = params.outputDpi();
 	}
