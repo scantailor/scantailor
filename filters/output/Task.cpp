@@ -200,6 +200,8 @@ Task::process(
 
 		if (cli["dewarping"] != "")
 			params.setDewarpingMode(DewarpingMode(cli["dewarping"]));
+		if (cli["depth-perception"] != "")
+			params.setDepthPerception(DepthPerception(cli["depth-perception"]));
 	}
 	OutputGenerator const generator(
 		params.outputDpi(), params.colorParams(), params.despeckleLevel(),

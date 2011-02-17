@@ -136,6 +136,7 @@ CommandLine::printHelp()
 	std::cout << "\t--threshold=<n>\t\t\t\t-- n<0 thinner, n>0 thicker; default: 0" << "\n";
 	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << "\n";
+	std::cout << "\t--depth-perception=<1.0...3.0>\t\t\t-- default: 2.0" << "\n";
 	std::cout << "\n";
 }
 
