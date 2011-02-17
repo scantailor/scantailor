@@ -132,7 +132,10 @@ CommandLine::printHelp()
 	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
 	std::cout << "\t--white-margins\t\t\t\t-- default: false" << "\n";
-	std::cout << "\t--normalize-illumination\t\t\t-- default: false" << "\n";
+	std::cout << "\t--normalize-illumination\t\t-- default: false" << "\n";
+	std::cout << "\t--threshold=<n>\t\t\t\t-- n<0 thinner, n>0 thicker; default: 0" << "\n";
+	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
+	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << "\n";
 	std::cout << "\n";
 }
 

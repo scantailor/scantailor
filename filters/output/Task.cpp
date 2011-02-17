@@ -174,30 +174,43 @@ Task::process(
 	bool const need_speckles_image = params.despeckleLevel() != DESPECKLE_OFF
 		&& params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
 	
-	Dpi outputDpi;
-	ColorParams colorParams=params.colorParams();
 	if (cli.images().size() > 0) {
-		outputDpi = cli.outputDpi();
+		Dpi outputDpi = cli.outputDpi();
+		params.setOutputDpi(outputDpi);
+
+		ColorParams colorParams = params.colorParams();
 		colorParams.setColorMode(cli.colorMode());
+
 		ColorGrayscaleOptions cgo;
 		if (cli["white-margins"] == "true")
 			cgo.setWhiteMargins(true);
 		if (cli["normalize-illumination"] == "true")
 			cgo.setNormalizeIllumination(true);
 		colorParams.setColorGrayscaleOptions(cgo);
-	} else {
-		outputDpi = params.outputDpi();
+
+		BlackWhiteOptions bwo;
+		if (cli["threshold"] != "")
+			bwo.setThresholdAdjustment(cli["threshold"].toInt());
+		colorParams.setBlackWhiteOptions(bwo);
+
+		params.setColorParams(colorParams);
+
+		if (cli["despeckle"] != "")
+			params.setDespeckleLevel(despeckleLevelFromString(cli["despeckle"]));
+
+		if (cli["dewarping"] != "")
+			params.setDewarpingMode(DewarpingMode(cli["dewarping"]));
 	}
 	OutputGenerator const generator(
-		outputDpi, colorParams, params.despeckleLevel(),
+		params.outputDpi(), params.colorParams(), params.despeckleLevel(),
 		data.xform(), content_rect_phys, page_rect_phys
 	);
 	
 	OutputImageParams new_output_image_params(
 		generator.outputImageSize(), generator.outputContentRect(),
-		data.xform(), outputDpi, colorParams,
+		data.xform(), params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
-		params.depthPerception(), params.despeckleLevel()
+		params.depthPerception(), params.despeckleLevel() 
 	);
 
 	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
