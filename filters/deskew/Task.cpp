@@ -116,7 +116,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 	CommandLine cli;
 	if (cli.images().size() > 0) {
-		if (cli["rotate"] != "" or cli["deskew"] == "manual") {
+		if (cli["rotate"] != "" || cli["deskew"] == "manual") {
 			double angle = 0.0;
 			if (cli["rotate"] != "")
 				angle = cli["rotate"].toDouble();
