@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="cs" sourcelanguage="en">
+<TS version="2.0" language="sk_SK" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -91,7 +91,7 @@ Taxman</source>
     <name>ColorPickupInteraction</name>
     <message>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation>Kliknite do oblasti pre získanie  farby alebo stlačte klávesu ESC pre zrušenie</translation>
+        <translation>Kliknite do oblasti pre získanie  farby alebo stlačte klávesu ESC pre zrušenie.</translation>
     </message>
 </context>
 <context>
@@ -127,7 +127,7 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Dump file</source>
-        <translation type="unfinished">Obsah souboru</translation>
+        <translation>Obsah súboru</translation>
     </message>
     <message>
         <source>Sending ...</source>
@@ -135,15 +135,15 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Unexpected response (code %1) from dispatcher</source>
-        <translation type="unfinished">Neočakávaná chyba (code %1) na strane odosielateľa</translation>
+        <translation>Neočakávaná chyba (code %1) na strane odosielateľa</translation>
     </message>
     <message>
         <source>Unexpected response from dispatcher</source>
-        <translation type="unfinished">Neočakávaná chyba na strane príjemcu</translation>
+        <translation>Neočakávaná chyba na strane príjemcu</translation>
     </message>
     <message>
         <source>Unexpected response (code %1) from the receiving side</source>
-        <translation type="unfinished">Neočakávaná chyba (code %1) na strane príjemcu</translation>
+        <translation>Neočakávaná chyba (code %1) na strane príjemcu</translation>
     </message>
     <message>
         <source>Successfully sent</source>
@@ -174,7 +174,7 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pre výber viacerých strán použite Ctr+Klik / Shift+Klik</translation>
+        <translation>Pre výber viacerých strán použite Ctr+Klik / Shift+Klik.</translation>
     </message>
 </context>
 <context>
@@ -197,7 +197,7 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Apply To ...</source>
-        <translation>Použiť na</translation>
+        <translation>Použiť na ...</translation>
     </message>
 </context>
 <context>
@@ -230,23 +230,23 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Tab 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Tab 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>DPI</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished">Vlastné</translation>
+        <translation>Vlastné</translation>
     </message>
     <message>
         <source>x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Apply</source>
@@ -285,7 +285,7 @@ English or Russian please.</source>
     </message>
     <message>
         <source>DPI for %1</source>
-        <translation type="unfinished">DPI pre %1</translation>
+        <translation>DPI pre %1</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -339,7 +339,8 @@ English or Russian please.</source>
     <message>
         <source>The following file could not be loaded:
 %1</source>
-        <translation>Tento súbor nemohl byť načítaný:</translation>
+        <translation type="unfinished">Tento súbor nemohl byť načítaný: 
+%1</translation>
     </message>
 </context>
 <context>
@@ -350,11 +351,11 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Keep current page in view.</source>
-        <translation>Ponechať zobrazenú aktuálnu stranu</translation>
+        <translation>Ponechať zobrazenú aktuálnu stranu.</translation>
     </message>
     <message>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
-        <translation>K presunu medzi stranami slúžia klávesy Home, End PgUp (alebo Q), PgDown (alebo W)</translation>
+        <translation>K presunu medzi stranami slúžia klávesy Home, End PgUp (alebo Q), PgDown (alebo W).</translation>
     </message>
     <message>
         <source>Tools</source>
@@ -482,7 +483,7 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Remove from project ...</source>
-        <translation>Odstrániť z projektu</translation>
+        <translation>Odstrániť z projektu ...</translation>
     </message>
     <message>
         <source>Insert here ...</source>
@@ -528,7 +529,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     </message>
     <message>
         <source>File to insert</source>
-        <translation>Soubor na vloženie</translation>
+        <translation>Súbor na vloženie</translation>
     </message>
     <message>
         <source>Images not in project (%1)</source>
@@ -555,7 +556,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     </message>
     <message>
         <source>Open Project ...</source>
-        <translation>Otevřít projekt ...</translation>
+        <translation>Otvoriť projekt ...</translation>
     </message>
     <message>
         <source>Recent Projects</source>
@@ -630,7 +631,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     </message>
     <message>
         <source>Apply to ...</source>
-        <translation>Použiť na</translation>
+        <translation>Použiť na ...</translation>
     </message>
 </context>
 <context>
@@ -794,7 +795,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     </message>
     <message>
         <source>Despeckling</source>
-        <translation>Vyčistit</translation>
+        <translation>Čistenie</translation>
     </message>
     <message>
         <source>No despeckling</source>
@@ -864,7 +865,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     </message>
     <message>
         <source>Top</source>
-        <translation>Navrch</translation>
+        <translation>Hore</translation>
     </message>
     <message>
         <source>...</source>
@@ -872,7 +873,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     </message>
     <message>
         <source>Bottom</source>
-        <translation>Naspodok</translation>
+        <translation>Dolu</translation>
     </message>
     <message>
         <source>Left</source>
@@ -1052,7 +1053,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Fix DPIs, even if they look OK</source>
-        <translation>Opraviť DPI, aj keď vyzerajú vporiadku</translation>
+        <translation>Opraviť DPI</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1286,7 +1287,7 @@ Vyraďte ich z projektu.</translation>
     <name>ZoneDefaultInteraction</name>
     <message>
         <source>Drag the vertex.</source>
-        <translation>Posunúť vrchol</translation>
+        <translation>Posunúť vrchol.</translation>
     </message>
     <message>
         <source>Click to create a new vertex here.</source>
@@ -1316,7 +1317,7 @@ Vyraďte ich z projektu.</translation>
     <name>deskew::Filter</name>
     <message>
         <source>Deskew</source>
-        <translation type="unfinished">Natočenie</translation>
+        <translation>Natočenie</translation>
     </message>
 </context>
 <context>
@@ -1443,7 +1444,7 @@ Vyraďte ich z projektu.</translation>
     </message>
     <message>
         <source>Fill Zones</source>
-        <translation>Prázdné zóny</translation>
+        <translation>Prázdne zóny</translation>
     </message>
     <message>
         <source>Dewarping</source>
@@ -1451,7 +1452,7 @@ Vyraďte ich z projektu.</translation>
     </message>
     <message>
         <source>Despeckling</source>
-        <translation>Vyčistiť</translation>
+        <translation>Čistenie</translation>
     </message>
 </context>
 <context>
@@ -1477,7 +1478,7 @@ Vyraďte ich z projektu.</translation>
     <name>page_layout::ImageView</name>
     <message>
         <source>Resize margins by dragging any of the solid lines.</source>
-        <translation type="unfinished">Zmeňte okraje ťahaním za ľubovoľný okraj.</translation>
+        <translation>Zmeňte okraje ťahaním za ľubovoľný okraj.</translation>
     </message>
 </context>
 <context>
