@@ -60,6 +60,10 @@ IF("${VERSION_QUAD}" STREQUAL "${version_h_contents}")
 	MESSAGE(FATAL_ERROR "Failed to extract VERSION_QUAD from version.h")
 ENDIF()
 
+# This has to go quite early on, as otherwise we risk picking
+# up an identically named header from a system include path.
+INCLUDE_DIRECTORIES(. foundation math interaction zones)
+
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(FindBoost)
@@ -278,9 +282,10 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
 ENDIF(WIN32)
 
-INCLUDE_DIRECTORIES(. foundation math interaction zones ${QT_INCLUDES})
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
+SET(QJPEG_LIBRARIES "")
 IF(WIN32)
 	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
 	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
@@ -289,16 +294,19 @@ IF(WIN32)
 		SET(QJPEG_DEBUG "${QJPEG_RELEASE}")
 	ELSEIF(QJPEG_DEBUG AND NOT QJPEG_RELEASE)
 		SET(QJPEG_RELEASE "${QJPEG_DEBUG}")
-	ENDIF(QJPEG_RELEASE AND NOT QJPEG_DEBUG)
+	ELSEIF(NOT QJPEG_DEBUG AND NOT QJPEG_RELEASE)
+		MESSAGE(FATAL_ERROR "qjpeg plugin wasn't found!")
+	ENDIF()
+	SET(QJPEG_LIBRARIES "debug;${QJPEG_DEBUG};optimized;${QJPEG_RELEASE}")
+
 	LIST(
-		APPEND EXTRA_LIBS
-		"${QT_QTMAIN_LIBRARY}" optimized "${QJPEG_RELEASE}"
-		debug "${QJPEG_DEBUG}"
+		APPEND EXTRA_LIBS "${QT_QTMAIN_LIBRARY}"
 		winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool
 	)
-ENDIF(WIN32)
-# ${JPEG_LIBRARY} must go after qjpeg plugin, because otherwise the GNU linker
-# won't resolve symbols qjpeg needs from it.
+ENDIF()
+
+# Note that ${JPEG_LIBRARY} must go after qjpeg plugin, because otherwise
+# the GNU linker won't resolve symbols qjpeg needs from it.
 LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
 
 IF(ENABLE_OPENGL)
@@ -500,10 +508,14 @@ ADD_EXECUTABLE(
 	scantailor WIN32 ${sources} ${ui_sources} version.h
 	${resource_sources} ${win32_resource_file} resources/icons/COPYING
 )
+
+# Note that order of static libraries matters with gcc.  Specifically,
+# QJPEG_LIBRARIES needs to go before Qt libraries and EXTRA_LIBS needs
+# to go after both of them.
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output
-	zones interaction imageproc math foundation
+	zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
