@@ -115,19 +115,10 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setDependencies(deps);
 
 	CommandLine cli;
-	if (cli.images().size() > 0) {
-		if (cli["rotate"] != "" || cli["deskew"] == "manual") {
-			double angle = 0.0;
-			if (cli["rotate"] != "")
-				angle = cli["rotate"].toDouble();
-			Params params(angle, deps, MODE_MANUAL);
-			m_ptrSettings->setPageParams(m_pageId, params);
-		}
-	}
 
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
 	if (params.get()) {
-		if (!deps.matches(params->dependencies())) {
+		if (!deps.matches(params->dependencies()) && cli["rotate"]=="" && cli["deskew"]=="") {
 			params.reset();
 		} else {
 			ui_data.setEffectiveDeskewAngle(params->deskewAngle());

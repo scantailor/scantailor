@@ -71,7 +71,8 @@ public:
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
 		OutputFileNameGenerator const& out_file_name_gen);
 	
-	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
+	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); };
+	Settings* getSettings() { return m_ptrSettings.get(); };
 private:
 	void writePageSettings(
 		QDomDocument& doc, QDomElement& filter_el,

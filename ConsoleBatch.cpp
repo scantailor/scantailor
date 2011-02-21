@@ -41,25 +41,32 @@
 #include <iostream>
 #include <assert.h>
 
+#include "filters/fix_orientation/Settings.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
 #include "filters/page_split/Filter.h"
 #include "filters/page_split/Task.h"
 #include "filters/page_split/CacheDrivenTask.h"
+#include "filters/deskew/Settings.h"
 #include "filters/deskew/Filter.h"
 #include "filters/deskew/Task.h"
 #include "filters/deskew/CacheDrivenTask.h"
+#include "filters/select_content/Settings.h"
 #include "filters/select_content/Filter.h"
 #include "filters/select_content/Task.h"
 #include "filters/select_content/CacheDrivenTask.h"
+#include "filters/page_layout/Settings.h"
 #include "filters/page_layout/Filter.h"
 #include "filters/page_layout/Task.h"
 #include "filters/page_layout/CacheDrivenTask.h"
+#include "filters/output/Settings.h"
+#include "filters/output/Params.h"
 #include "filters/output/Filter.h"
 #include "filters/output/Task.h"
 #include "filters/output/CacheDrivenTask.h"
 
+#include "OrthogonalRotation.h"
 #include "ConsoleBatch.h"
 //#include "ConsoleBatch.h.moc"
 #include "CommandLine.h"
@@ -149,7 +156,8 @@ void
 ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& output_dir, Qt::LayoutDirection const layout)
 {
 	IntrusivePtr<ProjectPages> pages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout));
-	StageSequence* stages = new StageSequence(pages, PageSelectionAccessor(main_wnd));
+	PageSelectionAccessor accessor(main_wnd);
+	StageSequence* stages = setup(pages, accessor);
 	IntrusivePtr<ThumbnailPixmapCache> thumbnail_cache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
 	OutputFileNameGenerator out_filename_gen(disambiguator, output_dir, pages->layoutDirection());
 
@@ -168,4 +176,101 @@ ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& o
 			(*bgTask)();
 		}
 	}
+}
+
+StageSequence*
+ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor accessor)
+{
+	StageSequence* stages = new StageSequence(pages, accessor);
+	std::set<PageId> allPages = pages->toPageSequence(IMAGE_VIEW).selectAll();
+
+	IntrusivePtr<fix_orientation::Filter> fix_orientation = stages->fixOrientationFilter(); 
+	IntrusivePtr<page_split::Filter> page_split = stages->pageSplitFilter(); 
+	IntrusivePtr<deskew::Filter> deskew = stages->deskewFilter(); 
+	IntrusivePtr<select_content::Filter> select_content = stages->selectContentFilter(); 
+	IntrusivePtr<page_layout::Filter> page_layout = stages->pageLayoutFilter(); 
+	IntrusivePtr<output::Filter> output = stages->outputFilter(); 
+
+	CommandLine cli;
+
+	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
+		PageId page = *i;
+
+		OrthogonalRotation rotation;
+		// FIX ORIENTATION FILTER
+		if (cli["orientation"] != "") {
+			if (cli["orientation"] == "left") {
+				rotation.prevClockwiseDirection();
+			} else if (cli["orientation"] == "right") {
+				rotation.nextClockwiseDirection();
+			} else if (cli["orientation"] == "upsidedown") {
+				rotation.nextClockwiseDirection();
+				rotation.nextClockwiseDirection();
+			}
+			fix_orientation->getSettings()->applyRotation(page.imageId(), rotation);
+		}
+	
+		// DESKEW FILTER
+		if (cli["rotate"] != "" || cli["deskew"] == "manual") {
+			double angle = 0.0;
+			if (cli["rotate"] != "")
+				angle = cli["rotate"].toDouble();
+			deskew::Dependencies deps(QPolygonF(), rotation);
+			deskew::Params params(angle, deps, MODE_MANUAL);
+			deskew->getSettings()->setPageParams(page, params);
+		}
+	
+		// SELECT CONTENT FILTER
+		if (cli["content-box"] != "") {
+			QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");
+			if (rx.exactMatch(cli["content-box"])) {
+				QRectF rect(rx.cap(1).toFloat(), rx.cap(2).toFloat(), rx.cap(3).toFloat(), rx.cap(4).toFloat());
+				QSizeF size_mm(rx.cap(3).toFloat(), rx.cap(4).toFloat());
+				select_content::Dependencies deps;
+				select_content::Params params(rect, size_mm, deps, MODE_MANUAL);
+				select_content->getSettings()->setPageParams(page, params);
+			} else {
+				std::cout << ("invalid --content-box=" + cli["content-box"] + "\n").toAscii().constData();
+				exit(2);
+			}
+		}
+
+		// PAGE LAYOUT FILTER
+		page_layout->getSettings()->setHardMarginsMM(page, cli.margins());
+		page_layout->getSettings()->setPageAlignment(page, cli.alignment());
+
+		// OUTPUT FILTER
+		output::Params params(output->getSettings()->getParams(page));
+		Dpi outputDpi = cli.outputDpi();
+		params.setOutputDpi(outputDpi);
+
+		output::ColorParams colorParams = params.colorParams();
+		colorParams.setColorMode(cli.colorMode());
+
+		output::ColorGrayscaleOptions cgo;
+		if (cli["white-margins"] == "true")
+			cgo.setWhiteMargins(true);
+		if (cli["normalize-illumination"] == "true")
+			cgo.setNormalizeIllumination(true);
+		colorParams.setColorGrayscaleOptions(cgo);
+
+		output::BlackWhiteOptions bwo;
+		if (cli["threshold"] != "")
+			bwo.setThresholdAdjustment(cli["threshold"].toInt());
+		colorParams.setBlackWhiteOptions(bwo);
+
+		params.setColorParams(colorParams);
+
+		if (cli["despeckle"] != "")
+			params.setDespeckleLevel(output::despeckleLevelFromString(cli["despeckle"]));
+
+		if (cli["dewarping"] != "")
+			params.setDewarpingMode(output::DewarpingMode(cli["dewarping"]));
+		if (cli["depth-perception"] != "")
+			params.setDepthPerception(output::DepthPerception(cli["depth-perception"]));
+
+		output->getSettings()->setParams(page, params);
+	}
+
+	return stages;
 }

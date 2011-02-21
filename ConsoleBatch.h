@@ -35,6 +35,7 @@
 #include "ImageFileInfo.h"
 #include "ThumbnailPixmapCache.h"
 #include "OutputFileNameGenerator.h"
+#include "PageSelectionAccessor.h"
 
 
 class ConsoleBatch
@@ -55,6 +56,8 @@ private:
 	bool debug;
 	MainWindow *main_wnd;
 	IntrusivePtr<FileNameDisambiguator> disambiguator;
+
+	StageSequence* setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor accessor);
 
 	BackgroundTaskPtr createCompositeTask(
 		StageSequence const* m_ptrStages,

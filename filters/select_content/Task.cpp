@@ -96,23 +96,9 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	Dependencies const deps(data.xform().resultingCropArea());
 	
 	CommandLine cli;
-	if (cli.images().size() > 0) {
-		if (cli["content-box"] != "") {
-			QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");
-			if (rx.exactMatch(cli["content-box"])) {
-				QRectF rect(rx.cap(1).toFloat(), rx.cap(2).toFloat(), rx.cap(3).toFloat(), rx.cap(4).toFloat());
-				QSizeF size_mm(rx.cap(3).toFloat(), rx.cap(4).toFloat());
-				Params params(rect, size_mm, deps, MODE_MANUAL);
-				m_ptrSettings->setPageParams(m_pageId, params);
-			} else {
-				std::cout << ("invalid --content-box=" + cli["content-box"] + "\n").toAscii().constData();
-				exit(2);
-			}
-		}
-	}
 	
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	if (params.get() && !params->dependencies().matches(deps) && params->mode() == MODE_AUTO) {
+	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO) && (cli["content-box"]=="")) {
 		params.reset();
 	}
 

@@ -70,8 +70,6 @@
 #include <QCoreApplication>
 #include <QDebug>
 
-#include "CommandLine.h"
-
 using namespace imageproc;
 
 namespace output
@@ -151,8 +149,6 @@ Task::process(
 {
 	status.throwIfCancelled();
 
-	CommandLine cli;
-	
 	Params params(m_ptrSettings->getParams(m_pageId));
 	RenderParams const render_params(params.colorParams());
 	QString const out_file_path(m_outFileNameGen.filePathFor(m_pageId));
@@ -174,35 +170,6 @@ Task::process(
 	bool const need_speckles_image = params.despeckleLevel() != DESPECKLE_OFF
 		&& params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE && !m_batchProcessing;
 	
-	if (cli.images().size() > 0) {
-		Dpi outputDpi = cli.outputDpi();
-		params.setOutputDpi(outputDpi);
-
-		ColorParams colorParams = params.colorParams();
-		colorParams.setColorMode(cli.colorMode());
-
-		ColorGrayscaleOptions cgo;
-		if (cli["white-margins"] == "true")
-			cgo.setWhiteMargins(true);
-		if (cli["normalize-illumination"] == "true")
-			cgo.setNormalizeIllumination(true);
-		colorParams.setColorGrayscaleOptions(cgo);
-
-		BlackWhiteOptions bwo;
-		if (cli["threshold"] != "")
-			bwo.setThresholdAdjustment(cli["threshold"].toInt());
-		colorParams.setBlackWhiteOptions(bwo);
-
-		params.setColorParams(colorParams);
-
-		if (cli["despeckle"] != "")
-			params.setDespeckleLevel(despeckleLevelFromString(cli["despeckle"]));
-
-		if (cli["dewarping"] != "")
-			params.setDewarpingMode(DewarpingMode(cli["dewarping"]));
-		if (cli["depth-perception"] != "")
-			params.setDepthPerception(DepthPerception(cli["depth-perception"]));
-	}
 	OutputGenerator const generator(
 		params.outputDpi(), params.colorParams(), params.despeckleLevel(),
 		data.xform(), content_rect_phys, page_rect_phys

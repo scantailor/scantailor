@@ -37,7 +37,6 @@
 #include <vector>
 #include <stddef.h>
 
-#include "CommandLine.h"
 
 using namespace ::boost;
 using namespace ::boost::multi_index;
@@ -358,11 +357,6 @@ Settings::Impl::Impl()
 	m_defaultHardMarginsMM(10.0, 5.0, 10.0, 5.0),
 	m_defaultAlignment(Alignment::TOP, Alignment::HCENTER)
 {
-	CommandLine cli;
-	if (cli.images().size() > 0) {
-		m_defaultHardMarginsMM = cli.margins();
-		m_defaultAlignment = cli.alignment();
-	}
 }
 
 Settings::Impl::~Impl()

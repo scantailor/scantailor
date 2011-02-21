@@ -38,8 +38,6 @@
 #include <QDomElement>
 #include <QDomNode>
 
-#include "CommandLine.h"
-
 namespace fix_orientation
 {
 
@@ -144,23 +142,6 @@ Filter::createTask(
 	IntrusivePtr<page_split::Task> const& next_task,
 	bool const batch_processing)
 {
-	CommandLine cli;
-
-	if (cli["orientation"] != "") {
-		OrthogonalRotation rotation;
-
-		if (cli["orientation"] == "left") {
-			rotation.prevClockwiseDirection();
-		} else if (cli["orientation"] == "right") {
-			rotation.nextClockwiseDirection();
-		} else if (cli["orientation"] == "upsidedown") {
-			rotation.nextClockwiseDirection();
-			rotation.nextClockwiseDirection();
-		}
-
-		m_ptrSettings->applyRotation(page_id.imageId(), rotation);
-	}
-
 	return IntrusivePtr<Task>(
 		new Task(
 			page_id.imageId(), IntrusivePtr<Filter>(this),
