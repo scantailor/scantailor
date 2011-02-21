@@ -19,8 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "MainWindow.h"
-#include "WorkerThread.h"
+#include <vector>
+#include <iostream>
+#include <assert.h>
+
 #include "ProjectPages.h"
 #include "PageSelectionAccessor.h"
 #include "StageSequence.h"
@@ -34,12 +36,6 @@
 #include "ImageId.h"
 #include "ThumbnailPixmapCache.h"
 #include "LoadFileTask.h"
-#include <QSettings>
-#include <Qt>
-#include <QDebug>
-#include <vector>
-#include <iostream>
-#include <assert.h>
 
 #include "filters/fix_orientation/Settings.h"
 #include "filters/fix_orientation/Filter.h"
@@ -68,12 +64,11 @@
 
 #include "OrthogonalRotation.h"
 #include "ConsoleBatch.h"
-//#include "ConsoleBatch.h.moc"
 #include "CommandLine.h"
 
 
-ConsoleBatch::ConsoleBatch(MainWindow* main_w)
-:   batch(true), debug(true), main_wnd(main_w),
+ConsoleBatch::ConsoleBatch()
+:   batch(true), debug(true),
 	disambiguator(new FileNameDisambiguator)
 {}
 
@@ -156,7 +151,7 @@ void
 ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& output_dir, Qt::LayoutDirection const layout)
 {
 	IntrusivePtr<ProjectPages> pages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout));
-	PageSelectionAccessor accessor(main_wnd);
+	PageSelectionAccessor const accessor(0);
 	StageSequence* stages = setup(pages, accessor);
 	IntrusivePtr<ThumbnailPixmapCache> thumbnail_cache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
 	OutputFileNameGenerator out_filename_gen(disambiguator, output_dir, pages->layoutDirection());
@@ -179,9 +174,9 @@ ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& o
 }
 
 StageSequence*
-ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor accessor)
+ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor const& accessor)
 {
-	StageSequence* stages = new StageSequence(pages, accessor);
+	StageSequence* stages = new StageSequence(pages, 0);
 	std::set<PageId> allPages = pages->toPageSequence(IMAGE_VIEW).selectAll();
 
 	IntrusivePtr<fix_orientation::Filter> fix_orientation = stages->fixOrientationFilter(); 

@@ -22,26 +22,28 @@
 #ifndef CONSOLEBATCH_H_
 #define CONSOLEBATCH_H_
 
-#include "MainWindow.h"
-#include "NonCopyable.h"
+#include <QString>
+#include <vector>
+
 #include "IntrusivePtr.h"
 #include "BackgroundTask.h"
 #include "FilterResult.h"
 #include "OutputFileNameGenerator.h"
 #include "PageId.h"
+#include "PageInfo.h"
 #include "PageView.h"
-#include <QString>
-#include <vector>
+#include "ProjectPages.h"
 #include "ImageFileInfo.h"
 #include "ThumbnailPixmapCache.h"
 #include "OutputFileNameGenerator.h"
+#include "StageSequence.h"
 #include "PageSelectionAccessor.h"
 
 
 class ConsoleBatch
 {
 public:
-	ConsoleBatch(MainWindow* main_w);
+	ConsoleBatch();
 
 	//virtual ~ConsoleBatch();
 
@@ -54,10 +56,9 @@ public:
 private:
 	bool batch;
 	bool debug;
-	MainWindow *main_wnd;
 	IntrusivePtr<FileNameDisambiguator> disambiguator;
 
-	StageSequence* setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor accessor);
+	StageSequence* setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor const& accessor);
 
 	BackgroundTaskPtr createCompositeTask(
 		StageSequence const* m_ptrStages,

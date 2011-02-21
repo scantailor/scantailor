@@ -33,12 +33,7 @@
 #include <Qt>
 #include <string.h>
 
-#include "ImageInfo.h"
-#include "ImageFileInfo.h"
-
-#include "ConsoleBatch.h"
 #include "CommandLine.h"
-#include <iostream>
 
 
 #ifdef Q_WS_WIN
@@ -193,12 +188,5 @@ int main(int argc, char** argv)
 		main_wnd->openProject(cli.projectFile());
 	}
 
-	if (cli.images().size() > 0) {
-		main_wnd->hide();
-		ConsoleBatch cbatch(main_wnd);
-		cbatch.process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
-		main_wnd->close();
-	} else {
-		return app.exec();
-	}
+	return app.exec();
 }
