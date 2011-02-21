@@ -198,29 +198,6 @@ Filter::createTask(
 	IntrusivePtr<deskew::Task> const& next_task,
 	bool const batch_processing, bool const debug)
 {
-	/*
-	m_ptrSettings->setLayoutTypeForAllPages(
-		//layoutTypeFromString("two-pages")
-		AUTO_LAYOUT_TYPE
-	);
-
-	ImageId const image_id(page_info.imageId());
-	Settings::UpdateAction update;
-		
-//	QString const layout_type("two-pages");
-//	update.setLayoutType(layoutTypeFromString(layout_type));
-	update.setLayoutType(AUTO_LAYOUT_TYPE);
-		
-	//QDomElement params_el(el.namedItem("params").toElement());
-	PageLayout pg_layout;
-	pg_layout.setType(PageLayout::TWO_PAGES);
-	Dependencies deps;
-	deps.setLayoutType(AUTO_LAYOUT_TYPE);
-	Params params(pg_layout, deps, MODE_AUTO);
-	update.setParams(params);
-
-	m_ptrSettings->updatePage(image_id, update);
-*/
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings, m_ptrPages,
