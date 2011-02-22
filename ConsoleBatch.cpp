@@ -62,6 +62,8 @@
 #include "filters/output/Task.h"
 #include "filters/output/CacheDrivenTask.h"
 
+#include <QMap>
+
 #include "OrthogonalRotation.h"
 #include "ConsoleBatch.h"
 #include "CommandLine.h"
@@ -187,6 +189,7 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 	IntrusivePtr<output::Filter> output = stages->outputFilter(); 
 
 	CommandLine cli;
+	QMap<QString, QImage> img_cache;
 
 	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
 		PageId page = *i;
@@ -233,15 +236,19 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 		// PAGE LAYOUT FILTER
 		page_layout::Alignment alignment = cli.alignment();
 		if (cli["match-layout-tolerance"] != "") {
-			QImage img(page.imageId().filePath());
+			QString const path = page.imageId().filePath();
+			if (img_cache[path].isNull())
+				img_cache[path] = QImage(path);
+			QImage img = img_cache[path];
 			float imgAspectRatio = float(img.width()) / float(img.height());
 			float tolerance = cli["match-layout-tolerance"].toFloat();
-			float max_width = 0.0;
-			float max_height = 0.0;
 			std::vector<float> diffs;
 			for (std::set<PageId>::iterator pi=allPages.begin(); pi!=allPages.end(); pi++) {
 				ImageId pimageId = pi->imageId();
-				QImage pimg(pimageId.filePath());
+				QString ppath = pimageId.filePath();
+				if (img_cache[ppath].isNull())
+					img_cache[ppath] = QImage(ppath);
+				QImage pimg = img_cache[ppath];
 				float pimgAspectRatio = float(pimg.width()) / float(pimg.height());
 				float diff = imgAspectRatio - pimgAspectRatio;
 				if (diff < 0.0) diff *= -1;
