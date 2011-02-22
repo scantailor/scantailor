@@ -21,6 +21,7 @@
 
 #include "VecNT.h"
 #include "MatMNT.h"
+#include <QLineF>
 
 namespace spfit
 {
@@ -34,11 +35,12 @@ namespace spfit
  * \li b: a 2 element column vector.
  * \li c: some constant.
  *
- * The value of the function approximates the squared distance
+ * The function is meant to approximate the squared distance
  * to the target model.  It's only accurate in a neighbourhood
  * of some unspecified point.
+ * The iso-curves of the function are rotated ellipses in a general case.
  *
- * \see formulas 6 and 7 in [2].
+ * \see Eq 8 in [1], Fig 4, 5 in [2].
  */
 struct SqDistApproximant
 {
@@ -46,9 +48,35 @@ struct SqDistApproximant
 	Vec2d b;
 	double c;
 
+	/**
+	 * Constructs a distance function that always evaluates to zero.
+	 * Passing it to Optimizer::addSample() will have no effect.
+	 */
 	SqDistApproximant() : c(0) {}
 
-	void initWithWeightedPointDistance(Vec2d const& pt, double weight = 1);
+	/**
+	 * \brief The general case constructor.
+	 *
+	 * We have a coordinate system at \p origin with orthonormal basis formed
+	 * by vectors \p u and \p v.  Given a point p in the global coordinate system,
+	 * the appoximant will evaluate to:
+	 * \code
+	 * sqdist = m * i^2 + n * j^2;
+	 * // Where i and j are projections onto u and v respectively.
+	 * // More precisely:
+	 * i = (p - origin) . u;
+	 * j = (p - origin) . v;
+	 * \endcode
+	 */
+	SqDistApproximant(Vec2d const& origin, Vec2d const& u, Vec2d const& v, double m, double n);
+
+	static SqDistApproximant pointDistance(Vec2d const& pt);
+
+	static SqDistApproximant weightedPointDistance(Vec2d const& pt, double weight);
+
+	static SqDistApproximant lineDistance(QLineF const& line);
+
+	static SqDistApproximant weightedLineDistance(QLineF const& line, double weight);
 
 	double evaluate(Vec2d const& pt) const;
 };
