@@ -231,8 +231,33 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 		}
 
 		// PAGE LAYOUT FILTER
+		page_layout::Alignment alignment = cli.alignment();
+		if (cli["match-layout-tolerance"] != "") {
+			QImage img(page.imageId().filePath());
+			float imgAspectRatio = float(img.width()) / float(img.height());
+			float tolerance = cli["match-layout-tolerance"].toFloat();
+			float max_width = 0.0;
+			float max_height = 0.0;
+			std::vector<float> diffs;
+			for (std::set<PageId>::iterator pi=allPages.begin(); pi!=allPages.end(); pi++) {
+				ImageId pimageId = pi->imageId();
+				QImage pimg(pimageId.filePath());
+				float pimgAspectRatio = float(pimg.width()) / float(pimg.height());
+				float diff = imgAspectRatio - pimgAspectRatio;
+				if (diff < 0.0) diff *= -1;
+				diffs.push_back(diff);
+			}
+			unsigned bad_diffs = 0;
+			for (unsigned j=0; j<diffs.size(); j++) {
+				if (diffs[j] > tolerance)
+					bad_diffs += 1;
+			}
+			if (bad_diffs > (diffs.size()/2)) {
+				alignment.setNull(true);
+			}
+		}
 		page_layout->getSettings()->setHardMarginsMM(page, cli.margins());
-		page_layout->getSettings()->setPageAlignment(page, cli.alignment());
+		page_layout->getSettings()->setPageAlignment(page, alignment);
 
 		// OUTPUT FILTER
 		output::Params params(output->getSettings()->getParams(page));

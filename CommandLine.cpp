@@ -137,6 +137,7 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-top=<number>" << "\n";
 	std::cout << "\t\t--margins-bottom=<number>" << "\n";
 	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << "\n";
+	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << "\n";
 	std::cout << "\t--alignment=center\t\t\t-- sets vertical and horizontal alignment to center" << "\n";
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom>" << "\n";
 	std::cout << "\t\t--alignment-horizontal=<left|center|right>" << "\n";
