@@ -161,6 +161,7 @@ private:
 	 * (0, 0) in millimeter coordinates.
 	 */
 	PhysicalTransformation const m_physXform;
+	ImageTransformation const m_xform;
 	
 	/**
 	 * Content box in virtual image coordinates.

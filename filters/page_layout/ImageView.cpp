@@ -58,6 +58,7 @@ ImageView::ImageView(
 		ImagePresentation(xform.transform(), xform.resultingCropArea()),
 		Margins(5, 5, 5, 5)
 	),
+	m_xform(xform),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_ptrSettings(settings),
@@ -557,7 +558,7 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	);
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_alignment
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_xform.resultingRect(), poly_mm.boundingRect()
 		)
 	);
 	
@@ -663,7 +664,7 @@ ImageView::recalcOuterRect()
 	);
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_alignment
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_xform.resultingRect(), poly_mm.boundingRect()
 		)
 	);
 	

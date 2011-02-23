@@ -28,6 +28,9 @@
 #include <QSizeF>
 #include <QRectF>
 #include <assert.h>
+#include <iostream>
+
+#include "CommandLine.h"
 
 namespace page_layout
 {
@@ -93,7 +96,7 @@ Utils::extendPolyRectWithMargins(
 Margins
 Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
-	Alignment const& alignment)
+	Alignment const& alignment, QRectF const& resultRect, QRectF const& boundingRect)
 {
 	if (alignment.isNull()) {
 		// This means we are not aligning this page with others.
@@ -104,7 +107,19 @@ Utils::calcSoftMarginsMM(
 	double bottom = 0.0;
 	double left = 0.0;
 	double right = 0.0;
+
+	// detect borders
+	double leftBorder = double(boundingRect.left()) / double(resultRect.width());
+	double rightBorder = double(boundingRect.right()) / double(resultRect.width());
+	double topBorder = double(boundingRect.top()) / double(resultRect.height());
+	double bottomBorder = double(boundingRect.bottom()) / double(resultRect.height());
 	
+	// get vertical and horizontal shift of page content
+	double horizontalShift = leftBorder - (1.0 - rightBorder); // <0 means more left; >0 more right; 0 is centered
+	double verticalShift = topBorder - (1.0 - bottomBorder);   // <0 more top; >0 more bottom; 0 is centered
+	double absHShift = horizontalShift < 0.0 ? horizontalShift*(-1) : horizontalShift;
+	double absVShift = verticalShift < 0.0 ? verticalShift*(-1) : verticalShift;
+
 	double const delta_width =
 			aggregate_hard_size_mm.width() - hard_size_mm.width();
 	if (delta_width > 0.0) {
@@ -117,6 +132,10 @@ Utils::calcSoftMarginsMM(
 				break;
 			case Alignment::RIGHT:
 				left = delta_width;
+				break;
+			default:
+				left = (delta_width * 0.5) + (delta_width * horizontalShift);
+				right = delta_width - left;
 				break;
 		}
 	}
@@ -134,9 +153,29 @@ Utils::calcSoftMarginsMM(
 			case Alignment::BOTTOM:
 				top = delta_height;
 				break;
+			default:
+				top = (delta_height * 0.5) + (delta_height * verticalShift);
+				bottom = delta_height - top;
+				break;
 		}
 	}
 	
+	// if the shift of page content is too big, keep original borders ratio
+	// TODO: gui interface; now it works as an hiden option
+	CommandLine cli;
+	if (cli["content-shift-tolerance"] != "") {
+		double tolerance = cli["content-shift-tolerance"].toFloat();
+
+		if (absHShift > tolerance && boundingRect.width() > 1.0) {
+			left = (delta_width * 0.5) + (delta_width * horizontalShift);
+			right = delta_width - left;
+		}
+		if (absVShift > tolerance && boundingRect.height() > 1.0) {
+			top = (delta_height * 0.5) + (delta_height * verticalShift);
+			bottom = delta_height - top;
+		}
+	}
+
 	return Margins(left, top, right, bottom);
 }
 
@@ -154,12 +193,12 @@ Utils::calcPageRectPhys(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
 		QLineF(poly_mm[0], poly_mm[3]).length()
 	);
-	Margins const soft_margins_mm(
+	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment()
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.resultingRect(), content_rect_phys.boundingRect()
 		)
 	);
-	
+
 	extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 	return phys_xform.mmToPixels().map(poly_mm);
 }

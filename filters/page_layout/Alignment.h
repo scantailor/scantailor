@@ -29,9 +29,9 @@ namespace page_layout
 class Alignment
 {
 public:
-	enum Vertical { TOP, VCENTER, BOTTOM };
+	enum Vertical { TOP, VCENTER, BOTTOM, VORIGINAL };
 	
-	enum Horizontal { LEFT, HCENTER, RIGHT };
+	enum Horizontal { LEFT, HCENTER, RIGHT, HORIGINAL };
 	
 	/**
 	 * \brief Constructs a null alignment.

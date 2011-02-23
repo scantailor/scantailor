@@ -131,6 +131,7 @@ CommandLine::printHelp()
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
+	std::cout << "\t--content-shift-tolerance=<0.0...1.0>\t\tdefault: off" << "\n";
 	std::cout << "\t--margins=<number>\t\t\t-- sets left, top, right and bottom margins to same number." << "\n";
 	std::cout << "\t\t--margins-left=<number>" << "\n";
 	std::cout << "\t\t--margins-right=<number>" << "\n";
@@ -138,9 +139,9 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-bottom=<number>" << "\n";
 	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << "\n";
 	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << "\n";
-	std::cout << "\t--alignment=center\t\t\t-- sets vertical and horizontal alignment to center" << "\n";
-	std::cout << "\t\t--alignment-vertical=<top|center|bottom>" << "\n";
-	std::cout << "\t\t--alignment-horizontal=<left|center|right>" << "\n";
+	std::cout << "\t--alignment=<center|original\t\t-- sets vertical and horizontal alignment to center or original" << "\n";
+	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << "\n";
+	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
@@ -259,11 +260,17 @@ CommandLine::getAlignment()
 		alignment.setHorizontal(page_layout::Alignment::HCENTER);
 	}
 
+	if (CommandLine::s_options["alignment"] == "original") {
+		alignment.setVertical(page_layout::Alignment::VORIGINAL);
+		alignment.setHorizontal(page_layout::Alignment::HORIGINAL);
+	}
+
 	if (CommandLine::s_options["alignment-vertical"] != "") {
 		QString a = CommandLine::s_options["alignment-vertical"].toLower();
 		if (a == "top") alignment.setVertical(page_layout::Alignment::TOP);
 		if (a == "center") alignment.setVertical(page_layout::Alignment::VCENTER);
 		if (a == "bottom") alignment.setVertical(page_layout::Alignment::BOTTOM);
+		if (a == "original") alignment.setVertical(page_layout::Alignment::VORIGINAL);
 	}
 
 	if (CommandLine::s_options["alignment-horizontal"] != "") {
@@ -271,6 +278,7 @@ CommandLine::getAlignment()
 		if (a == "left") alignment.setHorizontal(page_layout::Alignment::LEFT);
 		if (a == "center") alignment.setHorizontal(page_layout::Alignment::HCENTER);
 		if (a == "right") alignment.setHorizontal(page_layout::Alignment::RIGHT);
+		if (a == "original") alignment.setHorizontal(page_layout::Alignment::HORIGINAL);
 	}
 
 	return alignment;
