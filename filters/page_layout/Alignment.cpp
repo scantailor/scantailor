@@ -29,11 +29,16 @@ Alignment::Alignment(QDomElement const& el)
 	QString const vert(el.attribute("vert"));
 	QString const hor(el.attribute("hor"));
 	m_isNull = el.attribute("null").toInt() != 0;
+	m_tolerance = el.attribute("tolerance", QString::number(DEFAULT_TOLERANCE)).toDouble();
 	
 	if (vert == "top") {
 		m_vert = TOP;
 	} else if (vert == "bottom") {
 		m_vert = BOTTOM;
+	} else if (vert == "auto") {
+		m_vert = VAUTO;
+	} else if (vert == "original") {
+		m_vert = VORIGINAL;
 	} else {
 		m_vert = VCENTER;
 	}
@@ -42,6 +47,10 @@ Alignment::Alignment(QDomElement const& el)
 		m_hor = LEFT;
 	} else if (hor == "right") {
 		m_hor = RIGHT;
+	} else if (hor == "auto") {
+		m_hor = HAUTO;
+	} else if (vert == "original") {
+		m_hor = HORIGINAL;
 	} else {
 		m_hor = HCENTER;
 	}
@@ -61,6 +70,12 @@ Alignment::toXml(QDomDocument& doc, QString const& name) const
 		case BOTTOM:
 			vert = "bottom";
 			break;
+		case VAUTO:
+			vert = "auto";
+			break;
+		case VORIGINAL:
+			vert = "original";
+			break;
 	}
 	
 	char const* hor = 0;
@@ -74,12 +89,19 @@ Alignment::toXml(QDomDocument& doc, QString const& name) const
 		case RIGHT:
 			hor = "right";
 			break;
+		case HAUTO:
+			hor = "auto";
+			break;
+		case HORIGINAL:
+			hor = "original";
+			break;
 	}
 	
 	QDomElement el(doc.createElement(name));
 	el.setAttribute("vert", QString::fromAscii(vert));
 	el.setAttribute("hor", QString::fromAscii(hor));
 	el.setAttribute("null", m_isNull ? 1 : 0);
+	el.setAttribute("tolerance", QString::number(m_tolerance));
 	return el;
 }
 

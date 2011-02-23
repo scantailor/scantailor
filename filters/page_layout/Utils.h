@@ -75,7 +75,9 @@ public:
 	static Margins calcSoftMarginsMM(
 		QSizeF const& hard_size_mm,
 		QSizeF const& aggregate_hard_size_mm,
-		Alignment const& alignment);
+		Alignment const& alignment,
+		QRectF const& resultRect,
+		QRectF const& boundingRect);
 	
 	/**
 	 * \brief Calculates the page rect (content + hard margins + soft margins)
