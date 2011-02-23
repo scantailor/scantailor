@@ -19,6 +19,7 @@
 #ifndef SPFIT_POLYLINE_MODEL_SHAPE_H_
 #define SPFIT_POLYLINE_MODEL_SHAPE_H_
 
+#include "NonCopyable.h"
 #include "ModelShape.h"
 #include "SqDistApproximant.h"
 #include "XSpline.h"
@@ -32,6 +33,7 @@ namespace spfit
 
 class PolylineModelShape : public ModelShape
 {
+	DECLARE_NON_COPYABLE(PolylineModelShape)
 public:	
 	PolylineModelShape(std::vector<QPointF> const& polyline);
 

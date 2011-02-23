@@ -33,7 +33,7 @@ class SplineFitter::SampleProcessor : public VirtualFunction2<void, QPointF, dou
 {
 public:
 	SampleProcessor(FittableSpline& spline,
-		ModelShape& model_shape, Optimizer& optimizer,
+		ModelShape const& model_shape, Optimizer& optimizer,
 		std::vector<int> const& to_reduced_control_points);
 
 	virtual void operator()(QPointF pt, double t);
@@ -41,7 +41,7 @@ private:
 	void remapAndFilterCoeffs();
 
 	FittableSpline& m_rSpline;
-	ModelShape& m_rModelShape;
+	ModelShape const& m_rModelShape;
 	Optimizer& m_rOptimizer;
 	std::vector<int> const& m_rToReducedControlPoints;
 	std::vector<FittableSpline::LinearCoefficient> m_coeffs;
@@ -67,7 +67,7 @@ private:
 
 
 SplineFitter::SplineFitter(
-	FittableSpline* spline, ModelShape* model_shape,
+	FittableSpline* spline, ModelShape const* model_shape,
 	boost::dynamic_bitset<> const* fixed_control_points)
 :	m_pSpline(spline),
 	m_pModelShape(model_shape)
@@ -134,7 +134,7 @@ SplineFitter::setupControlPointMappings(boost::dynamic_bitset<> const* fixed_con
 /*========================= SampleProcessor =============================*/
 
 SplineFitter::SampleProcessor::SampleProcessor(
-	FittableSpline& spline, ModelShape& model_shape, Optimizer& optimizer,
+	FittableSpline& spline, ModelShape const& model_shape, Optimizer& optimizer,
 	std::vector<int> const& to_reduced_control_points)
 :	m_rSpline(spline),
 	m_rModelShape(model_shape),
