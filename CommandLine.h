@@ -31,6 +31,7 @@
 #include "filters/page_layout/Alignment.h"
 #include "ImageFileInfo.h"
 #include "Margins.h"
+#include "Despeckle.h"
 
 // CommandLine is a singleton simulation; if you create anywhere object CommandLine
 // you get always access to the same variables
@@ -47,6 +48,7 @@ class CommandLine
 	static Dpi getDpi(QString oname="dpi");
 	static Margins getMargins();
 	static page_layout::Alignment getAlignment();
+	static Despeckle::Level getContentDetection();
 
 	public:
 		CommandLine() {};
@@ -69,6 +71,7 @@ class CommandLine
 		output::ColorParams::ColorMode colorMode();
 		Margins margins() { return CommandLine::getMargins(); };
 		page_layout::Alignment alignment() { return CommandLine::getAlignment(); };
+		Despeckle::Level contentDetection() {return CommandLine::getContentDetection(); };
 
 		void printHelp();
 };

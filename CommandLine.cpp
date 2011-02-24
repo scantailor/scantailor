@@ -12,6 +12,7 @@
 #include "ImageMetadata.h"
 #include "filters/page_split/LayoutType.h"
 #include "Margins.h"
+#include "Despeckle.h"
 
 
 QMap<QString, QString> CommandLine::s_options;
@@ -128,6 +129,7 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
+	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
@@ -291,4 +293,20 @@ CommandLine::getAlignment()
 	}
 
 	return alignment;
+}
+
+Despeckle::Level
+CommandLine::getContentDetection()
+{
+	Despeckle::Level level = Despeckle::NORMAL;
+
+	if (CommandLine::s_options["content-detection"] != "") {
+		QString cm = CommandLine::s_options["content-detection"].toLower();
+		if (cm == "cautious")
+			level = Despeckle::CAUTIOUS;
+		else if (cm == "aggressive")
+			level = Despeckle::AGGRESSIVE;
+	}
+
+	return level;
 }

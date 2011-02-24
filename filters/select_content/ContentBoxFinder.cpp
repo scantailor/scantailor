@@ -62,6 +62,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#include "CommandLine.h"
+
 namespace select_content
 {
 
@@ -208,7 +210,9 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	BinaryImage despeckled(Despeckle::despeckle(content, Dpi(150, 150), Despeckle::NORMAL, status));
+	CommandLine cli;
+	Despeckle::Level despeckleLevel = cli.contentDetection();
+	BinaryImage despeckled(Despeckle::despeckle(content, Dpi(150, 150), despeckleLevel, status));
 	if (dbg) {
 		dbg->add(despeckled, "despeckled");
 	}
