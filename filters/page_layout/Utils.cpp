@@ -151,8 +151,8 @@ Utils::calcSoftMarginsMM(
 #endif
 
 	if (cli["content-shift-tolerance"] != "" && boundingRect.width() > 1.0 && (1.0-cmi) > tolerance) {
-		double hTolerance = tolerance * 0.7;
-		double vTolerance = tolerance * 0.5;
+		double hTolerance = tolerance * 0.5;
+		double vTolerance = tolerance * 0.7;
 		if (cli["content-shift-horizontal-tolerance"] != "")
 			hTolerance = cli["content-shift-horizontal-tolerance"].toFloat();
 		if (cli["content-shift-vertical-tolerance"] != "")
