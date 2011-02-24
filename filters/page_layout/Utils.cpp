@@ -29,6 +29,7 @@
 #include <QRectF>
 #include <assert.h>
 #include <iostream>
+#include <cmath>
 
 #include "CommandLine.h"
 
@@ -102,28 +103,96 @@ Utils::calcSoftMarginsMM(
 		// This means we are not aligning this page with others.
 		return Margins();
 	}
+
+	Alignment myAlign(alignment);
 	
 	double top = 0.0;
 	double bottom = 0.0;
 	double left = 0.0;
 	double right = 0.0;
 
-	// detect borders
+	double const delta_width =
+			aggregate_hard_size_mm.width() - hard_size_mm.width();
+	double const delta_height =
+			aggregate_hard_size_mm.height() - hard_size_mm.height();
+
+	// detect original borders
 	double leftBorder = double(boundingRect.left()) / double(resultRect.width());
 	double rightBorder = double(boundingRect.right()) / double(resultRect.width());
 	double topBorder = double(boundingRect.top()) / double(resultRect.height());
 	double bottomBorder = double(boundingRect.bottom()) / double(resultRect.height());
 	
-	// get vertical and horizontal shift of page content
-	double horizontalShift = leftBorder - (1.0 - rightBorder); // <0 means more left; >0 more right; 0 is centered
-	double verticalShift = topBorder - (1.0 - bottomBorder);   // <0 more top; >0 more bottom; 0 is centered
-	double absHShift = horizontalShift < 0.0 ? horizontalShift*(-1) : horizontalShift;
-	double absVShift = verticalShift < 0.0 ? verticalShift*(-1) : verticalShift;
+	// borders in new page layout in mm
+	double aggLeftBorder = (delta_width / (leftBorder + (1-rightBorder))) * leftBorder;
+	double aggRightBorder = delta_width - aggLeftBorder;
+	double aggTopBorder = (delta_height / (topBorder + (1-bottomBorder))) * topBorder;
+	double aggBottomBorder = delta_height - aggTopBorder;
 
-	double const delta_width =
-			aggregate_hard_size_mm.width() - hard_size_mm.width();
+	// new borders ratio
+	double newLeftBorder = aggLeftBorder / aggregate_hard_size_mm.width();
+	double newRightBorder = aggRightBorder / aggregate_hard_size_mm.width();
+	double newTopBorder = aggTopBorder / aggregate_hard_size_mm.height();
+	double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
+
+	// if the content is too small it can be more probably wrongly align
+	// eg: the page starts in 1/3 of page and you want to keep it or
+	//     last page of chapter has only few lines and you center pages or
+	//     small image attachement is centered etc.
+	// content mass index ;-)
+	double cmi =
+		double(hard_size_mm.width()*hard_size_mm.height()) /
+		double(aggregate_hard_size_mm.width()*aggregate_hard_size_mm.height());
+
+	CommandLine cli;
+	double tolerance = cli["content-shift-tolerance"].toFloat();
+#ifdef DEBUG_CLI
+	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << cmi << "\n";
+	std::cout << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
+#endif
+
+	if (cli["content-shift-tolerance"] != "" && boundingRect.width() > 1.0 && (1.0-cmi) > tolerance) {
+		double hTolerance = tolerance * 0.7;
+		double vTolerance = tolerance * 0.5;
+		if (cli["content-shift-horizontal-tolerance"] != "")
+			hTolerance = cli["content-shift-horizontal-tolerance"].toFloat();
+		if (cli["content-shift-vertical-tolerance"] != "")
+			vTolerance = cli["content-shift-vertical-tolerance"].toFloat();
+		if (aggregate_hard_size_mm.width() > aggregate_hard_size_mm.height()) {
+			hTolerance = vTolerance;
+			vTolerance = hTolerance;
+		}
+
+#ifdef DEBUG_CLI
+		std::cout << hTolerance << " " << vTolerance << "\n";
+#endif
+		if (newLeftBorder > hTolerance && newRightBorder <= hTolerance)
+			myAlign.setHorizontal(Alignment::RIGHT);
+		else if (newLeftBorder <= hTolerance && newRightBorder > hTolerance)
+			myAlign.setHorizontal(Alignment::LEFT);
+		else if (newLeftBorder > hTolerance && newRightBorder > hTolerance) {
+			if (newLeftBorder > (1.4*hTolerance) && newRightBorder > (1.4*hTolerance))
+				myAlign.setHorizontal(Alignment::HCENTER);
+			else
+				myAlign.setHorizontal(Alignment::HORIGINAL);
+		}
+
+		if (newTopBorder > vTolerance && newBottomBorder <= vTolerance)
+			myAlign.setVertical(Alignment::BOTTOM);
+		else if (newTopBorder <= vTolerance && newBottomBorder > vTolerance)
+			myAlign.setVertical(Alignment::TOP);
+		else if (newTopBorder > vTolerance && newBottomBorder > vTolerance) {
+			if (newTopBorder > (1.4*vTolerance) && newBottomBorder > (1.4*vTolerance))
+				myAlign.setVertical(Alignment::VCENTER);
+			else
+				myAlign.setVertical(Alignment::VORIGINAL);
+		}
+	}
+#ifdef DEBUG_CLI
+	std::cout << "\n";
+#endif
+
 	if (delta_width > 0.0) {
-		switch (alignment.horizontal()) {
+		switch (myAlign.horizontal()) {
 			case Alignment::LEFT:
 				right = delta_width;
 				break;
@@ -134,16 +203,14 @@ Utils::calcSoftMarginsMM(
 				left = delta_width;
 				break;
 			default:
-				left = (delta_width * 0.5) + (delta_width * horizontalShift);
-				right = delta_width - left;
+				left = aggLeftBorder;
+				right = aggRightBorder;
 				break;
 		}
 	}
 	
-	double const delta_height =
-			aggregate_hard_size_mm.height() - hard_size_mm.height();
 	if (delta_height > 0.0) {
-		switch (alignment.vertical()) {
+		switch (myAlign.vertical()) {
 			case Alignment::TOP:
 				bottom = delta_height;
 				break;
@@ -154,28 +221,12 @@ Utils::calcSoftMarginsMM(
 				top = delta_height;
 				break;
 			default:
-				top = (delta_height * 0.5) + (delta_height * verticalShift);
-				bottom = delta_height - top;
+				top = aggTopBorder;
+				bottom = aggBottomBorder;
 				break;
 		}
 	}
 	
-	// if the shift of page content is too big, keep original borders ratio
-	// TODO: gui interface; now it works as an hiden option
-	CommandLine cli;
-	if (cli["content-shift-tolerance"] != "") {
-		double tolerance = cli["content-shift-tolerance"].toFloat();
-
-		if (absHShift > tolerance && boundingRect.width() > 1.0) {
-			left = (delta_width * 0.5) + (delta_width * horizontalShift);
-			right = delta_width - left;
-		}
-		if (absVShift > tolerance && boundingRect.height() > 1.0) {
-			top = (delta_height * 0.5) + (delta_height * verticalShift);
-			bottom = delta_height - top;
-		}
-	}
-
 	return Margins(left, top, right, bottom);
 }
 
@@ -195,7 +246,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.resultingRect(), content_rect_phys.boundingRect()
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.rectBeforeCropping(), content_rect_phys.boundingRect()
 		)
 	);
 
