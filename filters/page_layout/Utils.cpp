@@ -134,6 +134,11 @@ Utils::calcSoftMarginsMM(
 	double newTopBorder = aggTopBorder / aggregate_hard_size_mm.height();
 	double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
 
+	double hShift = newLeftBorder - newRightBorder;
+	double vShift = newTopBorder - newBottomBorder;
+	double absHShift = std::abs(hShift);
+	double absVShift = std::abs(vShift);
+
 	// if the content is too small it can be more probably wrongly align
 	// eg: the page starts in 1/3 of page and you want to keep it or
 	//     last page of chapter has only few lines and you center pages or
@@ -146,13 +151,14 @@ Utils::calcSoftMarginsMM(
 	CommandLine cli;
 	double tolerance = cli["content-shift-tolerance"].toFloat();
 #ifdef DEBUG_CLI
-	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << cmi << "\n";
-	std::cout << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
+	std::cout << "Old Border: " << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << cmi << "\n";
+	std::cout << "New Border: " << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
+	std::cout << "Shift: " << hShift << " " << vShift << "\n";
 #endif
 
 	if (cli["content-shift-tolerance"] != "" && boundingRect.width() > 1.0 && (1.0-cmi) > tolerance) {
 		double hTolerance = tolerance * 0.5;
-		double vTolerance = tolerance * 0.7;
+		double vTolerance = tolerance * 0.5;
 		if (cli["content-shift-horizontal-tolerance"] != "")
 			hTolerance = cli["content-shift-horizontal-tolerance"].toFloat();
 		if (cli["content-shift-vertical-tolerance"] != "")
@@ -165,26 +171,22 @@ Utils::calcSoftMarginsMM(
 #ifdef DEBUG_CLI
 		std::cout << hTolerance << " " << vTolerance << "\n";
 #endif
-		if (newLeftBorder > hTolerance && newRightBorder <= hTolerance)
-			myAlign.setHorizontal(Alignment::RIGHT);
-		else if (newLeftBorder <= hTolerance && newRightBorder > hTolerance)
-			myAlign.setHorizontal(Alignment::LEFT);
-		else if (newLeftBorder > hTolerance && newRightBorder > hTolerance) {
-			if (newLeftBorder > (1.4*hTolerance) && newRightBorder > (1.4*hTolerance))
+		if (newLeftBorder > hTolerance || newRightBorder > hTolerance) {
+			if ((absHShift < hTolerance) || (newLeftBorder > (1.5*hTolerance) && newRightBorder > (1.5*hTolerance)))
 				myAlign.setHorizontal(Alignment::HCENTER);
+			else if (hShift < 0)
+				myAlign.setHorizontal(Alignment::LEFT);
 			else
-				myAlign.setHorizontal(Alignment::HORIGINAL);
+				myAlign.setHorizontal(Alignment::RIGHT);
 		}
 
-		if (newTopBorder > vTolerance && newBottomBorder <= vTolerance)
-			myAlign.setVertical(Alignment::BOTTOM);
-		else if (newTopBorder <= vTolerance && newBottomBorder > vTolerance)
-			myAlign.setVertical(Alignment::TOP);
-		else if (newTopBorder > vTolerance && newBottomBorder > vTolerance) {
-			if (newTopBorder > (1.4*vTolerance) && newBottomBorder > (1.4*vTolerance))
+		if (newTopBorder > vTolerance || newBottomBorder > vTolerance) {
+			if ((absVShift < (vTolerance/4.0)) || (newTopBorder > (1.5*vTolerance) && newBottomBorder > (1.5*vTolerance)))
 				myAlign.setVertical(Alignment::VCENTER);
+			else if (vShift < 0)
+				myAlign.setVertical(Alignment::TOP);
 			else
-				myAlign.setVertical(Alignment::VORIGINAL);
+				myAlign.setVertical(Alignment::BOTTOM);
 		}
 	}
 #ifdef DEBUG_CLI

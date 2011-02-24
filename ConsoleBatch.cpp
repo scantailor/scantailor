@@ -41,6 +41,7 @@
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
+#include "filters/page_split/Settings.h"
 #include "filters/page_split/Filter.h"
 #include "filters/page_split/Task.h"
 #include "filters/page_split/CacheDrivenTask.h"
@@ -218,6 +219,9 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 			deskew->getSettings()->setPageParams(page, params);
 		}
 	
+		// PAGE SPLIT
+		page_split->getSettings()->setLayoutTypeForAllPages(cli.layout());
+
 		// SELECT CONTENT FILTER
 		if (cli["content-box"] != "") {
 			QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");

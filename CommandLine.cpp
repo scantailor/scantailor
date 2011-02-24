@@ -134,7 +134,7 @@ CommandLine::printHelp()
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
 	std::cout << "\t--content-shift-tolerance=<0.0...1.0>\t-- default: off; working value is around 0.15" << "\n";
-	std::cout << "\t--content-shift-horizontal-tolerance=<0.0...1.0>\n\t\t\t\t\t\t-- default: 0.7*content-shift-tolerance" << "\n";
+	std::cout << "\t--content-shift-horizontal-tolerance=<0.0...1.0>\n\t\t\t\t\t\t-- default: 0.5*content-shift-tolerance" << "\n";
 	std::cout << "\t--content-shift-vertical-tolerance=<0.0...1.0>\n\t\t\t\t\t\t-- default: 0.5*content-shift-tolerance" << "\n";
 	std::cout << "\t\tIf the content is too small it can be more probably wrongly align" << "\n";
 	std::cout << "\t\teg: the page starts at 1/3 of page and you want to keep it or" << "\n";
@@ -142,7 +142,6 @@ CommandLine::printHelp()
 	std::cout << "\t\t    small image attachement is centerd etc." << "\n";
 	std::cout << "\t\tPlease notice that smaller shift tolerance means more realigning" << "\n";
 	std::cout << "\t\tand bigger shift tolerance means realign only smaller content." << "\n";
-	std::cout << "\t\tShift tolerance 0.0 means align all automaticaly." << "\n";
 	std::cout << "\t--margins=<number>\t\t\t-- sets left, top, right and bottom margins to same number." << "\n";
 	std::cout << "\t\t--margins-left=<number>" << "\n";
 	std::cout << "\t\t--margins-right=<number>" << "\n";
