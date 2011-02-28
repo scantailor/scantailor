@@ -61,9 +61,6 @@ Alignment::toXml(QDomDocument& doc, QString const& name) const
 		case BOTTOM:
 			vert = "bottom";
 			break;
-		case VORIGINAL:
-			vert = "original";
-			break;
 	}
 	
 	char const* hor = 0;
@@ -76,9 +73,6 @@ Alignment::toXml(QDomDocument& doc, QString const& name) const
 			break;
 		case RIGHT:
 			hor = "right";
-			break;
-		case HORIGINAL:
-			hor = "original";
 			break;
 	}
 	

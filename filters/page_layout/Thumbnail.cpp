@@ -151,7 +151,7 @@ Thumbnail::recalcBoxesAndPresentationTransform()
 	
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_params.alignment(), m_origXform.resultingRect(), m_adaptedContentRect
+			hard_size_mm, m_aggregateHardSizeMM, m_params.alignment()
 		)
 	);
 	
