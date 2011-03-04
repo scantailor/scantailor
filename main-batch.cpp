@@ -17,16 +17,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#include <QCoreApplication>
-#include <QApplication>
+#include <QCoreApplication>
+//#include <QApplication>
 
 #include "CommandLine.h"
 #include "ConsoleBatch.h"
 
 int main(int argc, char **argv)
 {
-	//QCoreApplication app(argc, argv);
-	QApplication app(argc, argv);
+	QCoreApplication app(argc, argv);
+	//QApplication app(argc, argv);
 
 	// parse command line arguments
 	CommandLine cli(app.arguments());
@@ -37,6 +37,4 @@ int main(int argc, char **argv)
 
 	ConsoleBatch cbatch;
 	cbatch.process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
-
-	//app.exec();
 }

@@ -38,6 +38,7 @@
 #include <QCoreApplication>
 #include <QDomElement>
 #include <stddef.h>
+#include "CommandLine.h"
 
 namespace page_split
 {
@@ -47,11 +48,14 @@ Filter::Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 :	m_ptrPages(page_sequence),
 	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(
-		new OptionsWidget(
-			m_ptrSettings, m_ptrPages, page_selection_accessor
-		)
-	);
+	CommandLine cli;
+	if (cli.gui()) {
+		m_ptrOptionsWidget.reset(
+			new OptionsWidget(
+				m_ptrSettings, m_ptrPages, page_selection_accessor
+			)
+		);
+	}
 }
 
 Filter::~Filter()

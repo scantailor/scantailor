@@ -15,6 +15,7 @@
 #include "Despeckle.h"
 
 
+bool CommandLine::s_gui=true;
 QMap<QString, QString> CommandLine::s_options;
 QString CommandLine::s_project_file = "";
 std::vector<QFileInfo> CommandLine::s_files;
@@ -93,6 +94,9 @@ CommandLine::parse_cli(QStringList const& argv)
 			}
 		}
 	}
+
+	if (CommandLine::s_images.size() > 0)
+		CommandLine::s_gui = false;
 
 #ifdef DEBUG_CLI
 	QStringList params = CommandLine::s_options.keys();

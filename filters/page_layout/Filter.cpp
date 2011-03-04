@@ -42,6 +42,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <assert.h>
+#include "CommandLine.h"
 
 namespace page_layout
 {
@@ -52,9 +53,12 @@ Filter::Filter(IntrusivePtr<ProjectPages> const& pages,
 	m_ptrSettings(new Settings),
 	m_selectedPageOrder(0)
 {
-	m_ptrOptionsWidget.reset(
-		new OptionsWidget(m_ptrSettings, page_selection_accessor)
-	);
+	CommandLine cli;
+	if (cli.gui()) {
+		m_ptrOptionsWidget.reset(
+			new OptionsWidget(m_ptrSettings, page_selection_accessor)
+		);
+	}
 
 	typedef PageOrderOption::ProviderPtr ProviderPtr;
 

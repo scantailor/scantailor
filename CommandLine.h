@@ -37,6 +37,7 @@
 // you get always access to the same variables
 class CommandLine
 {
+	static bool s_gui;
 	static QMap<QString, QString> s_options;
 	static QString s_project_file;
 	static std::vector<QFileInfo> s_files;
@@ -64,6 +65,7 @@ class CommandLine
 		QString const operator[](QString const& key) const { return CommandLine::s_options.value(key); };
 
 		bool help() { return (CommandLine::s_options["help"] == "true"); };
+		bool gui() { return CommandLine::s_gui; };
 		page_split::LayoutType layout();
 		Qt::LayoutDirection layoutDirection();
 		Dpi dpi() { return CommandLine::getDpi(); };

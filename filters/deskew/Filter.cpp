@@ -32,6 +32,7 @@
 #include <QCoreApplication>
 #include <QDomDocument>
 #include <QDomElement>
+#include "CommandLine.h"
 
 namespace deskew
 {
@@ -39,7 +40,10 @@ namespace deskew
 Filter::Filter(PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings, page_selection_accessor));
+	CommandLine cli;
+	if (cli.gui()) {
+		m_ptrOptionsWidget.reset(new OptionsWidget(m_ptrSettings, page_selection_accessor));
+	}
 }
 
 Filter::~Filter()

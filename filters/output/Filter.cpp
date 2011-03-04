@@ -36,6 +36,9 @@
 #include <QDomElement>
 #include <memory>
 
+#include "CommandLine.h"
+#include "ImageViewTab.h"
+
 namespace output
 {
 
@@ -43,9 +46,12 @@ Filter::Filter(
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(
-		new OptionsWidget(m_ptrSettings, page_selection_accessor)
-	);
+	CommandLine cli;
+	if (cli.gui()) {
+		m_ptrOptionsWidget.reset(
+			new OptionsWidget(m_ptrSettings, page_selection_accessor)
+		);
+	}
 }
 
 Filter::~Filter()
@@ -173,11 +179,15 @@ Filter::createTask(
 	OutputFileNameGenerator const& out_file_name_gen,
 	bool const batch, bool const debug)
 {
+	CommandLine cli;
+	ImageViewTab lastTab(TAB_OUTPUT);
+	if (cli.gui())
+		m_ptrOptionsWidget->lastTab();
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
 			thumbnail_cache, page_id, out_file_name_gen,
-			m_ptrOptionsWidget->lastTab(), batch, debug
+			lastTab, batch, debug
 		)
 	);
 }
