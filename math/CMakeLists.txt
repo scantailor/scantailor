@@ -12,7 +12,6 @@ SET(
 	ArcLengthMapper.cpp ArcLengthMapper.h
 	PolylineIntersector.cpp PolylineIntersector.h
 	XSpline.cpp XSpline.h
-	CylindricalSurfaceDewarper.cpp CylindricalSurfaceDewarper.h
 )
 SOURCE_GROUP("Sources" FILES ${GENERIC_SOURCES})
 

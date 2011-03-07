@@ -27,7 +27,7 @@
 #include <QString>
 #include <algorithm>
 
-namespace output
+namespace dewarping
 {
 
 struct Curve::CloseEnough
@@ -194,5 +194,5 @@ Curve::deserializeXSpline(QDomElement const& el)
 	return xspline;
 }
 
-} // namespace output
+} // namespace dewarping
 

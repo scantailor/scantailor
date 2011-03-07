@@ -26,16 +26,18 @@
 #include "Despeckle.h"
 #include "Undistort.h"
 #include "RenderParams.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include "Zone.h"
 #include "ZoneSet.h"
 #include "PictureLayerProperty.h"
 #include "FillColorProperty.h"
-#include "CylindricalSurfaceDewarper.h"
-#include "TextLineTracer.h"
-#include "DewarpingPointMapper.h"
+#include "dewarping/CylindricalSurfaceDewarper.h"
+#include "dewarping/TextLineTracer.h"
+#include "dewarping/DistortionModelBuilder.h"
+#include "dewarping/DewarpingPointMapper.h"
+#include "dewarping/RasterDewarper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
@@ -56,7 +58,6 @@
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
 #include "imageproc/PolygonRasterizer.h"
-#include "imageproc/RasterDewarper.h"
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/InfluenceMap.h"
 #include "config.h"
@@ -85,6 +86,7 @@
 #include <stdint.h>
 
 using namespace imageproc;
+using namespace dewarping;
 
 namespace output
 {
@@ -230,6 +232,7 @@ void combineMixed(
 }
 
 } // anonymous namespace
+
 
 OutputGenerator::OutputGenerator(
 	Dpi const& dpi, ColorParams const& color_params,
@@ -974,23 +977,18 @@ OutputGenerator::processWithDewarping(
 	}
 
 	if (dewarping_mode == DewarpingMode::AUTO) {
+		DistortionModelBuilder model_builder(Vec2d(0, 1));
+
 		QRect const content_rect(
 			m_contentRect.translated(-normalize_illumination_rect.topLeft())
 		);
-		std::list<std::vector<QPointF> > polylines(
-			TextLineTracer::trace(warped_gray_output, m_dpi, content_rect, status, dbg)
+		TextLineTracer::trace(
+			warped_gray_output, m_dpi, content_rect, model_builder, status, dbg
 		);
-
-		BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-			BOOST_FOREACH(QPointF& pt, polyline) {
-				pt = norm_illum_to_original.map(pt);
-			}
-		}
-
-		if (polylines.size() >= 2) {
-			distortion_model.setTopCurve(Curve(polylines.front()));
-			distortion_model.setBottomCurve(Curve(polylines.back()));
-		} else {
+		model_builder.transform(norm_illum_to_original);
+		
+		distortion_model = model_builder.tryBuildModel();
+		if (!distortion_model.isValid()) {
 			setupTrivialDistortionModel(distortion_model);
 		}
 	}

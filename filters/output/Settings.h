@@ -26,7 +26,7 @@
 #include "ColorParams.h"
 #include "OutputParams.h"
 #include "DewarpingMode.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PropertySet.h"
@@ -59,7 +59,7 @@ public:
 
 	void setDewarpingMode(PageId const& page_id, DewarpingMode const& mode);
 
-	void setDistortionModel(PageId const& page_id, DistortionModel const& model);
+	void setDistortionModel(PageId const& page_id, dewarping::DistortionModel const& model);
 
 	void setDepthPerception(PageId const& page_id, DepthPerception const& depth_perception);
 

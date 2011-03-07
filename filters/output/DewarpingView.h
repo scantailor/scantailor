@@ -26,7 +26,7 @@
 #include "DragHandler.h"
 #include "ZoomHandler.h"
 #include "DewarpingMode.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "DepthPerception.h"
 #include "Settings.h"
 #include "PageId.h"
@@ -47,12 +47,12 @@ public:
 		QTransform const& source_to_virt, QPolygonF const& virt_display_area,
 		QRectF const& virt_content_rect, PageId const& page_id,
 		DewarpingMode dewarping_mode,
-		DistortionModel const& distortion_model,
+		dewarping::DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception);
 	
 	virtual ~DewarpingView();
 signals:
-	void distortionModelChanged(DistortionModel const& model);
+	void distortionModelChanged(dewarping::DistortionModel const& model);
 public slots:
 	void depthPerceptionChanged(double val);	
 protected:
@@ -77,7 +77,7 @@ private:
 	PageId m_pageId;
 	QPolygonF m_virtDisplayArea;
 	DewarpingMode m_dewarpingMode;
-	DistortionModel m_distortionModel;
+	dewarping::DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	InteractiveXSpline m_topSpline;
 	InteractiveXSpline m_bottomSpline;

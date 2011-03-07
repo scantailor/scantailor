@@ -49,7 +49,6 @@ SET(
 	LocalMinMaxGeneric.h
 	SeedFillGeneric.cpp SeedFillGeneric.h
 	FindPeaksGeneric.h
-	RasterDewarper.cpp RasterDewarper.h
 	ColorMixer.h
 	ColorForId.h
 )

@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DETECT_VERT_CONTENT_BOUNDS_H_
-#define DETECT_VERT_CONTENT_BOUNDS_H_
+#ifndef DEWARPING_DETECT_VERT_CONTENT_BOUNDS_H_
+#define DEWARPING_DETECT_VERT_CONTENT_BOUNDS_H_
 
 #include <QLineF>
 #include <utility>
@@ -28,6 +28,9 @@ namespace imageproc
 {
 	class BinaryImage;
 }
+
+namespace dewarping
+{
 
 /**
  * \brief Detect the left and right content boundaries.
@@ -42,5 +45,7 @@ namespace imageproc
  */
 std::pair<QLineF, QLineF> detectVertContentBounds(
 	imageproc::BinaryImage const& image, DebugImages* dbg);
+
+} // namespace dewarping
 
 #endif

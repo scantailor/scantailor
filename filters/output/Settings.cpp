@@ -118,7 +118,7 @@ Settings::setDewarpingMode(PageId const& page_id, DewarpingMode const& mode)
 }
 
 void
-Settings::setDistortionModel(PageId const& page_id, DistortionModel const& model)
+Settings::setDistortionModel(PageId const& page_id, dewarping::DistortionModel const& model)
 {
 	QMutexLocker const locker(&m_mutex);
 

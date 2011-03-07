@@ -26,6 +26,9 @@
 
 using namespace imageproc;
 
+namespace dewarping
+{
+
 TowardsLineTracer::TowardsLineTracer(
 	imageproc::BinaryImage const& content, imageproc::GrayImage const& blurred,
 	imageproc::BinaryImage const& mask, QLineF const& line, QPoint const& initial_pos)
@@ -178,3 +181,5 @@ TowardsLineTracer::setupNeighbours()
 		nbh.maskLineOffset = nbh.vec.y() * m_mask.wordsPerLine();
 	}
 }
+
+} // namespace dewarping
