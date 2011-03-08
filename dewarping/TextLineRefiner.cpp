@@ -59,8 +59,9 @@ TextLineRefiner::TextLineRefiner(
 	float const h_sigma = (4.0f / 200.f) * dpi.horizontal();
 	float const v_sigma = (4.0f / 200.f) * dpi.vertical();
 	gaussBlurGeneric(
-		StaticCastValueConv<float>(), m_gradient.data(),
-		m_gradient.stride(), image.size(), h_sigma, v_sigma
+		image.size(), h_sigma, v_sigma,
+		m_gradient.data(), m_gradient.stride(), _1,
+		m_gradient.data(), m_gradient.stride(), _1 = _2
 	);
 	if (dbg) {
 		dbg->add(visualizeGradient(m_gradient, &image.toQImage()), "smoothed_gradient");
