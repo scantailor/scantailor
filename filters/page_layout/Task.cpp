@@ -37,6 +37,8 @@
 #include <QTransform>
 #include <QObject>
 
+#include "CommandLine.h"
+
 namespace page_layout
 {
 
@@ -107,6 +109,8 @@ Task::process(
 		Utils::adaptContentRect(data.xform(), content_rect)
 	);
 	
+	CommandLine cli;
+
 	if (m_ptrNextTask) {
 		QPolygonF const content_rect_phys(
 			data.xform().transformBack().map(adapted_content_rect)
@@ -120,7 +124,7 @@ Task::process(
 		return m_ptrNextTask->process(
 			status, data, content_rect_phys, page_rect_phys
 		);
-	} else {
+	} else if (cli.gui()) {
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_pageId,
@@ -129,6 +133,8 @@ Task::process(
 				m_batchProcessing
 			)
 		);
+	} else {
+		return FilterResultPtr(0);
 	}
 }
 

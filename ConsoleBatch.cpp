@@ -179,7 +179,7 @@ ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& o
 StageSequence*
 ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor const& accessor)
 {
-	StageSequence* stages = new StageSequence(pages, 0);
+	StageSequence* stages = new StageSequence(pages, accessor);
 	std::set<PageId> allPages = pages->toPageSequence(IMAGE_VIEW).selectAll();
 
 	IntrusivePtr<fix_orientation::Filter> fix_orientation = stages->fixOrientationFilter(); 

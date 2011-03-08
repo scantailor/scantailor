@@ -70,6 +70,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 
+#include "CommandLine.h"
+
 using namespace imageproc;
 
 namespace output
@@ -375,16 +377,21 @@ Task::process(
 		despeckle_visualization = despeckle_state.visualize();
 	}
 
-	return FilterResultPtr(
-		new UiUpdater(
-			m_ptrFilter, m_ptrSettings, m_ptrDbg, params,
-			generator.toOutput(), generator.outputContentRect(),
-			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
-			m_pageId, data.origImage(), out_img, automask_img,
-			despeckle_state, despeckle_visualization,
-			m_batchProcessing, m_debug
-		)
-	);
+	CommandLine cli;
+	if (cli.gui()) {
+		return FilterResultPtr(
+			new UiUpdater(
+				m_ptrFilter, m_ptrSettings, m_ptrDbg, params,
+				generator.toOutput(), generator.outputContentRect(),
+				QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
+				m_pageId, data.origImage(), out_img, automask_img,
+				despeckle_state, despeckle_visualization,
+				m_batchProcessing, m_debug
+			)
+		);
+	} else {
+		return FilterResultPtr(0);
+	}
 }
 
 /**
