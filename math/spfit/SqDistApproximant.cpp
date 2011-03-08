@@ -32,7 +32,7 @@ SqDistApproximant::SqDistApproximant(
 	assert(fabs(u.dot(v)) < 1e-06 && "u and v are not orthogonal");
 
 	// Consider the following equation:
-	// w = R*x + c
+	// w = R*x + t
 	// w: vector in the local coordinate system.
 	// R: rotation matrix.  Actually the inverse of [u v].
 	// x: vector in the global coordinate system.
