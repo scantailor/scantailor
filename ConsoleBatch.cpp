@@ -190,7 +190,7 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 	IntrusivePtr<output::Filter> output = stages->outputFilter(); 
 
 	CommandLine cli;
-	QMap<QString, QImage> img_cache;
+	QMap<QString, float> img_cache;
 
 	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
 		PageId page = *i;
@@ -241,19 +241,21 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 		page_layout::Alignment alignment = cli.alignment();
 		if (cli["match-layout-tolerance"] != "") {
 			QString const path = page.imageId().filePath();
-			if (img_cache[path].isNull())
-				img_cache[path] = QImage(path);
-			QImage img = img_cache[path];
-			float imgAspectRatio = float(img.width()) / float(img.height());
+			if (!img_cache.contains(path)) {
+				QImage img = QImage(path);
+				img_cache[path] = float(img.width()) / float(img.height());
+			}
+			float imgAspectRatio = img_cache[path];
 			float tolerance = cli["match-layout-tolerance"].toFloat();
 			std::vector<float> diffs;
 			for (std::set<PageId>::iterator pi=allPages.begin(); pi!=allPages.end(); pi++) {
 				ImageId pimageId = pi->imageId();
 				QString ppath = pimageId.filePath();
-				if (img_cache[ppath].isNull())
-					img_cache[ppath] = QImage(ppath);
-				QImage pimg = img_cache[ppath];
-				float pimgAspectRatio = float(pimg.width()) / float(pimg.height());
+				if (!img_cache.contains(ppath)) {
+					QImage img = QImage(ppath);
+					img_cache[ppath] = float(img.width()) / float(img.height());
+				}
+				float pimgAspectRatio = img_cache[ppath];
 				float diff = imgAspectRatio - pimgAspectRatio;
 				if (diff < 0.0) diff *= -1;
 				diffs.push_back(diff);
