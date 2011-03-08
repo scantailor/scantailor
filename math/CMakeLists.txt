@@ -10,6 +10,7 @@ SET(
 	SidesOfLine.cpp SidesOfLine.h
 	ToLineProjector.cpp ToLineProjector.h
 	ArcLengthMapper.cpp ArcLengthMapper.h
+	LineIntersectionScalar.cpp LineIntersectionScalar.h
 	PolylineIntersector.cpp PolylineIntersector.h
 	XSpline.cpp XSpline.h
 )
@@ -28,3 +29,5 @@ SET(
 SOURCE_GROUP("Sources\\Spline Fitting Framework" FILES ${SPFIT_SOURCES})
 
 ADD_LIBRARY(math STATIC ${GENERIC_SOURCES} ${SPFIT_SOURCES})
+
+ADD_SUBDIRECTORY(spfit/tests)
