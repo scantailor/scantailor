@@ -505,8 +505,8 @@ ADD_EXECUTABLE(
 # to go after both of them.
 TARGET_LINK_LIBRARIES(
 	scantailor
-	dewarping fix_orientation page_split deskew select_content page_layout
-	output zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
+	fix_orientation page_split deskew select_content page_layout
+	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
