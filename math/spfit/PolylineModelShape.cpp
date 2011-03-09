@@ -72,15 +72,16 @@ PolylineModelShape::boundingBox() const
 }
 
 SqDistApproximant
-PolylineModelShape::localSqDistApproximant(QPointF const& pt, int flags) const
+PolylineModelShape::localSqDistApproximant(
+	QPointF const& pt, FittableSpline::SampleFlags flags) const
 {
 	if (m_vertices.empty()) {
 		return SqDistApproximant();
 	}
 
-	if (flags & SPLINE_HEAD) {
+	if (flags & FittableSpline::HEAD_SAMPLE) {
 		return SqDistApproximant::pointDistance(m_vertices.front().point);
-	} else if (flags & SPLINE_TAIL) {
+	} else if (flags & FittableSpline::TAIL_SAMPLE) {
 		return SqDistApproximant::pointDistance(m_vertices.back().point);
 	}
 

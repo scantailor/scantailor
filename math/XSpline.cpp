@@ -182,7 +182,7 @@ XSpline::pointAtImpl(int segment, double t) const
 
 void
 XSpline::sample(
-	VirtualFunction2<void, QPointF, double>& sink, SamplingParams const& params) const
+	VirtualFunction3<void, QPointF, double, SampleFlags>& sink, SamplingParams const& params) const
 {
 	if (m_controlPoints.empty()) {
 		return;
@@ -199,7 +199,7 @@ XSpline::sample(
 	}
 
 	QPointF next_pt(pointAtImpl(0, 0.0));
-	sink(next_pt, 0.0);
+	sink(next_pt, 0.0, HEAD_SAMPLE);
 	
 	int const num_segments = numSegments();
 	if (num_segments == 0) {
@@ -217,13 +217,15 @@ XSpline::sample(
 			sink, max_sqdist_to_spline, max_sqdist_between_samples,
 			r_num_segments, segment, prev_t, prev_pt, next_t, next_pt
 		);
-		sink(next_pt, (segment + next_t) * r_num_segments);
+
+		SampleFlags flags = segment + 1 < num_segments ? JUNCTION_SAMPLE : TAIL_SAMPLE;
+		sink(next_pt, (segment + 1) * r_num_segments, flags);
 	}
 }
 
 void
 XSpline::maybeAddMoreSamples(
-	VirtualFunction2<void, QPointF, double>& sink,
+	VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
 	double max_sqdist_to_spline, double max_sqdist_between_samples,
 	double r_num_segments, int segment,
 	double prev_t, QPointF const& prev_pt,
@@ -248,7 +250,7 @@ XSpline::maybeAddMoreSamples(
 		r_num_segments, segment, prev_t, prev_pt, mid_t, mid_pt
 	);
 
-	sink(mid_pt, (segment + mid_t) * r_num_segments);
+	sink(mid_pt, (segment + mid_t) * r_num_segments, DEFAULT_SAMPLE);
 	
 	maybeAddMoreSamples(
 		sink, max_sqdist_to_spline, max_sqdist_between_samples,
@@ -584,11 +586,11 @@ XSpline::pointClosestTo(QPointF const to, double accuracy) const
 std::vector<QPointF>
 XSpline::toPolyline(SamplingParams const& params) const
 {
-	struct Sink : public VirtualFunction2<void, QPointF, double>
+	struct Sink : public VirtualFunction3<void, QPointF, double, SampleFlags>
 	{
 		std::vector<QPointF> polyline;
 
-		virtual void operator()(QPointF pt, double) {
+		virtual void operator()(QPointF pt, double, SampleFlags) {
 			polyline.push_back(pt);
 		}
 	};

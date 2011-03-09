@@ -333,27 +333,43 @@ DistortionModelBuilder::fitExtendedSpline(
 	public:
 		ModelShape(std::vector<QPointF> const& polyline, std::pair<QLineF, QLineF> const& bounds) :
 			PolylineModelShape(polyline),
-			m_polylineProj(QLineF(polyline.front(), polyline.back())),
+			m_headPoint(polyline.front()),
+			m_tailPoint(polyline.back()),
+			m_polylineProj(QLineF(m_headPoint, m_tailPoint)),
 			m_bounds(bounds)
 		{
 		}
 
-		virtual SqDistApproximant localSqDistApproximant(QPointF const& pt, int flags) const {
-			if (flags & SPLINE_HEAD) {
+		virtual SqDistApproximant localSqDistApproximant(
+			QPointF const& pt, FittableSpline::SampleFlags flags) const {
+
+			if (flags & FittableSpline::HEAD_SAMPLE) {
 				return SqDistApproximant::lineDistance(m_bounds.first);
-			} else if (flags & SPLINE_TAIL) {
+			} else if (flags & FittableSpline::TAIL_SAMPLE) {
 				return SqDistApproximant::lineDistance(m_bounds.second);
 			}
 
 			double const p = m_polylineProj.projectionScalar(pt);
 			if (p < 0 || p > 1) {
-				// It's outside of the snake.  Just ignore it.
-				return SqDistApproximant();
+				// Sample past the snake's endpoints.
+				if (flags & FittableSpline::JUNCTION_SAMPLE) {
+					// It's too dangerous to let a junction sample (which corresponds
+					// to a control point) past the snake endpoints bounds, where little or
+					// no influence will be applied to it.  Therefore, attract it to the
+					// corresponding snake endpoint.
+					return SqDistApproximant::pointDistance(p < 0 ? m_headPoint : m_tailPoint);
+				} else {
+					//Just ignore it.
+					return SqDistApproximant();
+				}
 			}
 
-			return PolylineModelShape::localSqDistApproximant(pt);
+			// Delegate to the parent class.
+			return PolylineModelShape::localSqDistApproximant(pt, FittableSpline::DEFAULT_SAMPLE);
 		}
 	private:
+		QPointF m_headPoint;
+		QPointF m_tailPoint;
 		ToLineProjector m_polylineProj;
 		std::pair<QLineF, QLineF> m_bounds;
 	};
