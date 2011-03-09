@@ -45,7 +45,7 @@ private:
 		Vec2d const& region_origin, Vec2d const& frenet_frame_origin,
 		Vec2d const& unit_tangent, Vec2f const& unit_normal, double curvature);
 
-	std::vector<imageproc::XSpline::PointAndDerivs> m_vertices;
+	std::vector<XSpline::PointAndDerivs> m_vertices;
 	QRectF m_boundingBox;
 };
 

@@ -29,11 +29,7 @@
 
 class QImage;
 class DebugImages;
-
-namespace imageproc
-{
-	class XSpline;
-}
+class XSpline;
 
 namespace dewarping
 {
@@ -109,7 +105,7 @@ private:
 
 	static void intersectBack(std::deque<QPointF>& polyline, QLineF const& bound);
 
-	static imageproc::XSpline fitExtendedSpline(
+	static XSpline fitExtendedSpline(
 		std::vector<QPointF> const& polyline, std::pair<QLineF, QLineF> const& bounds);
 
 	QImage visualizeModel(QImage const& background,

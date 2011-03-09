@@ -25,8 +25,6 @@
 #include <Qt>
 #include <boost/bind.hpp>
 
-using namespace imageproc;
-
 struct InteractiveXSpline::NoOp
 {
 	void operator()() const {}
@@ -50,7 +48,7 @@ InteractiveXSpline::InteractiveXSpline()
 }
 
 void
-InteractiveXSpline::setSpline(imageproc::XSpline const& spline)
+InteractiveXSpline::setSpline(XSpline const& spline)
 {
 	int const num_control_points = spline.numControlPoints();
 

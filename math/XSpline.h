@@ -26,9 +26,6 @@
 #include <QLineF>
 #include <vector>
 
-namespace imageproc // TODO: move it to the global namespace
-{
-
 /**
  * \brief An open X-Spline.
  *
@@ -165,7 +162,5 @@ inline void swap(XSpline& o1, XSpline& o2)
 {
 	o1.swap(o2);
 }
-
-} // namespace imageproc
 
 #endif

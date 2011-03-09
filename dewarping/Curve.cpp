@@ -47,7 +47,7 @@ Curve::Curve(std::vector<QPointF> const& polyline)
 {
 }
 
-Curve::Curve(imageproc::XSpline const& xspline)
+Curve::Curve(XSpline const& xspline)
 :	m_xspline(xspline),
 	m_polyline(xspline.toPolyline())
 {
@@ -150,7 +150,7 @@ Curve::approxPolylineMatch(
 
 QDomElement
 Curve::serializeXSpline(
-	imageproc::XSpline const& xspline, QDomDocument& doc, QString const& name)
+	XSpline const& xspline, QDomDocument& doc, QString const& name)
 {
 	if (xspline.numControlPoints() == 0) {
 		return QDomElement();
@@ -169,10 +169,10 @@ Curve::serializeXSpline(
 }
 
 
-imageproc::XSpline
+XSpline
 Curve::deserializeXSpline(QDomElement const& el)
 {
-	imageproc::XSpline xspline;
+	XSpline xspline;
 
 	QString const point_tag_name("point");
 	QDomNode node(el.firstChild());

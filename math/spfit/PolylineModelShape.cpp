@@ -27,8 +27,6 @@
 #include <math.h>
 #include <assert.h>
 
-using namespace imageproc;
-
 namespace spfit
 {
 

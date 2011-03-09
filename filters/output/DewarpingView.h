@@ -58,7 +58,7 @@ public slots:
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
-	static void initNewSpline(imageproc::XSpline& spline, QPointF const& p1, QPointF const& p2);
+	static void initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2);
 
 	void paintXSpline(
 		QPainter& painter, InteractionState const& interaction,

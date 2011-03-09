@@ -28,9 +28,6 @@
 #include <math.h>
 #include <assert.h>
 
-namespace imageproc
-{
-
 struct XSpline::TensionDerivedParams
 {
 	static double const t0;
@@ -754,6 +751,4 @@ XSpline::PointAndDerivs::curvature() const
 	double curvature = firstDeriv.x()*secondDeriv.y() - firstDeriv.y()*secondDeriv.x();
 	curvature /= pow(firstDeriv.x()*firstDeriv.x() + firstDeriv.y()*firstDeriv.y(), 1.5);
 	return curvature;
-};
-
-} // namespace imageproc
+}

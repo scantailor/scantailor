@@ -37,7 +37,7 @@ public:
 
 	Curve(std::vector<QPointF> const& polyline);
 
-	Curve(imageproc::XSpline const& xspline);
+	Curve(XSpline const& xspline);
 
 	Curve(QDomElement const& el);
 
@@ -47,7 +47,7 @@ public:
 
 	bool matches(Curve const& other) const;
 
-	imageproc::XSpline const& xspline() const { return m_xspline; }
+	XSpline const& xspline() const { return m_xspline; }
 
 	std::vector<QPointF> const& polyline() const { return m_polyline; }
 private:
@@ -58,16 +58,16 @@ private:
 	static QDomElement serializePolyline(
 		std::vector<QPointF> const& polyline, QDomDocument& doc, QString const& name);
 
-	static imageproc::XSpline deserializeXSpline(QDomElement const& el);
+	static XSpline deserializeXSpline(QDomElement const& el);
 
 	static QDomElement serializeXSpline(
-		imageproc::XSpline const& xspline, QDomDocument& doc, QString const& name);
+		XSpline const& xspline, QDomDocument& doc, QString const& name);
 
 	static bool approxPolylineMatch(
 		std::vector<QPointF> const& polyline1,
 		std::vector<QPointF> const& polyline2);
 
-	imageproc::XSpline m_xspline;
+	XSpline m_xspline;
 	std::vector<QPointF> m_polyline;
 };
 
