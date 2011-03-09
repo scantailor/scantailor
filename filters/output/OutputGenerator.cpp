@@ -35,6 +35,7 @@
 #include "FillColorProperty.h"
 #include "dewarping/CylindricalSurfaceDewarper.h"
 #include "dewarping/TextLineTracer.h"
+#include "dewarping/TopBottomEdgeTracer.h"
 #include "dewarping/DistortionModelBuilder.h"
 #include "dewarping/DewarpingPointMapper.h"
 #include "dewarping/RasterDewarper.h"
@@ -986,8 +987,13 @@ OutputGenerator::processWithDewarping(
 			warped_gray_output, m_dpi, content_rect, model_builder, status, dbg
 		);
 		model_builder.transform(norm_illum_to_original);
+
+		TopBottomEdgeTracer::trace(
+			input.grayImage(), model_builder.verticalBounds(),
+			model_builder, status, dbg
+		);
 		
-		distortion_model = model_builder.tryBuildModel();
+		distortion_model = model_builder.tryBuildModel(dbg, &input.grayImage().toQImage());
 		if (!distortion_model.isValid()) {
 			setupTrivialDistortionModel(distortion_model);
 		}

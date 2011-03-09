@@ -19,14 +19,21 @@
 #include "DistortionModelBuilder.h"
 #include "DistortionModel.h"
 #include "CylindricalSurfaceDewarper.h"
+#include "LineBoundedByRect.h"
 #include "ToLineProjector.h"
 #include "SidesOfLine.h"
 #include "XSpline.h"
+#include "DebugImages.h"
 #include "spfit/SqDistApproximant.h"
 #include "spfit/PolylineModelShape.h"
 #include "spfit/SplineFitter.h"
-#include <boost/foreach.hpp>
 #include <QTransform>
+#include <QImage>
+#include <QPainter>
+#include <QPen>
+#include <QColor>
+#include <boost/foreach.hpp>
+#include <math.h>
 #include <assert.h>
 
 using namespace imageproc;
@@ -93,6 +100,12 @@ DistortionModelBuilder::setVerticalBounds(QLineF const& bound1, QLineF const& bo
 	m_bound2 = bound2;
 }
 
+std::pair<QLineF, QLineF>
+DistortionModelBuilder::verticalBounds() const
+{
+	return std::pair<QLineF, QLineF>(m_bound1, m_bound2);
+}
+
 void
 DistortionModelBuilder::addHorizontalCurve(std::vector<QPointF> const& polyline)
 {
@@ -128,7 +141,7 @@ DistortionModelBuilder::transform(QTransform const& xform)
 }
 
 DistortionModel
-DistortionModelBuilder::tryBuildModel() const
+DistortionModelBuilder::tryBuildModel(DebugImages* dbg, QImage const* dbg_background) const
 {
 	int const num_curves = m_ltrPolylines.size();
 
@@ -171,6 +184,10 @@ DistortionModelBuilder::tryBuildModel() const
 		}
 	}
 	
+	if (dbg && dbg_background) {
+		dbg->add(visualizeModel(*dbg_background, ordered_curves, ransac.bestModel()), "distortion_model");
+	}
+
 	DistortionModel model;
 	if (ransac.bestModel().isValid()) {
 		model.setTopCurve(Curve(ransac.bestModel().topCurve->extendedPolyline));
@@ -436,7 +453,7 @@ try {
 } catch (std::runtime_error const&) {
 	// Probably CylindricalSurfaceDewarper didn't like something.
 }
-
+#if 0
 double
 DistortionModelBuilder::RansacAlgo::calcReferenceHeight(
 	CylindricalSurfaceDewarper const& dewarper, QPointF const& loc)
@@ -447,6 +464,52 @@ DistortionModelBuilder::RansacAlgo::calcReferenceHeight(
 	QPointF const pt1(dewarper.mapToDewarpedSpace(loc + QPointF(0.0, -10)));
 	QPointF const pt2(dewarper.mapToDewarpedSpace(loc + QPointF(0.0, 10)));
 	return fabs(pt1.y() - pt2.y());
+}
+#endif
+QImage
+DistortionModelBuilder::visualizeModel(
+	QImage const& background, std::vector<TracedCurve> const& curves, RansacModel const& model) const
+{
+	QImage canvas(background.convertToFormat(QImage::Format_RGB32));
+	QPainter painter(&canvas);
+	painter.setRenderHint(QPainter::Antialiasing);
+
+	int const width = background.width();
+	int const height = background.height();
+	double const stroke_width = sqrt(double(width * width + height * height)) / 500;
+
+	QPen active_curve_pen(QColor(0x45, 0xff, 0x53, 180));
+	active_curve_pen.setWidthF(stroke_width);
+	
+	QPen inactive_curve_pen(QColor(0, 0, 255, 140));
+	inactive_curve_pen.setWidthF(stroke_width);
+
+	BOOST_FOREACH(TracedCurve const& curve, curves) {
+		if (curve.extendedPolyline.empty()) {
+			continue;
+		}
+		if (&curve == model.topCurve || &curve == model.bottomCurve) {
+			painter.setPen(active_curve_pen);
+		} else {
+			painter.setPen(inactive_curve_pen);
+		}
+		painter.drawPolyline(&curve.extendedPolyline[0], curve.extendedPolyline.size());
+	}
+	
+	// Extend / trim bounds.
+	QLineF bound1(m_bound1);
+	QLineF bound2(m_bound2);
+	lineBoundedByRect(bound1, background.rect());
+	lineBoundedByRect(bound2, background.rect());
+
+	// Draw bounds.
+	QPen bounds_pen(QColor(0, 0, 255, 180));
+	bounds_pen.setWidthF(stroke_width);
+	painter.setPen(bounds_pen);
+	painter.drawLine(bound1);
+	painter.drawLine(bound2);
+
+	return canvas;
 }
 
 } // namespace dewarping

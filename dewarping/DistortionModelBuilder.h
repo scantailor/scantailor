@@ -27,6 +27,9 @@
 #include <deque>
 #include <utility>
 
+class QImage;
+class DebugImages;
+
 namespace imageproc
 {
 	class XSpline;
@@ -59,6 +62,13 @@ public:
 	void setVerticalBounds(QLineF const& bound1, QLineF const& bound2);
 
 	/**
+	 * \brief Returns the current vertical bounds.
+	 *
+	 * It's not specified which one is the left and which one is the right bound.
+	 */
+	std::pair<QLineF, QLineF> verticalBounds() const;
+
+	/**
 	 * \brief Add a curve that's meant to become straight and horizontal after dewarping.
 	 *
 	 * The curve doesn't have to touch or intersect the vertical bounds, although
@@ -79,7 +89,7 @@ public:
 	 * \return A DistortionModel that may be invalid.
 	 * \see DistortionModel::isValid()
 	 */
-	DistortionModel tryBuildModel() const;
+	DistortionModel tryBuildModel(DebugImages* dbg = 0, QImage const* dbg_background = 0) const;
 private:
 	struct TracedCurve;
 	struct RansacModel;
@@ -101,6 +111,9 @@ private:
 
 	static imageproc::XSpline fitExtendedSpline(
 		std::vector<QPointF> const& polyline, std::pair<QLineF, QLineF> const& bounds);
+
+	QImage visualizeModel(QImage const& background,
+		std::vector<TracedCurve> const& curves, RansacModel const& model) const;
 
 	Vec2d m_downDirection;
 	Vec2d m_rightDirection;
