@@ -146,6 +146,7 @@ int main(int argc, char** argv)
 		cli.printHelp();
 		return 0;
 	}
+	cli.setGui(true);
 	
 	QString const translation("scantailor_"+QLocale::system().name());
 	QTranslator translator;

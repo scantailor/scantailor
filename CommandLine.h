@@ -64,8 +64,9 @@ class CommandLine
 		QString & operator[](QString const& key) { return (QString &)CommandLine::s_options[key]; };
 		QString const operator[](QString const& key) const { return CommandLine::s_options.value(key); };
 
-		bool help() { return (CommandLine::s_options["help"] == "true"); };
 		bool gui() { return CommandLine::s_gui; };
+		void setGui(bool g) { CommandLine::s_gui = g; };
+
 		page_split::LayoutType layout();
 		Qt::LayoutDirection layoutDirection();
 		Dpi dpi() { return CommandLine::getDpi(); };
@@ -75,7 +76,9 @@ class CommandLine
 		page_layout::Alignment alignment() { return CommandLine::getAlignment(); };
 		Despeckle::Level contentDetection() {return CommandLine::getContentDetection(); };
 
+		bool help() { return (CommandLine::s_options["help"] == "true"); };
 		void printHelp();
+
 };
 
 #endif

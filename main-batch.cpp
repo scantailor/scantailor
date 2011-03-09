@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 		cli.printHelp();
 		return 0;
 	}
+	cli.setGui(false);
 
 	ConsoleBatch cbatch;
 	cbatch.process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
