@@ -36,6 +36,8 @@
 #include "ImageId.h"
 #include "ThumbnailPixmapCache.h"
 #include "LoadFileTask.h"
+#include "ProjectWriter.h"
+#include "SelectedPage.h"
 
 #include "filters/fix_orientation/Settings.h"
 #include "filters/fix_orientation/Filter.h"
@@ -173,6 +175,12 @@ ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& o
 			BackgroundTaskPtr bgTask = createCompositeTask(stages, thumbnail_cache, out_filename_gen, page, pages, j);
 			(*bgTask)();
 		}
+	}
+
+	if (cli["output-project"] != "") {
+		SelectedPage sPage;
+		ProjectWriter writer(pages, sPage, out_filename_gen);
+		writer.write(cli["output-project"], stages->filters());
 	}
 }
 

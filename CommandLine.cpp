@@ -50,6 +50,7 @@ CommandLine::parse_cli(QStringList const& argv)
 	shortMap["v"] = "verbose";
 	shortMap["l"] = "layout";
 	shortMap["ld"] = "layout-direction";
+	shortMap["o"] = "output-project";
 
 	// skip first argument (scantailor)
 	for (int i=1; i<argv.size(); i++) {
@@ -114,6 +115,7 @@ CommandLine::printHelp()
 	std::cout << "\t1) scantailor" << "\n";
 	std::cout << "\t2) scantailor <project_file>" << "\n";
 	std::cout << "\t3) scantailor-batch [options] <image, image, ...> <output_directory>" << "\n";
+	std::cout << "\t4) scantailor-batch [options] <project_file> [output_directory]" << "\n";
 	std::cout << "\n";
 	std::cout << "1)" << "\n";
 	std::cout << "\tstart ScanTailor's GUI interface" << "\n";
@@ -121,6 +123,9 @@ CommandLine::printHelp()
 	std::cout << "\tstart ScanTailor's GUI interface and load project file" << "\n";
 	std::cout << "3)" << "\n";
 	std::cout << "\tbatch processing images from command line; no GUI" << "\n";
+	std::cout << "4)" << "\n";
+	std::cout << "\tbatch processing project from command line; no GUI" << "\n";
+	std::cout << "\tif output_directory is specified as last argument, it overwrites the one in project file" << "\n";
 	std::cout << "\n";
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
@@ -157,6 +162,7 @@ CommandLine::printHelp()
 	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << "\n";
 	std::cout << "\t--depth-perception=<1.0...3.0>\t\t-- default: 2.0" << "\n";
+	std::cout << "\t--output-project=, -o=<project_name>" << "\n";
 	std::cout << "\n";
 }
 
