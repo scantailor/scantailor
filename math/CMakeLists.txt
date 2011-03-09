@@ -11,6 +11,7 @@ SET(
 	ToLineProjector.cpp ToLineProjector.h
 	ArcLengthMapper.cpp ArcLengthMapper.h
 	LineIntersectionScalar.cpp LineIntersectionScalar.h
+	LineBoundedByRect.cpp LineBoundedByRect.h
 	PolylineIntersector.cpp PolylineIntersector.h
 	XSpline.cpp XSpline.h
 )
