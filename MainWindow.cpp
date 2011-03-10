@@ -139,11 +139,11 @@ MainWindow::MainWindow()
 	setupUi(this);
 	sortOptions->setVisible(false);
 
-#if !defined(ENABLE_OPENGL)
+/*#if !defined(ENABLE_OPENGL)
 	// Right now the only setting is 3D acceleration, so get rid of
 	// the whole Settings dialog, if it's inaccessible.
 	actionSettings->setVisible(false);
-#endif
+#endif*/
 
 	createBatchProcessingWidget();
 	m_ptrProcessingIndicationWidget.reset(new ProcessingIndicationWidget);

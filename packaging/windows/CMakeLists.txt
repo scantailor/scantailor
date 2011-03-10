@@ -2,13 +2,13 @@ FIND_PROGRAM(
 	MAKENSIS_EXE makensis
 	PATHS "[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\NSIS;InstallLocation]"
 )
-IF(NOT MAKENSIS_EXE)
-	MESSAGE(
-		FATAL_ERROR
-		"makensis.exe could not be found.\n"
-		"makensis.exe is a part of NSIS. Get NSIS from http://nsis.sf.net/"
-	)
-ENDIF(NOT MAKENSIS_EXE)
+#IF(NOT MAKENSIS_EXE)
+#	MESSAGE(
+#		FATAL_ERROR
+#		"makensis.exe could not be found.\n"
+#		"makensis.exe is a part of NSIS. Get NSIS from http://nsis.sf.net/"
+#	)
+#ENDIF(NOT MAKENSIS_EXE)
 
 IF(MINGW)
 	FIND_FILE(
