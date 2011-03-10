@@ -30,6 +30,8 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 
 	QSettings settings;
 
+	ui.gfax4RadioButton->setChecked(settings.value("settings/bitonal_compress_g4fax", false).toBool());
+
 #ifndef ENABLE_OPENGL
 	ui.use3DAcceleration->setChecked(false);
 	ui.use3DAcceleration->setEnabled(false);
@@ -60,4 +62,5 @@ SettingsDialog::commitChanges()
 #ifdef ENABLE_OPENGL
 	settings.setValue("settings/use_3d_acceleration", ui.use3DAcceleration->isChecked());
 #endif
+	settings.setValue("settings/bitonal_compress_g4fax", ui.gfax4RadioButton->isChecked());
 }

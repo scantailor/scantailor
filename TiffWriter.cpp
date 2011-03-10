@@ -143,7 +143,7 @@ static void deviceUnmap(thandle_t, tdata_t, toff_t)
 }
 
 bool
-TiffWriter::writeImage(QString const& file_path, QImage const& image)
+TiffWriter::writeImage(QString const& file_path, QImage const& image, bool bitonal_g4fax)
 {
 	if (image.isNull()) {
 		return false;
@@ -154,7 +154,7 @@ TiffWriter::writeImage(QString const& file_path, QImage const& image)
 		return false;
 	}
 	
-	if (!writeImage(file, image)) {
+	if (!writeImage(file, image, bitonal_g4fax)) {
 		file.remove();
 		return false;
 	}
@@ -163,7 +163,7 @@ TiffWriter::writeImage(QString const& file_path, QImage const& image)
 }
 
 bool
-TiffWriter::writeImage(QIODevice& device, QImage const& image)
+TiffWriter::writeImage(QIODevice& device, QImage const& image, bool bitonal_g4fax)
 {
 	if (image.isNull()) {
 		return false;
@@ -199,7 +199,7 @@ TiffWriter::writeImage(QIODevice& device, QImage const& image)
 		case QImage::Format_Mono:
 		case QImage::Format_MonoLSB:
 		case QImage::Format_Indexed8:
-			return writeBitonalOrIndexed8Image(tif, image);
+			return writeBitonalOrIndexed8Image(tif, image, bitonal_g4fax);
 		default:;
 	}
 	
@@ -250,7 +250,7 @@ TiffWriter::setDpm(TiffHandle const& tif, Dpm const& dpm)
 
 bool
 TiffWriter::writeBitonalOrIndexed8Image(
-	TiffHandle const& tif, QImage const& image)
+	TiffHandle const& tif, QImage const& image, bool bitonal_g4fax)
 {
 	TIFFSetField(tif.handle(), TIFFTAG_SAMPLESPERPIXEL, uint16(1));
 	
@@ -266,7 +266,9 @@ TiffWriter::writeBitonalOrIndexed8Image(
 		case QImage::Format_MonoLSB:
 			// Don't use CCITTFAX4 compression, as Photoshop
 			// has problems with it.
-			//compression = COMPRESSION_CCITTFAX4;
+			if(bitonal_g4fax) {
+				compression = COMPRESSION_CCITTFAX4;
+			}
 			bits_per_sample = 1;
 			if (image.numColors() < 2) {
 				photometric = PHOTOMETRIC_MINISWHITE;

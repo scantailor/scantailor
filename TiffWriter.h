@@ -35,9 +35,10 @@ public:
 	 *
 	 * \param file_path The full path to the file.
 	 * \param image The image to write.  Writing a null image will fail.
+	 * \param bitonal_g4fax Compress Type for bitonal image. True - Groupe 4 FAX. False - LZW
 	 * \return True on success, false on failure.
 	 */
-	static bool writeImage(QString const& file_path, QImage const& image);
+	static bool writeImage(QString const& file_path, QImage const& image, bool bitonal_g4fax=false);
 	
 	/**
 	 * \brief Writes a QImage in TIFF format to an IO device.
@@ -45,16 +46,17 @@ public:
 	 * \param device The device to write to.  This device must be
 	 *        opened for writing and seekable.
 	 * \param image The image to write.  Writing a null image will fail.
+	 * \param bitonal_g4fax Compress Type for bitonal image. True - Groupe 4 FAX. False - LZW
 	 * \return True on success, false on failure.
 	 */
-	static bool writeImage(QIODevice& device, QImage const& image);
+	static bool writeImage(QIODevice& device, QImage const& image, bool bitonal_g4fax=false);
 private:
 	class TiffHandle;
 	
 	static void setDpm(TiffHandle const& tif, Dpm const& dpm);
 	
 	static bool writeBitonalOrIndexed8Image(
-		TiffHandle const& tif, QImage const& image);
+		TiffHandle const& tif, QImage const& image, bool bitonal_g4fax=false);
 	
 	static bool writeRGB32Image(
 		TiffHandle const& tif, QImage const& image);

@@ -69,6 +69,7 @@
 #include <QTabWidget>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QSettings>
 
 using namespace imageproc;
 
@@ -147,6 +148,9 @@ Task::process(
 	TaskStatus const& status, FilterData const& data,
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
+	QSettings settings;
+	bool bitonal_g4fax = settings.value("settings/bitonal_compress_g4fax", false).toBool();
+	
 	status.throwIfCancelled();
 	
 	Params params(m_ptrSettings->getParams(m_pageId));
@@ -321,7 +325,7 @@ Task::process(
 
 		bool invalidate_params = false;
 		
-		if (!TiffWriter::writeImage(out_file_path, out_img)) {
+		if (!TiffWriter::writeImage(out_file_path, out_img, bitonal_g4fax)) {
 			invalidate_params = true;
 		} else {
 			deleteMutuallyExclusiveOutputFiles();
@@ -330,14 +334,14 @@ Task::process(
 		if (write_automask) {
 			if (!QDir().mkpath(automask_dir)) {
 				invalidate_params = true;
-			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
+			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage(), bitonal_g4fax)) {
 				invalidate_params = true;
 			}
 		}
 		if (write_speckles_file) {
 			if (!QDir().mkpath(speckles_dir)) {
 				invalidate_params = true;
-			} else if (!TiffWriter::writeImage(speckles_file_path, speckles_img.toQImage())) {
+			} else if (!TiffWriter::writeImage(speckles_file_path, speckles_img.toQImage(), bitonal_g4fax)) {
 				invalidate_params = true;
 			}
 		}
