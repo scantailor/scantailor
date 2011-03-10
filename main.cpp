@@ -157,8 +157,8 @@ int main(int argc, char** argv)
 	app.installTranslator(&translator);
 	
 	// This information is used by QSettings.
-	app.setApplicationName("Scan Tailor");
-	app.setOrganizationName("Scan Tailor");
+	app.setApplicationName("Scan Tailor Plus");
+	app.setOrganizationName("Scan Tailor Plus");
 	app.setOrganizationDomain("scantailor.sourceforge.net");
 	QSettings settings;
 	
