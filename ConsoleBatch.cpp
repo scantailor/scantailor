@@ -37,6 +37,8 @@
 #include "ThumbnailPixmapCache.h"
 #include "LoadFileTask.h"
 #include "ProjectWriter.h"
+#include "ProjectReader.h"
+#include "OrthogonalRotation.h"
 #include "SelectedPage.h"
 
 #include "filters/fix_orientation/Settings.h"
@@ -66,31 +68,71 @@
 #include "filters/output/CacheDrivenTask.h"
 
 #include <QMap>
+#include <QDomDocument>
 
-#include "OrthogonalRotation.h"
 #include "ConsoleBatch.h"
 #include "CommandLine.h"
 
-
-ConsoleBatch::ConsoleBatch()
+ConsoleBatch::ConsoleBatch(std::vector<ImageFileInfo> const& images, QString const& output_dir, Qt::LayoutDirection const layout)
 :   batch(true), debug(true),
-	disambiguator(new FileNameDisambiguator)
-{}
+	m_ptrDisambiguator(new FileNameDisambiguator),
+	m_ptrPages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout))
+{
+	PageSelectionAccessor const accessor(0);
+	m_ptrStages = new StageSequence(m_ptrPages, accessor);
 
-/*
+	setup();
+
+	m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
+	m_outFileNameGen = OutputFileNameGenerator(m_ptrDisambiguator, output_dir, m_ptrPages->layoutDirection());
+}
+
+ConsoleBatch::ConsoleBatch(QString const project_file)
+:   batch(true), debug(true)
+{
+	QFile file(project_file);
+	if (!file.open(QIODevice::ReadOnly)) {
+		throw "Unable to open the project file.";
+	}
+
+	QDomDocument doc;
+	if (!doc.setContent(&file)) {
+		throw "The project file is broken.";
+	}
+
+	file.close();
+
+	m_ptrReader = new ProjectReader(doc);
+	m_ptrPages = m_ptrReader->pages();
+
+	PageSelectionAccessor const accessor(0);
+	m_ptrDisambiguator = m_ptrReader->namingDisambiguator();
+
+	m_ptrStages = new StageSequence(m_ptrPages, accessor);
+	m_ptrReader->readFilterSettings(m_ptrStages->filters());
+
+	setup();
+
+	CommandLine cli;
+	QString output_directory = m_ptrReader->outputDirectory();
+	if (cli.outputDirectory() != ".") {
+		output_directory = cli.outputDirectory();
+	}
+
+	m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_directory+"/cache/thumbs", QSize(200,200), 40, 5));
+	m_outFileNameGen = OutputFileNameGenerator(m_ptrDisambiguator, output_directory, m_ptrPages->layoutDirection());
+}
+
 ConsoleBatch::~ConsoleBatch()
 {
-	delete(disambiguator);
+	delete(m_ptrDisambiguator);
+	delete(m_ptrStages);
 }
-*/
+
 
 BackgroundTaskPtr
 ConsoleBatch::createCompositeTask(
-		StageSequence const* m_ptrStages,
-		IntrusivePtr<ThumbnailPixmapCache> const m_ptrThumbnailCache,
-		OutputFileNameGenerator const& m_outFileNameGen,
 		PageInfo const& page,
-		IntrusivePtr<ProjectPages> const m_ptrPages,
 		int const last_filter_idx)
 {
 	IntrusivePtr<fix_orientation::Task> fix_orientation_task;
@@ -153,53 +195,48 @@ ConsoleBatch::createCompositeTask(
 
 // process the image vector **images** and save output to **output_dir**
 void
-ConsoleBatch::process(std::vector<ImageFileInfo> const& images, QString const& output_dir, Qt::LayoutDirection const layout)
+ConsoleBatch::process()
 {
-	IntrusivePtr<ProjectPages> pages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout));
-	PageSelectionAccessor const accessor(0);
-	StageSequence* stages = setup(pages, accessor);
-	IntrusivePtr<ThumbnailPixmapCache> thumbnail_cache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
-	OutputFileNameGenerator out_filename_gen(disambiguator, output_dir, pages->layoutDirection());
-
 	CommandLine cli;
 
 	// it should be enough to run last two stages
-	PageSequence page_sequence = pages->toPageSequence(IMAGE_VIEW);
-	for (int j=4; j<stages->count(); j++) {
+	PageSequence page_sequence = m_ptrPages->toPageSequence(IMAGE_VIEW);
+	for (int j=4; j<m_ptrStages->count(); j++) {
 		if (cli["verbose"] == "true")
 			std::cout << "Filter: " << j << "\n";
+
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
 			if (cli["verbose"] == "true")
 				std::cout << "\tProcessing: " << page.imageId().filePath().toAscii().constData() << "\n";
-			BackgroundTaskPtr bgTask = createCompositeTask(stages, thumbnail_cache, out_filename_gen, page, pages, j);
+			BackgroundTaskPtr bgTask = createCompositeTask(page, j);
 			(*bgTask)();
 		}
 	}
-
-	if (cli["output-project"] != "") {
-		SelectedPage sPage;
-		ProjectWriter writer(pages, sPage, out_filename_gen);
-		writer.write(cli["output-project"], stages->filters());
-	}
 }
 
-StageSequence*
-ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor const& accessor)
+void
+ConsoleBatch::saveProject(QString const project_file)
 {
-	StageSequence* stages = new StageSequence(pages, accessor);
-	std::set<PageId> allPages = pages->toPageSequence(IMAGE_VIEW).selectAll();
+	SelectedPage sPage;
+	ProjectWriter writer(m_ptrPages, sPage, m_outFileNameGen);
+	writer.write(project_file, m_ptrStages->filters());
+}
 
-	IntrusivePtr<fix_orientation::Filter> fix_orientation = stages->fixOrientationFilter(); 
-	IntrusivePtr<page_split::Filter> page_split = stages->pageSplitFilter(); 
-	IntrusivePtr<deskew::Filter> deskew = stages->deskewFilter(); 
-	IntrusivePtr<select_content::Filter> select_content = stages->selectContentFilter(); 
-	IntrusivePtr<page_layout::Filter> page_layout = stages->pageLayoutFilter(); 
-	IntrusivePtr<output::Filter> output = stages->outputFilter(); 
+void
+ConsoleBatch::setup()
+{
+	IntrusivePtr<fix_orientation::Filter> fix_orientation = m_ptrStages->fixOrientationFilter(); 
+	IntrusivePtr<page_split::Filter> page_split = m_ptrStages->pageSplitFilter(); 
+	IntrusivePtr<deskew::Filter> deskew = m_ptrStages->deskewFilter(); 
+	IntrusivePtr<select_content::Filter> select_content = m_ptrStages->selectContentFilter(); 
+	IntrusivePtr<page_layout::Filter> page_layout = m_ptrStages->pageLayoutFilter(); 
+	IntrusivePtr<output::Filter> output = m_ptrStages->outputFilter(); 
 
 	CommandLine cli;
 	QMap<QString, float> img_cache;
 
+	std::set<PageId> allPages = m_ptrPages->toPageSequence(IMAGE_VIEW).selectAll();
 	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
 		PageId page = *i;
 
@@ -228,7 +265,9 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 		}
 	
 		// PAGE SPLIT
-		page_split->getSettings()->setLayoutTypeForAllPages(cli.layout());
+		if (cli["layout"] != "") {
+			page_split->getSettings()->setLayoutTypeForAllPages(cli.layout());
+		}
 
 		// SELECT CONTENT FILTER
 		if (cli["content-box"] != "") {
@@ -277,28 +316,37 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 				alignment.setNull(true);
 			}
 		}
-		page_layout->getSettings()->setHardMarginsMM(page, cli.margins());
-		page_layout->getSettings()->setPageAlignment(page, alignment);
+		if (cli["margins"] != "" || cli["margins-left"] != "" || cli["margins-right"] != "" || cli["margins-top"] != "" || cli["margins-bottom"] != "")
+			page_layout->getSettings()->setHardMarginsMM(page, cli.margins());
+		if (cli["match-layout-tolerance"] != "" || cli["alignment"] != "" || cli["alignment-vertical"] != "" || cli["alignment-horizontal"] != "")
+			page_layout->getSettings()->setPageAlignment(page, alignment);
 
 		// OUTPUT FILTER
 		output::Params params(output->getSettings()->getParams(page));
-		Dpi outputDpi = cli.outputDpi();
-		params.setOutputDpi(outputDpi);
+		if (cli["output-dpi"] != "" || cli["output-dpi-x"] != "" || cli["output-dpi-y"] != "") {
+			Dpi outputDpi = cli.outputDpi();
+			params.setOutputDpi(outputDpi);
+		}
 
 		output::ColorParams colorParams = params.colorParams();
-		colorParams.setColorMode(cli.colorMode());
+		if (cli["color-mode"] != "")
+			colorParams.setColorMode(cli.colorMode());
 
-		output::ColorGrayscaleOptions cgo;
-		if (cli["white-margins"] == "true")
-			cgo.setWhiteMargins(true);
-		if (cli["normalize-illumination"] == "true")
-			cgo.setNormalizeIllumination(true);
-		colorParams.setColorGrayscaleOptions(cgo);
+		if (cli["white-margins"] != "" || cli["normalize-illumination"] != "") {
+			output::ColorGrayscaleOptions cgo;
+			if (cli["white-margins"] == "true")
+				cgo.setWhiteMargins(true);
+			if (cli["normalize-illumination"] == "true")
+				cgo.setNormalizeIllumination(true);
+			colorParams.setColorGrayscaleOptions(cgo);
+		}
 
-		output::BlackWhiteOptions bwo;
-		if (cli["threshold"] != "")
-			bwo.setThresholdAdjustment(cli["threshold"].toInt());
-		colorParams.setBlackWhiteOptions(bwo);
+		if (cli["threshold"] != "") {
+			output::BlackWhiteOptions bwo;
+			if (cli["threshold"] != "")
+				bwo.setThresholdAdjustment(cli["threshold"].toInt());
+			colorParams.setBlackWhiteOptions(bwo);
+		}
 
 		params.setColorParams(colorParams);
 
@@ -312,6 +360,4 @@ ConsoleBatch::setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor cons
 
 		output->getSettings()->setParams(page, params);
 	}
-
-	return stages;
 }

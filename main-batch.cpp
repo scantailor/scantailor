@@ -18,7 +18,7 @@
 */
 
 #include <QCoreApplication>
-//#include <QApplication>
+#include <iostream>
 
 #include "CommandLine.h"
 #include "ConsoleBatch.h"
@@ -36,6 +36,14 @@ int main(int argc, char **argv)
 	}
 	cli.setGui(false);
 
-	ConsoleBatch cbatch;
-	cbatch.process(cli.images(), cli.outputDirectory(), cli.layoutDirection());
+	ConsoleBatch* cbatch;
+	if (cli.projectFile() != "") {
+		cbatch = new ConsoleBatch(cli.projectFile());
+	} else {
+		cbatch = new ConsoleBatch(cli.images(), cli.outputDirectory(), cli.layoutDirection());
+	}
+	cbatch->process();
+
+	if (cli["output-project"] != "")
+		cbatch->saveProject(cli["output-project"]);
 }

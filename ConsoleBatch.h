@@ -43,30 +43,33 @@
 class ConsoleBatch
 {
 public:
-	ConsoleBatch();
-
-	//virtual ~ConsoleBatch();
-
-	void process(
-			//std::vector<ImageInfo> const& images,
+	ConsoleBatch(
 			std::vector<ImageFileInfo> const& images,
 			QString                    const& output_dir,
 			Qt::LayoutDirection        const  layout);
+	ConsoleBatch(QString const project_file);
+
+	virtual ~ConsoleBatch();
+
+	void process();
+	void saveProject(QString const project_file);
 
 private:
 	bool batch;
 	bool debug;
-	IntrusivePtr<FileNameDisambiguator> disambiguator;
+	IntrusivePtr<FileNameDisambiguator> m_ptrDisambiguator;
+	IntrusivePtr<ProjectPages> m_ptrPages;
+	StageSequence* m_ptrStages;
+	OutputFileNameGenerator m_outFileNameGen;
+	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
+	ProjectReader *m_ptrReader;
 
-	StageSequence* setup(IntrusivePtr<ProjectPages> pages, PageSelectionAccessor const& accessor);
+	void setup();
 
 	BackgroundTaskPtr createCompositeTask(
-		StageSequence const* m_ptrStages,
-		IntrusivePtr<ThumbnailPixmapCache> const m_ptrThumbnailCache,
-		OutputFileNameGenerator const& m_outFileNameGen,
 		PageInfo const& page,
-		IntrusivePtr<ProjectPages> const m_ptrPages,
-		int const last_filter_idx);
+		int const last_filter_idx
+	);
 };
 
 #endif

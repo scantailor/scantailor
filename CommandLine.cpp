@@ -130,7 +130,7 @@ CommandLine::printHelp()
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
 	std::cout << "\t--verbose, -v" << "\n";
-//	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
+	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
 	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
