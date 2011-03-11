@@ -41,7 +41,8 @@ CommandLine::parse_cli(QStringList const& argv)
 {
 	QRegExp rx("^--([^=]+)=(.*)$");
 	QRegExp rx_switch("^--([^=]+)$");
-	QRegExp rx_short("^-(.*)$");
+	QRegExp rx_short("^-([^=]+)=(.*)$");
+	QRegExp rx_short_switch("^-([^=]+)$");
 	QRegExp rx_project(".*\\.ScanTailor$", Qt::CaseInsensitive);
 
 	QMap<QString, QString> shortMap;
@@ -64,7 +65,11 @@ CommandLine::parse_cli(QStringList const& argv)
 			// option without value
 			CommandLine::s_options[rx_switch.cap(1)] = "true";
 		} else if (rx_short.exactMatch(argv[i])) {
+			// option with a value
 			QString key = shortMap[rx_short.cap(1)];
+			CommandLine::s_options[key] = rx_short.cap(2);
+		} else if (rx_short_switch.exactMatch(argv[i])) {
+			QString key = shortMap[rx_short_switch.cap(1)];
 			if (key == "") continue;
 			CommandLine::s_options[key] = "true";
 		} else if (rx_project.exactMatch(argv[i])) {
