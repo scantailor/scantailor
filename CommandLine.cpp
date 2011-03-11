@@ -167,8 +167,8 @@ CommandLine::printHelp()
 	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << "\n";
 	std::cout << "\t--depth-perception=<1.0...3.0>\t\t-- default: 2.0" << "\n";
-	std::cout << "\t--start-filter=<1...6>\t\t-- default: 4" << "\n";
-	std::cout << "\t--end-filter=<1...6>\t\t-- default: 6" << "\n";
+	std::cout << "\t--start-filter=<1...6>\t\t\t-- default: 4" << "\n";
+	std::cout << "\t--end-filter=<1...6>\t\t\t-- default: 6" << "\n";
 	std::cout << "\t--output-project=, -o=<project_name>" << "\n";
 	std::cout << "\n";
 }
