@@ -199,9 +199,25 @@ ConsoleBatch::process()
 {
 	CommandLine cli;
 
-	for (int j=0; j<m_ptrStages->count(); j++) {
+	int startFilterIdx = m_ptrStages->selectContentFilterIdx();
+	if (cli["start-filter"] != "") {
+		int sf = cli["start-filter"].toInt() - 1;
+		if (sf<0 || sf>=m_ptrStages->filters().size())
+			throw "Start filter out of range";
+		startFilterIdx = sf;
+	}
+
+	int endFilterIdx = m_ptrStages->outputFilterIdx();
+	if (cli["end-filter"] != "") {
+		int ef = cli["end-filter"].toInt() - 1;
+		if (ef<0 || ef>=m_ptrStages->filters().size())
+			throw "End filter out of range";
+		endFilterIdx = ef;
+	}
+
+	for (int j=startFilterIdx; j<=endFilterIdx; j++) {
 		if (cli["verbose"] == "true")
-			std::cout << "Filter: " << j << "\n";
+			std::cout << "Filter: " << (j+1) << "\n";
 
 		// it should be enough to run last two stages
 		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
@@ -219,7 +235,7 @@ void
 ConsoleBatch::saveProject(QString const project_file)
 {
 	PageInfo fpage = m_ptrPages->toPageSequence(PAGE_VIEW).pageAt(0);
-	SelectedPage sPage(fpage.id(), PAGE_VIEW);
+	SelectedPage sPage(fpage.id(), IMAGE_VIEW);
 	ProjectWriter writer(m_ptrPages, sPage, m_outFileNameGen);
 	writer.write(project_file, m_ptrStages->filters());
 }

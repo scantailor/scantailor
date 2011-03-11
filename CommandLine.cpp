@@ -154,10 +154,10 @@ CommandLine::printHelp()
 	std::cout << "\t--alignment=center\t\t-- sets vertical and horizontal alignment to center" << "\n";
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom>" << "\n";
 	std::cout << "\t\t--alignment-horizontal=<left|center|right>" << "\n";
-	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 300" << "\n";
+	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
-	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 300" << "\n";
+	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 600" << "\n";
 	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
 	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
@@ -167,6 +167,8 @@ CommandLine::printHelp()
 	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << "\n";
 	std::cout << "\t--depth-perception=<1.0...3.0>\t\t-- default: 2.0" << "\n";
+	std::cout << "\t--start-filter=<1...6>\t\t-- default: 4" << "\n";
+	std::cout << "\t--end-filter=<1...6>\t\t-- default: 6" << "\n";
 	std::cout << "\t--output-project=, -o=<project_name>" << "\n";
 	std::cout << "\n";
 }
