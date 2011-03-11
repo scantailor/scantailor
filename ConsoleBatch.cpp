@@ -199,12 +199,12 @@ ConsoleBatch::process()
 {
 	CommandLine cli;
 
-	// it should be enough to run last two stages
-	PageSequence page_sequence = m_ptrPages->toPageSequence(IMAGE_VIEW);
-	for (int j=4; j<m_ptrStages->count(); j++) {
+	for (int j=0; j<m_ptrStages->count(); j++) {
 		if (cli["verbose"] == "true")
 			std::cout << "Filter: " << j << "\n";
 
+		// it should be enough to run last two stages
+		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
 			if (cli["verbose"] == "true")
@@ -218,7 +218,8 @@ ConsoleBatch::process()
 void
 ConsoleBatch::saveProject(QString const project_file)
 {
-	SelectedPage sPage;
+	PageInfo fpage = m_ptrPages->toPageSequence(PAGE_VIEW).pageAt(0);
+	SelectedPage sPage(fpage.id(), PAGE_VIEW);
 	ProjectWriter writer(m_ptrPages, sPage, m_outFileNameGen);
 	writer.write(project_file, m_ptrStages->filters());
 }
@@ -236,7 +237,7 @@ ConsoleBatch::setup()
 	CommandLine cli;
 	QMap<QString, float> img_cache;
 
-	std::set<PageId> allPages = m_ptrPages->toPageSequence(IMAGE_VIEW).selectAll();
+	std::set<PageId> allPages = m_ptrPages->toPageSequence(PAGE_VIEW).selectAll();
 	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
 		PageId page = *i;
 
