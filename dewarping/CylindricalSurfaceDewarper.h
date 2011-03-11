@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CYLINDRICAL_SURFACE_DEWARPER_H_
-#define CYLINDRICAL_SURFACE_DEWARPER_H_
+#ifndef DEWARPING_CYLINDRICAL_SURFACE_DEWARPER_H_
+#define DEWARPING_CYLINDRICAL_SURFACE_DEWARPER_H_
 
 #include "HomographicTransform.h"
 #include "PolylineIntersector.h"
@@ -27,6 +27,9 @@
 #include <utility>
 #include <QPointF>
 #include <QLineF>
+
+namespace dewarping
+{
 
 class CylindricalSurfaceDewarper
 {
@@ -115,5 +118,7 @@ private:
 	PolylineIntersector m_imgDirectrix1Intersector;
 	PolylineIntersector m_imgDirectrix2Intersector;
 };
+
+} // namespace dewarping
 
 #endif

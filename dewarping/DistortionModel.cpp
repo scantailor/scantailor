@@ -29,7 +29,7 @@
 #include <boost/foreach.hpp>
 #include <algorithm>
 
-namespace output
+namespace dewarping
 {
 
 DistortionModel::DistortionModel()
@@ -177,4 +177,4 @@ DistortionModel::boundingBox(QTransform const& transform) const
 	}
 }
 
-} // namespace output
+} // namespace dewarping

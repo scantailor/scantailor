@@ -54,6 +54,12 @@ ToLineProjector::projectionPoint(QPointF const& pt) const
 	return m_origin + m_vec * projectionScalar(pt);
 }
 
+QPointF
+ToLineProjector::projectionVector(QPointF const& pt) const
+{
+	return projectionPoint(pt) - pt;
+}
+
 double
 ToLineProjector::projectionDist(QPointF const& pt) const
 {

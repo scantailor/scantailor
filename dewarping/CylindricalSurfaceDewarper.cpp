@@ -48,6 +48,9 @@ crv: Dewarped normalized coordinates.  crv X coordinates are linked
 	 different for each generatrix.
 */
 
+namespace dewarping
+{
+
 class CylindricalSurfaceDewarper::CoupledPolylinesIterator
 {
 public:
@@ -458,3 +461,5 @@ CylindricalSurfaceDewarper::CoupledPolylinesIterator::advance2()
 	m_nextImgPt2 = *m_seq2It;
 	m_nextPlnX2 = m_img2pln(m_nextImgPt2)[0];
 }
+
+} // namespace dewarping

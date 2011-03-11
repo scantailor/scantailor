@@ -16,37 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SPFIT_MODEL_SHAPE_H_
-#define SPFIT_MODEL_SHAPE_H_
+#ifndef LINE_BOUNDED_BY_RECT_H_
+#define LINE_BOUNDED_BY_RECT_H_
 
-#include "SqDistApproximant.h"
-#include "FittableSpline.h"
-#include <QPointF>
+#include <QLineF>
 #include <QRectF>
 
-namespace spfit
-{
-
 /**
- * \brief A shape we are trying to fit a spline to.
- *
- * Could be a polyline or maybe a point cloud.
+ * If \p line (not line segment!) intersects with \p rect,
+ * writes intersection points as the new \p line endpoints
+ * and returns true.  Otherwise returns false and leaves
+ * \p line unmodified.
  */
-class ModelShape
-{
-public:
-	virtual ~ModelShape() {}
-
-	virtual QRectF boundingBox() const = 0;
-
-	/**
-	 * Returns a function that approximates the squared distance to the model.
-	 * The function is only accurate in the neighbourhood of \p pt.
-	 */
-	virtual SqDistApproximant localSqDistApproximant(
-		QPointF const& pt, FittableSpline::SampleFlags flags) const = 0;
-};
-
-} // namespace spfit
+bool lineBoundedByRect(QLineF& line, QRectF const& rect);
 
 #endif

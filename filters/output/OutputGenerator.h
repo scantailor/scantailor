@@ -31,14 +31,15 @@
 #include <QTransform>
 #include <QColor>
 #include <QPointF>
+#include <QLineF>
 #include <QPolygonF>
 #include <vector>
+#include <utility>
 #include <stdint.h>
 
 class TaskStatus;
 class DebugImages;
 class ImageTransformation;
-class CylindricalSurfaceDewarper;
 class FilterData;
 class ZoneSet;
 class QSize;
@@ -51,10 +52,14 @@ namespace imageproc
 	class GrayImage;
 }
 
+namespace dewarping
+{
+	class DistortionModel;
+	class CylindricalSurfaceDewarper;
+}
+
 namespace output
 {
-
-class DistortionModel;
 
 class OutputGenerator
 {
@@ -94,7 +99,7 @@ public:
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
-		DistortionModel& distortion_model,
+		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
@@ -116,7 +121,7 @@ private:
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
-		DistortionModel& distortion_model,
+		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
@@ -139,21 +144,21 @@ private:
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
-		DistortionModel& distortion_model,
+		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
 	
-	void setupTrivialDistortionModel(DistortionModel& distortion_model) const;
+	void setupTrivialDistortionModel(dewarping::DistortionModel& distortion_model) const;
 
-	static CylindricalSurfaceDewarper createDewarper(
-		DistortionModel const& distortion_model,
+	static dewarping::CylindricalSurfaceDewarper createDewarper(
+		dewarping::DistortionModel const& distortion_model,
 		QTransform const& distortion_model_to_target, double depth_perception);
 
 	QImage dewarp(
 		QTransform const& orig_to_src, QImage const& src,
-		QTransform const& src_to_output, DistortionModel const& distortion_model,
+		QTransform const& src_to_output, dewarping::DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception, QColor const& bg_color) const;
 
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);

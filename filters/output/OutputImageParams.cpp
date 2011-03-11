@@ -33,7 +33,7 @@ OutputImageParams::OutputImageParams(
 	ImageTransformation const& xform,
 	Dpi const& dpi, ColorParams const& color_params,
 	DewarpingMode const& dewarping_mode,
-	DistortionModel const& distortion_model,
+	dewarping::DistortionModel const& distortion_model,
 	DepthPerception const& depth_perception,
 	DespeckleLevel const despeckle_level)
 :	m_size(out_image_size),

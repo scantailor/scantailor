@@ -16,17 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_RASTER_DEWARPER_H_
-#define IMAGEPROC_RASTER_DEWARPER_H_
+#ifndef DEWARPING_RASTER_DEWARPER_H_
+#define DEWARPING_RASTER_DEWARPER_H_
 
-class CylindricalSurfaceDewarper;
 class QImage;
 class QSize;
 class QRectF;
 class QColor;
 
-namespace imageproc
+namespace dewarping
 {
+
+class CylindricalSurfaceDewarper;
 
 class RasterDewarper
 {
@@ -38,6 +39,6 @@ public:
 	);
 };
 
-} // namespace imageproc
+} // namespace dewarping
 
 #endif

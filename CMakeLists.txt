@@ -332,6 +332,7 @@ CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
 
 # crash_reporter is included unconditionally to collect translation sources from there.
 ADD_SUBDIRECTORY(crash_reporter)
+ADD_SUBDIRECTORY(dewarping)
 ADD_SUBDIRECTORY(foundation)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(imageproc)
@@ -437,10 +438,6 @@ SET(
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
 	#Undistort.cpp Undistort.h
-	DetectVertContentBounds.cpp DetectVertContentBounds.h
-	TextLineTracer.cpp TextLineTracer.h
-	TextLineRefiner.cpp TextLineRefiner.h
-	TowardsLineTracer.cpp TowardsLineTracer.h
 	ThreadPriority.cpp ThreadPriority.h
 	SystemLoadWidget.cpp SystemLoadWidget.h
 	FileNameDisambiguator.cpp FileNameDisambiguator.h
@@ -518,8 +515,8 @@ ADD_EXECUTABLE(
 # to go after both of them.
 TARGET_LINK_LIBRARIES(
 	scantailor
-	fix_orientation page_split deskew select_content page_layout output
-	zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
+	fix_orientation page_split deskew select_content page_layout
+	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 TARGET_LINK_LIBRARIES(

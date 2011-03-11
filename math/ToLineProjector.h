@@ -46,6 +46,11 @@ public:
 	QPointF projectionPoint(QPointF const& pt) const;
 
 	/**
+	 * \brief Equivalent to projectionPoint(pt) - pt.
+	 */
+	QPointF projectionVector(QPointF const& pt) const;
+
+	/**
 	 * Solves the equation of:\n
 	 * line.p1() + x * (line.p2() - line.p1()) = p\n
 	 * for x, where p would be the projection point.

@@ -22,7 +22,7 @@
 #include <QSize>
 #include <QRect>
 
-namespace output
+namespace dewarping
 {
 
 DewarpingPointMapper::DewarpingPointMapper(
@@ -73,4 +73,4 @@ DewarpingPointMapper::mapToWarpedSpace(QPointF const& dewarped_pt) const
 	return m_dewarper.mapToWarpedSpace(QPointF(crv_x, crv_y));
 }
 
-} // namespace output
+} // namespace dewarping

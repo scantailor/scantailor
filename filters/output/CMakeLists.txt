@@ -48,11 +48,8 @@ SET(
 	DespeckleLevel.cpp DespeckleLevel.h
 	DewarpingView.cpp DewarpingView.h
 	DewarpingMode.cpp DewarpingMode.h
-	DewarpingPointMapper.cpp DewarpingPointMapper.h
 	ChangeDewarpingDialog.cpp ChangeDewarpingDialog.h
-	DistortionModel.cpp DistortionModel.h
 	DepthPerception.cpp DepthPerception.h
-	Curve.cpp Curve.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

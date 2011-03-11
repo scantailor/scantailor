@@ -21,6 +21,7 @@
 
 #include "VirtualFunction.h"
 #include "NumericTraits.h"
+#include "FlagOps.h"
 #include <QPointF>
 #include <vector>
 
@@ -33,6 +34,13 @@ namespace spfit
 class FittableSpline
 {
 public:
+	enum SampleFlags {
+		DEFAULT_SAMPLE  = 0,
+		HEAD_SAMPLE     = 1 << 0, /**< Start point of an open spline. */
+		TAIL_SAMPLE     = 1 << 1, /**< End point of an open spline. */
+		JUNCTION_SAMPLE = 1 << 2  /**< Point on the boundary of two segments. */
+	};
+
 	/**
 	 * For a spline to be fittable, any point on a spline must be representable
 	 * as a linear combination of spline's control points.  The linear coefficients
@@ -93,11 +101,17 @@ public:
 	/**
 	 * \brief Generates an ordered set of points on a spline.
 	 *
-	 * The t parameter is provided with each point.
+	 * \p sink will be called with the following arguments:
+	 * -# Point on the spline.
+	 * -# t value corresponding to that point.
+	 * -# SampleFlags for the point.
 	 */
 	virtual void sample(
-		VirtualFunction2<void, QPointF, double>& sink, SamplingParams const& params) const = 0;
+		VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
+		SamplingParams const& params) const = 0;
 };
+
+DEFINE_FLAG_OPS(FittableSpline::SampleFlags)
 
 } // namespace spfit
 

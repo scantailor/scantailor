@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_DEWARPING_POINT_MAPPER_H_
-#define OUTPUT_DEWARPING_POINT_MAPPER_H_
+#ifndef DEWARPING_DEWARPING_POINT_MAPPER_H_
+#define DEWARPING_DEWARPING_POINT_MAPPER_H_
 
 #include "CylindricalSurfaceDewarper.h"
 
 class QRect;
 class QTransform;
 
-namespace output
+namespace dewarping
 {
 
 class DistortionModel;
@@ -33,7 +33,7 @@ class DewarpingPointMapper
 {
 public:
 	DewarpingPointMapper(
-		DistortionModel const& distortion_model, double depth_perception,
+		dewarping::DistortionModel const& distortion_model, double depth_perception,
 		QTransform const& distortion_model_to_output,
 		QRect const& output_content_rect);
 
@@ -60,6 +60,6 @@ private:
 	double m_modelYScaleToNormalized;
 };
 
-} // namespace output
+} // namespace dewarping
 
 #endif

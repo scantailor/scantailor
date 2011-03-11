@@ -41,9 +41,9 @@
 #include "DespeckleVisualization.h"
 #include "DespeckleLevel.h"
 #include "DewarpingMode.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
+#include "dewarping/DewarpingPointMapper.h"
 #include "DewarpingView.h"
-#include "DewarpingPointMapper.h"
 #include "ImageId.h"
 #include "PageId.h"
 #include "Dpi.h"
@@ -57,7 +57,7 @@
 #include "ImageLoader.h"
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
-#include "math/CylindricalSurfaceDewarper.h"
+#include "dewarping/CylindricalSurfaceDewarper.h"
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <QImage>
@@ -73,6 +73,7 @@
 #include "CommandLine.h"
 
 using namespace imageproc;
+using namespace dewarping;
 
 namespace output
 {
@@ -496,8 +497,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		dewarping_view.get(), SLOT(depthPerceptionChanged(double))
 	);
 	QObject::connect(
-		dewarping_view.get(), SIGNAL(distortionModelChanged(DistortionModel const&)),
-		opt_widget, SLOT(distortionModelChanged(DistortionModel const&))
+		dewarping_view.get(), SIGNAL(distortionModelChanged(dewarping::DistortionModel const&)),
+		opt_widget, SLOT(distortionModelChanged(dewarping::DistortionModel const&))
 	);
 
 	std::auto_ptr<QWidget> picture_zone_editor;
