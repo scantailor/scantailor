@@ -43,7 +43,7 @@ ImageView::ImageView(
 	bool left_half_removed, bool right_half_removed)
 :	ImageViewBase(
 		image, downscaled_image,
-		ImagePresentation(xform.transform(), xform.resultingCropArea())
+		ImagePresentation(xform.transform(), xform.resultingPreCropArea())
 	),
 	m_ptrPages(pages),
 	m_imageId(image_id),

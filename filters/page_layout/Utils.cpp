@@ -164,18 +164,6 @@ Utils::calcPageRectPhys(
 	return phys_xform.mmToPixels().map(poly_mm);
 }
 
-ImageTransformation
-Utils::calcPresentationTransform(
-	ImageTransformation const& orig_xform,
-	QPolygonF const& physical_crop_area)
-{
-	ImageTransformation new_xform(orig_xform);
-	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
-	new_xform.setCropArea(new_xform.transform().map(physical_crop_area));
-	new_xform.setPostRotation(orig_xform.postRotation());
-	return new_xform;
-}
-
 QPointF
 Utils::getRightUnitVector(QPolygonF const& poly_rect)
 {

@@ -21,6 +21,7 @@
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
 #include "../../Utils.h"
+#include <QPolygonF>
 #include <QDomDocument>
 #include <QDomElement>
 #include <math.h>
@@ -30,7 +31,7 @@ namespace output
 
 OutputImageParams::OutputImageParams(
 	QSize const& out_image_size, QRect const& content_rect,
-	ImageTransformation const& xform,
+	ImageTransformation xform,
 	Dpi const& dpi, ColorParams const& color_params,
 	DewarpingMode const& dewarping_mode,
 	dewarping::DistortionModel const& distortion_model,
@@ -38,7 +39,6 @@ OutputImageParams::OutputImageParams(
 	DespeckleLevel const despeckle_level)
 :	m_size(out_image_size),
 	m_contentRect(content_rect),
-	m_partialXform(xform.transform()),
 	m_dpi(dpi),
 	m_colorParams(color_params),
 	m_distortionModel(distortion_model),
@@ -46,6 +46,9 @@ OutputImageParams::OutputImageParams(
 	m_dewarpingMode(dewarping_mode),
 	m_despeckleLevel(despeckle_level)
 {
+	// For historical reasons, we disregard post-cropping and post-scaling here.
+	xform.setPostCropArea(QPolygonF()); // Resets post-scale as well.
+	m_partialXform = xform.transform();
 }
 
 OutputImageParams::OutputImageParams(QDomElement const& el)
@@ -154,6 +157,14 @@ OutputImageParams::colorParamsMatch(
 }
 
 /*=============================== PartialXform =============================*/
+
+OutputImageParams::PartialXform::PartialXform()
+:	m_11(),
+	m_12(),
+	m_21(),
+	m_22()
+{
+}
 
 OutputImageParams::PartialXform::PartialXform(QTransform const& xform)
 :	m_11(xform.m11()),

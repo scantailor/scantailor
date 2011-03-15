@@ -46,7 +46,7 @@ CacheDrivenTask::process(
 	PageInfo const& page_info, AbstractFilterDataCollector* collector,
 	ImageTransformation const& xform)
 {
-	Dependencies const deps(xform.cropArea(), xform.preRotation());
+	Dependencies const deps(xform.preCropArea(), xform.preRotation());
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	if (!params.get() || !deps.matches(params->dependencies())) {
 		

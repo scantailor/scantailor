@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,21 +74,20 @@ CacheDrivenTask::process(
 	QRectF const adapted_content_rect(
 		Utils::adaptContentRect(xform, content_rect)
 	);
+	QPolygonF const content_rect_phys(
+		xform.transformBack().map(adapted_content_rect)
+	);
+	QPolygonF const page_rect_phys(
+		Utils::calcPageRectPhys(
+			xform, content_rect_phys, *params,
+			m_ptrSettings->getAggregateHardSizeMM()
+		)
+	);
+	ImageTransformation new_xform(xform);
+	new_xform.setPostCropArea(xform.transform().map(page_rect_phys));
 	
 	if (m_ptrNextTask) {
-		QPolygonF const content_rect_phys(
-			xform.transformBack().map(adapted_content_rect)
-		);
-		QPolygonF const page_rect_phys(
-			Utils::calcPageRectPhys(
-				xform, content_rect_phys, *params,
-				m_ptrSettings->getAggregateHardSizeMM()
-			)
-		);
-		m_ptrNextTask->process(
-			page_info, collector, xform,
-			content_rect_phys, page_rect_phys
-		);
+		m_ptrNextTask->process(page_info, collector, new_xform, content_rect_phys);
 		return;
 	}
 	
@@ -99,9 +98,8 @@ CacheDrivenTask::process(
 				new Thumbnail(
 					thumb_col->thumbnailCache(),
 					thumb_col->maxLogicalThumbSize(),
-					page_info.imageId(), xform,
-					*params, adapted_content_rect,
-					m_ptrSettings->getAggregateHardSizeMM()
+					page_info.imageId(), *params,
+					new_xform, content_rect_phys
 				)
 			)
 		);

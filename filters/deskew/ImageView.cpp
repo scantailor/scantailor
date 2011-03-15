@@ -49,7 +49,7 @@ ImageView::ImageView(
 	ImageTransformation const& xform)
 :	ImageViewBase(
 		image, downscaled_image,
-		ImagePresentation(xform.transform(), xform.resultingCropArea())
+		ImagePresentation(xform.transform(), xform.resultingPreCropArea())
 	),
 	m_handlePixmap(":/icons/aqua-sphere.png"),
 	m_dragHandler(*this),
@@ -101,7 +101,7 @@ ImageView::manualDeskewAngleSetExternally(double const degrees)
 	}
 	
 	m_xform.setPostRotation(degrees);
-	updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
+	updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
 }
 
 void
@@ -204,7 +204,7 @@ ImageView::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
 
 	m_xform.setPostRotation(angle_deg);
 	updateTransformPreservingScale(
-		ImagePresentation(m_xform.transform(), m_xform.resultingCropArea())
+		ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea())
 	);
 	emit manualDeskewAngleSet(m_xform.postRotation());
 }
@@ -240,7 +240,7 @@ ImageView::handleMoveRequest(int idx, QPointF const& pos)
 	}
 
 	m_xform.setPostRotation(angle_deg);
-	updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
+	updateTransformPreservingScale(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
 }
 
 void

@@ -55,7 +55,7 @@ ImageView::ImageView(
 	QRectF const& adapted_content_rect, OptionsWidget const& opt_widget)
 :	ImageViewBase(
 		image, downscaled_image,
-		ImagePresentation(xform.transform(), xform.resultingCropArea()),
+		ImagePresentation(xform.transform(), xform.resultingPreCropArea()),
 		Margins(5, 5, 5, 5)
 	),
 	m_dragHandler(*this),

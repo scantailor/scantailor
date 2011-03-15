@@ -43,7 +43,7 @@ class OutputImageParams
 {
 public:
 	OutputImageParams(QSize const& out_image_size,
-		QRect const& content_rect, ImageTransformation const& xform,
+		QRect const& content_rect, ImageTransformation xform,
 		Dpi const& dpi, ColorParams const& color_params,
 		DewarpingMode const& dewarping_mode,
 		dewarping::DistortionModel const& distortion_model,
@@ -72,6 +72,8 @@ private:
 	class PartialXform
 	{
 	public:
+		PartialXform();
+
 		PartialXform(QTransform const& xform);
 		
 		PartialXform(QDomElement const& el);

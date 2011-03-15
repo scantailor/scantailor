@@ -141,7 +141,7 @@ ContentBoxFinder::findContentBox(
 	}
 	
 	PolygonRasterizer::fillExcept(
-		bw150, BLACK, xform_150dpi.resultingCropArea(), Qt::WindingFill
+		bw150, BLACK, xform_150dpi.resultingPreCropArea(), Qt::WindingFill
 	);
 	if (dbg) {
 		dbg->add(bw150, "page_mask_applied");
