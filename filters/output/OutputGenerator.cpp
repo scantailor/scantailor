@@ -248,7 +248,9 @@ OutputGenerator::OutputGenerator(
 	m_despeckleLevel(despeckle_level)
 {	
 	assert(m_outRect.topLeft() == QPoint(0, 0));
-	assert(m_outRect.contains(m_contentRect));
+
+	// Note that QRect::contains(<empty rect>) always returns false, so we don't use it here.
+	assert(m_outRect.contains(m_contentRect.topLeft()) && m_outRect.contains(m_contentRect.bottomRight()));
 }
 
 QImage
