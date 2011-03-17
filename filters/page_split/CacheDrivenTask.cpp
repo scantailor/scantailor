@@ -82,7 +82,7 @@ CacheDrivenTask::process(
 
 	if (m_ptrNextTask) {
 		ImageTransformation new_xform(xform);
-		new_xform.setCropArea(layout.pageOutline(page_info.id().subPage()));
+		new_xform.setPreCropArea(layout.pageOutline(page_info.id().subPage()));
 		m_ptrNextTask->process(page_info, collector, new_xform);
 		return;
 	}

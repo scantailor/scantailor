@@ -63,8 +63,7 @@ public:
 	
 	FilterResultPtr process(
 		TaskStatus const& status, FilterData const& data,
-		QPolygonF const& content_rect_phys,
-		QPolygonF const& page_rect_phys);
+		QPolygonF const& content_rect_phys);
 private:
 	class UiUpdater;
 	

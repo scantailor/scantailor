@@ -55,7 +55,7 @@ Thumbnail::paintOverImage(
 	
 	painter.setBrush(QColor(0x00, 0x00, 0xff, 50));
 	
-	QRectF content_rect(imageToThumb().mapRect(m_contentRect));
+	QRectF content_rect(virtToThumb().mapRect(m_contentRect));
 	
 	// Adjust to compensate for pen width.
 	content_rect.adjust(-1, -1, 1, 1);

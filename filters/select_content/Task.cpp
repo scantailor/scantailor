@@ -93,7 +93,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
 	
-	Dependencies const deps(data.xform().resultingCropArea());
+	Dependencies const deps(data.xform().resultingPreCropArea());
 	
 	CommandLine cli;
 	

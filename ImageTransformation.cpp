@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,13 +17,14 @@
 */
 
 #include "ImageTransformation.h"
+#include <QPointF>
+#include <QLineF>
 #include <algorithm>
 
 ImageTransformation::ImageTransformation(
 	QRectF const& orig_image_rect, Dpi const& orig_dpi)
 :	m_postRotation(0.0),
 	m_origRect(orig_image_rect),
-	m_croppedRect(orig_image_rect),
 	m_resultingRect(orig_image_rect),
 	m_origDpi(orig_dpi)
 {
@@ -50,25 +51,32 @@ ImageTransformation::preScaleToDpi(Dpi const& dpi)
 		m_origRect.width() * xscale, m_origRect.height() * yscale
 	);
 	
-	// Reverse pre-rotation.
-	QPolygonF tmp_crop_area(m_preRotateXform.inverted().map(m_cropArea));
+	// Undo's for the specified steps.
+	QTransform const undo21(m_preRotateXform.inverted() * m_preScaleXform.inverted());
+	QTransform const undo4321(m_postRotateXform.inverted() * m_preCropXform.inverted() * undo21);
 	
-	// Reverse pre-scaling.
-	tmp_crop_area = m_preScaleXform.inverted().map(tmp_crop_area);
-	
-	// Update m_preScaleXform and m_preRotateXform.
+	// Update transform #1: pre-scale.
 	m_preScaleXform.reset();
 	m_preScaleXform.scale(xscale, yscale);
+
+	// Update transform #2: pre-rotate.
 	m_preRotateXform = m_preRotation.transform(new_pre_scaled_image_size);
-	
-	// Apply new pre-scaling.
-	tmp_crop_area = m_preScaleXform.map(tmp_crop_area);
-	
-	// Re-apply pre-rotation.
-	m_cropArea = m_preRotateXform.map(tmp_crop_area);
-	
-	m_cropXform = calcCropXform(m_cropArea);
+
+	// Update transform #3: pre-crop.
+	QTransform const redo12(m_preScaleXform * m_preRotateXform);
+	m_preCropArea = (undo21 * redo12).map(m_preCropArea);
+	m_preCropXform = calcCropXform(m_preCropArea);
+
+	// Update transform #4: post-rotate.
 	m_postRotateXform = calcPostRotateXform(m_postRotation);
+
+	// Update transform #5: post-crop.
+	QTransform const redo1234(redo12 * m_preCropXform * m_postRotateXform);
+	m_postCropArea = (undo4321 * redo1234).map(m_postCropArea);
+	m_postCropXform = calcCropXform(m_postCropArea);
+
+	// Update transform #6: post-scale.
+	m_postScaleXform = calcPostScaleXform(m_postScaledDpi);
 	
 	update();
 }
@@ -85,23 +93,48 @@ ImageTransformation::setPreRotation(OrthogonalRotation const rotation)
 {
 	m_preRotation = rotation;
 	m_preRotateXform = m_preRotation.transform(m_origRect.size());
-	resetCropArea();
+	resetPreCropArea();
 	resetPostRotation();
+	resetPostCrop();
+	resetPostScale();
 	update();
 }
 
-QRectF
-ImageTransformation::rectBeforeCropping() const
+void
+ImageTransformation::setPreCropArea(QPolygonF const& area)
 {
-	return (m_preScaleXform * m_preRotateXform).mapRect(m_origRect);
+	m_preCropArea = area;
+	m_preCropXform = calcCropXform(area);
+	resetPostRotation();
+	resetPostCrop();
+	resetPostScale();
+	update();
 }
 
 void
-ImageTransformation::setCropArea(QPolygonF const& area)
+ImageTransformation::setPostRotation(double const degrees)
 {
-	m_cropArea = area;
-	m_cropXform = calcCropXform(area);
-	resetPostRotation();
+	m_postRotateXform = calcPostRotateXform(degrees);
+	m_postRotation = degrees;
+	resetPostCrop();
+	resetPostScale();
+	update();
+}
+
+void
+ImageTransformation::setPostCropArea(QPolygonF const& area)
+{
+	m_postCropArea = area;
+	m_postCropXform = calcCropXform(area);
+	resetPostScale();
+	update();
+}
+
+void
+ImageTransformation::postScaleToDpi(Dpi const& dpi)
+{
+	m_postScaledDpi = dpi;
+	m_postScaleXform = calcPostScaleXform(dpi);
 	update();
 }
 
@@ -114,26 +147,18 @@ ImageTransformation::calcCropXform(QPolygonF const& area)
 	return xform;
 }
 
-void
-ImageTransformation::setPostRotation(double const degrees)
-{
-	m_postRotateXform = calcPostRotateXform(degrees);
-	m_postRotation = degrees;
-	update();
-}
-
 QTransform
 ImageTransformation::calcPostRotateXform(double const degrees)
 {
 	QTransform xform;
 	if (degrees != 0.0) {
-		QPointF const origin(m_cropArea.boundingRect().center());
+		QPointF const origin(m_preCropArea.boundingRect().center());
 		xform.translate(-origin.x(), -origin.y());
 		xform *= QTransform().rotate(degrees);
 		xform *= QTransform().translate(origin.x(), origin.y());
 		
 		// Calculate size changes.
-		QPolygonF const pre_rotate_poly(m_cropXform.map(m_cropArea));
+		QPolygonF const pre_rotate_poly(m_preCropXform.map(m_preCropArea));
 		QRectF const pre_rotate_rect(pre_rotate_poly.boundingRect());
 		QPolygonF const post_rotate_poly(xform.map(pre_rotate_poly));
 		QRectF const post_rotate_rect(post_rotate_poly.boundingRect());
@@ -146,11 +171,37 @@ ImageTransformation::calcPostRotateXform(double const degrees)
 	return xform;
 }
 
-void
-ImageTransformation::resetCropArea()
+QTransform
+ImageTransformation::calcPostScaleXform(Dpi const& target_dpi)
 {
-	m_cropArea.clear();
-	m_cropXform.reset();
+	if (target_dpi.isNull()) {
+		return QTransform();
+	}
+
+	// We are going to measure the effective DPI after the previous transforms.
+	// Normally m_preScaledDpi would be symmetric, so we could just
+	// use that, but just in case ...
+
+	QTransform const to_orig(m_postScaleXform * m_transform.inverted());
+	// IMPORTANT: in the above line we assume post-scale is the last transform.
+
+	QLineF const hor_unit(QPointF(0, 0), QPointF(1, 0));
+	QLineF const vert_unit(QPointF(0, 0), QPointF(0, 1));
+	QLineF const orig_hor_unit(to_orig.map(hor_unit));
+	QLineF const orig_vert_unit(to_orig.map(vert_unit));
+	
+	double const xscale = target_dpi.horizontal() * orig_hor_unit.length() / m_origDpi.horizontal();
+	double const yscale = target_dpi.vertical() * orig_vert_unit.length() / m_origDpi.vertical();
+	QTransform xform;
+	xform.scale(xscale, yscale);
+	return xform;
+}
+
+void
+ImageTransformation::resetPreCropArea()
+{
+	m_preCropArea.clear();
+	m_preCropXform.reset();
 }
 
 void
@@ -161,16 +212,35 @@ ImageTransformation::resetPostRotation()
 }
 
 void
+ImageTransformation::resetPostCrop()
+{
+	m_postCropArea.clear();
+	m_postCropXform.reset();
+}
+
+void
+ImageTransformation::resetPostScale()
+{
+	m_postScaledDpi = Dpi();
+	m_postScaleXform.reset();
+}
+
+void
 ImageTransformation::update()
 {
-	QTransform const pre_scale_then_pre_rotate(m_preScaleXform * m_preRotateXform);
-	QTransform const crop_then_post_rotate(m_cropXform * m_postRotateXform);
-	m_transform = pre_scale_then_pre_rotate * crop_then_post_rotate;
+	QTransform const pre_scale_then_pre_rotate(m_preScaleXform * m_preRotateXform); // 12
+	QTransform const pre_crop_then_post_rotate(m_preCropXform * m_postRotateXform); // 34
+	QTransform const post_crop_then_post_scale(m_postCropXform * m_postScaleXform); // 56
+	QTransform const pre_crop_and_further(pre_crop_then_post_rotate * post_crop_then_post_scale); // 3456
+	m_transform = pre_scale_then_pre_rotate * pre_crop_and_further;
 	m_invTransform = m_transform.inverted();
-	if (m_cropArea.empty()) {
-		m_cropArea = pre_scale_then_pre_rotate.map(m_origRect);
+	if (m_preCropArea.empty()) {
+		m_preCropArea = pre_scale_then_pre_rotate.map(m_origRect);
 	}
-	m_resultingCropArea = crop_then_post_rotate.map(m_cropArea);
-	m_resultingRect = m_resultingCropArea.boundingRect();
-	m_croppedRect = m_cropXform.map(m_cropArea).boundingRect();
+	if (m_postCropArea.empty()) {
+		m_postCropArea = pre_crop_then_post_rotate.map(m_preCropArea);
+	}
+	m_resultingPreCropArea = pre_crop_and_further.map(m_preCropArea);
+	m_resultingPostCropArea = post_crop_then_post_scale.map(m_postCropArea);
+	m_resultingRect = m_resultingPostCropArea.boundingRect();
 }

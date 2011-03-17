@@ -30,7 +30,6 @@
 #include "ImageId.h"
 #include "Dpi.h"
 #include "Utils.h"
-#include "../page_layout/Utils.h"
 #include "filter_dc/AbstractFilterDataCollector.h"
 #include "filter_dc/ThumbnailCollector.h"
 #include <QString>
@@ -57,12 +56,15 @@ CacheDrivenTask::~CacheDrivenTask()
 void
 CacheDrivenTask::process(
 	PageInfo const& page_info, AbstractFilterDataCollector* collector,
-	ImageTransformation const& xform,
-	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
+	ImageTransformation const& xform, QPolygonF const& content_rect_phys)
 {
 	if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 		
 		QString const out_file_path(m_outFileNameGen.filePathFor(page_info.id()));
+		Params const params(m_ptrSettings->getParams(page_info.id()));
+
+		ImageTransformation new_xform(xform);
+		new_xform.postScaleToDpi(params.outputDpi());
 
 		bool need_reprocess = false;
 
@@ -76,15 +78,14 @@ CacheDrivenTask::process(
 				need_reprocess = true;
 				break;
 			}
-			
-			Params const params(m_ptrSettings->getParams(page_info.id()));
+
 			OutputGenerator const generator(
 				params.outputDpi(), params.colorParams(), params.despeckleLevel(),
-				xform, content_rect_phys, page_rect_phys
+				new_xform, content_rect_phys
 			);
 			OutputImageParams const new_output_image_params(
 				generator.outputImageSize(), generator.outputContentRect(),
-				xform, params.outputDpi(), params.colorParams(),
+				new_xform, params.outputDpi(), params.colorParams(),
 				params.dewarpingMode(), params.distortionModel(),
 				params.depthPerception(), params.despeckleLevel()
 			);
@@ -120,12 +121,6 @@ CacheDrivenTask::process(
 		} while (false);
 
 		if (need_reprocess) {
-			ImageTransformation const new_xform(
-				page_layout::Utils::calcPresentationTransform(
-					xform, page_rect_phys
-				)
-			);
-			
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(
 					new IncompleteThumbnail(
@@ -136,21 +131,10 @@ CacheDrivenTask::process(
 				)
 			);
 		} else {
-			Dpi const out_dpi(m_ptrSettings->getParams(page_info.id()).outputDpi());
-			
-			QTransform tmp_xform(xform.transform());
-			tmp_xform *= Utils::scaleFromToDpi(
-				xform.preScaledDpi(), out_dpi
-			);
-			
-			QRect const crop_rect(
-				tmp_xform.map(page_rect_phys).boundingRect().toRect()
-			);
-			
 			ImageTransformation const out_xform(
-				crop_rect.translated(-crop_rect.topLeft()), out_dpi
+				new_xform.resultingRect(), params.outputDpi()
 			);
-			
+
 			thumb_col->processThumbnail(
 				std::auto_ptr<QGraphicsItem>(
 					new Thumbnail(

@@ -43,7 +43,7 @@ ImageView::ImageView(
 	ImageTransformation const& xform, QRectF const& content_rect)
 :	ImageViewBase(
 		image, downscaled_image,
-		ImagePresentation(xform.transform(), xform.resultingCropArea())
+		ImagePresentation(xform.transform(), xform.resultingPreCropArea())
 	),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
