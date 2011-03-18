@@ -231,7 +231,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.rectBeforeCropping(), content_rect_phys.boundingRect()
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.origRect(), content_rect_phys.boundingRect()
 		)
 	);
 
