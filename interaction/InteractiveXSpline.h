@@ -40,9 +40,9 @@ public:
 
 	InteractiveXSpline();
 
-	void setSpline(imageproc::XSpline const& spline);
+	void setSpline(XSpline const& spline);
 
-	imageproc::XSpline const& spline() const { return m_spline; }
+	XSpline const& spline() const { return m_spline; }
 
 	void setStorageTransform(Transform const& from_storage, Transform const& to_storage);
 
@@ -99,7 +99,7 @@ private:
 	DragFinishedCallback m_dragFinishedCallback;
 	Transform m_fromStorage;
 	Transform m_toStorage;
-	imageproc::XSpline m_spline;
+	XSpline m_spline;
 	boost::scoped_array<ControlPoint> m_controlPoints;
 	InteractionState::Captor m_curveProximity;
 	QPointF m_curveProximityPointStorage;

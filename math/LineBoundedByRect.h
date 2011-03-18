@@ -16,39 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_THUMBNAIL_H_
-#define PAGE_LAYOUT_THUMBNAIL_H_
+#ifndef LINE_BOUNDED_BY_RECT_H_
+#define LINE_BOUNDED_BY_RECT_H_
 
-#include "ThumbnailBase.h"
-#include "Params.h"
-#include "ImageTransformation.h"
-#include "IntrusivePtr.h"
-#include <QTransform>
+#include <QLineF>
 #include <QRectF>
 
-class ThumbnailPixmapCache;
-class ImageId;
-
-namespace page_layout
-{
-
-class Thumbnail : public ThumbnailBase
-{
-public:
-	Thumbnail(IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
-		QSizeF const& max_size, ImageId const& image_id, Params const& params,
-		ImageTransformation const& xform, QPolygonF const& phys_content_rect);
-	
-	virtual void paintOverImage(
-		QPainter& painter,
-		QTransform const& image_to_display,
-		QTransform const& thumb_to_display);
-private:
-	Params m_params;
-	QRectF m_virtContentRect;
-	QRectF m_virtOuterRect;
-};
-
-} // namespace page_layout
+/**
+ * If \p line (not line segment!) intersects with \p rect,
+ * writes intersection points as the new \p line endpoints
+ * and returns true.  Otherwise returns false and leaves
+ * \p line unmodified.
+ */
+bool lineBoundedByRect(QLineF& line, QRectF const& rect);
 
 #endif

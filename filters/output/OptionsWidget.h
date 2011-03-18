@@ -32,12 +32,16 @@
 #include "ImageViewTab.h"
 #include <set>
 
+namespace dewarping
+{
+	class DistortionModel;
+}
+
 namespace output
 {
 
 class Settings;
 class DewarpingParams;
-class DistortionModel;
 
 class OptionsWidget
 	: public FilterOptionsWidget, private Ui::OutputOptionsWidget
@@ -63,7 +67,7 @@ signals:
 public slots:
 	void tabChanged(ImageViewTab tab);
 
-	void distortionModelChanged(DistortionModel const& model);
+	void distortionModelChanged(dewarping::DistortionModel const& model);
 private slots:
 	void changeDpiButtonClicked();
 	

@@ -22,7 +22,7 @@
 #include "Dpi.h"
 #include "ColorParams.h"
 #include "DewarpingMode.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
 #include <QSize>
@@ -43,19 +43,19 @@ class OutputImageParams
 {
 public:
 	OutputImageParams(QSize const& out_image_size,
-		QRect const& content_rect, ImageTransformation const& xform,
+		QRect const& content_rect, ImageTransformation xform,
 		Dpi const& dpi, ColorParams const& color_params,
 		DewarpingMode const& dewarping_mode,
-		DistortionModel const& distortion_model,
+		dewarping::DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception, DespeckleLevel despeckle_level);
 	
 	explicit OutputImageParams(QDomElement const& el);
 
 	DewarpingMode const& dewarpingMode() const { return m_dewarpingMode; }
 
-	DistortionModel const& distortionModel() const { return m_distortionModel; }
+	dewarping::DistortionModel const& distortionModel() const { return m_distortionModel; }
 
-	void setDistortionModel(DistortionModel const& model) { m_distortionModel = model; }
+	void setDistortionModel(dewarping::DistortionModel const& model) { m_distortionModel = model; }
 
 	DepthPerception const& depthPerception() const { return m_depthPerception; }
 
@@ -72,6 +72,8 @@ private:
 	class PartialXform
 	{
 	public:
+		PartialXform();
+
 		PartialXform(QTransform const& xform);
 		
 		PartialXform(QDomElement const& el);
@@ -112,7 +114,7 @@ private:
 	ColorParams m_colorParams;
 
 	/** Two curves and two lines connecting their endpoints.  Used for dewarping. */
-	DistortionModel m_distortionModel;
+	dewarping::DistortionModel m_distortionModel;
 
 	/** \see imageproc::CylindricalSurfaceDewarper */
 	DepthPerception m_depthPerception;

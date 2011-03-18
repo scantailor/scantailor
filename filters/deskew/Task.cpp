@@ -107,7 +107,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
 	
-	Dependencies const deps(data.xform().cropArea(), data.xform().preRotation());
+	Dependencies const deps(data.xform().preCropArea(), data.xform().preRotation());
 	
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);

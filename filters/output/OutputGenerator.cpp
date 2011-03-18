@@ -26,16 +26,19 @@
 #include "Despeckle.h"
 #include "Undistort.h"
 #include "RenderParams.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include "Zone.h"
 #include "ZoneSet.h"
 #include "PictureLayerProperty.h"
 #include "FillColorProperty.h"
-#include "CylindricalSurfaceDewarper.h"
-#include "TextLineTracer.h"
-#include "DewarpingPointMapper.h"
+#include "dewarping/CylindricalSurfaceDewarper.h"
+#include "dewarping/TextLineTracer.h"
+#include "dewarping/TopBottomEdgeTracer.h"
+#include "dewarping/DistortionModelBuilder.h"
+#include "dewarping/DewarpingPointMapper.h"
+#include "dewarping/RasterDewarper.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
@@ -56,7 +59,6 @@
 #include "imageproc/DrawOver.h"
 #include "imageproc/AdjustBrightness.h"
 #include "imageproc/PolygonRasterizer.h"
-#include "imageproc/RasterDewarper.h"
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/InfluenceMap.h"
 #include "config.h"
@@ -85,6 +87,7 @@
 #include <stdint.h>
 
 using namespace imageproc;
+using namespace dewarping;
 
 namespace output
 {
@@ -231,45 +234,23 @@ void combineMixed(
 
 } // anonymous namespace
 
+
 OutputGenerator::OutputGenerator(
 	Dpi const& dpi, ColorParams const& color_params,
 	DespeckleLevel const despeckle_level,
-	ImageTransformation const& pre_xform,
-	QPolygonF const& content_rect_phys,
-	QPolygonF const& page_rect_phys)
+	ImageTransformation const& xform,
+	QPolygonF const& content_rect_phys)
 :	m_dpi(dpi),
 	m_colorParams(color_params),
-	m_pageRectPhys(page_rect_phys),
-	m_toUncropped(pre_xform.transform()),
+	m_xform(xform),
+	m_outRect(xform.resultingRect().toRect()),
+	m_contentRect(xform.transform().map(content_rect_phys).boundingRect().toRect()),
 	m_despeckleLevel(despeckle_level)
-{
-	QTransform const post_scale(
-		Utils::scaleFromToDpi(pre_xform.preScaledDpi(), m_dpi)
-	);
-	m_toUncropped *= post_scale;
-	
-	m_contentRect = m_toUncropped.map(
-		content_rect_phys
-	).boundingRect().toRect();
-	
-	m_cropRect = m_toUncropped.map(
-		page_rect_phys
-	).boundingRect().toRect();
-	
-	m_fullPageRect = post_scale.map(
-		pre_xform.resultingCropArea()
-	).boundingRect().toRect();
-	
-	// Make sure both m_cropRect and m_fullPageRect completely
-	// cover m_contentRect.
-	m_cropRect |= m_contentRect;
-	m_fullPageRect |= m_contentRect;
-}
+{	
+	assert(m_outRect.topLeft() == QPoint(0, 0));
 
-QTransform
-OutputGenerator::toOutput() const
-{
-	return origToRectInUncroppedSpace(m_cropRect);
+	// Note that QRect::contains(<empty rect>) always returns false, so we don't use it here.
+	assert(m_outRect.contains(m_contentRect.topLeft()) && m_outRect.contains(m_contentRect.bottomRight()));
 }
 
 QImage
@@ -303,13 +284,13 @@ OutputGenerator::process(
 QSize
 OutputGenerator::outputImageSize() const
 {
-	return m_cropRect.size();
+	return m_outRect.size();
 }
 
 QRect
 OutputGenerator::outputContentRect() const
 {
-	return QRect(m_contentRect.topLeft() - m_cropRect.topLeft(), m_contentRect.size());
+	return m_contentRect;
 }
 
 GrayImage
@@ -432,7 +413,8 @@ OutputGenerator::modifyBinarizationMask(
 	imageproc::BinaryImage& bw_mask,
 	QRect const& mask_rect, ZoneSet const& zones) const
 {
-	QTransform xform(m_toUncropped * QTransform().translate(-mask_rect.x(), -mask_rect.y()));
+	QTransform xform(m_xform.transform());
+	xform *= QTransform().translate(-mask_rect.x(), -mask_rect.y());
 
 	typedef PictureLayerProperty PLP;
 
@@ -511,22 +493,22 @@ OutputGenerator::processAsIs(
 	QImage out;
 
 	if (input.origImage().allGray()) {
-		if (m_cropRect.isEmpty()) {
+		if (m_outRect.isEmpty()) {
 			QImage image(1, 1, QImage::Format_Indexed8);
 			image.setColorTable(createGrayscalePalette());
 			image.fill(dominant_gray);
 			return image;
 		}
 
-		out = transformToGray(input.grayImage(), m_toUncropped, m_cropRect, bg_color);
+		out = transformToGray(input.grayImage(), m_xform.transform(), m_outRect, bg_color);
 	} else {
-		if (m_cropRect.isEmpty()) {
+		if (m_outRect.isEmpty()) {
 			QImage image(1, 1, QImage::Format_RGB32);
 			image.fill(bg_color.rgb());
 			return image;
 		}
 		
-		out = transform(input.origImage(), m_toUncropped, m_cropRect, bg_color);
+		out = transform(input.origImage(), m_xform.transform(), m_outRect, bg_color);
 	}
 
 	applyFillZonesInPlace(out, fill_zones);
@@ -546,13 +528,15 @@ OutputGenerator::processWithoutDewarping(
 	RenderParams const render_params(m_colorParams);
 	
 	// The whole image minus the part cut off by the split line.
-	QRect const big_margins_rect(m_fullPageRect);
+	QRect const big_margins_rect(
+		m_xform.resultingPreCropArea().boundingRect().toRect() | m_contentRect
+	);
 	
 	// For various reasons, we need some whitespace around the content
 	// area.  This is the number of pixels of such whitespace.
 	int const content_margin = m_dpi.vertical() * 20 / 300;
 	
-	// The content area (in m_toUncropped coordinates) extended
+	// The content area (in output image coordinates) extended
 	// with content_margin.  Note that we prevent that extension
 	// from reaching the neighboring page.
 	QRect const small_margins_rect(
@@ -579,25 +563,24 @@ OutputGenerator::processWithoutDewarping(
 	
 	// Crop area in original image coordinates.
 	QPolygonF const orig_image_crop_area(
-		input.xform().transformBack().map(
-			input.xform().resultingCropArea()
+		m_xform.transformBack().map(
+			m_xform.resultingPreCropArea()
 		)
 	);
 	
-	// Crop area in maybe_normalized image coordinates.
-	QPolygonF normalize_illumination_crop_area(
-		m_toUncropped.map(orig_image_crop_area)
+	// Crop area in maybe_normalized image coordinates.	
+	QPolygonF const normalize_illumination_crop_area(
+		m_xform.resultingPreCropArea().translated(-normalize_illumination_rect.topLeft())
 	);
-	normalize_illumination_crop_area.translate(-normalize_illumination_rect.topLeft());
-	
+
 	if (render_params.normalizeIllumination()) {
 		maybe_normalized = normalizeIlluminationGray(
 			status, input.grayImage(), orig_image_crop_area,
-			m_toUncropped, normalize_illumination_rect, 0, dbg
+			m_xform.transform(), normalize_illumination_rect, 0, dbg
 		);
 	} else {
 		maybe_normalized = transform(
-			input.origImage(), m_toUncropped,
+			input.origImage(), m_xform.transform(),
 			normalize_illumination_rect, Qt::white
 		);
 	}
@@ -618,8 +601,8 @@ OutputGenerator::processWithoutDewarping(
 	
 	status.throwIfCancelled();
 	
-	if (render_params.binaryOutput() || m_cropRect.isEmpty()) {
-		BinaryImage dst(m_cropRect.size().expandedTo(QSize(1, 1)), WHITE);
+	if (render_params.binaryOutput() || m_outRect.isEmpty()) {
+		BinaryImage dst(m_outRect.size().expandedTo(QSize(1, 1)), WHITE);
 		
 		if (!m_contentRect.isEmpty()) {
 			BinaryImage bw_content(
@@ -639,7 +622,7 @@ OutputGenerator::processWithoutDewarping(
 			status.throwIfCancelled();
 			
 			QRect const src_rect(m_contentRect.translated(-normalize_illumination_rect.topLeft()));
-			QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+			QRect const dst_rect(m_contentRect);
 			rasterOp<RopSrc>(dst, dst_rect, bw_content, src_rect.topLeft());
 			bw_content.release(); // Save memory.
 			
@@ -648,7 +631,7 @@ OutputGenerator::processWithoutDewarping(
 			// we will be reconstructing the input to this despeckling
 			// operation from the final output file.
 			maybeDespeckleInPlace(
-				dst, m_cropRect, m_cropRect, m_despeckleLevel,
+				dst, m_outRect, m_outRect, m_despeckleLevel,
 				speckles_image, m_dpi, status, dbg
 			);
 		}
@@ -657,7 +640,7 @@ OutputGenerator::processWithoutDewarping(
 		return dst.toQImage();
 	}
 	
-	QSize const target_size(m_cropRect.size().expandedTo(QSize(1, 1)));
+	QSize const target_size(m_outRect.size().expandedTo(QSize(1, 1)));
 
 	BinaryImage bw_mask;
 	if (render_params.mixedOutput()) {
@@ -682,7 +665,7 @@ OutputGenerator::processWithoutDewarping(
 
 			if (!m_contentRect.isEmpty()) {
 				QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
-				QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+				QRect const dst_rect(m_contentRect);
 				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_rect.topLeft());
 			}
 		}
@@ -700,7 +683,7 @@ OutputGenerator::processWithoutDewarping(
 		assert(maybe_normalized.format() == QImage::Format_Indexed8);
 		QImage tmp(
 			transform(
-				input.origImage(), m_toUncropped,
+				input.origImage(), m_xform.transform(),
 				normalize_illumination_rect,
 				Qt::white
 			)
@@ -776,7 +759,7 @@ OutputGenerator::processWithoutDewarping(
 
 	if (!m_contentRect.isEmpty()) {
 		QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
-		QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+		QRect const dst_rect(m_contentRect);
 		drawOver(dst, dst_rect, maybe_normalized, src_rect);
 	}
 	
@@ -795,21 +778,23 @@ OutputGenerator::processWithDewarping(
 	imageproc::BinaryImage* speckles_image,
 	DebugImages* dbg) const
 {
-	QSize const target_size(m_cropRect.size().expandedTo(QSize(1, 1)));
-	if (m_cropRect.isEmpty()) {
+	QSize const target_size(m_outRect.size().expandedTo(QSize(1, 1)));
+	if (m_outRect.isEmpty()) {
 		return BinaryImage(target_size, WHITE).toQImage();
 	}
 
 	RenderParams const render_params(m_colorParams);
 	
 	// The whole image minus the part cut off by the split line.
-	QRect const big_margins_rect(m_fullPageRect);
+	QRect const big_margins_rect(
+		m_xform.resultingPreCropArea().boundingRect().toRect() | m_contentRect
+	);
 	
 	// For various reasons, we need some whitespace around the content
 	// area.  This is the number of pixels of such whitespace.
 	int const content_margin = m_dpi.vertical() * 20 / 300;
 	
-	// The content area (in m_toUncropped coordinates) extended
+	// The content area (in output image coordinates) extended
 	// with content_margin.  Note that we prevent that extension
 	// from reaching the neighboring page.
 	QRect const small_margins_rect(
@@ -834,16 +819,13 @@ OutputGenerator::processWithDewarping(
 	
 	// Crop area in original image coordinates.
 	QPolygonF const orig_image_crop_area(
-		input.xform().transformBack().map(
-			input.xform().resultingCropArea()
-		)
+		m_xform.transformBack().map(m_xform.resultingPreCropArea())
 	);
 	
 	// Crop area in maybe_normalized image coordinates.
-	QPolygonF normalize_illumination_crop_area(
-		m_toUncropped.map(orig_image_crop_area)
+	QPolygonF const normalize_illumination_crop_area(
+		m_xform.resultingPreCropArea().translated(-normalize_illumination_rect.topLeft())
 	);
-	normalize_illumination_crop_area.translate(-normalize_illumination_rect.topLeft());
 	
 	bool const color_original = !input.origImage().allGray();
 
@@ -864,9 +846,11 @@ OutputGenerator::processWithDewarping(
 
 	BinaryThreshold bw_threshold(128);
 
-	QTransform norm_illum_to_original(m_toUncropped.inverted());
-	norm_illum_to_original.translate(
-		normalize_illumination_rect.left(), normalize_illumination_rect.top()
+	QTransform const norm_illum_to_original(
+		QTransform().translate(
+			normalize_illumination_rect.left(),
+			normalize_illumination_rect.top()
+		) * m_xform.transformBack()
 	);
 
 	if (!render_params.normalizeIllumination()) {
@@ -877,7 +861,7 @@ OutputGenerator::processWithDewarping(
 		}
 		if (dewarping_mode == DewarpingMode::AUTO) {
 			warped_gray_output = transformToGray(
-				input.grayImage(), m_toUncropped, normalize_illumination_rect,
+				input.grayImage(), m_xform.transform(), normalize_illumination_rect,
 				Qt::white, /*weak_background=*/true
 			);
 		} // Otherwise we just don't need it.
@@ -885,7 +869,7 @@ OutputGenerator::processWithDewarping(
 		GrayImage warped_gray_background;
 		warped_gray_output = normalizeIlluminationGray(
 			status, input.grayImage(), orig_image_crop_area,
-			m_toUncropped, normalize_illumination_rect,
+			m_xform.transform(), normalize_illumination_rect,
 			&warped_gray_background, dbg
 		);
 
@@ -951,7 +935,7 @@ OutputGenerator::processWithDewarping(
 
 			if (!m_contentRect.isEmpty()) {
 				QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
-				QRect const dst_rect(m_contentRect.translated(-m_cropRect.topLeft()));
+				QRect const dst_rect(m_contentRect);
 				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, warped_bw_mask, src_rect.topLeft());
 			}
 		}
@@ -974,23 +958,23 @@ OutputGenerator::processWithDewarping(
 	}
 
 	if (dewarping_mode == DewarpingMode::AUTO) {
+		DistortionModelBuilder model_builder(Vec2d(0, 1));
+
 		QRect const content_rect(
 			m_contentRect.translated(-normalize_illumination_rect.topLeft())
 		);
-		std::list<std::vector<QPointF> > polylines(
-			TextLineTracer::trace(warped_gray_output, m_dpi, content_rect, status, dbg)
+		TextLineTracer::trace(
+			warped_gray_output, m_dpi, content_rect, model_builder, status, dbg
 		);
+		model_builder.transform(norm_illum_to_original);
 
-		BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-			BOOST_FOREACH(QPointF& pt, polyline) {
-				pt = norm_illum_to_original.map(pt);
-			}
-		}
-
-		if (polylines.size() >= 2) {
-			distortion_model.setTopCurve(Curve(polylines.front()));
-			distortion_model.setBottomCurve(Curve(polylines.back()));
-		} else {
+		TopBottomEdgeTracer::trace(
+			input.grayImage(), model_builder.verticalBounds(),
+			model_builder, status, dbg
+		);
+		
+		distortion_model = model_builder.tryBuildModel(dbg, &input.grayImage().toQImage());
+		if (!distortion_model.isValid()) {
 			setupTrivialDistortionModel(distortion_model);
 		}
 	}
@@ -999,7 +983,7 @@ OutputGenerator::processWithDewarping(
 
 	if (render_params.whiteMargins()) {
 		// Fill everything except the content area in normalized_original to white.
-		QPolygonF const orig_content_poly(m_toUncropped.inverted().map(QRectF(m_contentRect)));
+		QPolygonF const orig_content_poly(m_xform.transformBack().map(QRectF(m_contentRect)));
 		fillMarginsInPlace(normalized_original, orig_content_poly, Qt::white);
 		if (dbg) {
 			dbg->add(normalized_original, "white margins");
@@ -1019,14 +1003,14 @@ OutputGenerator::processWithDewarping(
 	QImage dewarped;
 	try {
 		dewarped = dewarp(
-			QTransform(), normalized_original, toOutput(),
+			QTransform(), normalized_original, m_xform.transform(),
 			distortion_model, depth_perception, bg_color
 		);
 	} catch (std::runtime_error const&) {
 		// Probably an impossible distortion model.  Let's fall back to a trivial one.
 		setupTrivialDistortionModel(distortion_model);
 		dewarped = dewarp(
-			QTransform(), normalized_original, toOutput(),
+			QTransform(), normalized_original, m_xform.transform(),
 			distortion_model, depth_perception, bg_color
 		);
 	}
@@ -1051,7 +1035,7 @@ OutputGenerator::processWithDewarping(
 	boost::shared_ptr<DewarpingPointMapper> mapper(
 		new DewarpingPointMapper(
 			distortion_model, depth_perception.value(),
-			toOutput(), outputContentRect()
+			m_xform.transform(), m_contentRect
 		)
 	);
 	boost::function<QPointF(QPointF const&)> const orig_to_output(
@@ -1079,7 +1063,7 @@ OutputGenerator::processWithDewarping(
 		// we will be reconstructing the input to this despeckling
 		// operation from the final output file.
 		maybeDespeckleInPlace(
-			dewarped_bw_content, m_cropRect, m_cropRect, m_despeckleLevel,
+			dewarped_bw_content, m_outRect, m_outRect, m_despeckleLevel,
 			speckles_image, m_dpi, status, dbg
 		);
 
@@ -1092,11 +1076,21 @@ OutputGenerator::processWithDewarping(
 		status.throwIfCancelled();
 
 		// Dewarp the B/W mask.
+		QTransform const orig_to_small_margins(
+			m_xform.transform() * QTransform().translate(
+				-small_margins_rect.left(),
+				-small_margins_rect.top()
+			)
+		);
+		QTransform small_margins_to_output;
+		small_margins_to_output.translate(
+			small_margins_rect.left(), small_margins_rect.top()
+		);
 		BinaryImage const dewarped_bw_mask(
 			dewarp(
-				origToRectInUncroppedSpace(small_margins_rect), warped_bw_mask.toQImage(),
-				rectInUncroppedSpaceToOutput(small_margins_rect),
-				distortion_model, depth_perception, Qt::black
+				orig_to_small_margins, warped_bw_mask.toQImage(),
+				small_margins_to_output, distortion_model,
+				depth_perception, Qt::black
 			)
 		);
 		if (dbg) {
@@ -1131,7 +1125,7 @@ OutputGenerator::processWithDewarping(
 		// we will be reconstructing the input to this despeckling
 		// operation from the final output file.
 		maybeDespeckleInPlace(
-			dewarped_bw_content, m_cropRect, m_contentRect,
+			dewarped_bw_content, m_outRect, m_contentRect,
 			m_despeckleLevel, speckles_image, m_dpi, status, dbg
 		);
 		
@@ -1163,7 +1157,6 @@ OutputGenerator::processWithDewarping(
 void
 OutputGenerator::setupTrivialDistortionModel(DistortionModel& distortion_model) const
 {
-	
 	QPolygonF poly;
 	if (!m_contentRect.isEmpty()) {
 		poly = QRectF(m_contentRect);
@@ -1173,7 +1166,7 @@ OutputGenerator::setupTrivialDistortionModel(DistortionModel& distortion_model) 
 		poly << m_contentRect.topLeft() + QPointF(0.5, 0.5);
 		poly << m_contentRect.topLeft() + QPointF(-0.5, 0.5);
 	}
-	poly = m_toUncropped.inverted().map(poly);
+	poly = m_xform.transformBack().map(poly);
 	
 	std::vector<QPointF> top_polyline, bottom_polyline;
 	top_polyline.push_back(poly[0]); // top-left
@@ -1244,7 +1237,7 @@ OutputGenerator::dewarp(
 	}
 
 	return RasterDewarper::dewarp(
-		src, m_cropRect.size(), dewarper, model_domain, bg_color
+		src, m_outRect.size(), dewarper, model_domain, bg_color
 	);
 }
 
@@ -1521,10 +1514,10 @@ OutputGenerator::maybeDespeckleInPlace(
 	Dpi const& dpi, TaskStatus const& status, DebugImages* dbg) const
 {
 	QRect const src_rect(mask_rect.translated(-image_rect.topLeft()));
-	QRect const dst_rect(mask_rect.translated(-m_cropRect.topLeft()));
+	QRect const dst_rect(mask_rect);
 
 	if (speckles_img) {
-		BinaryImage(m_cropRect.size(), WHITE).swap(*speckles_img);
+		BinaryImage(m_outRect.size(), WHITE).swap(*speckles_img);
 		if (!mask_rect.isEmpty()) {
 			rasterOp<RopSrc>(*speckles_img, dst_rect, image, src_rect.topLeft());
 		}
@@ -1800,7 +1793,7 @@ OutputGenerator::applyFillZonesInPlace(QImage& img, ZoneSet const& zones) const
 {
 	typedef QPointF (QTransform::*MapPointFunc)(QPointF const&) const;
 	applyFillZonesInPlace(
-		img, zones, boost::bind((MapPointFunc)&QTransform::map, toOutput(), _1)
+		img, zones, boost::bind((MapPointFunc)&QTransform::map, m_xform.transform(), _1)
 	);
 }
 
@@ -1831,25 +1824,8 @@ OutputGenerator::applyFillZonesInPlace(
 {
 	typedef QPointF (QTransform::*MapPointFunc)(QPointF const&) const;
 	applyFillZonesInPlace(
-		img, zones, boost::bind((MapPointFunc)&QTransform::map, toOutput(), _1)
+		img, zones, boost::bind((MapPointFunc)&QTransform::map, m_xform.transform(), _1)
 	);
-}
-
-QTransform
-OutputGenerator::origToRectInUncroppedSpace(QRect const& rect) const
-{
-	QTransform translation;
-	translation.translate(-rect.x(), -rect.y());
-	return m_toUncropped * translation;
-}
-
-QTransform
-OutputGenerator::rectInUncroppedSpaceToOutput(QRect const& rect) const
-{
-	QPoint const offset(rect.topLeft() - m_cropRect.topLeft());
-	QTransform translation;
-	translation.translate(offset.x(), offset.y());
-	return translation;
 }
 
 } // namespace output

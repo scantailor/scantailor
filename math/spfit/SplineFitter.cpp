@@ -29,14 +29,15 @@
 namespace spfit
 {
 
-class SplineFitter::SampleProcessor : public VirtualFunction2<void, QPointF, double>
+class SplineFitter::SampleProcessor :
+	public VirtualFunction3<void, QPointF, double, FittableSpline::SampleFlags>
 {
 public:
 	SampleProcessor(FittableSpline& spline,
 		ModelShape const& model_shape, Optimizer& optimizer,
 		std::vector<int> const& to_reduced_control_points);
 
-	virtual void operator()(QPointF pt, double t);
+	virtual void operator()(QPointF pt, double t, FittableSpline::SampleFlags flags);
 private:
 	void remapAndFilterCoeffs();
 
@@ -144,18 +145,11 @@ SplineFitter::SampleProcessor::SampleProcessor(
 }
 
 void
-SplineFitter::SampleProcessor::operator()(QPointF pt, double t)
+SplineFitter::SampleProcessor::operator()(
+	QPointF pt, double t, FittableSpline::SampleFlags flags)
 {
 	m_rSpline.linearCombinationAt(t, m_coeffs);
 	remapAndFilterCoeffs();
-
-	int flags = 0;
-	if (fabs(t) < 1e-5) {
-		flags |= ModelShape::SPLINE_HEAD;
-	} else if (fabs(t - 1) < 1e-5) {
-		flags |= ModelShape::SPLINE_TAIL;
-	}
-
 	m_rOptimizer.addSample(pt, m_coeffs, m_rModelShape.localSqDistApproximant(pt, flags));
 }
 

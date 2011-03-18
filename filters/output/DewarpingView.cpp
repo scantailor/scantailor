@@ -20,13 +20,13 @@
 #include "DewarpingView.h.moc"
 #include "ImagePresentation.h"
 #include "OutputMargins.h"
-#include "Curve.h"
+#include "dewarping/Curve.h"
 #include "VecNT.h"
 #include "MatrixCalc.h"
 #include "NumericTraits.h"
 #include "ToLineProjector.h"
 #include "XSpline.h"
-#include "CylindricalSurfaceDewarper.h"
+#include "dewarping/CylindricalSurfaceDewarper.h"
 #include "spfit/SplineFitter.h"
 #include "spfit/PolylineModelShape.h"
 #include "imageproc/Constants.h"
@@ -56,7 +56,7 @@ DewarpingView::DewarpingView(
 	QTransform const& image_to_virt, QPolygonF const& virt_display_area,
 	QRectF const& virt_content_rect, PageId const& page_id,
 	DewarpingMode dewarping_mode,
-	DistortionModel const& distortion_model,
+	dewarping::DistortionModel const& distortion_model,
 	DepthPerception const& depth_perception)
 :	ImageViewBase(
 		image, downscaled_image,
@@ -126,8 +126,8 @@ DewarpingView::DewarpingView(
 		makeLastFollower(*spline);
 	}
 
-	m_distortionModel.setTopCurve(Curve(m_topSpline.spline()));
-	m_distortionModel.setBottomCurve(Curve(m_bottomSpline.spline()));
+	m_distortionModel.setTopCurve(dewarping::Curve(m_topSpline.spline()));
+	m_distortionModel.setBottomCurve(dewarping::Curve(m_bottomSpline.spline()));
 
 	rootInteractionHandler().makeLastFollower(*this);
 	rootInteractionHandler().makeLastFollower(m_dragHandler);
@@ -186,15 +186,15 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 		try {
 			std::vector<QVector<QPointF> > curves(num_hor_grid_lines);
 
-			CylindricalSurfaceDewarper dewarper(
+			dewarping::CylindricalSurfaceDewarper dewarper(
 				m_distortionModel.topCurve().polyline(),
 				m_distortionModel.bottomCurve().polyline(), m_depthPerception.value()
 			);
-			CylindricalSurfaceDewarper::State state;
+			dewarping::CylindricalSurfaceDewarper::State state;
 
 			for (int j = 0; j < num_vert_grid_lines; ++j) {
 				double const x = j / (num_vert_grid_lines - 1.0);
-				CylindricalSurfaceDewarper::Generatrix const gtx(dewarper.mapGeneratrix(x, state));
+				dewarping::CylindricalSurfaceDewarper::Generatrix const gtx(dewarper.mapGeneratrix(x, state));
 				QPointF const gtx_p0(gtx.imgLine.pointAt(gtx.pln2img(0)));
 				QPointF const gtx_p1(gtx.imgLine.pointAt(gtx.pln2img(1)));
 				painter.drawLine(gtx_p0, gtx_p1);
@@ -215,8 +215,8 @@ DewarpingView::onPaint(QPainter& painter, InteractionState const& interaction)
 
 	if (!valid_model) {
 		// Just draw the frame.
-		Curve const& top_curve = m_distortionModel.topCurve();
-		Curve const& bottom_curve = m_distortionModel.bottomCurve();
+		dewarping::Curve const& top_curve = m_distortionModel.topCurve();
+		dewarping::Curve const& bottom_curve = m_distortionModel.bottomCurve();
 		painter.drawLine(top_curve.polyline().front(), bottom_curve.polyline().front());
 		painter.drawLine(top_curve.polyline().back(), bottom_curve.polyline().back());
 		painter.drawPolyline(QVector<QPointF>::fromStdVector(top_curve.polyline()));
@@ -278,9 +278,9 @@ void
 DewarpingView::curveModified(int curve_idx)
 {
 	if (curve_idx == 0) {
-		m_distortionModel.setTopCurve(Curve(m_topSpline.spline()));
+		m_distortionModel.setTopCurve(dewarping::Curve(m_topSpline.spline()));
 	} else {
-		m_distortionModel.setBottomCurve(Curve(m_bottomSpline.spline()));
+		m_distortionModel.setBottomCurve(dewarping::Curve(m_bottomSpline.spline()));
 	}
 	update();
 }
@@ -311,8 +311,8 @@ DewarpingView::widgetToSource(QPointF const& pt) const
 QPolygonF
 DewarpingView::virtMarginArea(int margin_idx) const
 {
-	Curve const& top_curve = m_distortionModel.topCurve();
-	Curve const& bottom_curve = m_distortionModel.bottomCurve();
+	dewarping::Curve const& top_curve = m_distortionModel.topCurve();
+	dewarping::Curve const& bottom_curve = m_distortionModel.bottomCurve();
 	
 	QLineF vert_boundary; // From top to bottom, that's important!
 

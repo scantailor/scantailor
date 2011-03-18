@@ -25,20 +25,21 @@
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
 #include "DewarpingMode.h"
+#include "ImageTransformation.h"
 #include <boost/function.hpp>
 #include <QSize>
 #include <QRect>
 #include <QTransform>
 #include <QColor>
 #include <QPointF>
+#include <QLineF>
 #include <QPolygonF>
 #include <vector>
+#include <utility>
 #include <stdint.h>
 
 class TaskStatus;
 class DebugImages;
-class ImageTransformation;
-class CylindricalSurfaceDewarper;
 class FilterData;
 class ZoneSet;
 class QSize;
@@ -51,10 +52,14 @@ namespace imageproc
 	class GrayImage;
 }
 
+namespace dewarping
+{
+	class DistortionModel;
+	class CylindricalSurfaceDewarper;
+}
+
 namespace output
 {
-
-class DistortionModel;
 
 class OutputGenerator
 {
@@ -62,9 +67,8 @@ public:
 	OutputGenerator(
 		Dpi const& dpi, ColorParams const& color_params,
 		DespeckleLevel despeckle_level,
-		ImageTransformation const& pre_xform,
-		QPolygonF const& content_rect_phys,
-		QPolygonF const& page_rect_phys);
+		ImageTransformation const& xform,
+		QPolygonF const& content_rect_phys);
 	
 	/**
 	 * \brief Produce the output image.
@@ -94,17 +98,12 @@ public:
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
-		DistortionModel& distortion_model,
+		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
 	
-	/**
-	 * Returns the transformation from original to output image coordinates.
-	 */
-	QTransform toOutput() const;
-
 	QSize outputImageSize() const;
 	
 	/**
@@ -116,7 +115,7 @@ private:
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
-		DistortionModel& distortion_model,
+		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
@@ -139,21 +138,21 @@ private:
 		TaskStatus const& status, FilterData const& input,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
-		DistortionModel& distortion_model,
+		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
 		DebugImages* dbg = 0) const;
 	
-	void setupTrivialDistortionModel(DistortionModel& distortion_model) const;
+	void setupTrivialDistortionModel(dewarping::DistortionModel& distortion_model) const;
 
-	static CylindricalSurfaceDewarper createDewarper(
-		DistortionModel const& distortion_model,
+	static dewarping::CylindricalSurfaceDewarper createDewarper(
+		dewarping::DistortionModel const& distortion_model,
 		QTransform const& distortion_model_to_target, double depth_perception);
 
 	QImage dewarp(
 		QTransform const& orig_to_src, QImage const& src,
-		QTransform const& src_to_output, DistortionModel const& distortion_model,
+		QTransform const& src_to_output, dewarping::DistortionModel const& distortion_model,
 		DepthPerception const& depth_perception, QColor const& bg_color) const;
 
 	static QSize from300dpi(QSize const& size, Dpi const& target_dpi);
@@ -239,42 +238,25 @@ private:
 		boost::function<QPointF(QPointF const&)> const& orig_to_output) const;
 
 	void applyFillZonesInPlace(imageproc::BinaryImage& img, ZoneSet const& zones) const;
-
-	QTransform origToRectInUncroppedSpace(QRect const& rect) const;
-
-	QTransform rectInUncroppedSpaceToOutput(QRect const& rect) const;
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
-	QPolygonF m_pageRectPhys;
 	
 	/**
-	 * Transformation from the input image coordinates to coordinates
-	 * of the output image before it's cropped.  This transformation
-	 * includes all transformations from the ImageTransformation
-	 * passed to a constructor, plus scaling to produce the
-	 * desired output DPI.
+	 * Transformation from the input to the output image coordinates.
 	 */
-	QTransform m_toUncropped;
-	
+	ImageTransformation m_xform;
+
 	/**
-	 * The content rectangle in m_toUncropped coordinates.
+	 * The rectangle corresponding to the output image.
+	 * The top-left corner will always be at (0, 0).
+	 */
+	QRect m_outRect;
+
+	/**
+	 * The content rectangle in output image coordinates.
 	 */
 	QRect m_contentRect;
-	
-	/**
-	 * The cropping rectangle in m_toUncropped coordinates.
-	 * The cropping rectangle is the content rect plus margins.
-	 */
-	QRect m_cropRect;
-	
-	/**
-	 * The bounding rectangle of a polygon that represents
-	 * the page boundaries.  The polygon is usually formed
-	 * by image edges and a split line.  This rectangle is
-	 * in m_toUncropped coordinates.
-	 */
-	QRect m_fullPageRect;
 
 	DespeckleLevel m_despeckleLevel;
 };

@@ -31,12 +31,29 @@
  * \anchor transformations
  * Suppose we need to make the following transformations
  * to a particular image (in this order):
- * \li Scale it, to achieve the desired optical resolution.
- * \li Rotate it by a multiple of 90 degrees,
+ * -#  Scale it, to achieve the desired optical resolution.
+ *     It's generally done only in case input had different
+ *     horizontal and vertical DPI.  We refer to this operation
+ *     as pre-scale.
+ * -#  Rotate it by a multiple of 90 degrees,
  *     swapping its width and height if necessary.
- * \li Crop it, reducing its width and height.
- * \li Apply a rotation around the image center,
+ *     That's done on the "Fix Orientation" stage.  We refer to
+ *     this operation as pre-rotate.
+ * -#  Crop it, reducing its width and height.
+ *     That's done on the "Split Pages" stage, where we crop
+ *     to the bounding box of a polygon formed by cutters and
+ *     remaining image edges.  We refer to this operation as
+ *     pre-crop.
+ * -#  Apply a rotation around the image center,
  *     increasing its width and height as necessary.
+ *     That's done on the "Deskew" stage.  We refer to this
+ *     operation as post-rotate.
+ * -#  Apply another crop, or maybe extend the image boundaries,
+ *     in order to place the required margins around content.
+ *     That's done on the "Margins" stage.  We refer to this operation
+ *     as post-crop.
+ * -#  Scale the image to desired DPI.  That's done on the "Output" stage.
+ *     We refer to this operation as post-scale.
  *
  * Instead of actually modifying the image, we provide
  * a mapping from the original image coordinates to the new ones.
@@ -104,27 +121,27 @@ public:
 	 *
 	 * \see \ref transformations Transformations.
 	 */
-	void setCropArea(QPolygonF const& area);
+	void setPreCropArea(QPolygonF const& area);
 
 	/**
-	 * \brief Get the effective crop area in pre-rotated coordinates.
+	 * \brief Get the effective pre-crop area in pre-rotated coordinates.
 	 *
-	 * If crop area was explicitly set with setCropArea(), then
+	 * If pre-crop area was explicitly set with setPreCropArea(), then
 	 * this function returns it as is.  Otherwise, the whole available
 	 * area is returned.
 	 */
-	QPolygonF const& cropArea() const { return m_cropArea; }
+	QPolygonF const& preCropArea() const { return m_preCropArea; }
 
 	/**
-	 * \brief Returns the crop area after all transformations.
+	 * \brief Returns the pre-crop area after all transformations.
 	 *
-	 * If no crop area was set, the whole image is assumed to be
-	 * the crop area.
+	 * If no pre-crop area was set, the whole image is assumed to be
+	 * the pre-crop area.
 	 */
-	QPolygonF const& resultingCropArea() const { return m_resultingCropArea; }
+	QPolygonF const& resultingPreCropArea() const { return m_resultingPreCropArea; }
 
 	/**
-	 * \brief Set the 4th step transformation.
+	 * \brief Set the 4th step transformation, resetting  the following ones.
 	 *
 	 * \see \ref transformations Transformations.
 	 */
@@ -146,6 +163,26 @@ public:
 	double postRotationCos() const { return m_postRotateXform.m11(); }
 
 	/**
+	 * \brief Set the 5th step transformation, resetting the following ones.
+	 */
+	void setPostCropArea(QPolygonF const& area);
+
+	/**
+	 * \brief Returns the post-crop area after all transformations.
+	 *
+	 * If no post-crop area was set, the whole image is assumed to be
+	 * the post-crop area.
+	 */
+	QPolygonF const& resultingPostCropArea() const { return m_resultingPostCropArea; }
+
+	/**
+	 * \brief Set the 6th step transformation.
+	 *
+	 * Passing a null (default constructed) Dpi means "don't apply post-scaling".
+	 */
+	void postScaleToDpi(Dpi const& dpi);
+
+	/**
 	 * \brief Returns the transformation matrix from the original
 	 *        to resulting image coordinates.
 	 */
@@ -163,11 +200,6 @@ public:
 	QRectF const& origRect() const { return m_origRect; }
 
 	/**
-	 * \brief Returns the image rectangle after pre-scaling and pre-rotation.
-	 */
-	QRectF rectBeforeCropping() const;
-
-	/**
 	 * \brief Returns the resulting image rectangle.
 	 *
 	 * The top-left corner of the resulting rectangle is expected
@@ -180,26 +212,36 @@ private:
 
 	QTransform calcPostRotateXform(double degrees);
 
-	void resetCropArea();
+	QTransform calcPostScaleXform(Dpi const& target_dpi);
+
+	void resetPreCropArea();
 
 	void resetPostRotation();
+
+	void resetPostCrop();
+
+	void resetPostScale();
 
 	void update();
 
 	QTransform m_preScaleXform;
 	QTransform m_preRotateXform;
-	QTransform m_cropXform;
+	QTransform m_preCropXform;
 	QTransform m_postRotateXform;
+	QTransform m_postCropXform;
+	QTransform m_postScaleXform;
 	QTransform m_transform;
 	QTransform m_invTransform;
 	double m_postRotation;
 	QRectF m_origRect;
-	QRectF m_croppedRect;
-	QRectF m_resultingRect;
-	QPolygonF m_cropArea;
-	QPolygonF m_resultingCropArea;
+	QRectF m_resultingRect; // Managed by update().
+	QPolygonF m_preCropArea;
+	QPolygonF m_resultingPreCropArea; // Managed by update().
+	QPolygonF m_postCropArea;
+	QPolygonF m_resultingPostCropArea; // Managed by update().
 	Dpi m_origDpi;
-	Dpi m_preScaledDpi;
+	Dpi m_preScaledDpi; // Always set, as preScaleToEqualizeDpi() is called from the constructor.
+	Dpi m_postScaledDpi; // Default constructed object if no post-scaling.
 	OrthogonalRotation m_preRotation;
 };
 

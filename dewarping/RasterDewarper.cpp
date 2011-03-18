@@ -19,9 +19,9 @@
 #include "RasterDewarper.h"
 #include "CylindricalSurfaceDewarper.h"
 #include "HomographicTransform.h"
-#include "ColorMixer.h"
-#include "GrayImage.h"
 #include "VecNT.h"
+#include "imageproc/ColorMixer.h"
+#include "imageproc/GrayImage.h"
 #include <QtGlobal>
 #include <QColor>
 #include <QImage>
@@ -35,7 +35,9 @@
 #define INTERP_AREA_MAPPING 2
 #define INTERPOLATION_METHOD INTERP_AREA_MAPPING
 
-namespace imageproc
+using namespace imageproc;
+
+namespace dewarping
 {
 
 namespace
@@ -578,4 +580,4 @@ RasterDewarper::dewarp(
 	}
 }
 
-} // namespace imageproc
+} // namespace dewarping

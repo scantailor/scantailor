@@ -195,7 +195,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	if (m_ptrNextTask) {
 		ImageTransformation new_xform(data.xform());
-		new_xform.setCropArea(layout.pageOutline(m_pageInfo.id().subPage()));
+		new_xform.setPreCropArea(layout.pageOutline(m_pageInfo.id().subPage()));
 		return m_ptrNextTask->process(status, FilterData(data, new_xform));
 	} else {
 		return FilterResultPtr(

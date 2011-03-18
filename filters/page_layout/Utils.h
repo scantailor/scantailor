@@ -92,23 +92,6 @@ public:
 		ImageTransformation const& xform,
 		QPolygonF const& content_rect_phys,
 		Params const& params, QSizeF const& aggregate_hard_size_mm);
-	
-	/**
-	 * \brief Calculates the presentation transformation.
-	 *
-	 * The idea is to make ImageViewBase and ThumbnailBase think that
-	 * the image is bigger than it is.  Specifically, we need margins
-	 * to be considered as parts of the image.  We do this by passing
-	 * a crafted ImageTransformation to ImageViewBase and ThumbnailBase
-	 * that has crop area altered and other parameters adjusted to
-	 * compensate that.
-	 * \param orig_xform Original transformation that we are going to adjust.
-	 * \param physical_crop_area The new crop area in physical image coordinates.
-	 * \return The adjusted transformation.
-	 */
-	static ImageTransformation calcPresentationTransform(
-		ImageTransformation const& orig_xform,
-		QPolygonF const& physical_crop_area);
 private:
 	static QPointF getRightUnitVector(QPolygonF const& poly_rect);
 	

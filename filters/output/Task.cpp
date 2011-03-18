@@ -41,9 +41,9 @@
 #include "DespeckleVisualization.h"
 #include "DespeckleLevel.h"
 #include "DewarpingMode.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
+#include "dewarping/DewarpingPointMapper.h"
 #include "DewarpingView.h"
-#include "DewarpingPointMapper.h"
 #include "ImageId.h"
 #include "PageId.h"
 #include "Dpi.h"
@@ -57,7 +57,7 @@
 #include "ImageLoader.h"
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
-#include "math/CylindricalSurfaceDewarper.h"
+#include "dewarping/CylindricalSurfaceDewarper.h"
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <QImage>
@@ -71,6 +71,7 @@
 #include <QDebug>
 
 using namespace imageproc;
+using namespace dewarping;
 
 namespace output
 {
@@ -145,7 +146,7 @@ Task::~Task()
 FilterResultPtr
 Task::process(
 	TaskStatus const& status, FilterData const& data,
-	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
+	QPolygonF const& content_rect_phys)
 {
 	status.throwIfCancelled();
 	
@@ -153,6 +154,9 @@ Task::process(
 	RenderParams const render_params(params.colorParams());
 	QString const out_file_path(m_outFileNameGen.filePathFor(m_pageId));
 	QFileInfo const out_file_info(out_file_path);
+
+	ImageTransformation new_xform(data.xform());
+	new_xform.postScaleToDpi(params.outputDpi());
 
 	QString const automask_dir(Utils::automaskDir(m_outFileNameGen.outDir()));
 	QString const automask_file_path(
@@ -172,12 +176,12 @@ Task::process(
 	
 	OutputGenerator const generator(
 		params.outputDpi(), params.colorParams(), params.despeckleLevel(),
-		data.xform(), content_rect_phys, page_rect_phys
+		new_xform, content_rect_phys
 	);
 	
 	OutputImageParams new_output_image_params(
 		generator.outputImageSize(), generator.outputContentRect(),
-		data.xform(), params.outputDpi(), params.colorParams(),
+		new_xform, params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
 		params.depthPerception(), params.despeckleLevel()
 	);
@@ -378,7 +382,7 @@ Task::process(
 	return FilterResultPtr(
 		new UiUpdater(
 			m_ptrFilter, m_ptrSettings, m_ptrDbg, params,
-			generator.toOutput(), generator.outputContentRect(),
+			new_xform.transform(), generator.outputContentRect(),
 			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
 			m_pageId, data.origImage(), out_img, automask_img,
 			despeckle_state, despeckle_visualization,
@@ -489,8 +493,8 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		dewarping_view.get(), SLOT(depthPerceptionChanged(double))
 	);
 	QObject::connect(
-		dewarping_view.get(), SIGNAL(distortionModelChanged(DistortionModel const&)),
-		opt_widget, SLOT(distortionModelChanged(DistortionModel const&))
+		dewarping_view.get(), SIGNAL(distortionModelChanged(dewarping::DistortionModel const&)),
+		opt_widget, SLOT(distortionModelChanged(dewarping::DistortionModel const&))
 	);
 
 	std::auto_ptr<QWidget> picture_zone_editor;
