@@ -82,7 +82,7 @@ SplineVertex::Ptr
 SplineVertex::insertAfter(QPointF const& pt)
 {
 	SplineVertex::Ptr new_vertex(new RealSplineVertex(pt, this, m_ptrNext.get()));
-	m_ptrNext->m_pPrev = new_vertex;
+	m_ptrNext->m_pPrev = new_vertex.get();
 	m_ptrNext = new_vertex;
 	return new_vertex;
 }
