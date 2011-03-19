@@ -104,6 +104,10 @@ private:
 
 	static RegionIdx findConnectingRegion(Edge const& edge1, Edge const& edge2);
 
+	static void extendTowardsVerticalBounds(std::deque<QPointF>& polyline,
+		std::pair<QLineF, QLineF> vert_bounds, imageproc::BinaryImage const& content,
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
+
 	static bool isCurvatureConsistent(std::vector<QPointF> const& polyline);
 
 	static bool isInsideBounds(

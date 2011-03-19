@@ -362,7 +362,19 @@ TextLineTracer::trace(
 		blurred, thick_mask, polylines,
 		vert_bounds.first, vert_bounds.second, dbg
 	);
-	blurred = GrayImage();
+	
+	// Extend polylines.
+	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+		std::deque<QPointF> growable_polyline(polyline.begin(), polyline.end());
+		extendTowardsVerticalBounds(
+			growable_polyline, vert_bounds, binarized, blurred, thick_mask
+		);
+		polyline.assign(growable_polyline.begin(), growable_polyline.end());
+	}
+	blurred = GrayImage(); // Save memory.
+	if (dbg) {
+		dbg->add(visualizePolylines(downscaled, polylines), "extended");
+	}
 
 	filterOutOfBoundsCurves(polylines, vert_bounds.first, vert_bounds.second);
 
@@ -1219,6 +1231,50 @@ TextLineTracer::sanitizeBinaryImage(BinaryImage& image, QRect const& content_rec
 
 	// Clear margins.
 	image.fillExcept(content_rect, WHITE);
+}
+
+void
+TextLineTracer::extendTowardsVerticalBounds(
+	std::deque<QPointF>& polyline, std::pair<QLineF, QLineF> vert_bounds,
+	BinaryImage const& content, GrayImage const& blurred, BinaryImage const& thick_mask)
+{
+	if (polyline.empty()) {
+		return;
+	}
+
+	// Maybe swap vert_bounds.first and vert_bounds.second.
+	{
+		ToLineProjector const proj1(vert_bounds.first);
+		ToLineProjector const proj2(vert_bounds.second);
+		if (proj1.projectionDist(polyline.front()) + proj2.projectionDist(polyline.back()) >
+				proj1.projectionDist(polyline.back()) + proj2.projectionDist(polyline.front())) {
+			std::swap(vert_bounds.first, vert_bounds.second);
+		}
+	}
+
+	// Because we know our images are about 200 DPI (because we
+	// downscale them), we can use a constant here.
+	qreal const max_dist = 30;
+
+	// Extend the head of our polyline.
+	{
+		TowardsLineTracer tracer(
+			content, blurred, thick_mask, vert_bounds.first, polyline.front().toPoint()
+		);
+		for (QPoint const* pt; (pt = tracer.trace(max_dist)); ) {
+			polyline.push_front(*pt);
+		}
+	}
+
+	// Extend the tail of our polyline.
+	{
+		TowardsLineTracer tracer(
+			content, blurred, thick_mask, vert_bounds.second, polyline.back().toPoint()
+		);
+		for (QPoint const* pt; (pt = tracer.trace(max_dist)); ) {
+			polyline.push_back(*pt);
+		}
+	}
 }
 
 /**
