@@ -569,9 +569,8 @@ OutputGenerator::processWithoutDewarping(
 	);
 	
 	// Crop area in maybe_normalized image coordinates.	
-	QPolygonF const normalize_illumination_crop_area(
-		m_xform.resultingPreCropArea().translated(-normalize_illumination_rect.topLeft())
-	);
+	QPolygonF normalize_illumination_crop_area(m_xform.resultingPreCropArea());
+	normalize_illumination_crop_area.translate(-normalize_illumination_rect.topLeft());
 
 	if (render_params.normalizeIllumination()) {
 		maybe_normalized = normalizeIlluminationGray(
@@ -823,9 +822,8 @@ OutputGenerator::processWithDewarping(
 	);
 	
 	// Crop area in maybe_normalized image coordinates.
-	QPolygonF const normalize_illumination_crop_area(
-		m_xform.resultingPreCropArea().translated(-normalize_illumination_rect.topLeft())
-	);
+	QPolygonF normalize_illumination_crop_area(m_xform.resultingPreCropArea());
+	normalize_illumination_crop_area.translate(-normalize_illumination_rect.topLeft());
 	
 	bool const color_original = !input.origImage().allGray();
 
