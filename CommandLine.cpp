@@ -11,6 +11,7 @@
 #include "ImageFileInfo.h"
 #include "ImageMetadata.h"
 #include "filters/page_split/LayoutType.h"
+#include "filters/page_layout/Settings.h"
 #include "Margins.h"
 #include "Despeckle.h"
 
@@ -238,7 +239,7 @@ CommandLine::colorMode()
 Margins
 CommandLine::getMargins()
 {
-	Margins margins(10.0, 5.0, 10.0, 5.0);
+	Margins margins(page_layout::Settings::defaultHardMarginsMM());
 
 	if (CommandLine::s_options["margins"] != "") {
 		double m = CommandLine::s_options["margins"].toDouble();

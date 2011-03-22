@@ -354,7 +354,7 @@ Settings::Impl::Impl()
 	m_descWidthOrder(m_items.get<DescWidthTag>()),
 	m_descHeightOrder(m_items.get<DescHeightTag>()),
 	m_invalidSize(),
-	m_defaultHardMarginsMM(10.0, 5.0, 10.0, 5.0),
+	m_defaultHardMarginsMM(page_layout::Settings::defaultHardMarginsMM()),
 	m_defaultAlignment(Alignment::TOP, Alignment::HCENTER)
 {
 }
