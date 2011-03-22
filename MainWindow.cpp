@@ -382,7 +382,7 @@ MainWindow::switchToNewProject(
 	if (out_dir.isEmpty()) {
 		m_ptrThumbnailCache.reset();
 	} else {
-		m_ptrThumbnailCache = createThumbnailCache();
+		m_ptrThumbnailCache = Utils::createThumbnailCache(m_outFileNameGen.outDir());
 	}
 	resetThumbSequence(currentPageOrderProvider());
 
@@ -390,18 +390,6 @@ MainWindow::switchToNewProject(
 	updateProjectActions();
 	updateWindowTitle();
 	updateMainArea();
-}
-
-IntrusivePtr<ThumbnailPixmapCache>
-MainWindow::createThumbnailCache()
-{
-	QSize const max_pixmap_size(200, 200);
-	
-	return IntrusivePtr<ThumbnailPixmapCache>(
-		new ThumbnailPixmapCache(
-			m_outFileNameGen.outDir()+"/cache/thumbs", max_pixmap_size, 40, 5
-		)
-	);
 }
 
 void

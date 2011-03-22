@@ -21,6 +21,8 @@
 
 #include <QString>
 
+#include "ThumbnailPixmapCache.h"
+
 class Utils
 {
 public:
@@ -28,6 +30,8 @@ public:
 	static typename M::iterator mapSetValue(
 		M& map, K const& key, V const& val);
 	
+	static IntrusivePtr<ThumbnailPixmapCache> createThumbnailCache(QString output_directory);
+
 	/**
 	 * Unlike QFile::rename(), this one overwrites existing files.
 	 */

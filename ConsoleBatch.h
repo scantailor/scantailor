@@ -46,7 +46,7 @@ class ConsoleBatch
 public:
 	ConsoleBatch(
 			std::vector<ImageFileInfo> const& images,
-			QString                    const& output_dir,
+			QString                    const& output_directory,
 			Qt::LayoutDirection        const  layout);
 	ConsoleBatch(QString const project_file);
 

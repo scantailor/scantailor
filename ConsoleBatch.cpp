@@ -23,6 +23,7 @@
 #include <iostream>
 #include <assert.h>
 
+#include "Utils.h"
 #include "ProjectPages.h"
 #include "PageSelectionAccessor.h"
 #include "StageSequence.h"
@@ -73,7 +74,7 @@
 #include "ConsoleBatch.h"
 #include "CommandLine.h"
 
-ConsoleBatch::ConsoleBatch(std::vector<ImageFileInfo> const& images, QString const& output_dir, Qt::LayoutDirection const layout)
+ConsoleBatch::ConsoleBatch(std::vector<ImageFileInfo> const& images, QString const& output_directory, Qt::LayoutDirection const layout)
 :   batch(true), debug(true),
 	m_ptrDisambiguator(new FileNameDisambiguator),
 	m_ptrPages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout))
@@ -83,8 +84,9 @@ ConsoleBatch::ConsoleBatch(std::vector<ImageFileInfo> const& images, QString con
 
 	setup();
 
-	m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
-	m_outFileNameGen = OutputFileNameGenerator(m_ptrDisambiguator, output_dir, m_ptrPages->layoutDirection());
+	//m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
+	m_ptrThumbnailCache = Utils::createThumbnailCache(output_directory);
+	m_outFileNameGen = OutputFileNameGenerator(m_ptrDisambiguator, output_directory, m_ptrPages->layoutDirection());
 }
 
 ConsoleBatch::ConsoleBatch(QString const project_file)
@@ -119,7 +121,8 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 		output_directory = cli.outputDirectory();
 	}
 
-	m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_directory+"/cache/thumbs", QSize(200,200), 40, 5));
+	//m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_directory+"/cache/thumbs", QSize(200,200), 40, 5));
+	m_ptrThumbnailCache = Utils::createThumbnailCache(output_directory);
 	m_outFileNameGen = OutputFileNameGenerator(m_ptrDisambiguator, output_directory, m_ptrPages->layoutDirection());
 }
 
