@@ -38,6 +38,7 @@
 #include "OutputFileNameGenerator.h"
 #include "StageSequence.h"
 #include "PageSelectionAccessor.h"
+#include "ProjectReader.h"
 
 
 class ConsoleBatch
@@ -49,8 +50,6 @@ public:
 			Qt::LayoutDirection        const  layout);
 	ConsoleBatch(QString const project_file);
 
-	virtual ~ConsoleBatch();
-
 	void process();
 	void saveProject(QString const project_file);
 
@@ -59,10 +58,10 @@ private:
 	bool debug;
 	IntrusivePtr<FileNameDisambiguator> m_ptrDisambiguator;
 	IntrusivePtr<ProjectPages> m_ptrPages;
-	StageSequence* m_ptrStages;
+	IntrusivePtr<StageSequence> m_ptrStages;
 	OutputFileNameGenerator m_outFileNameGen;
 	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
-	ProjectReader *m_ptrReader;
+	std::auto_ptr<ProjectReader> m_ptrReader;
 
 	void setup();
 

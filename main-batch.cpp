@@ -36,13 +36,13 @@ int main(int argc, char **argv)
 	}
 	cli.setGui(false);
 
-	ConsoleBatch* cbatch;
+	std::auto_ptr<ConsoleBatch> cbatch;
 
 	try {
 		if (cli.projectFile() != "") {
-			cbatch = new ConsoleBatch(cli.projectFile());
+			cbatch.reset(new ConsoleBatch(cli.projectFile()));
 		} else {
-			cbatch = new ConsoleBatch(cli.images(), cli.outputDirectory(), cli.layoutDirection());
+			cbatch.reset(new ConsoleBatch(cli.images(), cli.outputDirectory(), cli.layoutDirection()));
 		}
 		cbatch->process();
 	} catch(char const *msg) {

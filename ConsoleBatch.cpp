@@ -79,7 +79,7 @@ ConsoleBatch::ConsoleBatch(std::vector<ImageFileInfo> const& images, QString con
 	m_ptrPages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout))
 {
 	PageSelectionAccessor const accessor(0);
-	m_ptrStages = new StageSequence(m_ptrPages, accessor);
+	m_ptrStages = IntrusivePtr<StageSequence>(new StageSequence(m_ptrPages, accessor));
 
 	setup();
 
@@ -102,13 +102,13 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 
 	file.close();
 
-	m_ptrReader = new ProjectReader(doc);
+	m_ptrReader.reset(new ProjectReader(doc));
 	m_ptrPages = m_ptrReader->pages();
 
 	PageSelectionAccessor const accessor(0);
 	m_ptrDisambiguator = m_ptrReader->namingDisambiguator();
 
-	m_ptrStages = new StageSequence(m_ptrPages, accessor);
+	m_ptrStages = IntrusivePtr<StageSequence>(new StageSequence(m_ptrPages, accessor));
 	m_ptrReader->readFilterSettings(m_ptrStages->filters());
 
 	setup();
@@ -121,11 +121,6 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 
 	m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_directory+"/cache/thumbs", QSize(200,200), 40, 5));
 	m_outFileNameGen = OutputFileNameGenerator(m_ptrDisambiguator, output_directory, m_ptrPages->layoutDirection());
-}
-
-ConsoleBatch::~ConsoleBatch()
-{
-	delete(m_ptrStages);
 }
 
 
@@ -305,7 +300,7 @@ ConsoleBatch::setup()
 		if (cli["match-layout-tolerance"] != "") {
 			QString const path = page.imageId().filePath();
 			if (!img_cache.contains(path)) {
-				QImage img = QImage(path);
+				QImage img(path);
 				img_cache[path] = float(img.width()) / float(img.height());
 			}
 			float imgAspectRatio = img_cache[path];
@@ -315,7 +310,7 @@ ConsoleBatch::setup()
 				ImageId pimageId = pi->imageId();
 				QString ppath = pimageId.filePath();
 				if (!img_cache.contains(ppath)) {
-					QImage img = QImage(ppath);
+					QImage img(ppath);
 					img_cache[ppath] = float(img.width()) / float(img.height());
 				}
 				float pimgAspectRatio = img_cache[ppath];
