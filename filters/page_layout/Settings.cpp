@@ -199,8 +199,8 @@ private:
 	DescWidthOrder& m_descWidthOrder;
 	DescHeightOrder& m_descHeightOrder;
 	QSizeF const m_invalidSize;
-	Margins m_defaultHardMarginsMM;
-	Alignment m_defaultAlignment;
+	Margins const m_defaultHardMarginsMM;
+	Alignment const m_defaultAlignment;
 };
 
 

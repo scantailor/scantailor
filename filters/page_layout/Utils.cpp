@@ -104,8 +104,6 @@ Utils::calcSoftMarginsMM(
 		return Margins();
 	}
 
-	Alignment myAlign(alignment);
-	
 	double top = 0.0;
 	double bottom = 0.0;
 	double left = 0.0;
@@ -114,7 +112,7 @@ Utils::calcSoftMarginsMM(
 	double const delta_width =
 			aggregate_hard_size_mm.width() - hard_size_mm.width();
 	if (delta_width > 0.0) {
-		switch (myAlign.horizontal()) {
+		switch (alignment.horizontal()) {
 			case Alignment::LEFT:
 				right = delta_width;
 				break;
@@ -130,7 +128,7 @@ Utils::calcSoftMarginsMM(
 	double const delta_height =
 		aggregate_hard_size_mm.height() - hard_size_mm.height();
 	if (delta_height > 0.0) {
-		switch (myAlign.vertical()) {
+		switch (alignment.vertical()) {
 			case Alignment::TOP:
 				bottom = delta_height;
 				break;
@@ -160,7 +158,7 @@ Utils::calcPageRectPhys(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
 		QLineF(poly_mm[0], poly_mm[3]).length()
 	);
-	Margins soft_margins_mm(
+	Margins const soft_margins_mm(
 		calcSoftMarginsMM(
 			hard_size_mm, aggregate_hard_size_mm, params.alignment()
 		)

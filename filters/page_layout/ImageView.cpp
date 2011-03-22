@@ -58,7 +58,6 @@ ImageView::ImageView(
 		ImagePresentation(xform.transform(), xform.resultingPreCropArea()),
 		Margins(5, 5, 5, 5)
 	),
-	m_xform(xform),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_ptrSettings(settings),

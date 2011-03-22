@@ -31,8 +31,6 @@ public:
 	
 	int toDegrees() const { return m_degrees; }
 
-	void setDegree(int deg) { m_degrees = deg; };
-	
 	void nextClockwiseDirection();
 	
 	void prevClockwiseDirection();
