@@ -182,7 +182,7 @@ Filter::createTask(
 	CommandLine cli;
 	ImageViewTab lastTab(TAB_OUTPUT);
 	if (cli.gui())
-		m_ptrOptionsWidget->lastTab();
+		lastTab = m_ptrOptionsWidget->lastTab();
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
