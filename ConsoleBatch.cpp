@@ -125,7 +125,6 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 
 ConsoleBatch::~ConsoleBatch()
 {
-	delete(m_ptrDisambiguator);
 	delete(m_ptrStages);
 }
 

@@ -82,7 +82,7 @@ public:
 	void pageOrientationUpdate(
 		ImageId const& image_id, OrthogonalRotation const& orientation);
 
-	Settings* getSettings() { return m_ptrSettings; };
+	Settings* getSettings() { return m_ptrSettings.get(); };
 private:
 	void writeImageSettings(
 		QDomDocument& doc, QDomElement& filter_el,
