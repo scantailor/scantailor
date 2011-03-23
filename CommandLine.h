@@ -80,6 +80,7 @@ class CommandLine
 		output::DewarpingMode getDewarpingMode() const { return m_dewarpingMode; }
 		output::DespeckleLevel getDespeckleLevel() const { return m_despeckleLevel; }
 		output::DepthPerception getDepthPerception() const { return m_depthPerception; }
+		float getMatchLayoutTolerance() const { return m_matchLayoutTolerance; }
 
 		bool help() { return m_options.contains("help"); }
 		void printHelp();
@@ -118,6 +119,7 @@ class CommandLine
 		output::DewarpingMode m_dewarpingMode;
 		output::DespeckleLevel m_despeckleLevel;
 		output::DepthPerception m_depthPerception;
+		float m_matchLayoutTolerance;
 
 		void parseCli(QStringList const& argv);
 		void setup();
@@ -138,6 +140,7 @@ class CommandLine
 		output::DewarpingMode fetchDewarpingMode();
 		output::DespeckleLevel fetchDespeckleLevel();
 		output::DepthPerception fetchDepthPerception();
+		float fetchMatchLayoutTolerance();
 };
 
 #endif
