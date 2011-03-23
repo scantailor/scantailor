@@ -300,36 +300,6 @@ ConsoleBatch::setup()
 
 		// PAGE LAYOUT FILTER
 		page_layout::Alignment alignment = cli.getAlignment();
-		if (cli.contains("match-layout-tolerance")) {
-			QString const path = page.imageId().filePath();
-			if (!img_cache.contains(path)) {
-				QImage img(path);
-				img_cache[path] = float(img.width()) / float(img.height());
-			}
-			float imgAspectRatio = img_cache[path];
-			float tolerance = cli.getMatchLayoutTolerance();
-			std::vector<float> diffs;
-			for (std::set<PageId>::iterator pi=allPages.begin(); pi!=allPages.end(); pi++) {
-				ImageId pimageId = pi->imageId();
-				QString ppath = pimageId.filePath();
-				if (!img_cache.contains(ppath)) {
-					QImage img(ppath);
-					img_cache[ppath] = float(img.width()) / float(img.height());
-				}
-				float pimgAspectRatio = img_cache[ppath];
-				float diff = imgAspectRatio - pimgAspectRatio;
-				if (diff < 0.0) diff *= -1;
-				diffs.push_back(diff);
-			}
-			unsigned bad_diffs = 0;
-			for (unsigned j=0; j<diffs.size(); j++) {
-				if (diffs[j] > tolerance)
-					bad_diffs += 1;
-			}
-			if (bad_diffs > (diffs.size()/2)) {
-				alignment.setNull(true);
-			}
-		}
 		if (cli.containsMargins())
 			page_layout->getSettings()->setHardMarginsMM(page, cli.getMargins());
 		if (cli.containsAlignment())

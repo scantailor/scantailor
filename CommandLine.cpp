@@ -166,8 +166,6 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-right=<number>" << "\n";
 	std::cout << "\t\t--margins-top=<number>" << "\n";
 	std::cout << "\t\t--margins-bottom=<number>" << "\n";
-	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << "\n";
-	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << "\n";
 	std::cout << "\t--alignment=center\t\t-- sets vertical and horizontal alignment to center" << "\n";
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom>" << "\n";
 	std::cout << "\t\t--alignment-horizontal=<left|center|right>" << "\n";
@@ -286,11 +284,6 @@ page_layout::Alignment
 CommandLine::fetchAlignment()
 {
 	page_layout::Alignment alignment(page_layout::Alignment::TOP, page_layout::Alignment::HCENTER);
-
-	if (m_options.contains("match-layout")) {
-		if (m_options["match-layout"] == "false") alignment.setNull(true);
-		if (m_options["match-layout"] == "true") alignment.setNull(false);
-	}
 
 	if (m_options.contains("alignment")) {
 		alignment.setVertical(page_layout::Alignment::VCENTER);
@@ -444,16 +437,6 @@ CommandLine::fetchDepthPerception()
 	return output::DepthPerception(m_options["depth-perception"]);
 }
 
-float
-CommandLine::fetchMatchLayoutTolerance()
-{
-	if (!m_options.contains("match-layout-tolerance"))
-		return 0.2;
-
-	return m_options["match-layout-tolerance"].toFloat();
-}
-
-
 bool
 CommandLine::containsMargins()
 {
@@ -470,7 +453,6 @@ bool
 CommandLine::containsAlignment()
 {
 	return(
-		m_options.contains("match-layout-tolerance") ||
 		m_options.contains("alignment") ||
 		m_options.contains("alignment-vertical") ||
 		m_options.contains("alignment-horizontal")
