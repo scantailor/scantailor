@@ -379,8 +379,7 @@ Task::process(
 		despeckle_visualization = despeckle_state.visualize();
 	}
 
-	CommandLine cli;
-	if (cli.gui()) {
+	if (CommandLine::isGui()) {
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_ptrDbg, params,

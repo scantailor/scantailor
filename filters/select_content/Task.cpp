@@ -95,10 +95,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	Dependencies const deps(data.xform().resultingPreCropArea());
 	
-	CommandLine cli;
-	
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO) && (cli["content-box"]=="")) {
+	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO) && !CommandLine::get().contains("content-box")) {
 		params.reset();
 	}
 

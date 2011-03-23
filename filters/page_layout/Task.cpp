@@ -109,8 +109,6 @@ Task::process(
 		Utils::adaptContentRect(data.xform(), content_rect)
 	);
 	
-	CommandLine cli;
-
 	if (m_ptrNextTask) {
 		QPolygonF const content_rect_phys(
 			data.xform().transformBack().map(adapted_content_rect)
@@ -128,7 +126,7 @@ Task::process(
 		return m_ptrNextTask->process(
 			status, FilterData(data, new_xform), content_rect_phys
 		);
-	} else if (cli.gui()) {
+	} else if (m_ptrFilter->optionsWidget() != 0) {
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_pageId,

@@ -115,9 +115,9 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 
 	setup();
 
-	CommandLine cli;
+	CommandLine cli = CommandLine::get();
 	QString output_directory = m_ptrReader->outputDirectory();
-	if (cli.outputDirectory() != ".") {
+	if (!cli.outputDirectory().isEmpty()) {
 		output_directory = cli.outputDirectory();
 	}
 
@@ -194,33 +194,33 @@ ConsoleBatch::createCompositeTask(
 void
 ConsoleBatch::process()
 {
-	CommandLine cli;
+	CommandLine cli = CommandLine::get();
 
 	int startFilterIdx = m_ptrStages->selectContentFilterIdx();
-	if (cli["start-filter"] != "") {
-		int sf = cli["start-filter"].toInt() - 1;
+	if (cli.contains("start-filter")) {
+		int sf = cli.getStartFilterIdx();
 		if (sf<0 || sf>=m_ptrStages->filters().size())
 			throw "Start filter out of range";
 		startFilterIdx = sf;
 	}
 
 	int endFilterIdx = m_ptrStages->outputFilterIdx();
-	if (cli["end-filter"] != "") {
-		int ef = cli["end-filter"].toInt() - 1;
+	if (cli.contains("end-filter")) {
+		int ef = cli.getEndFilterIdx();
 		if (ef<0 || ef>=m_ptrStages->filters().size())
 			throw "End filter out of range";
 		endFilterIdx = ef;
 	}
 
 	for (int j=startFilterIdx; j<=endFilterIdx; j++) {
-		if (cli["verbose"] == "true")
+		if (cli.contains("verbose"))
 			std::cout << "Filter: " << (j+1) << "\n";
 
 		// it should be enough to run last two stages
 		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
-			if (cli["verbose"] == "true")
+			if (cli.contains("verbose"))
 				std::cout << "\tProcessing: " << page.imageId().filePath().toAscii().constData() << "\n";
 			BackgroundTaskPtr bgTask = createCompositeTask(page, j);
 			(*bgTask)();
@@ -247,7 +247,7 @@ ConsoleBatch::setup()
 	IntrusivePtr<page_layout::Filter> page_layout = m_ptrStages->pageLayoutFilter(); 
 	IntrusivePtr<output::Filter> output = m_ptrStages->outputFilter(); 
 
-	CommandLine cli;
+	CommandLine cli = CommandLine::get();
 	QMap<QString, float> img_cache;
 
 	std::set<PageId> allPages = m_ptrPages->toPageSequence(PAGE_VIEW).selectAll();
@@ -256,58 +256,58 @@ ConsoleBatch::setup()
 
 		OrthogonalRotation rotation;
 		// FIX ORIENTATION FILTER
-		if (cli["orientation"] != "") {
-			if (cli["orientation"] == "left") {
-				rotation.prevClockwiseDirection();
-			} else if (cli["orientation"] == "right") {
-				rotation.nextClockwiseDirection();
-			} else if (cli["orientation"] == "upsidedown") {
-				rotation.nextClockwiseDirection();
-				rotation.nextClockwiseDirection();
+		if (cli.contains("orientation")) {
+			switch(cli.getOrientation()) {
+				case CommandLine::LEFT:
+					rotation.prevClockwiseDirection();
+					break;
+				case CommandLine::RIGHT:
+					rotation.nextClockwiseDirection();
+					break;
+				case CommandLine::UPSIDEDOWN:
+					rotation.nextClockwiseDirection();
+					rotation.nextClockwiseDirection();
+					break;
+				default:
+					break;
 			}
 			fix_orientation->getSettings()->applyRotation(page.imageId(), rotation);
 		}
 	
 		// DESKEW FILTER
-		if (cli["rotate"] != "" || cli["deskew"] == "manual") {
+		if (cli.contains("rotate") || cli.contains("deskew")) {
 			double angle = 0.0;
-			if (cli["rotate"] != "")
-				angle = cli["rotate"].toDouble();
+			if (cli.contains("rotate"))
+				angle = cli.getDeskewAngle();
 			deskew::Dependencies deps(QPolygonF(), rotation);
 			deskew::Params params(angle, deps, MODE_MANUAL);
 			deskew->getSettings()->setPageParams(page, params);
 		}
 	
 		// PAGE SPLIT
-		if (cli["layout"] != "") {
-			page_split->getSettings()->setLayoutTypeForAllPages(cli.layout());
+		if (cli.contains("layout")) {
+			page_split->getSettings()->setLayoutTypeForAllPages(cli.getLayout());
 		}
 
 		// SELECT CONTENT FILTER
-		if (cli["content-box"] != "") {
-			QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");
-			if (rx.exactMatch(cli["content-box"])) {
-				QRectF rect(rx.cap(1).toFloat(), rx.cap(2).toFloat(), rx.cap(3).toFloat(), rx.cap(4).toFloat());
-				QSizeF size_mm(rx.cap(3).toFloat(), rx.cap(4).toFloat());
-				select_content::Dependencies deps;
-				select_content::Params params(rect, size_mm, deps, MODE_MANUAL);
-				select_content->getSettings()->setPageParams(page, params);
-			} else {
-				std::cout << ("invalid --content-box=" + cli["content-box"] + "\n").toAscii().constData();
-				exit(2);
-			}
+		if (cli.contains("content-box")) {
+			QRectF rect(cli.getContentRect());
+			QSizeF size_mm(rect.width(), rect.height());
+			select_content::Dependencies deps;
+			select_content::Params params(rect, size_mm, deps, MODE_MANUAL);
+			select_content->getSettings()->setPageParams(page, params);
 		}
 
 		// PAGE LAYOUT FILTER
-		page_layout::Alignment alignment = cli.alignment();
-		if (cli["match-layout-tolerance"] != "") {
+		page_layout::Alignment alignment = cli.getAlignment();
+		if (cli.contains("match-layout-tolerance")) {
 			QString const path = page.imageId().filePath();
 			if (!img_cache.contains(path)) {
 				QImage img(path);
 				img_cache[path] = float(img.width()) / float(img.height());
 			}
 			float imgAspectRatio = img_cache[path];
-			float tolerance = cli["match-layout-tolerance"].toFloat();
+			float tolerance = cli.getMatchLayoutTolerance();
 			std::vector<float> diffs;
 			for (std::set<PageId>::iterator pi=allPages.begin(); pi!=allPages.end(); pi++) {
 				ImageId pimageId = pi->imageId();
@@ -330,47 +330,46 @@ ConsoleBatch::setup()
 				alignment.setNull(true);
 			}
 		}
-		if (cli["margins"] != "" || cli["margins-left"] != "" || cli["margins-right"] != "" || cli["margins-top"] != "" || cli["margins-bottom"] != "")
-			page_layout->getSettings()->setHardMarginsMM(page, cli.margins());
-		if (cli["match-layout-tolerance"] != "" || cli["alignment"] != "" || cli["alignment-vertical"] != "" || cli["alignment-horizontal"] != "")
+		if (cli.containsMargins())
+			page_layout->getSettings()->setHardMarginsMM(page, cli.getMargins());
+		if (cli.containsAlignment())
 			page_layout->getSettings()->setPageAlignment(page, alignment);
 
 		// OUTPUT FILTER
 		output::Params params(output->getSettings()->getParams(page));
-		if (cli["output-dpi"] != "" || cli["output-dpi-x"] != "" || cli["output-dpi-y"] != "") {
-			Dpi outputDpi = cli.outputDpi();
+		if (cli.containsOutputDpi()) {
+			Dpi outputDpi = cli.getOutputDpi();
 			params.setOutputDpi(outputDpi);
 		}
 
 		output::ColorParams colorParams = params.colorParams();
-		if (cli["color-mode"] != "")
-			colorParams.setColorMode(cli.colorMode());
+		if (cli.contains("color-mode"))
+			colorParams.setColorMode(cli.getColorMode());
 
-		if (cli["white-margins"] != "" || cli["normalize-illumination"] != "") {
+		if (cli.contains("white-margins") || cli.contains("normalize-illumination")) {
 			output::ColorGrayscaleOptions cgo;
-			if (cli["white-margins"] == "true")
+			if (cli.contains("white-margins"))
 				cgo.setWhiteMargins(true);
-			if (cli["normalize-illumination"] == "true")
+			if (cli.contains("normalize-illumination"))
 				cgo.setNormalizeIllumination(true);
 			colorParams.setColorGrayscaleOptions(cgo);
 		}
 
-		if (cli["threshold"] != "") {
+		if (cli.contains("threshold")) {
 			output::BlackWhiteOptions bwo;
-			if (cli["threshold"] != "")
-				bwo.setThresholdAdjustment(cli["threshold"].toInt());
+			bwo.setThresholdAdjustment(cli.getThreshold());
 			colorParams.setBlackWhiteOptions(bwo);
 		}
 
 		params.setColorParams(colorParams);
 
-		if (cli["despeckle"] != "")
-			params.setDespeckleLevel(output::despeckleLevelFromString(cli["despeckle"]));
+		if (cli.contains("despeckle"))
+			params.setDespeckleLevel(cli.getDespeckleLevel());
 
-		if (cli["dewarping"] != "")
-			params.setDewarpingMode(output::DewarpingMode(cli["dewarping"]));
-		if (cli["depth-perception"] != "")
-			params.setDepthPerception(output::DepthPerception(cli["depth-perception"]));
+		if (cli.contains("dewarping"))
+			params.setDewarpingMode(cli.getDewarpingMode());
+		if (cli.contains("depth-perception"))
+			params.setDepthPerception(cli.getDepthPerception());
 
 		output->getSettings()->setParams(page, params);
 	}

@@ -45,8 +45,7 @@ Filter::Filter(
 :	m_ptrSettings(new Settings),
 	m_selectedPageOrder(0)
 {
-	CommandLine cli;
-	if (cli.gui()) {
+	if (CommandLine::isGui()) {
 		m_ptrOptionsWidget.reset(
 			new OptionsWidget(m_ptrSettings, page_selection_accessor)
 		);

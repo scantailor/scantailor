@@ -210,8 +210,12 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	CommandLine cli;
-	Despeckle::Level despeckleLevel = cli.contentDetection();
+	CommandLine cli = CommandLine::get();
+	Despeckle::Level despeckleLevel = Despeckle::NORMAL;
+	if (cli.contains("content-detection")) {
+		despeckleLevel = cli.getContentDetection();
+	}
+
 	BinaryImage despeckled(Despeckle::despeckle(content, Dpi(150, 150), despeckleLevel, status));
 	if (dbg) {
 		dbg->add(despeckled, "despeckled");

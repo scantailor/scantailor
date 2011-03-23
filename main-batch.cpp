@@ -23,26 +23,28 @@
 #include "CommandLine.h"
 #include "ConsoleBatch.h"
 
+bool CommandLine::m_gui = false;
+
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
-	//QApplication app(argc, argv);
 
 	// parse command line arguments
 	CommandLine cli(app.arguments());
-	if (cli["help"] == "true") {
+	CommandLine::set(cli);
+
+	if (cli.contains("help") || cli.outputDirectory().isEmpty() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
 		cli.printHelp();
 		return 0;
 	}
-	cli.setGui(false);
 
 	std::auto_ptr<ConsoleBatch> cbatch;
 
 	try {
-		if (cli.projectFile() != "") {
+		if (!cli.projectFile().isEmpty()) {
 			cbatch.reset(new ConsoleBatch(cli.projectFile()));
 		} else {
-			cbatch.reset(new ConsoleBatch(cli.images(), cli.outputDirectory(), cli.layoutDirection()));
+			cbatch.reset(new ConsoleBatch(cli.images(), cli.outputDirectory(), cli.getLayoutDirection()));
 		}
 		cbatch->process();
 	} catch(char const *msg) {
@@ -50,6 +52,6 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (cli["output-project"] != "")
-		cbatch->saveProject(cli["output-project"]);
+	if (cli.contains("output-project"))
+		cbatch->saveProject(cli.outputProjectFile());
 }

@@ -46,8 +46,7 @@ Filter::Filter(
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	CommandLine cli;
-	if (cli.gui()) {
+	if (CommandLine::isGui()) {
 		m_ptrOptionsWidget.reset(
 			new OptionsWidget(m_ptrSettings, page_selection_accessor)
 		);
@@ -179,9 +178,8 @@ Filter::createTask(
 	OutputFileNameGenerator const& out_file_name_gen,
 	bool const batch, bool const debug)
 {
-	CommandLine cli;
 	ImageViewTab lastTab(TAB_OUTPUT);
-	if (cli.gui())
+	if (m_ptrOptionsWidget.get() != 0)
 		lastTab = m_ptrOptionsWidget->lastTab();
 	return IntrusivePtr<Task>(
 		new Task(

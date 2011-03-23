@@ -23,11 +23,15 @@
 #define COMMANDLINE_H_
 
 #include <QMap>
+#include <QRectF>
 #include <QStringList>
 
 #include "Dpi.h"
 #include "filters/page_split/LayoutType.h"
 #include "filters/output/ColorParams.h"
+#include "filters/output/DespeckleLevel.h"
+#include "filters/output/DewarpingMode.h"
+#include "filters/output/DepthPerception.h"
 #include "filters/page_layout/Alignment.h"
 #include "ImageFileInfo.h"
 #include "Margins.h"
@@ -37,48 +41,106 @@
 // you get always access to the same variables
 class CommandLine
 {
-	static bool s_gui;
-	static QMap<QString, QString> s_options;
-	static QString s_project_file;
-	static std::vector<QFileInfo> s_files;
-	static std::vector<ImageFileInfo> s_images;
-	static QString s_output_directory;
-
-	static void parse_cli(QStringList const& argv);
-	static void parse_cli(int argc, char **argv);
-	static Dpi getDpi(QString oname="dpi");
-	static Margins getMargins();
-	static page_layout::Alignment getAlignment();
-	static Despeckle::Level getContentDetection();
-
 	public:
-		CommandLine() {};
-		CommandLine(QStringList const& argv) { CommandLine::parse_cli(argv); };
-		CommandLine(int argc, char **argv) { CommandLine::parse_cli(argc, argv); };
+		enum Orientation {TOP, LEFT, RIGHT, UPSIDEDOWN};
 
-		QMap<QString, QString> options() { return CommandLine::s_options; };
-		QString projectFile() { return CommandLine::s_project_file; };
-		std::vector<ImageFileInfo> images() { return CommandLine::s_images; };
-		QString outputDirectory() { return CommandLine::s_output_directory; };
+		static CommandLine const& get() { return m_globalInstance; }
+		static void set(CommandLine const& cl);
 
-		QString & operator[](QString const& key) { return (QString &)CommandLine::s_options[key]; };
-		QString const operator[](QString const& key) const { return CommandLine::s_options.value(key); };
+		CommandLine(QStringList const& argv): m_global(false) { CommandLine::parseCli(argv); }
 
-		bool gui() { return CommandLine::s_gui; };
-		void setGui(bool g) { CommandLine::s_gui = g; };
+		static bool isGui() { return m_gui; }
 
-		page_split::LayoutType layout();
-		Qt::LayoutDirection layoutDirection();
-		Dpi dpi() { return CommandLine::getDpi(); };
-		Dpi outputDpi() { return CommandLine::getDpi("output-dpi"); };
-		output::ColorParams::ColorMode colorMode();
-		Margins margins() { return CommandLine::getMargins(); };
-		page_layout::Alignment alignment() { return CommandLine::getAlignment(); };
-		Despeckle::Level contentDetection() {return CommandLine::getContentDetection(); };
+		//QMap<QString, QString> options() { return m_options; }
+		QString projectFile() { return m_projectFile; }
+		std::vector<ImageFileInfo> images() { return m_images; }
+		QString outputDirectory() { return m_outputDirectory; }
+		QString outputProjectFile() { return m_outputProjectFile; }
 
-		bool help() { return (CommandLine::s_options["help"] == "true"); };
+		bool contains(QString const& key) const { return m_options.contains(key); }
+		bool containsMargins();
+		bool containsAlignment();
+		bool containsDpi();
+		bool containsOutputDpi();
+
+		page_split::LayoutType getLayout() const { return m_layoutType; }
+		Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
+		output::ColorParams::ColorMode getColorMode() const { return m_colorMode; }
+		Dpi getInputDpi() const { return m_dpi; }
+		Dpi getOutputDpi() const { return m_outputDpi; }
+		Margins getMargins() const { return m_margins; }
+		page_layout::Alignment getAlignment() const { return m_alignment; }
+		Despeckle::Level getContentDetection() const { return m_contentDetection; }
+		QRectF getContentRect() const { return m_contentRect; }
+		Orientation getOrientation() const { return m_orientation; }
+		int getThreshold() const { return m_threshold; }
+		double getDeskewAngle() const { return m_deskewAngle; }
+		int getStartFilterIdx() const { return m_startFilterIdx; }
+		int getEndFilterIdx() const { return m_endFilterIdx; }
+		output::DewarpingMode getDewarpingMode() const { return m_dewarpingMode; }
+		output::DespeckleLevel getDespeckleLevel() const { return m_despeckleLevel; }
+		output::DepthPerception getDepthPerception() const { return m_depthPerception; }
+		float getMatchLayoutTolerance() const { return m_matchLayoutTolerance; }
+
+		bool help() { return m_options.contains("help"); }
 		void printHelp();
 
+	private:
+		CommandLine() :m_global(false) {}
+
+		static bool m_gui;
+		static CommandLine m_globalInstance;
+
+		bool m_global;
+		bool isGlobal() { return m_global; }
+		void setGlobal() { m_global = true; }
+
+		QMap<QString, QString> m_options;
+		QString m_projectFile;
+		QString m_outputProjectFile;
+		std::vector<QFileInfo> m_files;
+		std::vector<ImageFileInfo> m_images;
+		QString m_outputDirectory;
+
+		page_split::LayoutType m_layoutType;
+		Qt::LayoutDirection m_layoutDirection;
+		output::ColorParams::ColorMode m_colorMode;
+		Dpi m_dpi;
+		Dpi m_outputDpi;
+		Margins m_margins;
+		page_layout::Alignment m_alignment;
+		Despeckle::Level m_contentDetection;
+		QRectF m_contentRect;
+		Orientation m_orientation;
+		int m_threshold;
+		double m_deskewAngle;
+		int m_startFilterIdx;
+		int m_endFilterIdx;
+		output::DewarpingMode m_dewarpingMode;
+		output::DespeckleLevel m_despeckleLevel;
+		output::DepthPerception m_depthPerception;
+		float m_matchLayoutTolerance;
+
+		void parseCli(QStringList const& argv);
+		void setup();
+		page_split::LayoutType fetchLayoutType();
+		output::ColorParams::ColorMode fetchColorMode();
+		Qt::LayoutDirection fetchLayoutDirection();
+		Dpi fetchDpi(QString oname="dpi");
+		Margins fetchMargins();
+		page_layout::Alignment fetchAlignment();
+		Despeckle::Level fetchContentDetection();
+		QRectF fetchContentRect();
+		Orientation fetchOrientation();
+		QString fetchOutputProjectFile();
+		int fetchThreshold();
+		double fetchDeskewAngle();
+		int fetchStartFilterIdx();
+		int fetchEndFilterIdx();
+		output::DewarpingMode fetchDewarpingMode();
+		output::DespeckleLevel fetchDespeckleLevel();
+		output::DepthPerception fetchDepthPerception();
+		float fetchMatchLayoutTolerance();
 };
 
 #endif

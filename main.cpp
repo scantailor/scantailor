@@ -124,6 +124,8 @@ static bool crashCallback(wchar_t const* dump_path,
 
 #endif // ENABLE_CRASH_REPORTER
 
+bool CommandLine::m_gui = true;
+
 int main(int argc, char** argv)
 {
 #ifdef ENABLE_CRASH_REPORTER
@@ -142,11 +144,12 @@ int main(int argc, char** argv)
 
 	// parse command line arguments
 	CommandLine cli(app.arguments());
-	if (cli["help"] == "true") {
+	CommandLine::set(cli);
+
+	if (cli.contains("help")) {
 		cli.printHelp();
 		return 0;
 	}
-	cli.setGui(true);
 	
 	QString const translation("scantailor_"+QLocale::system().name());
 	QTranslator translator;
@@ -185,7 +188,7 @@ int main(int argc, char** argv)
 		main_wnd->showMaximized();
 	}
 
-	if (cli.projectFile() != "") {
+	if (!cli.projectFile().isEmpty()) {
 		main_wnd->openProject(cli.projectFile());
 	}
 

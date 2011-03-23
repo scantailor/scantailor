@@ -114,11 +114,11 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
 
-	CommandLine cli;
+	CommandLine cli = CommandLine::get();
 
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
 	if (params.get()) {
-		if (!deps.matches(params->dependencies()) && cli["rotate"]=="" && cli["deskew"]=="") {
+		if (!deps.matches(params->dependencies()) && !cli.contains("rotate") && !cli.contains("deskew")) {
 			params.reset();
 		} else {
 			ui_data.setEffectiveDeskewAngle(params->deskewAngle());
