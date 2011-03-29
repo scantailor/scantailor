@@ -47,7 +47,7 @@ Filter::Filter(
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	if (CommandLine::isGui()) {
+	if (CommandLine::get().isGui()) {
 		m_ptrOptionsWidget.reset(
 			new OptionsWidget(m_ptrSettings, page_selection_accessor)
 		);

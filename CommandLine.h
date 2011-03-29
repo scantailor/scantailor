@@ -50,9 +50,9 @@ public:
 	static CommandLine const& get() { return m_globalInstance; }
 	static void set(CommandLine const& cl);
 
-	CommandLine(QStringList const& argv): m_global(false) { CommandLine::parseCli(argv); }
+	CommandLine(QStringList const& argv, bool g=true) : m_gui(g), m_global(false) { CommandLine::parseCli(argv); }
 
-	static bool isGui() { return m_gui; }
+	bool isGui() const { return m_gui; }
 
 	std::vector<ImageFileInfo> const& images() const { return m_images; }
 	QString const& outputDirectory() const { return m_outputDirectory; }
@@ -89,7 +89,7 @@ public:
 private:
 	CommandLine() :m_global(false) {}
 
-	static bool m_gui;
+	bool m_gui;
 	static CommandLine m_globalInstance;
 
 	bool m_global;

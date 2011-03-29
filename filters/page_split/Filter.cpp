@@ -48,7 +48,7 @@ Filter::Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 :	m_ptrPages(page_sequence),
 	m_ptrSettings(new Settings)
 {
-	if (CommandLine::isGui()) {
+	if (CommandLine::get().isGui()) {
 		m_ptrOptionsWidget.reset(
 			new OptionsWidget(
 				m_ptrSettings, m_ptrPages, page_selection_accessor

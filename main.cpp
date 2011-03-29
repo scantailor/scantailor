@@ -124,7 +124,6 @@ static bool crashCallback(wchar_t const* dump_path,
 
 #endif // ENABLE_CRASH_REPORTER
 
-bool CommandLine::m_gui = true;
 
 int main(int argc, char** argv)
 {

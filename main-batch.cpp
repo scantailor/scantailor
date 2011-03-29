@@ -23,14 +23,13 @@
 #include "CommandLine.h"
 #include "ConsoleBatch.h"
 
-bool CommandLine::m_gui = false;
 
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
 
 	// parse command line arguments
-	CommandLine cli(app.arguments());
+	CommandLine cli(app.arguments(), false);
 	CommandLine::set(cli);
 
 	if (cli.contains("help") || cli.outputDirectory().isEmpty() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
