@@ -28,10 +28,6 @@
 #include <QSizeF>
 #include <QRectF>
 #include <assert.h>
-#include <iostream>
-#include <cmath>
-
-#include "CommandLine.h"
 
 namespace page_layout
 {
