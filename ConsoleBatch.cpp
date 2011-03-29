@@ -114,7 +114,7 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 
 	setup();
 
-	CommandLine cli = CommandLine::get();
+	CommandLine const& cli = CommandLine::get();
 	QString output_directory = m_ptrReader->outputDirectory();
 	if (!cli.outputDirectory().isEmpty()) {
 		output_directory = cli.outputDirectory();
@@ -193,7 +193,7 @@ ConsoleBatch::createCompositeTask(
 void
 ConsoleBatch::process()
 {
-	CommandLine cli = CommandLine::get();
+	CommandLine const& cli = CommandLine::get();
 
 	int startFilterIdx = m_ptrStages->selectContentFilterIdx();
 	if (cli.hasStartFilterIdx()) {
@@ -245,7 +245,7 @@ ConsoleBatch::setup()
 	IntrusivePtr<page_layout::Filter> page_layout = m_ptrStages->pageLayoutFilter(); 
 	IntrusivePtr<output::Filter> output = m_ptrStages->outputFilter(); 
 
-	CommandLine cli = CommandLine::get();
+	CommandLine const& cli = CommandLine::get();
 	QMap<QString, float> img_cache;
 
 	std::set<PageId> allPages = m_ptrPages->toPageSequence(PAGE_VIEW).selectAll();

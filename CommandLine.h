@@ -60,10 +60,9 @@ public:
 	QString const& projectFile() const { return m_projectFile; }
 	QString const& outputProjectFile() const { return m_outputProjectFile; }
 
-	bool hasMargins();
-	bool hasAlignment();
-	bool hasInputDpi();
-	bool hasOutputDpi();
+	bool hasMargins() const;
+	bool hasAlignment() const;
+	bool hasOutputDpi() const;
 
 	bool hasHelp() const { return contains("help"); }
 	bool hasOutputProject() const { return contains("output-project"); }

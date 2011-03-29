@@ -458,7 +458,7 @@ CommandLine::fetchDepthPerception()
 }
 
 bool
-CommandLine::hasMargins()
+CommandLine::hasMargins() const
 {
 	return(
 		m_options.contains("margins") ||
@@ -470,7 +470,7 @@ CommandLine::hasMargins()
 }
 
 bool
-CommandLine::hasAlignment()
+CommandLine::hasAlignment() const
 {
 	return(
 		m_options.contains("alignment") ||
@@ -480,7 +480,7 @@ CommandLine::hasAlignment()
 }
 
 bool
-CommandLine::hasOutputDpi()
+CommandLine::hasOutputDpi() const
 {
 	return(
 		m_options.contains("output-dpi") ||

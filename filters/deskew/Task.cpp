@@ -114,7 +114,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
 
-	CommandLine cli = CommandLine::get();
+	CommandLine const& cli = CommandLine::get();
 
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
 	if (params.get()) {
