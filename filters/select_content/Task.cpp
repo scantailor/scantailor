@@ -37,10 +37,6 @@
 #include <QTransform>
 #include <QDebug>
 
-#include "CommandLine.h"
-#include <QRegExp>
-#include <iostream>
-
 namespace select_content
 {
 
@@ -94,9 +90,9 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	status.throwIfCancelled();
 	
 	Dependencies const deps(data.xform().resultingPreCropArea());
-	
+
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO) && !CommandLine::get().hasContentRect()) {
+	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO)) {
 		params.reset();
 	}
 
