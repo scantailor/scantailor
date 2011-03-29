@@ -215,7 +215,6 @@ ConsoleBatch::process()
 		if (cli.contains("verbose"))
 			std::cout << "Filter: " << (j+1) << "\n";
 
-		// it should be enough to run last two stages
 		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);

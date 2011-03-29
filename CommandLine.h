@@ -54,10 +54,10 @@ public:
 
 	static bool isGui() { return m_gui; }
 
-	QString projectFile() { return m_projectFile; }
-	std::vector<ImageFileInfo> images() { return m_images; }
-	QString outputDirectory() { return m_outputDirectory; }
-	QString outputProjectFile() { return m_outputProjectFile; }
+	std::vector<ImageFileInfo> const& images() const { return m_images; }
+	QString const& outputDirectory() const { return m_outputDirectory; }
+	QString const& projectFile() const { return m_projectFile; }
+	QString const& outputProjectFile() const { return m_outputProjectFile; }
 
 	bool contains(QString const& key) const { return m_options.contains(key); }
 	bool containsMargins();
