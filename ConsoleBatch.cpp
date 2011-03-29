@@ -196,7 +196,7 @@ ConsoleBatch::process()
 	CommandLine cli = CommandLine::get();
 
 	int startFilterIdx = m_ptrStages->selectContentFilterIdx();
-	if (cli.contains("start-filter")) {
+	if (cli.hasStartFilterIdx()) {
 		int sf = cli.getStartFilterIdx();
 		if (sf<0 || sf>=m_ptrStages->filters().size())
 			throw std::runtime_error("Start filter out of range");
@@ -204,7 +204,7 @@ ConsoleBatch::process()
 	}
 
 	int endFilterIdx = m_ptrStages->outputFilterIdx();
-	if (cli.contains("end-filter")) {
+	if (cli.hasEndFilterIdx()) {
 		int ef = cli.getEndFilterIdx();
 		if (ef<0 || ef>=m_ptrStages->filters().size())
 			throw std::runtime_error("End filter out of range");
@@ -212,13 +212,13 @@ ConsoleBatch::process()
 	}
 
 	for (int j=startFilterIdx; j<=endFilterIdx; j++) {
-		if (cli.contains("verbose"))
+		if (cli.isVerbose())
 			std::cout << "Filter: " << (j+1) << "\n";
 
 		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
-			if (cli.contains("verbose"))
+			if (cli.isVerbose())
 				std::cout << "\tProcessing: " << page.imageId().filePath().toAscii().constData() << "\n";
 			BackgroundTaskPtr bgTask = createCompositeTask(page, j);
 			(*bgTask)();
@@ -254,7 +254,7 @@ ConsoleBatch::setup()
 
 		OrthogonalRotation rotation;
 		// FIX ORIENTATION FILTER
-		if (cli.contains("orientation")) {
+		if (cli.hasOrientation()) {
 			switch(cli.getOrientation()) {
 				case CommandLine::LEFT:
 					rotation.prevClockwiseDirection();
@@ -273,9 +273,9 @@ ConsoleBatch::setup()
 		}
 	
 		// DESKEW FILTER
-		if (cli.contains("rotate") || cli.contains("deskew")) {
+		if (cli.hasDeskewAngle() || cli.hasDeskew()) {
 			double angle = 0.0;
-			if (cli.contains("rotate"))
+			if (cli.hasDeskewAngle())
 				angle = cli.getDeskewAngle();
 			deskew::Dependencies deps(QPolygonF(), rotation);
 			deskew::Params params(angle, deps, MODE_MANUAL);
@@ -283,12 +283,12 @@ ConsoleBatch::setup()
 		}
 	
 		// PAGE SPLIT
-		if (cli.contains("layout")) {
+		if (cli.hasLayout()) {
 			page_split->getSettings()->setLayoutTypeForAllPages(cli.getLayout());
 		}
 
 		// SELECT CONTENT FILTER
-		if (cli.contains("content-box")) {
+		if (cli.hasContentRect()) {
 			QRectF rect(cli.getContentRect());
 			QSizeF size_mm(rect.width(), rect.height());
 			select_content::Dependencies deps;
@@ -298,32 +298,32 @@ ConsoleBatch::setup()
 
 		// PAGE LAYOUT FILTER
 		page_layout::Alignment alignment = cli.getAlignment();
-		if (cli.containsMargins())
+		if (cli.hasMargins())
 			page_layout->getSettings()->setHardMarginsMM(page, cli.getMargins());
-		if (cli.containsAlignment())
+		if (cli.hasAlignment())
 			page_layout->getSettings()->setPageAlignment(page, alignment);
 
 		// OUTPUT FILTER
 		output::Params params(output->getSettings()->getParams(page));
-		if (cli.containsOutputDpi()) {
+		if (cli.hasOutputDpi()) {
 			Dpi outputDpi = cli.getOutputDpi();
 			params.setOutputDpi(outputDpi);
 		}
 
 		output::ColorParams colorParams = params.colorParams();
-		if (cli.contains("color-mode"))
+		if (cli.hasColorMode())
 			colorParams.setColorMode(cli.getColorMode());
 
-		if (cli.contains("white-margins") || cli.contains("normalize-illumination")) {
+		if (cli.hasWhiteMargins() || cli.hasNormalizeIllumination()) {
 			output::ColorGrayscaleOptions cgo;
-			if (cli.contains("white-margins"))
+			if (cli.hasWhiteMargins())
 				cgo.setWhiteMargins(true);
-			if (cli.contains("normalize-illumination"))
+			if (cli.hasNormalizeIllumination())
 				cgo.setNormalizeIllumination(true);
 			colorParams.setColorGrayscaleOptions(cgo);
 		}
 
-		if (cli.contains("threshold")) {
+		if (cli.hasThreshold()) {
 			output::BlackWhiteOptions bwo;
 			bwo.setThresholdAdjustment(cli.getThreshold());
 			colorParams.setBlackWhiteOptions(bwo);
@@ -331,12 +331,12 @@ ConsoleBatch::setup()
 
 		params.setColorParams(colorParams);
 
-		if (cli.contains("despeckle"))
+		if (cli.hasDespeckle())
 			params.setDespeckleLevel(cli.getDespeckleLevel());
 
-		if (cli.contains("dewarping"))
+		if (cli.hasDewarping())
 			params.setDewarpingMode(cli.getDewarpingMode());
-		if (cli.contains("depth-perception"))
+		if (cli.hasDepthPerception())
 			params.setDepthPerception(cli.getDepthPerception());
 
 		output->getSettings()->setParams(page, params);

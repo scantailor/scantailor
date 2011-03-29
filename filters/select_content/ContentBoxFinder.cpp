@@ -212,7 +212,7 @@ ContentBoxFinder::findContentBox(
 	
 	CommandLine cli = CommandLine::get();
 	Despeckle::Level despeckleLevel = Despeckle::NORMAL;
-	if (cli.contains("content-detection")) {
+	if (cli.hasContentRect()) {
 		despeckleLevel = cli.getContentDetection();
 	}
 

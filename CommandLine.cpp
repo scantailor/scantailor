@@ -214,7 +214,7 @@ CommandLine::fetchLayoutType()
 {
 	page_split::LayoutType lt = page_split::AUTO_LAYOUT_TYPE;
 
-	if (!m_options.contains("layout"))
+	if (!hasLayout())
 		return lt;
 
 	if (m_options["layout"] == "1")
@@ -231,7 +231,7 @@ Qt::LayoutDirection
 CommandLine::fetchLayoutDirection()
 {
 	Qt::LayoutDirection l = Qt::LeftToRight;
-	if (m_options.contains("layout-direction"))
+	if (!hasLayoutDirection())
 		return l;
 
 	QString ld = m_options["layout-direction"].toLower();
@@ -347,7 +347,7 @@ CommandLine::fetchContentDetection()
 QRectF
 CommandLine::fetchContentRect()
 {
-	if (!m_options.contains("content-box"))
+	if (!hasContentRect())
 		return QRectF();
 
 	QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");
@@ -364,7 +364,7 @@ CommandLine::fetchContentRect()
 CommandLine::Orientation
 CommandLine::fetchOrientation()
 {
-	if (!m_options.contains("orientation"))
+	if (!hasOrientation())
 		return TOP;
 
 	Orientation orient;
@@ -388,7 +388,7 @@ CommandLine::fetchOrientation()
 QString
 CommandLine::fetchOutputProjectFile()
 {
-	if (!m_options.contains("output-project"))
+	if (!hasOutputProject())
 		return QString();
 
 	return m_options["output-project"];
@@ -397,7 +397,7 @@ CommandLine::fetchOutputProjectFile()
 int
 CommandLine::fetchThreshold()
 {
-	if (!m_options.contains("threshold"))
+	if (!hasThreshold())
 		return 0;
 
 	return m_options["threshold"].toInt();
@@ -406,7 +406,7 @@ CommandLine::fetchThreshold()
 double
 CommandLine::fetchDeskewAngle()
 {
-	if (!m_options.contains("rotate"))
+	if (!hasDeskewAngle())
 		return 0.0;
 
 	return m_options["rotate"].toDouble();
@@ -415,7 +415,7 @@ CommandLine::fetchDeskewAngle()
 int
 CommandLine::fetchStartFilterIdx()
 {
-	if (!m_options.contains("start-filter"))
+	if (!hasStartFilterIdx())
 		return 0;
 
 	return m_options["start-filter"].toInt() - 1;
@@ -424,7 +424,7 @@ CommandLine::fetchStartFilterIdx()
 int
 CommandLine::fetchEndFilterIdx()
 {
-	if (!m_options.contains("start-filter"))
+	if (!hasEndFilterIdx())
 		return 5;
 
 	return m_options["end-filter"].toInt() - 1;
@@ -433,7 +433,7 @@ CommandLine::fetchEndFilterIdx()
 output::DewarpingMode
 CommandLine::fetchDewarpingMode()
 {
-	if (!m_options.contains("dewarping"))
+	if (!hasDewarping())
 		return output::DewarpingMode::OFF;
 
 	return output::DewarpingMode(m_options["dewarping"].toLower());
@@ -442,7 +442,7 @@ CommandLine::fetchDewarpingMode()
 output::DespeckleLevel
 CommandLine::fetchDespeckleLevel()
 {
-	if (!m_options.contains("despeckle"))
+	if (!hasDespeckle())
 		return output::DESPECKLE_NORMAL;
 
 	return output::despeckleLevelFromString(m_options["despeckle"]);
@@ -451,14 +451,14 @@ CommandLine::fetchDespeckleLevel()
 output::DepthPerception
 CommandLine::fetchDepthPerception()
 {
-	if (!m_options.contains("depth-perception"))
+	if (!hasDepthPerception())
 		return output::DepthPerception();
 
 	return output::DepthPerception(m_options["depth-perception"]);
 }
 
 bool
-CommandLine::containsMargins()
+CommandLine::hasMargins()
 {
 	return(
 		m_options.contains("margins") ||
@@ -470,7 +470,7 @@ CommandLine::containsMargins()
 }
 
 bool
-CommandLine::containsAlignment()
+CommandLine::hasAlignment()
 {
 	return(
 		m_options.contains("alignment") ||
@@ -480,7 +480,7 @@ CommandLine::containsAlignment()
 }
 
 bool
-CommandLine::containsOutputDpi()
+CommandLine::hasOutputDpi()
 {
 	return(
 		m_options.contains("output-dpi") ||

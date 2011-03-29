@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 	CommandLine cli(app.arguments());
 	CommandLine::set(cli);
 
-	if (cli.contains("help")) {
+	if (cli.hasHelp()) {
 		cli.printHelp();
 		return 0;
 	}

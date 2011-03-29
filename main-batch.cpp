@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	CommandLine cli(app.arguments(), false);
 	CommandLine::set(cli);
 
-	if (cli.contains("help") || cli.outputDirectory().isEmpty() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
+	if (cli.hasHelp() || cli.outputDirectory().isEmpty() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
 		cli.printHelp();
 		return 0;
 	}
@@ -51,6 +51,6 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (cli.contains("output-project"))
+	if (cli.hasOutputProject())
 		cbatch->saveProject(cli.outputProjectFile());
 }

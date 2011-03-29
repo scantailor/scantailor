@@ -118,7 +118,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
 	if (params.get()) {
-		if (!deps.matches(params->dependencies()) && !cli.contains("rotate") && !cli.contains("deskew")) {
+		if (!deps.matches(params->dependencies()) && !cli.hasDeskewAngle() && !cli.hasDeskew()) {
 			params.reset();
 		} else {
 			ui_data.setEffectiveDeskewAngle(params->deskewAngle());

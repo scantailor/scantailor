@@ -53,17 +53,35 @@ public:
 	CommandLine(QStringList const& argv, bool g=true) : m_gui(g), m_global(false) { CommandLine::parseCli(argv); }
 
 	bool isGui() const { return m_gui; }
+	bool isVerbose() const { return contains("verbose"); }
 
 	std::vector<ImageFileInfo> const& images() const { return m_images; }
 	QString const& outputDirectory() const { return m_outputDirectory; }
 	QString const& projectFile() const { return m_projectFile; }
 	QString const& outputProjectFile() const { return m_outputProjectFile; }
 
-	bool contains(QString const& key) const { return m_options.contains(key); }
-	bool containsMargins();
-	bool containsAlignment();
-	bool containsDpi();
-	bool containsOutputDpi();
+	bool hasMargins();
+	bool hasAlignment();
+	bool hasInputDpi();
+	bool hasOutputDpi();
+
+	bool hasHelp() const { return contains("help"); }
+	bool hasOutputProject() const { return contains("output-project"); }
+	bool hasLayout() const { return contains("layout"); }
+	bool hasLayoutDirection() const { return contains("layout-direction"); }
+	bool hasStartFilterIdx() const { return contains("start-filter"); }
+	bool hasEndFilterIdx() const { return contains("end-filter"); }
+	bool hasOrientation() const { return contains("orientation"); }
+	bool hasDeskewAngle() const { return contains("rotate"); }
+	bool hasDeskew() const { return contains("deskew"); }
+	bool hasContentRect() const { return contains("content-box"); }
+	bool hasColorMode() const { return contains("color-mode"); }
+	bool hasWhiteMargins() const { return contains("white-margins"); }
+	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
+	bool hasThreshold() const { return contains("threshold"); }
+	bool hasDespeckle() const { return contains("despeckle"); }
+	bool hasDewarping() const { return contains("dewarping"); }
+	bool hasDepthPerception() const { return contains("dewarping"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
@@ -87,14 +105,17 @@ public:
 	void printHelp();
 
 private:
-	CommandLine() :m_global(false) {}
+	CommandLine() : m_gui(true), m_global(false) {}
 
-	bool m_gui;
 	static CommandLine m_globalInstance;
 
+	bool m_gui;
 	bool m_global;
+
 	bool isGlobal() { return m_global; }
 	void setGlobal() { m_global = true; }
+
+	bool contains(QString const& key) const { return m_options.contains(key); }
 
 	QMap<QString, QString> m_options;
 	QString m_projectFile;
