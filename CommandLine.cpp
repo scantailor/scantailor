@@ -143,6 +143,7 @@ CommandLine::setup()
 	m_deskewAngle = fetchDeskewAngle();
 	m_startFilterIdx = fetchStartFilterIdx();
 	m_endFilterIdx = fetchEndFilterIdx();
+	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
 }
 
 
