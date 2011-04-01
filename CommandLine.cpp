@@ -1,3 +1,23 @@
+/*
+    Scan Tailor - Interactive post-processing tool for scanned pages.
+
+    CommandLine - Interface for ScanTailor's parameters provided on CL.
+    Copyright (C) 2011 Petr Kovar <pejuko@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <cstdlib>
 #include <assert.h>
 #include <iostream>
@@ -196,7 +216,7 @@ CommandLine::fetchLayoutType()
 {
 	page_split::LayoutType lt = page_split::AUTO_LAYOUT_TYPE;
 
-	if (!m_options.contains("layout"))
+	if (!hasLayout())
 		return lt;
 
 	if (m_options["layout"] == "1")
@@ -213,7 +233,7 @@ Qt::LayoutDirection
 CommandLine::fetchLayoutDirection()
 {
 	Qt::LayoutDirection l = Qt::LeftToRight;
-	if (m_options.contains("layout-direction"))
+	if (!hasLayoutDirection())
 		return l;
 
 	QString ld = m_options["layout-direction"].toLower();
@@ -334,7 +354,7 @@ CommandLine::fetchContentDetection()
 QRectF
 CommandLine::fetchContentRect()
 {
-	if (!m_options.contains("content-box"))
+	if (!hasContentRect())
 		return QRectF();
 
 	QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");
@@ -351,7 +371,7 @@ CommandLine::fetchContentRect()
 CommandLine::Orientation
 CommandLine::fetchOrientation()
 {
-	if (!m_options.contains("orientation"))
+	if (!hasOrientation())
 		return TOP;
 
 	Orientation orient;
@@ -375,7 +395,7 @@ CommandLine::fetchOrientation()
 QString
 CommandLine::fetchOutputProjectFile()
 {
-	if (!m_options.contains("output-project"))
+	if (!hasOutputProject())
 		return QString();
 
 	return m_options["output-project"];
@@ -384,7 +404,7 @@ CommandLine::fetchOutputProjectFile()
 int
 CommandLine::fetchThreshold()
 {
-	if (!m_options.contains("threshold"))
+	if (!hasThreshold())
 		return 0;
 
 	return m_options["threshold"].toInt();
@@ -393,7 +413,7 @@ CommandLine::fetchThreshold()
 double
 CommandLine::fetchDeskewAngle()
 {
-	if (!m_options.contains("rotate"))
+	if (!hasDeskewAngle())
 		return 0.0;
 
 	return m_options["rotate"].toDouble();
@@ -402,7 +422,7 @@ CommandLine::fetchDeskewAngle()
 int
 CommandLine::fetchStartFilterIdx()
 {
-	if (!m_options.contains("start-filter"))
+	if (!hasStartFilterIdx())
 		return 0;
 
 	return m_options["start-filter"].toInt() - 1;
@@ -411,7 +431,7 @@ CommandLine::fetchStartFilterIdx()
 int
 CommandLine::fetchEndFilterIdx()
 {
-	if (!m_options.contains("start-filter"))
+	if (!hasEndFilterIdx())
 		return 5;
 
 	return m_options["end-filter"].toInt() - 1;
@@ -420,7 +440,7 @@ CommandLine::fetchEndFilterIdx()
 output::DewarpingMode
 CommandLine::fetchDewarpingMode()
 {
-	if (!m_options.contains("dewarping"))
+	if (!hasDewarping())
 		return output::DewarpingMode::OFF;
 
 	return output::DewarpingMode(m_options["dewarping"].toLower());
@@ -429,7 +449,7 @@ CommandLine::fetchDewarpingMode()
 output::DespeckleLevel
 CommandLine::fetchDespeckleLevel()
 {
-	if (!m_options.contains("despeckle"))
+	if (!hasDespeckle())
 		return output::DESPECKLE_NORMAL;
 
 	return output::despeckleLevelFromString(m_options["despeckle"]);
@@ -438,7 +458,7 @@ CommandLine::fetchDespeckleLevel()
 output::DepthPerception
 CommandLine::fetchDepthPerception()
 {
-	if (!m_options.contains("depth-perception"))
+	if (!hasDepthPerception())
 		return output::DepthPerception();
 
 	return output::DepthPerception(m_options["depth-perception"]);
@@ -455,7 +475,7 @@ CommandLine::fetchMatchLayoutTolerance()
 
 
 bool
-CommandLine::containsMargins()
+CommandLine::hasMargins() const
 {
 	return(
 		m_options.contains("margins") ||
@@ -467,10 +487,10 @@ CommandLine::containsMargins()
 }
 
 bool
-CommandLine::containsAlignment()
+CommandLine::hasAlignment() const
 {
 	return(
-		m_options.contains("match-layout-tolerance") ||
+		hasMatchLayoutTolerance() ||
 		m_options.contains("alignment") ||
 		m_options.contains("alignment-vertical") ||
 		m_options.contains("alignment-horizontal")
@@ -478,7 +498,7 @@ CommandLine::containsAlignment()
 }
 
 bool
-CommandLine::containsOutputDpi()
+CommandLine::hasOutputDpi() const
 {
 	return(
 		m_options.contains("output-dpi") ||

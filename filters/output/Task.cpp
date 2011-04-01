@@ -379,7 +379,7 @@ Task::process(
 		despeckle_visualization = despeckle_state.visualize();
 	}
 
-	if (CommandLine::isGui()) {
+	if (CommandLine::get().isGui()) {
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_ptrDbg, params,

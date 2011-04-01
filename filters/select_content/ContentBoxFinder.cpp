@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -210,9 +210,9 @@ ContentBoxFinder::findContentBox(
 	
 	status.throwIfCancelled();
 	
-	CommandLine cli = CommandLine::get();
+	CommandLine const& cli = CommandLine::get();
 	Despeckle::Level despeckleLevel = Despeckle::NORMAL;
-	if (cli.contains("content-detection")) {
+	if (cli.hasContentRect()) {
 		despeckleLevel = cli.getContentDetection();
 	}
 
@@ -1224,9 +1224,6 @@ ContentBoxFinder::trim(
 	}
 	
 	int const content_pixels = content.countBlackPixels(removed_area);
-	if (content_pixels < 20) {
-		return new_area;
-	}
 	
 	bool const vertical_cut = (
 		new_area.top() == area.top()

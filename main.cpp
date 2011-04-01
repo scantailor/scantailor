@@ -124,7 +124,6 @@ static bool crashCallback(wchar_t const* dump_path,
 
 #endif // ENABLE_CRASH_REPORTER
 
-bool CommandLine::m_gui = true;
 
 int main(int argc, char** argv)
 {
@@ -146,7 +145,7 @@ int main(int argc, char** argv)
 	CommandLine cli(app.arguments());
 	CommandLine::set(cli);
 
-	if (cli.contains("help")) {
+	if (cli.hasHelp()) {
 		cli.printHelp();
 		return 0;
 	}

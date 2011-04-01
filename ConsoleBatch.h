@@ -1,6 +1,5 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
 
     ConsoleBatch - Batch processing scanned pages from command line.
     Copyright (C) 2011 Petr Kovar <pejuko@gmail.com>
@@ -43,6 +42,7 @@
 
 class ConsoleBatch
 {
+	// Member-wise copying is OK.
 public:
 	ConsoleBatch(
 			std::vector<ImageFileInfo> const& images,
@@ -63,7 +63,13 @@ private:
 	IntrusivePtr<ThumbnailPixmapCache> m_ptrThumbnailCache;
 	std::auto_ptr<ProjectReader> m_ptrReader;
 
-	void setup();
+	void setupFilter(int idx, std::set<PageId> allPages);
+	void setupFixOrientation(std::set<PageId> allPages);
+	void setupPageSplit(std::set<PageId> allPages);
+	void setupDeskew(std::set<PageId> allPages);
+	void setupSelectContent(std::set<PageId> allPages);
+	void setupPageLayout(std::set<PageId> allPages);
+	void setupOutput(std::set<PageId> allPages);
 
 	BackgroundTaskPtr createCompositeTask(
 		PageInfo const& page,
