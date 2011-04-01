@@ -37,6 +37,8 @@
 #include <QTransform>
 #include <QObject>
 
+#include "CommandLine.h"
+
 namespace page_layout
 {
 
@@ -124,7 +126,7 @@ Task::process(
 		return m_ptrNextTask->process(
 			status, FilterData(data, new_xform), content_rect_phys
 		);
-	} else {
+	} else if (m_ptrFilter->optionsWidget() != 0) {
 		return FilterResultPtr(
 			new UiUpdater(
 				m_ptrFilter, m_ptrSettings, m_pageId,
@@ -133,6 +135,8 @@ Task::process(
 				m_batchProcessing
 			)
 		);
+	} else {
+		return FilterResultPtr(0);
 	}
 }
 

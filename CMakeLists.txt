@@ -20,6 +20,10 @@ PROJECT("Scan Tailor")
 # libraries it ships with!  It's harmless on other platforms.
 ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
+IF(DEBUG_CLI)
+	ADD_DEFINITIONS(-DDEBUG_CLI)
+ENDIF(DEBUG_CLI)
+
 ENABLE_TESTING()
 
 # An undocumented side-effect of CONFIGURE_FILE() is that it makes
@@ -362,7 +366,7 @@ ENDIF()
 
 SET(
 	sources
-	main.cpp Application.cpp Application.h
+	Application.cpp Application.h
 	BackgroundExecutor.cpp BackgroundExecutor.h
 	OpenGLSupport.cpp OpenGLSupport.h
 	PixmapRenderer.cpp PixmapRenderer.h
@@ -381,6 +385,8 @@ SET(
 	ProjectCreationContext.cpp ProjectCreationContext.h
 	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	MainWindow.cpp MainWindow.h
+	ConsoleBatch.cpp ConsoleBatch.h
+	CommandLine.cpp CommandLine.h
 	PageSelectionAccessor.cpp PageSelectionAccessor.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
 	PhysicalTransformation.cpp PhysicalTransformation.h
@@ -496,8 +502,12 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(
-	scantailor WIN32 ${sources} ${ui_sources} version.h
+	scantailor WIN32 ${sources} ${ui_sources} version.h main.cpp
 	${resource_sources} ${win32_resource_file} resources/icons/COPYING
+)
+
+ADD_EXECUTABLE(
+	scantailor-batch WIN32 ${sources} version.h main-batch.cpp
 )
 
 # Note that order of static libraries matters with gcc.  Specifically,
@@ -509,7 +519,13 @@ TARGET_LINK_LIBRARIES(
 	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
-INSTALL(TARGETS scantailor RUNTIME DESTINATION bin)
+TARGET_LINK_LIBRARIES(
+	scantailor-batch
+	fix_orientation page_split deskew select_content page_layout
+	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
+	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
+)
+INSTALL(TARGETS scantailor scantailor-batch RUNTIME DESTINATION bin)
 
 IF(ENABLE_CRASH_REPORTER)
 	FIND_PATH(

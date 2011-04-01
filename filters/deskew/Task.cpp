@@ -53,6 +53,8 @@
 #include <assert.h>
 #include <stddef.h>
 
+#include "CommandLine.h"
+
 namespace deskew
 {
 
@@ -111,10 +113,12 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	OptionsWidget::UiData ui_data;
 	ui_data.setDependencies(deps);
-	
+
+	CommandLine const& cli = CommandLine::get();
+
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
 	if (params.get()) {
-		if (!deps.matches(params->dependencies())) {
+		if (!deps.matches(params->dependencies()) && !cli.hasDeskewAngle() && !cli.hasDeskew()) {
 			params.reset();
 		} else {
 			ui_data.setEffectiveDeskewAngle(params->deskewAngle());

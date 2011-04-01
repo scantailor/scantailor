@@ -57,7 +57,7 @@
 #include "ImageLoader.h"
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
-#include "dewarping/CylindricalSurfaceDewarper.h"
+#include "imageproc/PolygonUtils.h"
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <QImage>
@@ -69,6 +69,8 @@
 #include <QTabWidget>
 #include <QCoreApplication>
 #include <QDebug>
+
+#include "CommandLine.h"
 
 using namespace imageproc;
 using namespace dewarping;
@@ -84,9 +86,8 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		std::auto_ptr<DebugImages> dbg_img,
 		Params const& params,
-		QTransform const& image_to_virt,
+		ImageTransformation const& xform,
 		QRect const& virt_content_rect,
-		QPolygonF const& virt_display_area,
 		PageId const& page_id,
 		QImage const& orig_image,
 		QImage const& output_image,
@@ -103,9 +104,8 @@ private:
 	IntrusivePtr<Settings> m_ptrSettings;
 	std::auto_ptr<DebugImages> m_ptrDbg;
 	Params m_params;
-	QTransform m_imageToVirt;
+	ImageTransformation m_xform;
 	QRect m_virtContentRect;
-	QPolygonF m_virtDisplayArea;
 	PageId m_pageId;
 	QImage m_origImage;
 	QImage m_downscaledOrigImage;
@@ -149,7 +149,7 @@ Task::process(
 	QPolygonF const& content_rect_phys)
 {
 	status.throwIfCancelled();
-	
+
 	Params params(m_ptrSettings->getParams(m_pageId));
 	RenderParams const render_params(params.colorParams());
 	QString const out_file_path(m_outFileNameGen.filePathFor(m_pageId));
@@ -183,7 +183,7 @@ Task::process(
 		generator.outputImageSize(), generator.outputContentRect(),
 		new_xform, params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
-		params.depthPerception(), params.despeckleLevel()
+		params.depthPerception(), params.despeckleLevel() 
 	);
 
 	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
@@ -379,16 +379,19 @@ Task::process(
 		despeckle_visualization = despeckle_state.visualize();
 	}
 
-	return FilterResultPtr(
-		new UiUpdater(
-			m_ptrFilter, m_ptrSettings, m_ptrDbg, params,
-			new_xform.transform(), generator.outputContentRect(),
-			QRectF(QPointF(0.0, 0.0), generator.outputImageSize()),
-			m_pageId, data.origImage(), out_img, automask_img,
-			despeckle_state, despeckle_visualization,
-			m_batchProcessing, m_debug
-		)
-	);
+	if (CommandLine::get().isGui()) {
+		return FilterResultPtr(
+			new UiUpdater(
+				m_ptrFilter, m_ptrSettings, m_ptrDbg, params,
+				new_xform, generator.outputContentRect(),
+				m_pageId, data.origImage(), out_img, automask_img,
+				despeckle_state, despeckle_visualization,
+				m_batchProcessing, m_debug
+			)
+		);
+	} else {
+		return FilterResultPtr(0);
+	}
 }
 
 /**
@@ -429,9 +432,8 @@ Task::UiUpdater::UiUpdater(
 	IntrusivePtr<Settings> const& settings,
 	std::auto_ptr<DebugImages> dbg_img,
 	Params const& params,
-	QTransform const& image_to_virt,
+	ImageTransformation const& xform,
 	QRect const& virt_content_rect,
-	QPolygonF const& virt_display_area,
 	PageId const& page_id,
 	QImage const& orig_image,
 	QImage const& output_image,
@@ -443,9 +445,8 @@ Task::UiUpdater::UiUpdater(
 	m_ptrSettings(settings),
 	m_ptrDbg(dbg_img),
 	m_params(params),
-	m_imageToVirt(image_to_virt),
+	m_xform(xform),
 	m_virtContentRect(virt_content_rect),
-	m_virtDisplayArea(virt_display_area),
 	m_pageId(page_id),
 	m_origImage(orig_image),
 	m_downscaledOrigImage(ImageView::createDownscaledImage(orig_image)),
@@ -481,9 +482,11 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 
 	std::auto_ptr<ImageViewBase> dewarping_view(
 		new DewarpingView(
-			m_origImage, m_downscaledOrigImage,
-			m_imageToVirt, m_virtDisplayArea, m_virtContentRect,
-			m_pageId, m_params.dewarpingMode(),
+			m_origImage, m_downscaledOrigImage, m_xform.transform(),
+			PolygonUtils::convexHull(
+				(m_xform.resultingPreCropArea() + m_xform.resultingPostCropArea()).toStdVector()
+			),
+			m_virtContentRect, m_pageId, m_params.dewarpingMode(),
 			m_params.distortionModel(), opt_widget->depthPerception()
 		)
 	);
@@ -506,7 +509,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		picture_zone_editor.reset(
 			new PictureZoneEditor(
 				m_origImage, downscaled_orig_pixmap, m_pictureMask,
-				m_imageToVirt, m_virtDisplayArea,
+				m_xform.transform(), m_xform.resultingPostCropArea(),
 				m_pageId, m_ptrSettings
 			)
 		);
@@ -527,15 +530,15 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 		boost::shared_ptr<DewarpingPointMapper> mapper(
 			new DewarpingPointMapper(
 				m_params.distortionModel(), m_params.depthPerception().value(),
-				m_imageToVirt, m_virtContentRect
+				m_xform.transform(), m_virtContentRect
 			)
 		);
 		orig_to_output = boost::bind(&DewarpingPointMapper::mapToDewarpedSpace, mapper, _1);
 		output_to_orig = boost::bind(&DewarpingPointMapper::mapToWarpedSpace, mapper, _1);
 	} else {
 		typedef QPointF (QTransform::*MapPointFunc)(QPointF const&) const;
-		orig_to_output = boost::bind((MapPointFunc)&QTransform::map, m_imageToVirt, _1);
-		output_to_orig = boost::bind((MapPointFunc)&QTransform::map, m_imageToVirt.inverted(), _1);
+		orig_to_output = boost::bind((MapPointFunc)&QTransform::map, m_xform.transform(), _1);
+		output_to_orig = boost::bind((MapPointFunc)&QTransform::map, m_xform.transformBack(), _1);
 	}
 
 	std::auto_ptr<QWidget> fill_zone_editor(

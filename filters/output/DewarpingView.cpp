@@ -19,7 +19,6 @@
 #include "DewarpingView.h"
 #include "DewarpingView.h.moc"
 #include "ImagePresentation.h"
-#include "OutputMargins.h"
 #include "dewarping/Curve.h"
 #include "VecNT.h"
 #include "MatrixCalc.h"
@@ -60,8 +59,7 @@ DewarpingView::DewarpingView(
 	DepthPerception const& depth_perception)
 :	ImageViewBase(
 		image, downscaled_image,
-		ImagePresentation(image_to_virt, virt_display_area),
-		OutputMargins()
+		ImagePresentation(image_to_virt, virt_display_area)
 	),
 	m_pageId(page_id),
 	m_virtDisplayArea(virt_display_area),

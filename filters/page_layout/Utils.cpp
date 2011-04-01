@@ -193,7 +193,13 @@ Utils::calcSoftMarginsMM(
 				break;
 		}
 	}
+<<<<<<< HEAD
 	
+=======
+
+	double const delta_height =
+		aggregate_hard_size_mm.height() - hard_size_mm.height();
+>>>>>>> master
 	if (delta_height > 0.0) {
 		switch (myAlign.vertical()) {
 			case Alignment::TOP:
