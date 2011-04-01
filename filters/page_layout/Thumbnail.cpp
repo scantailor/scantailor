@@ -100,36 +100,5 @@ Thumbnail::paintOverImage(
 	painter.drawRect(inner_rect.toRect());
 }
 
-void
-Thumbnail::recalcBoxesAndPresentationTransform()
-{
-	QPolygonF poly_mm(m_origToMM.map(m_adaptedContentRect));
-	Utils::extendPolyRectWithMargins(poly_mm, m_params.hardMarginsMM());
-	
-	//QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
-	
-	QSizeF const hard_size_mm(
-		QLineF(poly_mm[0], poly_mm[1]).length(),
-		QLineF(poly_mm[0], poly_mm[3]).length()
-	);
-	
-	Margins const soft_margins_mm(
-		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_params.alignment(), m_origXform.resultingRect(), m_adaptedContentRect
-		)
-	);
-	
-	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
-	
-	m_outerRect = m_mmToOrig.map(poly_mm).boundingRect();
-	
-	ImageTransformation const presentation_xform(
-		Utils::calcPresentationTransform(
-			m_origXform, m_physXform.mmToPixels().map(poly_mm)
-		)
-	);
-	
-	setImageXform(presentation_xform);
-}
 
 } // namespace page_layout
