@@ -20,7 +20,8 @@
 #include "SettingsDialog.h.moc"
 #include "OpenGLSupport.h"
 #include "config.h"
-#include <QSettings>
+#include "SettingsManager.h"
+
 #include <QVariant>
 #include <QToolButton>
 
@@ -29,11 +30,11 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 {
 	ui.setupUi(this);
 
-	QSettings settings;
+	SettingsManager sm;
 	// bitonal_compress_g4fax settings
-	ui.gfax4RadioButton->setChecked(settings.value("settings/output/bitonal_compress_g4fax", false).toBool());
+	ui.gfax4RadioButton->setChecked(sm.GetCompressG4Fax());
 	// despeckling settings
-	QString despeckle = settings.value("settings/output/despeckling", "cautious").toString();
+	QString despeckle = sm.GetDespeckling();
 	ui.despeckleCautiousBtn->setChecked(true);
 	if(despeckle=="off") {
 		ui.despeckleOffBtn->setChecked(true);
@@ -56,7 +57,7 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 		ui.use3DAcceleration->setToolTip(tr("Your hardware / driver don't provide the necessary features."));
 	} else {
 		ui.use3DAcceleration->setChecked(
-			settings.value("settings/use_3d_acceleration", false).toBool()
+			sm.GetUse3dAcceleration()
 		);
 	}
 #endif
@@ -71,12 +72,12 @@ SettingsDialog::~SettingsDialog()
 void
 SettingsDialog::commitChanges()
 {
-	QSettings settings;
+	SettingsManager sm;
 #ifdef ENABLE_OPENGL
-	settings.setValue("settings/use_3d_acceleration", ui.use3DAcceleration->isChecked());
+	sm.SetUse3dAcceleration(ui.use3DAcceleration->isChecked());
 #endif
 	// bitonal_compress_g4fax settings
-	settings.setValue("settings/output/bitonal_compress_g4fax", ui.gfax4RadioButton->isChecked());
+	sm.SetCompressG4Fax(ui.gfax4RadioButton->isChecked());
 	// despeckling settings
 	QString despeckle = "cautious";
 	if(ui.despeckleOffBtn->isChecked()) {
@@ -88,5 +89,5 @@ SettingsDialog::commitChanges()
 	} else if(ui.despeckleAggressiveBtn->isChecked()) {
 		despeckle = "aggressive";
 	}
-	settings.setValue("settings/output/despeckling", despeckle);
+	sm.SetDespeckling(despeckle);
 }

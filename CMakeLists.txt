@@ -450,6 +450,7 @@ SET(
 	filter_dc/ContentBoxCollector.h
 	filter_dc/PageOrientationCollector.h
 	config.h.in
+	SettingsManager.h SettingsManager.cpp
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})

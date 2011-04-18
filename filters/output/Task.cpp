@@ -58,6 +58,8 @@
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
 #include "math/CylindricalSurfaceDewarper.h"
+#include "../../SettingsManager.h"
+
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <QImage>
@@ -148,8 +150,8 @@ Task::process(
 	TaskStatus const& status, FilterData const& data,
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
-	QSettings settings;
-	bool bitonal_g4fax = settings.value("settings/output/bitonal_compress_g4fax", false).toBool();
+	SettingsManager sm;
+	bool bitonal_g4fax = sm.GetCompressG4Fax();
 	
 	status.throwIfCancelled();
 	

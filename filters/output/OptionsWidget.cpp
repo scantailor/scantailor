@@ -32,6 +32,7 @@
 #include "ScopedIncDec.h"
 #include "config.h"
 #include "DespeckleLevel.h"
+#include "SettingsManager.h"
 
 #include <boost/foreach.hpp>
 #include <QtGlobal>
@@ -44,7 +45,6 @@
 #include <QSize>
 #include <Qt>
 #include <QDebug>
-#include <QSettings>
 
 namespace output
 {
@@ -60,8 +60,8 @@ OptionsWidget::OptionsWidget(
 {
 	setupUi(this);
 	
-	QSettings stngs;
-	m_despeckleLevel = despeckleLevelFromString(stngs.value("settings/output/despeckling", "cautious").toString());
+	SettingsManager sm;
+	m_despeckleLevel = despeckleLevelFromString(sm.GetDespeckling());
 
 	depthPerceptionSlider->setMinimum(qRound(DepthPerception::minValue() * 10));
 	depthPerceptionSlider->setMaximum(qRound(DepthPerception::maxValue() * 10));
