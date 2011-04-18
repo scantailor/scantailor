@@ -149,7 +149,7 @@ Task::process(
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
 	QSettings settings;
-	bool bitonal_g4fax = settings.value("settings/bitonal_compress_g4fax", false).toBool();
+	bool bitonal_g4fax = settings.value("settings/output/bitonal_compress_g4fax", false).toBool();
 	
 	status.throwIfCancelled();
 	

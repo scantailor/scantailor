@@ -33,8 +33,22 @@
         <source>Joseph Artsimovich</source>
         <translation type="unfinished"></translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Marián Hvolka - Slovak
+Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <location filename="../ui/AboutDialog.ui" line="175"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -50,37 +64,25 @@ p, li { white-space: pre-wrap; }
         <source>Translators</source>
         <translation type="unfinished"></translation>
     </message>
-    <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
-        <source>Svetoslav Sashkov, Mandor - Bulgarian
-Stefan Birkner - German
-Angelo Gemmi - Italian
-Masahiro Kitagawa - Japanese
-Patrick Pascal - French
-Daniel Koć - Polish
-Joseph Artsimovich - Russian
-Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="168"/>
         <source>Contributors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="192"/>
         <source>Documentation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="197"/>
+        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="224"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>License</source>
         <translation type="unfinished"></translation>
     </message>
@@ -416,7 +418,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1544"/>
-        <source>%1 - Scan Tailor %2</source>
+        <source>%1 - Scan Tailor Plus %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1415,12 +1417,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="36"/>
+        <location filename="../SettingsDialog.cpp" line="51"/>
         <source>Compiled without OpenGL support.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="41"/>
+        <location filename="../SettingsDialog.cpp" line="56"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1430,8 +1432,70 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="20"/>
+        <location filename="../ui/SettingsDialog.ui" line="24"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="30"/>
         <source>Use 3D acceleration for user interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="38"/>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="44"/>
+        <source>Despeckling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="68"/>
+        <location filename="../ui/SettingsDialog.ui" line="71"/>
+        <source>No despeckling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="99"/>
+        <location filename="../ui/SettingsDialog.ui" line="102"/>
+        <location filename="../ui/SettingsDialog.ui" line="105"/>
+        <source>Cautious despeckling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="134"/>
+        <location filename="../ui/SettingsDialog.ui" line="137"/>
+        <location filename="../ui/SettingsDialog.ui" line="140"/>
+        <source>Normal despeckling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="166"/>
+        <location filename="../ui/SettingsDialog.ui" line="169"/>
+        <location filename="../ui/SettingsDialog.ui" line="172"/>
+        <source>Aggressive despeckling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="216"/>
+        <source>Bitonal Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="233"/>
+        <source>Bitonal Compression:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="240"/>
+        <source>CCITT Group 4 Fax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="247"/>
+        <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1590,7 +1654,7 @@ p, li { white-space: pre-wrap; }
     <name>fix_orientation::ApplyDialog</name>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more than one group is selected.</source>
+        <source>Can&apos;t do: more that one group is selected.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1633,14 +1697,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>output::DewarpingView</name>
-    <message>
-        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
-        <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>output::FillZoneEditor</name>
     <message>
         <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
@@ -1659,42 +1715,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Black and White</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
         <source>Color / Grayscale</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Mixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="413"/>
         <source>Apply Despeckling Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="493"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="676"/>
         <source>Manual</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1702,37 +1758,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="495"/>
+        <location filename="../filters/output/Task.cpp" line="503"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="547"/>
+        <location filename="../filters/output/Task.cpp" line="555"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="572"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="565"/>
+        <location filename="../filters/output/Task.cpp" line="573"/>
         <source>Picture Zones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="566"/>
+        <location filename="../filters/output/Task.cpp" line="574"/>
         <source>Fill Zones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="567"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Despeckling</source>
         <translation type="unfinished"></translation>
     </message>

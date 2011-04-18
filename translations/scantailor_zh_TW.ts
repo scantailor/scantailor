@@ -41,17 +41,19 @@
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="149"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
 Stefan Birkner - German
 Angelo Gemmi - Italian
 Masahiro Kitagawa - Japanese
 Patrick Pascal - French
 Daniel Koć - Polish
 Joseph Artsimovich - Russian
+Marián Hvolka - Slovak
 Davidson Wang - Traditional Chinese</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <location filename="../ui/AboutDialog.ui" line="175"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -79,7 +81,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="168"/>
         <source>Contributors</source>
         <translation>貢獻者</translation>
     </message>
@@ -94,12 +96,12 @@ Andrey Bergman - 系統負載調整.
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="192"/>
         <source>Documentation</source>
         <translation>文件製作</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="197"/>
+        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -108,7 +110,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="224"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>License</source>
         <translation>版權</translation>
     </message>
@@ -446,8 +448,8 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1544"/>
-        <source>%1 - Scan Tailor %2</source>
-        <translation></translation>
+        <source>%1 - Scan Tailor Plus %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1611"/>
@@ -1458,12 +1460,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="36"/>
+        <location filename="../SettingsDialog.cpp" line="51"/>
         <source>Compiled without OpenGL support.</source>
         <translation>沒有支援OpenGL的編譯.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="41"/>
+        <location filename="../SettingsDialog.cpp" line="56"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>您的硬體/驅動程式沒有支援所需要的功能.</translation>
     </message>
@@ -1473,9 +1475,71 @@ p, li { white-space: pre-wrap; }
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="20"/>
+        <location filename="../ui/SettingsDialog.ui" line="24"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="30"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>對使用者介面使用3D加速</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="38"/>
+        <source>Output</source>
+        <translation type="unfinished">輸出</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="44"/>
+        <source>Despeckling</source>
+        <translation type="unfinished">雜點清除</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="68"/>
+        <location filename="../ui/SettingsDialog.ui" line="71"/>
+        <source>No despeckling</source>
+        <translation type="unfinished">不進行雜點清除</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="99"/>
+        <location filename="../ui/SettingsDialog.ui" line="102"/>
+        <location filename="../ui/SettingsDialog.ui" line="105"/>
+        <source>Cautious despeckling</source>
+        <translation type="unfinished">輕微的雜點清除</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="134"/>
+        <location filename="../ui/SettingsDialog.ui" line="137"/>
+        <location filename="../ui/SettingsDialog.ui" line="140"/>
+        <source>Normal despeckling</source>
+        <translation type="unfinished">普通的雜點清除</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="166"/>
+        <location filename="../ui/SettingsDialog.ui" line="169"/>
+        <location filename="../ui/SettingsDialog.ui" line="172"/>
+        <source>Aggressive despeckling</source>
+        <translation type="unfinished">強力的雜點清除</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="216"/>
+        <source>Bitonal Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="233"/>
+        <source>Bitonal Compression:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="240"/>
+        <source>CCITT Group 4 Fax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="247"/>
+        <source>LZW</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1632,9 +1696,13 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>無法進行動作: 超過一個以上的群組被選取.</translation>
+        <translation type="obsolete">無法進行動作: 超過一個以上的群組被選取.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1676,14 +1744,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>output::DewarpingView</name>
-    <message>
-        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
-        <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>output::FillZoneEditor</name>
     <message>
         <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
@@ -1702,42 +1762,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Black and White</source>
         <translation>單色(黑白)</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
         <source>Color / Grayscale</source>
         <translation>彩色 / 灰階</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Mixed</source>
         <translation>混合</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="413"/>
         <source>Apply Despeckling Level</source>
         <translation>套用雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="493"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
         <source>Auto</source>
         <translation type="unfinished">自動</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="676"/>
         <source>Manual</source>
         <translation type="unfinished">手動</translation>
     </message>
@@ -1745,37 +1805,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="495"/>
+        <location filename="../filters/output/Task.cpp" line="503"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>圖形範圍只能在混合模式中.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="547"/>
+        <location filename="../filters/output/Task.cpp" line="555"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>雜點清除無法在 彩色/灰階 模式中使用.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="572"/>
         <source>Output</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="565"/>
+        <location filename="../filters/output/Task.cpp" line="573"/>
         <source>Picture Zones</source>
         <translation>圖片區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="566"/>
+        <location filename="../filters/output/Task.cpp" line="574"/>
         <source>Fill Zones</source>
         <translation>填滿區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="567"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Despeckling</source>
         <translation>雜點清除</translation>
     </message>

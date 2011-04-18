@@ -45,6 +45,19 @@
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="149"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Marián Hvolka - Slovak
+Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
 Stefan Birkner - German
 Angelo Gemmi - Italian
 Masahiro Kitagawa - Japanese
@@ -61,7 +74,7 @@ Joseph Artsimovich - ロシア語
 Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <location filename="../ui/AboutDialog.ui" line="175"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -89,7 +102,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="168"/>
         <source>Contributors</source>
         <translation>貢献者</translation>
     </message>
@@ -104,19 +117,19 @@ Andrey Bergman - システム負荷調整
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="192"/>
         <source>Documentation</source>
         <translation>ドキュメント化</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="197"/>
+        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="224"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>License</source>
         <translation>ライセンス</translation>
     </message>
@@ -451,6 +464,11 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1544"/>
+        <source>%1 - Scan Tailor Plus %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Page Layout&quot;.</source>
         <translation type="obsolete">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
@@ -461,9 +479,8 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>名前なし</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1544"/>
         <source>%1 - Scan Tailor %2</source>
-        <translation>%1 - Scan Tailor %2</translation>
+        <translation type="obsolete">%1 - Scan Tailor %2</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1611"/>
@@ -1534,12 +1551,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="36"/>
+        <location filename="../SettingsDialog.cpp" line="51"/>
         <source>Compiled without OpenGL support.</source>
         <translation>OpenGL サポート無しでコンパイルされています。</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="41"/>
+        <location filename="../SettingsDialog.cpp" line="56"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>必要な機能をハードウェアやドライバが持っていません。</translation>
     </message>
@@ -1549,9 +1566,71 @@ p, li { white-space: pre-wrap; }
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="20"/>
+        <location filename="../ui/SettingsDialog.ui" line="24"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="30"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>ユーザインターフェースに 3D アクセラレーションを用いる</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="38"/>
+        <source>Output</source>
+        <translation type="unfinished">出力</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="44"/>
+        <source>Despeckling</source>
+        <translation type="unfinished">スペックル除去</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="68"/>
+        <location filename="../ui/SettingsDialog.ui" line="71"/>
+        <source>No despeckling</source>
+        <translation type="unfinished">スペックル除去なし</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="99"/>
+        <location filename="../ui/SettingsDialog.ui" line="102"/>
+        <location filename="../ui/SettingsDialog.ui" line="105"/>
+        <source>Cautious despeckling</source>
+        <translation type="unfinished">控えめなスペックル除去</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="134"/>
+        <location filename="../ui/SettingsDialog.ui" line="137"/>
+        <location filename="../ui/SettingsDialog.ui" line="140"/>
+        <source>Normal despeckling</source>
+        <translation type="unfinished">標準的なスペックル除去</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="166"/>
+        <location filename="../ui/SettingsDialog.ui" line="169"/>
+        <location filename="../ui/SettingsDialog.ui" line="172"/>
+        <source>Aggressive despeckling</source>
+        <translation type="unfinished">積極的なスペックル除去</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="216"/>
+        <source>Bitonal Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="233"/>
+        <source>Bitonal Compression:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="240"/>
+        <source>CCITT Group 4 Fax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="247"/>
+        <source>LZW</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1727,9 +1806,13 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>実行できません：複数のグループが選択されています。</translation>
+        <translation type="obsolete">実行できません：複数のグループが選択されています。</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1773,9 +1856,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::DewarpingView</name>
     <message>
-        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
         <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation>自動生成されたグリッドを変更する機能はまだ実装されていません。必要に応じて手動モードに切り替えてください。</translation>
+        <translation type="obsolete">自動生成されたグリッドを変更する機能はまだ実装されていません。必要に応じて手動モードに切り替えてください。</translation>
     </message>
 </context>
 <context>
@@ -1797,42 +1879,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Black and White</source>
         <translation>白黒</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
         <source>Color / Grayscale</source>
         <translation>カラー／グレースケール</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Mixed</source>
         <translation>ミックス</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="413"/>
         <source>Apply Despeckling Level</source>
         <translation>スペックル除去レベルを適用する</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="493"/>
         <source>Apply Depth Perception</source>
         <translation>遠近感を適用</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
         <source>Off</source>
         <translation>オフ</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="676"/>
         <source>Manual</source>
         <translation>手動</translation>
     </message>
@@ -1840,37 +1922,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="495"/>
+        <location filename="../filters/output/Task.cpp" line="503"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>画像領域はミックスモードでのみ有効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="547"/>
+        <location filename="../filters/output/Task.cpp" line="555"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>スペックル除去はカラー／グレースケールモードでは無効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="572"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="565"/>
+        <location filename="../filters/output/Task.cpp" line="573"/>
         <source>Picture Zones</source>
         <translation>画像領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="566"/>
+        <location filename="../filters/output/Task.cpp" line="574"/>
         <source>Fill Zones</source>
         <translation>塗り潰し領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="567"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Dewarping</source>
         <translation>歪み補正</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Despeckling</source>
         <translation>スペックル除去</translation>
     </message>

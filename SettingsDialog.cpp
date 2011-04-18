@@ -22,6 +22,7 @@
 #include "config.h"
 #include <QSettings>
 #include <QVariant>
+#include <QToolButton>
 
 SettingsDialog::SettingsDialog(QWidget* parent)
 :	QDialog(parent)
@@ -29,9 +30,21 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 	ui.setupUi(this);
 
 	QSettings settings;
-
-	ui.gfax4RadioButton->setChecked(settings.value("settings/bitonal_compress_g4fax", false).toBool());
-
+	// bitonal_compress_g4fax settings
+	ui.gfax4RadioButton->setChecked(settings.value("settings/output/bitonal_compress_g4fax", false).toBool());
+	// despeckling settings
+	QString despeckle = settings.value("settings/output/despeckling", "cautious").toString();
+	ui.despeckleCautiousBtn->setChecked(true);
+	if(despeckle=="off") {
+		ui.despeckleOffBtn->setChecked(true);
+	} else if(despeckle=="cautious") {
+		ui.despeckleCautiousBtn->setChecked(true);
+	} else if (despeckle=="normal") {
+		ui.despeckleNormalBtn->setChecked(true);
+	} else if(despeckle=="aggressive") {
+		ui.despeckleAggressiveBtn->setChecked(true);
+	}
+	
 #ifndef ENABLE_OPENGL
 	ui.use3DAcceleration->setChecked(false);
 	ui.use3DAcceleration->setEnabled(false);
@@ -62,5 +75,18 @@ SettingsDialog::commitChanges()
 #ifdef ENABLE_OPENGL
 	settings.setValue("settings/use_3d_acceleration", ui.use3DAcceleration->isChecked());
 #endif
-	settings.setValue("settings/bitonal_compress_g4fax", ui.gfax4RadioButton->isChecked());
+	// bitonal_compress_g4fax settings
+	settings.setValue("settings/output/bitonal_compress_g4fax", ui.gfax4RadioButton->isChecked());
+	// despeckling settings
+	QString despeckle = "cautious";
+	if(ui.despeckleOffBtn->isChecked()) {
+		despeckle = "off";
+	} else if(ui.despeckleCautiousBtn->isChecked()) {
+		despeckle = "cautious";
+	} else if(ui.despeckleNormalBtn->isChecked()) {
+		despeckle = "normal";
+	} else if(ui.despeckleAggressiveBtn->isChecked()) {
+		despeckle = "aggressive";
+	}
+	settings.setValue("settings/output/despeckling", despeckle);
 }

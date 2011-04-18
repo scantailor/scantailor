@@ -31,6 +31,8 @@
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include "config.h"
+#include "DespeckleLevel.h"
+
 #include <boost/foreach.hpp>
 #include <QtGlobal>
 #include <QVariant>
@@ -42,6 +44,7 @@
 #include <QSize>
 #include <Qt>
 #include <QDebug>
+#include <QSettings>
 
 namespace output
 {
@@ -51,11 +54,14 @@ OptionsWidget::OptionsWidget(
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(settings),
 	m_pageSelectionAccessor(page_selection_accessor),
-	m_despeckleLevel(DESPECKLE_NORMAL),
+//	m_despeckleLevel(DESPECKLE_NORMAL),
 	m_lastTab(TAB_OUTPUT),
 	m_ignoreThresholdChanges(0)
 {
 	setupUi(this);
+	
+	QSettings stngs;
+	m_despeckleLevel = despeckleLevelFromString(stngs.value("settings/output/despeckling", "cautious").toString());
 
 	depthPerceptionSlider->setMinimum(qRound(DepthPerception::minValue() * 10));
 	depthPerceptionSlider->setMaximum(qRound(DepthPerception::maxValue() * 10));

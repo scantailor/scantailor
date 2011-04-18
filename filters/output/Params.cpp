@@ -21,18 +21,23 @@
 #include "BlackWhiteOptions.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "DespeckleLevel.h"
+
 #include <QDomDocument>
 #include <QDomElement>
 #include <QByteArray>
 #include <QString>
+#include <QSettings>
 
 namespace output
 {
 
 Params::Params()
-:	m_dpi(600, 600),
-	m_despeckleLevel(DESPECKLE_CAUTIOUS)
+:	m_dpi(600, 600)/*,
+	m_despeckleLevel(DESPECKLE_CAUTIOUS)*/
 {
+	QSettings stngs;
+	m_despeckleLevel = despeckleLevelFromString(stngs.value("settings/output/despeckling", "cautious").toString());
 }
 
 Params::Params(QDomElement const& el)
