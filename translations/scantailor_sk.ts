@@ -1501,69 +1501,95 @@ Vyraďte ich z projektu.</translation>
         <translation>Používať 3D akceleráciu pre použivateľské rozhranie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="38"/>
+        <location filename="../ui/SettingsDialog.ui" line="51"/>
         <source>Output</source>
         <translation type="unfinished">Výstup</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="44"/>
+        <location filename="../ui/SettingsDialog.ui" line="57"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="80"/>
+        <source>Threshold Level Value (Min. Max):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/SettingsDialog.ui" line="87"/>
+        <source>±</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="201"/>
+        <source>Thinner</source>
+        <translation type="unfinished">Tenšie</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="233"/>
+        <source>Thicker</source>
+        <translation type="unfinished">Hrubšie</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="254"/>
         <source>Despeckling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="68"/>
-        <location filename="../ui/SettingsDialog.ui" line="71"/>
+        <location filename="../ui/SettingsDialog.ui" line="278"/>
+        <location filename="../ui/SettingsDialog.ui" line="281"/>
+        <location filename="../ui/SettingsDialog.ui" line="284"/>
         <source>No despeckling</source>
         <translation type="unfinished">Bez čistenia</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="99"/>
-        <location filename="../ui/SettingsDialog.ui" line="102"/>
-        <location filename="../ui/SettingsDialog.ui" line="105"/>
+        <location filename="../ui/SettingsDialog.ui" line="313"/>
+        <location filename="../ui/SettingsDialog.ui" line="316"/>
+        <location filename="../ui/SettingsDialog.ui" line="319"/>
         <source>Cautious despeckling</source>
         <translation type="unfinished">Opatrné čistenie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="134"/>
-        <location filename="../ui/SettingsDialog.ui" line="137"/>
-        <location filename="../ui/SettingsDialog.ui" line="140"/>
+        <location filename="../ui/SettingsDialog.ui" line="348"/>
+        <location filename="../ui/SettingsDialog.ui" line="351"/>
+        <location filename="../ui/SettingsDialog.ui" line="354"/>
         <source>Normal despeckling</source>
         <translation type="unfinished">Normálne čistenie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="166"/>
-        <location filename="../ui/SettingsDialog.ui" line="169"/>
-        <location filename="../ui/SettingsDialog.ui" line="172"/>
+        <location filename="../ui/SettingsDialog.ui" line="380"/>
+        <location filename="../ui/SettingsDialog.ui" line="383"/>
+        <location filename="../ui/SettingsDialog.ui" line="386"/>
         <source>Aggressive despeckling</source>
         <translation type="unfinished">Agresívne čistenie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="216"/>
+        <location filename="../ui/SettingsDialog.ui" line="430"/>
         <source>Bitonal Compression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="233"/>
+        <location filename="../ui/SettingsDialog.ui" line="447"/>
         <source>Bitonal Compression:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="240"/>
+        <location filename="../ui/SettingsDialog.ui" line="454"/>
         <source>CCITT Group 4 Fax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="247"/>
+        <location filename="../ui/SettingsDialog.ui" line="461"/>
         <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="51"/>
+        <location filename="../SettingsDialog.cpp" line="96"/>
         <source>Compiled without OpenGL support.</source>
         <translation>Skompilované bez podpory OpenGL.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="56"/>
+        <location filename="../SettingsDialog.cpp" line="101"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>Váš hardvér nemá potrebné vlastnosti.</translation>
     </message>
@@ -1799,27 +1825,27 @@ Vyraďte ich z projektu.</translation>
         <translation>Zmiešané</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="413"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="414"/>
         <source>Apply Despeckling Level</source>
         <translation>Použiť úroveň čistenia</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="493"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="494"/>
         <source>Apply Depth Perception</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="667"/>
         <source>Off</source>
         <translation>Vypnuté</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
         <source>Auto</source>
         <translation>Automaticky</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="676"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
         <source>Manual</source>
         <translation>Ručne</translation>
     </message>
@@ -1827,37 +1853,37 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="503"/>
+        <location filename="../filters/output/Task.cpp" line="505"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Zóny obrázkov sú možné len v zmiešanom móde.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="555"/>
+        <location filename="../filters/output/Task.cpp" line="557"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Čistenie nemožno použiť vo farebnom / šedom móde.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="572"/>
+        <location filename="../filters/output/Task.cpp" line="574"/>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="573"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Picture Zones</source>
         <translation>Zóny obrázkov</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="574"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Fill Zones</source>
         <translation>Prázdné zóny</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="575"/>
+        <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Dewarping</source>
         <translation>Deformácie</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="576"/>
+        <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Despeckling</source>
         <translation>Vyčistiť</translation>
     </message>
