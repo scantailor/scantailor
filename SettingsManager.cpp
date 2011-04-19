@@ -20,6 +20,8 @@
 #include <QString>
 
 SettingsManager::SettingsManager() :
+	m_thresholdLevelValue("settings/output/threshold_level_value"),
+	m_thresholdValue("settings/output/threshold_value"),
 	m_despeckling("settings/output/despeckling"),
 	m_bitonal_compress_g4fax("settings/output/bitonal_compress_g4fax"),
 	m_use_3d_acceleration("settings/use_3d_acceleration")
@@ -28,6 +30,31 @@ SettingsManager::SettingsManager() :
 
 SettingsManager::~SettingsManager()
 {
+}
+
+// threshold settings
+void
+SettingsManager::SetThresholdLevelValue (int value)
+{
+	setValue(m_thresholdLevelValue, value);
+}
+
+int
+SettingsManager::GetThresholdLevelValue()
+{
+	return value(m_thresholdLevelValue, 50).toInt();
+}
+
+void
+SettingsManager::SetThresholdValue (int value)
+{
+	setValue(m_thresholdValue, value);
+}
+
+int
+SettingsManager::GetThresholdValue()
+{
+	return value(m_thresholdValue, 0).toInt();
 }
 
 // despeckling settings

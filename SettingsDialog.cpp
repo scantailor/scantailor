@@ -21,9 +21,13 @@
 #include "OpenGLSupport.h"
 #include "config.h"
 #include "SettingsManager.h"
+#include "Utils.h"
 
 #include <QVariant>
 #include <QToolButton>
+#include <QToolTip>
+#include <QString>
+#include <QPoint>
 
 SettingsDialog::SettingsDialog(QWidget* parent)
 :	QDialog(parent)
@@ -31,8 +35,48 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 	ui.setupUi(this);
 
 	SettingsManager sm;
+	
+	// threshold settings
+	connect(
+		ui.thresholdLevelSpinBox, SIGNAL(valueChanged(int)),
+		this, SLOT(bwThresholdLevelChanged())
+	);
+	ui.darkerThresholdLink->setText(
+		Utils::richTextForLink(ui.darkerThresholdLink->text())
+	);
+	ui.lighterThresholdLink->setText(
+		Utils::richTextForLink(ui.lighterThresholdLink->text())
+	);
+	ui.thresholdSlider->setToolTip(QString::number(ui.thresholdSlider->value()));
+	ui.thresholdLabel->setText(QString::number(ui.thresholdSlider->value()));
+	connect(
+		ui.lighterThresholdLink, SIGNAL(linkActivated(QString const&)),
+		this, SLOT(setLighterThreshold())
+	);
+	connect(
+		ui.darkerThresholdLink, SIGNAL(linkActivated(QString const&)),
+		this, SLOT(setDarkerThreshold())
+	);
+	connect(
+		ui.neutralThresholdBtn, SIGNAL(clicked()),
+		this, SLOT(setNeutralThreshold())
+	);
+	connect(
+		ui.thresholdSlider, SIGNAL(valueChanged(int)),
+		this, SLOT(bwThresholdChanged())
+	);
+	connect(
+		ui.thresholdSlider, SIGNAL(sliderReleased()),
+		this, SLOT(bwThresholdChanged())
+	);
+	bwThresholdLevelChanged();
+	
+	ui.thresholdLevelSpinBox->setValue(sm.GetThresholdLevelValue());
+	ui.thresholdSlider->setValue(sm.GetThresholdValue());
+	
 	// bitonal_compress_g4fax settings
 	ui.gfax4RadioButton->setChecked(sm.GetCompressG4Fax());
+	
 	// despeckling settings
 	QString despeckle = sm.GetDespeckling();
 	ui.despeckleCautiousBtn->setChecked(true);
@@ -76,8 +120,14 @@ SettingsDialog::commitChanges()
 #ifdef ENABLE_OPENGL
 	sm.SetUse3dAcceleration(ui.use3DAcceleration->isChecked());
 #endif
+	
+	// threshold settings
+	sm.SetThresholdLevelValue(ui.thresholdLevelSpinBox->value());
+	sm.SetThresholdValue(ui.thresholdSlider->value());
+	
 	// bitonal_compress_g4fax settings
 	sm.SetCompressG4Fax(ui.gfax4RadioButton->isChecked());
+	
 	// despeckling settings
 	QString despeckle = "cautious";
 	if(ui.despeckleOffBtn->isChecked()) {
@@ -90,4 +140,54 @@ SettingsDialog::commitChanges()
 		despeckle = "aggressive";
 	}
 	sm.SetDespeckling(despeckle);
+}
+
+void
+SettingsDialog::setLighterThreshold()
+{
+	ui.thresholdSlider->setValue(ui.thresholdSlider->value() - 1);
+}
+
+void
+SettingsDialog::setDarkerThreshold()
+{
+	ui.thresholdSlider->setValue(ui.thresholdSlider->value() + 1);
+}
+
+void
+SettingsDialog::setNeutralThreshold()
+{
+	ui.thresholdSlider->setValue(0);
+}
+
+void
+SettingsDialog::bwThresholdChanged()
+{
+	int const value = ui.thresholdSlider->value();
+	QString const tooltip_text(QString::number(value));
+	ui.thresholdSlider->setToolTip(tooltip_text);
+	
+	ui.thresholdLabel->setText(QString::number(value));
+	
+	// Show the tooltip immediately.
+	QPoint const center(ui.thresholdSlider->rect().center());
+	QPoint tooltip_pos(ui.thresholdSlider->mapFromGlobal(QCursor::pos()));
+	tooltip_pos.setY(center.y());
+	tooltip_pos.setX(qBound(0, tooltip_pos.x(), ui.thresholdSlider->width()));
+	tooltip_pos = ui.thresholdSlider->mapToGlobal(tooltip_pos);
+	QToolTip::showText(tooltip_pos, tooltip_text, ui.thresholdSlider);
+	
+	if (ui.thresholdSlider->isSliderDown()) {
+		// Wait for it to be released.
+		// We could have just disabled tracking, but in that case we wouldn't
+		// be able to show tooltips with a precise value.
+		return;
+	}
+}
+
+void
+SettingsDialog::bwThresholdLevelChanged()
+{
+	ui.thresholdSlider->setMinimum(0-ui.thresholdLevelSpinBox->value());
+	ui.thresholdSlider->setMaximum(ui.thresholdLevelSpinBox->value());
 }

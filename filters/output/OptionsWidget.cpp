@@ -159,8 +159,9 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(depthPerceptionChangedSlot(int))
 	);
 	
-	thresholdSlider->setMinimum(-50);
-	thresholdSlider->setMaximum(50);
+	int tv = sm.GetThresholdLevelValue();
+	thresholdSlider->setMinimum(0-tv);
+	thresholdSlider->setMaximum(tv);
 	thresholLabel->setText(QString::number(thresholdSlider->value()));
 }
 

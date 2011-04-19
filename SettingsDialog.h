@@ -31,6 +31,11 @@ public:
 	virtual ~SettingsDialog();
 private slots:
 	void commitChanges();
+	void setLighterThreshold();
+	void setDarkerThreshold();
+	void setNeutralThreshold();
+	void bwThresholdChanged();
+	void bwThresholdLevelChanged();
 private:
 	Ui::SettingsDialog ui;
 };

@@ -31,6 +31,12 @@ public:
 	SettingsManager();
 	virtual ~SettingsManager();
 	
+	// threshold settings
+	void SetThresholdLevelValue(int);
+	int GetThresholdLevelValue();
+	void SetThresholdValue(int);
+	int GetThresholdValue();
+	
 	// despeckling settings
 	void SetDespeckling(const QString&);
 	QString GetDespeckling();
@@ -44,6 +50,8 @@ public:
 	bool GetUse3dAcceleration();
 	
 private:
+	QString m_thresholdLevelValue;
+	QString m_thresholdValue;
 	QString m_despeckling;
 	QString m_bitonal_compress_g4fax;
 	QString m_use_3d_acceleration;

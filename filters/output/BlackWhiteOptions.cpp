@@ -17,6 +17,8 @@
 */
 
 #include "BlackWhiteOptions.h"
+#include "SettingsManager.h"
+
 #include <QDomDocument>
 #include <QDomElement>
 #include <QString>
@@ -25,8 +27,10 @@ namespace output
 {
 
 BlackWhiteOptions::BlackWhiteOptions()
-:	m_thresholdAdjustment(0)
+//:	m_thresholdAdjustment(0)
 {
+	SettingsManager sm;
+	m_thresholdAdjustment = sm.GetThresholdValue();
 }
 
 BlackWhiteOptions::BlackWhiteOptions(QDomElement const& el)
