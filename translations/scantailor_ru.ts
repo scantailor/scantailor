@@ -1676,7 +1676,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/SettingsDialog.ui" line="24"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Основные</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="30"/>
@@ -1691,12 +1691,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/SettingsDialog.ui" line="57"/>
         <source>Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Порог бинаризации</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="80"/>
-        <source>Threshold Level Value (Min. Max):</source>
-        <translation type="unfinished"></translation>
+        <source>Threshold Level value (Min. Max):</source>
+        <translation type="unfinished">Значение порога бинаризации (Min. Max):</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/SettingsDialog.ui" line="87"/>
@@ -1749,12 +1749,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/SettingsDialog.ui" line="430"/>
         <source>Bitonal Compression</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сжатие черно/белых сканов</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="447"/>
         <source>Bitonal Compression:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Тип сжатия:</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="454"/>

@@ -1512,7 +1512,7 @@ Vyraďte ich z projektu.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="80"/>
-        <source>Threshold Level Value (Min. Max):</source>
+        <source>Threshold Level value (Min. Max):</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">

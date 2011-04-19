@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>519</width>
-    <height>429</height>
+    <height>374</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,7 +77,7 @@
                <item>
                 <widget class="QLabel" name="thresholdLevelLabel">
                  <property name="text">
-                  <string>Threshold Level Value (Min. Max):</string>
+                  <string>Threshold Level value (Min. Max):</string>
                  </property>
                 </widget>
                </item>

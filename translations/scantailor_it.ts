@@ -1577,7 +1577,7 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="80"/>
-        <source>Threshold Level Value (Min. Max):</source>
+        <source>Threshold Level value (Min. Max):</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
