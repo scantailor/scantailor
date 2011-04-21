@@ -1049,7 +1049,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
         <source>Aggressive despeckling</source>
-        <translation>Аггрессивное удаление пятен</translation>
+        <translation>Агрессивное удаление пятен</translation>
     </message>
     <message>
         <source>Colors</source>
