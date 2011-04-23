@@ -21,7 +21,9 @@ SET(
 	DynamicPool.h
 	NumericTraits.h
 	VecNT.h
+	VecT.h
 	MatMNT.h
+	MatT.h
 	PriorityQueue.h
 	Grid.h
 	ValueConv.h
