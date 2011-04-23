@@ -189,7 +189,7 @@ Mat<T>
 Mat<T>::trans() const
 {
 	if (cols == 1 || rows == 1) {
-		return *this;
+		return Mat<T>(alloc, data, cols, rows);
 	}
 
 	T* p_trans = alloc->allocT(cols * rows);
