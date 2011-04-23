@@ -29,6 +29,15 @@ SET(
 )
 SOURCE_GROUP("Sources\\Spline Fitting Framework" FILES ${SPFIT_SOURCES})
 
-ADD_LIBRARY(math STATIC ${GENERIC_SOURCES} ${SPFIT_SOURCES})
+SET(
+	ADIFF_SOURCES
+	adiff/references.txt
+	adiff/SparseMap.cpp adiff/SparseMap.h
+	adiff/Function.cpp adiff/Function.h
+)
+SOURCE_GROUP("Sources\\Differentiation Framework" FILES ${ADIFF_SOURCES})
+
+ADD_LIBRARY(math STATIC ${GENERIC_SOURCES} ${SPFIT_SOURCES} ${ADIFF_SOURCES})
 
 ADD_SUBDIRECTORY(spfit/tests)
+ADD_SUBDIRECTORY(adiff/tests)
