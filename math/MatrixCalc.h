@@ -24,6 +24,9 @@
 #include "DynamicPool.h"
 #include "LinearSolver.h"
 #include "MatMNT.h"
+#include "MatT.h"
+#include "VecNT.h"
+#include "VecT.h"
 #include <stddef.h>
 #include <assert.h>
 
@@ -121,6 +124,19 @@ public:
 	template<size_t M, size_t N>
 	mcalc::Mat<T> operator()(MatMNT<M, N, T> const& mat) {
 		return mcalc::Mat<T>(&m_alloc, mat.data(), mat.ROWS, mat.COLS);
+	}
+
+	mcalc::Mat<T> operator()(MatT<T> const& mat) {
+		return mcalc::Mat<T>(&m_alloc, mat.data(), mat.rows(), mat.cols());
+	}
+
+	template<size_t N>
+	mcalc::Mat<T> operator()(VecNT<N, T> const& vec) {
+		return mcalc::Mat<T>(&m_alloc, vec.data(), vec.SIZE, 1);
+	}
+
+	mcalc::Mat<T> operator()(VecT<T> const& vec) {
+		return mcalc::Mat<T>(&m_alloc, vec.data(), vec.size(), 1);
 	}
 private:
 	Alloc m_alloc;
