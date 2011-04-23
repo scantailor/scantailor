@@ -13,6 +13,8 @@ SET(
 	LineIntersectionScalar.cpp LineIntersectionScalar.h
 	LineBoundedByRect.cpp LineBoundedByRect.h
 	PolylineIntersector.cpp PolylineIntersector.h
+	LinearFunction.cpp LinearFunction.h
+	QuadraticFunction.cpp QuadraticFunction.h
 	XSpline.cpp XSpline.h
 )
 SOURCE_GROUP("Sources" FILES ${GENERIC_SOURCES})
