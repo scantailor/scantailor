@@ -135,6 +135,10 @@ public:
 
 	VecNT& operator/=(T scalar);
 
+	T const* data() const { return m_data; }
+
+	T* data() { return m_data; }
+
 	/**
 	 * \brief Sums elements in the vector.
 	 */
