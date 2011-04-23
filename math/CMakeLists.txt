@@ -23,9 +23,13 @@ SET(
 	SPFIT_SOURCES
 	spfit/references.txt
 	spfit/FittableSpline.h
+	spfit/FrenetFrame.cpp spfit/FrenetFrame.h
+	spfit/ConstraintSet.cpp spfit/ConstraintSet.h
 	spfit/SqDistApproximant.cpp spfit/SqDistApproximant.h
 	spfit/ModelShape.h
 	spfit/PolylineModelShape.cpp spfit/PolylineModelShape.h
+	spfit/LinearForceBalancer.cpp spfit/LinearForceBalancer.h
+	spfit/OptimizationResult.cpp spfit/OptimizationResult.h
 	spfit/Optimizer.cpp spfit/Optimizer.h
 	spfit/SplineFitter.cpp spfit/SplineFitter.h
 )

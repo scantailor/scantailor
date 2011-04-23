@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FITTABLE_SPLINE_H_
-#define FITTABLE_SPLINE_H_
+#ifndef SPFIT_FITTABLE_SPLINE_H_
+#define SPFIT_FITTABLE_SPLINE_H_
 
 #include "VirtualFunction.h"
 #include "NumericTraits.h"
@@ -73,7 +73,7 @@ public:
 		 */
 		double maxDistBetweenSamples;
 
-		SamplingParams(double max_dist_from_spline = 0.2,
+		explicit SamplingParams(double max_dist_from_spline = 0.2,
 			double max_dist_between_samples = NumericTraits<double>::max())
 		:	maxDistFromSpline(max_dist_from_spline),
 			maxDistBetweenSamples(max_dist_between_samples) {}
@@ -105,10 +105,14 @@ public:
 	 * -# Point on the spline.
 	 * -# t value corresponding to that point.
 	 * -# SampleFlags for the point.
+	 *
+	 * \note No matter the values of from_t and to_t, samples
+	 *       corresponding to them will be marked with HEAD_SAMPLE
+	 *       and TAIL_SAMPLE respectably.
 	 */
 	virtual void sample(
 		VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
-		SamplingParams const& params) const = 0;
+		SamplingParams const& params, double from_t = 0.0, double to_t = 1.0) const = 0;
 };
 
 DEFINE_FLAG_OPS(FittableSpline::SampleFlags)

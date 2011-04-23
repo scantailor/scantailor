@@ -19,42 +19,86 @@
 #ifndef SPFIT_OPTIMIZER_H_
 #define SPFIT_OPTIMIZER_H_
 
+#include "OptimizationResult.h"
 #include "FittableSpline.h"
 #include "SqDistApproximant.h"
 #include "VirtualFunction.h"
 #include "VecNT.h"
-#include <boost/multi_array.hpp>
+#include "MatT.h"
+#include "VecT.h"
+#include "LinearFunction.h"
+#include "QuadraticFunction.h"
 #include <vector>
+#include <list>
 
 namespace spfit
 {
 
 class Optimizer
 {
+	// Member-wise copying is OK.
 public:
-	Optimizer(int num_control_points);
+	Optimizer(size_t num_vars = 0);
 
-	void reset();
+	/**
+	 * Sets linear constraints in the form of b^T * x + c = 0
+	 * Note that x in the above formula is not a vector of coordinates
+	 * but a vector of their displacements.  That is, the constraints
+	 * to be passed here depend on the current positions of control points.
+	 * That doesn't mean you have to provide updated constraints
+	 * on very iteration though, as optimize() will update them for you.
+	 */
+	void setConstraints(std::list<LinearFunction> const& constraints);
 
-	void addSample(Vec2d const& spline_point,
-		std::vector<FittableSpline::LinearCoefficient> const& coeffs,
-		SqDistApproximant const& sqdist_approx);
+	void addExternalForce(QuadraticFunction const& force);
 
-	void optimize(VirtualFunction2<void, int, Vec2d>& displacement_vectors_sink);
+	void addExternalForce(QuadraticFunction const& force, std::vector<int> const& sparse_map);
 
-	double origTotalSqDist() const { return m_origTotalSqDist; }
+	void addInternalForce(QuadraticFunction const& force);
 
-	double optimizedTotalSqDist() const { return m_optimizedTotalSqDist; }
+	void addInternalForce(QuadraticFunction const& force, std::vector<int> const& sparse_map);
+
+	size_t numVars() const { return m_numVars; }
+
+	/**
+	 * Get the external force accumulated from calls to addAttractionForce().
+	 * Note that optimize() will reset all forces.
+	 */
+	double externalForce() const { return m_externalForce.c; }
+
+	/**
+	 * Get the internal force accumulated from calls to addInternalForce().
+	 * Note that optimize() will reset all forces.
+	 */
+	double internalForce() const { return m_internalForce.c; }
+
+	OptimizationResult optimize(double internal_external_ratio);
+
+	double const* displacementVector() const { return m_x.data(); }
+
+	/**
+	 * Rolls back the very last adjustment to constraints done by optimize()
+	 * and sets the displacement vector to all zeros.
+	 */
+	void undoLastStep();
+
+	void swap(Optimizer& other);
 private:
-	void matrixMakeSymmetric();
+	void adjustConstraints(double direction);
 
-	double m_origTotalSqDist;
-	double m_optimizedTotalSqDist;
-	boost::multi_array<double, 2> m_A;
-	std::vector<double> m_b;
-	int m_numControlPoints;
-	
+	size_t m_numVars;
+	MatT<double> m_A;
+	VecT<double> m_b;
+	VecT<double> m_x;
+	QuadraticFunction m_externalForce;
+	QuadraticFunction m_internalForce;
 };
+
+
+inline void swap(Optimizer& o1, Optimizer& o2)
+{
+	o1.swap(o2);
+}
 
 } // namespace spfit
 

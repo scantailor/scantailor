@@ -16,34 +16,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SPFIT_MODEL_SHAPE_H_
-#define SPFIT_MODEL_SHAPE_H_
-
-#include "SqDistApproximant.h"
-#include "FittableSpline.h"
-#include <QPointF>
+#include "FrenetFrame.h"
+#include <math.h>
 
 namespace spfit
 {
 
-/**
- * \brief A shape we are trying to fit a spline to.
- *
- * Could be a polyline or maybe a point cloud.
- */
-class ModelShape
+FrenetFrame::FrenetFrame(Vec2d const& origin, Vec2d const& tangent_vector, YAxisDirection ydir)
+: m_origin(origin)
 {
-public:
-	virtual ~ModelShape() {}
-
-	/**
-	 * Returns a function that approximates the squared distance to the model.
-	 * The function is only accurate in the neighbourhood of \p pt.
-	 */
-	virtual SqDistApproximant localSqDistApproximant(
-		QPointF const& pt, FittableSpline::SampleFlags flags) const = 0;
-};
+	double const sqlen = tangent_vector.squaredNorm();
+	if (sqlen > 1e-6) {
+		m_unitTangent = tangent_vector / sqrt(sqlen);	
+		if (ydir == Y_POINTS_UP) {
+			m_unitNormal[0] = -m_unitTangent[1];
+			m_unitNormal[1] = m_unitTangent[0];
+		} else {
+			m_unitNormal[0] = m_unitTangent[1];
+			m_unitNormal[1] = -m_unitTangent[0];
+		}
+	}
+}
 
 } // namespace spfit
-
-#endif

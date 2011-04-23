@@ -90,6 +90,7 @@ private:
 	struct TracedCurve;
 	struct RansacModel;
 	class RansacAlgo;
+	class BadCurve;
 
 	TracedCurve polylineToCurve(std::vector<QPointF> const& polyline) const;
 
@@ -97,16 +98,23 @@ private:
 
 	std::pair<QLineF, QLineF> frontBackBounds(std::vector<QPointF> const& polyline) const;
 
-	static bool trimFront(std::deque<QPointF>& polyline, QLineF const& bound);
+	static std::vector<QPointF> maybeTrimPolyline(
+		std::vector<QPointF> const& polyline, std::pair<QLineF, QLineF> const& bounds);
 
-	static bool trimBack(std::deque<QPointF>& polyline, QLineF const& bound);
+	static bool maybeTrimFront(std::deque<QPointF>& polyline, QLineF const& bound);
+
+	static bool maybeTrimBack(std::deque<QPointF>& polyline, QLineF const& bound);
 
 	static void intersectFront(std::deque<QPointF>& polyline, QLineF const& bound);
 
 	static void intersectBack(std::deque<QPointF>& polyline, QLineF const& bound);
 
 	static XSpline fitExtendedSpline(
-		std::vector<QPointF> const& polyline, std::pair<QLineF, QLineF> const& bounds);
+		std::vector<QPointF> const& polyline, Vec2d const& centroid,
+		std::pair<QLineF, QLineF> const& bounds);
+
+	QImage visualizeTrimmedPolylines(
+		QImage const& background, std::vector<TracedCurve> const& curves) const;
 
 	QImage visualizeModel(QImage const& background,
 		std::vector<TracedCurve> const& curves, RansacModel const& model) const;

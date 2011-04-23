@@ -16,32 +16,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SPFIT_MODEL_SHAPE_H_
-#define SPFIT_MODEL_SHAPE_H_
+#ifndef SPFIT_CONSTRAINT_SET_H_
+#define SPFIT_CONSTRAINT_SET_H_
 
-#include "SqDistApproximant.h"
-#include "FittableSpline.h"
+#include "LinearFunction.h"
 #include <QPointF>
+#include <QLineF>
+#include <list>
+#include <stddef.h>
 
 namespace spfit
 {
 
-/**
- * \brief A shape we are trying to fit a spline to.
- *
- * Could be a polyline or maybe a point cloud.
- */
-class ModelShape
-{
-public:
-	virtual ~ModelShape() {}
+class FittableSpline;
 
-	/**
-	 * Returns a function that approximates the squared distance to the model.
-	 * The function is only accurate in the neighbourhood of \p pt.
-	 */
-	virtual SqDistApproximant localSqDistApproximant(
-		QPointF const& pt, FittableSpline::SampleFlags flags) const = 0;
+class ConstraintSet
+{
+	// Member-wise copying is OK.
+public:
+	ConstraintSet(FittableSpline const* spline);
+
+	std::list<LinearFunction> const& constraints() const { return m_constraints; }
+
+	void constrainControlPoint(int cp_idx, QPointF const& pos);
+
+	void constrainControlPoint(int cp_idx, QLineF const& line);
+
+	void constrainSplinePoint(double t, QPointF const& pos);
+
+	void constrainSplinePoint(double t, QLineF const& line);
+private:
+	FittableSpline const* m_pSpline;
+	std::list<LinearFunction> m_constraints;	
 };
 
 } // namespace spfit

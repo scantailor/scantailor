@@ -16,34 +16,28 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SPFIT_MODEL_SHAPE_H_
-#define SPFIT_MODEL_SHAPE_H_
-
-#include "SqDistApproximant.h"
-#include "FittableSpline.h"
-#include <QPointF>
+#include "OptimizationResult.h"
+#include <limits>
+#include <algorithm>
 
 namespace spfit
 {
 
-/**
- * \brief A shape we are trying to fit a spline to.
- *
- * Could be a polyline or maybe a point cloud.
- */
-class ModelShape
+OptimizationResult::OptimizationResult(
+	double force_before, double force_after)
+:	m_forceBefore(std::max<double>(force_before, 0)),
+	m_forceAfter(std::max<double>(force_after, 0))
 {
-public:
-	virtual ~ModelShape() {}
+	// In theory, these distances can't be negative, but in practice they can.
+	// We are going to treat negative ones as they are zeros.
+}
 
-	/**
-	 * Returns a function that approximates the squared distance to the model.
-	 * The function is only accurate in the neighbourhood of \p pt.
-	 */
-	virtual SqDistApproximant localSqDistApproximant(
-		QPointF const& pt, FittableSpline::SampleFlags flags) const = 0;
-};
+double
+OptimizationResult::improvementPercentage() const
+{
+	double improvement = m_forceBefore - m_forceAfter;
+	improvement /= (m_forceBefore + std::numeric_limits<double>::epsilon());
+	return improvement * 100; // Convert to percents.
+}
 
 } // namespace spfit
-
-#endif
