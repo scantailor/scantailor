@@ -56,6 +56,7 @@ public:
 	ImageViewTab lastTab() const { return m_lastTab; }
 
 	DepthPerception const& depthPerception() const { return m_depthPerception; }
+	
 signals:
 	void despeckleLevelChanged(DespeckleLevel level, bool* handled);
 
@@ -64,6 +65,8 @@ public slots:
 	void tabChanged(ImageViewTab tab);
 
 	void distortionModelChanged(DistortionModel const& model);
+	
+	void setThresholdRange();
 private slots:
 	void changeDpiButtonClicked();
 	
@@ -118,6 +121,8 @@ private:
 	void updateColorsDisplay();
 
 	void updateDewarpingDisplay();
+	
+//	void setThresholdRange();
 	
 	IntrusivePtr<Settings> m_ptrSettings;
 	PageSelectionAccessor m_pageSelectionAccessor;

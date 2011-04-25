@@ -22,6 +22,7 @@
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
 #include "DespeckleLevel.h"
+#include "SettingsManager.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -36,8 +37,8 @@ Params::Params()
 :	m_dpi(600, 600)/*,
 	m_despeckleLevel(DESPECKLE_CAUTIOUS)*/
 {
-	QSettings stngs;
-	m_despeckleLevel = despeckleLevelFromString(stngs.value("settings/output/despeckling", "cautious").toString());
+	SettingsManager sm;
+	m_despeckleLevel = despeckleLevelFromString(sm.GetDespeckling());
 }
 
 Params::Params(QDomElement const& el)

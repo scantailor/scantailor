@@ -1529,90 +1529,101 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="30"/>
+        <location filename="../ui/SettingsDialog.ui" line="32"/>
+        <source>Autosave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="39"/>
+        <source>each</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="60"/>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="82"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Użyj akceleracji 3D do interfejsu użytkownika</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="51"/>
+        <location filename="../ui/SettingsDialog.ui" line="103"/>
         <source>Output</source>
         <translation type="unfinished">Wyjście</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="57"/>
+        <location filename="../ui/SettingsDialog.ui" line="109"/>
         <source>Threshold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="80"/>
-        <source>Threshold Level value (Min. Max):</source>
+        <location filename="../ui/SettingsDialog.ui" line="132"/>
+        <source>Threshold Range value:</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/SettingsDialog.ui" line="87"/>
+        <location filename="../ui/SettingsDialog.ui" line="139"/>
         <source>±</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="201"/>
+        <location filename="../ui/SettingsDialog.ui" line="253"/>
         <source>Thinner</source>
         <translation type="unfinished">cieńsze</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="233"/>
+        <location filename="../ui/SettingsDialog.ui" line="285"/>
         <source>Thicker</source>
         <translation type="unfinished">grubsze</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="254"/>
+        <location filename="../ui/SettingsDialog.ui" line="306"/>
         <source>Despeckling</source>
         <translation type="unfinished">Oczyszczanie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="278"/>
-        <location filename="../ui/SettingsDialog.ui" line="281"/>
-        <location filename="../ui/SettingsDialog.ui" line="284"/>
+        <location filename="../ui/SettingsDialog.ui" line="330"/>
+        <location filename="../ui/SettingsDialog.ui" line="333"/>
         <source>No despeckling</source>
         <translation type="unfinished">Bez oczyszczania</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="313"/>
-        <location filename="../ui/SettingsDialog.ui" line="316"/>
-        <location filename="../ui/SettingsDialog.ui" line="319"/>
+        <location filename="../ui/SettingsDialog.ui" line="365"/>
+        <location filename="../ui/SettingsDialog.ui" line="368"/>
         <source>Cautious despeckling</source>
         <translation type="unfinished">Ostrożne oczyszczanie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="348"/>
-        <location filename="../ui/SettingsDialog.ui" line="351"/>
-        <location filename="../ui/SettingsDialog.ui" line="354"/>
+        <location filename="../ui/SettingsDialog.ui" line="400"/>
+        <location filename="../ui/SettingsDialog.ui" line="403"/>
         <source>Normal despeckling</source>
         <translation type="unfinished">Normalne oczyszczanie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="380"/>
-        <location filename="../ui/SettingsDialog.ui" line="383"/>
-        <location filename="../ui/SettingsDialog.ui" line="386"/>
+        <location filename="../ui/SettingsDialog.ui" line="432"/>
+        <location filename="../ui/SettingsDialog.ui" line="435"/>
         <source>Aggressive despeckling</source>
         <translation type="unfinished">Agresywne oczyszczanie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="430"/>
+        <location filename="../ui/SettingsDialog.ui" line="482"/>
         <source>Bitonal Compression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="447"/>
+        <location filename="../ui/SettingsDialog.ui" line="499"/>
         <source>Bitonal Compression:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="454"/>
+        <location filename="../ui/SettingsDialog.ui" line="506"/>
         <source>CCITT Group 4 Fax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="461"/>
+        <location filename="../ui/SettingsDialog.ui" line="513"/>
         <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>

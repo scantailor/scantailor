@@ -58,7 +58,6 @@
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
 #include "math/CylindricalSurfaceDewarper.h"
-#include "../../SettingsManager.h"
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
@@ -126,7 +125,7 @@ Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
-	ImageViewTab const last_tab, bool const batch, bool const debug)
+	ImageViewTab const last_tab, bool const batch, bool const debug, bool const bitonal_g4fax)
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrThumbnailCache(thumbnail_cache),
@@ -134,7 +133,8 @@ Task::Task(IntrusivePtr<Filter> const& filter,
 	m_outFileNameGen(out_file_name_gen),
 	m_lastTab(last_tab),
 	m_batchProcessing(batch),
-	m_debug(debug)
+	m_debug(debug),
+	m_bitonal_g4fax(bitonal_g4fax)
 {
 	if (debug) {
 		m_ptrDbg.reset(new DebugImages);
@@ -150,9 +150,6 @@ Task::process(
 	TaskStatus const& status, FilterData const& data,
 	QPolygonF const& content_rect_phys, QPolygonF const& page_rect_phys)
 {
-	SettingsManager sm;
-	bool bitonal_g4fax = sm.GetCompressG4Fax();
-	
 	status.throwIfCancelled();
 	
 	Params params(m_ptrSettings->getParams(m_pageId));
@@ -327,7 +324,7 @@ Task::process(
 
 		bool invalidate_params = false;
 		
-		if (!TiffWriter::writeImage(out_file_path, out_img, bitonal_g4fax)) {
+		if (!TiffWriter::writeImage(out_file_path, out_img, m_bitonal_g4fax)) {
 			invalidate_params = true;
 		} else {
 			deleteMutuallyExclusiveOutputFiles();
@@ -336,14 +333,14 @@ Task::process(
 		if (write_automask) {
 			if (!QDir().mkpath(automask_dir)) {
 				invalidate_params = true;
-			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage(), bitonal_g4fax)) {
+			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage(), m_bitonal_g4fax)) {
 				invalidate_params = true;
 			}
 		}
 		if (write_speckles_file) {
 			if (!QDir().mkpath(speckles_dir)) {
 				invalidate_params = true;
-			} else if (!TiffWriter::writeImage(speckles_file_path, speckles_img.toQImage(), bitonal_g4fax)) {
+			} else if (!TiffWriter::writeImage(speckles_file_path, speckles_img.toQImage(), m_bitonal_g4fax)) {
 				invalidate_params = true;
 			}
 		}

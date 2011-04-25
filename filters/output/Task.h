@@ -57,7 +57,7 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
-		ImageViewTab last_tab, bool batch, bool debug);
+		ImageViewTab last_tab, bool batch, bool debug, bool const bitonal_g4fax);
 	
 	virtual ~Task();
 	
@@ -79,6 +79,7 @@ private:
 	ImageViewTab m_lastTab;
 	bool m_batchProcessing;
 	bool m_debug;
+	bool m_bitonal_g4fax;
 };
 
 } // namespace output

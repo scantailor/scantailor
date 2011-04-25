@@ -40,7 +40,7 @@ SettingsManager::SetThresholdLevelValue (int value)
 }
 
 int
-SettingsManager::GetThresholdLevelValue()
+SettingsManager::GetThresholdLevelValue() const
 {
 	return value(m_thresholdLevelValue, 50).toInt();
 }
@@ -52,7 +52,7 @@ SettingsManager::SetThresholdValue (int value)
 }
 
 int
-SettingsManager::GetThresholdValue()
+SettingsManager::GetThresholdValue() const
 {
 	return value(m_thresholdValue, 0).toInt();
 }
@@ -65,7 +65,7 @@ SettingsManager::SetDespeckling(const QString& despeckle)
 }
 
 QString
-SettingsManager::GetDespeckling()
+SettingsManager::GetDespeckling() const
 {
 	return value(m_despeckling, "cautious").toString();
 }
@@ -78,7 +78,7 @@ SettingsManager::SetCompressG4Fax(bool g4fax)
 }
 
 bool
-SettingsManager::GetCompressG4Fax()
+SettingsManager::GetCompressG4Fax() const
 {
 	return value(m_bitonal_compress_g4fax, false).toBool();
 }
@@ -91,7 +91,7 @@ SettingsManager::SetUse3dAcceleration(bool u3d)
 }
 
 bool
-SettingsManager::GetUse3dAcceleration()
+SettingsManager::GetUse3dAcceleration() const
 {
 	return value(m_use_3d_acceleration, false).toBool();
 }

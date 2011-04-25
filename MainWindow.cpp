@@ -56,7 +56,7 @@
 #include "ImageMetadataLoader.h"
 #include "OrthogonalRotation.h"
 #include "FixDpiSinglePageDialog.h"
-#include "SettingsDialog.h"
+//#include "SettingsDialog.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -83,6 +83,8 @@
 #include "ui_BatchProcessingLowerPanel.h"
 #include "config.h"
 #include "version.h"
+#include "SettingsManager.h"
+
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
@@ -1360,10 +1362,18 @@ MainWindow::closeProject()
 void
 MainWindow::openSettingsDialog()
 {
-	SettingsDialog* dialog = new SettingsDialog(this);
-	dialog->setAttribute(Qt::WA_DeleteOnClose);
-	dialog->setWindowModality(Qt::WindowModal);
-	dialog->show();
+	// SettingsDialog* dialog = new SettingsDialog(this);
+	// dialog->setAttribute(Qt::WA_DeleteOnClose);
+	// dialog->setWindowModality(Qt::WindowModal);
+	// dialog->show();
+	m_settingsDialog = new SettingsDialog(this);
+	connect(
+		m_settingsDialog, SIGNAL(updateUIThresholdSlider()),
+		this, SLOT(updateUIThresholdSlider())
+	);
+	m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
+	m_settingsDialog->setWindowModality(Qt::WindowModal);
+	m_settingsDialog->show();
 }
 
 void
@@ -1855,8 +1865,9 @@ MainWindow::createCompositeTask(
 	}
 
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
+		SettingsManager sm;
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
+			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug, sm.GetCompressG4Fax()
 		);
 		debug = false;
 	}
@@ -1946,5 +1957,16 @@ MainWindow::updateDisambiguationRecords(PageSequence const& pages)
 	int const count = pages.numPages();
 	for (int i = 0; i < count; ++i) {
 		m_outFileNameGen.disambiguator()->registerFile(pages.pageAt(i).imageId().filePath());
+	}
+}
+
+void
+MainWindow::updateUIThresholdSlider()
+{
+	if(filterList->selectedRow()==5) {
+		//output::OptionsWidget* const opt_widget = m_ptrStages->outputFilter()->optionsWidget();
+		//opt_widget->setThresholdRange();
+		// Start loading / processing the current page.
+		updateMainArea();
 	}
 }

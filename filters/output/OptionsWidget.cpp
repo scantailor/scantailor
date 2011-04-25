@@ -159,9 +159,7 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(depthPerceptionChangedSlot(int))
 	);
 	
-	int tv = sm.GetThresholdLevelValue();
-	thresholdSlider->setMinimum(0-tv);
-	thresholdSlider->setMaximum(tv);
+	setThresholdRange();
 	thresholLabel->setText(QString::number(thresholdSlider->value()));
 }
 
@@ -172,6 +170,8 @@ OptionsWidget::~OptionsWidget()
 void
 OptionsWidget::preUpdateUI(PageId const& page_id)
 {
+	setThresholdRange();
+
 	Params const params(m_ptrSettings->getParams(page_id));
 	m_pageId = page_id;
 	m_outputDpi = params.outputDpi();
@@ -677,6 +677,15 @@ OptionsWidget::updateDewarpingDisplay()
 	depthPerceptionSlider->blockSignals(true);
 	depthPerceptionSlider->setValue(qRound(m_depthPerception.value() * 10));
 	depthPerceptionSlider->blockSignals(false);
+}
+
+void
+OptionsWidget::setThresholdRange()
+{
+	SettingsManager sm;
+	int tv = sm.GetThresholdLevelValue();
+	thresholdSlider->setMinimum(-tv);
+	thresholdSlider->setMaximum(tv);
 }
 
 } // namespace output

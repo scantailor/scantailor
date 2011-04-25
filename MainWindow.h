@@ -32,6 +32,9 @@
 #include "PageRange.h"
 #include "SelectedPage.h"
 #include "BeforeOrAfter.h"
+
+#include "SettingsDialog.h"
+
 #include <boost/function.hpp>
 #include <QMainWindow>
 #include <QString>
@@ -155,6 +158,8 @@ private slots:
 	void openSettingsDialog();
 
 	void showAboutDialog();
+	
+	void updateUIThresholdSlider();
 private:
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
@@ -278,6 +283,8 @@ private:
 	bool m_debug;
 	bool m_closing;
 	bool m_beepOnBatchProcessingCompletion;
+	
+	SettingsDialog* m_settingsDialog;
 };
 
 #endif

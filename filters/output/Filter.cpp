@@ -171,13 +171,13 @@ Filter::createTask(
 	PageId const& page_id,
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	OutputFileNameGenerator const& out_file_name_gen,
-	bool const batch, bool const debug)
+	bool const batch, bool const debug, bool const bitonal_g4fax)
 {
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
 			thumbnail_cache, page_id, out_file_name_gen,
-			m_ptrOptionsWidget->lastTab(), batch, debug
+			m_ptrOptionsWidget->lastTab(), batch, debug, bitonal_g4fax
 		)
 	);
 }

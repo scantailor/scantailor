@@ -33,21 +33,21 @@ public:
 	
 	// threshold settings
 	void SetThresholdLevelValue(int);
-	int GetThresholdLevelValue();
+	int GetThresholdLevelValue() const;
 	void SetThresholdValue(int);
-	int GetThresholdValue();
+	int GetThresholdValue() const;
 	
 	// despeckling settings
 	void SetDespeckling(const QString&);
-	QString GetDespeckling();
+	QString GetDespeckling() const;
 	
 	// bitonal_compress_g4fax settings
 	void SetCompressG4Fax(bool);
-	bool GetCompressG4Fax();
+	bool GetCompressG4Fax() const;
 	
 	// use_3d_acceleration settings
 	void SetUse3dAcceleration(bool);
-	bool GetUse3dAcceleration();
+	bool GetUse3dAcceleration() const;
 	
 private:
 	QString m_thresholdLevelValue;

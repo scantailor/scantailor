@@ -122,6 +122,7 @@ SettingsDialog::commitChanges()
 #endif
 	
 	// threshold settings
+	int range = sm.GetThresholdLevelValue();
 	sm.SetThresholdLevelValue(ui.thresholdLevelSpinBox->value());
 	sm.SetThresholdValue(ui.thresholdSlider->value());
 	
@@ -140,6 +141,10 @@ SettingsDialog::commitChanges()
 		despeckle = "aggressive";
 	}
 	sm.SetDespeckling(despeckle);
+	
+	if(ui.thresholdLevelSpinBox->value()!=range) {
+		updateUIThresholdSlider();
+	}
 }
 
 void
@@ -188,6 +193,6 @@ SettingsDialog::bwThresholdChanged()
 void
 SettingsDialog::bwThresholdLevelChanged()
 {
-	ui.thresholdSlider->setMinimum(0-ui.thresholdLevelSpinBox->value());
+	ui.thresholdSlider->setMinimum(-ui.thresholdLevelSpinBox->value());
 	ui.thresholdSlider->setMaximum(ui.thresholdLevelSpinBox->value());
 }

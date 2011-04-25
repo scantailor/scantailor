@@ -37,6 +37,7 @@ public:
 	void setStages(IntrusivePtr<StageSequence> const& stages);
 	
 	virtual QSize sizeHint() const { return m_sizeHint; }
+	int selectedRow() const;
 signals:
 	void launchBatchProcessing();
 public slots:
@@ -66,7 +67,7 @@ private:
 	
 	void updateRowSpans();
 	
-	int selectedRow() const;
+//	int selectedRow() const;
 	
 	QSize m_sizeHint;
 	Model* m_pModel;

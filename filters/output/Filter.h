@@ -66,7 +66,7 @@ public:
 		PageId const& page_id,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		OutputFileNameGenerator const& out_file_name_gen,
-		bool batch, bool debug);
+		bool batch, bool debug, bool const bitonal_g4fax);
 	
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
 		OutputFileNameGenerator const& out_file_name_gen);

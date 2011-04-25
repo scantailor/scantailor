@@ -29,6 +29,9 @@ public:
 	SettingsDialog(QWidget* parent = 0);
 	
 	virtual ~SettingsDialog();
+signals:
+	void updateUIThresholdSlider();
+	
 private slots:
 	void commitChanges();
 	void setLighterThreshold();
