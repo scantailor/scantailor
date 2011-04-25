@@ -20,6 +20,8 @@
 #include <QString>
 
 SettingsManager::SettingsManager() :
+	m_AutoSave("settings/general/autosave"),
+	m_AutoSaveValue("settings/general/autosave_value"),
 	m_thresholdLevelValue("settings/output/threshold_level_value"),
 	m_thresholdValue("settings/output/threshold_value"),
 	m_despeckling("settings/output/despeckling"),
@@ -30,6 +32,31 @@ SettingsManager::SettingsManager() :
 
 SettingsManager::~SettingsManager()
 {
+}
+
+// autosave settings
+void
+SettingsManager::SetAutoSave (bool as)
+{
+	setValue(m_AutoSave, as);
+}
+
+bool
+SettingsManager::GetAutoSave() const
+{
+	return value(m_AutoSave, false).toBool();
+}
+
+void
+SettingsManager::SetAutoSaveValue (int value)
+{
+	setValue(m_AutoSaveValue, value);
+}
+
+int
+SettingsManager::GetAutoSaveValue() const
+{
+	return value(m_AutoSaveValue, 5).toInt();
 }
 
 // threshold settings

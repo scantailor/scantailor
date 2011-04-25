@@ -33,8 +33,13 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 :	QDialog(parent)
 {
 	ui.setupUi(this);
+	ui.autosaveSpinBox->setEnabled(false);
 
 	SettingsManager sm;
+	
+	// autosave settings
+	ui.autosaveCheckBox->setChecked(sm.GetAutoSave());
+	ui.autosaveSpinBox->setValue(sm.GetAutoSaveValue());
 	
 	// threshold settings
 	connect(
@@ -120,6 +125,10 @@ SettingsDialog::commitChanges()
 #ifdef ENABLE_OPENGL
 	sm.SetUse3dAcceleration(ui.use3DAcceleration->isChecked());
 #endif
+	
+	// autosave settings
+	sm.SetAutoSave(ui.autosaveCheckBox->isChecked());
+	sm.SetAutoSaveValue(ui.autosaveSpinBox->value());
 	
 	// threshold settings
 	int range = sm.GetThresholdLevelValue();

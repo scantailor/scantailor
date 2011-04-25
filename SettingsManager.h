@@ -31,6 +31,12 @@ public:
 	SettingsManager();
 	virtual ~SettingsManager();
 	
+	// autosave settings
+	void SetAutoSave(bool);
+	bool GetAutoSave() const;
+	void SetAutoSaveValue(int);
+	int GetAutoSaveValue() const;
+	
 	// threshold settings
 	void SetThresholdLevelValue(int);
 	int GetThresholdLevelValue() const;
@@ -50,6 +56,8 @@ public:
 	bool GetUse3dAcceleration() const;
 	
 private:
+	QString m_AutoSave;
+	QString m_AutoSaveValue;
 	QString m_thresholdLevelValue;
 	QString m_thresholdValue;
 	QString m_despeckling;

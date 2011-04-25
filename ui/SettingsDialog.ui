@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settingsTabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -41,16 +41,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QTimeEdit" name="autosaveTimeEdit">
-           <property name="currentSection">
-            <enum>QDateTimeEdit::MinuteSection</enum>
+          <widget class="QSpinBox" name="autosaveSpinBox">
+           <property name="readOnly">
+            <bool>false</bool>
            </property>
-           <property name="time">
-            <time>
-             <hour>0</hour>
-             <minute>5</minute>
-             <second>0</second>
-            </time>
+           <property name="value">
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -603,6 +599,22 @@
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>autosaveCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>autosaveSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>55</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>148</x>
+     <y>49</y>
     </hint>
    </hints>
   </connection>
