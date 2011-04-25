@@ -43,6 +43,9 @@
 
 using namespace imageproc;
 
+namespace dewarping
+{
+
 namespace
 {
 
@@ -180,7 +183,7 @@ SequentialColumnProcessor::process(int x, VertRange const& range)
 	// Our current choice is not to, as it's bad for cases when the title or some
 	// other decorative element is the widest element on the page and doesn't have
 	// a counterpart on the other side (top / bottom).
-#define ENFORCE_CONVEXITY 0
+#define ENFORCE_CONVEXITY 1
 
 	if (m_path.empty()) {
 		m_leadingTop = QPoint(x, range.top);
@@ -485,3 +488,5 @@ std::pair<QLineF, QLineF> detectVertContentBounds(
 
 	return bounds;
 }
+
+} // namespace dewarping

@@ -28,9 +28,6 @@
 #include <math.h>
 #include <assert.h>
 
-namespace imageproc
-{
-
 struct XSpline::TensionDerivedParams
 {
 	static double const t0;
@@ -185,7 +182,7 @@ XSpline::pointAtImpl(int segment, double t) const
 
 void
 XSpline::sample(
-	VirtualFunction2<void, QPointF, double>& sink, SamplingParams const& params) const
+	VirtualFunction3<void, QPointF, double, SampleFlags>& sink, SamplingParams const& params) const
 {
 	if (m_controlPoints.empty()) {
 		return;
@@ -202,7 +199,7 @@ XSpline::sample(
 	}
 
 	QPointF next_pt(pointAtImpl(0, 0.0));
-	sink(next_pt, 0.0);
+	sink(next_pt, 0.0, HEAD_SAMPLE);
 	
 	int const num_segments = numSegments();
 	if (num_segments == 0) {
@@ -220,13 +217,15 @@ XSpline::sample(
 			sink, max_sqdist_to_spline, max_sqdist_between_samples,
 			r_num_segments, segment, prev_t, prev_pt, next_t, next_pt
 		);
-		sink(next_pt, (segment + next_t) * r_num_segments);
+
+		SampleFlags flags = segment + 1 < num_segments ? JUNCTION_SAMPLE : TAIL_SAMPLE;
+		sink(next_pt, (segment + 1) * r_num_segments, flags);
 	}
 }
 
 void
 XSpline::maybeAddMoreSamples(
-	VirtualFunction2<void, QPointF, double>& sink,
+	VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
 	double max_sqdist_to_spline, double max_sqdist_between_samples,
 	double r_num_segments, int segment,
 	double prev_t, QPointF const& prev_pt,
@@ -251,7 +250,7 @@ XSpline::maybeAddMoreSamples(
 		r_num_segments, segment, prev_t, prev_pt, mid_t, mid_pt
 	);
 
-	sink(mid_pt, (segment + mid_t) * r_num_segments);
+	sink(mid_pt, (segment + mid_t) * r_num_segments, DEFAULT_SAMPLE);
 	
 	maybeAddMoreSamples(
 		sink, max_sqdist_to_spline, max_sqdist_between_samples,
@@ -385,34 +384,43 @@ XSpline::pointAndDtsAtImpl(int segment, double t) const
 
 	TensionDerivedParams const tdp(pts[1].tension, pts[2].tension);
 
+	// Note that we don't want the derivate with respect to t that's
+	// passed to us (ranging from 0 to 1 within a segment).
+	// Rather we want it with respect to the t that's passed to
+	// pointAndDerivsAt(), ranging from 0 to 1 across all segments.
+	// Let's call the latter capital T.  Their relationship is:
+	// t = T*num_segments - C
+	// dt/dT = num_segments
+	double const dtdT = numSegments();
+
 	Vec4d A;
-	Vec4d dA; // First derivatives with respect to t.
-	Vec4d ddA; // Second derivatives with respect to t.
+	Vec4d dA; // First derivatives with respect to T.
+	Vec4d ddA; // Second derivatives with respect to T.
 
 	// Control point 0.
 	{
 		// u = (t - tdp.T0p) / (tdp.t0 - tdp.T0p)
 		double const ta = 1.0 / (tdp.t0 - tdp.T0p);
 		double const tb = -tdp.T0p * ta;
-		double const u = ta * t + tb;
-		
+		double const u = ta * t + tb;		
 		if (t <= tdp.T0p) {
-			// u(t) = ta * t + tb
+			// u(t) = ta * tt + tb
 			// u'(t) = ta
 			// g(t) = g(u(t), <tension derived params>)
-			// g'(t) = g'(u(t)) * u'(t)
-			// g'(t) = g'(u(t)) * ta
-			// g"(t) = g"(u(t)) * u'(t) * ta
-			// g"(t) = g"(u(t)) * ta * ta
 			GBlendFunc g(tdp.q[0], tdp.p[0]);
 			A[0] = g.value(u);
-			dA[0] = g.firstDerivative(u) * ta;
-			ddA[0] = g.secondDerivative(u) * ta * ta;
+
+			// g'(u(t(T))) = g'(u)*u'(t)*t'(T)
+			dA[0] = g.firstDerivative(u) * (ta * dtdT);
+
+			// Note that u'(t) and t'(T) are constant functions.
+			// g"(u(t(T))) = g"(u)*u'(t)*t'(T)*u'(t)*t'(T)
+			ddA[0] = g.secondDerivative(u) * (ta * dtdT) * (ta * dtdT);
 		} else {
 			HBlendFunc h(tdp.q[0]);
 			A[0] = h.value(u);
-			dA[0] = h.firstDerivative(u) * ta;
-			ddA[0] = h.secondDerivative(u) * ta * ta;
+			dA[0] = h.firstDerivative(u) * (ta * dtdT);
+			ddA[0] = h.secondDerivative(u) * (ta * dtdT) * (ta * dtdT);
 		}
 	}
 
@@ -424,8 +432,8 @@ XSpline::pointAndDtsAtImpl(int segment, double t) const
 		double const u = ta * t + tb;
 		GBlendFunc g(tdp.q[1], tdp.p[1]);
 		A[1] = g.value(u);
-		dA[1] = g.firstDerivative(u) * ta;
-		ddA[1] = g.secondDerivative(u) * ta * ta;
+		dA[1] = g.firstDerivative(u) * (ta * dtdT);
+		ddA[1] = g.secondDerivative(u) * (ta * dtdT) * (ta * dtdT);
 	}
 
 	// Control point 2.
@@ -436,8 +444,8 @@ XSpline::pointAndDtsAtImpl(int segment, double t) const
 		double const u = ta * t + tb;
 		GBlendFunc g(tdp.q[2], tdp.p[2]);
 		A[2] = g.value(u);
-		dA[2] = g.firstDerivative(u) * ta;
-		ddA[2] = g.secondDerivative(u) * ta * ta;
+		dA[2] = g.firstDerivative(u) * (ta * dtdT);
+		ddA[2] = g.secondDerivative(u) * (ta * dtdT) * (ta * dtdT);
 	}
 
 	// Control point 3.
@@ -449,13 +457,13 @@ XSpline::pointAndDtsAtImpl(int segment, double t) const
 		if (t >= tdp.T3m) {
 			GBlendFunc g(tdp.q[3], tdp.p[3]);
 			A[3] = g.value(u);
-			dA[3] = g.firstDerivative(u) * ta;
-			ddA[3] = g.secondDerivative(u) * ta * ta;
+			dA[3] = g.firstDerivative(u) * (ta * dtdT);
+			ddA[3] = g.secondDerivative(u) * (ta * dtdT) * (ta * dtdT);
 		} else {
 			HBlendFunc h(tdp.q[3]);
 			A[3] = h.value(u);
-			dA[3] = h.firstDerivative(u) * ta;
-			ddA[3] = h.secondDerivative(u) * ta * ta;
+			dA[3] = h.firstDerivative(u) * (ta * dtdT);
+			ddA[3] = h.secondDerivative(u) * (ta * dtdT) * (ta * dtdT);
 		}
 	}
 	
@@ -500,6 +508,7 @@ XSpline::pointAndDtsAtImpl(int segment, double t) const
 		pd.secondDeriv += pts[i].pos * dd3;
 	}
 
+	pd.point /= sum;
 	pd.firstDeriv /= sum * sum;
 	pd.secondDeriv /= sum * sum * sum * sum;
 #endif
@@ -587,11 +596,11 @@ XSpline::pointClosestTo(QPointF const to, double accuracy) const
 std::vector<QPointF>
 XSpline::toPolyline(SamplingParams const& params) const
 {
-	struct Sink : public VirtualFunction2<void, QPointF, double>
+	struct Sink : public VirtualFunction3<void, QPointF, double, SampleFlags>
 	{
 		std::vector<QPointF> polyline;
 
-		virtual void operator()(QPointF pt, double) {
+		virtual void operator()(QPointF pt, double, SampleFlags) {
 			polyline.push_back(pt);
 		}
 	};
@@ -754,6 +763,4 @@ XSpline::PointAndDerivs::curvature() const
 	double curvature = firstDeriv.x()*secondDeriv.y() - firstDeriv.y()*secondDeriv.x();
 	curvature /= pow(firstDeriv.x()*firstDeriv.x() + firstDeriv.y()*firstDeriv.y(), 1.5);
 	return curvature;
-};
-
-} // namespace imageproc
+}

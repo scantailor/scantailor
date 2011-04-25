@@ -32,7 +32,7 @@ class SplineFitter
 {
 	DECLARE_NON_COPYABLE(SplineFitter)
 public:
-	SplineFitter(FittableSpline* spline, ModelShape* model_shape,
+	SplineFitter(FittableSpline* spline, ModelShape const* model_shape,
 		boost::dynamic_bitset<> const* fixed_control_points = 0);
 
 	void setSamplingParams(FittableSpline::SamplingParams const& params) {
@@ -53,7 +53,7 @@ private:
 	int numReducedControlPoints() const { return m_toOrigControlPoints.size(); }
 
 	FittableSpline* m_pSpline;
-	ModelShape* m_pModelShape;
+	ModelShape const* m_pModelShape;
 	FittableSpline::SamplingParams m_samplingParams;
 	std::vector<int> m_toReducedControlPoints;
 	std::vector<int> m_toOrigControlPoints;

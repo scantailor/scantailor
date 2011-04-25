@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEXT_LINE_TRACER3_H_
-#define TEXT_LINE_TRACER3_H_
+#ifndef DEWARPING_TEXT_LINE_TRACER3_H_
+#define DEWARPING_TEXT_LINE_TRACER3_H_
 
 #include "Grid.h"
 #include <QPoint>
@@ -46,12 +46,17 @@ namespace imageproc
 	class ConnectivityMap;
 }
 
+namespace dewarping
+{
+
+class DistortionModelBuilder;
+
 class TextLineTracer
 {
 public:
-	static std::list<std::vector<QPointF> > trace(
+	static void trace(
 		imageproc::GrayImage const& input, Dpi const& dpi,
-		QRect const& content_rect,
+		QRect const& content_rect, DistortionModelBuilder& output,
 		TaskStatus const& status, DebugImages* dbg = 0);
 private:
 	class CentroidCalculator;
@@ -63,9 +68,6 @@ private:
 	struct EdgeConnection;
 	struct EdgeNode;
 	class ShortestPathQueue;
-	struct TracedCurve;
-	struct RansacModel;
-	class RansacAlgo;
 
 	typedef uint32_t RegionIdx;
 	typedef uint32_t EdgeNodeIdx;
@@ -102,6 +104,10 @@ private:
 
 	static RegionIdx findConnectingRegion(Edge const& edge1, Edge const& edge2);
 
+	static void extendTowardsVerticalBounds(std::deque<QPointF>& polyline,
+		std::pair<QLineF, QLineF> vert_bounds, imageproc::BinaryImage const& content,
+		imageproc::GrayImage const& blurred, imageproc::BinaryImage const& thick_mask);
+
 	static bool isCurvatureConsistent(std::vector<QPointF> const& polyline);
 
 	static bool isInsideBounds(
@@ -111,41 +117,6 @@ private:
 		QLineF const& left_bound, QLineF const& right_bound);
 
 	static void filterEdgyCurves(std::list<std::vector<QPointF> >& polylines);
-
-	static void pickRepresentativeLines(std::list<std::vector<QPointF> >& polylines,
-		QRectF const& image_rect, QLineF const& left_bound, QLineF const& right_bound);
-
-	static void makeLeftToRight(std::vector<QPointF>& polyline);
-
-	static void extendOrTrimPolyline(
-		std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const right_bound,
-		imageproc::BinaryImage const& content, imageproc::GrayImage const& blurred,
-		imageproc::BinaryImage const& thick_mask);
-
-	static bool trimFront(std::deque<QPointF>& polyline, QLineF const& bound);
-
-	static bool trimBack(std::deque<QPointF>& polyline, QLineF const& bound);
-
-	static void growFront(
-		std::deque<QPointF>& polyline, QLineF const& bound,
-		imageproc::BinaryImage const& content,
-		imageproc::GrayImage const& blurred,
-		imageproc::BinaryImage const& thick_mask);
-
-	static void growBack(
-		std::deque<QPointF>& polyline, QLineF const& bound,
-		imageproc::BinaryImage const& content,
-		imageproc::GrayImage const& blurred,
-		imageproc::BinaryImage const& thick_mask);
-
-	static void intersectFront(
-		std::deque<QPointF>& polyline, QLineF const& bound);
-
-	static void intersectBack(
-		std::deque<QPointF>& polyline, QLineF const& bound);
-
-	static void intersectWithVerticalBoundaries(
-		std::vector<QPointF>& polylines, QLineF const& left_bound, QLineF const& right_bound);
 
 	static void sanitizeBinaryImage(imageproc::BinaryImage& image, QRect const& content_rect);
 
@@ -157,11 +128,8 @@ private:
 	static QImage visualizePolylines(
 		QImage const& background, std::list<std::vector<QPointF> > const& polylines,
 		std::pair<QLineF, QLineF> const* vert_bounds = 0);
-
-	static QImage visualizeExtendedPolylines(
-		QImage const& blurred, imageproc::BinaryImage const&  thick_mask,
-		std::list<std::vector<QPointF> > const& polylines,
-		QLineF const& left_bound, QLineF const& right_bound);
 };
+
+} // namespace dewarping
 
 #endif

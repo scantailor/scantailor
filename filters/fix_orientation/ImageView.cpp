@@ -29,7 +29,7 @@ ImageView::ImageView(
 	ImageTransformation const& xform)
 :	ImageViewBase(
 		image, downscaled_image,
-		ImagePresentation(xform.transform(), xform.resultingCropArea())
+		ImagePresentation(xform.transform(), xform.resultingPreCropArea())
 	),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
@@ -53,7 +53,7 @@ ImageView::setPreRotation(OrthogonalRotation const rotation)
 	m_xform.setPreRotation(rotation);
 
 	// This should call update() by itself.
-	updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingCropArea()));
+	updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
 }
 
 } // namespace fix_orientation

@@ -20,6 +20,7 @@
 #define SPFIT_MODEL_SHAPE_H_
 
 #include "SqDistApproximant.h"
+#include "FittableSpline.h"
 #include <QPointF>
 #include <QRectF>
 
@@ -34,8 +35,6 @@ namespace spfit
 class ModelShape
 {
 public:
-	enum Flags { SPLINE_HEAD = 1 << 0, SPLINE_TAIL = 1 << 1 };
-
 	virtual ~ModelShape() {}
 
 	virtual QRectF boundingBox() const = 0;
@@ -44,7 +43,8 @@ public:
 	 * Returns a function that approximates the squared distance to the model.
 	 * The function is only accurate in the neighbourhood of \p pt.
 	 */
-	virtual SqDistApproximant localSqDistApproximant(QPointF const& pt, int flags = 0) const = 0;
+	virtual SqDistApproximant localSqDistApproximant(
+		QPointF const& pt, FittableSpline::SampleFlags flags) const = 0;
 };
 
 } // namespace spfit

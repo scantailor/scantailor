@@ -46,7 +46,7 @@ class IntegralImage
 public:
 	IntegralImage(int width, int height);
 	
-	IntegralImage(QSize const& size);
+	explicit IntegralImage(QSize const& size);
 	
 	~IntegralImage();
 	

@@ -33,6 +33,9 @@
 #include <Qt>
 #include <string.h>
 
+#include "CommandLine.h"
+
+
 #ifdef Q_WS_WIN
 // Import static plugins
 Q_IMPORT_PLUGIN(qjpeg)
@@ -121,6 +124,7 @@ static bool crashCallback(wchar_t const* dump_path,
 
 #endif // ENABLE_CRASH_REPORTER
 
+
 int main(int argc, char** argv)
 {
 #ifdef ENABLE_CRASH_REPORTER
@@ -136,6 +140,15 @@ int main(int argc, char** argv)
 #endif
 
 	Application app(argc, argv);
+
+	// parse command line arguments
+	CommandLine cli(app.arguments());
+	CommandLine::set(cli);
+
+	if (cli.hasHelp()) {
+		cli.printHelp();
+		return 0;
+	}
 	
 	QString const translation("scantailor_"+QLocale::system().name());
 	QTranslator translator;
@@ -173,13 +186,10 @@ int main(int argc, char** argv)
 	} else {
 		main_wnd->showMaximized();
 	}
-	
-	// Note that we use app.arguments() rather than argv,
-	// because the former is Unicode-safe under Windows.
-	QStringList const args(app.arguments());
-	if (args.size() > 1) {
-		main_wnd->openProject(args[1]);
+
+	if (!cli.projectFile().isEmpty()) {
+		main_wnd->openProject(cli.projectFile());
 	}
-	
+
 	return app.exec();
 }

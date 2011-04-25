@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,12 @@
 template<typename T>
 class IntrusivePtr
 {
+private:
+	struct BooleanTestHelper
+	{
+		int dataMember;
+	};
+	typedef int BooleanTestHelper::*BooleanTest;
 public:
 	IntrusivePtr() : m_pObj(0) {}
 	
@@ -48,13 +54,31 @@ public:
 	
 	T* operator->() const { return m_pObj; }
 	
-	operator T*() const { return m_pObj; }
-	
 	T* get() const { return m_pObj; }
 	
 	void reset(T* obj = 0);
 	
 	void swap(IntrusivePtr& other);
+
+	/**
+	 * Used for boolean tests, like:
+	 * \code
+	 * IntrusivePtr<T> ptr = ...;
+	 * if (ptr) {
+	 *   ...
+	 * }
+	 * if (!ptr) {
+	 *   ...
+	 * }
+	 * \endcode
+	 * This implementation insures that the following expressions fail to compile:
+	 * \code
+	 * IntrusivePtr<T> ptr = ...;
+	 * int i = ptr;
+	 * delete ptr;
+	 * \endcode
+	 */
+	inline operator BooleanTest() const;
 private:
 	T* m_pObj;
 };
@@ -158,5 +182,25 @@ inline void swap(IntrusivePtr<T>& o1, IntrusivePtr<T>& o2)
 {
 	o1.swap(o2);
 }
+
+template<typename T>
+IntrusivePtr<T>::operator BooleanTest() const
+{
+	return m_pObj ? &BooleanTestHelper::dataMember : 0;
+}
+
+#define INTRUSIVE_PTR_OP(op) \
+template<typename T> \
+inline bool operator op(IntrusivePtr<T> const& lhs, IntrusivePtr<T> const& rhs) \
+{ \
+	return lhs.get() op rhs.get(); \
+}
+
+INTRUSIVE_PTR_OP(==)
+INTRUSIVE_PTR_OP(!=)
+INTRUSIVE_PTR_OP(<)
+INTRUSIVE_PTR_OP(>)
+INTRUSIVE_PTR_OP(<=)
+INTRUSIVE_PTR_OP(>=)
 
 #endif

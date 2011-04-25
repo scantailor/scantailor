@@ -125,7 +125,7 @@ ThumbnailBase::paint(QPainter* painter,
 	);
 	
 	// The polygon to draw into in original image coordinates.
-	QPolygonF image_poly(PolygonUtils::round(m_imageXform.resultingCropArea()));
+	QPolygonF image_poly(PolygonUtils::round(m_imageXform.resultingPostCropArea()));
 	if (!m_extendedClipArea) {
 		image_poly = image_poly.intersected(
 			PolygonUtils::round(

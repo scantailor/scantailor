@@ -26,9 +26,6 @@
 #include <QLineF>
 #include <vector>
 
-namespace imageproc // TODO: move it to the global namespace
-{
-
 /**
  * \brief An open X-Spline.
  *
@@ -117,7 +114,7 @@ public:
 
 	/** \see spfit::FittableSpline::sample() */
 	virtual void sample(
-		VirtualFunction2<void, QPointF, double>& sink,
+		VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
 		SamplingParams const& params = SamplingParams()) const;
 
 	std::vector<QPointF> toPolyline(SamplingParams const& params = SamplingParams()) const;
@@ -150,7 +147,7 @@ private:
 	PointAndDerivs pointAndDtsAtImpl(int segment, double t) const;
 
 	void maybeAddMoreSamples(
-		VirtualFunction2<void, QPointF, double>& sink,
+		VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
 		double max_sqdist_to_spline, double max_sqdist_between_samples,
 		double r_num_segments, int segment,
 		double prev_t, QPointF const& prev_pt,
@@ -165,7 +162,5 @@ inline void swap(XSpline& o1, XSpline& o2)
 {
 	o1.swap(o2);
 }
-
-} // namespace imageproc
 
 #endif

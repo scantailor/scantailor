@@ -22,6 +22,8 @@
 #include "GaussBlur.h"
 #include "GrayImage.h"
 #include "Constants.h"
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 #include <stdint.h>
 #include <math.h>
 
@@ -99,17 +101,20 @@ void find_iir_constants(
 
 GrayImage gaussBlur(GrayImage const& src, float h_sigma, float v_sigma)
 {	
+	using namespace boost::lambda;
+
 	if (src.isNull()) {
 		return src;
 	}
 
-	GrayImage tmp(src);
+	GrayImage dst(src.size());
 	gaussBlurGeneric(
-		RoundAndClipValueConv<uint8_t>(), tmp.data(), tmp.stride(),
-		tmp.size(), h_sigma, v_sigma
+		src.size(), h_sigma, v_sigma,
+		src.data(), src.stride(), StaticCastValueConv<float>(),
+		dst.data(), dst.stride(), _1 = bind<uint8_t>(RoundAndClipValueConv<uint8_t>(), _2)
 	);
 
-	return tmp;
+	return dst;
 }
 
 } // namespace imageproc

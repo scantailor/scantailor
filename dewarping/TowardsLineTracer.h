@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TOWARDS_LINE_TRACER_H_
-#define TOWARDS_LINE_TRACER_H_
+#ifndef DEWARPING_TOWARDS_LINE_TRACER_H_
+#define DEWARPING_TOWARDS_LINE_TRACER_H_
 
 #include "VecNT.h"
 #include "imageproc/GrayImage.h"
@@ -26,6 +26,9 @@
 #include <QPoint>
 #include <QLineF>
 #include <stdint.h>
+
+namespace dewarping
+{
 
 /**
  * This class is used for tracing a path towards intersection with a given line.
@@ -62,5 +65,7 @@ private:
 	Neighbour m_neighbours[8];
 	bool m_finished;
 };
+
+} // namespace dewarping
 
 #endif

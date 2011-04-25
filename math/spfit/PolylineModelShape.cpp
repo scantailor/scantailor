@@ -18,17 +18,14 @@
 
 #include "PolylineModelShape.h"
 #include "NumericTraits.h"
-#include "MatrixCalc.h"
 #include "XSpline.h"
-#include "MatMNT.h"
 #include "VecNT.h"
 #include "ToLineProjector.h"
 #include <boost/foreach.hpp>
 #include <stdexcept>
 #include <limits>
 #include <math.h>
-
-using namespace imageproc;
+#include <assert.h>
 
 namespace spfit
 {
@@ -75,20 +72,17 @@ PolylineModelShape::boundingBox() const
 }
 
 SqDistApproximant
-PolylineModelShape::localSqDistApproximant(QPointF const& pt, int flags) const
+PolylineModelShape::localSqDistApproximant(
+	QPointF const& pt, FittableSpline::SampleFlags flags) const
 {
 	if (m_vertices.empty()) {
 		return SqDistApproximant();
 	}
 
-	if (flags & SPLINE_HEAD) {
-		SqDistApproximant approx;
-		approx.initWithWeightedPointDistance(m_vertices.front().point);
-		return approx;
-	} else if (flags & SPLINE_TAIL) {
-		SqDistApproximant approx;
-		approx.initWithWeightedPointDistance(m_vertices.back().point);
-		return approx;
+	if (flags & FittableSpline::HEAD_SAMPLE) {
+		return SqDistApproximant::pointDistance(m_vertices.front().point);
+	} else if (flags & FittableSpline::TAIL_SAMPLE) {
+		return SqDistApproximant::pointDistance(m_vertices.back().point);
 	}
 
 	// First, find the point on the polyline closest to pt.
@@ -136,17 +130,7 @@ PolylineModelShape::localSqDistApproximant(QPointF const& pt, int flags) const
 
 		QPointF const pt1(m_vertices[segment_idx].point);
 		QPointF const pt2(m_vertices[segment_idx + 1].point);
-		QLineF const segment(pt1, pt2);
-
-		Vec2d unit_tangent(pt2 - pt1);
-		double const tangent_sqlen = unit_tangent.squaredNorm();
-		if (tangent_sqlen > std::numeric_limits<double>::epsilon()) {
-			unit_tangent /= sqrt(tangent_sqlen);
-		}
-		Vec2d unit_normal(-unit_tangent[1], unit_tangent[0]);
-
-		double const curvature = 0;
-		return calcApproximant(pt, best_foot_point, unit_tangent, unit_normal, curvature);
+		return SqDistApproximant::lineDistance(QLineF(pt1, pt2));
 	} else {
 		// The foot point is a vertex of the polyline.
 		assert(vertex_idx != -1);
@@ -169,42 +153,14 @@ PolylineModelShape::calcApproximant(
 	Vec2d const& unit_tangent, Vec2f const& unit_normal, double curvature)
 {
 	double m = 0;
+	
 	if (fabs(curvature) > 1e-6) {
 		double const p = fabs(1.0 / curvature);
 		double const d = fabs(unit_normal.dot(region_origin - frenet_frame_origin));
 		m = d / (d + p); // Formula 7 in [2].
 	}
 
-	// Consider the following equation:
-	// u = R*x + c
-	// u: vector in a Frenet frame.
-	// R: rotation matrix.
-	// x: vector in the global coordinate system.
-	// t: translation component.
-	
-	// R = | t1 t2 |
-	//     | n1 n2 |
-	// where [t1 t2] is the tangent unit vector and [n1 n2] is the normal unit vector.
-	Mat22d R;
-	R(0, 0) = unit_tangent[0];
-	R(0, 1) = unit_tangent[1];
-	R(1, 0) = unit_normal[0];
-	R(1, 1) = unit_normal[1];
-
-	StaticMatrixCalc<double, 4> mc;
-	Vec2d c; // translation component
-	(-(mc(R) * mc(frenet_frame_origin, 2, 1))).write(c);
-
-	SqDistApproximant approx;
-	approx.A(0, 0) = m * R(0, 0) * R(0, 0) + R(1, 0) * R(1, 0);
-	approx.A(1, 0) = m * R(0, 0) * R(0, 1) + R(1, 0) * R(1, 1);
-	approx.A(0, 1) = approx.A(1, 0);
-	approx.A(1, 1) = m * R(0, 1) * R(0, 1) + R(1, 1) * R(1, 1);
-	approx.b[0] = 2 * (m * c[0] * R(0, 0) + c[1] * R(1, 0));
-	approx.b[1] = 2 * (m * c[0] * R(0, 1) + c[1] * R(1, 1));
-	approx.c = m * c[0] * c[0] + c[1] * c[1];
-
-	return approx;
+	return SqDistApproximant(frenet_frame_origin, unit_tangent, unit_normal, m, 1);
 }
 
 } // namespace spfit

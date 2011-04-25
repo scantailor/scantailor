@@ -33,8 +33,9 @@
 #include "PolylineIntersector.h"
 #include "CylindricalSurfaceDewarper.h"
 #include "PerformanceTimer.h"
-#include "filters/output/Curve.h"  // TODO: move these to global namespace
-#include "filters/output/DistortionModel.h" 
+#include "DistortionModelBuilder.h"
+#include "DistortionModel.h"
+#include "Curve.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/BinaryThreshold.h"
 #include "imageproc/Binarize.h"
@@ -92,6 +93,9 @@ namespace
 	}
 
 }
+
+namespace dewarping
+{
 
 class TextLineTracer::CentroidCalculator
 {
@@ -293,9 +297,10 @@ private:
 };
 
 
-std::list<std::vector<QPointF> >
+void
 TextLineTracer::trace(
 	GrayImage const& input, Dpi const& dpi, QRect const& content_rect,
+	DistortionModelBuilder& output,
 	TaskStatus const& status, DebugImages* dbg)
 {
 	using namespace boost::lambda;
@@ -330,7 +335,7 @@ TextLineTracer::trace(
 		dbg->add(binarized, "sanitized");
 	}
 
-	std::pair<QLineF, QLineF> const vert_bounds(detectVertContentBounds(binarized, dbg));
+	std::pair<QLineF, QLineF> vert_bounds(detectVertContentBounds(binarized, dbg));
 	if (dbg) {
 		dbg->add(visualizeVerticalBounds(binarized.toQImage(), vert_bounds), "vert_bounds");
 	}
@@ -357,29 +362,21 @@ TextLineTracer::trace(
 		blurred, thick_mask, polylines,
 		vert_bounds.first, vert_bounds.second, dbg
 	);
-
-	if (polylines.size() < 2 && !dbg) {
-		polylines.clear();
-		return polylines;
+	
+	// Extend polylines.
+	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
+		std::deque<QPointF> growable_polyline(polyline.begin(), polyline.end());
+		extendTowardsVerticalBounds(
+			growable_polyline, vert_bounds, binarized, blurred, thick_mask
+		);
+		polyline.assign(growable_polyline.begin(), growable_polyline.end());
+	}
+	blurred = GrayImage(); // Save memory.
+	if (dbg) {
+		dbg->add(visualizePolylines(downscaled, polylines), "extended");
 	}
 
 	filterOutOfBoundsCurves(polylines, vert_bounds.first, vert_bounds.second);
-
-	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-		extendOrTrimPolyline(
-			polyline, vert_bounds.first, vert_bounds.second,
-			binarized, blurred, thick_mask
-		);
-	}
-	if (dbg) {
-		dbg->add(
-			visualizeExtendedPolylines(
-				blurred.toQImage(), thick_mask, polylines,
-				vert_bounds.first, vert_bounds.second
-			),
-			"extended_polylines"
-		);
-	}
 
 	TextLineRefiner refiner(downscaled, Dpi(200, 200), dbg);
 	refiner.refine(polylines, /*iterations=*/100, dbg, &downscaled.toQImage());
@@ -389,23 +386,19 @@ TextLineTracer::trace(
 		dbg->add(visualizePolylines(downscaled, polylines), "edgy_curves_removed");
 	}
 
-	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
-		makeLeftToRight(polyline);
-	}
 
-	pickRepresentativeLines(polylines, blurred.rect(), vert_bounds.first, vert_bounds.second);
-	if (dbg) {
-		dbg->add(visualizePolylines(downscaled.toQImage(), polylines, &vert_bounds), "representative_lines");
-	}
+	// Transform back to original coordinates and output.
 
-	// Transform back to original coordinates.
+	vert_bounds.first = to_orig.map(vert_bounds.first);
+	vert_bounds.second = to_orig.map(vert_bounds.second);
+	output.setVerticalBounds(vert_bounds.first, vert_bounds.second);
+
 	BOOST_FOREACH(std::vector<QPointF>& polyline, polylines) {
 		BOOST_FOREACH(QPointF& pt, polyline) {
 			pt = to_orig.map(pt);
 		}
+		output.addHorizontalCurve(polyline);
 	}
-
-	return polylines;
 }
 
 GrayImage
@@ -1240,6 +1233,50 @@ TextLineTracer::sanitizeBinaryImage(BinaryImage& image, QRect const& content_rec
 	image.fillExcept(content_rect, WHITE);
 }
 
+void
+TextLineTracer::extendTowardsVerticalBounds(
+	std::deque<QPointF>& polyline, std::pair<QLineF, QLineF> vert_bounds,
+	BinaryImage const& content, GrayImage const& blurred, BinaryImage const& thick_mask)
+{
+	if (polyline.empty()) {
+		return;
+	}
+
+	// Maybe swap vert_bounds.first and vert_bounds.second.
+	{
+		ToLineProjector const proj1(vert_bounds.first);
+		ToLineProjector const proj2(vert_bounds.second);
+		if (proj1.projectionDist(polyline.front()) + proj2.projectionDist(polyline.back()) >
+				proj1.projectionDist(polyline.back()) + proj2.projectionDist(polyline.front())) {
+			std::swap(vert_bounds.first, vert_bounds.second);
+		}
+	}
+
+	// Because we know our images are about 200 DPI (because we
+	// downscale them), we can use a constant here.
+	qreal const max_dist = 30;
+
+	// Extend the head of our polyline.
+	{
+		TowardsLineTracer tracer(
+			content, blurred, thick_mask, vert_bounds.first, polyline.front().toPoint()
+		);
+		for (QPoint const* pt; (pt = tracer.trace(max_dist)); ) {
+			polyline.push_front(*pt);
+		}
+	}
+
+	// Extend the tail of our polyline.
+	{
+		TowardsLineTracer tracer(
+			content, blurred, thick_mask, vert_bounds.second, polyline.back().toPoint()
+		);
+		for (QPoint const* pt; (pt = tracer.trace(max_dist)); ) {
+			polyline.push_back(*pt);
+		}
+	}
+}
+
 /**
  * Returns false if the curve contains both significant convexities and concavities.
  */
@@ -1351,362 +1388,6 @@ TextLineTracer::filterEdgyCurves(std::list<std::vector<QPointF> >& polylines)
 	}
 }
 
-struct TextLineTracer::TracedCurve
-{
-	std::vector<QPointF> polyline;
-	std::vector<QPointF> extendedPolyline;
-	QPointF centerPoint;
-
-	TracedCurve(std::vector<QPointF> const& polyline,
-		std::vector<QPointF> const& extended_polyline, QPointF const& center_point)
-		: polyline(polyline), extendedPolyline(extended_polyline), centerPoint(center_point) {}
-
-	bool operator<(TracedCurve const& rhs) const { return centerPoint.y() < rhs.centerPoint.y(); }
-};
-
-struct TextLineTracer::RansacModel
-{
-	TracedCurve const* topCurve;
-	TracedCurve const* bottomCurve; 
-	double totalError;
-
-	RansacModel() : topCurve(0), bottomCurve(0), totalError(NumericTraits<double>::max()) {}
-
-	bool isValid() const { return topCurve && bottomCurve; }
-};
-
-class TextLineTracer::RansacAlgo
-{
-public:
-	RansacAlgo(std::vector<TracedCurve> const& all_curves)
-		: m_rAllCurves(all_curves) {}
-
-	void buildAndAssessModel(
-		TracedCurve const* top_curve, TracedCurve const* bottom_curve);
-
-	RansacModel& bestModel() { return m_bestModel; }
-
-	RansacModel const& bestModel() const { return m_bestModel; }
-private:
-	double calcReferenceHeight(
-		CylindricalSurfaceDewarper const& dewarper, QPointF const& loc);
-
-	RansacModel m_bestModel;
-	std::vector<TracedCurve> const& m_rAllCurves;
-};
-
-void
-TextLineTracer::RansacAlgo::buildAndAssessModel(
-	TracedCurve const* top_curve, TracedCurve const* bottom_curve)
-try {
-	using namespace output;
-
-	DistortionModel model;
-	model.setTopCurve(Curve(top_curve->extendedPolyline));
-	model.setBottomCurve(Curve(bottom_curve->extendedPolyline));
-	if (!model.isValid()) {
-		return;
-	}
-
-	double const depth_perception = 2.0; // Doesn't matter much here.
-	CylindricalSurfaceDewarper const dewarper(
-		top_curve->extendedPolyline, bottom_curve->extendedPolyline, depth_perception
-	);
-
-	double error = 0;
-	BOOST_FOREACH(TracedCurve const& curve, m_rAllCurves) {
-		size_t const polyline_size = curve.polyline.size();
-		double const r_reference_height = 1.0 / calcReferenceHeight(dewarper, curve.centerPoint);
-
-		// We are going to approximate the dewarped polyline by a straight line
-		// using linear least-squares: At*A*x = At*B -> x = (At*A)-1 * At*B
-		std::vector<double> At;
-		At.reserve(polyline_size * 2);
-		std::vector<double> B;
-		B.reserve(polyline_size);
-
-		BOOST_FOREACH(QPointF const& warped_pt, curve.polyline) {
-			// TODO: add another signature with hint for efficiency.
-			QPointF const dewarped_pt(dewarper.mapToDewarpedSpace(warped_pt));
-
-			// ax + b = y  <-> x * a + 1 * b = y 
-			At.push_back(dewarped_pt.x());
-			At.push_back(1);
-			B.push_back(dewarped_pt.y());
-		}
-
-		DynamicMatrixCalc<double> mc;
-		
-		// A = Att
-		boost::scoped_array<double> A(new double[polyline_size * 2]);
-		mc(&At[0], 2, polyline_size).transWrite(&A[0]);
-
-		try {
-			boost::scoped_array<double> errvec(new double[polyline_size]);
-			double ab[2]; // As in "y = ax + b".
-
-			// errvec = B - A * (At*A)-1 * At * B
-			// ab = (At*A)-1 * At * B
-			(
-				mc(&B[0], polyline_size, 1) - mc(&A[0], polyline_size, 2)
-				*((mc(&At[0], 2, polyline_size)*mc(&A[0], polyline_size, 2)).inv()
-				*mc(&At[0], 2, polyline_size)*mc(&B[0], polyline_size, 1)).write(ab)
-			).write(&errvec[0]);
-
-			double sum_abs_err = 0;
-			for (size_t i = 0; i < polyline_size; ++i) {
-				sum_abs_err += fabs(errvec[i]) * r_reference_height;
-			}
-
-			// Penalty for not being straight.
-			error += sum_abs_err / polyline_size;
-
-			// TODO: penalty for not being horizontal.
-		} catch (std::runtime_error const&) {
-			// Strictly vertical line?
-			error += 1000;
-		}
-	}
-
-	if (error < m_bestModel.totalError) {
-		m_bestModel.topCurve = top_curve;
-		m_bestModel.bottomCurve = bottom_curve;
-		m_bestModel.totalError = error;
-	}
-} catch (std::runtime_error const&) {
-	// Probably CylindricalSurfaceDewarper didn't like something.
-}
-
-double
-TextLineTracer::RansacAlgo::calcReferenceHeight(
-	CylindricalSurfaceDewarper const& dewarper, QPointF const& loc)
-{
-	// TODO: ideally, we would use the counterpart of CylindricalSurfaceDewarper::mapGeneratrix(),
-	// that would map it the other way, and which doesn't currently exist.
-
-	QPointF const pt1(dewarper.mapToDewarpedSpace(loc + QPointF(0.0, -10)));
-	QPointF const pt2(dewarper.mapToDewarpedSpace(loc + QPointF(0.0, 10)));
-	return fabs(pt1.y() - pt2.y());
-}
-
-void
-TextLineTracer::pickRepresentativeLines(
-	std::list<std::vector<QPointF> >& polylines, QRectF const& image_rect,
-	QLineF const& left_bound, QLineF const& right_bound)
-{
-	int const num_curves = polylines.size();
-
-	if (num_curves < 2) {
-		polylines.clear();
-		return;
-	}
-
-	std::vector<TracedCurve> ordered_curves;
-	ordered_curves.reserve(num_curves);
-
-	// First, sort them top to bottom.
-	// For this purpose, calculate where they intersect this line:
-	QLineF const mid_vert_line(
-		0.5 * (image_rect.topLeft() + image_rect.topRight()),
-		0.5 * (image_rect.bottomLeft() + image_rect.bottomRight())
-	);
-	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
-		std::vector<QPointF> extended_polyline(polyline);
-		intersectWithVerticalBoundaries(extended_polyline, left_bound, right_bound);
-		
-		PolylineIntersector const intersector(polyline);
-		PolylineIntersector::Hint hint;
-		QPointF const intersection(intersector.intersect(mid_vert_line, hint));
-
-		ordered_curves.push_back(TracedCurve(polyline, extended_polyline, intersection));
-	}
-	std::sort(ordered_curves.begin(), ordered_curves.end());
-
-	// Select the best pair using RANSAC.
-	RansacAlgo ransac(ordered_curves);
-
-	// First let's try to combine each of the 3 top-most lines
-	// with each of the 3 bottom-most ones.
-	for (int i = 0; i < std::min<int>(3, num_curves); ++i) {
-		for (int j = std::max<int>(0, num_curves - 3); j < num_curves; ++j) {
-			if (i < j) {
-				ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j]);
-			}
-		}
-	}
-
-	// Continue by throwing in some random pairs of lines.
-	qsrand(0); // Repeatablity is important.
-	int random_pairs_remaining = 10;
-	while (random_pairs_remaining-- > 0) {
-		int i = qrand() % num_curves;
-		int j = qrand() % num_curves;
-		if (i > j) {
-			std::swap(i, j);
-		}
-		if (i < j) {
-			ransac.buildAndAssessModel(&ordered_curves[i], &ordered_curves[j]);
-		}
-	}
-	
-	if (ransac.bestModel().isValid()) {
-		std::list<std::vector<QPointF> > new_polylines;
-		new_polylines.push_back(ransac.bestModel().topCurve->extendedPolyline);
-		new_polylines.push_back(ransac.bestModel().bottomCurve->extendedPolyline);
-		polylines.swap(new_polylines);
-	}
-}
-
-void
-TextLineTracer::makeLeftToRight(std::vector<QPointF>& polyline)
-{
-	assert(polyline.size() >= 2);
-
-	if (polyline.front().x() > polyline.back().x()) {
-		std::reverse(polyline.begin(), polyline.end());
-	}
-}
-
-void
-TextLineTracer::extendOrTrimPolyline(
-	std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const right_bound,
-	BinaryImage const& content, GrayImage const& blurred, BinaryImage const& thick_mask)
-{
-	assert(polyline.size() >= 2);
-
-	QLineF front_bound(left_bound);
-	QLineF back_bound(right_bound);
-	if (polyline.front().x() > polyline.back().x()) {
-		std::swap(front_bound, back_bound);
-	}
-
-	std::deque<QPointF> new_polyline(polyline.begin(), polyline.end());
-
-	// Note that the reason we do trimming is to dodge the possibility
-	// a snake would be attracted to some garbage on the other side of the line.
-
-	if (!trimFront(new_polyline, front_bound)) {
-		growFront(new_polyline, front_bound, content, blurred, thick_mask);
-	}
-	
-	if (!trimBack(new_polyline, back_bound)) {
-		growBack(new_polyline, back_bound, content, blurred, thick_mask);
-	}
-
-	polyline.clear();
-	polyline.insert(polyline.end(), new_polyline.begin(), new_polyline.end());
-}
-
-void
-TextLineTracer::growFront(
-	std::deque<QPointF>& polyline, QLineF const& bound,
-	BinaryImage const& content, GrayImage const& blurred,
-	BinaryImage const& thick_mask)
-{
-	TowardsLineTracer tracer(content, blurred, thick_mask, bound, polyline.front().toPoint());
-	while (QPoint const* pt = tracer.trace(40)) { // XXX: hardcoded constant
-		polyline.push_front(*pt);
-	}
-}
-
-void
-TextLineTracer::growBack(
-	std::deque<QPointF>& polyline, QLineF const& bound,
-	BinaryImage const& content, GrayImage const& blurred,
-	BinaryImage const& thick_mask)
-{
-	TowardsLineTracer tracer(content, blurred, thick_mask, bound, polyline.back().toPoint());
-	while (QPoint const* pt = tracer.trace(40)) { // XXX: hardcoded constant
-		polyline.push_back(*pt);
-	}
-}
-
-bool
-TextLineTracer::trimFront(std::deque<QPointF>& polyline, QLineF const& bound)
-{
-	if (sidesOfLine(bound, polyline.front(), polyline.back()) >= 0) {
-		// Doesn't need trimming.
-		return false;
-	}
-
-	while (polyline.size() > 2 && sidesOfLine(bound, polyline.front(), polyline[1]) > 0) {
-		polyline.pop_front();
-	}
-	
-	intersectFront(polyline, bound);
-	
-	return true;
-}
-
-bool
-TextLineTracer::trimBack(std::deque<QPointF>& polyline, QLineF const& bound)
-{
-	if (sidesOfLine(bound, polyline.front(), polyline.back()) >= 0) {
-		// Doesn't need trimming.
-		return false;
-	}
-
-	while (polyline.size() > 2 && sidesOfLine(bound, polyline[polyline.size() - 2], polyline.back()) > 0) {
-		polyline.pop_back();
-	}
-	
-	intersectBack(polyline, bound);
-	
-	return true;
-}
-
-void
-TextLineTracer::intersectFront(
-	std::deque<QPointF>& polyline, QLineF const& bound)
-{
-	assert(polyline.size() >= 2);
-
-	QLineF const front_segment(polyline.front(), polyline[1]);
-	QPointF intersection;
-	if (bound.intersect(front_segment, &intersection) != QLineF::NoIntersection) {
-		polyline.front() = intersection;
-	}
-}
-
-void
-TextLineTracer::intersectBack(
-	std::deque<QPointF>& polyline, QLineF const& bound)
-{
-	assert(polyline.size() >= 2);
-
-	QLineF const back_segment(polyline[polyline.size() - 2], polyline.back());
-	QPointF intersection;
-	if (bound.intersect(back_segment, &intersection) != QLineF::NoIntersection) {
-		polyline.back() = intersection;
-	}
-}
-
-void
-TextLineTracer::intersectWithVerticalBoundaries(
-	std::vector<QPointF>& polyline, QLineF const& left_bound, QLineF const& right_bound)
-{
-	assert(polyline.size() >= 2);
-
-	QLineF front_bound(left_bound);
-	QLineF back_bound(right_bound);
-	if (polyline.front().x() > polyline.back().x()) {
-		std::swap(front_bound, back_bound);
-	}
-
-	std::deque<QPointF> new_polyline(polyline.begin(), polyline.end());
-
-	if (!trimFront(new_polyline, front_bound)) {
-		intersectFront(new_polyline, front_bound);
-	}
-
-	if (!trimBack(new_polyline, back_bound)) {
-		intersectBack(new_polyline, back_bound);
-	}
-
-	polyline.clear();
-	polyline.insert(polyline.end(), new_polyline.begin(), new_polyline.end());
-}
-
 QImage
 TextLineTracer::visualizeVerticalBounds(
 	QImage const& background, std::pair<QLineF, QLineF> const& bounds)
@@ -1781,44 +1462,4 @@ TextLineTracer::visualizePolylines(
 	return canvas;
 }
 
-QImage
-TextLineTracer::visualizeExtendedPolylines(
-	QImage const& blurred, imageproc::BinaryImage const&  thick_mask,
-	std::list<std::vector<QPointF> > const& polylines,
-	QLineF const& left_bound, QLineF const& right_bound)
-{
-	QImage canvas(blurred.convertToFormat(QImage::Format_ARGB32_Premultiplied));
-	QPainter painter(&canvas);
-	painter.drawImage(0, 0, thick_mask.toAlphaMask(QColor(255, 0, 0, 20)));
-	
-	painter.setRenderHint(QPainter::Antialiasing);
-
-	// Draw polylines.
-	QPen pen(Qt::blue);
-	pen.setWidthF(3.0);
-	painter.setPen(pen);
-	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
-		if (!polyline.empty()) {
-			painter.drawPolyline(&polyline[0], polyline.size());
-		}
-	}
-
-	// Draw vertical bounds.
-	painter.drawLine(left_bound);
-	painter.drawLine(right_bound);
-
-	// Draw polyline nodes.
-	painter.setPen(Qt::NoPen);
-	QBrush brush(Qt::yellow);
-	painter.setBrush(brush);
-	painter.setOpacity(0.7);
-	QRectF rect(0, 0, 15, 15);
-	BOOST_FOREACH(std::vector<QPointF> const& polyline, polylines) {
-		BOOST_FOREACH(QPointF const& pt, polyline) {
-			rect.moveCenter(pt);
-			painter.drawEllipse(rect);
-		}
-	}
-
-	return canvas;
-}
+} // namespace dewarping

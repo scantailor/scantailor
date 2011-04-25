@@ -19,18 +19,12 @@
 #include "Thumbnail.h"
 #include "Utils.h"
 #include "imageproc/PolygonUtils.h"
-#include <QRectF>
-#include <QSizeF>
-#include <QLineF>
 #include <QPolygonF>
 #include <QTransform>
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
 #include <QColor>
-#include <QApplication>
-#include <QPalette>
-#include <QDebug>
 
 using namespace imageproc;
 
@@ -39,20 +33,13 @@ namespace page_layout
 
 Thumbnail::Thumbnail(
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
-	QSizeF const& max_size, ImageId const& image_id,
-	ImageTransformation const& xform, Params const& params,
-	QRectF const& adapted_content_rect,
-	QSizeF const& aggregate_hard_size_mm)
+	QSizeF const& max_size, ImageId const& image_id, Params const& params,
+	ImageTransformation const& xform, QPolygonF const& phys_content_rect)
 :	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
 	m_params(params),
-	m_adaptedContentRect(adapted_content_rect),
-	m_aggregateHardSizeMM(aggregate_hard_size_mm),
-	m_origXform(xform),
-	m_physXform(xform.origDpi()),
-	m_origToMM(m_origXform.transformBack() * m_physXform.pixelsToMM()),
-	m_mmToOrig(m_physXform.mmToPixels() * m_origXform.transform())
+	m_virtContentRect(xform.transform().map(phys_content_rect).boundingRect()),
+	m_virtOuterRect(xform.resultingPostCropArea().boundingRect())
 {
-	recalcBoxesAndPresentationTransform();
 	setExtendedClipArea(true);
 }
 
@@ -60,29 +47,21 @@ void
 Thumbnail::paintOverImage(
 	QPainter& painter, QTransform const& image_to_display,
 	QTransform const& thumb_to_display)
-{
-	QTransform const orig_to_presentation(
-		m_origXform.transformBack() * imageXform().transform()
-	);
-	QTransform const presentation_to_thumb(
-		image_to_display * thumb_to_display.inverted()
-	);
-	QTransform const orig_to_thumb(
-		orig_to_presentation * presentation_to_thumb
-	);
-	
-	// We work in thumbnail coordinates because we want to adjust
-	// rectangle coordinates by exactly their display width.
-	painter.setWorldTransform(thumb_to_display);
-	
-	QRectF const inner_rect(orig_to_thumb.mapRect(m_adaptedContentRect));
+{	
+	// We work in display coordinates because we want to be
+	// pixel-accurate with what we draw.
+	painter.setWorldTransform(QTransform());
+
+	QTransform const virt_to_display(virtToThumb() * thumb_to_display);
+
+	QRectF const inner_rect(virt_to_display.map(m_virtContentRect).boundingRect());
 	
 	// We extend the outer rectangle because otherwise we may get white
 	// thin lines near the edges due to rounding errors and the lack
 	// of subpixel accuracy.  Doing that is actually OK, because what
 	// we paint will be clipped anyway.
 	QRectF const outer_rect(
-		orig_to_thumb.mapRect(m_outerRect).adjusted(-1.0, -1.0, 1.0, 1.0)
+		virt_to_display.map(m_virtOuterRect).boundingRect().adjusted(-1.0, -1.0, 1.0, 1.0)
 	);
 	
 	QPainterPath outer_outline;
@@ -91,22 +70,7 @@ Thumbnail::paintOverImage(
 	QPainterPath content_outline;
 	content_outline.addPolygon(PolygonUtils::round(inner_rect));
 	
-	QPolygonF const orig_image_outline(
-		m_origXform.transform().map(m_origXform.origRect())
-	);
-
-	QPainterPath page_outline;
-	page_outline.addPolygon(
-		PolygonUtils::round(
-			orig_to_thumb.map(orig_image_outline.intersected(m_outerRect))
-		)
-	);
-	
 	painter.setRenderHint(QPainter::Antialiasing, true);
-	
-	// Clear parts of the thumbnail that don't belong to the image
-	// but belong to outer_rect.
-	painter.fillPath(outer_outline.subtracted(page_outline), QApplication::palette().window());
 	
 	QColor bg_color;
 	QColor fg_color;
@@ -134,38 +98,6 @@ Thumbnail::paintOverImage(
 	// For some reason, if we let Qt round the coordinates,
 	// the result is slightly different.
 	painter.drawRect(inner_rect.toRect());
-}
-
-void
-Thumbnail::recalcBoxesAndPresentationTransform()
-{
-	QPolygonF poly_mm(m_origToMM.map(m_adaptedContentRect));
-	Utils::extendPolyRectWithMargins(poly_mm, m_params.hardMarginsMM());
-	
-	//QRectF const middle_rect(m_mmToOrig.map(poly_mm).boundingRect());
-	
-	QSizeF const hard_size_mm(
-		QLineF(poly_mm[0], poly_mm[1]).length(),
-		QLineF(poly_mm[0], poly_mm[3]).length()
-	);
-	
-	Margins const soft_margins_mm(
-		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_params.alignment()
-		)
-	);
-	
-	Utils::extendPolyRectWithMargins(poly_mm, soft_margins_mm);
-	
-	m_outerRect = m_mmToOrig.map(poly_mm).boundingRect();
-	
-	ImageTransformation const presentation_xform(
-		Utils::calcPresentationTransform(
-			m_origXform, m_physXform.mmToPixels().map(poly_mm)
-		)
-	);
-	
-	setImageXform(presentation_xform);
 }
 
 } // namespace page_layout

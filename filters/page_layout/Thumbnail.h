@@ -22,10 +22,8 @@
 #include "ThumbnailBase.h"
 #include "Params.h"
 #include "ImageTransformation.h"
-#include "PhysicalTransformation.h"
 #include "IntrusivePtr.h"
 #include <QTransform>
-#include <QSizeF>
 #include <QRectF>
 
 class ThumbnailPixmapCache;
@@ -38,53 +36,17 @@ class Thumbnail : public ThumbnailBase
 {
 public:
 	Thumbnail(IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
-		QSizeF const& max_size, ImageId const& image_id,
-		ImageTransformation const& xform, Params const& params,
-		QRectF const& adapted_content_rect,
-		QSizeF const& aggregate_hard_size_mm);
+		QSizeF const& max_size, ImageId const& image_id, Params const& params,
+		ImageTransformation const& xform, QPolygonF const& phys_content_rect);
 	
 	virtual void paintOverImage(
 		QPainter& painter,
 		QTransform const& image_to_display,
 		QTransform const& thumb_to_display);
 private:
-	void recalcBoxesAndPresentationTransform();
-	
-	Params const m_params;
-	QRectF const m_adaptedContentRect; /**< In m_origXform coortinates. */
-	QSizeF const m_aggregateHardSizeMM;
-	
-	/**
-	 * \brief Image transformation, as provided by the previous filter.
-	 *
-	 * We pass another transformation to ThumbnailBase, which we call
-	 * "presentation transformation" in order to be able to display margins
-	 * that may be outside the image area.  The presentation transformation
-	 * is accessible via imageXform().
-	 */
-	ImageTransformation const m_origXform;
-	
-	/**
-	 * Transformation between the original image coordinates and millimeters,
-	 * assuming that point (0, 0) in pixel coordinates corresponds to point
-	 * (0, 0) in millimeter coordinates.
-	 */
-	PhysicalTransformation const m_physXform;
-	
-	/**
-	 * Transformation from m_origXform coordinates to millimeter coordinates.
-	 */
-	QTransform const m_origToMM;
-	
-	/**
-	 * Transformation from millimeter coordinates to m_origXform coordinates.
-	 */
-	QTransform const m_mmToOrig;
-	
-	/**
-	 * The outer rectangle (bounded by soft margins) in m_origXform coordinates.
-	 */
-	QRectF m_outerRect;
+	Params m_params;
+	QRectF m_virtContentRect;
+	QRectF m_virtOuterRect;
 };
 
 } // namespace page_layout

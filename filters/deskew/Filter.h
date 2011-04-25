@@ -73,6 +73,7 @@ public:
 		IntrusivePtr<select_content::CacheDrivenTask> const& next_task);
 	
 	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
+	Settings* getSettings() { return m_ptrSettings.get(); };
 private:
 	void writePageSettings(
 		QDomDocument& doc, QDomElement& filter_el,

@@ -18,22 +18,77 @@
 
 #include "SqDistApproximant.h"
 #include "MatrixCalc.h"
+#include <assert.h>
+#include <math.h>
 
 namespace spfit
 {
 
-void
-SqDistApproximant::initWithWeightedPointDistance(Vec2d const& pt, double weight)
+SqDistApproximant::SqDistApproximant(
+	Vec2d const& origin, Vec2d const& u, Vec2d const& v, double m, double n)
 {
-	A(0, 0) = weight;
-	A(0, 1) = 0;
-	A(1, 0) = 0;
-	A(1, 1) = weight;
+	assert(fabs(u.squaredNorm() - 1.0) < 1e-06 && "u is not normalized");
+	assert(fabs(v.squaredNorm() - 1.0) < 1e-06 && "v is not normalized");
+	assert(fabs(u.dot(v)) < 1e-06 && "u and v are not orthogonal");
 
-	b[0] = -2.0 * weight * pt[0];
-	b[1] = -2.0 * weight * pt[1];
+	// Consider the following equation:
+	// w = R*x + t
+	// w: vector in the local coordinate system.
+	// R: rotation matrix.  Actually the inverse of [u v].
+	// x: vector in the global coordinate system.
+	// t: translation component.
 	
-	c = weight * (pt[0] * pt[0] + pt[1] * pt[1]);
+	// R = | u1 u2 |
+	//     | v1 v2 |
+	Mat22d R;
+	R(0, 0) = u[0];  R(0, 1) = u[1];
+	R(1, 0) = v[0];  R(1, 1) = v[1];
+
+	StaticMatrixCalc<double, 4> mc;
+	Vec2d t; // Translation component.
+	(-(mc(R) * mc(origin, 2, 1))).write(t);
+
+	A(0, 0) = m * R(0, 0) * R(0, 0) + n * R(1, 0) * R(1, 0);
+	A(0, 1) = A(1, 0) = m * R(0, 0) * R(0, 1) + n * R(1, 0) * R(1, 1);
+	A(1, 1) = m * R(0, 1) * R(0, 1) + n * R(1, 1) * R(1, 1);
+	b[0] = 2 * (m * t[0] * R(0, 0) + n * t[1] * R(1, 0));
+	b[1] = 2 * (m * t[0] * R(0, 1) + n * t[1] * R(1, 1));
+	c = m * t[0] * t[0] + n * t[1] * t[1];
+}
+
+SqDistApproximant
+SqDistApproximant::pointDistance(Vec2d const& pt)
+{
+	return weightedPointDistance(pt, 1);
+}
+
+SqDistApproximant
+SqDistApproximant::weightedPointDistance(Vec2d const& pt, double weight)
+{
+	return SqDistApproximant(pt, Vec2d(1, 0), Vec2d(0, 1), weight, weight);
+}
+
+SqDistApproximant
+SqDistApproximant::lineDistance(QLineF const& line)
+{
+	return weightedLineDistance(line, 1);
+}
+
+SqDistApproximant
+SqDistApproximant::weightedLineDistance(QLineF const& line, double weight)
+{
+	Vec2d u(line.p2() - line.p1());
+	double const sqlen = u.squaredNorm();
+	if (sqlen > 1e-6) {
+		u /= sqrt(sqlen);
+	} else {
+		return pointDistance(line.p1());
+	}
+
+	// Unit normal to line.
+	Vec2d const v(-u[1], u[0]);
+
+	return SqDistApproximant(line.p1(), u, v, 0, weight);
 }
 
 double

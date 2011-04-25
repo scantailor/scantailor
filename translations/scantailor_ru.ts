@@ -38,13 +38,25 @@
         <translation>Иосиф Арцимович
 </translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
         <source>Translators</source>
         <translation>Переводчики</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="173"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
 Petr Kovář - Czech
 Stefan Birkner - German
@@ -55,18 +67,6 @@ Daniel Koć - Polish
 Joseph Artsimovich - Russian
 Marián Hvolka - Slovak
 Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="175"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -86,7 +86,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="168"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Contributors</source>
         <translation>Благодарности</translation>
     </message>
@@ -353,17 +353,17 @@ Taxman</source>
 <context>
     <name>InteractiveXSpline</name>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -380,46 +380,41 @@ Taxman</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../MainWindow.cpp" line="1311"/>
-        <location filename="../MainWindow.cpp" line="1320"/>
-        <location filename="../MainWindow.cpp" line="1610"/>
-        <location filename="../MainWindow.cpp" line="1641"/>
-        <location filename="../MainWindow.cpp" line="1718"/>
+        <location filename="../MainWindow.cpp" line="1299"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1598"/>
+        <location filename="../MainWindow.cpp" line="1629"/>
+        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1506"/>
+        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Вывод невозможен, поскольку еще не известны итоговые размеры страниц.
 Для их определения, прогоните пакетную обработку на этапах &quot;Полезная Область&apos; или &quot;Поля&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1544"/>
-        <source>%1 - Scan Tailor Plus %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1611"/>
-        <location filename="../MainWindow.cpp" line="1642"/>
+        <location filename="../MainWindow.cpp" line="1599"/>
+        <location filename="../MainWindow.cpp" line="1630"/>
         <source>Error saving the project file!</source>
         <translation>Ошибка при сохранении файла!</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save Project</source>
         <translation>Сохранить проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save this project?</source>
         <translation>Сохранить этот проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1226"/>
-        <location filename="../MainWindow.cpp" line="1294"/>
+        <location filename="../MainWindow.cpp" line="1214"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекты Scan Tailor</translation>
     </message>
@@ -430,7 +425,7 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
 Для их определения, прогоните пакетную обработку на этапах &quot;Полезная Область&apos; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1527"/>
         <source>Unnamed</source>
         <translation>Без имени</translation>
     </message>
@@ -544,7 +539,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Вывод невозможен, поскольку еще не известны итоговые размеры страниц.  Для их определения, прогоните пакетную обработку на этапах &quot;Полезная область&quot; или &quot;Макет страницы&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1293"/>
+        <location filename="../MainWindow.cpp" line="1281"/>
         <source>Open Project</source>
         <translation>Открыть проект</translation>
     </message>
@@ -553,32 +548,32 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Звуковой сигнал по окончании</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="905"/>
+        <location filename="../MainWindow.cpp" line="893"/>
         <source>Insert before ...</source>
         <translation>Вставить перед ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="908"/>
+        <location filename="../MainWindow.cpp" line="896"/>
         <source>Insert after ...</source>
         <translation>Вставить после ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="914"/>
+        <location filename="../MainWindow.cpp" line="902"/>
         <source>Remove from project ...</source>
         <translation>Удалить из проекта ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="935"/>
+        <location filename="../MainWindow.cpp" line="923"/>
         <source>Insert here ...</source>
         <translation>Вставить сюда ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
         <source>Unable to open the project file.</source>
         <translation>Не удалось открыть файл проекта.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1321"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
         <source>The project file is broken.</source>
         <translation>Файл проекта поврежден.</translation>
     </message>
@@ -587,17 +582,22 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Не удалось импортировать проект.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1689"/>
+        <location filename="../MainWindow.cpp" line="1532"/>
+        <source>%1 - Scan Tailor %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1677"/>
         <source>File to insert</source>
         <translation>Вставить файл</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1695"/>
+        <location filename="../MainWindow.cpp" line="1683"/>
         <source>Images not in project (%1)</source>
         <translation>Изображения не в проекте (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1719"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
         <source>Error opening the image file.</source>
         <translation>Ошибка при открытии файла изображения.</translation>
     </message>
@@ -606,7 +606,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страницы %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1759"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
@@ -683,7 +683,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Автопрокрутка ленты предпросмотра.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="460"/>
+        <location filename="../MainWindow.cpp" line="448"/>
         <source>Stop batch processing</source>
         <translation>Остановить пакетную обработку</translation>
     </message>
@@ -1659,12 +1659,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="96"/>
+        <location filename="../SettingsDialog.cpp" line="36"/>
         <source>Compiled without OpenGL support.</source>
         <translation>Собрано без поддержки OpenGL.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="101"/>
+        <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>Ваше железо или драйвер не поддерживают необходимого функционала.</translation>
     </message>
@@ -1674,112 +1674,9 @@ p, li { white-space: pre-wrap; }
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="24"/>
-        <source>General</source>
-        <translation>Основные</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="32"/>
-        <source>Autosave</source>
-        <translation type="unfinished">Автосохранение</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="39"/>
-        <source>each</source>
-        <translation type="unfinished">каждые</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="60"/>
-        <source>minute</source>
-        <translation type="unfinished">минут(ы)</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="82"/>
+        <location filename="../ui/SettingsDialog.ui" line="20"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Использовать 3D ускорение для интерфейса пользователя</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="103"/>
-        <source>Output</source>
-        <translation type="unfinished">Вывод</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="109"/>
-        <source>Threshold</source>
-        <translation type="unfinished">Порог бинаризации</translation>
-    </message>
-    <message>
-        <source>Threshold Level value (Min. Max):</source>
-        <translation type="obsolete">Значение порога бинаризации (Min. Max):</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="132"/>
-        <source>Threshold Range value:</source>
-        <translation>Диаппазон</translation>
-    </message>
-    <message utf8="true">
-        <location filename="../ui/SettingsDialog.ui" line="139"/>
-        <source>±</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="253"/>
-        <source>Thinner</source>
-        <translation type="unfinished">Тоньше</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="285"/>
-        <source>Thicker</source>
-        <translation type="unfinished">Жирнее</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="306"/>
-        <source>Despeckling</source>
-        <translation type="unfinished">Удаление пятен</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="330"/>
-        <location filename="../ui/SettingsDialog.ui" line="333"/>
-        <source>No despeckling</source>
-        <translation type="unfinished">Не удалять</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="365"/>
-        <location filename="../ui/SettingsDialog.ui" line="368"/>
-        <source>Cautious despeckling</source>
-        <translation type="unfinished">Осторожное удаление</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="400"/>
-        <location filename="../ui/SettingsDialog.ui" line="403"/>
-        <source>Normal despeckling</source>
-        <translation type="unfinished">Обычное удаление</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="432"/>
-        <location filename="../ui/SettingsDialog.ui" line="435"/>
-        <source>Aggressive despeckling</source>
-        <translation type="unfinished">Агрессивное удаление</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="482"/>
-        <source>Bitonal Compression</source>
-        <translation type="unfinished">Сжатие черно-белых сканов</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="499"/>
-        <source>Bitonal Compression:</source>
-        <translation type="unfinished">Тип сжатия:</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="506"/>
-        <source>CCITT Group 4 Fax</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="513"/>
-        <source>LZW</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1926,7 +1823,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="52"/>
+        <location filename="../filters/deskew/Filter.cpp" line="55"/>
         <source>Deskew</source>
         <translation>Компенсация наклона</translation>
     </message>
@@ -1979,7 +1876,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
         <translation>Исправление ориентации</translation>
     </message>
@@ -2033,7 +1930,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="58"/>
+        <location filename="../filters/output/Filter.cpp" line="63"/>
         <source>Output</source>
         <translation>Вывод</translation>
     </message>
@@ -2041,7 +1938,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
         <translation>Черно-белый</translation>
     </message>
@@ -2050,37 +1947,37 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Двухтоновый</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
         <translation>Цветной / Серый</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
         <translation>Смешанный</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="414"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
         <translation>Применить уровень удаления пятен</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="494"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="667"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
         <source>Auto</source>
         <translation type="unfinished">Автоматически</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
         <source>Manual</source>
         <translation type="unfinished">Вручную</translation>
     </message>
@@ -2148,37 +2045,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="505"/>
+        <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоны картинок доступны только в режиме &quot;Смешанный&quot;.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="557"/>
+        <location filename="../filters/output/Task.cpp" line="558"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Удаление пятен не делается в режиме &quot;Цветной / Серый&quot;.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="574"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Output</source>
         <translation>Вывод</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="575"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Picture Zones</source>
         <translation>Зоны картинок</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="576"/>
+        <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Fill Zones</source>
         <translation>Зоны заливки</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="577"/>
+        <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="578"/>
+        <location filename="../filters/output/Task.cpp" line="579"/>
         <source>Despeckling</source>
         <translation>Удаление пятен</translation>
     </message>
@@ -2190,22 +2087,22 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Макет страницы</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="64"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="67"/>
         <source>Natural order</source>
         <translation>Естественный порядок</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="65"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="68"/>
         <source>Order by increasing width</source>
         <translation>Сортировка по возрастающей ширине</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="66"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="69"/>
         <source>Order by increasing height</source>
         <translation>Сортировка по возрастающей высоте</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="76"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="79"/>
         <source>Margins</source>
         <translation>Поля</translation>
     </message>
@@ -2234,7 +2131,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="64"/>
+        <location filename="../filters/page_split/Filter.cpp" line="67"/>
         <source>Split Pages</source>
         <translation>Разрезка страниц</translation>
     </message>
@@ -2298,22 +2195,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="56"/>
+        <location filename="../filters/select_content/Filter.cpp" line="59"/>
         <source>Natural order</source>
         <translation>Естественный порядок</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="57"/>
+        <location filename="../filters/select_content/Filter.cpp" line="60"/>
         <source>Order by increasing width</source>
         <translation>Сортировка по возрастающей ширине</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="58"/>
+        <location filename="../filters/select_content/Filter.cpp" line="61"/>
         <source>Order by increasing height</source>
         <translation>Сортировка по возрастающей высоте</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="68"/>
+        <location filename="../filters/select_content/Filter.cpp" line="71"/>
         <source>Select Content</source>
         <translation>Полезная область</translation>
     </message>

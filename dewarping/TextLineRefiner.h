@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEXT_LINE_REFINER_H_
-#define TEXT_LINE_REFINER_H_
+#ifndef DEWARPING_TEXT_LINE_REFINER_H_
+#define DEWARPING_TEXT_LINE_REFINER_H_
 
 #include "Grid.h"
 #include "VecNT.h"
@@ -35,6 +35,9 @@ namespace imageproc
 {
 	class GrayImage;
 }
+
+namespace dewarping
+{
 
 class TextLineRefiner
 {
@@ -76,5 +79,7 @@ private:
 	
 	Grid<float> m_gradient;
 };
+
+} // namespace dewarping
 
 #endif

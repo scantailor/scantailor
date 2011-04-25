@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="cs" sourcelanguage="en">
+<TS version="2.0" language="sk_SK" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -27,13 +27,30 @@
         <source>Lead Developer</source>
         <translation>Hlavný vývojár</translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
         <source>Translators</source>
         <translation>Prekladatelia</translation>
     </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <source>Contributors</source>
+        <translation>Prispeli</translation>
+    </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="173"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
 Petr Kovář - Czech
 Stefan Birkner - German
@@ -45,11 +62,6 @@ Joseph Artsimovich - Russian
 Marián Hvolka - Slovak
 Davidson Wang - Traditional Chinese</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="168"/>
-        <source>Contributors</source>
-        <translation>Prispeli</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="192"/>
@@ -70,18 +82,6 @@ Davidson Wang - Traditional Chinese</source>
         <location filename="../ui/AboutDialog.ui" line="132"/>
         <source>Joseph Artsimovich</source>
         <translation></translation>
-    </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="175"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="199"/>
@@ -109,7 +109,7 @@ Taxman</source>
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation>Kliknite do oblasti pre získanie  farby alebo stlačte klávesu ESC pre zrušenie</translation>
+        <translation>Kliknite do oblasti pre získanie  farby alebo stlačte klávesu ESC pre zrušenie.</translation>
     </message>
 </context>
 <context>
@@ -145,7 +145,7 @@ English or Russian please.</source>
     </message>
     <message>
         <source>Dump file</source>
-        <translation type="obsolete">Obsah souboru</translation>
+        <translation type="obsolete">Obsah súboru</translation>
     </message>
     <message>
         <source>Sending ...</source>
@@ -198,7 +198,7 @@ English or Russian please.</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pre výber viacerých strán použite Ctr+Klik / Shift+Klik</translation>
+        <translation>Pre výber viacerých strán použite Ctr+Klik / Shift+Klik.</translation>
     </message>
 </context>
 <context>
@@ -226,7 +226,7 @@ English or Russian please.</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
         <source>Apply To ...</source>
-        <translation>Použiť na</translation>
+        <translation>Použiť na ...</translation>
     </message>
 </context>
 <context>
@@ -265,27 +265,27 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="23"/>
         <source>Tab 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="33"/>
         <source>Tab 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="46"/>
         <source>DPI</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="69"/>
         <source>Custom</source>
-        <translation type="unfinished">Vlastné</translation>
+        <translation>Vlastné</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="90"/>
         <source>x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="113"/>
@@ -334,7 +334,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/FixDpiSinglePageDialog.ui" line="19"/>
         <source>DPI for %1</source>
-        <translation type="unfinished">DPI pre %1</translation>
+        <translation>DPI pre %1</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiSinglePageDialog.ui" line="45"/>
@@ -378,17 +378,17 @@ English or Russian please.</source>
 <context>
     <name>InteractiveXSpline</name>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
         <translation>Nový kontrolný bod vytvoríte kliknutím.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
         <translation>S týmto bodom môžete hýbať.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation>Posuňte tento bod alebo ho zmažte klávesou Del nebo D.</translation>
     </message>
@@ -399,7 +399,8 @@ English or Russian please.</source>
         <location filename="../LoadFileTask.cpp" line="136"/>
         <source>The following file could not be loaded:
 %1</source>
-        <translation>Tento súbor nemohl byť načítaný:</translation>
+        <translation type="unfinished">Tento súbor nemohl byť načítaný: 
+%1</translation>
     </message>
 </context>
 <context>
@@ -412,12 +413,12 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="134"/>
         <source>Keep current page in view.</source>
-        <translation>Ponechať zobrazenú aktuálnu stranu</translation>
+        <translation>Ponechať zobrazenú aktuálnu stranu.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="160"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
-        <translation>K presunu medzi stranami slúžia klávesy Home, End PgUp (alebo Q), PgDown (alebo W)</translation>
+        <translation>K presunu medzi stranami slúžia klávesy Home, End PgUp (alebo Q), PgDown (alebo W).</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="189"/>
@@ -441,7 +442,7 @@ English or Russian please.</source>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save Project</source>
         <translation>Uložiť projekt</translation>
     </message>
@@ -558,105 +559,105 @@ English or Russian please.</source>
         <translation>O programe</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="460"/>
+        <location filename="../MainWindow.cpp" line="448"/>
         <source>Stop batch processing</source>
         <translation>Zastaviť dávkové spracovanie</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save this project?</source>
         <translation>Uložiť projekt?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="905"/>
+        <location filename="../MainWindow.cpp" line="893"/>
         <source>Insert before ...</source>
         <translation>Vložiť pred ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="908"/>
+        <location filename="../MainWindow.cpp" line="896"/>
         <source>Insert after ...</source>
         <translation>Vložiť za ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="914"/>
+        <location filename="../MainWindow.cpp" line="902"/>
         <source>Remove from project ...</source>
-        <translation>Odstrániť z projektu</translation>
+        <translation>Odstrániť z projektu ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="935"/>
+        <location filename="../MainWindow.cpp" line="923"/>
         <source>Insert here ...</source>
         <translation>Vložiť sem ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1226"/>
-        <location filename="../MainWindow.cpp" line="1294"/>
+        <location filename="../MainWindow.cpp" line="1214"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Scan Tailor Projects</source>
         <translation>Zoznam projektov</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1293"/>
+        <location filename="../MainWindow.cpp" line="1281"/>
         <source>Open Project</source>
         <translation>Otvoriť projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1311"/>
-        <location filename="../MainWindow.cpp" line="1320"/>
-        <location filename="../MainWindow.cpp" line="1610"/>
-        <location filename="../MainWindow.cpp" line="1641"/>
-        <location filename="../MainWindow.cpp" line="1718"/>
+        <location filename="../MainWindow.cpp" line="1299"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1598"/>
+        <location filename="../MainWindow.cpp" line="1629"/>
+        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
         <source>Unable to open the project file.</source>
         <translation>Nemožno otvoriť súbor s projektom.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1321"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
         <source>The project file is broken.</source>
         <translation>Súbor s projektom je poškodený.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1506"/>
+        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Výstup zatiaľ nie je možný, lebo ešte nie je známa konečná veľkosť strán.
 Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obsah&quot; alebo &quot;Okraje&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1527"/>
         <source>Unnamed</source>
         <translation>Nepomenovaný</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1544"/>
-        <source>%1 - Scan Tailor Plus %2</source>
-        <translation type="unfinished"></translation>
+        <location filename="../MainWindow.cpp" line="1532"/>
+        <source>%1 - Scan Tailor %2</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1611"/>
-        <location filename="../MainWindow.cpp" line="1642"/>
+        <location filename="../MainWindow.cpp" line="1599"/>
+        <location filename="../MainWindow.cpp" line="1630"/>
         <source>Error saving the project file!</source>
         <translation>Chyba pri ukladaní súboru s projektom!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1689"/>
+        <location filename="../MainWindow.cpp" line="1677"/>
         <source>File to insert</source>
-        <translation>Soubor na vloženie</translation>
+        <translation>Súbor na vloženie</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1695"/>
+        <location filename="../MainWindow.cpp" line="1683"/>
         <source>Images not in project (%1)</source>
         <translation>Obrázky, ktoré nie sú v projekte (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1719"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
         <source>Error opening the image file.</source>
         <translation>Chyba pri otváraní súboru s obrázkom.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1759"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Remove</source>
         <translation>Odstrániť</translation>
     </message>
@@ -676,7 +677,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="78"/>
         <source>Open Project ...</source>
-        <translation>Otevřít projekt ...</translation>
+        <translation>Otvoriť projekt ...</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="103"/>
@@ -770,7 +771,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="188"/>
         <source>Apply to ...</source>
-        <translation>Použiť na</translation>
+        <translation>Použiť na ...</translation>
     </message>
 </context>
 <context>
@@ -975,7 +976,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="509"/>
         <source>Despeckling</source>
-        <translation>Vyčistit</translation>
+        <translation>Čistenie</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
@@ -1063,7 +1064,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="87"/>
         <source>Top</source>
-        <translation>Navrch</translation>
+        <translation>Hore</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
@@ -1083,7 +1084,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
         <source>Bottom</source>
-        <translation>Naspodok</translation>
+        <translation>Dolu</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
@@ -1307,7 +1308,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="178"/>
         <source>Fix DPIs, even if they look OK</source>
-        <translation>Opraviť DPI, aj keď vyzerajú vporiadku</translation>
+        <translation>Opraviť DPI</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="526"/>
@@ -1491,116 +1492,17 @@ Vyraďte ich z projektu.</translation>
         <translation>Nastavenie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="24"/>
-        <source>General</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="32"/>
-        <source>Autosave</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="39"/>
-        <source>each</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="60"/>
-        <source>minute</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="82"/>
+        <location filename="../ui/SettingsDialog.ui" line="20"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Používať 3D akceleráciu pre použivateľské rozhranie</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="103"/>
-        <source>Output</source>
-        <translation type="unfinished">Výstup</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="109"/>
-        <source>Threshold</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="132"/>
-        <source>Threshold Range value:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message utf8="true">
-        <location filename="../ui/SettingsDialog.ui" line="139"/>
-        <source>±</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="253"/>
-        <source>Thinner</source>
-        <translation type="unfinished">Tenšie</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="285"/>
-        <source>Thicker</source>
-        <translation type="unfinished">Hrubšie</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="306"/>
-        <source>Despeckling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="330"/>
-        <location filename="../ui/SettingsDialog.ui" line="333"/>
-        <source>No despeckling</source>
-        <translation type="unfinished">Bez čistenia</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="365"/>
-        <location filename="../ui/SettingsDialog.ui" line="368"/>
-        <source>Cautious despeckling</source>
-        <translation type="unfinished">Opatrné čistenie</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="400"/>
-        <location filename="../ui/SettingsDialog.ui" line="403"/>
-        <source>Normal despeckling</source>
-        <translation type="unfinished">Normálne čistenie</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="432"/>
-        <location filename="../ui/SettingsDialog.ui" line="435"/>
-        <source>Aggressive despeckling</source>
-        <translation type="unfinished">Agresívne čistenie</translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="482"/>
-        <source>Bitonal Compression</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="499"/>
-        <source>Bitonal Compression:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="506"/>
-        <source>CCITT Group 4 Fax</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="513"/>
-        <source>LZW</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../SettingsDialog.cpp" line="96"/>
+        <location filename="../SettingsDialog.cpp" line="36"/>
         <source>Compiled without OpenGL support.</source>
         <translation>Skompilované bez podpory OpenGL.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="101"/>
+        <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>Váš hardvér nemá potrebné vlastnosti.</translation>
     </message>
@@ -1696,7 +1598,7 @@ Vyraďte ich z projektu.</translation>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="45"/>
         <source>Drag the vertex.</source>
-        <translation>Posunúť vrchol</translation>
+        <translation>Posunúť vrchol.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="46"/>
@@ -1730,9 +1632,9 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="52"/>
+        <location filename="../filters/deskew/Filter.cpp" line="55"/>
         <source>Deskew</source>
-        <translation type="unfinished">Natočenie</translation>
+        <translation>Natočenie</translation>
     </message>
 </context>
 <context>
@@ -1767,7 +1669,7 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
         <translation>Opraviť orientáciu</translation>
     </message>
@@ -1813,7 +1715,7 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="58"/>
+        <location filename="../filters/output/Filter.cpp" line="63"/>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
@@ -1821,42 +1723,42 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
         <translation>Čierna a biela</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
         <translation>Farebné / Stupne šedej</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
         <translation>Zmiešané</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="414"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
         <translation>Použiť úroveň čistenia</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="494"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="667"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
         <translation>Vypnuté</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
         <source>Auto</source>
         <translation>Automaticky</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
         <source>Manual</source>
         <translation>Ručne</translation>
     </message>
@@ -1864,60 +1766,60 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="505"/>
+        <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Zóny obrázkov sú možné len v zmiešanom móde.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="557"/>
+        <location filename="../filters/output/Task.cpp" line="558"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Čistenie nemožno použiť vo farebnom / šedom móde.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="574"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="575"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Picture Zones</source>
         <translation>Zóny obrázkov</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="576"/>
+        <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Fill Zones</source>
-        <translation>Prázdné zóny</translation>
+        <translation>Prázdne zóny</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="577"/>
+        <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
         <translation>Deformácie</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="578"/>
+        <location filename="../filters/output/Task.cpp" line="579"/>
         <source>Despeckling</source>
-        <translation>Vyčistiť</translation>
+        <translation>Čistenie</translation>
     </message>
 </context>
 <context>
     <name>page_layout::Filter</name>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="64"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="67"/>
         <source>Natural order</source>
         <translation>Postupné zoradenie</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="65"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="68"/>
         <source>Order by increasing width</source>
         <translation>Zoradiť podľa rastúcej šírky</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="66"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="69"/>
         <source>Order by increasing height</source>
         <translation>Zoradiť podľa rastúcej výšky</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="76"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="79"/>
         <source>Margins</source>
         <translation>Okraje</translation>
     </message>
@@ -1927,7 +1829,7 @@ Vyraďte ich z projektu.</translation>
     <message>
         <location filename="../filters/page_layout/ImageView.cpp" line="76"/>
         <source>Resize margins by dragging any of the solid lines.</source>
-        <translation type="unfinished">Zmeňte okraje ťahaním za ľubovoľný okraj.</translation>
+        <translation>Zmeňte okraje ťahaním za ľubovoľný okraj.</translation>
     </message>
 </context>
 <context>
@@ -1946,7 +1848,7 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="64"/>
+        <location filename="../filters/page_split/Filter.cpp" line="67"/>
         <source>Split Pages</source>
         <translation>Orezať strany</translation>
     </message>
@@ -1998,22 +1900,22 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="56"/>
+        <location filename="../filters/select_content/Filter.cpp" line="59"/>
         <source>Natural order</source>
         <translation>Postupné zoradenie</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="57"/>
+        <location filename="../filters/select_content/Filter.cpp" line="60"/>
         <source>Order by increasing width</source>
         <translation>Zoradiť podľa rastúcej šírky</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="58"/>
+        <location filename="../filters/select_content/Filter.cpp" line="61"/>
         <source>Order by increasing height</source>
         <translation>Zoradiť podľa rastúcej výšky</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="68"/>
+        <location filename="../filters/select_content/Filter.cpp" line="71"/>
         <source>Select Content</source>
         <translation>Vybrať obsah</translation>
     </message>

@@ -22,7 +22,7 @@
 #include "Dpi.h"
 #include "ColorParams.h"
 #include "DewarpingMode.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "DepthPerception.h"
 #include "DespeckleLevel.h"
 
@@ -51,9 +51,9 @@ public:
 
 	void setDewarpingMode(DewarpingMode const& mode) { m_dewarpingMode = mode; }
 
-	DistortionModel const& distortionModel() const { return m_distortionModel; }
+	dewarping::DistortionModel const& distortionModel() const { return m_distortionModel; }
 
-	void setDistortionModel(DistortionModel const& model) { m_distortionModel = model; }
+	void setDistortionModel(dewarping::DistortionModel const& model) { m_distortionModel = model; }
 
 	DepthPerception const& depthPerception() const { return m_depthPerception; }
 
@@ -73,7 +73,7 @@ private:
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
-	DistortionModel m_distortionModel;
+	dewarping::DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;

@@ -23,7 +23,7 @@
 #include "ApplyColorsDialog.h"
 #include "Settings.h"
 #include "Params.h"
-#include "DistortionModel.h"
+#include "dewarping/DistortionModel.h"
 #include "DespeckleLevel.h"
 #include "ZoneSet.h"
 #include "PictureZoneComparator.h"
@@ -200,7 +200,7 @@ OptionsWidget::tabChanged(ImageViewTab const tab)
 }
 
 void
-OptionsWidget::distortionModelChanged(DistortionModel const& model)
+OptionsWidget::distortionModelChanged(dewarping::DistortionModel const& model)
 {
 	m_ptrSettings->setDistortionModel(m_pageId, model);
 	
@@ -537,7 +537,7 @@ OptionsWidget::reloadIfNecessary()
 	ZoneSet saved_picture_zones;
 	ZoneSet saved_fill_zones;
 	DewarpingMode saved_dewarping_mode;
-	DistortionModel saved_distortion_model;
+	dewarping::DistortionModel saved_distortion_model;
 	DepthPerception saved_depth_perception;
 	DespeckleLevel saved_despeckle_level = DESPECKLE_CAUTIOUS;
 	

@@ -26,6 +26,8 @@
 #include "imageproc/GaussBlur.h"
 #include <boost/scoped_array.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 #include <QImage>
 #include <QPainter>
 #include <QPen>
@@ -40,10 +42,15 @@
 
 using namespace imageproc;
 
+namespace dewarping
+{
+
 TextLineRefiner::TextLineRefiner(
 	GrayImage const& image, Dpi const& dpi, DebugImages* dbg)
 :	m_gradient(image.width(), image.height(), /*padding=*/1)
 {
+	using namespace boost::lambda;
+
 	verticalSobel(image, m_gradient);
 	if (dbg) {
 		dbg->add(visualizeGradient(m_gradient, &image.toQImage()), "vertical_gradient");
@@ -52,8 +59,9 @@ TextLineRefiner::TextLineRefiner(
 	float const h_sigma = (4.0f / 200.f) * dpi.horizontal();
 	float const v_sigma = (4.0f / 200.f) * dpi.vertical();
 	gaussBlurGeneric(
-		StaticCastValueConv<float>(), m_gradient.data(),
-		m_gradient.stride(), image.size(), h_sigma, v_sigma
+		image.size(), h_sigma, v_sigma,
+		m_gradient.data(), m_gradient.stride(), _1,
+		m_gradient.data(), m_gradient.stride(), _1 = _2
 	);
 	if (dbg) {
 		dbg->add(visualizeGradient(m_gradient, &image.toQImage()), "smoothed_gradient");
@@ -587,3 +595,5 @@ TextLineRefiner::visualizeSnakes(std::vector<Snake> const& snakes, QImage const*
 
 	return canvas;
 }
+
+} // namespace dewarping

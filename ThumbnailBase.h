@@ -72,7 +72,7 @@ protected:
 	
 	/**
 	 * By default, the image is clipped by both the crop area (as defined
-	 * by imageXform().resultingCropArea()), and the physical boundaries of
+	 * by imageXform().resultingPostCropArea()), and the physical boundaries of
 	 * the image itself.  Basically a point won't be clipped only if it's both
 	 * inside of the crop area and inside the image.
 	 * Extended clipping area only includes the cropping area, so it's possible
@@ -84,7 +84,12 @@ protected:
 	
 	ImageTransformation const& imageXform() const { return m_imageXform; }
 	
-	QTransform const& imageToThumb() const { return m_postScaleXform; }
+	/**
+	 * \brief Converts from the virtual image coordinates to thumbnail image coordinates.
+	 *
+	 * Virtual image coordinates is what you get after ImageTransformation.
+	 */
+	QTransform const& virtToThumb() const { return m_postScaleXform; }
 private:
 	class LoadCompletionHandler;
 	

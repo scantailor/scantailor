@@ -16,33 +16,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OUTPUT_DISTORTION_MODEL_H_
-#define OUTPUT_DISTORTION_MODEL_H_
+#ifndef DEWARPING_DISTORTION_MODEL_H_
+#define DEWARPING_DISTORTION_MODEL_H_
 
 #include "Curve.h"
 
-class CylindricalSurfaceDewarper;
 class QDomDocument;
 class QDomElement;
 class QString;
 class QRectF;
 class QTransform;
 
-namespace output
+namespace dewarping
 {
+
+class CylindricalSurfaceDewarper;
 
 class DistortionModel
 {
 public:
+	/**
+	 * \brief Constructs a null distortion model.
+	 */
 	DistortionModel();
 
-	DistortionModel(QDomElement const& el);
+	explicit DistortionModel(QDomElement const& el);
 
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
 	/**
 	 * Returns true if the model is not null and in addition meets certain
-	 * criteria, like being curve endpoints forming a convex quadrilateral.
+	 * criteria, like curve endpoints forming a convex quadrilateral.
 	 */
 	bool isValid() const;
 
@@ -77,6 +81,6 @@ private:
 	Curve m_bottomCurve;
 };
 
-} // namespace output
+} // namespace dewarping
 
 #endif

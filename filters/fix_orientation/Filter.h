@@ -79,7 +79,9 @@ public:
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
 		IntrusivePtr<page_split::CacheDrivenTask> const& next_task);
 	
-	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); }
+	OptionsWidget* optionsWidget() { return m_ptrOptionsWidget.get(); };
+
+	Settings* getSettings() { return m_ptrSettings.get(); };
 private:
 	void writeImageSettings(
 		QDomDocument& doc, QDomElement& filter_el,

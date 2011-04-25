@@ -83,7 +83,6 @@
 #include "ui_BatchProcessingLowerPanel.h"
 #include "config.h"
 #include "version.h"
-#include "SettingsManager.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -384,7 +383,7 @@ MainWindow::switchToNewProject(
 	if (out_dir.isEmpty()) {
 		m_ptrThumbnailCache.reset();
 	} else {
-		m_ptrThumbnailCache = createThumbnailCache();
+		m_ptrThumbnailCache = Utils::createThumbnailCache(m_outFileNameGen.outDir());
 	}
 	resetThumbSequence(currentPageOrderProvider());
 
@@ -392,18 +391,6 @@ MainWindow::switchToNewProject(
 	updateProjectActions();
 	updateWindowTitle();
 	updateMainArea();
-}
-
-IntrusivePtr<ThumbnailPixmapCache>
-MainWindow::createThumbnailCache()
-{
-	QSize const max_pixmap_size(200, 200);
-	
-	return IntrusivePtr<ThumbnailPixmapCache>(
-		new ThumbnailPixmapCache(
-			m_outFileNameGen.outDir()+"/cache/thumbs", max_pixmap_size, 40, 5
-		)
-	);
 }
 
 void
@@ -1865,9 +1852,8 @@ MainWindow::createCompositeTask(
 	}
 
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
-		SettingsManager sm;
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug, sm.GetCompressG4Fax()
+			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
 		);
 		debug = false;
 	}

@@ -59,6 +59,7 @@ SetCompressor /SOLID /FINAL lzma
 Section
   SetOutPath $INSTDIR
   File "${SCANTAILOR_EXE}"
+  File "${SCANTAILOR_BATCH_EXE}"
   !if "${MINGWM10_DLL}" != ""
     File "${MINGWM10_DLL}"
   !endif

@@ -58,3 +58,16 @@ Utils::richTextForLink(
 		"text-indent:0px;\"><a href=\"%1\">%2</a></p></body></html>"
 	).arg(Qt::escape(target), Qt::escape(label));
 }
+
+
+IntrusivePtr<ThumbnailPixmapCache>
+Utils::createThumbnailCache(QString output_directory)
+{
+	QSize const max_pixmap_size(200, 200);
+	QString const thumbs_cache_path(output_directory+"/cache/thumbs");
+	
+	return IntrusivePtr<ThumbnailPixmapCache>(
+		new ThumbnailPixmapCache(thumbs_cache_path, max_pixmap_size, 40, 5)
+	);
+}
+

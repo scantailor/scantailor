@@ -33,11 +33,16 @@ ChangeDewarpingDialog::ChangeDewarpingDialog(
 	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
 	m_curPage(cur_page),
-	m_mode(mode)
+	m_mode(mode),
+	m_pScopeGroup(new QButtonGroup(this))
 {
 	using namespace boost::lambda;
 
 	ui.setupUi(this);
+	m_pScopeGroup->addButton(ui.thisPageRB);
+	m_pScopeGroup->addButton(ui.allPagesRB);
+	m_pScopeGroup->addButton(ui.thisPageAndFollowersRB);
+	m_pScopeGroup->addButton(ui.selectedPagesRB);
 	if (m_selectedPages.size() <= 1) {
 		ui.selectedPagesWidget->setEnabled(false);
 	}

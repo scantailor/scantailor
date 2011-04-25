@@ -36,6 +36,9 @@
 #include <QDomElement>
 #include <memory>
 
+#include "CommandLine.h"
+#include "ImageViewTab.h"
+
 namespace output
 {
 
@@ -43,9 +46,11 @@ Filter::Filter(
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrSettings(new Settings)
 {
-	m_ptrOptionsWidget.reset(
-		new OptionsWidget(m_ptrSettings, page_selection_accessor)
-	);
+	if (CommandLine::get().isGui()) {
+		m_ptrOptionsWidget.reset(
+			new OptionsWidget(m_ptrSettings, page_selection_accessor)
+		);
+	}
 }
 
 Filter::~Filter()
@@ -171,13 +176,16 @@ Filter::createTask(
 	PageId const& page_id,
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	OutputFileNameGenerator const& out_file_name_gen,
-	bool const batch, bool const debug, bool const bitonal_g4fax)
+	bool const batch, bool const debug)
 {
+	ImageViewTab lastTab(TAB_OUTPUT);
+	if (m_ptrOptionsWidget.get() != 0)
+		lastTab = m_ptrOptionsWidget->lastTab();
 	return IntrusivePtr<Task>(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
 			thumbnail_cache, page_id, out_file_name_gen,
-			m_ptrOptionsWidget->lastTab(), batch, debug, bitonal_g4fax
+			lastTab, batch, debug
 		)
 	);
 }

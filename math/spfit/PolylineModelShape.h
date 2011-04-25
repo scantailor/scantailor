@@ -19,6 +19,7 @@
 #ifndef SPFIT_POLYLINE_MODEL_SHAPE_H_
 #define SPFIT_POLYLINE_MODEL_SHAPE_H_
 
+#include "NonCopyable.h"
 #include "ModelShape.h"
 #include "SqDistApproximant.h"
 #include "XSpline.h"
@@ -32,18 +33,20 @@ namespace spfit
 
 class PolylineModelShape : public ModelShape
 {
+	DECLARE_NON_COPYABLE(PolylineModelShape)
 public:	
 	PolylineModelShape(std::vector<QPointF> const& polyline);
 
 	virtual QRectF boundingBox() const;
 
-	virtual SqDistApproximant localSqDistApproximant(QPointF const& pt, int flags = 0) const;
+	virtual SqDistApproximant localSqDistApproximant(
+		QPointF const& pt, FittableSpline::SampleFlags flags) const;
 private:
 	static SqDistApproximant calcApproximant(
 		Vec2d const& region_origin, Vec2d const& frenet_frame_origin,
 		Vec2d const& unit_tangent, Vec2f const& unit_normal, double curvature);
 
-	std::vector<imageproc::XSpline::PointAndDerivs> m_vertices;
+	std::vector<XSpline::PointAndDerivs> m_vertices;
 	QRectF m_boundingBox;
 };
 

@@ -89,13 +89,13 @@ Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
 	
-	Dependencies const deps(data.xform().resultingCropArea());
-	
+	Dependencies const deps(data.xform().resultingPreCropArea());
+
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	if (params.get() && !params->dependencies().matches(deps) && params->mode() == MODE_AUTO) {
+	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO)) {
 		params.reset();
 	}
-	
+
 	OptionsWidget::UiData ui_data;
 	ui_data.setSizeCalc(PhysSizeCalc(data.xform()));
 

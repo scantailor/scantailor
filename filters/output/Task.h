@@ -57,14 +57,13 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
-		ImageViewTab last_tab, bool batch, bool debug, bool const bitonal_g4fax);
+		ImageViewTab last_tab, bool batch, bool debug);
 	
 	virtual ~Task();
 	
 	FilterResultPtr process(
 		TaskStatus const& status, FilterData const& data,
-		QPolygonF const& content_rect_phys,
-		QPolygonF const& page_rect_phys);
+		QPolygonF const& content_rect_phys);
 private:
 	class UiUpdater;
 	

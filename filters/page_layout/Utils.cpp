@@ -99,12 +99,12 @@ Utils::calcSoftMarginsMM(
 		// This means we are not aligning this page with others.
 		return Margins();
 	}
-	
+
 	double top = 0.0;
 	double bottom = 0.0;
 	double left = 0.0;
 	double right = 0.0;
-	
+
 	double const delta_width =
 			aggregate_hard_size_mm.width() - hard_size_mm.width();
 	if (delta_width > 0.0) {
@@ -120,9 +120,9 @@ Utils::calcSoftMarginsMM(
 				break;
 		}
 	}
-	
+
 	double const delta_height =
-			aggregate_hard_size_mm.height() - hard_size_mm.height();
+		aggregate_hard_size_mm.height() - hard_size_mm.height();
 	if (delta_height > 0.0) {
 		switch (alignment.vertical()) {
 			case Alignment::TOP:
@@ -159,21 +159,9 @@ Utils::calcPageRectPhys(
 			hard_size_mm, aggregate_hard_size_mm, params.alignment()
 		)
 	);
-	
+
 	extendPolyRectWithMargins(poly_mm, soft_margins_mm);
 	return phys_xform.mmToPixels().map(poly_mm);
-}
-
-ImageTransformation
-Utils::calcPresentationTransform(
-	ImageTransformation const& orig_xform,
-	QPolygonF const& physical_crop_area)
-{
-	ImageTransformation new_xform(orig_xform);
-	new_xform.setCropArea(QPolygonF()); // Reset the crop area and deskew angle.
-	new_xform.setCropArea(new_xform.transform().map(physical_crop_area));
-	new_xform.setPostRotation(orig_xform.postRotation());
-	return new_xform;
 }
 
 QPointF
