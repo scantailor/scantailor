@@ -378,105 +378,109 @@ Taxman</translation>
     <name>MainWindow</name>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="520"/>
+        <location filename="../MainWindow.cpp" line="521"/>
         <source>Save Project</source>
         <translation>Sauvegarder le Projet</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="520"/>
+        <location filename="../MainWindow.cpp" line="521"/>
         <source>Save this project?</source>
         <translation>Sauvegarder ce projet ?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="893"/>
+        <location filename="../MainWindow.cpp" line="894"/>
         <source>Insert before ...</source>
         <translation>Insérer avant ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="896"/>
+        <location filename="../MainWindow.cpp" line="897"/>
         <source>Insert after ...</source>
         <translation>Insérer après ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="902"/>
+        <location filename="../MainWindow.cpp" line="903"/>
         <source>Remove from project ...</source>
         <translation>Retirer du projet ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="923"/>
+        <location filename="../MainWindow.cpp" line="924"/>
         <source>Insert here ...</source>
         <translation>Insérer ici ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1214"/>
-        <location filename="../MainWindow.cpp" line="1282"/>
+        <location filename="../MainWindow.cpp" line="1215"/>
+        <location filename="../MainWindow.cpp" line="1283"/>
         <source>Scan Tailor Projects</source>
         <translation>Projets Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1281"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Open Project</source>
         <translation>Ouvrir un projet</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1299"/>
-        <location filename="../MainWindow.cpp" line="1308"/>
-        <location filename="../MainWindow.cpp" line="1598"/>
-        <location filename="../MainWindow.cpp" line="1629"/>
-        <location filename="../MainWindow.cpp" line="1706"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
+        <location filename="../MainWindow.cpp" line="1607"/>
+        <location filename="../MainWindow.cpp" line="1638"/>
+        <location filename="../MainWindow.cpp" line="1715"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1300"/>
+        <location filename="../MainWindow.cpp" line="1301"/>
         <source>Unable to open the project file.</source>
         <translation>Impossible d&apos;ouvrir le.fichier du projet.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1309"/>
+        <location filename="../MainWindow.cpp" line="1310"/>
         <source>The project file is broken.</source>
         <translation>Le fichier du projet est endommagé.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1494"/>
+        <location filename="../MainWindow.cpp" line="1503"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>La sortie n&apos;est pas encore possible, car la taille final des pages n&apos;est pas connue.
 Pour la déterminer, lancez le processus de traitement à l&apos;étape &quot;Sélectionner le contenu&quot; ou &quot;Marges&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1527"/>
+        <location filename="../MainWindow.cpp" line="1536"/>
         <source>Unnamed</source>
         <translation>Sans Nom</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1532"/>
-        <source>%1 - Scan Tailor %2</source>
-        <translation>%1 - Scan Tailor %2</translation>
+        <location filename="../MainWindow.cpp" line="1541"/>
+        <source>%1 - Scan Tailor Plus %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1599"/>
-        <location filename="../MainWindow.cpp" line="1630"/>
+        <source>%1 - Scan Tailor %2</source>
+        <translation type="obsolete">%1 - Scan Tailor %2</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1608"/>
+        <location filename="../MainWindow.cpp" line="1639"/>
         <source>Error saving the project file!</source>
         <translation>Erreur lors de la sauvegarde du fichier du projet !</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1677"/>
+        <location filename="../MainWindow.cpp" line="1686"/>
         <source>File to insert</source>
         <translation>Fichier à insérer</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1683"/>
+        <location filename="../MainWindow.cpp" line="1692"/>
         <source>Images not in project (%1)</source>
         <translation>Images non présente dans le projet (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1707"/>
+        <location filename="../MainWindow.cpp" line="1716"/>
         <source>Error opening the image file.</source>
         <translation>Erreur à l&apos;ouverture du fichier de l&apos;image.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1747"/>
+        <location filename="../MainWindow.cpp" line="1756"/>
         <source>Remove</source>
         <translation></translation>
     </message>
@@ -623,7 +627,7 @@ Pour la déterminer, lancez le processus de traitement à l&apos;étape &quot;S�
         <translation>À propos</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="448"/>
+        <location filename="../MainWindow.cpp" line="449"/>
         <source>Stop batch processing</source>
         <translation>Arrêter le traitement</translation>
     </message>
@@ -1463,12 +1467,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="36"/>
+        <location filename="../SettingsDialog.cpp" line="101"/>
         <source>Compiled without OpenGL support.</source>
         <translation>Compilé sans le support OpenGL.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="41"/>
+        <location filename="../SettingsDialog.cpp" line="106"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>Votre matériel / driver n&apos;a pas les caractéristiques requises.</translation>
     </message>
@@ -1478,9 +1482,118 @@ p, li { white-space: pre-wrap; }
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="20"/>
+        <location filename="../ui/SettingsDialog.ui" line="24"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="32"/>
+        <source>Autosave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="39"/>
+        <source>each</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="56"/>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="78"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Utilise l&apos;accélération 3D pour l&apos;interface</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="99"/>
+        <source>Default for a new Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="109"/>
+        <source>Page Layout</source>
+        <translation type="unfinished">Mise en page</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="114"/>
+        <source>Output</source>
+        <translation type="unfinished">Sortie</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="120"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="143"/>
+        <source>Threshold Range value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/SettingsDialog.ui" line="150"/>
+        <source>±</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="264"/>
+        <source>Thinner</source>
+        <translation type="unfinished">Éclaircir</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="296"/>
+        <source>Thicker</source>
+        <translation type="unfinished">Épaissir</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="317"/>
+        <source>Despeckling</source>
+        <translation type="unfinished">Élimination du bruit</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="341"/>
+        <location filename="../ui/SettingsDialog.ui" line="344"/>
+        <source>No despeckling</source>
+        <translation type="unfinished">Pas d&apos;élimination du bruit</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="376"/>
+        <location filename="../ui/SettingsDialog.ui" line="379"/>
+        <source>Cautious despeckling</source>
+        <translation type="unfinished">Légère élimination du bruit</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="411"/>
+        <location filename="../ui/SettingsDialog.ui" line="414"/>
+        <source>Normal despeckling</source>
+        <translation type="unfinished">Élimination du bruit standard</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="443"/>
+        <location filename="../ui/SettingsDialog.ui" line="446"/>
+        <source>Aggressive despeckling</source>
+        <translation type="unfinished">Élimination aggressive du bruit</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="493"/>
+        <source>Bitonal Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="510"/>
+        <source>Bitonal Compression:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="517"/>
+        <source>CCITT Group 4 Fax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="524"/>
+        <source>LZW</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1703,42 +1816,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Black and White</source>
         <translation>Noir et blanc</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
         <source>Color / Grayscale</source>
         <translation>Couleur / Niveaux de gris</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Mixed</source>
         <translation>Mixte</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="414"/>
         <source>Apply Despeckling Level</source>
         <translation>Appliquer le réglage d&apos;élimination du bruit</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="494"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="667"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
         <source>Auto</source>
         <translation type="unfinished">Auto</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
         <source>Manual</source>
         <translation type="unfinished">Manuel</translation>
     </message>
@@ -1746,37 +1859,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="506"/>
+        <location filename="../filters/output/Task.cpp" line="511"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Les zones images sont uniquement disponnible dans le mode Mixte.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="558"/>
+        <location filename="../filters/output/Task.cpp" line="563"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>l&apos;élimination du bruit ne peut être effectuée en mode Couleur / Niveau de gris.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="575"/>
+        <location filename="../filters/output/Task.cpp" line="580"/>
         <source>Output</source>
         <translation>Sortie</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="576"/>
+        <location filename="../filters/output/Task.cpp" line="581"/>
         <source>Picture Zones</source>
         <translation>Zone images</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="577"/>
+        <location filename="../filters/output/Task.cpp" line="582"/>
         <source>Fill Zones</source>
         <translation>Zones de remplissage</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="578"/>
+        <location filename="../filters/output/Task.cpp" line="583"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="579"/>
+        <location filename="../filters/output/Task.cpp" line="584"/>
         <source>Despeckling</source>
         <translation>Élimination du bruit</translation>
     </message>

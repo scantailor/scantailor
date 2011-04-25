@@ -388,71 +388,76 @@ Taxman</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="520"/>
+        <location filename="../MainWindow.cpp" line="521"/>
         <source>Save Project</source>
         <translation>Запазване на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="520"/>
+        <location filename="../MainWindow.cpp" line="521"/>
         <source>Save this project?</source>
         <translation>Да се запази ли този проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="893"/>
+        <location filename="../MainWindow.cpp" line="894"/>
         <source>Insert before ...</source>
         <translation>Вмъкни преди...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="896"/>
+        <location filename="../MainWindow.cpp" line="897"/>
         <source>Insert after ...</source>
         <translation>Вмъкни след...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="902"/>
+        <location filename="../MainWindow.cpp" line="903"/>
         <source>Remove from project ...</source>
         <translation>Премахване от проекта...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="923"/>
+        <location filename="../MainWindow.cpp" line="924"/>
         <source>Insert here ...</source>
         <translation>Вмъкни тук ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1214"/>
-        <location filename="../MainWindow.cpp" line="1282"/>
+        <location filename="../MainWindow.cpp" line="1215"/>
+        <location filename="../MainWindow.cpp" line="1283"/>
         <source>Scan Tailor Projects</source>
         <translation>Проекти на Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1281"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Open Project</source>
         <translation>Отваряне на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1299"/>
-        <location filename="../MainWindow.cpp" line="1308"/>
-        <location filename="../MainWindow.cpp" line="1598"/>
-        <location filename="../MainWindow.cpp" line="1629"/>
-        <location filename="../MainWindow.cpp" line="1706"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
+        <location filename="../MainWindow.cpp" line="1607"/>
+        <location filename="../MainWindow.cpp" line="1638"/>
+        <location filename="../MainWindow.cpp" line="1715"/>
         <source>Error</source>
         <translation>Грешка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1300"/>
+        <location filename="../MainWindow.cpp" line="1301"/>
         <source>Unable to open the project file.</source>
         <translation>Проектният файл не може да бъде отворен.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1309"/>
+        <location filename="../MainWindow.cpp" line="1310"/>
         <source>The project file is broken.</source>
         <translation>Проектният файл е повреден.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1494"/>
+        <location filename="../MainWindow.cpp" line="1503"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Изходният резулат все още не е възможен, тъй като не се знае крайният размер на страниците.
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1541"/>
+        <source>%1 - Scan Tailor Plus %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
@@ -461,33 +466,28 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1527"/>
+        <location filename="../MainWindow.cpp" line="1536"/>
         <source>Unnamed</source>
         <translation>Без име</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1532"/>
-        <source>%1 - Scan Tailor %2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="1599"/>
-        <location filename="../MainWindow.cpp" line="1630"/>
+        <location filename="../MainWindow.cpp" line="1608"/>
+        <location filename="../MainWindow.cpp" line="1639"/>
         <source>Error saving the project file!</source>
         <translation>Грешка при запазване на проектния файл!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1677"/>
+        <location filename="../MainWindow.cpp" line="1686"/>
         <source>File to insert</source>
         <translation>Файл за вмъкване</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1683"/>
+        <location filename="../MainWindow.cpp" line="1692"/>
         <source>Images not in project (%1)</source>
         <translation>Изображения, които не са в проекта (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1707"/>
+        <location filename="../MainWindow.cpp" line="1716"/>
         <source>Error opening the image file.</source>
         <translation>Грешка при отваряне на файла с изображението.</translation>
     </message>
@@ -496,7 +496,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страница %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1747"/>
+        <location filename="../MainWindow.cpp" line="1756"/>
         <source>Remove</source>
         <translation>Премахване</translation>
     </message>
@@ -653,7 +653,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>За програмата</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="448"/>
+        <location filename="../MainWindow.cpp" line="449"/>
         <source>Stop batch processing</source>
         <translation>Спиране на масовата обработка</translation>
     </message>
@@ -1541,12 +1541,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="36"/>
+        <location filename="../SettingsDialog.cpp" line="101"/>
         <source>Compiled without OpenGL support.</source>
         <translation>Компилирано без поддръжка на OpenGL.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="41"/>
+        <location filename="../SettingsDialog.cpp" line="106"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
         <translation>Вашият хардуер (или драйвер) няма нужните характеристики.</translation>
     </message>
@@ -1556,9 +1556,118 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="20"/>
+        <location filename="../ui/SettingsDialog.ui" line="24"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="32"/>
+        <source>Autosave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="39"/>
+        <source>each</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="56"/>
+        <source>minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="78"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Използване 3D ускорение за потребителския интрефейс</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="99"/>
+        <source>Default for a new Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="109"/>
+        <source>Page Layout</source>
+        <translation type="unfinished">Оформление на страница</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="114"/>
+        <source>Output</source>
+        <translation type="unfinished">Краен резултат</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="120"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="143"/>
+        <source>Threshold Range value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/SettingsDialog.ui" line="150"/>
+        <source>±</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="264"/>
+        <source>Thinner</source>
+        <translation type="unfinished">По-тънко</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="296"/>
+        <source>Thicker</source>
+        <translation type="unfinished">По-дебело</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="317"/>
+        <source>Despeckling</source>
+        <translation type="unfinished">Почистване на шум</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="341"/>
+        <location filename="../ui/SettingsDialog.ui" line="344"/>
+        <source>No despeckling</source>
+        <translation type="unfinished">Без почистване</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="376"/>
+        <location filename="../ui/SettingsDialog.ui" line="379"/>
+        <source>Cautious despeckling</source>
+        <translation type="unfinished">Предпазливо почистване на шум</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="411"/>
+        <location filename="../ui/SettingsDialog.ui" line="414"/>
+        <source>Normal despeckling</source>
+        <translation type="unfinished">Нормално почистване на шум</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="443"/>
+        <location filename="../ui/SettingsDialog.ui" line="446"/>
+        <source>Aggressive despeckling</source>
+        <translation type="unfinished">Агресивно почистване на шум</translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="493"/>
+        <source>Bitonal Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="510"/>
+        <source>Bitonal Compression:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="517"/>
+        <source>CCITT Group 4 Fax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="524"/>
+        <source>LZW</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1800,42 +1909,42 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::OptionsWidget</name>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Black and White</source>
         <translation>Черно и бяло</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
         <source>Color / Grayscale</source>
         <translation>Цветно / Степени на сивото</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Mixed</source>
         <translation>Смесено</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="414"/>
         <source>Apply Despeckling Level</source>
         <translation>Прилагане почистването на шум</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="494"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="667"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="670"/>
         <source>Auto</source>
         <translation type="unfinished">Автоматично</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="673"/>
         <source>Manual</source>
         <translation type="unfinished">Ръчно</translation>
     </message>
@@ -1843,37 +1952,37 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="506"/>
+        <location filename="../filters/output/Task.cpp" line="511"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="558"/>
+        <location filename="../filters/output/Task.cpp" line="563"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="575"/>
+        <location filename="../filters/output/Task.cpp" line="580"/>
         <source>Output</source>
         <translation>Краен резултат</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="576"/>
+        <location filename="../filters/output/Task.cpp" line="581"/>
         <source>Picture Zones</source>
         <translation>Зони за изображения</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="577"/>
+        <location filename="../filters/output/Task.cpp" line="582"/>
         <source>Fill Zones</source>
         <translation>Запълване на зони</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="578"/>
+        <location filename="../filters/output/Task.cpp" line="583"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="579"/>
+        <location filename="../filters/output/Task.cpp" line="584"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
     </message>
