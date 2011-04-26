@@ -22,6 +22,8 @@
 #include "ImageMetadata.h"
 #include "ImageMetadataLoader.h"
 #include "SmartFilenameOrdering.h"
+#include "SettingsManager.h"
+
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 #include <QModelIndex>
@@ -578,6 +580,8 @@ ProjectFilesDialog::onOK()
 	}
 	
 	startLoadingMetadata();
+	SettingsManager sm;
+	sm.SetCurrentFilesInputDirectory(inp_dir.path());
 }
 
 void

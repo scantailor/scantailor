@@ -69,6 +69,7 @@ class ProcessingTaskQueue;
 class QLineF;
 class QRectF;
 class QLayout;
+class QTimer;
 
 class MainWindow :
 	public QMainWindow,
@@ -160,6 +161,10 @@ private slots:
 	void showAboutDialog();
 	
 	void updateUIThresholdSlider();
+	
+	void startAutoSaveTimer();
+	void stopAutoSaveTimer();
+	void autoSave();
 private:
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
@@ -255,6 +260,8 @@ private:
 
 	void updateDisambiguationRecords(PageSequence const& pages);
 	
+	bool copyFileTo(const QString &sFromPath, const QString &sToPath);
+	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<StageSequence> m_ptrStages;
@@ -285,6 +292,7 @@ private:
 	bool m_beepOnBatchProcessingCompletion;
 	
 	SettingsDialog* m_settingsDialog;
+	QTimer* m_autosave_timer;
 };
 
 #endif

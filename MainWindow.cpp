@@ -83,6 +83,7 @@
 #include "ui_BatchProcessingLowerPanel.h"
 #include "config.h"
 #include "version.h"
+#include "SettingsManager.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -122,6 +123,7 @@
 #include <stddef.h>
 #include <math.h>
 #include <assert.h>
+#include <QTimer.h>
 
 MainWindow::MainWindow()
 :	m_ptrPages(new ProjectPages),
@@ -272,11 +274,24 @@ MainWindow::MainWindow()
 			resize(1014, 689); // A sensible value.
 		}
 	}
+	
+	// autosave timer
+	m_autosave_timer = new QTimer(this);
+	connect(
+		m_autosave_timer, SIGNAL(timeout()),
+		this, SLOT(autoSave())
+	);
+	SettingsManager sm;
+	if (sm.GetAutoSave()) {
+		startAutoSaveTimer();
+	}
 }
 
 
 MainWindow::~MainWindow()
 {
+	stopAutoSaveTimer();
+	
 	m_ptrInteractiveQueue->cancelAndClear();
 	if (m_ptrBatchQueue.get()) {
 		m_ptrBatchQueue->cancelAndClear();
@@ -501,6 +516,7 @@ MainWindow::timerEvent(QTimerEvent* const event)
 	// We only use the timer event for delayed closing of the window.
 	killTimer(event->timerId());
 	
+	stopAutoSaveTimer();
 	if (closeProjectInteractive()) {
 		m_closing = true;
 		QSettings settings;
@@ -512,6 +528,7 @@ MainWindow::timerEvent(QTimerEvent* const event)
 		}
 		close();
 	}
+	startAutoSaveTimer();
 }
 
 MainWindow::SavePromptResult
@@ -1189,13 +1206,17 @@ void
 MainWindow::saveProjectTriggered()
 {
 	if (m_projectFile.isEmpty()) {
+		stopAutoSaveTimer();
 		saveProjectAsTriggered();
+		startAutoSaveTimer();
 		return;
 	}
 	
+	stopAutoSaveTimer();
 	if (saveProjectWithFeedback(m_projectFile)) {
 		updateWindowTitle();
 	}
+	startAutoSaveTimer();
 }
 
 void
@@ -1243,7 +1264,10 @@ MainWindow::saveProjectAsTriggered()
 void
 MainWindow::newProject()
 {
+	stopAutoSaveTimer();
+	
 	if (!closeProjectInteractive()) {
+		startAutoSaveTimer();
 		return;
 	}
 	
@@ -1253,6 +1277,8 @@ MainWindow::newProject()
 		context, SIGNAL(done(ProjectCreationContext*)),
 		this, SLOT(newProjectCreated(ProjectCreationContext*))
 	);
+	
+	startAutoSaveTimer();
 }
 
 void
@@ -1270,7 +1296,10 @@ MainWindow::newProjectCreated(ProjectCreationContext* context)
 void
 MainWindow::openProject()
 {
+	stopAutoSaveTimer();
+	
 	if (!closeProjectInteractive()) {
+		startAutoSaveTimer();
 		return;
 	}
 	
@@ -1289,6 +1318,8 @@ MainWindow::openProject()
 	}
 	
 	openProject(project_file);
+	
+	startAutoSaveTimer();
 }
 
 void
@@ -1343,7 +1374,11 @@ MainWindow::projectOpened(ProjectOpeningContext* context)
 void
 MainWindow::closeProject()
 {
+	stopAutoSaveTimer();
+	
 	closeProjectInteractive();
+	
+	startAutoSaveTimer();
 }
 
 void
@@ -1353,10 +1388,20 @@ MainWindow::openSettingsDialog()
 	// dialog->setAttribute(Qt::WA_DeleteOnClose);
 	// dialog->setWindowModality(Qt::WindowModal);
 	// dialog->show();
+	stopAutoSaveTimer();
+	
 	m_settingsDialog = new SettingsDialog(this);
 	connect(
 		m_settingsDialog, SIGNAL(updateUIThresholdSlider()),
 		this, SLOT(updateUIThresholdSlider())
+	);
+	connect(
+		m_settingsDialog, SIGNAL(startAutoSaveTimer()),
+		this, SLOT(startAutoSaveTimer())
+	);
+	connect(
+		m_settingsDialog, SIGNAL(stopAutoSaveTimer()),
+		this, SLOT(stopAutoSaveTimer())
 	);
 	m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
 	m_settingsDialog->setWindowModality(Qt::WindowModal);
@@ -1955,4 +2000,75 @@ MainWindow::updateUIThresholdSlider()
 		// Start loading / processing the current page.
 		updateMainArea();
 	}
+}
+
+void
+MainWindow::startAutoSaveTimer()
+{
+	SettingsManager sm;
+	m_autosave_timer->start(1000*sm.GetAutoSaveValue()*60);
+}
+
+void
+MainWindow::stopAutoSaveTimer()
+{
+	m_autosave_timer->stop();
+}
+
+void
+MainWindow::autoSave()
+{
+	stopAutoSaveTimer();
+	
+	SettingsManager sm;
+	QString const unnamed_autosave_projectFile(
+		QDir::toNativeSeparators(sm.GetCurrentFilesInputDirectory() + "/UnnamedAutoSave.Scantailor")
+	);
+	if (m_ptrPages->numImages()!=0) {
+		if (m_projectFile.isEmpty()) {
+			if (saveProjectWithFeedback(unnamed_autosave_projectFile)) {
+			}
+		} else {
+			QFileInfo const project_file(m_projectFile);
+			QFileInfo const file_as(
+				project_file.absoluteDir(),
+				project_file.fileName()+".as"
+			);
+			QString const file_as_path(file_as.absoluteFilePath());
+			if (saveProjectWithFeedback(file_as_path)) {
+				QFile::remove(unnamed_autosave_projectFile);
+				if (copyFileTo(m_projectFile, m_projectFile+".bak")) {
+					QFile::remove(m_projectFile);
+				}
+				if (copyFileTo(file_as_path, m_projectFile)) {
+					QFile::remove(file_as_path);
+				}
+				//QFile::remove(m_projectFile+".bak");
+			}
+		}
+	}
+
+	startAutoSaveTimer();
+}
+
+bool
+MainWindow::copyFileTo(const QString &sFromPath, const QString &sToPath) {
+    if(QFile::exists(sFromPath)) {
+        QDir d;
+        QFile f(sFromPath);
+        if(QFile::exists(sToPath)) {
+            QFileInfo fi(sToPath);
+            if(fi.isHidden() || !fi.isWritable()) {
+                QFile::setPermissions(sToPath, QFile::WriteUser | QFile::ExeUser);
+            }
+            if(QFile::remove(sToPath)) {
+                d.mkpath(QDir::toNativeSeparators(QFileInfo(sToPath).path()));
+                return f.copy(sToPath);
+            }
+        } else {
+            d.mkpath(QDir::toNativeSeparators(QFileInfo(sToPath).path()));
+            return f.copy(sToPath);
+        }
+    }
+    return false;
 }

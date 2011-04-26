@@ -26,7 +26,8 @@ SettingsManager::SettingsManager() :
 	m_thresholdValue("settings/output/threshold_value"),
 	m_despeckling("settings/output/despeckling"),
 	m_bitonal_compress_g4fax("settings/output/bitonal_compress_g4fax"),
-	m_use_3d_acceleration("settings/use_3d_acceleration")
+	m_use_3d_acceleration("settings/use_3d_acceleration"),
+	m_current_files_input_dir("settings/currentdir/inputdir")
 {
 }
 
@@ -123,3 +124,15 @@ SettingsManager::GetUse3dAcceleration() const
 	return value(m_use_3d_acceleration, false).toBool();
 }
 
+// current input/output dir
+void
+SettingsManager::SetCurrentFilesInputDirectory(QString dir)
+{
+	setValue(m_current_files_input_dir, dir);
+}
+
+QString
+SettingsManager::GetCurrentFilesInputDirectory() const
+{
+	return value(m_current_files_input_dir, "").toString();
+}

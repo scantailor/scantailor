@@ -45,6 +45,9 @@
            <property name="readOnly">
             <bool>false</bool>
            </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
            <property name="value">
             <number>5</number>
            </property>

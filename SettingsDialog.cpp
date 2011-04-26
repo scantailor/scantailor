@@ -129,6 +129,10 @@ SettingsDialog::commitChanges()
 	// autosave settings
 	sm.SetAutoSave(ui.autosaveCheckBox->isChecked());
 	sm.SetAutoSaveValue(ui.autosaveSpinBox->value());
+	stopAutoSaveTimer();
+	if(ui.autosaveCheckBox->isChecked()) {
+		startAutoSaveTimer();
+	}
 	
 	// threshold settings
 	int range = sm.GetThresholdLevelValue();

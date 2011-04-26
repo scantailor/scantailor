@@ -31,6 +31,8 @@ public:
 	virtual ~SettingsDialog();
 signals:
 	void updateUIThresholdSlider();
+	void startAutoSaveTimer();
+	void stopAutoSaveTimer();
 	
 private slots:
 	void commitChanges();

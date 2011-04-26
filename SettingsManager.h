@@ -55,6 +55,10 @@ public:
 	void SetUse3dAcceleration(bool);
 	bool GetUse3dAcceleration() const;
 	
+	// current input/output dir
+	void SetCurrentFilesInputDirectory(QString);
+	QString GetCurrentFilesInputDirectory() const;
+	
 private:
 	QString m_AutoSave;
 	QString m_AutoSaveValue;
@@ -63,6 +67,7 @@ private:
 	QString m_despeckling;
 	QString m_bitonal_compress_g4fax;
 	QString m_use_3d_acceleration;
+	QString m_current_files_input_dir;
 };
 
 #endif // SETTINGS_MANAGER_H_
