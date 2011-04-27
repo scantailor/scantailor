@@ -279,7 +279,7 @@ MainWindow::MainWindow()
 	m_autosave_timer = new QTimer(this);
 	connect(
 		m_autosave_timer, SIGNAL(timeout()),
-		this, SLOT(autoSave())
+		this, SLOT(autoSaveProject())
 	);
 	SettingsManager sm;
 	if (sm.GetAutoSave()) {
@@ -1291,11 +1291,16 @@ MainWindow::newProjectCreated(ProjectCreationContext* context)
 		)
 	);
 	switchToNewProject(pages, context->outDir());
+	m_inputDir = context->inputDir();
+	m_outputDir = context->outDir();
 }
 
 void
 MainWindow::openProject()
 {
+	m_inputDir = "";
+	m_outputDir = "";
+	
 	stopAutoSaveTimer();
 	
 	if (!closeProjectInteractive()) {
@@ -1369,6 +1374,8 @@ MainWindow::projectOpened(ProjectOpeningContext* context)
 		context->projectReader()->outputDirectory(),
 		context->projectFile(), context->projectReader()
 	);
+	m_inputDir = context->projectReader()->inputDirectory();
+	m_outputDir = context->projectReader()->outputDirectory();
 }
 
 void
@@ -2016,13 +2023,12 @@ MainWindow::stopAutoSaveTimer()
 }
 
 void
-MainWindow::autoSave()
+MainWindow::autoSaveProject()
 {
 	stopAutoSaveTimer();
 	
-	SettingsManager sm;
 	QString const unnamed_autosave_projectFile(
-		QDir::toNativeSeparators(sm.GetCurrentFilesInputDirectory() + "/UnnamedAutoSave.Scantailor")
+		QDir::toNativeSeparators(m_inputDir + "/UnnamedAutoSave.Scantailor")
 	);
 	if (m_ptrPages->numImages()!=0) {
 		if (m_projectFile.isEmpty()) {

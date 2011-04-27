@@ -62,6 +62,7 @@ ProjectCreationContext::projectFilesSubmitted()
 {
 	m_files = m_ptrProjectFilesDialog->inProjectFiles();
 	m_outDir = m_ptrProjectFilesDialog->outputDirectory();
+	m_inputDir = m_ptrProjectFilesDialog->inputDirectory();
 	m_layoutDirection = Qt::LeftToRight;
 	if (m_ptrProjectFilesDialog->isRtlLayout()) {
 		m_layoutDirection = Qt::RightToLeft;
@@ -136,5 +137,3 @@ ProjectCreationContext::showFixDpiDialog()
 	);
 	m_ptrFixDpiDialog->show();
 }
-
-

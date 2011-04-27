@@ -164,7 +164,7 @@ private slots:
 	
 	void startAutoSaveTimer();
 	void stopAutoSaveTimer();
-	void autoSave();
+	void autoSaveProject();
 private:
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
@@ -293,6 +293,9 @@ private:
 	
 	SettingsDialog* m_settingsDialog;
 	QTimer* m_autosave_timer;
+	
+	QString m_inputDir;
+	QString m_outputDir;
 };
 
 #endif

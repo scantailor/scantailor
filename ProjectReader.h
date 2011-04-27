@@ -52,6 +52,8 @@ public:
 	
 	QString const& outputDirectory() const { return m_outDir; }
 	
+	QString const& inputDirectory() const { return m_inputDir; }
+	
 	IntrusivePtr<ProjectPages> const& pages() const { return m_ptrPages; }
 
 	SelectedPage const& selectedPage() const { return m_selectedPage; }
@@ -101,6 +103,7 @@ private:
 	
 	QDomDocument m_doc;
 	QString m_outDir;
+	QString m_inputDir;
 	DirMap m_dirMap;
 	FileMap m_fileMap;
 	ImageMap m_imageMap;
