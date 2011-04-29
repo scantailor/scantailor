@@ -281,10 +281,8 @@ MainWindow::MainWindow()
 		m_autosave_timer, SIGNAL(timeout()),
 		this, SLOT(autoSaveProject())
 	);
-	SettingsManager sm;
-	if (sm.GetAutoSave()) {
-		startAutoSaveTimer();
-	}
+
+	startAutoSaveTimer();
 }
 
 
@@ -2013,7 +2011,9 @@ void
 MainWindow::startAutoSaveTimer()
 {
 	SettingsManager sm;
-	m_autosave_timer->start(1000*sm.GetAutoSaveValue()*60);
+	if (sm.GetAutoSave()) {
+		m_autosave_timer->start(1000*sm.GetAutoSaveValue()*60);
+	}
 }
 
 void
