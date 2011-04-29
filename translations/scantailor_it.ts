@@ -388,74 +388,74 @@ Taxman</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="521"/>
+        <location filename="../MainWindow.cpp" line="538"/>
         <source>Save Project</source>
         <translation>Salva progetto</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="521"/>
+        <location filename="../MainWindow.cpp" line="538"/>
         <source>Save this project?</source>
         <translation>Salvo questo progetto?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="894"/>
+        <location filename="../MainWindow.cpp" line="911"/>
         <source>Insert before ...</source>
         <translation>Inserisci prima...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="897"/>
+        <location filename="../MainWindow.cpp" line="914"/>
         <source>Insert after ...</source>
         <translation>Inserisci dopo...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="903"/>
+        <location filename="../MainWindow.cpp" line="920"/>
         <source>Remove from project ...</source>
         <translation>Rimuovi dal progetto...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="924"/>
+        <location filename="../MainWindow.cpp" line="941"/>
         <source>Insert here ...</source>
         <translation>Inserisci qui ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1215"/>
-        <location filename="../MainWindow.cpp" line="1283"/>
+        <location filename="../MainWindow.cpp" line="1236"/>
+        <location filename="../MainWindow.cpp" line="1317"/>
         <source>Scan Tailor Projects</source>
         <translation>Progetto Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1282"/>
+        <location filename="../MainWindow.cpp" line="1316"/>
         <source>Open Project</source>
         <translation>Apri progetto</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1300"/>
-        <location filename="../MainWindow.cpp" line="1309"/>
-        <location filename="../MainWindow.cpp" line="1607"/>
-        <location filename="../MainWindow.cpp" line="1638"/>
-        <location filename="../MainWindow.cpp" line="1715"/>
+        <location filename="../MainWindow.cpp" line="1336"/>
+        <location filename="../MainWindow.cpp" line="1345"/>
+        <location filename="../MainWindow.cpp" line="1659"/>
+        <location filename="../MainWindow.cpp" line="1690"/>
+        <location filename="../MainWindow.cpp" line="1767"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1301"/>
+        <location filename="../MainWindow.cpp" line="1337"/>
         <source>Unable to open the project file.</source>
         <translation>Impossibile aprire il file del progetto.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1310"/>
+        <location filename="../MainWindow.cpp" line="1346"/>
         <source>The project file is broken.</source>
         <translation>Il file del progetto è danneggiato.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1503"/>
+        <location filename="../MainWindow.cpp" line="1555"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Non è ancora possibile produrre i file di output, in quanto la dimensione finale delle pagine non è ancora nota.
 Per determinarla, avvia l&apos;elaborazione automatica a &quot;Seleziona contenuto&quot; o &quot;Margini&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1541"/>
+        <location filename="../MainWindow.cpp" line="1593"/>
         <source>%1 - Scan Tailor Plus %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -466,28 +466,28 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 Per determinarla, avvia l&apos;elaborazione automatica a &quot; o &quot; Conformazione pagina&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1536"/>
+        <location filename="../MainWindow.cpp" line="1588"/>
         <source>Unnamed</source>
         <translation>Senza nome</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1608"/>
-        <location filename="../MainWindow.cpp" line="1639"/>
+        <location filename="../MainWindow.cpp" line="1660"/>
+        <location filename="../MainWindow.cpp" line="1691"/>
         <source>Error saving the project file!</source>
         <translation>Errore nel salvataggio del file del progetto!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1686"/>
+        <location filename="../MainWindow.cpp" line="1738"/>
         <source>File to insert</source>
         <translation>File da inserire</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1692"/>
+        <location filename="../MainWindow.cpp" line="1744"/>
         <source>Images not in project (%1)</source>
         <translation>Immagini non nel progetto (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1716"/>
+        <location filename="../MainWindow.cpp" line="1768"/>
         <source>Error opening the image file.</source>
         <translation>Errore nell&apos;apertura del file immagine.</translation>
     </message>
@@ -496,7 +496,7 @@ Per determinarla, avvia l&apos;elaborazione automatica a &quot; o &quot; Conform
         <translation type="obsolete">%1 (pagina %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1756"/>
+        <location filename="../MainWindow.cpp" line="1808"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
@@ -653,7 +653,7 @@ Per determinarla, avvia l&apos;elaborazione automatica a &quot; o &quot; Conform
         <translation>A proposito di...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="449"/>
+        <location filename="../MainWindow.cpp" line="464"/>
         <source>Stop batch processing</source>
         <translation>Arresta l&apos;elaborazione automatica</translation>
     </message>
@@ -1571,101 +1571,110 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="56"/>
+        <location filename="../ui/SettingsDialog.ui" line="59"/>
         <source>minute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="78"/>
+        <location filename="../ui/SettingsDialog.ui" line="81"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Utilizza accelerazione 3D per l&apos;interfaccia utente</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="99"/>
+        <location filename="../ui/SettingsDialog.ui" line="102"/>
         <source>Default for a new Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="109"/>
+        <location filename="../ui/SettingsDialog.ui" line="122"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#aa007f;&quot;&gt;Stages of the processing&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/SettingsDialog.ui" line="140"/>
         <source>Page Layout</source>
         <translation type="unfinished">Conformazione pagina</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="114"/>
+        <location filename="../ui/SettingsDialog.ui" line="145"/>
         <source>Output</source>
         <translation type="unfinished">Output</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="120"/>
+        <location filename="../ui/SettingsDialog.ui" line="151"/>
         <source>Threshold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="143"/>
+        <location filename="../ui/SettingsDialog.ui" line="174"/>
         <source>Threshold Range value:</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/SettingsDialog.ui" line="150"/>
+        <location filename="../ui/SettingsDialog.ui" line="181"/>
         <source>±</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="264"/>
+        <location filename="../ui/SettingsDialog.ui" line="295"/>
         <source>Thinner</source>
         <translation type="unfinished">Più sottile</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="296"/>
+        <location filename="../ui/SettingsDialog.ui" line="327"/>
         <source>Thicker</source>
         <translation type="unfinished">Più spesso</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="317"/>
+        <location filename="../ui/SettingsDialog.ui" line="348"/>
         <source>Despeckling</source>
         <translation type="unfinished">Despeckling</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="341"/>
-        <location filename="../ui/SettingsDialog.ui" line="344"/>
+        <location filename="../ui/SettingsDialog.ui" line="372"/>
+        <location filename="../ui/SettingsDialog.ui" line="375"/>
         <source>No despeckling</source>
         <translation type="unfinished">No despeckling</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="376"/>
-        <location filename="../ui/SettingsDialog.ui" line="379"/>
+        <location filename="../ui/SettingsDialog.ui" line="403"/>
+        <location filename="../ui/SettingsDialog.ui" line="406"/>
         <source>Cautious despeckling</source>
         <translation type="unfinished">Despeckling prudente</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="411"/>
-        <location filename="../ui/SettingsDialog.ui" line="414"/>
+        <location filename="../ui/SettingsDialog.ui" line="438"/>
+        <location filename="../ui/SettingsDialog.ui" line="441"/>
         <source>Normal despeckling</source>
         <translation type="unfinished">НDespeckling normale</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="443"/>
-        <location filename="../ui/SettingsDialog.ui" line="446"/>
+        <location filename="../ui/SettingsDialog.ui" line="470"/>
+        <location filename="../ui/SettingsDialog.ui" line="473"/>
         <source>Aggressive despeckling</source>
         <translation type="unfinished">Despeckling agressivo</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="493"/>
+        <location filename="../ui/SettingsDialog.ui" line="520"/>
         <source>Bitonal Compression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="510"/>
+        <location filename="../ui/SettingsDialog.ui" line="546"/>
         <source>Bitonal Compression:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="517"/>
+        <location filename="../ui/SettingsDialog.ui" line="553"/>
         <source>CCITT Group 4 Fax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="524"/>
+        <location filename="../ui/SettingsDialog.ui" line="560"/>
         <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>
