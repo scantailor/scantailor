@@ -122,12 +122,13 @@ ContentBoxFinder::findContentBox(
 	}
 	
 	uint8_t const darkest_gray_level = darkestGrayLevel(data.grayImage());
+	QColor const outside_color(darkest_gray_level, darkest_gray_level, darkest_gray_level);
 
 	QImage gray150(
 		transformToGray(
 			data.grayImage(), xform_150dpi.transform(),
 			xform_150dpi.resultingRect().toRect(),
-			QColor(darkest_gray_level, darkest_gray_level, darkest_gray_level)
+			OutsidePixels::assumeColor(outside_color)
 		)
 	);
 	// Note that we fill new areas that appear as a result of

@@ -302,8 +302,7 @@ OutputGenerator::normalizeIlluminationGray(
 {
 	GrayImage to_be_normalized(
 		transformToGray(
-			input, xform, target_rect,
-			Qt::black // <-- Important!
+			input, xform, target_rect, OutsidePixels::assumeWeakNearest()
 		)
 	);
 	if (dbg) {
@@ -500,7 +499,10 @@ OutputGenerator::processAsIs(
 			return image;
 		}
 
-		out = transformToGray(input.grayImage(), m_xform.transform(), m_outRect, bg_color);
+		out = transformToGray(
+			input.grayImage(), m_xform.transform(), m_outRect,
+			OutsidePixels::assumeColor(bg_color)
+		);
 	} else {
 		if (m_outRect.isEmpty()) {
 			QImage image(1, 1, QImage::Format_RGB32);
@@ -508,7 +510,10 @@ OutputGenerator::processAsIs(
 			return image;
 		}
 		
-		out = transform(input.origImage(), m_xform.transform(), m_outRect, bg_color);
+		out = transform(
+			input.origImage(), m_xform.transform(), m_outRect,
+			OutsidePixels::assumeColor(bg_color)
+		);
 	}
 
 	applyFillZonesInPlace(out, fill_zones);
@@ -580,7 +585,7 @@ OutputGenerator::processWithoutDewarping(
 	} else {
 		maybe_normalized = transform(
 			input.origImage(), m_xform.transform(),
-			normalize_illumination_rect, Qt::white
+			normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
 		);
 	}
 
@@ -684,7 +689,7 @@ OutputGenerator::processWithoutDewarping(
 			transform(
 				input.origImage(), m_xform.transform(),
 				normalize_illumination_rect,
-				Qt::white
+				OutsidePixels::assumeColor(Qt::white)
 			)
 		);
 		
@@ -860,7 +865,7 @@ OutputGenerator::processWithDewarping(
 		if (dewarping_mode == DewarpingMode::AUTO) {
 			warped_gray_output = transformToGray(
 				input.grayImage(), m_xform.transform(), normalize_illumination_rect,
-				Qt::white, /*weak_background=*/true
+				OutsidePixels::assumeWeakColor(Qt::white)
 			);
 		} // Otherwise we just don't need it.
 	} else {
@@ -876,7 +881,7 @@ OutputGenerator::processWithDewarping(
 		// Transform warped_gray_background to original image coordinates.
 		warped_gray_background = transformToGray(
 			warped_gray_background.toQImage(), norm_illum_to_original,
-			input.origImage().rect(), Qt::black, /*weak_background=*/true
+			input.origImage().rect(), OutsidePixels::assumeWeakColor(Qt::black)
 		);
 		if (dbg) {
 			dbg->add(warped_gray_background, "orig_background");
