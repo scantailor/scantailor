@@ -33,25 +33,8 @@
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich</translation>
     </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="142"/>
-        <source>Translators</source>
-        <translation>翻譯人員</translation>
-    </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="149"/>
-        <source>Svetoslav Sashkov, Mandor - Bulgarian
-Stefan Birkner - German
-Angelo Gemmi - Italian
-Masahiro Kitagawa - Japanese
-Patrick Pascal - French
-Daniel Koć - Polish
-Joseph Artsimovich - Russian
-Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="173"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -59,7 +42,26 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <source>Translators</source>
+        <translation>翻譯人員</translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Marián Hvolka - Slovak
+Davidson Wang - Traditional Chinese</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -79,7 +81,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - Traditional Chinese</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Contributors</source>
         <translation>貢獻者</translation>
     </message>
@@ -94,12 +96,12 @@ Andrey Bergman - 系統負載調整.
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="192"/>
         <source>Documentation</source>
         <translation>文件製作</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="197"/>
+        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -108,7 +110,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="224"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>License</source>
         <translation>版權</translation>
     </message>
@@ -344,17 +346,17 @@ Taxman</translation>
 <context>
     <name>InteractiveXSpline</name>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -373,105 +375,105 @@ Taxman</translation>
     <name>MainWindow</name>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save Project</source>
         <translation>儲存專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save this project?</source>
         <translation>是否要儲存此專案?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="905"/>
+        <location filename="../MainWindow.cpp" line="893"/>
         <source>Insert before ...</source>
         <translation>插入在此之前...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="908"/>
+        <location filename="../MainWindow.cpp" line="896"/>
         <source>Insert after ...</source>
         <translation>插入在此之後...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="914"/>
+        <location filename="../MainWindow.cpp" line="902"/>
         <source>Remove from project ...</source>
         <translation>從專案中移除...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="935"/>
+        <location filename="../MainWindow.cpp" line="923"/>
         <source>Insert here ...</source>
         <translation>在此插入...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1226"/>
-        <location filename="../MainWindow.cpp" line="1294"/>
+        <location filename="../MainWindow.cpp" line="1214"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor 專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1293"/>
+        <location filename="../MainWindow.cpp" line="1281"/>
         <source>Open Project</source>
         <translation>開啟專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1311"/>
-        <location filename="../MainWindow.cpp" line="1320"/>
-        <location filename="../MainWindow.cpp" line="1610"/>
-        <location filename="../MainWindow.cpp" line="1641"/>
-        <location filename="../MainWindow.cpp" line="1718"/>
+        <location filename="../MainWindow.cpp" line="1299"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1598"/>
+        <location filename="../MainWindow.cpp" line="1629"/>
+        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
         <source>Unable to open the project file.</source>
         <translation>無法開啟專案檔.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1321"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
         <source>The project file is broken.</source>
         <translation>專案檔已毀損.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1506"/>
+        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>目前無法輸出,因為沒有指定輸出的頁面範圍.
 請使用批次處理中的&quot;內容選擇&quot;或&quot;邊界&quot;項目來偵測與指定範圍.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1527"/>
         <source>Unnamed</source>
         <translation>未命名</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1544"/>
+        <location filename="../MainWindow.cpp" line="1532"/>
         <source>%1 - Scan Tailor %2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1611"/>
-        <location filename="../MainWindow.cpp" line="1642"/>
+        <location filename="../MainWindow.cpp" line="1599"/>
+        <location filename="../MainWindow.cpp" line="1630"/>
         <source>Error saving the project file!</source>
         <translation>儲存時發生錯誤!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1689"/>
+        <location filename="../MainWindow.cpp" line="1677"/>
         <source>File to insert</source>
         <translation>插入檔案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1695"/>
+        <location filename="../MainWindow.cpp" line="1683"/>
         <source>Images not in project (%1)</source>
         <translation>專案外的圖片 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1719"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
         <source>Error opening the image file.</source>
         <translation>開啟影像時發生錯誤.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1759"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
@@ -618,7 +620,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation>關於</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="460"/>
+        <location filename="../MainWindow.cpp" line="448"/>
         <source>Stop batch processing</source>
         <translation>停止批次處理</translation>
     </message>
@@ -1603,7 +1605,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="52"/>
+        <location filename="../filters/deskew/Filter.cpp" line="55"/>
         <source>Deskew</source>
         <translation>糾偏</translation>
     </message>
@@ -1632,15 +1634,19 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>無法進行動作: 超過一個以上的群組被選取.</translation>
+        <translation type="obsolete">無法進行動作: 超過一個以上的群組被選取.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
         <translation>修正方向</translation>
     </message>
@@ -1676,14 +1682,6 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>output::DewarpingView</name>
-    <message>
-        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
-        <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>output::FillZoneEditor</name>
     <message>
         <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
@@ -1694,7 +1692,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="58"/>
+        <location filename="../filters/output/Filter.cpp" line="63"/>
         <source>Output</source>
         <translation>輸出</translation>
     </message>
@@ -1717,27 +1715,27 @@ p, li { white-space: pre-wrap; }
         <translation>混合</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
         <translation>套用雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
         <source>Auto</source>
         <translation type="unfinished">自動</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
         <source>Manual</source>
         <translation type="unfinished">手動</translation>
     </message>
@@ -1745,37 +1743,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="495"/>
+        <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>圖形範圍只能在混合模式中.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="547"/>
+        <location filename="../filters/output/Task.cpp" line="558"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>雜點清除無法在 彩色/灰階 模式中使用.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Output</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="565"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Picture Zones</source>
         <translation>圖片區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="566"/>
+        <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Fill Zones</source>
         <translation>填滿區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="567"/>
+        <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="579"/>
         <source>Despeckling</source>
         <translation>雜點清除</translation>
     </message>
@@ -1783,22 +1781,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_layout::Filter</name>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="64"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="67"/>
         <source>Natural order</source>
         <translation>自然排序</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="65"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="68"/>
         <source>Order by increasing width</source>
         <translation>寬度遞增排序</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="66"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="69"/>
         <source>Order by increasing height</source>
         <translation>高度遞增排序</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="76"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="79"/>
         <source>Margins</source>
         <translation>邊距</translation>
     </message>
@@ -1827,7 +1825,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="64"/>
+        <location filename="../filters/page_split/Filter.cpp" line="67"/>
         <source>Split Pages</source>
         <translation>分割頁面</translation>
     </message>
@@ -1875,22 +1873,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="56"/>
+        <location filename="../filters/select_content/Filter.cpp" line="59"/>
         <source>Natural order</source>
         <translation>自然排序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="57"/>
+        <location filename="../filters/select_content/Filter.cpp" line="60"/>
         <source>Order by increasing width</source>
         <translation>寬度遞增排序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="58"/>
+        <location filename="../filters/select_content/Filter.cpp" line="61"/>
         <source>Order by increasing height</source>
         <translation>高度遞增排序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="68"/>
+        <location filename="../filters/select_content/Filter.cpp" line="71"/>
         <source>Select Content</source>
         <translation>選擇內容</translation>
     </message>

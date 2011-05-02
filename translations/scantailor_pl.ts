@@ -39,6 +39,31 @@
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Marián Hvolka - Slovak
+Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
         <source>Svetoslav Sashkov, Mandor - Bulgarian
 Petr Kovář - Czech
 Stefan Birkner - German
@@ -48,7 +73,7 @@ Patrick Pascal - French
 Daniel Koć - Polish
 Joseph Artsimovich - Russian
 Davidson Wang - Traditional Chinese</source>
-        <translation>Svetoslav Sashkov, Mandor - bułgarski
+        <translation type="obsolete">Svetoslav Sashkov, Mandor - bułgarski
 Petr Kovář - czeski
 Stefan Birkner - niemiecki
 Angelo Gemmi - włoski
@@ -59,7 +84,6 @@ Joseph Artsimovich - rosyjski
 Davidson Wang - tradycyjny chiński</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="174"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -68,7 +92,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -94,7 +118,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - tradycyjny chiński</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
         <source>Translators</source>
         <translation>Tłumacze</translation>
     </message>
@@ -117,7 +141,7 @@ Joseph Artsimovich - rosyjski
 Davidson Wang - tradycyjny chiński</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="167"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Contributors</source>
         <translation>Współtwórcy</translation>
     </message>
@@ -131,12 +155,12 @@ Robert B. - Algorytm prostowania stron.
 Andrey Bergman - Regulacja obciążenia systemu.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="191"/>
+        <location filename="../ui/AboutDialog.ui" line="192"/>
         <source>Documentation</source>
         <translation>Dokumentacja</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="198"/>
+        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
@@ -145,7 +169,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="225"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>License</source>
         <translation>Licencja</translation>
     </message>
@@ -381,17 +405,17 @@ Taxman</translation>
 <context>
     <name>InteractiveXSpline</name>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
         <translation>Kliknij aby utworzyć nowy punkt kontrolny.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
         <translation>Ten punkt można przesuwać.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation>Przesuń ten punkt lub usuń go naciskając klawisz Del albo D.</translation>
     </message>
@@ -410,105 +434,105 @@ Taxman</translation>
     <name>MainWindow</name>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save Project</source>
         <translation>Zapisz projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save this project?</source>
         <translation>Zapisać ten projekt?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="905"/>
+        <location filename="../MainWindow.cpp" line="893"/>
         <source>Insert before ...</source>
         <translation>Wstaw przed...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="908"/>
+        <location filename="../MainWindow.cpp" line="896"/>
         <source>Insert after ...</source>
         <translation>Wstaw po...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="914"/>
+        <location filename="../MainWindow.cpp" line="902"/>
         <source>Remove from project ...</source>
         <translation>Usuń z projektu...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="935"/>
+        <location filename="../MainWindow.cpp" line="923"/>
         <source>Insert here ...</source>
         <translation>Wstaw tu...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1226"/>
-        <location filename="../MainWindow.cpp" line="1294"/>
+        <location filename="../MainWindow.cpp" line="1214"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Scan Tailor Projects</source>
         <translation>Projekty Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1293"/>
+        <location filename="../MainWindow.cpp" line="1281"/>
         <source>Open Project</source>
         <translation>Otwórz projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1311"/>
-        <location filename="../MainWindow.cpp" line="1320"/>
-        <location filename="../MainWindow.cpp" line="1610"/>
-        <location filename="../MainWindow.cpp" line="1641"/>
-        <location filename="../MainWindow.cpp" line="1718"/>
+        <location filename="../MainWindow.cpp" line="1299"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1598"/>
+        <location filename="../MainWindow.cpp" line="1629"/>
+        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Error</source>
         <translation>Błąd</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
         <source>Unable to open the project file.</source>
         <translation>Nie można otworzyć pliku projektu.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1321"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
         <source>The project file is broken.</source>
         <translation>Plik projektu jest uszkodzony.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1506"/>
+        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Wyjście jeszcze niedostępne, ponieważ nie jest znany ostateczny rozmiar strony.
 Aby go ustalić uruchom przetwarzanie wsadowe w sekcji &quot;Wybierz zawartość&quot; lub &quot;Marginesy&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1527"/>
         <source>Unnamed</source>
         <translation>Bez nazwy</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1544"/>
+        <location filename="../MainWindow.cpp" line="1532"/>
         <source>%1 - Scan Tailor %2</source>
         <translation>%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1611"/>
-        <location filename="../MainWindow.cpp" line="1642"/>
+        <location filename="../MainWindow.cpp" line="1599"/>
+        <location filename="../MainWindow.cpp" line="1630"/>
         <source>Error saving the project file!</source>
         <translation>Błąd zapisywania pliku projektu!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1689"/>
+        <location filename="../MainWindow.cpp" line="1677"/>
         <source>File to insert</source>
         <translation>Plik do wstawienia</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1695"/>
+        <location filename="../MainWindow.cpp" line="1683"/>
         <source>Images not in project (%1)</source>
         <translation>Plik spoza projektu (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1719"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
         <source>Error opening the image file.</source>
         <translation>Błąd otwierania pliku grafiki.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1759"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Remove</source>
         <translation>Usuń</translation>
     </message>
@@ -655,7 +679,7 @@ Aby go ustalić uruchom przetwarzanie wsadowe w sekcji &quot;Wybierz zawartość
         <translation>O programie</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="460"/>
+        <location filename="../MainWindow.cpp" line="448"/>
         <source>Stop batch processing</source>
         <translation>Zatrzymaj przetwarzanie wsadowe</translation>
     </message>
@@ -1637,7 +1661,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="52"/>
+        <location filename="../filters/deskew/Filter.cpp" line="55"/>
         <source>Deskew</source>
         <translation>Obróć</translation>
     </message>
@@ -1666,15 +1690,19 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>Niewykonalne: zaznaczono więcej niż jedną grupę.</translation>
+        <translation type="obsolete">Niewykonalne: zaznaczono więcej niż jedną grupę.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
         <translation>Popraw orientację</translation>
     </message>
@@ -1727,7 +1755,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="58"/>
+        <location filename="../filters/output/Filter.cpp" line="63"/>
         <source>Output</source>
         <translation>Wyjście</translation>
     </message>
@@ -1778,37 +1806,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="499"/>
+        <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Obszary grafiki są dostępne tylko w trybie mieszanym.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="551"/>
+        <location filename="../filters/output/Task.cpp" line="558"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Oczyszczanie nie jest możliwe w trybie koloru/skali szarości.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Output</source>
         <translation>Wyjście</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="569"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Picture Zones</source>
         <translation>Obszary grafiki</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="570"/>
+        <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Fill Zones</source>
         <translation>Obszary wypełnienia</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="571"/>
+        <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
         <translation>Prostowanie</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="572"/>
+        <location filename="../filters/output/Task.cpp" line="579"/>
         <source>Despeckling</source>
         <translation>Oczyszczanie</translation>
     </message>
@@ -1816,22 +1844,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_layout::Filter</name>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="64"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="67"/>
         <source>Natural order</source>
         <translation>kolejność standardowa</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="65"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="68"/>
         <source>Order by increasing width</source>
         <translation>rosnąco według szerokości</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="66"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="69"/>
         <source>Order by increasing height</source>
         <translation>rosnąco według wysokości</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="76"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="79"/>
         <source>Margins</source>
         <translation>Marginesy</translation>
     </message>
@@ -1860,7 +1888,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="64"/>
+        <location filename="../filters/page_split/Filter.cpp" line="67"/>
         <source>Split Pages</source>
         <translation>Dziel strony</translation>
     </message>
@@ -1908,22 +1936,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="56"/>
+        <location filename="../filters/select_content/Filter.cpp" line="59"/>
         <source>Natural order</source>
         <translation>Kolejność standardowa</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="57"/>
+        <location filename="../filters/select_content/Filter.cpp" line="60"/>
         <source>Order by increasing width</source>
         <translation>Rosnąco według szerokości</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="58"/>
+        <location filename="../filters/select_content/Filter.cpp" line="61"/>
         <source>Order by increasing height</source>
         <translation>Rosnąco według wysokości</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="68"/>
+        <location filename="../filters/select_content/Filter.cpp" line="71"/>
         <source>Select Content</source>
         <translation>Wybierz zawartość</translation>
     </message>

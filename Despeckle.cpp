@@ -355,7 +355,8 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 	int const width = cmap.size().width() + 2;
 	int const height = cmap.size().height() + 2;
 	
-	dist.resize(width * height); // We don't really need to initialize it.
+	assert(dist.empty());
+	dist.resize(width * height, Distance::zero());
 	
 	std::vector<uint32_t> sqdists(width * 2, 0);
 	uint32_t* prev_sqdist_line = &sqdists[0];
@@ -373,7 +374,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 	}
 	
 	// Top to bottom scan.
-	for (int y = 1; y < height - 1; ++y) {
+	for (int y = 1; y < height; ++y) {
 		dist_line += width;
 		cmap_line += width;
 		dist_line[0].reset(0);
@@ -384,6 +385,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 		for (int x = 1; x < width - 1; ++x) {
 			if (cmap_line[x]) {
 				this_sqdist_line[x] = 0;
+				assert(dist_line[x] == Distance::zero());
 				continue;
 			}
 			
@@ -416,7 +418,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 			Distance right_dist = dist_line[x + 1];
 			uint32_t sqdist_right = this_sqdist_line[x + 1];
 			sqdist_right += 1 + (int(right_dist.vec.x) << 1);
-			
+
 			if (sqdist_right < this_sqdist_line[x]) {
 				this_sqdist_line[x] = sqdist_right;
 				++right_dist.vec.x;
@@ -426,14 +428,6 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 		}
 		
 		std::swap(this_sqdist_line, prev_sqdist_line);
-	}
-	
-	dist_line[0].reset(0);
-	prev_sqdist_line[0] = dist_line[0].sqdist();
-	for (int x = 1; x < width; ++x) {
-		dist_line[x].vec.x = dist_line[x - 1].vec.x - 1;
-		prev_sqdist_line[x] = prev_sqdist_line[x - 1]
-				- (int(dist_line[x - 1].vec.x) << 1) + 1;
 	}
 	
 	// Bottom to top scan.
@@ -455,7 +449,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 			Distance bottom_dist = dist_line[x + width];
 			uint32_t sqdist_bottom = prev_sqdist_line[x];
 			sqdist_bottom += VERTICAL_SCALE_SQ + 2 * VERTICAL_SCALE_SQ * int(bottom_dist.vec.y);
-			
+
 			this_sqdist_line[x] = dist_line[x].sqdist();
 			
 			if (sqdist_right < this_sqdist_line[x]) {
