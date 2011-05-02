@@ -52,7 +52,6 @@ public:
 private:
 	struct GridNode;
 	class PrioQueue;
-	class LineTraverser;
 	struct Step;
 
 	static bool intersectWithRect(std::pair<QLineF, QLineF>& bounds, QRectF const& rect);

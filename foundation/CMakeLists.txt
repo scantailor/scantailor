@@ -17,6 +17,7 @@ SET(
 	PropertySet.cpp PropertySet.h
 	PerformanceTimer.cpp PerformanceTimer.h
 	QtSignalForwarder.cpp QtSignalForwarder.h
+	GridLineTraverser.cpp GridLineTraverser.h
 	StaticPool.h
 	DynamicPool.h
 	NumericTraits.h
