@@ -20,9 +20,14 @@
 #include "SidesOfLine.h"
 #include "ToLineProjector.h"
 #include "NumericTraits.h"
+#include "imageproc/SEDM.h"
 #include <QRect>
 #include <QtGlobal>
 #include <boost/foreach.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+#include <algorithm>
+#include <assert.h>
 
 using namespace imageproc;
 
@@ -30,17 +35,16 @@ namespace dewarping
 {
 
 TowardsLineTracer::TowardsLineTracer(
-	imageproc::BinaryImage const& content, imageproc::GrayImage const& blurred,
-	imageproc::BinaryImage const& mask, QLineF const& line, QPoint const& initial_pos)
-:	m_content(content),
-	m_pContentData(m_content.data()),
-	m_blurred(blurred),
-	m_pBlurredData(blurred.data()),
-	m_mask(mask),
-	m_pMaskData(m_mask.data()),
+	imageproc::SEDM const* dm, Grid<float> const* pm, QLineF const& line, QPoint const& initial_pos)
+:	m_pDmData(dm->data()),
+	m_dmStride(dm->stride()),
+	m_pPmData(pm->data()),
+	m_pmStride(pm->stride()),
+	m_rect(QPoint(0, 0), dm->size()),
 	m_line(line),
 	m_normalTowardsLine(m_line.normalVector().p2() - m_line.p1()),
 	m_lastOutputPos(initial_pos),
+	m_numSteps(0),
 	m_finished(false)
 {
 	if (sidesOfLine(m_line, initial_pos, line.p1() + m_normalTowardsLine) > 0) {
@@ -48,99 +52,82 @@ TowardsLineTracer::TowardsLineTracer(
 		m_normalTowardsLine = -m_normalTowardsLine;
 	}
 
-	setupNeighbours();
+	setupSteps();
 }
 
 QPoint const*
-TowardsLineTracer::trace(qreal const max_dist)
+TowardsLineTracer::trace(float const max_dist)
 {
 	if (m_finished) {
 		return 0;
 	}
 
-	qreal const max_sqdist = max_dist * max_dist;
-	QRect const image_rect(m_blurred.rect());
-	uint32_t const msb = uint32_t(1) << 31;
+	int const max_sqdist = qRound(max_dist * max_dist);
 	
 	QPoint cur_pos(m_lastOutputPos);
 	QPoint last_content_pos(-1, -1);
 
-	uint32_t const* content_line = m_pContentData + cur_pos.y() * m_content.wordsPerLine();
-	uint8_t const* p_blurred = m_pBlurredData + cur_pos.y() * m_blurred.stride() + cur_pos.x();
-	uint32_t const* mask_line = m_pMaskData + cur_pos.y() * m_mask.wordsPerLine();
+	uint32_t const* p_dm = m_pDmData + cur_pos.y() * m_dmStride + cur_pos.x();
+	float const* p_pm = m_pPmData + cur_pos.y() * m_pmStride + cur_pos.x();
 
 	for (;;) {
-		int best_neighbour = -1;
-		qreal best_cost = NumericTraits<qreal>::max();
-	
-		for (int nbh_idx = 0; nbh_idx < 8; ++nbh_idx) {
-			Neighbour const& nbh = m_neighbours[nbh_idx];
-			
-			QPoint const new_pos(cur_pos + nbh.vec);
-			if (!image_rect.contains(new_pos)) {
+		int best_dm_idx = -1;
+		int best_pm_idx = -1;
+		uint32_t best_squared_dist = 0;
+		float best_probability = NumericTraits<float>::min();
+
+		for (int i = 0; i < m_numSteps; ++i) {
+			Step const& step = m_steps[i];
+			QPoint const new_pos(cur_pos + step.vec);
+			if (!m_rect.contains(new_pos)) {
 				continue;
 			}
 
-			uint32_t const* new_mask_line = mask_line + nbh.maskLineOffset;
-			if (!(new_mask_line[new_pos.x() >> 5] & (msb >> (new_pos.x() & 31)))) {
-				continue;
+			uint32_t const sqd = p_dm[step.dmOffset];
+			if (sqd > best_squared_dist) {
+				best_squared_dist = sqd;
+				best_dm_idx = i;
 			}
-			
-			qreal const dot = m_normalTowardsLine.dot(nbh.vecF);
-			if (dot <= 0) {
-				// We only allow movement that gets us closer to the line.
-				continue;
-			}
-
-			// We add the term with "dot" to chose the preferred direction when all
-			// colors in the neighbourhood are the same.
-			qreal const cost = p_blurred[nbh.blurredPixelOffset] + 0.000001 * dot;
-			if (cost < best_cost) {
-				best_cost = cost;
-				best_neighbour = nbh_idx;
+			float const probability = p_pm[step.pmOffset];
+			if (probability > best_probability) {
+				best_probability = probability;
+				best_pm_idx = i;
 			}
 		}
 
-		if (best_neighbour == -1) {
-			// We can't proceed any further without going outside of the mask
-			// or the entire image.  Now we could have jumped straight to the
-			// line from here, but that's a bad idea, as that point would become
-			// a part of a snake, and there wouldn't be any gradient for that
-			// point to be attracted to.
+		if (best_dm_idx == -1) {
 			m_finished = true;
 			break;
 		}
+		assert(best_pm_idx != -1);
 
-		Neighbour const& nbh = m_neighbours[best_neighbour];
-		cur_pos += nbh.vec;
-		content_line += nbh.contentLineOffset;
-		p_blurred += nbh.blurredPixelOffset;
-		mask_line += nbh.maskLineOffset;
-
-		bool content_hit = false;
-		if (content_line[cur_pos.x() >> 5] & (msb >> (cur_pos.x() & 31))) {
-			last_content_pos = cur_pos;
-			content_hit = true;
+		int best_idx = best_pm_idx;
+		if (p_dm[m_steps[best_dm_idx].dmOffset] > *p_dm) {
+			best_idx = best_dm_idx;
 		}
+
+		Step& step = m_steps[best_idx];
 		
-		if (sidesOfLine(m_line, cur_pos, m_lastOutputPos) <= 0) {
-			// Line reached.
+		if (sidesOfLine(m_line, cur_pos + step.vec, m_lastOutputPos) < 0) {
+			// Note that this has to be done before we update cur_pos,
+			// as it will be used after breaking from this loop.
 			m_finished = true;
 			break;
 		}
 
-		if (content_hit) {
-			// Our policy is only to output nodes that correspond to a black pixel in content.
-			QPoint const vec(cur_pos - m_lastOutputPos);
-			if (vec.x() * vec.x() + vec.y() * vec.y() > max_sqdist) {
-				// max_dist exceeded.
-				break;
-			}
+		cur_pos += step.vec;
+		p_dm += step.dmOffset;
+		p_pm += step.pmOffset;
+
+		QPoint const vec(cur_pos - m_lastOutputPos);
+		if (vec.x() * vec.x() + vec.y() * vec.y() > max_sqdist) {
+			m_lastOutputPos = cur_pos;
+			return &m_lastOutputPos;
 		}
 	}
 
-	if (last_content_pos.x() != -1) {
-		m_lastOutputPos = last_content_pos;
+	if (m_lastOutputPos != cur_pos) {
+		m_lastOutputPos = cur_pos;
 		return &m_lastOutputPos;
 	} else {
 		return 0;
@@ -148,38 +135,53 @@ TowardsLineTracer::trace(qreal const max_dist)
 }
 
 void
-TowardsLineTracer::setupNeighbours()
+TowardsLineTracer::setupSteps()
 {
-	// m_neighbours[0] is top-left neighbour, and then clockwise from there.
+	QPoint all_directions[8];
+	// all_directions[0] is north-west, and then clockwise from there.
 
 	static int const m0p[] = { -1, 0, 1 };
 	static int const p0m[] = { 1, 0, -1 };
 
 	for (int i = 0; i < 3; ++i) {
-		// top line
-		m_neighbours[i].vec.setX(m0p[i]);
-		m_neighbours[i].vec.setY(-1);
+		// north
+		all_directions[i].setX(m0p[i]);
+		all_directions[i].setY(-1);
 
-		// right line
-		m_neighbours[2 + i].vec.setX(1);
-		m_neighbours[2 + i].vec.setY(m0p[i]);
+		// east
+		all_directions[2 + i].setX(1);
+		all_directions[2 + i].setY(m0p[i]);
 
-		// bottom line
-		m_neighbours[4 + i].vec.setX(p0m[i]);
-		m_neighbours[4 + i].vec.setY(1);
+		// south
+		all_directions[4 + i].setX(p0m[i]);
+		all_directions[4 + i].setY(1);
 
-		// left line
-		m_neighbours[(6 + i) & 7].vec.setX(-1);
-		m_neighbours[(6 + i) & 7].vec.setY(p0m[i]);
+		// west
+		all_directions[(6 + i) & 7].setX(-1);
+		all_directions[(6 + i) & 7].setY(p0m[i]);
 	}
 
-	BOOST_FOREACH(Neighbour& nbh, m_neighbours) {
-		nbh.vecF[0] = float(nbh.vec.x());
-		nbh.vecF[1] = float(nbh.vec.y());
-		nbh.contentLineOffset = nbh.vec.y() * m_content.wordsPerLine();
-		nbh.blurredPixelOffset = nbh.vec.y() * m_blurred.stride() + nbh.vec.x();
-		nbh.maskLineOffset = nbh.vec.y() * m_mask.wordsPerLine();
+	m_numSteps = 0;
+	BOOST_FOREACH(QPoint const dir, all_directions) {
+		if (m_normalTowardsLine.dot(QPointF(dir)) > 0.0) {
+			Step& step = m_steps[m_numSteps];
+			step.vec = dir;
+			step.unitVec = Vec2d(step.vec.x(), step.vec.y());
+			step.unitVec /= sqrt(step.unitVec.squaredNorm());
+			step.dmOffset = step.vec.y() * m_dmStride + step.vec.x();
+			step.pmOffset = step.vec.y() * m_pmStride + step.vec.x();
+			++m_numSteps;
+			assert(m_numSteps <= int(sizeof(m_steps)/sizeof(m_steps[0])));
+		}
 	}
+
+	// Sort by decreasing alignment with m_normalTowardsLine.
+	using namespace boost::lambda;
+	std::sort(
+		m_steps, m_steps + m_numSteps,
+		bind(&Vec2d::dot, m_normalTowardsLine, bind(&Step::unitVec, _1)) >
+		bind(&Vec2d::dot, m_normalTowardsLine, bind(&Step::unitVec, _2))
+	);
 }
 
 } // namespace dewarping
