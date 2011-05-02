@@ -92,7 +92,13 @@ public:
 
 	Mat write(T* buf) const;
 
+	template<size_t N>
+	Mat write(VecNT<N, T>& vec) const;
+
 	Mat transWrite(T* buf) const;
+
+	template<size_t N>
+	Mat transWrite(VecNT<N, T>& vec) const;
 
 	Mat operator-() const;
 
@@ -119,6 +125,11 @@ public:
 
 	mcalc::Mat<T> operator()(T const* data, int rows, int cols) {
 		return mcalc::Mat<T>(&m_alloc, data, rows, cols);
+	}
+
+	template<size_t N>
+	mcalc::Mat<T> operator()(VecNT<N, T> const& vec, int rows, int cols) {
+		return mcalc::Mat<T>(&m_alloc, vec.data(), rows, cols);
 	}
 
 	template<size_t M, size_t N>
@@ -226,6 +237,15 @@ Mat<T>::write(T* buf) const
 }
 
 template<typename T>
+template<size_t N>
+Mat<T>
+Mat<T>::write(VecNT<N, T>& vec) const
+{
+	assert(N >= rows * cols);
+	return write(vec.data());
+}
+
+template<typename T>
 Mat<T>
 Mat<T>::transWrite(T* buf) const
 {
@@ -240,6 +260,15 @@ Mat<T>::transWrite(T* buf) const
 	}
 
 	return *this;
+}
+
+template<typename T>
+template<size_t N>
+Mat<T>
+Mat<T>::transWrite(VecNT<N, T>& vec) const
+{
+	assert(N >= rows * cols);
+	return transWrite(vec.data());
 }
 
 /** Unary minus. */
