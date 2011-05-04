@@ -77,7 +77,8 @@ public:
 		QSizeF const& aggregate_hard_size_mm,
 		Alignment const& alignment,
 		QRectF const& resultRect,
-		QRectF const& boundingRect);
+		QRectF const& boundingRect,
+		QRectF const& agg_content_rect);
 	
 	/**
 	 * \brief Calculates the page rect (content + hard margins + soft margins)
@@ -91,7 +92,7 @@ public:
 	static QPolygonF calcPageRectPhys(
 		ImageTransformation const& xform,
 		QPolygonF const& content_rect_phys,
-		Params const& params, QSizeF const& aggregate_hard_size_mm);
+		Params const& params, QSizeF const& aggregate_hard_size_mm, QRectF const& agg_content_rect);
 private:
 	static QPointF getRightUnitVector(QPolygonF const& poly_rect);
 	

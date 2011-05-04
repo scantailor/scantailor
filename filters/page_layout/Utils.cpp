@@ -95,12 +95,26 @@ Utils::extendPolyRectWithMargins(
 Margins
 Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
-	Alignment const& alignment, QRectF const& resultRect, QRectF const& boundingRect)
+	Alignment const& alignment, QRectF const& resultRect, QRectF const& boundingRect, QRectF const& agg_content_rect)
 {
 	if (alignment.isNull()) {
 		// This means we are not aligning this page with others.
 		return Margins();
 	}
+
+#ifdef DEBUG
+	std::cout << "left: " << agg_content_rect.left() << " ";
+	std::cout << "top: " << agg_content_rect.top() << " ";
+	std::cout << "right: " << agg_content_rect.right() << " ";
+	std::cout << "bottom: " << agg_content_rect.bottom() << " ";
+	std::cout << "\n";
+
+	std::cout << "boundingLeft: " << boundingRect.left() << " ";
+	std::cout << "boundingTop: " << boundingRect.top() << " ";
+	std::cout << "boundingRight: " << boundingRect.right() << " ";
+	std::cout << "boundingBottom: " << boundingRect.bottom() << " ";
+	std::cout << "\n";
+#endif
 
 	Alignment myAlign = alignment;
 	
@@ -114,16 +128,16 @@ Utils::calcSoftMarginsMM(
 	double const delta_height =
 			aggregate_hard_size_mm.height() - hard_size_mm.height();
 
-	// detect original borders
-	double leftBorder = double(boundingRect.left()) / double(resultRect.width());
-	double rightBorder = double(boundingRect.right()) / double(resultRect.width());
-	double topBorder = double(boundingRect.top()) / double(resultRect.height());
-	double bottomBorder = double(boundingRect.bottom()) / double(resultRect.height());
+	// detect original borders in page mirror
+	double leftBorder = double(boundingRect.left() - agg_content_rect.left()) / double(agg_content_rect.width());
+	double rightBorder = double(agg_content_rect.right() - boundingRect.right()) / double(agg_content_rect.width());
+	double topBorder = double(boundingRect.top() - agg_content_rect.top()) / double(agg_content_rect.height());
+	double bottomBorder = double(agg_content_rect.bottom() - boundingRect.bottom()) / double(agg_content_rect.height());
 	
 	// borders in new page layout in mm
-	double aggLeftBorder = (delta_width / (leftBorder + (1-rightBorder))) * leftBorder;
+	double aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * leftBorder;
 	double aggRightBorder = delta_width - aggLeftBorder;
-	double aggTopBorder = (delta_height / (topBorder + (1-bottomBorder))) * topBorder;
+	double aggTopBorder = (delta_height / (topBorder + bottomBorder)) * topBorder;
 	double aggBottomBorder = delta_height - aggTopBorder;
 
 	// new borders ratio
@@ -133,6 +147,7 @@ Utils::calcSoftMarginsMM(
 	double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
 
 #ifdef DEBUG
+	std::cout << aggLeftBorder << " " << aggRightBorder << " " << aggTopBorder << " " << aggBottomBorder << ":" << "\n";
 	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << "\n";
 	std::cout << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
 #endif
@@ -218,7 +233,7 @@ Utils::calcSoftMarginsMM(
 QPolygonF
 Utils::calcPageRectPhys(
 	ImageTransformation const& xform, QPolygonF const& content_rect_phys,
-	Params const& params, QSizeF const& aggregate_hard_size_mm)
+	Params const& params, QSizeF const& aggregate_hard_size_mm, QRectF const& agg_content_rect)
 {
 	PhysicalTransformation const phys_xform(xform.origDpi());
 	
@@ -231,7 +246,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.origRect(), content_rect_phys.boundingRect()
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.origRect(), content_rect_phys.boundingRect(), agg_content_rect
 		)
 	);
 
