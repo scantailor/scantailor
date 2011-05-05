@@ -180,8 +180,8 @@ TowardsLineTracer::setupSteps()
 	using namespace boost::lambda;
 	std::sort(
 		m_steps, m_steps + m_numSteps,
-		bind(&Vec2d::dot, m_normalTowardsLine, bind(&Step::unitVec, _1)) >
-		bind(&Vec2d::dot, m_normalTowardsLine, bind(&Step::unitVec, _2))
+		bind(&Vec2d::dot, m_normalTowardsLine, bind<Vec2d const&>(&Step::unitVec, _1)) >
+		bind(&Vec2d::dot, m_normalTowardsLine, bind<Vec2d const&>(&Step::unitVec, _2))
 	);
 }
 
