@@ -27,6 +27,7 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <algorithm>
+#include <math.h>
 #include <assert.h>
 
 using namespace imageproc;
