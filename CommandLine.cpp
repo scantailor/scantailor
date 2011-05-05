@@ -190,9 +190,10 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-right=<number>" << "\n";
 	std::cout << "\t\t--margins-top=<number>" << "\n";
 	std::cout << "\t\t--margins-bottom=<number>" << "\n";
-	std::cout << "\t--alignment=<center|original|auto>\t\t-- sets vertical to original and horizontal to center" << "\n";
+	std::cout << "\t--alignment=<center|original|auto>\t-- sets vertical to original and horizontal to center" << "\n";
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << "\n";
 	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << "\n";
+	std::cout << "\t--alignment-tolerance=<float>\t\t\t-- sets tolerance for auto alignment" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
@@ -308,6 +309,10 @@ page_layout::Alignment
 CommandLine::fetchAlignment()
 {
 	page_layout::Alignment alignment(page_layout::Alignment::TOP, page_layout::Alignment::HCENTER);
+
+	if (m_options.contains("alignment-tolerance")) {
+		alignment.setTolerance(m_options["alignment-tolerance"].toFloat());
+	}
 
 	if (m_options.contains("alignment")) {
 		if (m_options["alignment"] == "original")
