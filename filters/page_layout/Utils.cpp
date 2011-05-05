@@ -140,19 +140,22 @@ Utils::calcSoftMarginsMM(
 	double aggTopBorder = (delta_height / (topBorder + bottomBorder)) * topBorder;
 	double aggBottomBorder = delta_height - aggTopBorder;
 
-	// new borders ratio
-	double newLeftBorder = aggLeftBorder / aggregate_hard_size_mm.width();
-	double newRightBorder = aggRightBorder / aggregate_hard_size_mm.width();
-	double newTopBorder = aggTopBorder / aggregate_hard_size_mm.height();
-	double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
-
 #ifdef DEBUG
 	std::cout << aggLeftBorder << " " << aggRightBorder << " " << aggTopBorder << " " << aggBottomBorder << ":" << "\n";
 	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << "\n";
-	std::cout << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
 #endif
 
-	if (boundingRect.width() > 1.0) {
+	// if align auto and not empty page
+	if (boundingRect.width() > 1.0 && (myAlign.horizontal() == Alignment::HAUTO || myAlign.vertical() == Alignment::VAUTO)) {
+		// new borders ratio
+		double newLeftBorder = aggLeftBorder / aggregate_hard_size_mm.width();
+		double newRightBorder = aggRightBorder / aggregate_hard_size_mm.width();
+		double newTopBorder = aggTopBorder / aggregate_hard_size_mm.height();
+		double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
+
+		// content mass index
+		double cmi = double(boundingRect.width() * boundingRect.height()) / double(agg_content_rect.width() * agg_content_rect.height());
+
 		double hTolerance = myAlign.tolerance();
 		double vTolerance = myAlign.tolerance() * 0.7;
 		double hShift = newRightBorder - newLeftBorder;
@@ -161,28 +164,39 @@ Utils::calcSoftMarginsMM(
 		double vabsShift = std::abs(vShift);
 
 #ifdef DEBUG 
+	std::cout << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
+	std::cout << vabsShift << " " << habsShift << std::endl;
+	std::cout << cmi << std::endl;
 		std::cout << hTolerance << " " << vTolerance << "\n";
 #endif
 		if (myAlign.horizontal() == Alignment::HAUTO) {
-			if (habsShift < hTolerance && newLeftBorder > 1.4*hTolerance && newRightBorder > 1.4*hTolerance) {
+			if ((1.0-cmi) < alignment.tolerance()) {
+				myAlign.setHorizontal(Alignment::HCENTER);
+			} else if (habsShift < hTolerance){
 				myAlign.setHorizontal(Alignment::HCENTER);
 			} else {
-				if (hShift > 0) {
+				if (hShift > 0 && newLeftBorder > 1.4*hTolerance) {
 					myAlign.setHorizontal(Alignment::RIGHT);
-				} else {
+				} else if (hShift <=0 && newRightBorder > 1.4*hTolerance) {
 					myAlign.setHorizontal(Alignment::LEFT);
+				} else {
+					myAlign.setHorizontal(Alignment::HORIGINAL);
 				}
 			}
 		}
 
 		if (myAlign.vertical() == Alignment::VAUTO) {
-			if (vabsShift < 2.0*vTolerance && newTopBorder > 1.4*vTolerance && newBottomBorder > 1.4*vTolerance) {
+			if ((1.0-cmi) < alignment.tolerance()) {
+				myAlign.setVertical(Alignment::TOP);
+			} else if (vabsShift < vTolerance) {
 				myAlign.setVertical(Alignment::VCENTER);
 			} else {
-				if (vShift > 0) {
+				if (vShift > 0 && newBottomBorder > 1.4*vTolerance) {
 					myAlign.setVertical(Alignment::TOP);
-				} else {
+				} else if (vShift <= 0 && newTopBorder > 1.4*vTolerance) {
 					myAlign.setVertical(Alignment::BOTTOM);
+				} else {
+					myAlign.setVertical(Alignment::VORIGINAL);
 				}
 			}
 		}
@@ -194,15 +208,19 @@ Utils::calcSoftMarginsMM(
 	if (delta_width > 0.0) {
 		switch (myAlign.horizontal()) {
 			case Alignment::LEFT:
+				std::cout << "align:left" << std::endl;
 				right = delta_width;
 				break;
 			case Alignment::HCENTER:
+				std::cout << "align:hcenter" << std::endl;
 				left = right = 0.5 * delta_width;
 				break;
 			case Alignment::RIGHT:
+				std::cout << "align:right" << std::endl;
 				left = delta_width;
 				break;
 			default:
+				std::cout << "align:horiginal" << std::endl;
 				left = aggLeftBorder;
 				right = aggRightBorder;
 				break;
@@ -212,15 +230,19 @@ Utils::calcSoftMarginsMM(
 	if (delta_height > 0.0) {
 		switch (myAlign.vertical()) {
 			case Alignment::TOP:
+				std::cout << "align:top" << std::endl;
 				bottom = delta_height;
 				break;
 			case Alignment::VCENTER:
+				std::cout << "align:vcenter" << std::endl;
 				top = bottom = 0.5 * delta_height;
 				break;
 			case Alignment::BOTTOM:
+				std::cout << "align:bottom" << std::endl;
 				top = delta_height;
 				break;
 			default:
+				std::cout << "align:voriginal" << std::endl;
 				top = aggTopBorder;
 				bottom = aggBottomBorder;
 				break;
