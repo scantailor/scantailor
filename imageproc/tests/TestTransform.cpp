@@ -42,7 +42,8 @@ BOOST_AUTO_TEST_CASE(test_null_image)
 	QTransform const null_xform;
 	QRect const unit_rect(0, 0, 1, 1);
 	QColor const bgcolor(0xff, 0xff, 0xff);
-	BOOST_CHECK(transformToGray(null_img, null_xform, unit_rect, bgcolor).isNull());
+	OutsidePixels const outside_pixels(OutsidePixels::assumeColor(bgcolor));
+	BOOST_CHECK(transformToGray(null_img, null_xform, unit_rect, outside_pixels).isNull());
 }
 
 BOOST_AUTO_TEST_CASE(test_random_image)
@@ -57,9 +58,10 @@ BOOST_AUTO_TEST_CASE(test_random_image)
 	}
 	
 	QColor const bgcolor(0xff, 0xff, 0xff);
+	OutsidePixels const outside_pixels(OutsidePixels::assumeColor(bgcolor));
 	
 	QTransform const null_xform;
-	BOOST_CHECK(transformToGray(img, null_xform, img.rect(), bgcolor) == img);
+	BOOST_CHECK(transformToGray(img, null_xform, img.rect(), outside_pixels) == img);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

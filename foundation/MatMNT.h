@@ -109,9 +109,10 @@ template<size_t M, size_t N, typename T>
 template<typename OT>
 MatMNT<M, N, T>::MatMNT(MatMNT<M, N, OT> const& other)
 {
+	OT const* data = other.data();
 	size_t const len = ROWS*COLS;
 	for (size_t i = 0; i < len; ++i) {
-		m_data[i] = static_cast<T>(other[i]);
+		m_data[i] = static_cast<T>(data[i]);
 	}
 }
 

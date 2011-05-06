@@ -26,8 +26,12 @@
 #include "ToLineProjector.h"
 #include "XSpline.h"
 #include "dewarping/CylindricalSurfaceDewarper.h"
+#include "dewarping/Curve.h"
 #include "spfit/SplineFitter.h"
+#include "spfit/ConstraintSet.h"
 #include "spfit/PolylineModelShape.h"
+#include "spfit/LinearForceBalancer.h"
+#include "spfit/OptimizationResult.h"
 #include "imageproc/Constants.h"
 #include <QCursor>
 #include <QLineF>
@@ -69,8 +73,6 @@ DewarpingView::DewarpingView(
 	m_dragHandler(*this),
 	m_zoomHandler(*this)	
 {
-	using namespace spfit;
-
 	setMouseTracking(true);
 	
 	QPolygonF const source_content_rect(virtualToImage().map(virt_content_rect));
@@ -85,9 +87,7 @@ DewarpingView::DewarpingView(
 			initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1]);
 		} else {
 			initNewSpline(new_top_spline, polyline.front(), polyline.back());
-			PolylineModelShape model_shape(polyline);
-			SplineFitter fitter(&new_top_spline, &model_shape);
-			fitter.fit();
+			fitSpline(new_top_spline, polyline);
 		}
 
 		top_spline.swap(new_top_spline);
@@ -100,9 +100,7 @@ DewarpingView::DewarpingView(
 			initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2]);
 		} else {
 			initNewSpline(new_bottom_spline, polyline.front(), polyline.back());
-			PolylineModelShape model_shape(polyline);
-			SplineFitter fitter(&new_bottom_spline, &model_shape);
-			fitter.fit();
+			fitSpline(new_bottom_spline, polyline);
 		}
 
 		bottom_spline.swap(new_bottom_spline);
@@ -145,6 +143,47 @@ DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& 
 	spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
 	spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
 	spline.appendControlPoint(line.p2(), 0);
+}
+
+void
+DewarpingView::fitSpline(XSpline& spline, std::vector<QPointF> const& polyline)
+{
+	using namespace spfit;
+
+	SplineFitter fitter(&spline);
+	PolylineModelShape const model_shape(polyline);
+
+	ConstraintSet constraints(&spline);
+	constraints.constrainSplinePoint(0.0, polyline.front());
+	constraints.constrainSplinePoint(1.0, polyline.back());
+	fitter.setConstraints(constraints);
+
+	FittableSpline::SamplingParams sampling_params;
+	sampling_params.maxDistBetweenSamples = 10;
+	fitter.setSamplingParams(sampling_params);
+
+	int iterations_remaining = 20;
+	LinearForceBalancer balancer(0.8);
+	balancer.setTargetRatio(0.1);
+	balancer.setIterationsToTarget(iterations_remaining - 1);
+
+	for (; iterations_remaining > 0; --iterations_remaining, balancer.nextIteration()) {
+		fitter.addAttractionForces(model_shape);
+		fitter.addInternalForce(spline.controlPointsAttractionForce());
+
+		double internal_force_weight = balancer.calcInternalForceWeight(
+			fitter.internalForce(), fitter.externalForce()
+		);
+		OptimizationResult const res(fitter.optimize(internal_force_weight));
+		if (dewarping::Curve::splineHasLoops(spline)) {
+			fitter.undoLastStep();
+			break;
+		}
+
+		if (res.improvementPercentage() < 0.5) {
+			break;
+		}
+	}
 }
 
 void

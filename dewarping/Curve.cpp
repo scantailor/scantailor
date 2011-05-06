@@ -19,6 +19,7 @@
 #include "Curve.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "VecNT.h"
 #include <boost/foreach.hpp>
 #include <QByteArray>
 #include <QDataStream>
@@ -192,6 +193,30 @@ Curve::deserializeXSpline(QDomElement const& el)
 	}
 
 	return xspline;
+}
+
+bool
+Curve::splineHasLoops(XSpline const& spline)
+{
+	int const num_control_points = spline.numControlPoints();
+	Vec2d const main_direction(spline.pointAt(1) - spline.pointAt(0));
+
+	for (int i = 1; i < num_control_points; ++i) {
+		QPointF const cp1(spline.controlPointPosition(i - 1));
+		QPointF const cp2(spline.controlPointPosition(i));
+		if (Vec2d(cp2 - cp1).dot(main_direction) < 0) {
+			return true;
+		}
+#if 0
+		double const t1 = spline.controlPointIndexToT(i - 1);
+		double const t2 = spline.controlPointIndexToT(i);
+		if (Vec2d(spline.pointAt(t2) - spline.pointAt(t1)).dot(main_direction)) < 0) {
+			return true;
+		}
+#endif
+	}
+
+	return false;
 }
 
 } // namespace dewarping

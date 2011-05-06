@@ -34,6 +34,7 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPolygonF>
+#include <vector>
 
 namespace output
 {
@@ -59,6 +60,8 @@ protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
 	static void initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2);
+
+	static void fitSpline(XSpline& spline, std::vector<QPointF> const& polyline);
 
 	void paintXSpline(
 		QPainter& painter, InteractionState const& interaction,

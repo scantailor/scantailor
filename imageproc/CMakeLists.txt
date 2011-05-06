@@ -31,6 +31,7 @@ SET(
 	PolygonRasterizer.cpp PolygonRasterizer.h
 	HoughLineDetector.cpp HoughLineDetector.h
 	GaussBlur.cpp GaussBlur.h
+	Sobel.h
 	MorphGradientDetect.cpp MorphGradientDetect.h
 	LeastSquaresFit.cpp LeastSquaresFit.h
 	PolynomialLine.cpp PolynomialLine.h

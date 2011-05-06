@@ -113,7 +113,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 			ui_data.setContentRect(content_rect);
 		}
 
-		if (params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty() || !params->dependencies().matches(deps)) {
+		if ((params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty()) || !params->dependencies().matches(deps)) {
 			// Backwards compatibilty: put the missing data where it belongs.
 			Params const new_params(
 				ui_data.contentRect(), ui_data.contentSizeMM(),

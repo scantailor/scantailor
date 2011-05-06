@@ -267,7 +267,10 @@ ImageViewBase::createDownscaledImage(QImage const& image)
 	
 	QTransform xform;
 	xform.scale((double)d_w / o_w, (double)d_h / o_h);
-	return transform(image, xform, QRect(0, 0, d_w, d_h), Qt::white);
+	return transform(
+		image, xform, QRect(0, 0, d_w, d_h),
+		OutsidePixels::assumeColor(Qt::white)
+	);
 }
 
 QRectF
@@ -1141,7 +1144,7 @@ ImageViewBase::HqTransformTask::operator()()
 	QImage hq_image(
 		transform(
 			m_image, m_xform, target_rect,
-			Qt::white, true, QSizeF(0.0, 0.0)
+			OutsidePixels::assumeWeakColor(Qt::white), QSizeF(0.0, 0.0)
 		)
 	);
 #if defined(Q_WS_X11)
