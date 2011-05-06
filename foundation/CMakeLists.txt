@@ -17,11 +17,14 @@ SET(
 	PropertySet.cpp PropertySet.h
 	PerformanceTimer.cpp PerformanceTimer.h
 	QtSignalForwarder.cpp QtSignalForwarder.h
+	GridLineTraverser.cpp GridLineTraverser.h
 	StaticPool.h
 	DynamicPool.h
 	NumericTraits.h
 	VecNT.h
+	VecT.h
 	MatMNT.h
+	MatT.h
 	PriorityQueue.h
 	Grid.h
 	ValueConv.h

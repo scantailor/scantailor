@@ -50,6 +50,8 @@ public:
 	XSpline const& xspline() const { return m_xspline; }
 
 	std::vector<QPointF> const& polyline() const { return m_polyline; }
+
+	static bool splineHasLoops(XSpline const& spline);
 private:
 	struct CloseEnough;
 

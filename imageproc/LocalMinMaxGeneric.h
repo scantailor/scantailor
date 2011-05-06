@@ -243,7 +243,8 @@ void verticalPass(
  * \param input Pointer to the input buffer.
  * \param input_stride The size of a row in input buffer, in terms of the number of T objects.
  * \param input_size Dimensions of the input grid.
- * \param output Pointer to the output data.
+ * \param output Pointer to the output data.  Note that the input and output buffers
+ *        may be the same.
  * \param output_stride The size of a row in the output buffer, in terms of the number of T objects.
  *        The output grid is presumed to have the same dimensions as the input grid.
  *

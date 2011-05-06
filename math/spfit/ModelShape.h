@@ -22,7 +22,6 @@
 #include "SqDistApproximant.h"
 #include "FittableSpline.h"
 #include <QPointF>
-#include <QRectF>
 
 namespace spfit
 {
@@ -36,8 +35,6 @@ class ModelShape
 {
 public:
 	virtual ~ModelShape() {}
-
-	virtual QRectF boundingBox() const = 0;
 
 	/**
 	 * Returns a function that approximates the squared distance to the model.

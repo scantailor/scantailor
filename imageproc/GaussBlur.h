@@ -148,8 +148,8 @@ void gaussBlurGeneric(QSize const size, float const h_sigma, float const v_sigma
 		SrcIt sp_m(sp_p + (height - 1) * input_stride);
 		float* vp = &val_p[0];
 		float* vm = &val_m[0] + height - 1;
-		float const initial_p(float_reader(sp_p[0]));
-		float const initial_m(float_reader(sp_m[0]));
+		float const initial_p = float_reader(sp_p[0]);
+		float const initial_m = float_reader(sp_m[0]);
 		
 		for (int y = 0; y < height; ++y) {
 			int const terms = y < 4 ? y : 4;
@@ -187,8 +187,8 @@ void gaussBlurGeneric(QSize const size, float const h_sigma, float const v_sigma
 		float const* sp_m = intermediate_line + width - 1;
 		float* vp = &val_p[0];
 		float* vm = &val_m[0] + width - 1;
-		unsigned char const initial_p = sp_p[0];
-		unsigned char const initial_m = sp_m[0];
+		float const initial_p = sp_p[0];
+		float const initial_m = sp_m[0];
 		
 		for (int x = 0; x < width; ++x) {
 			int const terms = x < 4 ? x : 4;

@@ -24,8 +24,8 @@
 #include "SqDistApproximant.h"
 #include "XSpline.h"
 #include "VecNT.h"
+#include "FlagOps.h"
 #include <QPointF>
-#include <QRectF>
 #include <vector>
 
 namespace spfit
@@ -34,21 +34,26 @@ namespace spfit
 class PolylineModelShape : public ModelShape
 {
 	DECLARE_NON_COPYABLE(PolylineModelShape)
-public:	
+public:
+	enum Flags {
+		DEFAULT_FLAGS  = 0,
+		POLYLINE_FRONT = 1 << 0,
+		POLYLINE_BACK  = 1 << 1
+	};
+
 	PolylineModelShape(std::vector<QPointF> const& polyline);
 
-	virtual QRectF boundingBox() const;
-
 	virtual SqDistApproximant localSqDistApproximant(
-		QPointF const& pt, FittableSpline::SampleFlags flags) const;
+		QPointF const& pt, FittableSpline::SampleFlags sample_flags) const;
+protected:
+	virtual SqDistApproximant calcApproximant(
+		QPointF const& pt, FittableSpline::SampleFlags sample_flags,
+		Flags polyline_flags, FrenetFrame const& frenet_frame, double signed_curvature) const;
 private:
-	static SqDistApproximant calcApproximant(
-		Vec2d const& region_origin, Vec2d const& frenet_frame_origin,
-		Vec2d const& unit_tangent, Vec2f const& unit_normal, double curvature);
-
 	std::vector<XSpline::PointAndDerivs> m_vertices;
-	QRectF m_boundingBox;
 };
+
+DEFINE_FLAG_OPS(PolylineModelShape::Flags)
 
 } // namespace spfit
 

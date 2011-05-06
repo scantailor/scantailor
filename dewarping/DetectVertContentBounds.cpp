@@ -122,7 +122,7 @@ class SequentialColumnProcessor
 public:
 	enum LeftOrRight { LEFT, RIGHT };
 
-	SequentialColumnProcessor(LeftOrRight left_or_right);
+	SequentialColumnProcessor(QSize const& page_size, LeftOrRight left_or_right);
 
 	void process(int x, VertRange const& range);
 
@@ -130,14 +130,20 @@ public:
 
 	QImage visualizeEnvelope(QImage const& background);
 private:
-	bool midPointShouldGo(QPoint top, QPoint mid, QPoint bottom, QPoint leader) const;
+	bool topMidBottomConcave(QPoint top, QPoint mid, QPoint bottom) const;
+
+	static int crossZ(QPoint v1, QPoint v2);
+
+	bool segmentIsTooLong(QPoint p1, QPoint p2) const;
 
 	QLineF interpolateSegments(std::vector<Segment> const& segments) const;
 
-	// top and bottom on the leftmost or the rightmost line.
+	// Top and bottom points on the leftmost or the rightmost line.
 	QPoint m_leadingTop;
 	QPoint m_leadingBottom;
 	std::deque<QPoint> m_path; // Top to bottom.
+	int m_maxSegmentSqLen;
+	int m_leftMinusOneRightOne;
 	LeftOrRight m_leftOrRight;
 };
 
@@ -167,9 +173,14 @@ RansacAlgo::buildAndAssessModel(Segment const& seed_segment)
 }
 
 
-SequentialColumnProcessor::SequentialColumnProcessor(LeftOrRight left_or_right)
-:	m_leftOrRight(left_or_right)
+SequentialColumnProcessor::SequentialColumnProcessor(
+	QSize const& page_size, LeftOrRight left_or_right)
+: m_leftMinusOneRightOne(left_or_right == LEFT ? -1 : 1)
+, m_leftOrRight(left_or_right)
 {
+	int const w = page_size.width();
+	int const h = page_size.height();
+	m_maxSegmentSqLen = (w * w + h * h) / 3;
 }
 
 void
@@ -179,12 +190,6 @@ SequentialColumnProcessor::process(int x, VertRange const& range)
 		return;
 	}
 
-	// If defined, we build something like a convex hull, but just from one side.
-	// Our current choice is not to, as it's bad for cases when the title or some
-	// other decorative element is the widest element on the page and doesn't have
-	// a counterpart on the other side (top / bottom).
-#define ENFORCE_CONVEXITY 1
-
 	if (m_path.empty()) {
 		m_leadingTop = QPoint(x, range.top);
 		m_leadingBottom = QPoint(x, range.bottom);
@@ -193,51 +198,78 @@ SequentialColumnProcessor::process(int x, VertRange const& range)
 		if (range.top != range.bottom) { // We don't want zero length segments in m_path.
 			m_path.push_back(m_leadingBottom);
 		}
-	} else {
-		if (range.top < m_path.front().y()) {
-			QPoint const new_pt(x, range.top);
-#if ENFORCE_CONVEXITY
-			while (m_path.size() > 1 && midPointShouldGo(new_pt, m_path.front(), m_path[1], m_leadingTop)) {
-				m_path.pop_front();
+		return;
+	}
+
+	if (range.top < m_path.front().y()) {
+		// Growing towards the top.
+		QPoint const top(x, range.top);
+
+		// Now we decide if we need to trim the path before
+		// adding a new element to it to preserve convexity.
+		size_t const size = m_path.size();
+		size_t mid_idx = 0;
+		size_t bottom_idx = 1;
+
+		for (; bottom_idx < size; ++mid_idx, ++bottom_idx) {
+			if (!topMidBottomConcave(top, m_path[mid_idx], m_path[bottom_idx])) {
+				break;
 			}
-#endif
-			m_path.push_front(new_pt);
 		}
 
-		if (range.bottom > m_path.back().y()) {
-			QPoint const new_pt(x, range.bottom);
-#if ENFORCE_CONVEXITY
-			while (m_path.size() > 1 && midPointShouldGo(m_path[m_path.size() - 2], m_path.back(), new_pt, m_leadingBottom)) {
-				m_path.pop_back();
-			}
-#endif
-			m_path.push_back(new_pt);
+		// We avoid trimming the path too much.  This helps cases like a heading
+		// wider than the rest of the text.
+		if (!segmentIsTooLong(top, m_path[mid_idx])) {
+			m_path.erase(m_path.begin(), m_path.begin() + mid_idx);
 		}
+
+		m_path.push_front(top);
+	}
+
+	if (range.bottom > m_path.back().y()) {
+		// Growing towards the bottom.
+		QPoint const bottom(x, range.bottom);
+
+		// Now we decide if we need to trim the path before
+		// adding a new element to it to preserve convexity.
+		int mid_idx = m_path.size() - 1;
+		int top_idx = mid_idx - 1;
+
+		for (; top_idx >= 0; --top_idx, --mid_idx) {
+			if (!topMidBottomConcave(m_path[top_idx], m_path[mid_idx], bottom)) {
+				break;
+			}
+		}
+
+		// We avoid trimming the path too much.  This helps cases like a heading
+		// wider than the rest of the text.
+		if (!segmentIsTooLong(bottom, m_path[mid_idx])) {
+			m_path.erase(m_path.begin() + (mid_idx + 1), m_path.end());
+		}
+		
+		m_path.push_back(bottom);
 	}
 }
 
 bool
-SequentialColumnProcessor::midPointShouldGo(
-	QPoint top, QPoint mid, QPoint bottom, QPoint leader) const
+SequentialColumnProcessor::topMidBottomConcave(QPoint top, QPoint mid, QPoint bottom) const
 {
-	if (mid == leader) {
-		// The leader can't go.
-		return false;
-	}
+	int const cross_z = crossZ(mid - top, bottom - mid);
+	return cross_z * m_leftMinusOneRightOne < 0;
+}
 
-	QPoint upper_normal(top - mid);
-	std::swap(upper_normal.rx(), upper_normal.ry());
-	if (m_leftOrRight == LEFT) {
-		upper_normal.setX(-upper_normal.x());
-	} else {
-		upper_normal.setY(-upper_normal.y());
-	}
-	// upper_normal now points *inside* the image, towards the other bound.
+int
+SequentialColumnProcessor::crossZ(QPoint v1, QPoint v2)
+{
+	return v1.x() * v2.y() - v2.x() * v1.y();
+}
 
-	QPoint down_vec(bottom - mid);
-	int const dot = upper_normal.x() * down_vec.x() + upper_normal.y() * down_vec.y();
-
-	return dot <= 0;
+bool
+SequentialColumnProcessor::segmentIsTooLong(QPoint const p1, QPoint const p2) const
+{
+	QPoint const v(p2 - p1);
+	int const sqlen = v.x() * v.x() + v.y() * v.y();
+	return sqlen > m_maxSegmentSqLen;
 }
 
 QLineF
@@ -451,12 +483,12 @@ std::pair<QLineF, QLineF> detectVertContentBounds(
 	std::vector<VertRange> cols;
 	calculateVertRanges(image, cols);
 
-	SequentialColumnProcessor left_processor(SequentialColumnProcessor::LEFT);
+	SequentialColumnProcessor left_processor(image.size(), SequentialColumnProcessor::LEFT);
 	for (int x = 0; x < width; ++x) {
 		left_processor.process(x, cols[x]);
 	}
 	
-	SequentialColumnProcessor right_processor(SequentialColumnProcessor::RIGHT);
+	SequentialColumnProcessor right_processor(image.size(), SequentialColumnProcessor::RIGHT);
 	for (int x = width - 1; x >= 0; --x) {
 		right_processor.process(x, cols[x]);
 	}

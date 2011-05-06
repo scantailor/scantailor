@@ -24,6 +24,9 @@
 #include "DynamicPool.h"
 #include "LinearSolver.h"
 #include "MatMNT.h"
+#include "MatT.h"
+#include "VecNT.h"
+#include "VecT.h"
 #include <stddef.h>
 #include <assert.h>
 
@@ -89,7 +92,13 @@ public:
 
 	Mat write(T* buf) const;
 
+	template<size_t N>
+	Mat write(VecNT<N, T>& vec) const;
+
 	Mat transWrite(T* buf) const;
+
+	template<size_t N>
+	Mat transWrite(VecNT<N, T>& vec) const;
 
 	Mat operator-() const;
 
@@ -118,9 +127,27 @@ public:
 		return mcalc::Mat<T>(&m_alloc, data, rows, cols);
 	}
 
+	template<size_t N>
+	mcalc::Mat<T> operator()(VecNT<N, T> const& vec, int rows, int cols) {
+		return mcalc::Mat<T>(&m_alloc, vec.data(), rows, cols);
+	}
+
 	template<size_t M, size_t N>
 	mcalc::Mat<T> operator()(MatMNT<M, N, T> const& mat) {
 		return mcalc::Mat<T>(&m_alloc, mat.data(), mat.ROWS, mat.COLS);
+	}
+
+	mcalc::Mat<T> operator()(MatT<T> const& mat) {
+		return mcalc::Mat<T>(&m_alloc, mat.data(), mat.rows(), mat.cols());
+	}
+
+	template<size_t N>
+	mcalc::Mat<T> operator()(VecNT<N, T> const& vec) {
+		return mcalc::Mat<T>(&m_alloc, vec.data(), vec.SIZE, 1);
+	}
+
+	mcalc::Mat<T> operator()(VecT<T> const& vec) {
+		return mcalc::Mat<T>(&m_alloc, vec.data(), vec.size(), 1);
 	}
 private:
 	Alloc m_alloc;
@@ -189,7 +216,7 @@ Mat<T>
 Mat<T>::trans() const
 {
 	if (cols == 1 || rows == 1) {
-		return *this;
+		return Mat<T>(alloc, data, cols, rows);
 	}
 
 	T* p_trans = alloc->allocT(cols * rows);
@@ -210,6 +237,15 @@ Mat<T>::write(T* buf) const
 }
 
 template<typename T>
+template<size_t N>
+Mat<T>
+Mat<T>::write(VecNT<N, T>& vec) const
+{
+	assert(N >= rows * cols);
+	return write(vec.data());
+}
+
+template<typename T>
 Mat<T>
 Mat<T>::transWrite(T* buf) const
 {
@@ -224,6 +260,15 @@ Mat<T>::transWrite(T* buf) const
 	}
 
 	return *this;
+}
+
+template<typename T>
+template<size_t N>
+Mat<T>
+Mat<T>::transWrite(VecNT<N, T>& vec) const
+{
+	assert(N >= rows * cols);
+	return transWrite(vec.data());
 }
 
 /** Unary minus. */

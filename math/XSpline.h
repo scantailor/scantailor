@@ -20,6 +20,7 @@
 #define XSPLINE_H_
 
 #include "spfit/FittableSpline.h"
+#include "QuadraticFunction.h"
 #include "VirtualFunction.h"
 #include "NumericTraits.h"
 #include <QPointF>
@@ -37,11 +38,21 @@ class XSpline : public spfit::FittableSpline
 public:
 	struct PointAndDerivs
 	{
-		QPointF point;
-		QPointF firstDeriv;
-		QPointF secondDeriv;
+		QPointF point; /**< Point on a spline. */
+		QPointF firstDeriv; /**< First derivative with respect to t. */
+		QPointF secondDeriv; /**< Second derivative with respect to t. */
 
-		double curvature() const;
+		/**
+		 * \brief Curvature at a given point on the spline.
+		 *
+		 * The sign indicates curving direction.  Positive signs normally
+		 * indicate anti-clockwise direction, though in 2D computer graphics
+		 * it's usually the other way around, as the Y axis points down.
+		 * In other words, if you rotate your coordinate system so that
+		 * the X axis aligns with the tangent vector, curvature will be
+		 * positive if the spline curves towards the positive Y direction.
+		 */
+		double signedCurvature() const;
 	};
 
 	virtual int numControlPoints() const;
@@ -52,6 +63,8 @@ public:
 	 * will always be max(0, numControlPoints() - 1).
 	 */
 	int numSegments() const;
+
+	double controlPointIndexToT(int idx) const;
 
 	/**
 	 * \brief Appends a control point to the end of the spline.
@@ -99,6 +112,40 @@ public:
 
 	/** \see spfit::FittableSpline::linearCombinationAt() */
 	virtual void linearCombinationAt(double t, std::vector<LinearCoefficient>& coeffs) const;
+
+	/**
+	 * Returns a function equivalent to:
+	 * \code
+	 * sum((cp[i].x - cp[i - 1].x)^2 + (cp[i].y - cp[i - 1].y)^2)
+	 * \endcode
+	 * Except the returned function is a function of control point displacements,
+	 * not positions.
+	 * The sum is calculated across all segments.
+	 */
+	QuadraticFunction controlPointsAttractionForce() const;
+
+	/**
+	 * Same as the above one, but you provide a range of segments to consider.
+	 * The range is half-closed: [seg_begin, seg_end)
+	 */
+	QuadraticFunction controlPointsAttractionForce(int seg_begin, int seg_end) const;
+
+	/**
+	 * Returns a function equivalent to:
+	 * \code
+	 * sum(Vec2d(pointAt(controlPointIndexToT(i)) - pointAt(controlPointIndexToT(i - 1))).squaredNorm())
+	 * \endcode
+	 * Except the returned function is a function of control point displacements,
+	 * not positions.
+	 * The sum is calculated across all segments.
+	 */
+	QuadraticFunction junctionPointsAttractionForce() const;
+
+	/**
+	 * Same as the above one, but you provide a range of segments to consider.
+	 * The range is half-closed: [seg_begin, seg_end)
+	 */
+	QuadraticFunction junctionPointsAttractionForce(int seg_begin, int seg_end) const;
 	
 	/**
 	 * \brief Finds a point on the spline that's closest to a given point.
@@ -115,9 +162,12 @@ public:
 	/** \see spfit::FittableSpline::sample() */
 	virtual void sample(
 		VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
-		SamplingParams const& params = SamplingParams()) const;
+		SamplingParams const& params = SamplingParams(),
+		double from_t = 0.0, double to_t = 1.0) const;
 
-	std::vector<QPointF> toPolyline(SamplingParams const& params = SamplingParams()) const;
+	std::vector<QPointF> toPolyline(
+		SamplingParams const& params = SamplingParams(),
+		double from_t = 0.0, double to_t = 1.0) const;
 
 	void swap(XSpline& other) { m_controlPoints.swap(other.m_controlPoints); }
 private:
@@ -139,17 +189,20 @@ private:
 	struct TensionDerivedParams;
 	class GBlendFunc;
 	class HBlendFunc;
+	struct DecomposedDerivs;
 	
 	QPointF pointAtImpl(int segment, double t) const;
 
 	int linearCombinationFor(LinearCoefficient* coeffs, int segment, double t) const;
 
-	PointAndDerivs pointAndDtsAtImpl(int segment, double t) const;
+	DecomposedDerivs decomposedDerivs(double t) const;
+
+	DecomposedDerivs decomposedDerivsImpl(int segment, double t) const;
 
 	void maybeAddMoreSamples(
 		VirtualFunction3<void, QPointF, double, SampleFlags>& sink,
 		double max_sqdist_to_spline, double max_sqdist_between_samples,
-		double r_num_segments, int segment,
+		double num_segments, double r_num_segments,
 		double prev_t, QPointF const& prev_pt,
 		double next_t, QPointF const& next_pt) const;
 

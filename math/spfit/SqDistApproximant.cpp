@@ -17,7 +17,9 @@
 */
 
 #include "SqDistApproximant.h"
+#include "FrenetFrame.h"
 #include "MatrixCalc.h"
+#include <limits>
 #include <assert.h>
 #include <math.h>
 
@@ -89,6 +91,34 @@ SqDistApproximant::weightedLineDistance(QLineF const& line, double weight)
 	Vec2d const v(-u[1], u[0]);
 
 	return SqDistApproximant(line.p1(), u, v, 0, weight);
+}
+
+SqDistApproximant
+SqDistApproximant::curveDistance(
+	Vec2d const& reference_point, FrenetFrame const& frenet_frame, double signed_curvature)
+{
+	return weightedCurveDistance(reference_point, frenet_frame, signed_curvature, 1);
+}
+
+SqDistApproximant
+SqDistApproximant::weightedCurveDistance(
+	Vec2d const& reference_point, FrenetFrame const& frenet_frame,
+	double const signed_curvature, double const weight)
+{
+	double const abs_curvature = fabs(signed_curvature);
+	double m = 0;
+
+	if (abs_curvature > std::numeric_limits<double>::epsilon()) {
+		Vec2d const to_reference_point(reference_point - frenet_frame.origin());
+		double const p = 1.0 / abs_curvature;
+		double const d = fabs(frenet_frame.unitNormal().dot(to_reference_point));
+		m = d / (d + p); // Formula 7 in [2].
+	}
+
+	return SqDistApproximant(
+		frenet_frame.origin(), frenet_frame.unitTangent(),
+		frenet_frame.unitNormal(), m * weight, weight
+	);
 }
 
 double

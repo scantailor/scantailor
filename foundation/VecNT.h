@@ -119,9 +119,9 @@ public:
 	template<typename OT>
 	VecNT& operator=(VecNT<N, OT> const& other);
 
-	operator T*() { return m_data; }
+	T& operator[](size_t idx) { return m_data[idx]; }
 
-	operator T const*() const { return m_data; }
+	T const& operator[](size_t idx) const { return m_data[idx]; }
 	
 	VecNT& operator+=(T scalar);
 
@@ -134,6 +134,10 @@ public:
 	VecNT& operator*=(T scalar);
 
 	VecNT& operator/=(T scalar);
+
+	T const* data() const { return m_data; }
+
+	T* data() { return m_data; }
 
 	/**
 	 * \brief Sums elements in the vector.

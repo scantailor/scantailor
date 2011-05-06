@@ -378,7 +378,7 @@ PictureZoneEditor::MaskTransformTask::operator()()
 	QImage gray_mask(
 		transformToGray(
 			m_origMask.toQImage(), m_xform, target_rect,
-			Qt::black, true, QSizeF(0.0, 0.0)
+			OutsidePixels::assumeWeakColor(Qt::black), QSizeF(0.0, 0.0)
 		)
 	);
 

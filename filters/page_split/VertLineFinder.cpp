@@ -36,6 +36,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QTransform>
+#include <Qt>
 #include <QDebug>
 #include <list>
 #include <algorithm>
@@ -63,11 +64,10 @@ VertLineFinder::findLines(
 		target_rect.setHeight(1);
 	}
 
-	QColor const black(0x00, 0x00, 0x00);
 	GrayImage const gray100(
 		transformToGray(
-			image, xform_100dpi.transform(), target_rect, black, true,
-			QSizeF(5.0, 5.0)
+			image, xform_100dpi.transform(), target_rect,
+			OutsidePixels::assumeWeakColor(Qt::black), QSizeF(5.0, 5.0)
 		)
 	);
 	if (dbg) {
