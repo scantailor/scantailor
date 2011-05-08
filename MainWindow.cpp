@@ -123,7 +123,7 @@
 #include <stddef.h>
 #include <math.h>
 #include <assert.h>
-#include <QTimer.h>
+#include <qtimer.h>
 
 MainWindow::MainWindow()
 :	m_ptrPages(new ProjectPages),
