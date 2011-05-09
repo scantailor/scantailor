@@ -497,7 +497,9 @@ Settings::Impl::updateContentSizeAndGetParams(
 	if (agg_hard_size_after) {
 		*agg_hard_size_after = getAggregateHardSizeMMLocked();
 	}
-	
+
+	updateContentRect();
+
 	return Params(
 		item_it->hardMarginsMM, item_it->contentRect,
 		item_it->contentSizeMM, item_it->alignment

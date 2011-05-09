@@ -104,7 +104,6 @@ Task::process(
 			&agg_hard_size_before, &agg_hard_size_after
 		)
 	);
-	m_ptrSettings->updateContentRect();
 	
 	QRectF const adapted_content_rect(
 		Utils::adaptContentRect(data.xform(), content_rect)
