@@ -241,7 +241,7 @@ template<size_t N>
 Mat<T>
 Mat<T>::write(VecNT<N, T>& vec) const
 {
-	assert(N >= rows * cols);
+        assert(N >= size_t(rows * cols));
 	return write(vec.data());
 }
 

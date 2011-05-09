@@ -95,13 +95,13 @@ Function<2>::hessian(SparseMap<2> const& sparse_map) const
 	for (size_t i = 0; i < num_vars; ++i) {
 		for (size_t j = 0; j < num_vars; ++j) {
 			double Fij = 0;
-			int const ij = sparse_map.nonZeroElementIdx(i, j);
+                        size_t const ij = sparse_map.nonZeroElementIdx(i, j);
 			if (ij != sparse_map.ZERO_ELEMENT) {
 				if (i == j) {
 					Fij = secondDerivs[ij];
 				} else {
-					int const ii = sparse_map.nonZeroElementIdx(i, i);
-					int const jj = sparse_map.nonZeroElementIdx(j, j);
+                                        size_t const ii = sparse_map.nonZeroElementIdx(i, i);
+                                        size_t const jj = sparse_map.nonZeroElementIdx(j, j);
 					assert(ii != sparse_map.ZERO_ELEMENT && jj != sparse_map.ZERO_ELEMENT);
 					Fij = 0.5 * (secondDerivs[ij] - (secondDerivs[ii] + secondDerivs[jj]));
 				}
