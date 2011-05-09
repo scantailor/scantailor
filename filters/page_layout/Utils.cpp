@@ -208,19 +208,27 @@ Utils::calcSoftMarginsMM(
 	if (delta_width > 0.0) {
 		switch (myAlign.horizontal()) {
 			case Alignment::LEFT:
+#ifdef DEBUG
 				std::cout << "align:left" << std::endl;
+#endif
 				right = delta_width;
 				break;
 			case Alignment::HCENTER:
+#ifdef DEBUG
 				std::cout << "align:hcenter" << std::endl;
+#endif
 				left = right = 0.5 * delta_width;
 				break;
 			case Alignment::RIGHT:
+#ifdef DEBUG
 				std::cout << "align:right" << std::endl;
+#endif
 				left = delta_width;
 				break;
 			default:
+#ifdef DEBUG
 				std::cout << "align:horiginal" << std::endl;
+#endif
 				left = aggLeftBorder;
 				right = aggRightBorder;
 				break;
@@ -230,19 +238,27 @@ Utils::calcSoftMarginsMM(
 	if (delta_height > 0.0) {
 		switch (myAlign.vertical()) {
 			case Alignment::TOP:
+#ifdef DEBUG
 				std::cout << "align:top" << std::endl;
+#endif
 				bottom = delta_height;
 				break;
 			case Alignment::VCENTER:
+#ifdef DEBUG
 				std::cout << "align:vcenter" << std::endl;
+#endif
 				top = bottom = 0.5 * delta_height;
 				break;
 			case Alignment::BOTTOM:
+#ifdef DEBUG
 				std::cout << "align:bottom" << std::endl;
+#endif
 				top = delta_height;
 				break;
 			default:
+#ifdef DEBUG
 				std::cout << "align:voriginal" << std::endl;
+#endif
 				top = aggTopBorder;
 				bottom = aggBottomBorder;
 				break;
