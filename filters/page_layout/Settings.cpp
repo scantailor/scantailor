@@ -516,6 +516,7 @@ Settings::Impl::updateContentRect()
 	for (; it != m_items.end(); it++) {
 		if (it->contentRect == m_invalidRect) continue;
 		if (it->alignment.isNull()) continue;
+		std::cout << "\tupateContentRect: " << it->pageId.imageId().filePath().toAscii().constData() << "\n";
 
 		QRectF icr(it->contentRect);
 		if (icr.left() < m_contentRect.left()) m_contentRect.setLeft(icr.left());

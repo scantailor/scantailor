@@ -98,6 +98,7 @@ Utils::calcSoftMarginsMM(
 	Alignment const& alignment, QRectF const& resultRect, QRectF const& boundingRect, QRectF const& agg_content_rect)
 {
 	if (alignment.isNull()) {
+		std::cout << "\tskip soft margins: " <<  "\n";
 		// This means we are not aligning this page with others.
 		return Margins();
 	}
