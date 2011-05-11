@@ -404,7 +404,10 @@ OutputGenerator::estimateBinarizationMask(
 		picture_areas, source_sub_rect.size()
 	);
 	
-	return BinaryImage(picture_areas, threshold);
+	BinaryImage ret_img(picture_areas, threshold);
+	ret_img.rectangularizeAreas();
+
+	return ret_img;
 }
 
 void

@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <boost/foreach.hpp>
 #include "BinaryImage.h"
 #include "ByteOrder.h"
 #include "BitOps.h"
@@ -26,6 +27,7 @@
 #include <memory>
 #include <stdexcept>
 #include <algorithm>
+#include <iostream>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -557,6 +559,93 @@ BinaryImage::contentBoundingBox(BWColor const content_color) const
 	// bottom is inclusive, right is a positive offset from width.
 	return QRect(left, top, w - right - left, bottom - top + 1);
 }
+
+
+void
+BinaryImage::rectangularizeAreas(BWColor content_color)
+{
+	if (isNull()) {
+		return;
+	}
+
+	std::cout << "rectangularizeAreas" << std::endl;
+
+	int const w = m_width;
+	int const h = m_height;
+	int const wpl = m_wpl;
+	int const last_word_idx = (w - 1) >> 5;
+	int const last_word_bits = w - (last_word_idx << 5);
+	int const last_word_unused_bits = 32 - last_word_bits;
+	uint32_t const last_word_mask = ~uint32_t(0) << last_word_unused_bits;
+	uint32_t const modifier = (content_color == WHITE) ? ~uint32_t(0) : 0;
+	uint32_t const* const data = this->data();
+	std::vector<QRect> areas;
+
+	uint32_t const* line = data + h * wpl;
+	// create list of filled continuous blocks on each line
+	for (int y = 0; y < h; ++y, line += wpl) {
+		if (isLineMonotone(line, last_word_idx, last_word_mask, modifier)) {
+			continue;
+		}
+
+		QRect area;
+		for (int i = 0; i <= last_word_idx; ++i) {
+			uint32_t word = line[i] ^ modifier;
+			if (i==last_word_idx) {
+				// The last (possibly incomplete) word.
+				word = (line[last_word_idx] ^ modifier) & last_word_mask;
+			}
+			if (word) {
+				if (area.isEmpty()) {
+					area.setLeft(i);
+					area.setRight(i+1);
+					area.setTop(y);
+					area.setBottom(y+1);
+				} else {
+					area.setRight(i+1);
+				}
+			} else {
+				if (!area.isEmpty()) {
+					areas.push_back(QRect(area));
+				}
+				area = QRect();
+			}
+		}
+		if (!area.isEmpty()) {
+			areas.push_back(QRect(area));
+		}
+	}
+
+	std::cout << areas.size() << std::endl;
+	// join adjacent blocks of areas
+	bool join = true;
+	while (join) {
+		join = false;
+		std::vector<QRect> tmp;
+		BOOST_FOREACH(QRect area, areas) {
+			//std::cout << "l: " << area.left() << " r: " << area.right() << " t: " << area.top() << " b: " << area.bottom() << std::endl;
+			// take an area and try to join with something in tmp
+			bool intersected = false;
+			std::vector<QRect> tmp2;
+			BOOST_FOREACH(QRect ta, tmp) {
+				if (area.intersects(ta)) {
+					intersected = true;
+					tmp2.push_back(area.united(ta));
+				}
+			}
+			if (!intersected) {
+				tmp2.push_back(QRect(area));
+			}
+			tmp = tmp2;
+		}
+		areas = tmp;
+	}
+	std::cout << areas.size() << std::endl;
+	BOOST_FOREACH(QRect area, areas) {
+		fill(area, WHITE);
+	}
+}
+
 
 uint32_t*
 BinaryImage::data()
