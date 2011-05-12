@@ -305,7 +305,7 @@ Task::process(
 			params.depthPerception(),
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
-			m_ptrDbg.get()
+			m_ptrDbg.get(), params.pictureShape()
 		);
 
 		if (params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid()) {
