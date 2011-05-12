@@ -64,6 +64,9 @@ OptionsWidget::OptionsWidget(
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
 	
+	pictureShapeSelector->addItem(tr("Free"), FREE_SHAPE);
+	pictureShapeSelector->addItem(tr("Rectangular"), RECTANGULAR_SHAPE);
+
 	darkerThresholdLink->setText(
 		Utils::richTextForLink(darkerThresholdLink->text())
 	);
@@ -83,6 +86,10 @@ OptionsWidget::OptionsWidget(
 	connect(
 		colorModeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(colorModeChanged(int))
+	);
+	connect(
+		pictureShapeSelector, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(pictureShapeChanged(int))
 	);
 	connect(
 		whiteMarginsCB, SIGNAL(clicked(bool)),
@@ -169,6 +176,7 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 	m_pageId = page_id;
 	m_outputDpi = params.outputDpi();
 	m_colorParams = params.colorParams();
+	m_pictureShape = params.pictureShape();
 	m_dewarpingMode = params.dewarpingMode();
 	m_depthPerception = params.depthPerception();
 	m_despeckleLevel = params.despeckleLevel();
@@ -212,6 +220,14 @@ OptionsWidget::colorModeChanged(int const idx)
 	m_colorParams.setColorMode((ColorParams::ColorMode)mode);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	updateColorsDisplay();
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::pictureShapeChanged(int const idx)
+{
+	m_pictureShape = (PictureShape)(pictureShapeSelector->itemData(idx).toInt());
+	m_ptrSettings->setPictureShape(m_pageId, m_pictureShape);
 	emit reloadRequested();
 }
 
@@ -348,6 +364,7 @@ OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 {
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setColorParams(page_id, m_colorParams);
+		m_ptrSettings->setPictureShape(page_id, m_pictureShape);
 		emit invalidateThumbnail(page_id);
 	}
 	
@@ -599,6 +616,7 @@ OptionsWidget::updateColorsDisplay()
 	
 	bool color_grayscale_options_visible = false;
 	bool bw_options_visible = false;
+	bool picture_shape_visible = false;
 	switch (color_mode) {
 		case ColorParams::BLACK_AND_WHITE:
 			bw_options_visible = true;
@@ -608,6 +626,7 @@ OptionsWidget::updateColorsDisplay()
 			break;
 		case ColorParams::MIXED:
 			bw_options_visible = true;
+			picture_shape_visible = true;
 			break;
 	}
 	
@@ -622,8 +641,14 @@ OptionsWidget::updateColorsDisplay()
 	}
 	
 	modePanel->setVisible(m_lastTab != TAB_DEWARPING);
+	//pictureShapeOptions->setVisible(picture_shape_visible);
 	bwOptions->setVisible(bw_options_visible);
 	despecklePanel->setVisible(bw_options_visible && m_lastTab != TAB_DEWARPING);
+
+	if (picture_shape_visible) {
+		int const picture_shape_idx = pictureShapeSelector->findData(m_pictureShape);
+		pictureShapeSelector->setCurrentIndex(picture_shape_idx);
+	}
 
 	if (bw_options_visible) {
 		switch (m_despeckleLevel) {

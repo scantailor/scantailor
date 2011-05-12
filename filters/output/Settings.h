@@ -24,6 +24,7 @@
 #include "PageId.h"
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "Params.h"
 #include "OutputParams.h"
 #include "DewarpingMode.h"
 #include "dewarping/DistortionModel.h"
@@ -54,6 +55,8 @@ public:
 	void setParams(PageId const& page_id, Params const& params);
 
 	void setColorParams(PageId const& page_id, ColorParams const& prms);
+
+	void setPictureShape(PageId const& page_id, PictureShape picture_shape);
 
 	void setDpi(PageId const& page_id, Dpi const& dpi);
 

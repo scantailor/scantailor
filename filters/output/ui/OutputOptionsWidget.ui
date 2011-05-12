@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>228</width>
-    <height>621</height>
+    <width>324</width>
+    <height>661</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -135,6 +135,47 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="pictureShapeOptions">
+        <item>
+         <spacer name="horizontalSpacer_23">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Picture Shape</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="pictureShapeSelector">
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_24">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
             <height>20</height>
            </size>
           </property>
@@ -682,21 +723,21 @@
         </item>
        </layout>
       </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
