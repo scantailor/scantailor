@@ -568,7 +568,7 @@ BinaryImage::rectangularizeAreas(BWColor content_color)
 		return;
 	}
 
-	std::cout << "rectangularizeAreas" << std::endl;
+	//std::cout << "rectangularizeAreas" << std::endl;
 
 	int const w = m_width;
 	int const h = m_height;
@@ -581,13 +581,9 @@ BinaryImage::rectangularizeAreas(BWColor content_color)
 	uint32_t const* const data = this->data();
 	std::vector<QRect> areas;
 
-	uint32_t const* line = data + h * wpl;
+	uint32_t const* line = data;
 	// create list of filled continuous blocks on each line
 	for (int y = 0; y < h; ++y, line += wpl) {
-		if (isLineMonotone(line, last_word_idx, last_word_mask, modifier)) {
-			continue;
-		}
-
 		QRect area;
 		for (int i = 0; i <= last_word_idx; ++i) {
 			uint32_t word = line[i] ^ modifier;
@@ -597,12 +593,12 @@ BinaryImage::rectangularizeAreas(BWColor content_color)
 			}
 			if (word) {
 				if (area.isEmpty()) {
-					area.setLeft(i);
-					area.setRight(i+1);
+					area.setLeft(i<<5);
+					area.setRight(((i+1)<<5)-1);
 					area.setTop(y);
-					area.setBottom(y+1);
+					area.setBottom(y);
 				} else {
-					area.setRight(i+1);
+					area.setRight(((i+1)<<5)-1);
 				}
 			} else {
 				if (!area.isEmpty()) {
@@ -616,32 +612,38 @@ BinaryImage::rectangularizeAreas(BWColor content_color)
 		}
 	}
 
-	std::cout << areas.size() << std::endl;
 	// join adjacent blocks of areas
 	bool join = true;
+	int overlap = 16;
 	while (join) {
 		join = false;
 		std::vector<QRect> tmp;
 		BOOST_FOREACH(QRect area, areas) {
-			//std::cout << "l: " << area.left() << " r: " << area.right() << " t: " << area.top() << " b: " << area.bottom() << std::endl;
 			// take an area and try to join with something in tmp
+			QRect enlArea(area.adjusted(-overlap,-overlap, overlap, overlap));
 			bool intersected = false;
 			std::vector<QRect> tmp2;
 			BOOST_FOREACH(QRect ta, tmp) {
-				if (area.intersects(ta)) {
+				QRect enlTA(ta.adjusted(-overlap,-overlap, overlap, overlap));
+				if (enlArea.intersects(enlTA)) {
 					intersected = true;
+					join = true;
 					tmp2.push_back(area.united(ta));
+				} else {
+					tmp2.push_back(ta);
 				}
 			}
 			if (!intersected) {
-				tmp2.push_back(QRect(area));
+				tmp2.push_back(area);
 			}
 			tmp = tmp2;
 		}
 		areas = tmp;
+		//std::cout << areas.size() << std::endl;
 	}
-	std::cout << areas.size() << std::endl;
+	//std::cout << areas.size() << std::endl;
 	BOOST_FOREACH(QRect area, areas) {
+		//std::cout << "l: " << area.left() << " r: " << area.right() << " t: " << area.top() << " b: " << area.bottom() << std::endl;
 		fill(area, WHITE);
 	}
 }

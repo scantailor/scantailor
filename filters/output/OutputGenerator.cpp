@@ -404,10 +404,7 @@ OutputGenerator::estimateBinarizationMask(
 		picture_areas, source_sub_rect.size()
 	);
 	
-	BinaryImage ret_img(picture_areas, threshold);
-	ret_img.rectangularizeAreas();
-
-	return ret_img;
+	return BinaryImage(picture_areas, threshold);
 }
 
 void
@@ -660,6 +657,7 @@ OutputGenerator::processWithoutDewarping(
 			normalize_illumination_rect,
 			small_margins_rect, dbg
 		);
+		bw_mask.rectangularizeAreas(WHITE);
 		if (dbg) {
 			dbg->add(bw_mask, "bw_mask");
 		}
