@@ -87,7 +87,7 @@ CacheDrivenTask::process(
 				generator.outputImageSize(), generator.outputContentRect(),
 				new_xform, params.outputDpi(), params.colorParams(),
 				params.dewarpingMode(), params.distortionModel(),
-				params.depthPerception(), params.despeckleLevel()
+				params.depthPerception(), params.despeckleLevel(), params.pictureShape()
 			);
 
 			if (!stored_output_params->outputImageParams().matches(new_output_image_params)) {
