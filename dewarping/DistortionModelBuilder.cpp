@@ -671,7 +671,7 @@ DistortionModelBuilder::visualizeModel(
 			}
 
 			// We've got a reverse segment.
-			if (!reverse_segments.empty() && reverse_segments.back().back() == i - 1) {
+			if (!reverse_segments.empty() && reverse_segments.back().back() == int(i) - 1) {
 				// Continue the previous sequence.
 				reverse_segments.back().push_back(i);
 			} else {
