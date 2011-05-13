@@ -193,7 +193,7 @@ CommandLine::printHelp()
 	std::cout << "\t--alignment=<center|original|auto>\t-- sets vertical to original and horizontal to center" << "\n";
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << "\n";
 	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << "\n";
-	std::cout << "\t--alignment-tolerance=<float>\t\t\t-- sets tolerance for auto alignment" << "\n";
+	std::cout << "\t--alignment-tolerance=<float>\t\t-- sets tolerance for auto alignment" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
