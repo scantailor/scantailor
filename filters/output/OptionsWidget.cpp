@@ -641,7 +641,7 @@ OptionsWidget::updateColorsDisplay()
 	}
 	
 	modePanel->setVisible(m_lastTab != TAB_DEWARPING);
-	//pictureShapeOptions->setVisible(picture_shape_visible);
+	pictureShapeOptions->setVisible(picture_shape_visible);
 	bwOptions->setVisible(bw_options_visible);
 	despecklePanel->setVisible(bw_options_visible && m_lastTab != TAB_DEWARPING);
 
