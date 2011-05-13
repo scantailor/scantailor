@@ -42,7 +42,7 @@ Params::Params(QDomElement const& el)
 	m_depthPerception(el.attribute("depthPerception")),
 	m_dewarpingMode(el.attribute("dewarpingMode")),
 	m_despeckleLevel(despeckleLevelFromString(el.attribute("despeckleLevel"))),
-	m_pictureShape(FREE_SHAPE)
+	m_pictureShape((PictureShape)(el.attribute("pictureShape").toInt()))
 {
 	QDomElement const cp(el.namedItem("color-params").toElement());
 	m_colorParams.setColorMode(parseColorMode(cp.attribute("colorMode")));
@@ -63,6 +63,7 @@ Params::toXml(QDomDocument& doc, QString const& name) const
 	
 	QDomElement el(doc.createElement(name));
 	el.appendChild(m_distortionModel.toXml(doc, "distortion-model"));
+	el.setAttribute("pictureShape", (int)m_pictureShape);
 	el.setAttribute("depthPerception", m_depthPerception.toString());
 	el.setAttribute("dewarpingMode", m_dewarpingMode.toString());
 	el.setAttribute("despeckleLevel", despeckleLevelToString(m_despeckleLevel));
