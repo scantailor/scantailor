@@ -396,7 +396,8 @@ OutputGenerator::estimateBinarizationMask(
 	status.throwIfCancelled();
 	
 	BinaryThreshold const threshold(
-		BinaryThreshold::mokjiThreshold(picture_areas, 5, 26)
+		//BinaryThreshold::mokjiThreshold(picture_areas, 5, 26)
+		32
 	);
 	
 	// Scale back to original size.
@@ -1391,7 +1392,12 @@ OutputGenerator::detectPictures(
 		dbg->add(holes_filled, "holes_filled");
 	}
 	
-	return holes_filled;
+	GrayImage stretched2(stretchGrayRange(holes_filled , 0.01, 0.01));
+	if (dbg) {
+		dbg->add(stretched2, "stretched2");
+	}
+
+	return stretched2;
 }
 
 QImage
