@@ -429,7 +429,7 @@ English or Russian please.</source>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="538"/>
+        <location filename="../MainWindow.cpp" line="536"/>
         <source>Save Project</source>
         <translation>Uložit projekt</translation>
     </message>
@@ -546,105 +546,105 @@ English or Russian please.</source>
         <translation>O programu</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="464"/>
+        <location filename="../MainWindow.cpp" line="462"/>
         <source>Stop batch processing</source>
         <translation>Zastavit dávkové zpracování</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="538"/>
+        <location filename="../MainWindow.cpp" line="536"/>
         <source>Save this project?</source>
         <translation>Uložit projekt?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="911"/>
+        <location filename="../MainWindow.cpp" line="909"/>
         <source>Insert before ...</source>
         <translation>Vložit před ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="914"/>
+        <location filename="../MainWindow.cpp" line="912"/>
         <source>Insert after ...</source>
         <translation>Vložit za ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="920"/>
+        <location filename="../MainWindow.cpp" line="918"/>
         <source>Remove from project ...</source>
         <translation>Odstranit z projektu</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="941"/>
+        <location filename="../MainWindow.cpp" line="939"/>
         <source>Insert here ...</source>
         <translation>Vložit sem ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1236"/>
-        <location filename="../MainWindow.cpp" line="1317"/>
+        <location filename="../MainWindow.cpp" line="1234"/>
+        <location filename="../MainWindow.cpp" line="1315"/>
         <source>Scan Tailor Projects</source>
         <translation>Seznam projektů</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1316"/>
+        <location filename="../MainWindow.cpp" line="1314"/>
         <source>Open Project</source>
         <translation>Otevřít projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1336"/>
-        <location filename="../MainWindow.cpp" line="1345"/>
-        <location filename="../MainWindow.cpp" line="1659"/>
-        <location filename="../MainWindow.cpp" line="1690"/>
-        <location filename="../MainWindow.cpp" line="1767"/>
+        <location filename="../MainWindow.cpp" line="1334"/>
+        <location filename="../MainWindow.cpp" line="1343"/>
+        <location filename="../MainWindow.cpp" line="1657"/>
+        <location filename="../MainWindow.cpp" line="1688"/>
+        <location filename="../MainWindow.cpp" line="1765"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1337"/>
+        <location filename="../MainWindow.cpp" line="1335"/>
         <source>Unable to open the project file.</source>
         <translation>Nelze otevřít soubor s projektem.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1346"/>
+        <location filename="../MainWindow.cpp" line="1344"/>
         <source>The project file is broken.</source>
         <translation>Soubor s projektem je poškozen.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1555"/>
+        <location filename="../MainWindow.cpp" line="1553"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Výstup zatim není možný, protože ještě není známa konečná velikost stránek.
 Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat Obsah&quot; nebo &quot;Okraje&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1588"/>
+        <location filename="../MainWindow.cpp" line="1586"/>
         <source>Unnamed</source>
         <translation>Nepojmenovaný</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1593"/>
+        <location filename="../MainWindow.cpp" line="1591"/>
         <source>%1 - Scan Tailor Plus %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1660"/>
-        <location filename="../MainWindow.cpp" line="1691"/>
+        <location filename="../MainWindow.cpp" line="1658"/>
+        <location filename="../MainWindow.cpp" line="1689"/>
         <source>Error saving the project file!</source>
         <translation>Chyba při ukládání souboru s projektem!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1738"/>
+        <location filename="../MainWindow.cpp" line="1736"/>
         <source>File to insert</source>
         <translation>Soubor pro vložení</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1744"/>
+        <location filename="../MainWindow.cpp" line="1742"/>
         <source>Images not in project (%1)</source>
         <translation>Obrázky, které nejsou v projektu (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1768"/>
+        <location filename="../MainWindow.cpp" line="1766"/>
         <source>Error opening the image file.</source>
         <translation>Chyba při otevírání souboru s obrázkem.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1808"/>
+        <location filename="../MainWindow.cpp" line="1806"/>
         <source>Remove</source>
         <translation>Vyjmout</translation>
     </message>
@@ -1479,31 +1479,26 @@ Vyjměte je z projektu.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="32"/>
-        <source>Autosave</source>
+        <source>Autosave each</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="39"/>
-        <source>each</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/SettingsDialog.ui" line="59"/>
+        <location filename="../ui/SettingsDialog.ui" line="52"/>
         <source>minute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="81"/>
+        <location filename="../ui/SettingsDialog.ui" line="74"/>
         <source>Use 3D acceleration for user interface</source>
         <translation>Používat 3D akceleraci pro uživatelské rozhraní</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="102"/>
+        <location filename="../ui/SettingsDialog.ui" line="95"/>
         <source>Default for a new Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="122"/>
+        <location filename="../ui/SettingsDialog.ui" line="115"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -1512,86 +1507,86 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="140"/>
+        <location filename="../ui/SettingsDialog.ui" line="133"/>
         <source>Page Layout</source>
         <translation type="unfinished">Layout strany</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="145"/>
+        <location filename="../ui/SettingsDialog.ui" line="138"/>
         <source>Output</source>
         <translation type="unfinished">Výstup</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="151"/>
+        <location filename="../ui/SettingsDialog.ui" line="144"/>
         <source>Threshold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="174"/>
+        <location filename="../ui/SettingsDialog.ui" line="167"/>
         <source>Threshold Range value:</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/SettingsDialog.ui" line="181"/>
+        <location filename="../ui/SettingsDialog.ui" line="174"/>
         <source>±</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="295"/>
+        <location filename="../ui/SettingsDialog.ui" line="288"/>
         <source>Thinner</source>
         <translation type="unfinished">Tenčí</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="327"/>
+        <location filename="../ui/SettingsDialog.ui" line="320"/>
         <source>Thicker</source>
         <translation type="unfinished">Tlustší</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="348"/>
+        <location filename="../ui/SettingsDialog.ui" line="341"/>
         <source>Despeckling</source>
         <translation type="unfinished">Vyčistit</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="372"/>
-        <location filename="../ui/SettingsDialog.ui" line="375"/>
+        <location filename="../ui/SettingsDialog.ui" line="365"/>
+        <location filename="../ui/SettingsDialog.ui" line="368"/>
         <source>No despeckling</source>
         <translation type="unfinished">Bez čištění</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="403"/>
-        <location filename="../ui/SettingsDialog.ui" line="406"/>
+        <location filename="../ui/SettingsDialog.ui" line="396"/>
+        <location filename="../ui/SettingsDialog.ui" line="399"/>
         <source>Cautious despeckling</source>
         <translation type="unfinished">Opatrné čištění</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="438"/>
-        <location filename="../ui/SettingsDialog.ui" line="441"/>
+        <location filename="../ui/SettingsDialog.ui" line="431"/>
+        <location filename="../ui/SettingsDialog.ui" line="434"/>
         <source>Normal despeckling</source>
         <translation type="unfinished">Normální čištění</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="470"/>
-        <location filename="../ui/SettingsDialog.ui" line="473"/>
+        <location filename="../ui/SettingsDialog.ui" line="463"/>
+        <location filename="../ui/SettingsDialog.ui" line="466"/>
         <source>Aggressive despeckling</source>
         <translation type="unfinished">Agresivní čištění</translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="520"/>
+        <location filename="../ui/SettingsDialog.ui" line="513"/>
         <source>Bitonal Compression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="546"/>
+        <location filename="../ui/SettingsDialog.ui" line="539"/>
         <source>Bitonal Compression:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="553"/>
+        <location filename="../ui/SettingsDialog.ui" line="546"/>
         <source>CCITT Group 4 Fax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/SettingsDialog.ui" line="560"/>
+        <location filename="../ui/SettingsDialog.ui" line="553"/>
         <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1654,22 +1649,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Delete confirmation</source>
         <translation>Potvrzení smazání</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Really delete this zone?</source>
         <translation>Opravdu si přejete smazat tuto zónu?</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="265"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="275"/>
         <source>Properties</source>
         <translation>Vlastnosti</translation>
     </message>

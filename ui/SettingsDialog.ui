@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>336</width>
+    <width>338</width>
     <height>409</height>
    </rect>
   </property>
@@ -29,14 +29,7 @@
          <item>
           <widget class="QCheckBox" name="autosaveCheckBox">
            <property name="text">
-            <string>Autosave</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="eachLabel">
-           <property name="text">
-            <string>each</string>
+            <string>Autosave each</string>
            </property>
           </widget>
          </item>
