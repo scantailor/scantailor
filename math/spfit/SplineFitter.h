@@ -21,42 +21,66 @@
 
 #include "NonCopyable.h"
 #include "FittableSpline.h"
-#include "ModelShape.h"
-#include <boost/dynamic_bitset.hpp>
+#include "Optimizer.h"
+#include "VecNT.h"
 #include <vector>
 
 namespace spfit
 {
 
+class ConstraintSet;
+class ModelShape;
+struct SqDistApproximant;
+class OptimizationResult;
+
 class SplineFitter
 {
 	DECLARE_NON_COPYABLE(SplineFitter)
 public:
-	SplineFitter(FittableSpline* spline, ModelShape const* model_shape,
-		boost::dynamic_bitset<> const* fixed_control_points = 0);
+	explicit SplineFitter(FittableSpline* spline);
 
-	void setSamplingParams(FittableSpline::SamplingParams const& params) {
-		m_samplingParams = params;
-	}
+	/**
+	 * To be called after adding / moving / removing any of spline's control points.
+	 * This will reset the optimizer, which means the current set of constraints
+	 * is lost.  Any forces accumulated since the last optimize() call are lost as well.
+	 */
+	void splineModified();
 
-	void fit(int max_iterations = 20);
+	void setConstraints(ConstraintSet const& constraints);
+
+	void setSamplingParams(FittableSpline::SamplingParams const& sampling_params);
+
+	void addAttractionForce(Vec2d const& spline_point,
+		std::vector<FittableSpline::LinearCoefficient> const& coeffs,
+		SqDistApproximant const& sqdist_approx);
+
+	void addAttractionForces(ModelShape const& model_shape,
+		double from_t = 0.0, double to_t = 1.0);
+
+	void addExternalForce(QuadraticFunction const& force);
+
+	void addExternalForce(QuadraticFunction const& force, std::vector<int> const& sparse_map);
+
+	void addInternalForce(QuadraticFunction const& force);
+
+	void addInternalForce(QuadraticFunction const& force, std::vector<int> const& sparce_map);
+
+	/** \see Optimizer::externalForce() */
+	double externalForce() const { return m_optimizer.externalForce(); }
+
+	/** \see Optimizer::internalForce() */
+	double internalForce() const { return m_optimizer.internalForce(); }
+
+	OptimizationResult optimize(double internal_force_weight);
+
+	void undoLastStep();
 private:
-	class SampleProcessor;
-	class DisplacementVectorProcessor;
-
-	void setupInitialSamplingParams();
-
-	void setupControlPointMappings(boost::dynamic_bitset<> const* fixed_control_points);
-
-	int numOrigControlPoints() const { return m_toReducedControlPoints.size(); }
-
-	int numReducedControlPoints() const { return m_toOrigControlPoints.size(); }
-
 	FittableSpline* m_pSpline;
-	ModelShape const* m_pModelShape;
+	Optimizer m_optimizer;
 	FittableSpline::SamplingParams m_samplingParams;
-	std::vector<int> m_toReducedControlPoints;
-	std::vector<int> m_toOrigControlPoints;
+	std::vector<double> m_tempVars;
+	std::vector<int> m_tempSparseMap;
+	std::vector<FittableSpline::LinearCoefficient> m_tempCoeffs;
 };
 
 } // namespace spfit

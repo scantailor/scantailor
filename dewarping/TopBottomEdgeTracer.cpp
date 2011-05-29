@@ -24,6 +24,7 @@
 #include "PriorityQueue.h"
 #include "ToLineProjector.h"
 #include "LineBoundedByRect.h"
+#include "GridLineTraverser.h"
 #include "MatrixCalc.h"
 #include "imageproc/GrayImage.h"
 #include "imageproc/Scale.h"
@@ -154,59 +155,6 @@ public:
 	}
 private:
 	GridNode* const m_pData;
-};
-
-
-class TopBottomEdgeTracer::LineTraverser
-{
-public:
-	LineTraverser(QLineF const& line) {
-		m_x0 = line.p1().x();
-		m_y0 = line.p1().y();
-		double const x1 = line.p2().x();
-		double const y1 = line.p2().y();
-		if (fabs(x1 - m_x0) > fabs(y1 - m_y0)) {
-			m_horTraversing = true;
-			m_slope = (y1 - m_y0) / (x1 - m_x0);
-			m_cur = qRound(m_x0);
-			m_end = qRound(x1);
-		} else {
-			m_horTraversing = false;
-			m_slope = (x1 - m_x0) / (y1 - m_y0);
-			m_cur = qRound(m_y0);
-			m_end = qRound(y1);
-		}
-		if (m_cur < m_end) {
-			m_step = 1;
-		} else {
-			m_step = -1;
-		}
-	}
-
-	bool hasNext() const { return m_cur != m_end; }
-
-	QPoint next() {
-		int x, y;
-		
-		if (m_horTraversing) {
-			x = m_cur;
-			y = qRound((x - m_x0) * m_slope + m_y0);
-		} else {
-			y = m_cur;
-			x = qRound((y - m_y0) * m_slope + m_x0);
-		}
-
-		m_cur += m_step;
-		return QPoint(x, y);
-	}
-private:
-	double m_x0;
-	double m_y0;
-	double m_slope;
-	int m_cur;
-	int m_end;
-	int m_step;
-	bool m_horTraversing;
 };
 
 
@@ -551,7 +499,7 @@ TopBottomEdgeTracer::prepareForShortestPathsFrom(
 		line += stride;
 	}
 
-	LineTraverser traverser(from);
+	GridLineTraverser traverser(from);
 	while (traverser.hasNext()) {
 		QPoint const pt(traverser.next());
 
@@ -659,7 +607,7 @@ TopBottomEdgeTracer::locateBestPathEndpoints(Grid<GridNode> const& grid, QLineF 
 	int const min_sqdist = 100*100;
 	std::vector<Path> best_paths;
 
-	LineTraverser traverser(line);
+	GridLineTraverser traverser(line);
 	while (traverser.hasNext()) {
 		QPoint const pt(traverser.next());
 

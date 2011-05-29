@@ -26,6 +26,11 @@ class Grid
 {
 public:
 	/**
+	 * Creates a null grid.
+	 */
+	Grid();
+
+	/**
 	 * \brief Creates a width x height grid with specified padding on each side.
 	 */
 	Grid(int width, int height, int padding);
@@ -36,6 +41,8 @@ public:
 	 * Stride is also preserved.
 	 */
 	Grid(Grid const& other);
+
+	bool isNull() const { return m_width <= 0 || m_height <= 0; }
 
 	void initPadding(Node const& padding_node);
 
@@ -80,7 +87,15 @@ public:
 	 * Returns the number of padding layers from each side.
 	 */
 	int padding() const { return m_padding; }
+
+	void swap(Grid& other);
 private:
+	template<typename T>
+	static void basicSwap(T& o1, T& o2) {
+		// Just to avoid incoduing the heavy <algorithm> header.
+		T tmp(o1); o1 = o2; o2 = tmp;
+	}
+
 	boost::scoped_array<Node> m_storage;
 	Node* m_pData;
 	int m_width;
@@ -89,6 +104,16 @@ private:
 	int m_padding;
 };
 
+
+template<typename Node>
+Grid<Node>::Grid()
+:	m_pData(0),
+	m_width(0),
+	m_height(0),
+	m_stride(0),
+	m_padding(0)
+{
+}
 
 template<typename Node>
 Grid<Node>::Grid(int width, int height, int padding)
@@ -162,6 +187,24 @@ Grid<Node>::initInterior(Node const& interior_node)
 		}
 		line += m_stride;
 	}
+}
+
+template<typename Node>
+void
+Grid<Node>::swap(Grid& other)
+{
+	m_storage.swap(other.m_storage);
+	basicSwap(m_pData, other.m_pData);
+	basicSwap(m_width, other.m_width);
+	basicSwap(m_height, other.m_height);
+	basicSwap(m_stride, other.m_stride);
+	basicSwap(m_padding, other.m_padding);
+}
+
+template<typename Node>
+void swap(Grid<Node>& o1, Grid<Node>& o2)
+{
+	o1.swap(o2);
 }
 
 #endif

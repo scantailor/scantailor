@@ -97,7 +97,7 @@ T
 HomographicTransform<1, T>::operator()(T from) const
 {
 	// Optimized version for 1D case.
-	T const* m = this->mat();
+	T const* m = this->mat().data();
 	return (from * m[0] + m[2]) / (from * m[1] + m[3]);
 }
 

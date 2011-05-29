@@ -174,6 +174,10 @@ CommandLine::printHelp()
 	std::cout << "\t--help, -h" << "\n";
 	std::cout << "\t--verbose, -v" << "\n";
 	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
+	std::cout << "\t\t\t  0: auto detect" << "\n";
+	std::cout << "\t\t\t  1: one page layout" << "\n";
+	std::cout << "\t\t\t1.5: one page layout but cutting is needed" << "\n";
+	std::cout << "\t\t\t  2: two page layout" << "\n";
 	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
@@ -189,7 +193,7 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-bottom=<number>" << "\n";
 	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << "\n";
 	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << "\n";
-	std::cout << "\t--alignment=center\t\t-- sets vertical and horizontal alignment to center" << "\n";
+	std::cout << "\t--alignment=center\t\t\t-- sets vertical and horizontal alignment to center" << "\n";
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom>" << "\n";
 	std::cout << "\t\t--alignment-horizontal=<left|center|right>" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << "\n";

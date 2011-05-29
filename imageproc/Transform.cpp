@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Scale.h"
+#include "Transform.h"
 #include "Grayscale.h"
 #include "GrayImage.h"
 #include <QImage>
@@ -161,8 +161,8 @@ template<typename StorageUnit, typename Mixer>
 static void transformGeneric(
 	StorageUnit const* const src_data, int const src_stride, QSize const src_size,
 	StorageUnit* const dst_data, int const dst_stride, QTransform const& xform,
-	QRect const& dst_rect, StorageUnit const background_color,
-	bool const weak_background, QSizeF const& min_mapping_area)
+	QRect const& dst_rect, StorageUnit const outside_color, int const outside_flags,
+	QSizeF const& min_mapping_area)
 {
 	int const sw = src_size.width();
 	int const sh = src_size.height();
@@ -205,7 +205,13 @@ static void transformGeneric(
 			
 			if (src_bottom < 0 || src_right < 0 || src_left >= sw || src_top >= sh) {
 				// Completely outside of src image.
-				dst_line[dx] = background_color;
+				if (outside_flags & OutsidePixels::COLOR) {
+					dst_line[dx] = outside_color;
+				} else {
+					int const src_x = qBound<int>(0, (src_left + src_right) >> 1, sw - 1);
+					int const src_y = qBound<int>(0, (src_top + src_bottom) >> 1, sh - 1);
+					dst_line[dx] = src_data[src_y * src_stride + src_x];
+				}
 				continue;
 			}
 			
@@ -261,10 +267,10 @@ static void transformGeneric(
 			assert(src_right >= src_left);
 			
 			Mixer mixer;
-			if (weak_background) {
+			if (outside_flags & OutsidePixels::WEAK) {
 				background_area = 0;
 			} else {
-				mixer.add(background_color, background_area);
+				mixer.add(outside_color, background_area);
 			}
 			
 			unsigned const left_fraction = 32 - (src32_left & 31);
@@ -277,7 +283,13 @@ static void transformGeneric(
 			
 			unsigned const src_area = (src32_bottom - src32_top) * (src32_right - src32_left);
 			if (src_area == 0) {
-				dst_line[dx] = background_color;
+				if ((outside_flags & OutsidePixels::COLOR)) {
+					dst_line[dx] = outside_color;
+				} else {
+					int const src_x = qBound<int>(0, (src_left + src_right) >> 1, sw - 1);
+					int const src_y = qBound<int>(0, (src_top + src_bottom) >> 1, sh - 1);
+					dst_line[dx] = src_data[src_y * src_stride + src_x];
+				}
 				continue;
 			}
 			
@@ -384,8 +396,8 @@ static void transformGeneric(
 
 QImage transform(
 	QImage const& src, QTransform const& xform,
-	QRect const& dst_rect, QColor const& background_color,
-	bool const weak_background, QSizeF const& min_mapping_area)
+	QRect const& dst_rect, OutsidePixels const outside_pixels,
+	QSizeF const& min_mapping_area)
 {
 	if (src.isNull() || dst_rect.isEmpty()) {
 		return QImage();
@@ -407,18 +419,18 @@ QImage transform(
 		transformGeneric<uint8_t, Gray>(
 			gray_src.data(), gray_src.stride(), src.size(),
 			gray_dst.data(), gray_dst.stride(), xform, dst_rect,
-			qGray(background_color.rgb()),
-			weak_background, min_mapping_area
+			outside_pixels.grayLevel(), outside_pixels.flags(),
+			min_mapping_area
 		);
 		return gray_dst;
 	} else {
-		if (src.hasAlphaChannel() || qAlpha(background_color.rgba()) != 0xff) {
+		if (src.hasAlphaChannel() || qAlpha(outside_pixels.rgba()) != 0xff) {
 			QImage const src_argb32(src.convertToFormat(QImage::Format_ARGB32));
 			QImage dst(dst_rect.size(), QImage::Format_ARGB32);
 			transformGeneric<uint32_t, ARGB32>(
 				(uint32_t const*)src_argb32.bits(), src_argb32.bytesPerLine() / 4, src_argb32.size(),
 				(uint32_t*)dst.bits(), dst.bytesPerLine() / 4, xform, dst_rect,
-				background_color.rgba(), weak_background, min_mapping_area
+				outside_pixels.rgba(), outside_pixels.flags(), min_mapping_area
 			);
 			return dst;
 		} else {
@@ -427,7 +439,7 @@ QImage transform(
 			transformGeneric<uint32_t, RGB32>(
 				(uint32_t const*)src_rgb32.bits(), src_rgb32.bytesPerLine() / 4, src_rgb32.size(),
 				(uint32_t*)dst.bits(), dst.bytesPerLine() / 4, xform, dst_rect,
-				background_color.rgb(), weak_background, min_mapping_area
+				outside_pixels.rgb(), outside_pixels.flags(), min_mapping_area
 			);
 			return dst;
 		}
@@ -436,8 +448,8 @@ QImage transform(
 
 GrayImage transformToGray(
 	QImage const& src, QTransform const& xform,
-	QRect const& dst_rect, QColor const& background_color,
-	bool const weak_background, QSizeF const& min_mapping_area)
+	QRect const& dst_rect, OutsidePixels const outside_pixels,
+	QSizeF const& min_mapping_area)
 {
 	if (src.isNull() || dst_rect.isEmpty()) {
 		return GrayImage();
@@ -457,8 +469,8 @@ GrayImage transformToGray(
 	transformGeneric<uint8_t, Gray>(
 		gray_src.data(), gray_src.stride(), gray_src.size(),
 		dst.data(), dst.stride(), xform, dst_rect,
-		qGray(background_color.rgb()),
-		weak_background, min_mapping_area
+		outside_pixels.grayLevel(), outside_pixels.flags(),
+		min_mapping_area
 	);
 	
 	return dst;

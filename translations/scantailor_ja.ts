@@ -37,13 +37,54 @@
         <source>Joseph Artsimovich</source>
         <translation></translation>
     </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - 画像自動選択アルゴリズム&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - 歪み補正アルゴリズム&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - システム負荷調整&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - コマンドラインインタフェース&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <location filename="../ui/AboutDialog.ui" line="166"/>
         <source>Translators</source>
         <translation>翻訳者</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="173"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian
+Petr Kovář - Czech
+Stefan Birkner - German
+Angelo Gemmi - Italian
+Masahiro Kitagawa - Japanese
+Patrick Pascal - French
+Daniel Koć - Polish
+Joseph Artsimovich - Russian
+Marián Hvolka - Slovak
+Davidson Wang - Traditional Chinese</source>
+        <translation>Svetoslav Sashkov, Mandor - ブルガリア語
+Petr Kovář - チェコ語
+Stefan Birkner - ドイツ語
+Angelo Gemmi - イタリア語
+北川雅裕 - 日本語
+Patrick Pascal - フランス語
+Daniel Koć - ポーランド語
+Joseph Artsimovich - ロシア語
+Marián Hvolka - スロバキア語
+Davidson Wang - 繁体字中国語</translation>
+    </message>
+    <message utf8="true">
         <source>Svetoslav Sashkov, Mandor - Bulgarian
 Stefan Birkner - German
 Angelo Gemmi - Italian
@@ -59,18 +100,6 @@ Angelo Gemmi - イタリア語
 Patrick Pascal - フランス語
 Joseph Artsimovich - ロシア語
 Davidson Wang - 繁体字中国語</translation>
-    </message>
-    <message>
-        <location filename="../ui/AboutDialog.ui" line="173"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
@@ -89,7 +118,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Contributors</source>
         <translation>貢献者</translation>
     </message>
@@ -104,19 +133,19 @@ Andrey Bergman - システム負荷調整
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="192"/>
         <source>Documentation</source>
         <translation>ドキュメント化</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="197"/>
+        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="224"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>License</source>
         <translation>ライセンス</translation>
     </message>
@@ -352,17 +381,17 @@ Taxman</source>
 <context>
     <name>InteractiveXSpline</name>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="49"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
         <translation>クリックすると新しいコントロールポイントを作成できます。</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
         <translation>このポイントはドラッグできます。</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation>このポイントはドラッグできます。Del または D を押すと削除できます。</translation>
     </message>
@@ -385,67 +414,67 @@ Taxman</source>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save Project</source>
         <translation>プロジェクトを保存する</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="532"/>
+        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save this project?</source>
         <translation>プロジェクトを保存しますか？</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="905"/>
+        <location filename="../MainWindow.cpp" line="893"/>
         <source>Insert before ...</source>
         <translation>前に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="908"/>
+        <location filename="../MainWindow.cpp" line="896"/>
         <source>Insert after ...</source>
         <translation>後に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="914"/>
+        <location filename="../MainWindow.cpp" line="902"/>
         <source>Remove from project ...</source>
         <translation>プロジェクトから取り除く…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="935"/>
+        <location filename="../MainWindow.cpp" line="923"/>
         <source>Insert here ...</source>
         <translation>ここに挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1226"/>
-        <location filename="../MainWindow.cpp" line="1294"/>
+        <location filename="../MainWindow.cpp" line="1214"/>
+        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor プロジェクト</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1293"/>
+        <location filename="../MainWindow.cpp" line="1281"/>
         <source>Open Project</source>
         <translation>プロジェクトを開く</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1311"/>
-        <location filename="../MainWindow.cpp" line="1320"/>
-        <location filename="../MainWindow.cpp" line="1610"/>
-        <location filename="../MainWindow.cpp" line="1641"/>
-        <location filename="../MainWindow.cpp" line="1718"/>
+        <location filename="../MainWindow.cpp" line="1299"/>
+        <location filename="../MainWindow.cpp" line="1308"/>
+        <location filename="../MainWindow.cpp" line="1598"/>
+        <location filename="../MainWindow.cpp" line="1629"/>
+        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1312"/>
+        <location filename="../MainWindow.cpp" line="1300"/>
         <source>Unable to open the project file.</source>
         <translation>プロジェクトファイルを開けませんでした。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1321"/>
+        <location filename="../MainWindow.cpp" line="1309"/>
         <source>The project file is broken.</source>
         <translation>プロジェクトファイルは破損しています。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1506"/>
+        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
@@ -456,33 +485,33 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1527"/>
         <source>Unnamed</source>
         <translation>名前なし</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1544"/>
+        <location filename="../MainWindow.cpp" line="1532"/>
         <source>%1 - Scan Tailor %2</source>
         <translation>%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1611"/>
-        <location filename="../MainWindow.cpp" line="1642"/>
+        <location filename="../MainWindow.cpp" line="1599"/>
+        <location filename="../MainWindow.cpp" line="1630"/>
         <source>Error saving the project file!</source>
         <translation>プロジェクトファイルを保存できません！</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1689"/>
+        <location filename="../MainWindow.cpp" line="1677"/>
         <source>File to insert</source>
         <translation>挿入するファイル</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1695"/>
+        <location filename="../MainWindow.cpp" line="1683"/>
         <source>Images not in project (%1)</source>
         <translation>プロジェクトに含まれない画像 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1719"/>
+        <location filename="../MainWindow.cpp" line="1707"/>
         <source>Error opening the image file.</source>
         <translation>画像ファイルを開けません！</translation>
     </message>
@@ -491,7 +520,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1759"/>
+        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Remove</source>
         <translation>取り除く</translation>
     </message>
@@ -648,7 +677,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="460"/>
+        <location filename="../MainWindow.cpp" line="448"/>
         <source>Stop batch processing</source>
         <translation>一括処理を停止</translation>
     </message>
@@ -1698,7 +1727,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="52"/>
+        <location filename="../filters/deskew/Filter.cpp" line="55"/>
         <source>Deskew</source>
         <translation>傾きを修正</translation>
     </message>
@@ -1727,15 +1756,19 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>fix_orientation::ApplyDialog</name>
     <message>
-        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
+        <translation type="obsolete">実行できません：複数のグループが選択されています。</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
         <translation>実行できません：複数のグループが選択されています。</translation>
     </message>
 </context>
 <context>
     <name>fix_orientation::Filter</name>
     <message>
-        <location filename="../filters/fix_orientation/Filter.cpp" line="60"/>
+        <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
         <translation>向きを訂正</translation>
     </message>
@@ -1773,9 +1806,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::DewarpingView</name>
     <message>
-        <location filename="../filters/output/DewarpingView.cpp" line="78"/>
         <source>Modifying auto-generated grid is not yet implemented.  Switch to Manual mode if necessary.</source>
-        <translation>自動生成されたグリッドを変更する機能はまだ実装されていません。必要に応じて手動モードに切り替えてください。</translation>
+        <translation type="obsolete">自動生成されたグリッドを変更する機能はまだ実装されていません。必要に応じて手動モードに切り替えてください。</translation>
     </message>
 </context>
 <context>
@@ -1789,7 +1821,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Filter</name>
     <message>
-        <location filename="../filters/output/Filter.cpp" line="58"/>
+        <location filename="../filters/output/Filter.cpp" line="63"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
@@ -1812,27 +1844,27 @@ p, li { white-space: pre-wrap; }
         <translation>ミックス</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="394"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
         <translation>スペックル除去レベルを適用する</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="456"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
         <translation>遠近感を適用</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="626"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
         <translation>オフ</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="629"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="632"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
         <source>Manual</source>
         <translation>手動</translation>
     </message>
@@ -1840,37 +1872,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="495"/>
+        <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>画像領域はミックスモードでのみ有効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="547"/>
+        <location filename="../filters/output/Task.cpp" line="558"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>スペックル除去はカラー／グレースケールモードでは無効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="565"/>
+        <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Picture Zones</source>
         <translation>画像領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="566"/>
+        <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Fill Zones</source>
         <translation>塗り潰し領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="567"/>
+        <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
         <translation>歪み補正</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="568"/>
+        <location filename="../filters/output/Task.cpp" line="579"/>
         <source>Despeckling</source>
         <translation>スペックル除去</translation>
     </message>
@@ -1882,22 +1914,22 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">ページ配置</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="64"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="67"/>
         <source>Natural order</source>
         <translation>通常の順序</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="65"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="68"/>
         <source>Order by increasing width</source>
         <translation>幅の狭い順</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="66"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="69"/>
         <source>Order by increasing height</source>
         <translation>高さの低い順</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/Filter.cpp" line="76"/>
+        <location filename="../filters/page_layout/Filter.cpp" line="79"/>
         <source>Margins</source>
         <translation>余白</translation>
     </message>
@@ -1926,7 +1958,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="64"/>
+        <location filename="../filters/page_split/Filter.cpp" line="67"/>
         <source>Split Pages</source>
         <translation>ページを分割</translation>
     </message>
@@ -1974,22 +2006,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>select_content::Filter</name>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="56"/>
+        <location filename="../filters/select_content/Filter.cpp" line="59"/>
         <source>Natural order</source>
         <translation>通常の順序</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="57"/>
+        <location filename="../filters/select_content/Filter.cpp" line="60"/>
         <source>Order by increasing width</source>
         <translation>幅の狭い順</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="58"/>
+        <location filename="../filters/select_content/Filter.cpp" line="61"/>
         <source>Order by increasing height</source>
         <translation>高さの低い順</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/Filter.cpp" line="68"/>
+        <location filename="../filters/select_content/Filter.cpp" line="71"/>
         <source>Select Content</source>
         <translation>版面を選択</translation>
     </message>

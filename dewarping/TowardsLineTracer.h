@@ -20,12 +20,16 @@
 #define DEWARPING_TOWARDS_LINE_TRACER_H_
 
 #include "VecNT.h"
-#include "imageproc/GrayImage.h"
-#include "imageproc/BinaryImage.h"
-#include <QPointF>
+#include "Grid.h"
 #include <QPoint>
+#include <QRect>
 #include <QLineF>
 #include <stdint.h>
+
+namespace imageproc
+{
+	class SEDM;
+}
 
 namespace dewarping
 {
@@ -37,32 +41,30 @@ class TowardsLineTracer
 {
 public:
 	TowardsLineTracer(
-		imageproc::BinaryImage const& content, imageproc::GrayImage const& blurred,
-		imageproc::BinaryImage const& mask, QLineF const& line, QPoint const& initial_pos);
+		imageproc::SEDM const* dm, Grid<float> const* pm, QLineF const& line, QPoint const& initial_pos);
 
-	QPoint const* trace(qreal max_dist);
+	QPoint const* trace(float max_dist);
 private:
-	struct Neighbour
+	struct Step
 	{
+		Vec2d unitVec;
 		QPoint vec;
-		Vec2f vecF;
-		int contentLineOffset;
-		int blurredPixelOffset;
-		int maskLineOffset;
+		int dmOffset;
+		int pmOffset;
 	};
 
-	void setupNeighbours();
+	void setupSteps();
 
-	imageproc::BinaryImage m_content;
-	uint32_t const* m_pContentData;
-	imageproc::GrayImage m_blurred;
-	uint8_t const* m_pBlurredData;
-	imageproc::BinaryImage m_mask;
-	uint32_t const* m_pMaskData;
+	uint32_t const* m_pDmData;
+	int m_dmStride;
+	float const* m_pPmData;
+	int m_pmStride;
+	QRect m_rect;
 	QLineF m_line;
-	Vec2f m_normalTowardsLine;
+	Vec2d m_normalTowardsLine;
 	QPoint m_lastOutputPos;
-	Neighbour m_neighbours[8];
+	Step m_steps[5];
+	int m_numSteps;
 	bool m_finished;
 };
 

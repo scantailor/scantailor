@@ -243,8 +243,8 @@ CylindricalSurfaceDewarper::fourPoint2DHomography(
 {
 	VecNT<64, double> A;
 	VecNT<8, double> B;
-	double* pa = A;
-	double* pb = B;
+	double* pa = A.data();
+	double* pb = B.data();
 	int i = 0;
 
 	typedef std::pair<QPointF, QPointF> Pair;
@@ -293,8 +293,8 @@ CylindricalSurfaceDewarper::threePoint1DHomography(
 {
 	VecNT<9, double> A;
 	VecNT<3, double> B;
-	double* pa = A;
-	double* pb = B;
+	double* pa = A.data();
+	double* pb = B.data();
 
 	typedef std::pair<double, double> Pair;
 	BOOST_FOREACH(Pair const& pair, pairs) {

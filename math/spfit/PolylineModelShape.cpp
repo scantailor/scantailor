@@ -17,10 +17,12 @@
 */
 
 #include "PolylineModelShape.h"
+#include "FrenetFrame.h"
 #include "NumericTraits.h"
 #include "XSpline.h"
 #include "VecNT.h"
 #include "ToLineProjector.h"
+#include <QDebug>
 #include <boost/foreach.hpp>
 #include <stdexcept>
 #include <limits>
@@ -36,21 +38,12 @@ PolylineModelShape::PolylineModelShape(std::vector<QPointF> const& polyline)
 		throw std::invalid_argument("PolylineModelShape: polyline must have at least 2 vertices");
 	}
 
-	double left = NumericTraits<double>::max();
-	double top = NumericTraits<double>::max();
-	double right = NumericTraits<double>::min();
-	double bottom = NumericTraits<double>::min();
-
 	// We build an interpolating X-spline with control points at the vertices
 	// of our polyline.  We'll use it to calculate curvature at polyline vertices.
 	XSpline spline;
 
 	BOOST_FOREACH(QPointF const& pt, polyline) {
 		spline.appendControlPoint(pt, -1);
-		left = std::min<double>(left, pt.x());
-		top = std::min<double>(top, pt.y());
-		right = std::max<double>(right, pt.x());
-		bottom = std::max<double>(bottom, pt.y());
 	}
 	
 	int const num_control_points = spline.numControlPoints();
@@ -58,36 +51,20 @@ PolylineModelShape::PolylineModelShape(std::vector<QPointF> const& polyline)
 	for (int i = 0; i < num_control_points; ++i) {
 		m_vertices.push_back(spline.pointAndDtsAt(i * scale));
 	}
-
-	if (left <= right) {
-		m_boundingBox.setTopLeft(QPointF(left, top));
-		m_boundingBox.setBottomRight(QPointF(right, bottom));
-	}
-}
-
-QRectF
-PolylineModelShape::boundingBox() const
-{
-	return m_boundingBox;
 }
 
 SqDistApproximant
 PolylineModelShape::localSqDistApproximant(
-	QPointF const& pt, FittableSpline::SampleFlags flags) const
+	QPointF const& pt, FittableSpline::SampleFlags sample_flags) const
 {
 	if (m_vertices.empty()) {
 		return SqDistApproximant();
 	}
 
-	if (flags & FittableSpline::HEAD_SAMPLE) {
-		return SqDistApproximant::pointDistance(m_vertices.front().point);
-	} else if (flags & FittableSpline::TAIL_SAMPLE) {
-		return SqDistApproximant::pointDistance(m_vertices.back().point);
-	}
-
 	// First, find the point on the polyline closest to pt.
 	QPointF best_foot_point;
 	double best_sqdist = NumericTraits<double>::max();
+	double segment_t = -1;
 	int segment_idx = -1; // If best_foot_point is on a segment, its index goes here.
 	int vertex_idx = -1; // If best_foot_point is a vertex, its index goes here.
 
@@ -106,6 +83,7 @@ PolylineModelShape::localSqDistApproximant(
 				best_sqdist = sqdist;
 				best_foot_point = foot_point;
 				segment_idx = i;
+				segment_t = s;
 				vertex_idx = -1;
 			}
 		}
@@ -127,40 +105,47 @@ PolylineModelShape::localSqDistApproximant(
 
 	if (segment_idx != -1) {
 		// The foot point is on a line segment.
+		assert(segment_t >= 0 && segment_t <= 1);
 
-		QPointF const pt1(m_vertices[segment_idx].point);
-		QPointF const pt2(m_vertices[segment_idx + 1].point);
-		return SqDistApproximant::lineDistance(QLineF(pt1, pt2));
+		XSpline::PointAndDerivs const& pd1 = m_vertices[segment_idx];
+		XSpline::PointAndDerivs const& pd2 = m_vertices[segment_idx + 1];
+		FrenetFrame const frenet_frame(best_foot_point, pd2.point - pd1.point);
+
+		double const k1 = pd1.signedCurvature();
+		double const k2 = pd2.signedCurvature();
+		double const weighted_k = k1 + segment_t * (k2 - k1);
+		
+		return calcApproximant(pt, sample_flags, DEFAULT_FLAGS, frenet_frame, weighted_k);
 	} else {
 		// The foot point is a vertex of the polyline.
 		assert(vertex_idx != -1);
 
-		Vec2d unit_tangent(m_vertices[vertex_idx].firstDeriv);
-		double const tangent_sqlen = unit_tangent.squaredNorm();
-		if (tangent_sqlen > std::numeric_limits<double>::epsilon()) {
-			unit_tangent /= sqrt(tangent_sqlen);
-		}
-		Vec2d unit_normal(-unit_tangent[1], unit_tangent[0]);
+		XSpline::PointAndDerivs const& pd = m_vertices[vertex_idx];
+		FrenetFrame const frenet_frame(best_foot_point, pd.firstDeriv);
 
-		double const curvature = m_vertices[vertex_idx].curvature();
-		return calcApproximant(pt, best_foot_point, unit_tangent, unit_normal, curvature);
+		Flags polyline_flags = DEFAULT_FLAGS;
+		if (vertex_idx == 0) {
+			polyline_flags |= POLYLINE_FRONT;
+		}
+		if (vertex_idx == int(m_vertices.size()) - 1) {
+			polyline_flags |= POLYLINE_BACK;
+		}
+
+		return calcApproximant(pt, sample_flags, polyline_flags, frenet_frame, pd.signedCurvature());
 	}
 }
 
 SqDistApproximant
 PolylineModelShape::calcApproximant(
-	Vec2d const& region_origin, Vec2d const& frenet_frame_origin,
-	Vec2d const& unit_tangent, Vec2f const& unit_normal, double curvature)
+	QPointF const& pt, FittableSpline::SampleFlags const sample_flags,
+	Flags const polyline_flags, FrenetFrame const& frenet_frame,
+	double const signed_curvature) const
 {
-	double m = 0;
-	
-	if (fabs(curvature) > 1e-6) {
-		double const p = fabs(1.0 / curvature);
-		double const d = fabs(unit_normal.dot(region_origin - frenet_frame_origin));
-		m = d / (d + p); // Formula 7 in [2].
+	if (sample_flags & (FittableSpline::HEAD_SAMPLE|FittableSpline::TAIL_SAMPLE)) {
+		return SqDistApproximant::pointDistance(frenet_frame.origin());
+	} else {
+		return SqDistApproximant::curveDistance(pt, frenet_frame, signed_curvature);
 	}
-
-	return SqDistApproximant(frenet_frame_origin, unit_tangent, unit_normal, m, 1);
 }
 
 } // namespace spfit

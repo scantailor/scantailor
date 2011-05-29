@@ -19,113 +19,175 @@
 #include "Optimizer.h"
 #include "MatrixCalc.h"
 #include <boost/foreach.hpp>
-#include <string.h>
+#include <stdexcept>
+#include <algorithm>
+#include <assert.h>
 
 namespace spfit
 {
 
-Optimizer::Optimizer(int num_control_points)
-:	m_origTotalSqDist(0),
-	m_optimizedTotalSqDist(0),
-	m_A(boost::extents[num_control_points*2][num_control_points*2], boost::fortran_storage_order()),
-	m_b(num_control_points*2, 0.0),
-	m_numControlPoints(num_control_points)
+Optimizer::Optimizer(size_t num_vars)
+: m_numVars(num_vars)
+, m_A(num_vars, num_vars)
+, m_b(num_vars)
+, m_x(num_vars)
+, m_externalForce(num_vars)
+, m_internalForce(num_vars)
 {
 }
 
 void
-Optimizer::reset()
+Optimizer::setConstraints(std::list<LinearFunction> const& constraints)
 {
-	memset(m_A.data(), 0, sizeof(m_A[0][0])*4*m_numControlPoints*m_numControlPoints);
-	memset(&m_b[0], 0, sizeof(m_b[0])*2*m_numControlPoints);
-	m_origTotalSqDist = 0;
-	m_optimizedTotalSqDist = 0;
-}
+	size_t const num_constraints = constraints.size();
+	size_t const num_dimensions = m_numVars + num_constraints;
 
-void
-Optimizer::addSample(Vec2d const& spline_point,
-	std::vector<FittableSpline::LinearCoefficient> const& coeffs,
-	SqDistApproximant const& sqdist_approx)
-{
-	m_origTotalSqDist += sqdist_approx.evaluate(spline_point);
+	MatT<double> A(num_dimensions, num_dimensions);
+	VecT<double> b(num_dimensions);
+	// Matrix A and vector b will have the following layout:
+	//     |N N N L L|      |-D|
+	//     |N N N L L|      |-D|
+	// A = |N N N L L|  b = |-D|
+	//     |C C C 0 0|      |-J|
+	//     |C C C 0 0|      |-J|
+	// N: non-constant part of the gradient of the function we are minimizing.
+	// C: non-constant part of constraint functions (one per line).
+	// L: coefficients of Lagrange multipliers.  These happen to be equal
+	//    to the symmetric C values.
+	// D: constant part of the gradient of the function we are optimizing.
+	// J: constant part of constraint functions.
 
-	// Update matrix m_A which stands for A in "C^T*A*C + b^T*C + c" in [1].
-	for (int i = 0; i < 2; ++i) {
-		for (int j = 0; j < 2; ++j) {
-			double const a = sqdist_approx.A(i, j);
-
-			// Now we'll be multiplying two polynomials: P[i] * P[j]
-			// where P[0] = sum(k[m]*c[m].x]) and P[1] = sum(k[n]*c[n].y])
-			// where c[i] represents a control point displacement vector
-			// and k[i] represents the corresponding linear coefficient.
-			// m and n belong to [0, numControlPoints)
-			//
-			// Note #1: we consider the vector c to be flat, with the following layout:
-			// c = [x0 y0 x1 y1 x2 y2 ...]
-			// Note #2: We don't have to iterate m and n all the way
-			// from 0 to numControlPoints, as we know only a few linear
-			// coefficients will be non-zero, and we already know which ones.
-			BOOST_FOREACH(FittableSpline::LinearCoefficient const& c1, coeffs) {
-				int const c1_idx = c1.controlPointIdx * 2 + i;
-				BOOST_FOREACH(FittableSpline::LinearCoefficient const& c2, coeffs) {
-					int const c2_idx = c2.controlPointIdx * 2 + j;	
-					m_A[c1_idx][c2_idx] += a * c1.coeff * c2.coeff;
-				}
-			}
+	std::list<LinearFunction>::const_iterator ctr(constraints.begin());
+	for (size_t i = m_numVars; i < num_dimensions; ++i, ++ctr) {
+		b[i] = -ctr->b;
+		for (size_t j = 0; j < m_numVars; ++j) {
+			A(i, j) = A(j, i) = ctr->a[j];
 		}
 	}
 
-	StaticMatrixCalc<double, 10, 1> mc;
+	VecT<double>(num_dimensions).swap(m_x);
+	m_A.swap(A);
+	m_b.swap(b);
+}
 
-	Vec2d w; // Represents "2*Ak*sk + bk" in [1].
-	(mc(sqdist_approx.A)*mc(spline_point, 2, 1)*2.0 + mc(sqdist_approx.b, 2, 1)).write(w);
+void
+Optimizer::addExternalForce(QuadraticFunction const& force)
+{
+	m_externalForce += force;
+}
+
+void
+Optimizer::addExternalForce(QuadraticFunction const& force, std::vector<int> const& sparse_map)
+{
+	size_t const num_vars = force.numVars();
+	for (size_t i = 0; i < num_vars; ++i) {
+		int const ii = sparse_map[i];
+		for (size_t j = 0; j < num_vars; ++j) {
+			int const jj = sparse_map[j];
+			m_externalForce.A(ii, jj) += force.A(i, j);
+		}
+		m_externalForce.b[ii] += force.b[i];
+	}
+	m_externalForce.c += force.c;
+}
+
+void
+Optimizer::addInternalForce(QuadraticFunction const& force)
+{
+	m_internalForce += force;
+}
+
+void
+Optimizer::addInternalForce(
+	QuadraticFunction const& force, std::vector<int> const& sparse_map)
+{
+	size_t const num_vars = force.numVars();
+	for (size_t i = 0; i < num_vars; ++i) {
+		int const ii = sparse_map[i];
+		for (size_t j = 0; j < num_vars; ++j) {
+			int const jj = sparse_map[j];
+			m_internalForce.A(ii, jj) += force.A(i, j);
+		}
+		m_internalForce.b[ii] += force.b[i];
+	}
+	m_internalForce.c += force.c;
+}
+
+OptimizationResult
+Optimizer::optimize(double internal_force_weight)
+{
+	// Note: because we are supposed to reset the forces anyway,
+	// we re-use m_internalForce to store the cummulative force.
+	m_internalForce *= internal_force_weight;
+	m_internalForce += m_externalForce;
 	
-	// Update vector m_b which stands for b in "C^T*A*C + b^T*C + c" in [1].
-	for (int i = 0; i < 2; ++i) {
-		BOOST_FOREACH(FittableSpline::LinearCoefficient const& c, coeffs) {
-			int const c_idx = c.controlPointIdx * 2 + i;
-			m_b[c_idx] += w[i] * c.coeff;
+	// For the layout of m_A and m_b, see setConstraints()
+	QuadraticFunction::Gradient const grad(m_internalForce.gradient());
+	for (size_t i = 0; i < m_numVars; ++i) {
+		m_b[i] = -grad.b[i];
+		for (size_t j = 0; j < m_numVars; ++j) {
+			m_A(i, j) = grad.A(i, j);
 		}
 	}
-}
 
-void
-Optimizer::optimize(VirtualFunction2<void, int, Vec2d>& displacement_vectors_sink)
-{
-	matrixMakeSymmetric();
-
-	int const nc2 = m_numControlPoints*2;
-
+	double const total_force_before = m_internalForce.c;
 	DynamicMatrixCalc<double> mc;
-	double const* c = mc(m_A.data(), nc2, nc2).solve(-0.5*mc(&m_b[0], nc2, 1)).rawData();
 
-	for (int i = 0; i < m_numControlPoints; ++i) {
-		displacement_vectors_sink(i, Vec2d(c[i*2], c[i*2 + 1]));
+	try {
+		mc(m_A).solve(mc(m_b)).write(m_x.data());
+	} catch (std::runtime_error const&) {
+		m_externalForce.reset();
+		m_internalForce.reset();
+		m_x.fill(0); // To make undoLastStep() work as expected.
+		return OptimizationResult(total_force_before, total_force_before);
 	}
 
-	// Now calculate the new total squared distance.
-	m_optimizedTotalSqDist = m_origTotalSqDist;
-	for (int i = 0; i < nc2; ++i) {
-		for (int j = 0; j < nc2; ++j) {
-			m_optimizedTotalSqDist += m_A[i][j] * c[i] * c[j];
+	double const total_force_after = m_internalForce.evaluate(m_x.data());
+	m_externalForce.reset(); // Now it's finally safe to reset these.
+	m_internalForce.reset();
+
+	// The last thing remaining is to adjust constraints,
+	// as they depend on the current variables.
+	adjustConstraints(1.0);
+
+	return OptimizationResult(total_force_before, total_force_after);
+}
+
+void
+Optimizer::undoLastStep()
+{
+	adjustConstraints(-1.0);
+	m_x.fill(0);
+}
+
+/**
+ * direction == 1 is used for forward adjustment,
+ * direction == -1 is used for undoing the last step.
+ */
+void
+Optimizer::adjustConstraints(double direction)
+{
+	size_t const num_dimensions = m_b.size();
+	for (size_t i = m_numVars; i < num_dimensions; ++i) {
+		// See setConstraints() for more information
+		// on the layout of m_A and m_b.
+		double c = 0;
+		for (size_t j = 0; j < m_numVars; ++j) {
+			c += m_A(i, j) * m_x[j];
 		}
-	}
-	for (int i = 0; i < nc2; ++i) {
-		m_optimizedTotalSqDist += m_b[i] * c[i];
+		m_b[i] -= c * direction;
 	}
 }
 
 void
-Optimizer::matrixMakeSymmetric()
+Optimizer::swap(Optimizer& other)
 {
-	int const nc2 = m_numControlPoints*2;
-	for (int i = 0; i < nc2; ++i) {
-		for (int j = i + 1; j < nc2; ++j) {
-			double avg = 0.5 * (m_A[i][j] + m_A[j][i]);
-			m_A[i][j] = avg;
-			m_A[j][i] = avg;
-		}
-	}
+	m_A.swap(other.m_A);
+	m_b.swap(other.m_b);
+	m_x.swap(other.m_x);
+	m_externalForce.swap(other.m_externalForce);
+	m_internalForce.swap(other.m_internalForce);
+	std::swap(m_numVars, other.m_numVars);
 }
 
 } // namespace spfit

@@ -462,7 +462,7 @@ SET(
 	filter_dc/PageOrientationCollector.h
 	config.h.in
 )
-SOURCE_GROUP("Sources" FILES ${sources})
+SOURCE_GROUP("Sources" FILES ${sources} main.cpp main-batch.cpp)
 QT4_AUTOMOC(${sources})
 
 SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
@@ -507,7 +507,7 @@ ADD_EXECUTABLE(
 )
 
 ADD_EXECUTABLE(
-	scantailor-batch WIN32 ${sources} version.h main-batch.cpp
+	scantailor-batch ${sources} version.h main-batch.cpp
 )
 
 # Note that order of static libraries matters with gcc.  Specifically,

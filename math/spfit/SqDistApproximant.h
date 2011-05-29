@@ -26,6 +26,8 @@
 namespace spfit
 {
 
+class FrenetFrame;
+
 /**
  * A quadratic function of the form:\n
  * F(x) = x^T * A * x + b^T * x + c\n
@@ -77,6 +79,12 @@ struct SqDistApproximant
 	static SqDistApproximant lineDistance(QLineF const& line);
 
 	static SqDistApproximant weightedLineDistance(QLineF const& line, double weight);
+
+	static SqDistApproximant curveDistance(
+		Vec2d const& reference_point, FrenetFrame const& frenet_frame, double signed_curvature);
+
+	static SqDistApproximant weightedCurveDistance(
+		Vec2d const& reference_point, FrenetFrame const& frenet_frame, double signed_curvature, double weight);
 
 	double evaluate(Vec2d const& pt) const;
 };
