@@ -559,7 +559,7 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	);
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_xform.resultingRect(), m_ptrSettings->getPageParams(m_pageId)->contentRect(), m_ptrSettings->getContentRect()
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_ptrSettings->getPageParams(m_pageId)->contentRect(), m_ptrSettings->getContentRect()
 		)
 	);
 	
@@ -665,7 +665,7 @@ ImageView::recalcOuterRect()
 	);
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_xform.resultingRect(), m_ptrSettings->getPageParams(m_pageId)->contentRect(), m_ptrSettings->getContentRect()
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_ptrSettings->getPageParams(m_pageId)->contentRect(), m_ptrSettings->getContentRect()
 		)
 	);
 	

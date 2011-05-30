@@ -76,7 +76,6 @@ public:
 		QSizeF const& hard_size_mm,
 		QSizeF const& aggregate_hard_size_mm,
 		Alignment const& alignment,
-		QRectF const& resultRect,
 		QRectF const& contentRect,
 		QRectF const& agg_content_rect);
 	

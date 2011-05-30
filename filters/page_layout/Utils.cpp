@@ -95,7 +95,7 @@ Utils::extendPolyRectWithMargins(
 Margins
 Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
-	Alignment const& alignment, QRectF const& resultRect, QRectF const& contentRect, QRectF const& agg_content_rect)
+	Alignment const& alignment, QRectF const& contentRect, QRectF const& agg_content_rect)
 {
 	if (alignment.isNull()) {
 		std::cout << "\tskip soft margins: " <<  "\n";
@@ -295,7 +295,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.origRect(), params.contentRect(), agg_content_rect
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), params.contentRect(), agg_content_rect
 		)
 	);
 
