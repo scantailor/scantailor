@@ -95,7 +95,7 @@ Utils::extendPolyRectWithMargins(
 Margins
 Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
-	Alignment const& alignment, QRectF const& resultRect, QRectF const& boundingRect, QRectF const& agg_content_rect)
+	Alignment const& alignment, QRectF const& resultRect, QRectF const& contentRect, QRectF const& agg_content_rect)
 {
 	if (alignment.isNull()) {
 		std::cout << "\tskip soft margins: " <<  "\n";
@@ -110,10 +110,10 @@ Utils::calcSoftMarginsMM(
 	std::cout << "bottom: " << agg_content_rect.bottom() << " ";
 	std::cout << "\n";
 
-	std::cout << "boundingLeft: " << boundingRect.left() << " ";
-	std::cout << "boundingTop: " << boundingRect.top() << " ";
-	std::cout << "boundingRight: " << boundingRect.right() << " ";
-	std::cout << "boundingBottom: " << boundingRect.bottom() << " ";
+	std::cout << "contentLeft: " << contentRect.left() << " ";
+	std::cout << "contentTop: " << contentRect.top() << " ";
+	std::cout << "contentRight: " << contentRect.right() << " ";
+	std::cout << "contentBottom: " << contentRect.bottom() << " ";
 	std::cout << "\n";
 #endif
 
@@ -130,24 +130,34 @@ Utils::calcSoftMarginsMM(
 			aggregate_hard_size_mm.height() - hard_size_mm.height();
 
 	// detect original borders in page mirror
-	double leftBorder = double(boundingRect.left() - agg_content_rect.left()) / double(agg_content_rect.width());
-	double rightBorder = double(agg_content_rect.right() - boundingRect.right()) / double(agg_content_rect.width());
-	double topBorder = double(boundingRect.top() - agg_content_rect.top()) / double(agg_content_rect.height());
-	double bottomBorder = double(agg_content_rect.bottom() - boundingRect.bottom()) / double(agg_content_rect.height());
+	double leftBorder = double(contentRect.left() - agg_content_rect.left()) / double(agg_content_rect.width());
+	double rightBorder = double(agg_content_rect.right() - contentRect.right()) / double(agg_content_rect.width());
+	double topBorder = double(contentRect.top() - agg_content_rect.top()) / double(agg_content_rect.height());
+	double bottomBorder = double(agg_content_rect.bottom() - contentRect.bottom()) / double(agg_content_rect.height());
 	
 	// borders in new page layout in mm
-	double aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * leftBorder;
-	double aggRightBorder = delta_width - aggLeftBorder;
-	double aggTopBorder = (delta_height / (topBorder + bottomBorder)) * topBorder;
-	double aggBottomBorder = delta_height - aggTopBorder;
+	double aggLeftBorder = 0.0;
+	double aggRightBorder = 0.0;
+	double aggTopBorder = 0.0;
+	double aggBottomBorder = 0.0;
+
+	if (delta_width > 0.0) {
+		aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * leftBorder;
+		aggRightBorder = delta_width - aggLeftBorder;
+	}
+	if (delta_height > 0.0) {
+		aggTopBorder = (delta_height / (topBorder + bottomBorder)) * topBorder;
+		aggBottomBorder = delta_height - aggTopBorder;
+	}
 
 #ifdef DEBUG
+	std::cout << "delta_width: " << delta_width << " " << "delta_height: " << delta_height << "\n";
 	std::cout << aggLeftBorder << " " << aggRightBorder << " " << aggTopBorder << " " << aggBottomBorder << ":" << "\n";
 	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << "\n";
 #endif
 
 	// if align auto and not empty page
-	if (boundingRect.width() > 1.0 && (myAlign.horizontal() == Alignment::HAUTO || myAlign.vertical() == Alignment::VAUTO)) {
+	if (contentRect.width() > 1.0 && (myAlign.horizontal() == Alignment::HAUTO || myAlign.vertical() == Alignment::VAUTO)) {
 		// new borders ratio
 		double newLeftBorder = aggLeftBorder / aggregate_hard_size_mm.width();
 		double newRightBorder = aggRightBorder / aggregate_hard_size_mm.width();
@@ -155,7 +165,7 @@ Utils::calcSoftMarginsMM(
 		double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
 
 		// content mass index
-		double cmi = double(boundingRect.width() * boundingRect.height()) / double(agg_content_rect.width() * agg_content_rect.height());
+		double cmi = double(contentRect.width() * contentRect.height()) / double(agg_content_rect.width() * agg_content_rect.height());
 
 		double hTolerance = myAlign.tolerance();
 		double vTolerance = myAlign.tolerance() * 0.7;
@@ -285,7 +295,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.origRect(), content_rect_phys.boundingRect(), agg_content_rect
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), xform.origRect(), params.contentRect(), agg_content_rect
 		)
 	);
 
