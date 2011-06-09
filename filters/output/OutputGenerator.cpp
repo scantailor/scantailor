@@ -702,7 +702,10 @@ OutputGenerator::processWithoutDewarping(
 		}
 	}
 	
-	if (render_params.mixedOutput()) {
+	if (!render_params.mixedOutput()) {
+		// It's "Color / Grayscale" mode, as we handle B/W above.
+		reserveBlackAndWhite(maybe_normalized);
+	} else {
 		BinaryImage bw_content(
 			binarize(maybe_smoothed, normalize_illumination_crop_area, &bw_mask)
 		);
@@ -756,9 +759,13 @@ OutputGenerator::processWithoutDewarping(
 	QImage dst(target_size, maybe_normalized.format());
 	if (maybe_normalized.format() == QImage::Format_Indexed8) {
 		dst.setColorTable(createGrayscalePalette());
-		dst.fill(0xff); // White.
+		// White.  0xff is reserved if in "Color / Grayscale" mode.
+		uint8_t const color = render_params.mixedOutput() ? 0xff : 0xfe;
+		dst.fill(color);
 	} else {
-		dst.fill(0xffffffff); // Opaque white.
+		// White.  0x[ff]ffffff is reserved if in "Color / Grayscale" mode.
+		uint32_t const color = render_params.mixedOutput() ? 0xffffffff : 0xfffefefe;
+		dst.fill(color);
 	}
 
 	if (!m_contentRect.isEmpty()) {
@@ -1075,7 +1082,10 @@ OutputGenerator::processWithDewarping(
 		return dewarped_bw_content.toQImage();
 	}
 
-	if (render_params.mixedOutput()) {
+	if (!render_params.mixedOutput()) {
+		// It's "Color / Grayscale" mode, as we handle B/W above.
+		reserveBlackAndWhite(dewarped);
+	} else {
 		status.throwIfCancelled();
 
 		// Dewarp the B/W mask.
