@@ -1352,6 +1352,13 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Natural order</source>
+        <translation type="obsolete">自然排序</translation>
+    </message>
+</context>
+<context>
     <name>RemovePagesDialog</name>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="14"/>
@@ -1938,7 +1945,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation type="unfinished">自然排序</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split line count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>分割頁面</translation>
     </message>

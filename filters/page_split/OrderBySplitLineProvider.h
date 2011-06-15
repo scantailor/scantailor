@@ -1,6 +1,7 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
+    Copyright (C)  Vadim Kuznetsov ()DikBSD <dikbsd@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,27 +17,28 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_LAYOUT_TYPE_H_
-#define PAGE_SPLIT_LAYOUT_TYPE_H_
+#ifndef PAGE_SPLIT_ORDER_BY_SPLIT_LINE_PROVIDER_H_
+#define PAGE_SPLIT_ORDER_BY_SPLIT_LINE_PROVIDER_H_
 
-#include <QString>
+#include "Settings.h"
+#include "IntrusivePtr.h"
+#include "PageOrderProvider.h"
 
 namespace page_split
 {
 
-enum LayoutType {
-	AUTO_LAYOUT_TYPE,
-	SINGLE_PAGE_UNCUT,
-	PAGE_PLUS_OFFCUT,
-	TWO_PAGES
+class OrderBySplitLineProvider : public PageOrderProvider
+{
+public:
+	OrderBySplitLineProvider(IntrusivePtr<Settings> const& settings);
+
+	virtual bool precedes(
+		PageId const& lhs_page, bool lhs_incomplete,
+		PageId const& rhs_page, bool rhs_incomplete) const;
+private:
+	IntrusivePtr<Settings> m_ptrSettings;
 };
-
-QString layoutTypeToString(LayoutType type);
-
-LayoutType layoutTypeFromString(QString const& layout_type);
-
-int layoutTypeToSplitLineCount(LayoutType type);
 
 } // namespace page_split
 
-#endif
+#endif //PAGE_SPLIT_ORDER_BY_SPLIT_LINE_PROVIDER_H_

@@ -1430,6 +1430,13 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Natural order</source>
+        <translation type="obsolete">Естествено подреждане</translation>
+    </message>
+</context>
+<context>
     <name>RemoveFileDialog</name>
     <message>
         <source>Remove File</source>
@@ -2058,7 +2065,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation type="unfinished">Естествено подреждане</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split line count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>Разделяне на страници</translation>
     </message>

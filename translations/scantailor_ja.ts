@@ -1440,6 +1440,13 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Natural order</source>
+        <translation type="obsolete">通常の順序</translation>
+    </message>
+</context>
+<context>
     <name>RemoveFileDialog</name>
     <message>
         <source>Remove File</source>
@@ -2075,7 +2082,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation type="unfinished">通常の順序</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split line count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>ページを分割</translation>
     </message>

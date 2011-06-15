@@ -1532,6 +1532,17 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <source>Natural order</source>
+        <translation type="obsolete">Естественный порядок</translation>
+    </message>
+    <message>
+        <source>Order by split line</source>
+        <translation type="obsolete">Сортировка по числу резаков</translation>
+    </message>
+</context>
+<context>
     <name>RemoveFileDialog</name>
     <message>
         <source>Remove File</source>
@@ -2256,7 +2267,21 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation>Естественный порядок</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split line count</source>
+        <translation>Сортировка по числу резаков</translation>
+    </message>
+    <message>
+        <source>Order by split line</source>
+        <translation type="obsolete">Сортировка по числу резаков</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>Разрезка страниц</translation>
     </message>
