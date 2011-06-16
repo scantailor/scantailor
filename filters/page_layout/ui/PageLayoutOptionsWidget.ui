@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>214</width>
-    <height>451</height>
+    <width>262</width>
+    <height>499</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,6 +90,12 @@
           </item>
           <item row="0" column="2" rowspan="2">
            <widget class="QToolButton" name="topBottomLink">
+            <property name="minimumSize">
+             <size>
+              <width>24</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -145,6 +151,12 @@
           </item>
           <item row="2" column="2" rowspan="2">
            <widget class="QToolButton" name="leftRightLink">
+            <property name="minimumSize">
+             <size>
+              <width>24</width>
+              <height>48</height>
+             </size>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
