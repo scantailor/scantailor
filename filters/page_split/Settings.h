@@ -130,7 +130,7 @@ public:
 		LayoutType m_layoutType;
 		Action m_paramsAction;
 		Action m_layoutTypeAction;
-		int m_split_line_count;
+		int m_splitLineCount;
 	};
 	
 	
