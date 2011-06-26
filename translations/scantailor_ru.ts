@@ -2138,7 +2138,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split line count</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сортировка по числу резаков</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
