@@ -61,7 +61,7 @@ private:
 			return !(m_paramsValid || m_layoutTypeValid);
 		}
 		
-		int splitLineCount() const { return m_split_line_count; }
+		int splitLineCount() const { return m_splitLineCount; }
 		
 	protected:
 		void setParams(Params const& params);
@@ -82,7 +82,7 @@ private:
 		LayoutType m_layoutType;
 		bool m_paramsValid;
 		bool m_layoutTypeValid;
-		int m_split_line_count;
+		int m_splitLineCount;
 	};
 public:
 	class UpdateAction;
