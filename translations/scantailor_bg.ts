@@ -1092,48 +1092,48 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Отгоре</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="149"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="326"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="349"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="372"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="395"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="418"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="444"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="467"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="490"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="513"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="100"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="161"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="338"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="361"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="384"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="407"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="430"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="456"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="479"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="502"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="525"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="121"/>
         <source>Bottom</source>
         <translation>Отдолу</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="138"/>
         <source>Left</source>
         <translation>Отляво</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="173"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="185"/>
         <source>Right</source>
         <translation>Отдясно</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="232"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="568"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="244"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="580"/>
         <source>Apply To ...</source>
         <translation>Приложи към...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="257"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="269"/>
         <source>Alignment</source>
         <translation>Подравняване</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
         <translation>Подравняване с другите страници</translation>
     </message>
@@ -1625,22 +1625,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="275"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="265"/>
         <source>Delete</source>
         <translation>Изтриване</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Delete confirmation</source>
         <translation>Потвърждение за изтриване</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Really delete this zone?</source>
         <translation>Наистина ли да бъде изтрита тази зона?</translation>
     </message>
@@ -1945,7 +1945,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation type="unfinished">Естествено подреждане</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split line count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>Разделяне на страници</translation>
     </message>
