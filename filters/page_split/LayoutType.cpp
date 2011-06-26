@@ -51,4 +51,19 @@ LayoutType layoutTypeFromString(QString const& layout_type)
 	}
 }
 
+int layoutTypeToSplitLineCount(LayoutType const layout_type)
+{
+	switch (layout_type) {
+		case AUTO_LAYOUT_TYPE:
+			return -1;
+		case SINGLE_PAGE_UNCUT:
+			return 0;
+		case PAGE_PLUS_OFFCUT:
+			return 2;
+		case TWO_PAGES:
+			return 1;
+	}
+	return -1;
+}
+
 } // namespace page_split

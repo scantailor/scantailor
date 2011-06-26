@@ -214,7 +214,8 @@ Settings::BaseRecord::BaseRecord()
 :	m_params(PageLayout(), Dependencies(), MODE_AUTO),
 	m_layoutType(AUTO_LAYOUT_TYPE),
 	m_paramsValid(false),
-	m_layoutTypeValid(false)
+	m_layoutTypeValid(false),
+	m_splitLineCount(-1)
 {
 }
 
@@ -230,6 +231,7 @@ Settings::BaseRecord::setLayoutType(LayoutType const layout_type)
 {
 	m_layoutType = layout_type;
 	m_layoutTypeValid = true;
+	m_splitLineCount = layoutTypeToSplitLineCount(layout_type);
 }
 
 bool
@@ -320,6 +322,7 @@ Settings::UpdateAction::setLayoutType(LayoutType const layout_type)
 {
 	m_layoutType = layout_type;
 	m_layoutTypeAction = SET;
+	m_splitLineCount = layoutTypeToSplitLineCount(layout_type);
 }
 
 void

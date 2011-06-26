@@ -39,6 +39,7 @@
 #include <QDomElement>
 #include <stddef.h>
 #include "CommandLine.h"
+#include "OrderBySplitLineProvider.h"
 
 namespace page_split
 {
@@ -46,7 +47,8 @@ namespace page_split
 Filter::Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 	PageSelectionAccessor const& page_selection_accessor)
 :	m_ptrPages(page_sequence),
-	m_ptrSettings(new Settings)
+	m_ptrSettings(new Settings),
+	m_selectedPageOrder(0)
 {
 	if (CommandLine::get().isGui()) {
 		m_ptrOptionsWidget.reset(
@@ -55,6 +57,13 @@ Filter::Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 			)
 		);
 	}
+	
+	typedef PageOrderOption::ProviderPtr ProviderPtr;
+
+	ProviderPtr const default_order;
+	ProviderPtr const order_by_splitline(new OrderBySplitLineProvider(m_ptrSettings));
+	m_pageOrderOptions.push_back(PageOrderOption(tr("Natural order"), default_order));
+	m_pageOrderOptions.push_back(PageOrderOption(tr("Order by split line count"), order_by_splitline));
 }
 
 Filter::~Filter()
@@ -216,6 +225,25 @@ Filter::createCacheDrivenTask(
 	return IntrusivePtr<CacheDrivenTask>(
 		new CacheDrivenTask(m_ptrSettings, next_task)
 	);
+}
+
+std::vector<PageOrderOption>
+Filter::pageOrderOptions() const
+{
+	return m_pageOrderOptions;
+}
+
+int
+Filter::selectedPageOrder() const
+{
+	return m_selectedPageOrder;
+}
+
+void
+Filter::selectPageOrder(int option)
+{
+	assert((unsigned)option < m_pageOrderOptions.size());
+	m_selectedPageOrder = option;
 }
 
 } // page_split
