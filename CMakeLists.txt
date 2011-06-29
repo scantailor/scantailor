@@ -1,4 +1,8 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
+IF(WIN32)
+	CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
+ELSE()
+	CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
+ENDIF()
 
 IF(COMMAND cmake_policy)
 	# Suppress warnings.
@@ -72,6 +76,8 @@ INCLUDE(cmake/SetDefaultBuildType.cmake)
 INCLUDE(cmake/SetDefaultGccFlags.cmake)
 INCLUDE(cmake/ToNativePath.cmake)
 INCLUDE(cmake/UpdateTranslations.cmake)
+INCLUDE(cmake/CopyToBuildDir.cmake)
+INCLUDE(cmake/LibToDLL.cmake)
 
 ST_SET_DEFAULT_BUILD_TYPE(Release)
 IF(CMAKE_COMPILER_IS_GNUCC)
@@ -81,20 +87,36 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 GET_FILENAME_COMPONENT(source_outer_dir "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
 GET_FILENAME_COMPONENT(build_outer_dir "${PROJECT_BINARY_DIR}/.." ABSOLUTE)
 
-IF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
-	FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-4.[0-9]*")
-	FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-4.[0-9]*")
-	FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-4.[0-9]*")
-	FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-4.[0-9]*")
-	FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
-	FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
-	FIND_PROGRAM(
-		QT_QMAKE_EXECUTABLE qmake
-		PATHS dummy_dir ${qt_dirs1} ${qt_dirs2} ${qt_dirs3}
-		${qt_dirs4} ${qt_dirs5} ${qt_dirs6}
-		PATH_SUFFIXES bin
+SET(STAGING_LIBS_DIR "")
+IF(WIN32)
+	FIND_PATH(
+		DEPS_BUILD_DIR build-qt.bat
+		HINTS "${build_outer_dir}/scantailor-deps-build"
+		DOC "Build directory for Scan Tailor dependencies."
 	)
-ENDIF(WIN32 AND NOT QT_QMAKE_EXECUTABLE)
+	IF(NOT DEPS_BUILD_DIR)
+		MESSAGE(
+			FATAL_ERROR "The build directory for Scan Tailor dependencies could not be found! "
+			"You can specify it manually in DEPS_BUILD_DIR variable. Make sure you build the dependencies first!"
+		)
+	ENDIF()
+	SET(STAGING_LIBS_DIR "${DEPS_BUILD_DIR}/staging/libs")
+	
+	IF (NOT EXISTS "${QT_QMAKE_EXECUTABLE}")
+		FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-4.[0-9]*")
+		FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-4.[0-9]*")
+		FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-4.[0-9]*")
+		FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-4.[0-9]*")
+		FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
+		FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
+		FIND_PROGRAM(
+			QT_QMAKE_EXECUTABLE qmake
+			PATHS dummy_dir ${qt_dirs1} ${qt_dirs2} ${qt_dirs3}
+			${qt_dirs4} ${qt_dirs5} ${qt_dirs6}
+			PATH_SUFFIXES bin
+		)
+	ENDIF()
+ENDIF()
 
 INCLUDE(FindQt4)
 IF(NOT QT4_FOUND)
@@ -104,6 +126,7 @@ IF(NOT QT4_FOUND)
 		"You can do it in interactive mode (ccmake instead of cmake) or using -DVAR=VAL syntax."
 	)
 ENDIF(NOT QT4_FOUND)
+GET_FILENAME_COMPONENT(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
 
 
 INCLUDE(FindOpenGL)
@@ -121,6 +144,8 @@ FILE(GLOB zlib_dirs1 "${build_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB zlib_dirs2 "${source_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB png_dirs1 "${build_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB png_dirs2 "${source_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB png_dirs3 "${build_outer_dir}/lpng[0-9]*")
+FILE(GLOB png_dirs4 "${source_outer_dir}/lpng[0-9]*")
 FILE(GLOB tiff_dirs1 "${build_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB tiff_dirs2 "${source_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB boost_dirs1 "${build_outer_dir}/boost_1_[0-9]*_[0-9]*")
@@ -128,7 +153,8 @@ FILE(GLOB boost_dirs2 "${source_outer_dir}/boost_1_[0-9]*_[0-9]*")
 
 FIND_PATH(
 	JPEG_INCLUDE_DIR jpeglib.h
-	PATHS /usr/local/include /usr/include ${jpeg_dirs1} ${jpeg_dirs2}
+	PATHS /usr/local/include /usr/include
+	HINTS ${jpeg_dirs1} ${jpeg_dirs2}
 	DOC "Path to libjpeg headers."
 )
 IF(NOT JPEG_INCLUDE_DIR)
@@ -137,18 +163,29 @@ IF(NOT JPEG_INCLUDE_DIR)
 		"Could not find jpeg headers.\n"
 		"You may need to install a package named libjpeg62-dev or similarly."
 	)
-ENDIF(NOT JPEG_INCLUDE_DIR)
+ENDIF()
+
+INCLUDE_DIRECTORIES("${JPEG_INCLUDE_DIR}")
 
 FIND_LIBRARY(
 	JPEG_LIBRARY NAMES jpeg libjpeg.lib
-	PATHS /usr/local/lib /usr/lib ${jpeg_dirs1} ${jpeg_dirs2}
+	PATHS /usr/local/lib /usr/lib
+	HINTS ${jpeg_dirs1} ${jpeg_dirs2} ${STAGING_LIBS_DIR}
 	DOC "Path to jpeg library."
 )
-INCLUDE_DIRECTORIES("${JPEG_INCLUDE_DIR}")
+IF(NOT JPEG_LIBRARY)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find jpeg library.\n"
+		"You may need to install a package named libjpeg62-dev or similarly."
+	)
+ENDIF()
+
 
 FIND_PATH(
 	ZLIB_INCLUDE_DIR zlib.h
-	PATHS /usr/local/include /usr/include ${zlib_dirs1} ${zlib_dirs2}
+	PATHS /usr/local/include /usr/include
+	HINTS ${zlib_dirs1} ${zlib_dirs2}
 	DOC "Path to zlib headers."
 )
 IF(NOT ZLIB_INCLUDE_DIR)
@@ -157,18 +194,28 @@ IF(NOT ZLIB_INCLUDE_DIR)
 		"Could not find zlib headers.\n"
 		"You may need to install a package named zlib1g-dev or similarly."
 	)
-ENDIF(NOT ZLIB_INCLUDE_DIR)
+ENDIF()
+
+INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
 
 FIND_LIBRARY(
-	ZLIB_LIBRARY NAMES z libz.lib
-	PATHS /usr/local/lib /usr/lib ${zlib_dirs1} ${zlib_dirs2}
+	ZLIB_LIBRARY NAMES z zdll.lib
+	PATHS /usr/local/lib /usr/lib
+	HINTS ${zlib_dirs1} ${zlib_dirs2} ${STAGING_LIBS_DIR}
 	DOC "Path to zlib library."
 )
-INCLUDE_DIRECTORIES("${ZLIB_INCLUDE_DIR}")
+IF(NOT ZLIB_LIBRARY)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find zlib library.\n"
+		"You may need to install a package named zlib1g-dev or similarly."
+	)
+ENDIF()
 
 FIND_PATH(
 	PNG_INCLUDE_DIR png.h
-	PATHS /usr/local/include /usr/include ${png_dirs1} ${png_dirs2}
+	PATHS /usr/local/include /usr/include
+	HINTS ${png_dirs1} ${png_dirs2} ${png_dirs3} ${png_dirs4}
 	DOC "Path to libpng headers."
 )
 IF(NOT PNG_INCLUDE_DIR)
@@ -177,18 +224,29 @@ IF(NOT PNG_INCLUDE_DIR)
 		"Could not find libpng headers.\n"
 		"You may need to install a package named libpng12-dev or similarly."
 	)
-ENDIF(NOT PNG_INCLUDE_DIR)
+ENDIF()
+
+INCLUDE_DIRECTORIES("${PNG_INCLUDE_DIR}")
 
 FIND_LIBRARY(
 	PNG_LIBRARY NAMES png libpng.lib
-	PATHS /usr/local/lib /usr/lib ${png_dirs1} ${png_dirs2}
-	DOC "PAth to png library."
+	PATHS /usr/local/lib /usr/lib
+	HINTS ${png_dirs1} ${png_dirs2} ${png_dirs3} ${png_dirs4} ${STAGING_LIBS_DIR}
+	DOC "Path to png library."
 )
-INCLUDE_DIRECTORIES("${PNG_INCLUDE_DIR}")
+IF(NOT PNG_LIBRARY)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find libpng library.\n"
+		"You may need to install a package named libpng12-dev or similarly."
+	)
+ENDIF()
+
 
 FIND_PATH(
 	TIFF_INCLUDE_DIR tiff.h
-	PATHS /usr/local/include /usr/include ${tiff_dirs1} ${tiff_dirs2}
+	PATHS /usr/local/include /usr/include
+	HINTS ${tiff_dirs1} ${tiff_dirs2}
 	PATH_SUFFIXES libtiff
 	DOC "Path to libtiff headers."
 )
@@ -198,15 +256,29 @@ IF(NOT TIFF_INCLUDE_DIR)
 		"Could not find libtiff headers.\n"
 		"You may need to install a package named libtiff4-dev or similarly."
 	)
-ENDIF(NOT TIFF_INCLUDE_DIR)
+ENDIF()
+
+INCLUDE_DIRECTORIES("${TIFF_INCLUDE_DIR}")
 
 FIND_LIBRARY(
 	TIFF_LIBRARY tiff libtiff.lib
-	PATHS /usr/local/lib /usr/lib ${tiff_dirs1} ${tiff_dirs2}
+	PATHS /usr/local/lib /usr/lib
+	HINTS ${tiff_dirs1} ${tiff_dirs2} ${STAGING_LIBS_DIR}
 	PATH_SUFFIXES libtiff
 	DOC "Path to tiff library."
 )
-INCLUDE_DIRECTORIES("${TIFF_INCLUDE_DIR}")
+IF(NOT TIFF_LIBRARY)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find libtiff library.\n"
+		"You may need to install a package named libtiff4-dev or similarly."
+	)
+ENDIF()
+
+IF(WIN32)
+	ADD_DEFINITIONS(-DUSE_LIBTIFF_DLL)
+ENDIF()
+
 
 IF(WIN32)
 	FIND_PATH(
@@ -278,27 +350,23 @@ ADD_DEFINITIONS(
 	${QT_DEFINITIONS} -DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION
 )
 
-IF(WIN32)
-	ADD_DEFINITIONS(-DLIBTIFF_STATIC)
-ENDIF(WIN32)
-
 INCLUDE_DIRECTORIES(${QT_INCLUDES})
 LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 
-SET(QJPEG_LIBRARIES "")
+#SET(QJPEG_LIBRARIES "")
 IF(WIN32)
-	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
-	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
-	MARK_AS_ADVANCED(FORCE QJPEG_RELEASE QJPEG_DEBUG)
-	IF(QJPEG_RELEASE AND NOT QJPEG_DEBUG)
-		SET(QJPEG_DEBUG "${QJPEG_RELEASE}")
-	ELSEIF(QJPEG_DEBUG AND NOT QJPEG_RELEASE)
-		SET(QJPEG_RELEASE "${QJPEG_DEBUG}")
-	ELSEIF(NOT QJPEG_DEBUG AND NOT QJPEG_RELEASE)
-		MESSAGE(FATAL_ERROR "qjpeg plugin wasn't found!")
-	ENDIF()
-	SET(QJPEG_LIBRARIES "debug;${QJPEG_DEBUG};optimized;${QJPEG_RELEASE}")
-
+#	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
+#	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
+#	MARK_AS_ADVANCED(FORCE QJPEG_RELEASE QJPEG_DEBUG)
+#	IF(QJPEG_RELEASE AND NOT QJPEG_DEBUG)
+#		SET(QJPEG_DEBUG "${QJPEG_RELEASE}")
+#	ELSEIF(QJPEG_DEBUG AND NOT QJPEG_RELEASE)
+#		SET(QJPEG_RELEASE "${QJPEG_DEBUG}")
+#	ELSEIF(NOT QJPEG_DEBUG AND NOT QJPEG_RELEASE)
+#		MESSAGE(FATAL_ERROR "qjpeg plugin wasn't found!")
+#	ENDIF()
+#	SET(QJPEG_LIBRARIES "debug;${QJPEG_DEBUG};optimized;${QJPEG_RELEASE}")
+#
 	LIST(
 		APPEND EXTRA_LIBS "${QT_QTMAIN_LIBRARY}"
 		winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool
@@ -507,7 +575,7 @@ ADD_EXECUTABLE(
 )
 
 ADD_EXECUTABLE(
-	scantailor-batch ${sources} version.h main-batch.cpp
+	scantailor-batch ${sources} version.h main-batch.cpp ${TIFF_INCLUDE_DIR}
 )
 
 # Note that order of static libraries matters with gcc.  Specifically,
@@ -529,7 +597,8 @@ INSTALL(TARGETS scantailor scantailor-batch RUNTIME DESTINATION bin)
 
 IF(ENABLE_CRASH_REPORTER)
 	FIND_PATH(
-		SYMBOLS_PATH . PATHS "${outer_dir}/symbols" NO_DEFAULT_PATH
+		SYMBOLS_PATH . PATHS "${build_outer_dir}/symbols"
+		"${source_outer_dir}/symbols" NO_DEFAULT_PATH
 		DOC "The directory to write symbol information into."
 	)
 	IF(NOT SYMBOLS_PATH)
@@ -540,7 +609,7 @@ IF(ENABLE_CRASH_REPORTER)
 	# of the Visual Studio Express Edition, so we rely on a pre-built
 	# version which can be found in the Mozilla repository.
 	FIND_PROGRAM(
-		DUMP_SYMS_EXECUTABLE dump_syms PATHS "${outer_dir}"
+		DUMP_SYMS_EXECUTABLE dump_syms PATHS "${build_outer_dir}" "${source_outer_dir}"
 		DOC "Path to dump_syms.exe, which can be found in Mozilla repository."
 	)
 	IF(NOT DUMP_SYMS_EXECUTABLE)
@@ -602,7 +671,75 @@ SET(
 )
 INCLUDE(CPack)
 
-# Installer for Windows.
 IF(WIN32)
+	# Copy some DLLs to the staging dir.
+	
+	IF(MINGW)
+		FIND_FILE(
+			MINGWM10_DLL mingwm10.dll
+			PATHS c:/MinGW/bin ENV PATH
+			DOC "Full path to mingwm10.dll"
+		)
+		IF(NOT MINGWM10_DLL)
+			MESSAGE(
+				FATAL_ERROR
+				"Could not find mingwm10.dll\n"
+				"It should be in the 'bin' subdirectory of your MinGW installation."
+			)
+		ENDIF(NOT MINGWM10_DLL)
+		COPY_TO_BUILD_DIR("${MINGWM10_DLL}")
+
+		FIND_FILE(
+			GCC_DW2_DLL libgcc_s_dw2-1.dll
+			PATHS c:/MinGW/bin ENV PATH
+			DOC "Full path to libgcc_s_dw2-1.dll"
+		)
+		IF(NOT GCC_DW2_DLL)
+			SET(GCC_DW2_DLL "") # For NSIS
+			MESSAGE(
+				"Could not find libgcc_s_dw2-1.dll\n"
+				"That's fine if your MinGW is old and just doesn't have it."
+			)
+		ELSE()
+			COPY_TO_BUILD_DIR("${GCC_DW2_DLL}")
+		ENDIF()
+	ENDIF(MINGW)
+	
+	SET(
+		libs_copy_debug
+		"${QT_QTCORE_LIBRARY_DEBUG}"
+		"${QT_QTGUI_LIBRARY_DEBUG}"
+		"${QT_QTXML_LIBRARY_DEBUG}"
+		"${QT_QTNETWORK_LIBRARY_DEBUG}"
+	)
+	LIB_TO_DLL(libs_copy_debug ${libs_copy_debug})
+	COPY_TO_BUILD_DIR(${libs_copy_debug} CONFIGURATIONS Debug)
+	
+	SET(
+		libs_copy_nondebug
+		"${QT_QTCORE_LIBRARY_RELEASE}"
+		"${QT_QTGUI_LIBRARY_RELEASE}"
+		"${QT_QTXML_LIBRARY_RELEASE}"
+		"${QT_QTNETWORK_LIBRARY_RELEASE}"
+	)
+	LIB_TO_DLL(libs_copy_nondebug ${libs_copy_nondebug})
+	COPY_TO_BUILD_DIR(${libs_copy_nondebug} CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
+	
+	IF(MINGW)
+		SET(zlib_dll "${QT_BIN_DIR}/libz.dll")
+	ELSE()
+		SET(zlib_dll "${QT_BIN_DIR}/zdll.dll")
+	ENDIF()
+	SET(
+		libs_copy_all_confs
+		"${QT_BIN_DIR}/libpng.dll" "${QT_BIN_DIR}/libjpeg.dll"
+		"${QT_BIN_DIR}/libtiff.dll" "${zlib_dll}"
+	)
+	COPY_TO_BUILD_DIR(${libs_copy_all_confs})
+	
+	# Generate the target that will actually do the copying.
+	GENERATE_COPY_TO_BUILD_DIR_TARGET(copy_to_build_dir)
+	
+	# Installer for Windows.  Must go the last.
 	ADD_SUBDIRECTORY(packaging/windows)
 ENDIF(WIN32)
