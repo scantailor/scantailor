@@ -20,6 +20,7 @@
 #define PAGELAYOUT_H_
 
 #include "PageId.h"
+#include "LayoutType.h"
 #include <QPolygonF>
 #include <QLineF>
 #include <QString>
@@ -89,6 +90,8 @@ public:
 	 *        is consistent with the new type.
 	 */
 	void setType(Type type);
+
+	LayoutType toLayoutType() const;
 
 	QPolygonF const& uncutOutline() const { return m_uncutOutline; }
 

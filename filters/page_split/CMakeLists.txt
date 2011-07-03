@@ -26,7 +26,7 @@ SET(
 	CacheDrivenTask.cpp CacheDrivenTask.h
 	LayoutType.cpp LayoutType.h
 	UnremoveButton.cpp UnremoveButton.h
-	OrderBySplitLineProvider.cpp OrderBySplitLineProvider.h
+	OrderBySplitTypeProvider.cpp OrderBySplitTypeProvider.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
 QT4_AUTOMOC(${sources})
