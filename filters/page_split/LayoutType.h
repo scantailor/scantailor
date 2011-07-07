@@ -35,8 +35,6 @@ QString layoutTypeToString(LayoutType type);
 
 LayoutType layoutTypeFromString(QString const& layout_type);
 
-int layoutTypeToSplitLineCount(LayoutType type);
-
 } // namespace page_split
 
 #endif

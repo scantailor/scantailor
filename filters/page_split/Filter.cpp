@@ -39,7 +39,7 @@
 #include <QDomElement>
 #include <stddef.h>
 #include "CommandLine.h"
-#include "OrderBySplitLineProvider.h"
+#include "OrderBySplitTypeProvider.h"
 
 namespace page_split
 {
@@ -61,9 +61,9 @@ Filter::Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 	typedef PageOrderOption::ProviderPtr ProviderPtr;
 
 	ProviderPtr const default_order;
-	ProviderPtr const order_by_splitline(new OrderBySplitLineProvider(m_ptrSettings));
+	ProviderPtr const order_by_splitline(new OrderBySplitTypeProvider(m_ptrSettings));
 	m_pageOrderOptions.push_back(PageOrderOption(tr("Natural order"), default_order));
-	m_pageOrderOptions.push_back(PageOrderOption(tr("Order by split line count"), order_by_splitline));
+	m_pageOrderOptions.push_back(PageOrderOption(tr("Order by split type"), order_by_splitline));
 }
 
 Filter::~Filter()

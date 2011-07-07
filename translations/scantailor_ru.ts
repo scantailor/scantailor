@@ -1169,48 +1169,48 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Сверху</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="149"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="326"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="349"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="372"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="395"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="418"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="444"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="467"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="490"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="513"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="100"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="161"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="338"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="361"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="384"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="407"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="430"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="456"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="479"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="502"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="525"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="121"/>
         <source>Bottom</source>
         <translation>Снизу</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="138"/>
         <source>Left</source>
         <translation>Слева</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="173"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="185"/>
         <source>Right</source>
         <translation>Справа</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="232"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="568"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="244"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="580"/>
         <source>Apply To ...</source>
         <translation>Применить к ...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="257"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="269"/>
         <source>Alignment</source>
         <translation>Выравнивание</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
         <translation>Выровнять размеры
 с другими страницами</translation>
@@ -2269,16 +2269,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="65"/>
         <source>Natural order</source>
-        <translation>Естественный порядок</translation>
+        <translation type="unfinished">Естественный порядок</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split line count</source>
-        <translation>Сортировка по числу резаков</translation>
-    </message>
-    <message>
-        <source>Order by split line</source>
-        <translation type="obsolete">Сортировка по числу резаков</translation>
+        <translation type="unfinished">Сортировка по числу резаков</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>

@@ -1053,48 +1053,48 @@ zur Auswahl mehrerer Seiten.</translation>
         <translation>Oben</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="149"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="326"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="349"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="372"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="395"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="418"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="444"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="467"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="490"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="513"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="100"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="161"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="338"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="361"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="384"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="407"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="430"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="456"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="479"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="502"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="525"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="121"/>
         <source>Bottom</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="138"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="173"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="185"/>
         <source>Right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="232"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="568"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="244"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="580"/>
         <source>Apply To ...</source>
         <translation>Anwenden auf ...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="257"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="269"/>
         <source>Alignment</source>
         <translation>Ausrichtung</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
         <translation>Größe an andere Seiten
 anpassen</translation>

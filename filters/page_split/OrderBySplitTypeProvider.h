@@ -17,8 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SPLIT_ORDER_BY_SPLIT_LINE_PROVIDER_H_
-#define PAGE_SPLIT_ORDER_BY_SPLIT_LINE_PROVIDER_H_
+#ifndef PAGE_SPLIT_ORDER_BY_SPLIT_TYPE_PROVIDER_H_
+#define PAGE_SPLIT_ORDER_BY_SPLIT_TYPE_PROVIDER_H_
 
 #include "Settings.h"
 #include "IntrusivePtr.h"
@@ -27,10 +27,10 @@
 namespace page_split
 {
 
-class OrderBySplitLineProvider : public PageOrderProvider
+class OrderBySplitTypeProvider : public PageOrderProvider
 {
 public:
-	OrderBySplitLineProvider(IntrusivePtr<Settings> const& settings);
+	OrderBySplitTypeProvider(IntrusivePtr<Settings> const& settings);
 
 	virtual bool precedes(
 		PageId const& lhs_page, bool lhs_incomplete,
@@ -41,4 +41,4 @@ private:
 
 } // namespace page_split
 
-#endif //PAGE_SPLIT_ORDER_BY_SPLIT_LINE_PROVIDER_H_
+#endif //PAGE_SPLIT_ORDER_BY_SPLIT_TYPE_PROVIDER_H_

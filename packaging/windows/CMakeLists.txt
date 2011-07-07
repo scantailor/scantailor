@@ -2,29 +2,16 @@ FIND_PROGRAM(
 	MAKENSIS_EXE makensis
 	PATHS "[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\NSIS;InstallLocation]"
 )
-#IF(NOT MAKENSIS_EXE)
-#	MESSAGE(
-#		FATAL_ERROR
-#		"makensis.exe could not be found.\n"
-#		"makensis.exe is a part of NSIS. Get NSIS from http://nsis.sf.net/"
-#	)
-#ENDIF(NOT MAKENSIS_EXE)
 
-IF(MINGW)
-	FIND_FILE(
-		MINGWM10_DLL mingwm10.dll
-		PATHS c:/MinGW/bin ENV PATH
-		DOC "Full path to mingwm10.dll"
+IF(NOT MAKENSIS_EXE)
+	MESSAGE(
+		FATAL_ERROR
+		"makensis.exe could not be found.\n"
+		"makensis.exe is a part of NSIS. Get NSIS from http://nsis.sf.net/"
 	)
-	IF(NOT MINGWM10_DLL)
-		MESSAGE(
-			FATAL_ERROR
-			"Could not find mingwm10.dll\n"
-			"It should be in the 'bin' subdirectory of your MinGW installation."
-		)
-	ENDIF(NOT MINGWM10_DLL)
-	TO_NATIVE_PATH("${MINGWM10_DLL}" MINGWM10_DLL)
-ELSEIF(MSVC)
+ENDIF(NOT MAKENSIS_EXE)
+	
+IF(MSVC)
 	GET_FILENAME_COMPONENT(make_program_dir "${CMAKE_MAKE_PROGRAM}" PATH)
 	FIND_FILE(
 		VC_REDIST_DIR VC/redist PATHS "${make_program_dir}"
@@ -39,7 +26,6 @@ ELSEIF(MSVC)
 		FILE(GLOB crt_redist_dirs "${VC_REDIST_DIR}/x86/Microsoft.VC*.CRT")
 		IF(crt_redist_dirs)
 			LIST(GET crt_redist_dirs 0 CRT_REDIST_PATH)
-			GET_FILENAME_COMPONENT(CRT_REDIST_DIR "${CRT_REDIST_PATH}" NAME)
 		ENDIF(crt_redist_dirs)
 	ENDIF(VC_REDIST_DIR)
 
@@ -53,19 +39,19 @@ ELSEIF(MSVC)
 			"Specifically, we are after redist\x86\Microsoft.VC*.CRT"
 		)
 	ENDIF(NOT CRT_REDIST_PATH)
-
-	TO_NATIVE_PATH("${CRT_REDIST_PATH}" CRT_REDIST_PATH)
-	TO_NATIVE_PATH("${CRT_REDIST_DIR}" CRT_REDIST_DIR)
-ENDIF(MINGW)
+ENDIF()
 
 SET(LICENSE_FILE "${CMAKE_SOURCE_DIR}/GPL3.txt")
 SET(INSTALLER_FILENAME "scantailor-${VERSION}-install.exe")
-
 SET(REGISTER_EXTENSION_NSH "${CMAKE_CURRENT_SOURCE_DIR}/registerExtension.nsh")
-TO_NATIVE_PATH("${REGISTER_EXTENSION_NSH}" REGISTER_EXTENSION_NSH)
 
-CONFIGURE_FILE(scantailor.nsi.in "${CMAKE_BINARY_DIR}/scantailor.nsi" @ONLY)
-SOURCE_GROUP("Sources" FILES scantailor.nsi.in)
+SET(
+	SOURCES
+	scantailor.nsi.in "${CMAKE_SOURCE_DIR}/cmake/generate_nsi_file.cmake.in"
+	"${CMAKE_SOURCE_DIR}/cmake/prepare_staging_dir.cmake.in"
+)
+
+SOURCE_GROUP("Sources" FILES ${SOURCES})
 SOURCE_GROUP("Generated" FILES "${CMAKE_BINARY_DIR}/scantailor.nsi")
 
 GET_TARGET_PROPERTY(SCANTAILOR_EXE scantailor LOCATION)
@@ -74,43 +60,104 @@ TO_NATIVE_PATH("${SCANTAILOR_EXE}" SCANTAILOR_EXE)
 GET_TARGET_PROPERTY(SCANTAILOR_BATCH_EXE scantailor-batch LOCATION)
 TO_NATIVE_PATH("${SCANTAILOR_BATCH_EXE}" SCANTAILOR_BATCH_EXE)
 
+CONFIGURE_FILE(
+	"${CMAKE_SOURCE_DIR}/cmake/prepare_staging_dir.cmake.in"
+	"${CMAKE_BINARY_DIR}/prepare_staging_dir.cmake" @ONLY
+)
+
+SET(MAYBE_CRASHREPORTER_EXE "")
+IF(ENABLE_CRASHREPORTER)
+	SET(MAYBE_CRASHREPORTER_EXE "-DCRASHREPORTER_EXE=$<TARGET_FILE:CrashReporter>")
+ENDIF()
+
+SET(MAYBE_CRT_REDIST_PATH "")
+IF(CRT_REDIST_PATH)
+	SET(MAYBE_CRT_REDIST_PATH "-DCRT_REDIST_PATH=${CRT_REDIST_PATH}")
+ENDIF()
+ADD_CUSTOM_TARGET(
+	prepare_staging_dir
+	COMMAND "${CMAKE_COMMAND}" ARGS -DCFG=$<CONFIGURATION>
+	"-DSCANTAILOR_EXE=$<TARGET_FILE:scantailor>"
+	"-DSCANTAILOR_BATCH_EXE=$<TARGET_FILE:scantailor-batch>"
+	${MAYBE_CRASHREPORTER_EXE}
+	${MAYBE_CRT_REDIST_PATH}
+	-P "${CMAKE_BINARY_DIR}/prepare_staging_dir.cmake"
+	DEPENDS "${CMAKE_SOURCE_DIR}/cmake/prepare_staging_dir.cmake.in"
+)
+ADD_DEPENDENCIES(
+	prepare_staging_dir
+	scantailor scantailor-batch compile_translations
+)
+IF(ENABLE_CRASHREPORTER)
+	ADD_DEPENDENCIES(prepare_staging_dir CrashReporter)
+ENDIF()
+
 SET(extra_deps scantailor compile_translations)
 
 SET(DUMP_SYMBOLS_COMMANDS "")
 IF(ENABLE_CRASH_REPORTER)
-	GET_TARGET_PROPERTY(CRASHREPORTER_EXE CrashReporter LOCATION)
-	TO_NATIVE_PATH("${CRASHREPORTER_EXE}" CRASHREPORTER_EXE)
 	LIST(APPEND extra_deps CrashReporter)
 	SET(
 		DUMP_SYMBOLS_COMMANDS
 		COMMAND "${CMAKE_COMMAND}" ARGS -E echo "Dumping symbols..."
+		
 		COMMAND "${DUMP_SYMS_EXECUTABLE}" ARGS "${SCANTAILOR_EXE}"
+		">" "${SYMBOLS_PATH}/temp.sym"
+		COMMAND "${CMAKE_COMMAND}" ARGS "-DSYMBOLS_PATH=${SYMBOLS_PATH}"
+		-P "${CMAKE_SOURCE_DIR}/cmake/move_sym_file.cmake"
+		
+		COMMAND "${DUMP_SYMS_EXECUTABLE}" ARGS "${SCANTAILOR_BATCH_EXE}"
 		">" "${SYMBOLS_PATH}/temp.sym"
 		COMMAND "${CMAKE_COMMAND}" ARGS "-DSYMBOLS_PATH=${SYMBOLS_PATH}"
 		-P "${CMAKE_SOURCE_DIR}/cmake/move_sym_file.cmake"
 	)
 ENDIF(ENABLE_CRASH_REPORTER)
 
-# SCANTAILOR_EXE and CRASHREPORTER_EXE may contain variable references
-# that are only known at run time, so we pass them to makensis, rather
-# than harcoding them into scantailor.nsi
+CONFIGURE_FILE(
+	"${CMAKE_SOURCE_DIR}/cmake/generate_nsi_file.cmake.in"
+	"${CMAKE_BINARY_DIR}/generate_nsi_file.cmake" @ONLY
+)
+
+SET(
+	scantailor_nsi_command
+	OUTPUT "${CMAKE_BINARY_DIR}/scantailor.nsi"
+	COMMAND "${CMAKE_COMMAND}" "-DCFG=$<CONFIGURATION>"
+	"-DSCANTAILOR_EXE=$<TARGET_FILE:scantailor>"
+	"-DSCANTAILOR_BATCH_EXE=$<TARGET_FILE:scantailor-batch>"
+)
+IF(ENABLE_CRASH_REPORTER)
+	LIST(
+		APPEND scantailor_nsi_command
+		"-DCRASHREPORTER_EXE=$<TARGET_FILE:CrashReporter>"
+	)
+ENDIF()
+LIST(
+	APPEND scantailor_nsi_command
+	-P "${CMAKE_BINARY_DIR}/generate_nsi_file.cmake"
+	DEPENDS scantailor.nsi.in
+	"${CMAKE_SOURCE_DIR}/cmake/generate_nsi_file.cmake.in"
+	VERBATIM
+)
+ADD_CUSTOM_COMMAND(${scantailor_nsi_command})
+
 ADD_CUSTOM_COMMAND(
 	OUTPUT "${INSTALLER_FILENAME}"
 	${DUMP_SYMBOLS_COMMANDS}
-	COMMAND "${MAKENSIS_EXE}" /V2
-	"/DSCANTAILOR_EXE=${SCANTAILOR_EXE}"
-	"/DSCANTAILOR_BATCH_EXE=${SCANTAILOR_BATCH_EXE}"
-	"/DCRASHREPORTER_EXE=${CRASHREPORTER_EXE}" scantailor.nsi
+	COMMAND "${MAKENSIS_EXE}" /V2 scantailor.nsi
 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-	MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/scantailor.nsi
+	MAIN_DEPENDENCY "${CMAKE_BINARY_DIR}/scantailor.nsi"
 	DEPENDS ${extra_deps}
 	VERBATIM
 )
 
 OPTION(BUILD_INSTALLER_BY_DEFAULT "Wheter the \"installer\" target gets built by default" ON)
-SET(installer_target installer)
+SET(maybe_all "")
 IF(BUILD_INSTALLER_BY_DEFAULT)
-	LIST(APPEND installer_target ALL)
+	SET(maybe_all ALL)
 ENDIF()
-LIST(APPEND installer_target DEPENDS "${INSTALLER_FILENAME}")
-ADD_CUSTOM_TARGET(${installer_target} SOURCES scantailor.nsi.in)
+ADD_CUSTOM_TARGET(
+	installer ${maybe_all}
+	SOURCES ${SOURCES}
+	DEPENDS "${INSTALLER_FILENAME}"
+)
+ADD_DEPENDENCIES(installer prepare_staging_dir copy_to_staging_dir)
