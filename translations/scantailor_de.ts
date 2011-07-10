@@ -37,36 +37,85 @@
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich</translation>
     </message>
-    <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="157"/>
+        <source>U235 - Picture auto-detection algorithm.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
-        <source>Translators</source>
-        <translation>Übersetzer</translation>
+        <location filename="../ui/AboutDialog.ui" line="164"/>
+        <source>Robert B. - First generation dewarping algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="171"/>
+        <source>Andrey Bergman - System load adjustment.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="173"/>
-        <source>Svetoslav Sashkov, Mandor - Bulgarian
-Petr Kovář - Czech
-Stefan Birkner - German
-Angelo Gemmi - Italian
-Masahiro Kitagawa - Japanese
-Patrick Pascal - French
-Daniel Koć - Polish
-Joseph Artsimovich - Russian
-Marián Hvolka - Slovak
-Davidson Wang - Traditional Chinese</source>
+        <location filename="../ui/AboutDialog.ui" line="178"/>
+        <source>Petr Kovář - Command line interface.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="205"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="212"/>
+        <source>Petr Kovář - Czech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="219"/>
+        <source>Stefan Birkner - German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <source>Angelo Gemmi - Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="233"/>
+        <source>Masahiro Kitagawa - Japanese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="240"/>
+        <source>Patrick Pascal - French</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="247"/>
+        <source>Daniel Koć - Polish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="254"/>
+        <source>Joseph Artsimovich - Russian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="261"/>
+        <source>Marián Hvolka - Slovak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="268"/>
+        <source>Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="295"/>
+        <source>denver 22</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <source>Translators</source>
+        <translation>Übersetzer</translation>
     </message>
     <message>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
@@ -99,21 +148,20 @@ Robert B. - Dewarping-Algorithmus.
 Andrey Bergman - Einstellen der Systemauslastung.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="192"/>
+        <location filename="../ui/AboutDialog.ui" line="280"/>
         <source>Documentation</source>
         <translation>Dokumentation</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
-        <translation>denver 22
+        <translation type="obsolete">denver 22
 phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <location filename="../ui/AboutDialog.ui" line="336"/>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
@@ -1011,14 +1059,31 @@ zur Auswahl mehrerer Seiten.</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
+        <source>Every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
+        <translation type="unfinished">alle anderen Seiten</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
+        <source>The current page will be included.</source>
+        <translation type="unfinished">Die aktuelle Seite mit eingeschlossen.</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
         <source>Selected pages</source>
         <translation>ausgewählte Seiten</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="92"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="143"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Verwenden Sie Strg+Mausklick/Shift+Mausklick
 zur Auswahl mehrerer Seiten.</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
+        <source>Every other selected page</source>
+        <translation type="unfinished">alle anderen ausgewählten Seiten</translation>
     </message>
 </context>
 <context>
@@ -1796,6 +1861,14 @@ Benutzeroberläche verwenden</translation>
     </message>
 </context>
 <context>
+    <name>page_layout::ApplyDialog</name>
+    <message>
+        <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>page_layout::Filter</name>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="67"/>
@@ -1848,7 +1921,7 @@ Benutzeroberläche verwenden</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
-        <source>Order by split line count</source>
+        <source>Order by split type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
