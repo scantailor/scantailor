@@ -530,7 +530,7 @@ SET(
 	filter_dc/PageOrientationCollector.h
 	config.h.in
 )
-SOURCE_GROUP("Sources" FILES ${sources} main.cpp main-batch.cpp)
+SOURCE_GROUP("Sources" FILES ${sources} main.cpp main-cli.cpp)
 QT4_AUTOMOC(${sources})
 
 SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
@@ -575,7 +575,7 @@ ADD_EXECUTABLE(
 )
 
 ADD_EXECUTABLE(
-	scantailor-batch ${sources} version.h main-batch.cpp ${TIFF_INCLUDE_DIR}
+	scantailor-cli ${sources} version.h main-cli.cpp ${TIFF_INCLUDE_DIR}
 )
 
 # Note that order of static libraries matters with gcc.  Specifically,
@@ -588,12 +588,12 @@ TARGET_LINK_LIBRARIES(
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 TARGET_LINK_LIBRARIES(
-	scantailor-batch
+	scantailor-cli
 	fix_orientation page_split deskew select_content page_layout
 	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
-INSTALL(TARGETS scantailor scantailor-batch RUNTIME DESTINATION bin)
+INSTALL(TARGETS scantailor scantailor-cli RUNTIME DESTINATION bin)
 
 IF(ENABLE_CRASH_REPORTER)
 	FIND_PATH(
