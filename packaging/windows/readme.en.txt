@@ -22,9 +22,9 @@ Visual C++ were added later and marked with [VC++].
 First, download the following software.  Unless stated otherwise, take the
 latest stable version.
 
-1. CMake 2.6.x (tested with 2.6.2)
+1. CMake >= 2.8.4
    Homepage: http://www.cmake.org
-2. jpeg-6b
+2. jpeg library
    Homepage: http://www.ijg.org/
    The file we need will be named jpegsrc.v7.tar.gz or similarly.
 3. zlib
@@ -44,12 +44,12 @@ latest stable version.
    The process of patching libtiff is described later in this document.
    If you aren't going to distribute your Scan Tailor build and aren't going
    to open files from untrusted sources, then you don't really need patching it.
-6. Qt 4.x.x (tested with 4.5.0)
+6. Qt 4.x.x (tested with 4.7.3)
    Homepage: http://qt.nokia.com/
    From there: Download -> LGPL / Free -> Download Qt SDK for Windows
    If you are going to use Visual Studio, you may turn off the "MinGW"
    option in the installer.
-7. Boost (tested with 1.38.0) and Boost Jam (tested with 3.1.17)
+7. Boost (tested with 1.44.0) and Boost Jam (tested with 3.1.17)
    Homepage: http://boost.org/
    For Boost, you can download any of the files, provided you know how to unpack it.
    For Boost Jam, take the file with "ntx86" suffix.
@@ -66,13 +66,13 @@ latest stable version.
 1. Create a build directory.  Its full path should have no spaces.  I suggest
    C:\build
 
-2. Unpack jpeg-6b, libpng, libtiff, zlib, boost, boost jam, and scantailor
+2. Unpack jpeg, libpng, libtiff, zlib, boost, boost jam, and scantailor
    itself to the build directory.  You should get a directory structure like
    this:
    C:\build
      | boost_1_38_0
      | boost-jam-3.1.17-1-ntx86
-     | jpeg-6b
+     | jpeg-8c
      | libpng-1.2.31
      | scantailor-0.9.0
      | tiff-3.8.2
@@ -103,7 +103,7 @@ latest stable version.
    2.  You may just launch CMake from the Qt Command Prompt, which takes
        care about adjusting the PATH variable.  Unfortunately, in this case
        you will have to write the full path to the CMake executable, like:
-       C:\Program Files\CMake 2.6\bin\CMakeSetup.exe
+       C:\Program Files\CMake 2.8\bin\cmake-gui.exe
        Using just CMakeSetup.exe won't work even if you've chosen to add
        CMake to PATH when installing it.  That's because Qt Command Prompt
        Overwrites the PATH variable completely.  Of course you can edit

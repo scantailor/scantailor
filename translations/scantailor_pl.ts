@@ -37,30 +37,79 @@
         <source>Joseph Artsimovich</source>
         <translation>Joseph Artsimovich</translation>
     </message>
-    <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Picture auto-detection algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="157"/>
+        <source>U235 - Picture auto-detection algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="164"/>
+        <source>Robert B. - First generation dewarping algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="171"/>
+        <source>Andrey Bergman - System load adjustment.</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="173"/>
-        <source>Svetoslav Sashkov, Mandor - Bulgarian
-Petr Kovář - Czech
-Stefan Birkner - German
-Angelo Gemmi - Italian
-Masahiro Kitagawa - Japanese
-Patrick Pascal - French
-Daniel Koć - Polish
-Joseph Artsimovich - Russian
-Marián Hvolka - Slovak
-Davidson Wang - Traditional Chinese</source>
+        <location filename="../ui/AboutDialog.ui" line="178"/>
+        <source>Petr Kovář - Command line interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="205"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="212"/>
+        <source>Petr Kovář - Czech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="219"/>
+        <source>Stefan Birkner - German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <source>Angelo Gemmi - Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="233"/>
+        <source>Masahiro Kitagawa - Japanese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="240"/>
+        <source>Patrick Pascal - French</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="247"/>
+        <source>Daniel Koć - Polish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="254"/>
+        <source>Joseph Artsimovich - Russian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="261"/>
+        <source>Marián Hvolka - Slovak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="268"/>
+        <source>Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="295"/>
+        <source>denver 22</source>
         <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
@@ -118,7 +167,7 @@ p, li { white-space: pre-wrap; }
                Davidson Wang - tradycyjny chiński</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="190"/>
         <source>Translators</source>
         <translation>Tłumacze</translation>
     </message>
@@ -155,21 +204,20 @@ Robert B. - Algorytm prostowania stron.
 Andrey Bergman - Regulacja obciążenia systemu.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="192"/>
+        <location filename="../ui/AboutDialog.ui" line="280"/>
         <source>Documentation</source>
         <translation>Dokumentacja</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
-        <translation>denver 22
+        <translation type="obsolete">denver 22
 phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <location filename="../ui/AboutDialog.ui" line="336"/>
         <source>License</source>
         <translation>Licencja</translation>
     </message>
@@ -1058,13 +1106,30 @@ Aby go ustalić uruchom przetwarzanie wsadowe w sekcji &quot;Wybierz zawartość
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
+        <source>Every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
+        <translation type="unfinished">wszystkie pozostałe strony</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
+        <source>The current page will be included.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
         <source>Selected pages</source>
         <translation>wybrane strony</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="92"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="143"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Użyj klawisza Ctrl z kółkiem myszki/Shift z kółkiem myszki aby wybrać wiele stron.</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
+        <source>Every other selected page</source>
+        <translation type="unfinished">wszystkie pozostałe wybrane strony</translation>
     </message>
 </context>
 <context>
@@ -1095,48 +1160,48 @@ Aby go ustalić uruchom przetwarzanie wsadowe w sekcji &quot;Wybierz zawartość
         <translation>górny</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="149"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="326"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="349"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="372"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="395"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="418"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="444"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="467"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="490"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="513"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="100"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="161"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="338"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="361"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="384"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="407"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="430"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="456"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="479"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="502"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="525"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="121"/>
         <source>Bottom</source>
         <translation>dolny</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="138"/>
         <source>Left</source>
         <translation>lewy</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="173"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="185"/>
         <source>Right</source>
         <translation>prawy</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="232"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="568"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="244"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="580"/>
         <source>Apply To ...</source>
         <translation>Zastosuj do...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="257"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="269"/>
         <source>Alignment</source>
         <translation>Wyrównanie</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
         <translation>dopasuj rozmiar do pozostałych stron</translation>
     </message>
@@ -1584,22 +1649,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="275"/>
         <source>Properties</source>
         <translation>Właściwości</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="265"/>
         <source>Delete</source>
         <translation>Usuń</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Delete confirmation</source>
         <translation>Potwierdzenie usunięcia</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Really delete this zone?</source>
         <translation>Naprawdę usunąć ten obszar?</translation>
     </message>
@@ -1842,6 +1907,14 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>page_layout::ApplyDialog</name>
+    <message>
+        <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>page_layout::Filter</name>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="67"/>
@@ -1888,7 +1961,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>Dziel strony</translation>
     </message>

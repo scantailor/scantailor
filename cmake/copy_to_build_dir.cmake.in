@@ -1,0 +1,13 @@
+SET("COPY_TO_BUILD_DIR_Debug" "@COPY_TO_BUILD_DIR_Debug@")
+SET("COPY_TO_BUILD_DIR_Release" "@COPY_TO_BUILD_DIR_Release@")
+SET("COPY_TO_BUILD_DIR_MinSizeRel" "@COPY_TO_BUILD_DIR_MinSizeRel@")
+SET("COPY_TO_BUILD_DIR_RelWithDebInfo" "@COPY_TO_BUILD_DIR_RelWithDebInfo@")
+
+FOREACH(src_file ${COPY_TO_BUILD_DIR_${CFG}})
+	GET_FILENAME_COMPONENT(dst_file "${src_file}" NAME)
+	
+	IF("${src_file}" IS_NEWER_THAN "${TARGET_DIR}/${dst_file}")
+		MESSAGE(STATUS "Copying ${dst_file} to ${CFG}")
+		CONFIGURE_FILE("${src_file}" "${TARGET_DIR}/${dst_file}" COPYONLY)
+	ENDIF()
+ENDFOREACH()

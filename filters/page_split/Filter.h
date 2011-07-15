@@ -26,6 +26,8 @@
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
 #include <set>
+#include "PageOrderOption.h"
+#include <QCoreApplication>
 
 class PageId;
 class ImageId;
@@ -52,6 +54,7 @@ class Params;
 class Filter : public AbstractFilter
 {
 	DECLARE_NON_COPYABLE(Filter)
+	Q_DECLARE_TR_FUNCTIONS(page_split::Filter)
 public:
 	Filter(IntrusivePtr<ProjectPages> const& page_sequence,
 		PageSelectionAccessor const& page_selection_accessor);
@@ -83,6 +86,10 @@ public:
 		ImageId const& image_id, OrthogonalRotation const& orientation);
 
 	Settings* getSettings() { return m_ptrSettings.get(); };
+	
+	virtual std::vector<PageOrderOption> pageOrderOptions() const;
+	virtual int selectedPageOrder() const;
+	virtual void selectPageOrder(int option);
 private:
 	void writeImageSettings(
 		QDomDocument& doc, QDomElement& filter_el,
@@ -91,6 +98,8 @@ private:
 	IntrusivePtr<ProjectPages> m_ptrPages;
 	IntrusivePtr<Settings> m_ptrSettings;
 	SafeDeletingQObjectPtr<OptionsWidget> m_ptrOptionsWidget;
+	std::vector<PageOrderOption> m_pageOrderOptions;
+	int m_selectedPageOrder;
 };
 
 } // namespace page_split

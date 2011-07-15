@@ -20,7 +20,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor е интерактивен инструмент за пост-обработка на сканирани страници. Той извършва операции като разрязване на страници, корекция на наклона, добавяне/премахване на полета и др. Вие му подавате необработени сканове, а в резултат получавате страници, готови за печат или пакетиране в PDF или DJVU файлове. Сканирането и оптичното разпознаване на символи не влизат в обхвата на този проект.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="101"/>
@@ -38,8 +38,82 @@
         <translation>Йосиф Арцимович
 </translation>
     </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="157"/>
+        <source>U235 - Picture auto-detection algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="164"/>
+        <source>Robert B. - First generation dewarping algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="171"/>
+        <source>Andrey Bergman - System load adjustment.</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <location filename="../ui/AboutDialog.ui" line="178"/>
+        <source>Petr Kovář - Command line interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="205"/>
+        <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="212"/>
+        <source>Petr Kovář - Czech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="219"/>
+        <source>Stefan Birkner - German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <source>Angelo Gemmi - Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="233"/>
+        <source>Masahiro Kitagawa - Japanese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="240"/>
+        <source>Patrick Pascal - French</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="247"/>
+        <source>Daniel Koć - Polish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="254"/>
+        <source>Joseph Artsimovich - Russian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="261"/>
+        <source>Marián Hvolka - Slovak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="268"/>
+        <source>Davidson Wang - Traditional Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="295"/>
+        <source>denver 22</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message utf8="true">
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -48,15 +122,21 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - First generation dewarping algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - System load adjustment.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Command line interface.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;U235 - Алгоритъм за автоматично откриване на картинки.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Robert B. - Алгоритъм за премахване на геометрични изкривявания (първо поколение).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Andrey Bergman - Настройка натоварването на системата.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Petr Kovář - Интерфейс на командния ред.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="166"/>
+        <location filename="../ui/AboutDialog.ui" line="190"/>
         <source>Translators</source>
         <translation>Преводачи</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="173"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
 Petr Kovář - Czech
 Stefan Birkner - German
@@ -67,7 +147,16 @@ Daniel Koć - Polish
 Joseph Artsimovich - Russian
 Marián Hvolka - Slovak
 Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Светослав Сашков, Mandor - Български
+Petr Kovář - Чешки
+Stefan Birkner - Немски
+Angelo Gemmi - Италиански
+Masahiro Kitagawa - Японски
+Patrick Pascal - Френски
+Daniel Koć - Полски
+Йосиф Арцимович - Руски
+Marián Hvolka - Словашки
+Davidson Wang - Традиционен китайски</translation>
     </message>
     <message>
         <source>Svetoslav Sashkov, Mandor - Bulgarian
@@ -78,12 +167,12 @@ Davidson Wang - Traditional Chinese</source>
                Joseph Artsimovich - Russian
                Davidson Wang - Traditional Chinese</source>
         <translation type="obsolete">Светослав Сашков, Mandor - Български
-               Stefan Birkner - German
-               Angelo Gemmi - Italian
+               Stefan Birkner - Немски
+               Angelo Gemmi - Италиански
                Masahiro Kitagawa - Японски
-               Patrick Pascal - French
+               Patrick Pascal - Френски
                Йосиф Арцимович - Руски
-               Davidson Wang - Traditional Chinese</translation>
+               Davidson Wang - Традиционен китайски</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="142"/>
@@ -101,21 +190,20 @@ Andrey Bergman - Настройка натоварването на систем
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="192"/>
+        <location filename="../ui/AboutDialog.ui" line="280"/>
         <source>Documentation</source>
         <translation>Документация</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="199"/>
         <source>denver 22
 phaedrus
 Taxman</source>
-        <translation>denver 22
+        <translation type="obsolete">denver 22
 phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <location filename="../ui/AboutDialog.ui" line="336"/>
         <source>License</source>
         <translation>Лиценз</translation>
     </message>
@@ -146,32 +234,32 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="20"/>
         <source>Apply to</source>
-        <translation type="unfinished">Приложи към</translation>
+        <translation>Приложи към</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished">Само тази страница (вече е приложено)</translation>
+        <translation>Само тази страница (вече е приложено)</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation type="unfinished">Всички страници</translation>
+        <translation>Всички страници</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">Тази и следващите страници</translation>
+        <translation>Тази и следващите страници</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="59"/>
         <source>Selected pages</source>
-        <translation type="unfinished">Избраните страници</translation>
+        <translation>Избраните страници</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
+        <translation>Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
     </message>
 </context>
 <context>
@@ -199,7 +287,7 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
         <source>Apply To ...</source>
-        <translation type="unfinished">Приложи към...</translation>
+        <translation>Приложи към...</translation>
     </message>
 </context>
 <context>
@@ -357,17 +445,17 @@ Taxman</translation>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
-        <translation type="unfinished"></translation>
+        <translation>Цъкнете, за да създадете нова контролна точка.</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
-        <translation type="unfinished"></translation>
+        <translation>Тази точка може да бъде влачена.</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
-        <translation type="unfinished"></translation>
+        <translation>Преместете тази точка или я изтрийте чрез клавишите Del или D.</translation>
     </message>
 </context>
 <context>
@@ -717,7 +805,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Всяка втора страница</translation>
+        <translation>Всяка втора страница спрямо текущата</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="101"/>
@@ -818,57 +906,57 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
         <source>Apply Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Прилагане режим на корекция</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
         <source>Mode</source>
-        <translation type="unfinished">Режим</translation>
+        <translation>Режим</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Без корекция</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
         <source>Auto (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматично (експериментален)</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
         <source>Manual</source>
-        <translation type="unfinished">Ръчно</translation>
+        <translation>Ръчно</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
         <source>Scope</source>
-        <translation type="unfinished">Обхват</translation>
+        <translation>Обхват</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
         <source>This page only</source>
-        <translation type="unfinished">Само тази страница</translation>
+        <translation>Само тази страница</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
         <source>All pages</source>
-        <translation type="unfinished">Всички страници</translation>
+        <translation>Всички страници</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">Тази и следващите страници</translation>
+        <translation>Тази и следващите страници</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
         <source>Selected pages</source>
-        <translation type="unfinished">Избраните страници</translation>
+        <translation>Избраните страници</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
+        <translation>Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
     </message>
 </context>
 <context>
@@ -950,12 +1038,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Корекция на изкривявания</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
         <source>Depth perception</source>
-        <translation type="unfinished"></translation>
+        <translation>Дълбочина</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
@@ -1039,13 +1127,30 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
+        <source>Every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
+        <translation type="unfinished">Всяка втора страница спрямо текущата</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
+        <source>The current page will be included.</source>
+        <translation type="unfinished">Текущата страница ще бъде включена.</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
         <source>Selected pages</source>
         <translation>Избраните страници</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="92"/>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="143"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
+        <source>Every other selected page</source>
+        <translation type="unfinished">Всяка втора избрана страница</translation>
     </message>
 </context>
 <context>
@@ -1076,48 +1181,48 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Отгоре</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="94"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="149"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="326"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="349"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="372"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="395"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="418"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="444"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="467"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="490"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="513"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="100"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="161"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="338"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="361"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="384"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="407"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="430"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="456"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="479"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="502"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="525"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="115"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="121"/>
         <source>Bottom</source>
         <translation>Отдолу</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="132"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="138"/>
         <source>Left</source>
         <translation>Отляво</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="173"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="185"/>
         <source>Right</source>
         <translation>Отдясно</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="232"/>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="568"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="244"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="580"/>
         <source>Apply To ...</source>
         <translation>Приложи към...</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="257"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="269"/>
         <source>Alignment</source>
         <translation>Подравняване</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="281"/>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
         <translation>Подравняване с другите страници</translation>
     </message>
@@ -1455,54 +1560,54 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="17"/>
         <source>Select Content</source>
-        <translation type="unfinished">Избор на съдържание</translation>
+        <translation>Избор на съдържание</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
         <source>Apply to</source>
-        <translation type="unfinished">Приложи към</translation>
+        <translation>Приложи към</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished">Само тази страница (вече е приложено)</translation>
+        <translation>Само тази страница (вече е приложено)</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation type="unfinished">Всички страници</translation>
+        <translation>Всички страници</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation type="unfinished">Тази и следващите страници</translation>
+        <translation>Тази и следващите страници</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Всяка втора страница</translation>
+        <translation>Всяка втора страница спрямо текущата</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="206"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">Текущата страница ще бъде включена.</translation>
+        <translation>Текущата страница ще бъде включена.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="125"/>
         <source>Selected pages</source>
-        <translation type="unfinished">Избраните страници</translation>
+        <translation>Избраните страници</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation type="unfinished">Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
+        <translation>Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Всяка втора избрана страница</translation>
+        <translation>Всяка втора избрана страница</translation>
     </message>
 </context>
 <context>
@@ -1530,12 +1635,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
         <source>Scope</source>
-        <translation type="unfinished">Обхват</translation>
+        <translation>Обхват</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
         <source>Apply to ...</source>
-        <translation type="unfinished">Приложи към...</translation>
+        <translation>Приложи към...</translation>
     </message>
 </context>
 <context>
@@ -1566,7 +1671,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../StageListView.cpp" line="130"/>
         <source>Launch batch processing</source>
-        <translation>Пускане на масовата обработка</translation>
+        <translation>Стартиране на пакетна обработка</translation>
     </message>
 </context>
 <context>
@@ -1595,7 +1700,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation>Максимално</translation>
+        <translation>Нормално</translation>
     </message>
 </context>
 <context>
@@ -1609,22 +1714,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ZoneContextMenuInteraction</name>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="260"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="275"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="250"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="265"/>
         <source>Delete</source>
         <translation>Изтриване</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Delete confirmation</source>
         <translation>Потвърждение за изтриване</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="234"/>
+        <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Really delete this zone?</source>
         <translation>Наистина ли да бъде изтрита тази зона?</translation>
     </message>
@@ -1652,7 +1757,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="45"/>
         <source>Drag the vertex.</source>
-        <translation>Влачете върхът.</translation>
+        <translation>Влачете върха.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="46"/>
@@ -1728,7 +1833,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
         <source>Apply Deskew</source>
-        <translation type="unfinished"></translation>
+        <translation>Приложи корекции</translation>
     </message>
 </context>
 <context>
@@ -1740,7 +1845,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more that one group is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не може да се изпълни: избрана е повече от една група.</translation>
     </message>
 </context>
 <context>
@@ -1822,22 +1927,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
-        <translation type="unfinished"></translation>
+        <translation>Прилагане на дълбочина</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Изключено</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
         <source>Auto</source>
-        <translation type="unfinished">Автоматично</translation>
+        <translation>Автоматично</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="666"/>
         <source>Manual</source>
-        <translation type="unfinished">Ръчно</translation>
+        <translation>Ръчно</translation>
     </message>
 </context>
 <context>
@@ -1870,12 +1975,20 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Корекция изкривявания</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="579"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
+    </message>
+</context>
+<context>
+    <name>page_layout::ApplyDialog</name>
+    <message>
+        <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
+        <source>Can&apos;t do: more that one group is selected.</source>
+        <translation type="unfinished">Не може да се изпълни: избрана е повече от една група.</translation>
     </message>
 </context>
 <context>
@@ -1929,7 +2042,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_split::Filter</name>
     <message>
-        <location filename="../filters/page_split/Filter.cpp" line="67"/>
+        <location filename="../filters/page_split/Filter.cpp" line="65"/>
+        <source>Natural order</source>
+        <translation type="unfinished">Естествено подреждане</translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="66"/>
+        <source>Order by split type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
         <translation>Разделяне на страници</translation>
     </message>
@@ -1979,7 +2102,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Не може да се изпълни: избрана е повече от една група.</translation>
+        <translation>Не може да се изпълни: избрана е повече от една група.</translation>
     </message>
 </context>
 <context>
