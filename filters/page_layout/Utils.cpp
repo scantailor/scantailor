@@ -141,11 +141,11 @@ Utils::calcSoftMarginsMM(
 	double aggTopBorder = 0.0;
 	double aggBottomBorder = 0.0;
 
-	if (delta_width > 0.0) {
+	if (delta_width > 1.0) {
 		aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * leftBorder;
 		aggRightBorder = delta_width - aggLeftBorder;
 	}
-	if (delta_height > 0.0) {
+	if (delta_height > 1.0) {
 		aggTopBorder = (delta_height / (topBorder + bottomBorder)) * topBorder;
 		aggBottomBorder = delta_height - aggTopBorder;
 	}
