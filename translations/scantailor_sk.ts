@@ -1721,7 +1721,7 @@ Vyraďte ich z projektu.</translation>
     <name>fix_orientation::ApplyDialog</name>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Nemožno vykonať: je vybraná viac než jedna skupina.</translation>
     </message>
 </context>
@@ -1864,7 +1864,7 @@ Vyraďte ich z projektu.</translation>
     <name>page_layout::ApplyDialog</name>
     <message>
         <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation type="unfinished">Nemožno vykonať: je vybraná viac než jedna skupina.</translation>
     </message>
 </context>
@@ -1965,7 +1965,7 @@ Vyraďte ich z projektu.</translation>
 <context>
     <name>select_content::ApplyDialog</name>
     <message>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation type="obsolete">Nemožno vykonať: je vybraná viac než jedna skupina.</translation>
     </message>
     <message>
