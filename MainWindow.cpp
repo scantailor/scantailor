@@ -116,6 +116,7 @@
 #include <QSortFilterProxyModel>
 #include <QFileSystemModel>
 #include <QFileInfo>
+#include <QResource>
 #include <Qt>
 #include <QDebug>
 #include <algorithm>
@@ -1420,6 +1421,10 @@ MainWindow::showAboutDialog()
 	QDialog* dialog = new QDialog(this);
 	ui.setupUi(dialog);
 	ui.version->setText(QString::fromUtf8(VERSION));
+
+	QResource license(":/GPLv3.html");
+	ui.licenseViewer->setHtml(QString::fromUtf8((char const*)license.data(), license.size()));
+
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->show();

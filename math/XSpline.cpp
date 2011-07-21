@@ -251,6 +251,12 @@ XSpline::maybeAddMoreSamples(
 	double prev_t, QPointF const& prev_pt,
 	double next_t, QPointF const& next_pt) const
 {
+	double const prev_next_sqdist = Vec2d(next_pt - prev_pt).squaredNorm();
+	if (prev_next_sqdist < 1e-6) {
+		// Too close. Projecting anything on such a small line segment is dangerous.
+		return;
+	}
+
 	SampleFlags flags = DEFAULT_SAMPLE;
 	double mid_t = 0.5 * (prev_t + next_t);
 	double const nearby_junction_t = floor(mid_t * num_segments + 0.5) * r_num_segments;
@@ -269,10 +275,8 @@ XSpline::maybeAddMoreSamples(
 			ToLineProjector(QLineF(prev_pt, next_pt)).projectionPoint(mid_pt)
 		);
 
-		QPointF const v1(mid_pt - projection);
-		if (v1.x() * v1.x() + v1.y() * v1.y() <= max_sqdist_to_spline) {
-			QPointF const v2(next_pt - prev_pt);
-			if (v2.x() * v2.x() + v2.y() * v2.y() <= max_sqdist_between_samples) {
+		if (prev_next_sqdist <= max_sqdist_between_samples) {
+			if (Vec2d(mid_pt - projection).squaredNorm() <= max_sqdist_to_spline) {
 				return;
 			}
 		}

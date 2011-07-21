@@ -20,6 +20,7 @@
 #include "ApplyDialog.h.moc"
 #include "PageSelectionAccessor.h"
 #include <QButtonGroup>
+#include <assert.h>
 
 namespace page_layout
 {
@@ -29,6 +30,7 @@ ApplyDialog::ApplyDialog(QWidget* parent, PageId const& cur_page,
 :	QDialog(parent),
 	m_pages(page_selection_accessor.allPages()),
 	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_selectedRanges(page_selection_accessor.selectedRanges()),
 	m_curPage(cur_page),
 	m_pScopeGroup(new QButtonGroup(this))
 {
@@ -37,8 +39,16 @@ ApplyDialog::ApplyDialog(QWidget* parent, PageId const& cur_page,
 	m_pScopeGroup->addButton(allPagesRB);
 	m_pScopeGroup->addButton(thisPageAndFollowersRB);
 	m_pScopeGroup->addButton(selectedPagesRB);
+	m_pScopeGroup->addButton(everyOtherRB);
+	m_pScopeGroup->addButton(everyOtherSelectedRB);
+
 	if (m_selectedPages.size() <= 1) {
 		selectedPagesWidget->setEnabled(false);
+		everyOtherSelectedWidget->setEnabled(false);
+		everyOtherSelectedHint->setText(selectedPagesHint->text());
+	} else if (m_selectedRanges.size() > 1) {
+		everyOtherSelectedWidget->setEnabled(false);
+		everyOtherSelectedHint->setText(tr("Can't do: more than one group is selected."));
 	}
 	
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
@@ -62,6 +72,12 @@ ApplyDialog::onSubmit()
 		emit accepted(m_selectedPages);
 		accept();
 		return;
+	} else if (everyOtherRB->isChecked()) {
+		m_pages.selectEveryOther(m_curPage).swap(pages);
+	} else if (everyOtherSelectedRB->isChecked()) {
+		assert(m_selectedRanges.size() == 1);
+		PageRange const& range = m_selectedRanges.front();
+		range.selectEveryOther(m_curPage).swap(pages);
 	}
 	
 	emit accepted(pages);
