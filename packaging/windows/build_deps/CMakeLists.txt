@@ -295,7 +295,7 @@ IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
 ENDIF()
 
 ADD_CUSTOM_TARGET(
-	boost "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
+	boost ALL "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
 	threading=multi link=static variant=debug,release ${boost_64bit_flags}
 	define=_BIND_TO_CURRENT_VCLIBS_VERSION=1
 	stage
