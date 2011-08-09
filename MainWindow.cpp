@@ -1683,7 +1683,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 			QFileInfo(existing.filePath()).absolutePath()
 		)
 	);
-	dialog->setFileMode(QFileDialog::ExistingFile);
+	dialog->setFileMode(QFileDialog::ExistingFiles);
 	dialog->setProxyModel(new ProxyModel(*m_ptrPages));
 	dialog->setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));
 	
@@ -1692,50 +1692,52 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	}
 	
 	QStringList const files(dialog->selectedFiles());
-	if (files.size() != 1) {
+	if (files.size() < 1) {
 		assert(files.empty());
 		return;
 	}
 	
 	using namespace boost::lambda;
 	
-	QString const file(files.front());
-	ImageId const image_id(file, 0);
-	
-	std::vector<ImageMetadata> metadata_list;
-	ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
-		file, bind(&std::vector<ImageMetadata>::push_back, var(metadata_list), _1)
-	);
-	if (status != ImageMetadataLoader::LOADED) {
-		QMessageBox::warning(
-			0, tr("Error"),
-			tr("Error opening the image file.")
+	// dialog->selectedFiles() returns file list in reverse order.
+	for (int i=files.count()-1; i>=0 ;i--) {
+		ImageId const image_id(files.at(i), 0);
+		
+		std::vector<ImageMetadata> metadata_list;
+		ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
+			files.at(i), bind(&std::vector<ImageMetadata>::push_back, var(metadata_list), _1)
 		);
-		return;
-	}
-	
-	ImageMetadata& metadata = metadata_list.front();
-	
-	if (!metadata.isDpiOK()) {
-		std::auto_ptr<FixDpiSinglePageDialog> dpi_dialog(
-			new FixDpiSinglePageDialog(
-				image_id, metadata, this
-			)
-		);
-		if (dpi_dialog->exec() != QDialog::Accepted) {
+		if (status != ImageMetadataLoader::LOADED) {
+			QMessageBox::warning(
+				0, tr("Error"),
+				tr("Error opening the image file.")
+			);
 			return;
 		}
-		metadata.setDpi(dpi_dialog->dpi());
+		
+		ImageMetadata& metadata = metadata_list.front();
+		
+		if (!metadata.isDpiOK()) {
+			std::auto_ptr<FixDpiSinglePageDialog> dpi_dialog(
+				new FixDpiSinglePageDialog(
+					image_id, metadata, this
+				)
+			);
+			if (dpi_dialog->exec() != QDialog::Accepted) {
+				return;
+			}
+			metadata.setDpi(dpi_dialog->dpi());
+		}
+		
+		// This has to be done after metadata.setDpi() call above.
+		int const num_sub_pages = ProjectPages::adviseNumberOfLogicalPages(
+			metadata, OrthogonalRotation()
+		);
+		ImageInfo const image_info(
+			image_id, metadata, num_sub_pages, false, false
+		);
+		insertImage(image_info, before_or_after, existing);
 	}
-	
-	// This has to be done after metadata.setDpi() call above.
-	int const num_sub_pages = ProjectPages::adviseNumberOfLogicalPages(
-		metadata, OrthogonalRotation()
-	);
-	ImageInfo const image_info(
-		image_id, metadata, num_sub_pages, false, false
-	);
-	insertImage(image_info, before_or_after, existing);
 }
 
 void
