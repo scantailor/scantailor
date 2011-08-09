@@ -245,7 +245,7 @@ ImageView::virtualCutterLine(int line_idx) const
 QRectF
 ImageView::reducedWidgetArea() const
 {
-	double const delta = 0.5 * m_handlePixmap.width();
+	qreal const delta = 0.5 * m_handlePixmap.width();
 	return getOccupiedWidgetRect().adjusted(0.0, delta, 0.0, -delta);
 }
 
@@ -259,7 +259,7 @@ ImageView::customInscribedCutterLine(QLineF const& line, QRectF const& rect)
 {
 	if (line.p1().y() == line.p2().y()) {
 		// This should not happen, but if it does, we need to handle it gracefully.
-		double middle_x = 0.5 * (line.p1().x() + line.p2().x());
+		qreal middle_x = 0.5 * (line.p1().x() + line.p2().x());
 		middle_x = qBound(rect.left(), middle_x, rect.right());
 		return QLineF(QPointF(middle_x, rect.top()), QPointF(middle_x, rect.bottom()));
 	}

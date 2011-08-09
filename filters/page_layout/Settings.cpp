@@ -638,7 +638,7 @@ Settings::Impl::getAggregateHardSizeMM(
 				width = hard_size_mm.width();
 			} else {
 				width = std::max(
-					hard_size_mm.width(), it->influenceHardWidthMM()
+					hard_size_mm.width(), qreal(it->influenceHardWidthMM())
 				);
 			}
 		}
@@ -656,7 +656,7 @@ Settings::Impl::getAggregateHardSizeMM(
 				height = hard_size_mm.height();
 			} else {
 				height = std::max(
-					hard_size_mm.height(), it->influenceHardHeightMM()
+					hard_size_mm.height(), qreal(it->influenceHardHeightMM())
 				);
 			}
 		}
