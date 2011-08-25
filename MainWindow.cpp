@@ -57,6 +57,8 @@
 #include "OrthogonalRotation.h"
 #include "FixDpiSinglePageDialog.h"
 #include "SettingsDialog.h"
+#include "OutOfMemoryHandler.h"
+#include "OutOfMemoryDialog.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -128,6 +130,7 @@ MainWindow::MainWindow()
 	m_ptrStages(new StageSequence(m_ptrPages, PageSelectionAccessor(this))),
 	m_ptrWorkerThread(new WorkerThread),
 	m_ptrInteractiveQueue(new ProcessingTaskQueue(ProcessingTaskQueue::RANDOM_ORDER)),
+	m_ptrOutOfMemoryDialog(new OutOfMemoryDialog),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
@@ -166,7 +169,10 @@ MainWindow::MainWindow()
 	addAction(actionPrevPage);
 	addAction(actionPrevPageQ);
 	addAction(actionNextPageW);
-	
+
+	// Should be enough to save a project.
+	OutOfMemoryHandler::instance().allocateEmergencyMemory(3*1024*1024);
+
 	connect(actionFirstPage, SIGNAL(triggered(bool)), SLOT(goFirstPage()));
 	connect(actionLastPage, SIGNAL(triggered(bool)), SLOT(goLastPage()));
 	connect(actionPrevPage, SIGNAL(triggered(bool)), SLOT(goPrevPage()));
@@ -174,6 +180,10 @@ MainWindow::MainWindow()
 	connect(actionPrevPageQ, SIGNAL(triggered(bool)), this, SLOT(goPrevPage()));
 	connect(actionNextPageW, SIGNAL(triggered(bool)), this, SLOT(goNextPage()));
 	connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(showAboutDialog()));
+	connect(
+		&OutOfMemoryHandler::instance(),
+		SIGNAL(outOfMemory()), SLOT(handleOutOfMemorySituation())
+	);
 	
 	connect(
 		filterList->selectionModel(),
@@ -1201,6 +1211,8 @@ MainWindow::saveProjectTriggered()
 void
 MainWindow::saveProjectAsTriggered()
 {
+	// XXX: this function is duplicated in OutOfMemoryDialog.
+
 	QString project_dir;
 	if (!m_projectFile.isEmpty()) {
 		project_dir = QFileInfo(m_projectFile).absolutePath();
@@ -1369,6 +1381,24 @@ MainWindow::showAboutDialog()
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->show();
+}
+
+/**
+ * This function is called asynchronously, always from the main thread.
+ */
+void
+MainWindow::handleOutOfMemorySituation()
+{
+	deleteLater();
+
+	m_ptrOutOfMemoryDialog->setParams(
+		m_projectFile, m_ptrStages, m_ptrPages, m_selectedPage, m_outFileNameGen
+	);
+
+	closeProjectWithoutSaving();
+
+	m_ptrOutOfMemoryDialog->setAttribute(Qt::WA_DeleteOnClose);
+	m_ptrOutOfMemoryDialog.release()->show();
 }
 
 /**

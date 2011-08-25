@@ -108,7 +108,7 @@ FilterResultPtr
 Task::process(TaskStatus const& status, FilterData const& data)
 {
 	status.throwIfCancelled();
-	
+
 	Dependencies const deps(data.xform().preCropArea(), data.xform().preRotation());
 	
 	OptionsWidget::UiData ui_data;

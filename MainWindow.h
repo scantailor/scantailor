@@ -63,6 +63,7 @@ class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
 class TabbedDebugImages;
 class ProcessingTaskQueue;
+class OutOfMemoryDialog;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -155,6 +156,8 @@ private slots:
 	void openSettingsDialog();
 
 	void showAboutDialog();
+
+	void handleOutOfMemorySituation();
 private:
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
@@ -272,6 +275,7 @@ private:
 	SelectedPage m_selectedPage;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;
+	std::auto_ptr<OutOfMemoryDialog> m_ptrOutOfMemoryDialog;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
 	int m_ignorePageOrderingChanges;

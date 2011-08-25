@@ -441,6 +441,7 @@ SET(
 	SkinnedButton.cpp SkinnedButton.h
 	BubbleAnimation.cpp BubbleAnimation.h
 	ProcessingIndicationWidget.cpp ProcessingIndicationWidget.h
+	NonOwningWidget.cpp NonOwningWidget.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
 	ImageInfo.cpp ImageInfo.h
@@ -452,6 +453,8 @@ SET(
 	FixDpiSinglePageDialog.cpp FixDpiSinglePageDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
 	ProjectOpeningContext.cpp ProjectOpeningContext.h
+	OutOfMemoryHandler.cpp OutOfMemoryHandler.h
+	OutOfMemoryDialog.cpp OutOfMemoryDialog.h
 	MainWindow.cpp MainWindow.h
 	ConsoleBatch.cpp ConsoleBatch.h
 	CommandLine.cpp CommandLine.h
