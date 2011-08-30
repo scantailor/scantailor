@@ -52,12 +52,12 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Andrey Bergman - System load adjustment.</source>
-        <translation>Andrey Bergman - Регулировка заргузки системы.</translation>
+        <translation>Andrey Bergman - Регулировка загрузки системы.</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>Petr Kovář - Command line interface.</source>
-        <translation>Petr Kovář - Версия для коммандной строки.</translation>
+        <translation>Petr Kovář - Версия для командной строки.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
@@ -887,7 +887,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <source>Scope</source>
-        <translation type="obsolete">Примененить</translation>
+        <translation type="obsolete">Применить</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
@@ -1468,7 +1468,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation>Дируктории ввода и вывода не могут совпадать.</translation>
+        <translation>Директории ввода и вывода не могут совпадать.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="554"/>
@@ -1879,7 +1879,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../zones/ZoneVertexDragInteraction.cpp" line="162"/>
         <source>Move the vertex to one of its neighbors to merge them.</source>
-        <translation>Придвиньте вершину к одной из соседних вершин, чтобы объеденить их.</translation>
+        <translation>Придвиньте вершину к одной из соседних вершин, чтобы объединить их.</translation>
     </message>
 </context>
 <context>
@@ -1931,7 +1931,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Невозможно: выбрано несколько групп страниц.</translation>
     </message>
 </context>
@@ -2101,7 +2101,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Move the vertex to one of its neighbors to merge them.</source>
-        <translation type="obsolete">Придвиньте вершину к одной из соседних вершин, чтобы объеденить их.</translation>
+        <translation type="obsolete">Придвиньте вершину к одной из соседних вершин, чтобы объединить их.</translation>
     </message>
 </context>
 <context>
@@ -2146,7 +2146,7 @@ p, li { white-space: pre-wrap; }
     <name>page_layout::ApplyDialog</name>
     <message>
         <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>Невозможно: выбрано несколько групп страниц.</translation>
     </message>
 </context>

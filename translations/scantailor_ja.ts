@@ -40,77 +40,77 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="157"/>
         <source>U235 - Picture auto-detection algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>U235 - 画像自動選択アルゴリズム</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="164"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Robert B. - 第1世代の歪み補正アルゴリズム</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Andrey Bergman - System load adjustment.</source>
-        <translation type="unfinished"></translation>
+        <translation>Andrey Bergman - システム負荷調整</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>Petr Kovář - Command line interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>Petr Kovář - コマンドラインインタフェース</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
-        <translation type="unfinished"></translation>
+        <translation>Svetoslav Sashkov, Mandor - ブルガリア語</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="212"/>
         <source>Petr Kovář - Czech</source>
-        <translation type="unfinished"></translation>
+        <translation>Petr Kovář - チェコ語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="219"/>
         <source>Stefan Birkner - German</source>
-        <translation type="unfinished"></translation>
+        <translation>Stefan Birkner - ドイツ語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>Angelo Gemmi - Italian</source>
-        <translation type="unfinished"></translation>
+        <translation>Angelo Gemmi - イタリア語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="233"/>
         <source>Masahiro Kitagawa - Japanese</source>
-        <translation type="unfinished"></translation>
+        <translation>北川雅裕 - 日本語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="240"/>
         <source>Patrick Pascal - French</source>
-        <translation type="unfinished"></translation>
+        <translation>Patrick Pascal - フランス語</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="247"/>
         <source>Daniel Koć - Polish</source>
-        <translation type="unfinished"></translation>
+        <translation>Daniel Koć - ポーランド語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="254"/>
         <source>Joseph Artsimovich - Russian</source>
-        <translation type="unfinished"></translation>
+        <translation>Joseph Artsimovich - ロシア語</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="261"/>
         <source>Marián Hvolka - Slovak</source>
-        <translation type="unfinished"></translation>
+        <translation>Marián Hvolka - スロバキア語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation>Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="295"/>
         <source>denver 22</source>
-        <translation type="unfinished"></translation>
+        <translation>denver 22</translation>
     </message>
     <message utf8="true">
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1131,13 +1131,13 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">1ページおき</translation>
+        <translation>1ページおき</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">現在のページは含まれます。</translation>
+        <translation>現在のページは含まれます。</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
@@ -1152,7 +1152,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">選択されたページで1ページおき</translation>
+        <translation>選択されたページで1ページおき</translation>
     </message>
 </context>
 <context>
@@ -1844,7 +1844,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
+        <source>Can&apos;t do: more than one group is selected.</source>
         <translation>実行できません：複数のグループが選択されています。</translation>
     </message>
 </context>
@@ -1994,8 +1994,8 @@ p, li { white-space: pre-wrap; }
     <name>page_layout::ApplyDialog</name>
     <message>
         <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
-        <source>Can&apos;t do: more that one group is selected.</source>
-        <translation type="unfinished">実行できません：複数のグループが選択されています。</translation>
+        <source>Can&apos;t do: more than one group is selected.</source>
+        <translation>実行できません：複数のグループが選択されています。</translation>
     </message>
 </context>
 <context>
@@ -2051,12 +2051,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="65"/>
         <source>Natural order</source>
-        <translation type="unfinished">通常の順序</translation>
+        <translation>通常の順序</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split type</source>
-        <translation type="unfinished"></translation>
+        <translation>ページ分割の種類順</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
