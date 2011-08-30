@@ -157,8 +157,8 @@ CommandLine::printHelp()
 	std::cout << "ScanTailor usage: " << "\n";
 	std::cout << "\t1) scantailor" << "\n";
 	std::cout << "\t2) scantailor <project_file>" << "\n";
-	std::cout << "\t3) scantailor-batch [options] <image, image, ...> <output_directory>" << "\n";
-	std::cout << "\t4) scantailor-batch [options] <project_file> [output_directory]" << "\n";
+	std::cout << "\t3) scantailor-cli [options] <image, image, ...> <output_directory>" << "\n";
+	std::cout << "\t4) scantailor-cli [options] <project_file> [output_directory]" << "\n";
 	std::cout << "\n";
 	std::cout << "1)" << "\n";
 	std::cout << "\tstart ScanTailor's GUI interface" << "\n";

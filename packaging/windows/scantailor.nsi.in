@@ -1,11 +1,8 @@
-# SCANTAILOR_EXE and CRASHREPORTER_EXE are passed as parameters.
 !define VERSION "@VERSION@"
 !define VERSION_QUAD "@VERSION_QUAD@"
 !define LICENSE_FILE "@LICENSE_FILE@"
-!define MINGWM10_DLL "@MINGWM10_DLL@"
-!define CRT_REDIST_PATH "@CRT_REDIST_PATH@"
-!define CRT_REDIST_DIR "@CRT_REDIST_DIR@"
 !define INSTALLER_FILENAME "@INSTALLER_FILENAME@"
+!define STAGING_DIR "@STAGING_DIR@"
 !define UNINST_REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scan Tailor"
 
 # The window identifier of the main Scan Tailor window.
@@ -58,19 +55,7 @@ SetCompressor /SOLID /FINAL lzma
 
 Section
   SetOutPath $INSTDIR
-  File "${SCANTAILOR_EXE}"
-  File "${SCANTAILOR_BATCH_EXE}"
-  !if "${MINGWM10_DLL}" != ""
-    File "${MINGWM10_DLL}"
-  !endif
-  !if "${CRASHREPORTER_EXE}" != ""
-    File "${CRASHREPORTER_EXE}"
-  !endif
-  !if "${CRT_REDIST_PATH}" != ""
-	File /r "${CRT_REDIST_PATH}"
-  !endif
-  SetOutPath "$INSTDIR\translations"
-  File *.qm
+  File /r "${STAGING_DIR}\*"
   
   WriteUninstaller $INSTDIR\Uninstaller.exe
   
@@ -105,16 +90,28 @@ Section "Uninstall"
   
   # Remove program files.
   Delete "$INSTDIR\scantailor.exe"
+  Delete "$INSTDIR\scantailor-cli.exe"
   Delete "$INSTDIR\mingwm10.dll"
+  Delete "$INSTDIR\libgcc_*.dll"
   Delete "$INSTDIR\CrashReporter.exe"
+  Delete "$INSTDIR\Qt*.dll"
+  Delete "$INSTDIR\libz.dll"
+  Delete "$INSTDIR\zdll.dll"
+  Delete "$INSTDIR\libpng.dll"
+  Delete "$INSTDIR\libjpeg.dll"
+  Delete "$INSTDIR\libtiff.dll"
   Delete "$INSTDIR\Uninstaller.exe"
-  !if "${CRT_REDIST_DIR}" != ""
-	RMDir /r "$INSTDIR\${CRT_REDIST_DIR}"
-  !endif
+  RMDir /r "$INSTDIR\Microsoft.VC80.CRT"
+  RMDir /r "$INSTDIR\Microsoft.VC90.CRT"
+  RMDir /r "$INSTDIR\Microsoft.VC100.CRT"
   
   # Remove translations.
   Delete "$INSTDIR\translations\*.qm"
   RMDir "$INSTDIR\translations"
+  
+  # Remove imageformats.
+  Delete "$INSTDIR\imageformats\*.dll"
+  RMDir "$INSTDIR\imageformats"
   
   # Remove the installation directory.
   RMDir "$INSTDIR"

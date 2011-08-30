@@ -50,7 +50,7 @@ ApplyDialog::ApplyDialog(
 		everyOtherSelectedHint->setText(selectedPagesHint->text());
 	} else if (m_selectedRanges.size() > 1) {
 		everyOtherSelectedWidget->setEnabled(false);
-		everyOtherSelectedHint->setText(tr("Can't do: more that one group is selected."));
+		everyOtherSelectedHint->setText(tr("Can't do: more than one group is selected."));
 	}
 	
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
