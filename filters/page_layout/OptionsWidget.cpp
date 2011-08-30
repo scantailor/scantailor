@@ -318,6 +318,7 @@ OptionsWidget::alignmentModeChanged(int idx)
 			break;
 	}
 
+	m_ptrSettings->updateContentRect();
 	enableDisableAlignmentButtons();
 	emit alignmentChanged(m_alignment);
 }
