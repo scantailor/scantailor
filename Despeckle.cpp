@@ -456,12 +456,14 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 				this_sqdist_line[x] = sqdist_right;
 				++right_dist.vec.x;
 				dist_line[x] = right_dist;
+				assert(cmap_line[x] == 0 || cmap_line[x + 1] != 0);
 				cmap_line[x] = cmap_line[x + 1];
 			}
 			if (sqdist_bottom < this_sqdist_line[x]) {
 				this_sqdist_line[x] = sqdist_bottom;
 				++bottom_dist.vec.y;
 				dist_line[x] = bottom_dist;
+				assert(cmap_line[x] == 0 || cmap_line[x + width] != 0);
 				cmap_line[x] = cmap_line[x + width];
 			}
 		}
@@ -477,6 +479,7 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist)
 				this_sqdist_line[x] = sqdist_left;
 				--left_dist.vec.x;
 				dist_line[x] = left_dist;
+				assert(cmap_line[x] == 0 || cmap_line[x - 1] != 0);
 				cmap_line[x] = cmap_line[x - 1];
 			}
 		}
@@ -496,6 +499,14 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 	
 	Distance* dist_line = &dist[0];
 	uint32_t* cmap_line = cmap.paddedData();
+
+	dist_line[0].reset(0);
+	prev_sqdist_line[0] = dist_line[0].sqdist();
+	for (int x = 1; x < width; ++x) {
+		dist_line[x].vec.x = dist_line[x - 1].vec.x - 1;
+		prev_sqdist_line[x] = prev_sqdist_line[x - 1]
+				- (int(dist_line[x - 1].vec.x) << 1) + 1;
+	}
 	
 	// Top to bottom scan.
 	for (int y = 1; y < height - 1; ++y) {
@@ -522,6 +533,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 					this_sqdist_line[x] = sqdist_left;
 					--left_dist.vec.x;
 					dist_line[x] = left_dist;
+					assert(cmap_line[x] == 0 || cmap_line[x - 1] != 0);
 					cmap_line[x] = cmap_line[x - 1];
 				}
 			}
@@ -535,6 +547,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 					this_sqdist_line[x] = sqdist_top;
 					--top_dist.vec.y;
 					dist_line[x] = top_dist;
+					assert(cmap_line[x] == 0 || cmap_line[x - width] != 0);
 					cmap_line[x] = cmap_line[x - width];
 				}
 			}
@@ -555,6 +568,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 					this_sqdist_line[x] = sqdist_right;
 					++right_dist.vec.x;
 					dist_line[x] = right_dist;
+					assert(cmap_line[x] == 0 || cmap_line[x + 1] != 0);
 					cmap_line[x] = cmap_line[x + 1];
 				}
 			}
@@ -588,6 +602,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 					this_sqdist_line[x] = sqdist_right;
 					++right_dist.vec.x;
 					dist_line[x] = right_dist;
+					assert(cmap_line[x] == 0 || cmap_line[x + 1] != 0);
 					cmap_line[x] = cmap_line[x + 1];
 				}
 			}
@@ -601,6 +616,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 					this_sqdist_line[x] = sqdist_bottom;
 					++bottom_dist.vec.y;
 					dist_line[x] = bottom_dist;
+					assert(cmap_line[x] == 0 || cmap_line[x + width] != 0);
 					cmap_line[x] = cmap_line[x + width];
 				}
 			}
@@ -621,6 +637,7 @@ void voronoiSpecial(ConnectivityMap& cmap, std::vector<Distance>& dist, Distance
 					this_sqdist_line[x] = sqdist_left;
 					--left_dist.vec.x;
 					dist_line[x] = left_dist;
+					assert(cmap_line[x] == 0 || cmap_line[x - 1] != 0);
 					cmap_line[x] = cmap_line[x - 1];
 				}
 			}

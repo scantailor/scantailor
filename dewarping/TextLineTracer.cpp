@@ -133,8 +133,13 @@ TextLineTracer::trace(
 		dbg->add(visualizePolylines(downscaled, polylines), "filtered1");
 	}
 
-	TextLineRefiner refiner(downscaled, Dpi(200, 200), dbg);
-	refiner.refine(polylines, /*iterations=*/50, dbg, &downscaled.toQImage());
+	Vec2f unit_down_vector(calcAvgUnitVector(vert_bounds));
+	unit_down_vector /= sqrt(unit_down_vector.squaredNorm());
+	if (unit_down_vector[1] < 0) {
+		unit_down_vector = -unit_down_vector;
+	}
+	TextLineRefiner refiner(downscaled, Dpi(200, 200), unit_down_vector);
+	refiner.refine(polylines, /*iterations=*/100, dbg);
 
 	filterEdgyCurves(polylines);
 	if (dbg) {

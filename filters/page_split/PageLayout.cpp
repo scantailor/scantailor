@@ -172,6 +172,22 @@ PageLayout::setCutterLine(int idx, QLineF const& cutter)
 	(idx == 0 ? m_cutter1 : m_cutter2) = cutter;
 }
 
+LayoutType
+PageLayout::toLayoutType() const
+{
+	switch (m_type) {
+		case SINGLE_PAGE_UNCUT:
+			return page_split::SINGLE_PAGE_UNCUT;
+		case SINGLE_PAGE_CUT:
+			return page_split::PAGE_PLUS_OFFCUT;
+		case TWO_PAGES:
+			return page_split::TWO_PAGES;
+	}
+
+	assert(!"Unreachable");
+	return page_split::SINGLE_PAGE_UNCUT;
+}
+
 int
 PageLayout::numCutters() const
 {

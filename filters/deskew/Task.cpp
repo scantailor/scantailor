@@ -123,6 +123,11 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		} else {
 			ui_data.setEffectiveDeskewAngle(params->deskewAngle());
 			ui_data.setMode(params->mode());
+
+			Params const new_params(
+				ui_data.effectiveDeskewAngle(), deps, ui_data.mode()
+			);
+			m_ptrSettings->setPageParams(m_pageId, new_params);
 		}
 	}
 	

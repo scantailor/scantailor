@@ -1,6 +1,7 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
     Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
+    Copyright (C)  Vadim Kuznetsov ()DikBSD <dikbsd@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,43 +17,28 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_LAYOUT_APPLYDIALOG_H_
-#define PAGE_LAYOUT_APPLYDIALOG_H_
+#ifndef PAGE_SPLIT_ORDER_BY_SPLIT_TYPE_PROVIDER_H_
+#define PAGE_SPLIT_ORDER_BY_SPLIT_TYPE_PROVIDER_H_
 
-#include "ui_PageLayoutApplyDialog.h"
-#include "PageId.h"
-#include "PageRange.h"
-#include "PageSequence.h"
+#include "Settings.h"
 #include "IntrusivePtr.h"
-#include <QDialog>
-#include <set>
+#include "PageOrderProvider.h"
 
-class PageSelectionAccessor;
-class QButtonGroup;
-
-namespace page_layout
+namespace page_split
 {
 
-class ApplyDialog : public QDialog, private Ui::PageLayoutApplyDialog
+class OrderBySplitTypeProvider : public PageOrderProvider
 {
-	Q_OBJECT
 public:
-	ApplyDialog(QWidget* parent, PageId const& cur_page,
-		PageSelectionAccessor const& page_selection_accessor);
-	
-	virtual ~ApplyDialog();
-signals:
-	void accepted(std::set<PageId> const& pages);
-private slots:
-	void onSubmit();
+	OrderBySplitTypeProvider(IntrusivePtr<Settings> const& settings);
+
+	virtual bool precedes(
+		PageId const& lhs_page, bool lhs_incomplete,
+		PageId const& rhs_page, bool rhs_incomplete) const;
 private:
-	PageSequence m_pages;
-	std::set<PageId> m_selectedPages;
-	std::vector<PageRange> m_selectedRanges;
-	PageId m_curPage;
-	QButtonGroup* m_pScopeGroup;
+	IntrusivePtr<Settings> m_ptrSettings;
 };
 
-} // namespace page_layout
+} // namespace page_split
 
-#endif
+#endif //PAGE_SPLIT_ORDER_BY_SPLIT_TYPE_PROVIDER_H_
