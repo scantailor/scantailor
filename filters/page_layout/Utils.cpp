@@ -156,6 +156,12 @@ Utils::calcSoftMarginsMM(
 	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << "\n";
 #endif
 
+	if ((leftBorder<0 || rightBorder<0 || topBorder<0 || bottomBorder<0 || !leftBorder) && myAlign.vertical()==Alignment::VORIGINAL) {
+		// FIX: from gui is the agg_content_rect unknown before batch is completed and after change it is necessary to run batch again
+		std::cout << "\tskip soft margins nan: " <<  "\n";
+		return Margins(delta_width/2, 0, delta_width/2, delta_height);
+	}
+
 	// if align auto and not empty page
 	if (contentRect.width() > 1.0 && (myAlign.horizontal() == Alignment::HAUTO || myAlign.vertical() == Alignment::VAUTO)) {
 		// new borders ratio
