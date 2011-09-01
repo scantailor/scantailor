@@ -130,10 +130,10 @@ Utils::calcSoftMarginsMM(
 			aggregate_hard_size_mm.height() - hard_size_mm.height();
 
 	// detect original borders in page mirror
-	double leftBorder = double(contentRect.left() - agg_content_rect.left()) / double(agg_content_rect.width());
-	double rightBorder = double(agg_content_rect.right() - contentRect.right()) / double(agg_content_rect.width());
-	double topBorder = double(contentRect.top() - agg_content_rect.top()) / double(agg_content_rect.height());
-	double bottomBorder = double(agg_content_rect.bottom() - contentRect.bottom()) / double(agg_content_rect.height());
+	double leftBorder = double(contentRect.left() - agg_content_rect.left() + 1) / double(agg_content_rect.width());
+	double rightBorder = double(agg_content_rect.right() - contentRect.right() + 1) / double(agg_content_rect.width());
+	double topBorder = double(contentRect.top() - agg_content_rect.top() + 1) / double(agg_content_rect.height());
+	double bottomBorder = double(agg_content_rect.bottom() - contentRect.bottom() + 1) / double(agg_content_rect.height());
 	
 	// borders in new page layout in mm
 	double aggLeftBorder = 0.0;
@@ -142,11 +142,11 @@ Utils::calcSoftMarginsMM(
 	double aggBottomBorder = 0.0;
 
 	if (delta_width > 0.1) {
-		aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * leftBorder;
+		aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * (leftBorder);
 		aggRightBorder = delta_width - aggLeftBorder;
 	}
 	if (delta_height > 0.1) {
-		aggTopBorder = (delta_height / (topBorder + bottomBorder)) * topBorder;
+		aggTopBorder = (delta_height / (topBorder + bottomBorder)) * (topBorder);
 		aggBottomBorder = delta_height - aggTopBorder;
 	}
 
@@ -155,12 +155,6 @@ Utils::calcSoftMarginsMM(
 	std::cout << aggLeftBorder << " " << aggRightBorder << " " << aggTopBorder << " " << aggBottomBorder << ":" << "\n";
 	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << "\n";
 #endif
-
-	if ((leftBorder<0 || rightBorder<0 || topBorder<0 || bottomBorder<0 || !leftBorder) && myAlign.vertical()==Alignment::VORIGINAL) {
-		// FIX: from gui is the agg_content_rect unknown before batch is completed and after change it is necessary to run batch again
-		std::cout << "\tskip soft margins nan: " <<  "\n";
-		return Margins(delta_width/2, 0, delta_width/2, delta_height);
-	}
 
 	// if align auto and not empty page
 	if (contentRect.width() > 1.0 && (myAlign.horizontal() == Alignment::HAUTO || myAlign.vertical() == Alignment::VAUTO)) {
