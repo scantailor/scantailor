@@ -130,10 +130,10 @@ Utils::calcSoftMarginsMM(
 			aggregate_hard_size_mm.height() - hard_size_mm.height();
 
 	// detect original borders in page mirror
-	double leftBorder = double(contentRect.left() - agg_content_rect.left() + 1) / double(agg_content_rect.width());
-	double rightBorder = double(agg_content_rect.right() - contentRect.right() + 1) / double(agg_content_rect.width());
-	double topBorder = double(contentRect.top() - agg_content_rect.top() + 1) / double(agg_content_rect.height());
-	double bottomBorder = double(agg_content_rect.bottom() - contentRect.bottom() + 1) / double(agg_content_rect.height());
+	double leftBorder = double(contentRect.left() - agg_content_rect.left() + 1) / double(agg_content_rect.width() + 1);
+	double rightBorder = double(agg_content_rect.right() - contentRect.right() + 1) / double(agg_content_rect.width() + 1);
+	double topBorder = double(contentRect.top() - agg_content_rect.top() + 1) / double(agg_content_rect.height() + 1);
+	double bottomBorder = double(agg_content_rect.bottom() - contentRect.bottom() + 1) / double(agg_content_rect.height() + 1);
 	
 	// borders in new page layout in mm
 	double aggLeftBorder = 0.0;
