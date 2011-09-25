@@ -43,8 +43,6 @@ FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
 FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
 FILE(GLOB boost_dirs1 "${build_outer_dir}/boost_1_[0-9]*_[0-9]*")
 FILE(GLOB boost_dirs2 "${source_outer_dir}/boost_1_[0-9]*_[0-9]*")
-FILE(GLOB boost_jam_dirs1 "${build_outer_dir}/boost-jam-*")
-FILE(GLOB boost_jam_dirs2 "${source_outer_dir}/boost-jam-*")
 
 FIND_PATH(
 	JPEG_DIR jpeglib.h HINTS ${jpeg_dirs1} ${jpeg_dirs2}
@@ -71,10 +69,6 @@ FIND_PATH(
 	BOOST_DIR boost/foreach.hpp HINTS ${boost_dirs1} ${boost_dirs2}
 	DOC "Path to top-level Boost source directory."
 )
-FIND_PROGRAM(
-	BJAM_EXECUTABLE bjam HINTS ${boost_jam_dirs1} ${boost_jam_dirs2}
-	DOC "Path to a directory containing bjam executable."
-)
 
 IF(NOT JPEG_DIR)
 	MESSAGE(FATAL_ERROR "JPEG source directory not found. You may specify it manually.")
@@ -88,9 +82,7 @@ ELSEIF(NOT QT_DIR)
 	MESSAGE(FATAL_ERROR "Qt source directory not found. You may specify it manually.")
 ELSEIF(NOT BOOST_DIR)
 	MESSAGE(FATAL_ERROR "Boost source directory not found. You may specify it manually.")
-ELSEIF(NOT BJAM_EXECUTABLE)
-	MESSAGE(FATAL_ERROR "bjam executable not found. You may specify it manually.")
-ENDIF(NOT JPEG_DIR)
+ENDIF()
 
 
 IF(MINGW)
@@ -295,11 +287,13 @@ IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
 ENDIF()
 
 ADD_CUSTOM_TARGET(
-	boost ALL "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
+	boost ALL
+	COMMAND bootstrap && b2 --with-test toolset=${boost_toolset}
 	threading=multi link=static variant=debug,release ${boost_64bit_flags}
 	define=_BIND_TO_CURRENT_VCLIBS_VERSION=1
 	stage
 	WORKING_DIRECTORY "${BOOST_DIR}"
+	VERBATIM
 )
 
 
