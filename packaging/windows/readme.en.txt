@@ -49,10 +49,9 @@ latest stable version.
    From there: Download -> LGPL / Free -> Download Qt SDK for Windows
    If you are going to use Visual Studio, you may turn off the "MinGW"
    option in the installer.
-7. Boost (tested with 1.44.0) and Boost Jam (tested with 3.1.17)
+7. Boost (tested with 1.47.0)
    Homepage: http://boost.org/
-   For Boost, you can download any of the files, provided you know how to unpack it.
-   For Boost Jam, take the file with "ntx86" suffix.
+   You can download it in any file format, provided you know how to unpack it.
 8. NSIS 2.x (tested with 2.42)
    Homepage: http://nsis.sourceforge.net/
 9. [VC++]
@@ -70,8 +69,7 @@ latest stable version.
    itself to the build directory.  You should get a directory structure like
    this:
    C:\build
-     | boost_1_38_0
-     | boost-jam-3.1.17-1-ntx86
+     | boost_1_47_0
      | jpeg-8c
      | libpng-1.2.31
      | scantailor-0.9.0
