@@ -70,6 +70,7 @@ INCLUDE_DIRECTORIES(. foundation math interaction zones)
 
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
+INCLUDE(TestCXXAcceptsFlag)
 INCLUDE(FindBoost)
 INCLUDE(cmake/FindPthreads.cmake)
 INCLUDE(cmake/SetDefaultBuildType.cmake)
@@ -675,34 +676,37 @@ IF(WIN32)
 	# Copy some DLLs to the staging dir.
 	
 	IF(MINGW)
-		FIND_FILE(
-			MINGWM10_DLL mingwm10.dll
-			PATHS c:/MinGW/bin ENV PATH
-			DOC "Full path to mingwm10.dll"
-		)
-		IF(NOT MINGWM10_DLL)
-			MESSAGE(
-				FATAL_ERROR
-				"Could not find mingwm10.dll\n"
-				"It should be in the 'bin' subdirectory of your MinGW installation."
+		CHECK_CXX_ACCEPTS_FLAG("-m64" MINGW64)
+		IF(NOT MINGW64)
+			FIND_FILE(
+				MINGWM10_DLL mingwm10.dll
+				PATHS c:/MinGW/bin ENV PATH
+				DOC "Full path to mingwm10.dll"
 			)
-		ENDIF(NOT MINGWM10_DLL)
-		COPY_TO_BUILD_DIR("${MINGWM10_DLL}")
+			IF(NOT MINGWM10_DLL)
+				MESSAGE(
+					FATAL_ERROR
+					"Could not find mingwm10.dll\n"
+					"It shou 'bin' subdirectory of your MinGW installation."
+				)
+			ENDIF(NOT MINGWM10_DLL)
+			COPY_TO_BUILD_DIR("${MINGWM10_DLL}")
 
-		FIND_FILE(
-			GCC_DW2_DLL libgcc_s_dw2-1.dll
-			PATHS c:/MinGW/bin ENV PATH
-			DOC "Full path to libgcc_s_dw2-1.dll"
-		)
-		IF(NOT GCC_DW2_DLL)
-			SET(GCC_DW2_DLL "") # For NSIS
-			MESSAGE(
-				"Could not find libgcc_s_dw2-1.dll\n"
-				"That's fine if your MinGW is old and just doesn't have it."
+			FIND_FILE(
+				GCC_DW2_DLL libgcc_s_dw2-1.dll
+				PATHS c:/MinGW/bin ENV PATH
+				DOC "Full path to libgcc_s_dw2-1.dll"
 			)
-		ELSE()
-			COPY_TO_BUILD_DIR("${GCC_DW2_DLL}")
-		ENDIF()
+			IF(NOT GCC_DW2_DLL)
+				SET(GCC_DW2_DLL "") # For NSIS
+				MESSAGE(
+					"Could not find libgcc_s_dw2-1.dll\n"
+					"That's fine if your MinGW is old and just doesn't have it."
+				)
+			ELSE()
+				COPY_TO_BUILD_DIR("${GCC_DW2_DLL}")
+			ENDIF()
+		ENDIF(NOT MINGW64)
 	ENDIF(MINGW)
 	
 	SET(

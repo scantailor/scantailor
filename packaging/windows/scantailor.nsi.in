@@ -9,8 +9,10 @@
 !define WNDCLASS "ScanTailor_Window"
 
 !include "@REGISTER_EXTENSION_NSH@"
-
+!include "x64.nsh"
 !include "MUI2.nsh"
+!include "LogicLib.nsh"
+
 BrandingText " " # To remove the mention of NullSoft.
 #LoadLanguageFile "${NSISDIR}\Contrib\Language files\Russian.nlf"
 
@@ -18,7 +20,12 @@ Name "Scan Tailor version ${VERSION}"
 
 OutFile "${INSTALLER_FILENAME}"
 
-installDir "$PROGRAMFILES\Scan Tailor"
+!if "@SIZEOF_VOID_PTR@" == "8"
+InstallDir "$PROGRAMFILES64\Scan Tailor"
+!else
+InstallDir "$PROGRAMFILES\Scan Tailor"
+!endif
+
 InstallDirRegKey HKLM "${UNINST_REGKEY}" "InstallLocation"
 
 RequestExecutionLevel admin
@@ -52,6 +59,15 @@ SetCompressor /SOLID /FINAL lzma
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "English"
+
+!if "@SIZEOF_VOID_PTR@" == "8"
+Function .onInit
+  ${IfNot} ${RunningX64}
+    MessageBox MB_ICONSTOP|MB_OK "A 64-bit version of Scan Tailor won't work on a 32-bit version of Windows."
+    Abort
+  ${EndIf}
+FunctionEnd
+!endif
 
 Section
   SetOutPath $INSTDIR
