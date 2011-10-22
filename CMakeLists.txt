@@ -450,7 +450,7 @@ SET(
 	RecentProjects.cpp RecentProjects.h
 	SettingsDialog.cpp SettingsDialog.h
 	FixDpiDialog.cpp FixDpiDialog.h
-	FixDpiSinglePageDialog.cpp FixDpiSinglePageDialog.h
+	LoadFilesStatusDialog.cpp LoadFilesStatusDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h
 	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	MainWindow.cpp MainWindow.h

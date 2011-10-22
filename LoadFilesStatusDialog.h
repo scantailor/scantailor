@@ -16,37 +16,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_DPI_SINGLE_PAGE_DIALOG_H_
-#define FIX_DPI_SINGLE_PAGE_DIALOG_H_
+#ifndef LOAD_FILES_STATUS_DIALOG_H_
+#define LOAD_FILES_STATUS_DIALOG_H_
 
-#include "ui_FixDpiSinglePageDialog.h"
-#include "Dpi.h"
-#include "ImageMetadata.h"
-#include <QPalette>
+#include "ui_LoadFilesStatusDialog.h"
+#include <QString>
+#include <vector>
 
-class QPushButton;
-class ImageId;
-
-class FixDpiSinglePageDialog : public QDialog
+class LoadFilesStatusDialog : public QDialog
 {
-	Q_OBJECT
 public:
-	FixDpiSinglePageDialog(ImageId const& image_id,
-		ImageMetadata const& image_metadata, QWidget* parent = 0);
+	LoadFilesStatusDialog(QWidget* parent = 0);
+
+	void setLoadedFiles(std::vector<QString> const& files);
 	
-	Dpi const& dpi() const { return m_metadata.dpi(); }
-private slots:
-	void dpiComboChangedByUser(int idx);
-	
-	void dpiValueChanged();
+	void setFailedFiles(std::vector<QString> const& failed);
+
+	void setOkButtonName(QString const& name);
 private:
-	void decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpi_status) const;
-	
-	Ui::FixDpiSinglePageDialog ui;
-	ImageMetadata m_metadata;
-	QPalette m_normalPalette;
-	QPalette m_errorPalette;
-	QPushButton* m_pOkBtn;
+	Ui::LoadFilesStatusDialog ui;
+	QString m_loadedTabNameTemplate;
+	QString m_failedTabNameTemplate;
 };
 
 #endif
