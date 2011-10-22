@@ -22,6 +22,7 @@
 #include "TaskStatus.h"
 #include "DebugImages.h"
 #include "imageproc/RasterOp.h"
+#include <new>
 #include <stdint.h>
 
 using namespace imageproc;
@@ -93,6 +94,9 @@ DespeckleState::overlaySpeckles(
 	QImage const& mixed, imageproc::BinaryImage const& speckles)
 {
 	QImage result(mixed.convertToFormat(QImage::Format_RGB32));
+	if (result.isNull() && !mixed.isNull()) {
+		throw std::bad_alloc();
+	}
 
 	if (speckles.isNull()) {
 		return result;
