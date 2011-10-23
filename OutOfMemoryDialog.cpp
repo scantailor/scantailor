@@ -30,6 +30,10 @@ OutOfMemoryDialog::OutOfMemoryDialog(QWidget* parent)
 :	QDialog(parent)
 {
 	ui.setupUi(this);
+	if (sizeof(void*) > 32) {
+		ui.only_32bit_1->hide();
+		ui.only_32bit_2->hide();
+	}
 
 	ui.topLevelStack->setCurrentWidget(ui.mainPage);
 

@@ -34,8 +34,8 @@ OutOfMemoryHandler::instance()
 	// However, because we insist an instance of this object to be created early on,
 	// the only case that might get us into trouble is an out-of-memory situation
 	// after main() has returned and this instance got destroyed.  This scenario
-	// sounds rather fantastic, and is not a big deal, as the project would
-	// already be saved.
+	// sounds rather fantastic, and is not a big deal, as the project would have
+	// already been saved.
 	static OutOfMemoryHandler object;
 
 	return object;
