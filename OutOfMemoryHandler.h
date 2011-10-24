@@ -16,18 +16,40 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef APPLICATION_H_
-#define APPLICATION_H_
+#ifndef OUT_OF_MEMORY_HANDLER_H_
+#define OUT_OF_MEMORY_HANDLER_H_
 
-#include <QApplication>
+#include "NonCopyable.h"
+#include <QObject>
+#include <QMutex>
+#include <boost/scoped_array.hpp>
+#include <stddef.h>
 
-class Application : public QApplication
+class OutOfMemoryHandler : public QObject
 {
 	Q_OBJECT
+	DECLARE_NON_COPYABLE(OutOfMemoryHandler)
 public:
-	Application(int& argc, char** argv);
+	static OutOfMemoryHandler& instance();
 
-	virtual bool notify(QObject* receiver, QEvent* e);
+	/**
+	 * To be called once, before any OOM situations can occur.
+	 */
+	void allocateEmergencyMemory(size_t bytes);
+
+	/** May be called from any thread. */
+	void handleOutOfMemorySituation();
+
+	bool hadOutOfMemorySituation() const;
+signals:
+	/** Will be dispatched from the main thread. */
+	void outOfMemory();
+private:
+	OutOfMemoryHandler();
+
+	mutable QMutex m_mutex;
+	boost::scoped_array<char> m_emergencyBuffer;
+	bool m_hadOOM;
 };
 
 #endif

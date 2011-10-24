@@ -66,6 +66,8 @@ class ProjectOpeningContext;
 class CompositeCacheDrivenTask;
 class TabbedDebugImages;
 class ProcessingTaskQueue;
+class FixDpiDialog;
+class OutOfMemoryDialog;
 class QLineF;
 class QRectF;
 class QLayout;
@@ -142,6 +144,10 @@ private slots:
 	
 	void debugToggled(bool enabled);
 	
+	void fixDpiDialogRequested();
+
+	void fixedDpiSubmitted();
+
 	void saveProjectTriggered();
 	
 	void saveProjectAsTriggered();
@@ -165,6 +171,8 @@ private slots:
 	void startAutoSaveTimer();
 	void stopAutoSaveTimer();
 	void autoSaveProject();
+
+	void handleOutOfMemorySituation();
 private:
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
@@ -275,6 +283,7 @@ private:
 	QStackedLayout* m_pImageFrameLayout;
 	QStackedLayout* m_pOptionsFrameLayout;
 	QPointer<FilterOptionsWidget> m_ptrOptionsWidget;
+	QPointer<FixDpiDialog> m_ptrFixDpiDialog;
 	std::auto_ptr<TabbedDebugImages> m_ptrTabbedDebugImages;
 	std::auto_ptr<ContentBoxPropagator> m_ptrContentBoxPropagator;
 	std::auto_ptr<PageOrientationPropagator> m_ptrPageOrientationPropagator;
@@ -284,6 +293,7 @@ private:
 	SelectedPage m_selectedPage;
 	QObjectCleanupHandler m_optionsWidgetCleanup;
 	QObjectCleanupHandler m_imageWidgetCleanup;
+	std::auto_ptr<OutOfMemoryDialog> m_ptrOutOfMemoryDialog;
 	int m_curFilter;
 	int m_ignoreSelectionChanges;
 	int m_ignorePageOrderingChanges;

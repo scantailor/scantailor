@@ -16,18 +16,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef APPLICATION_H_
-#define APPLICATION_H_
+#ifndef LOAD_FILES_STATUS_DIALOG_H_
+#define LOAD_FILES_STATUS_DIALOG_H_
 
-#include <QApplication>
+#include "ui_LoadFilesStatusDialog.h"
+#include <QString>
+#include <vector>
 
-class Application : public QApplication
+class LoadFilesStatusDialog : public QDialog
 {
-	Q_OBJECT
 public:
-	Application(int& argc, char** argv);
+	LoadFilesStatusDialog(QWidget* parent = 0);
 
-	virtual bool notify(QObject* receiver, QEvent* e);
+	void setLoadedFiles(std::vector<QString> const& files);
+	
+	void setFailedFiles(std::vector<QString> const& failed);
+
+	void setOkButtonName(QString const& name);
+private:
+	Ui::LoadFilesStatusDialog ui;
+	QString m_loadedTabNameTemplate;
+	QString m_failedTabNameTemplate;
 };
 
 #endif

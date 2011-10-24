@@ -16,37 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_DPI_SINGLE_PAGE_DIALOG_H_
-#define FIX_DPI_SINGLE_PAGE_DIALOG_H_
+#ifndef NON_OWNING_WIDGET_H_
+#define NON_OWNING_WIDGET_H_
 
-#include "ui_FixDpiSinglePageDialog.h"
-#include "Dpi.h"
-#include "ImageMetadata.h"
-#include <QPalette>
+#include <QWidget>
 
-class QPushButton;
-class ImageId;
-
-class FixDpiSinglePageDialog : public QDialog
+/**
+ * \brief Your normal QWidget, except it doesn't delete its children with itself,
+ *        rather it calls setParent(0) on them.
+ */
+class NonOwningWidget : public QWidget
 {
-	Q_OBJECT
 public:
-	FixDpiSinglePageDialog(ImageId const& image_id,
-		ImageMetadata const& image_metadata, QWidget* parent = 0);
-	
-	Dpi const& dpi() const { return m_metadata.dpi(); }
-private slots:
-	void dpiComboChangedByUser(int idx);
-	
-	void dpiValueChanged();
-private:
-	void decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpi_status) const;
-	
-	Ui::FixDpiSinglePageDialog ui;
-	ImageMetadata m_metadata;
-	QPalette m_normalPalette;
-	QPalette m_errorPalette;
-	QPushButton* m_pOkBtn;
+	NonOwningWidget(QWidget* parent = 0);
+
+	virtual ~NonOwningWidget();
 };
 
 #endif

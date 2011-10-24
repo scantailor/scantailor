@@ -3,18 +3,26 @@ This document describes building the Windows version of Scan Tailor.
 Both Visual C++ (part of Visual Studio) and MinGW compilers are supported.
 Theoretically, any version of Visual C++ starting from Visual C++ 2003 should
 work.  In practice, Visual C++ 2008 Express Edition is known to work and no
-others were tested.  As for MinGW, the version shipped with Qt is known
-to work.
-The official builds are built with Visual C++ with the main reason being
+others were tested.  As for MinGW, the version shipped with Qt should work
+fine for 32-bit builds, while the 64-bit edition of TDM-GCC was used for
+64-bit builds.
+The official 32-bit builds are made with Visual C++ with the main reason being
 the built-in crash reporter only supporting Visual C++ under Windows.
 For unofficial builds the crash reporter is useless and should not be enabled,
 because only the person who built the particular version will have symbolic
 data used to transform the crash report to a human readable form.
-Generally, it's easier to build Scan Tailor using MinGW, but it's easier to
-develop it using Visual C++.
+For 64-bit builds only MinGW is currently supported, so these go
+without the crash reporter.
+If in doubt over which compiler to use, go with Visual C++ 2008 Express Edition.
+That's the one used most heavily by the author, so you are least likely to
+run into problems when building.
 
-Initially this document was only covering MinGW, while bits related to
-Visual C++ were added later and marked with [VC++].
+
+Initially this document was only covering 32-bit MinGW.  The bits related to
+Visual C++ and 64-bit MinGW were added later and marked with [VC++] and
+[MinGW64] respectively.  When we talk about MinGW not mentioning if it's
+a 32-bit or a 64-bit version, it applies to both.
+
 
 
                                 Downloading Prerequisites
@@ -24,6 +32,9 @@ latest stable version.
 
 1. CMake >= 2.8.4
    Homepage: http://www.cmake.org
+   Warning! Don't install CMake into "C:\Program Files (x86)\...",
+   which is the default installation path on 64-bit versions of Windows.
+   Some versions of MinGW have problems with parentheses in paths.
 2. jpeg library
    Homepage: http://www.ijg.org/
    The file we need will be named jpegsrc.v7.tar.gz or similarly.
@@ -44,11 +55,11 @@ latest stable version.
    The process of patching libtiff is described later in this document.
    If you aren't going to distribute your Scan Tailor build and aren't going
    to open files from untrusted sources, then you don't really need patching it.
-6. Qt 4.x.x (tested with 4.7.3)
+6. Qt 4.x.x (tested with 4.7.4)
    Homepage: http://qt.nokia.com/
    From there: Download -> LGPL / Free -> Download Qt SDK for Windows
-   If you are going to use Visual Studio, you may turn off the "MinGW"
-   option in the installer.
+   Tou may turn off the "MinGW" option in the installer if you are going to
+   use Visual Studio or a 64-bit version of MinGW.  
 7. Boost (tested with 1.47.0)
    Homepage: http://boost.org/
    You can download it in any file format, provided you know how to unpack it.
@@ -57,6 +68,12 @@ latest stable version.
 9. [VC++]
    You would need the Visual C++ itself, which you can download from here:
    http://www.microsoft.com/Express/vc/
+   Don't go for the latest version - go specifically with 2008 Express Edition.
+10.[MinGW64]
+   Download and install the 64-bit edition of TDM-GCC from
+   http://tdm-gcc.tdragon.net/
+   If you've got another version of MinGW already installed, make sure it's
+   not in PATH.
 
 
 
@@ -102,7 +119,7 @@ latest stable version.
        care about adjusting the PATH variable.  Unfortunately, in this case
        you will have to write the full path to the CMake executable, like:
        C:\Program Files\CMake 2.8\bin\cmake-gui.exe
-       Using just CMakeSetup.exe won't work even if you've chosen to add
+       Using just cmake-gui.exe won't work even if you've chosen to add
        CMake to PATH when installing it.  That's because Qt Command Prompt
        Overwrites the PATH variable completely.  Of course you can edit
        the qtvars.bat file and put the CMake directory to PATH there.

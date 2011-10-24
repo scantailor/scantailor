@@ -6,6 +6,7 @@ MACRO(ST_SET_DEFAULT_GCC_FLAGS)
 		SET(dead_strip_ldflags_ "")
 		SET(gc_sections_cflags_ "")
 		SET(gc_sections_ldflags_ "")
+		SET(no_inline_dllexport_cflags_ "")
 		
 		CHECK_CXX_ACCEPTS_FLAG(
 			"-ffunction-sections -fdata-sections -Wl,--gc-sections"
@@ -14,7 +15,28 @@ MACRO(ST_SET_DEFAULT_GCC_FLAGS)
 		IF(gc_sections_supported_)
 			SET(gc_sections_cflags_ "-ffunction-sections -fdata-sections")
 			SET(gc_sections_ldflags_ "-Wl,--gc-sections")
-		ENDIF(gc_sections_supported_)		
+		ENDIF(gc_sections_supported_)
+
+		CHECK_CXX_ACCEPTS_FLAG("-fno-keep-inline-dllexport" no_inline_dllexport_supported_)
+		IF(no_inline_dllexport_supported_)
+			SET(no_inline_dllexport_cflags_ "-fno-keep-inline-dllexport")
+		ENDIF()
+		
+		IF(MINGW)
+			CHECK_CXX_ACCEPTS_FLAG("-shared-libgcc -static-libstdc++" supported_)
+			IF(supported_)
+				# This is the configuration we want for 32-bit MinGW.
+				# Note that the default for libstdc++ recently changed
+				# from static to shared. We don't want to bundle
+				# another DLL, so we force it back.
+				# For 64-bit MinGW, such configuration is invalid and
+				# fortunately gets rejected.
+				SET(stdlibs_shared_static_ "-shared-libgcc -static-libstdc++")
+			ELSE()
+				# This configuration is used for 64-bit MinGW.
+				SET(stdlibs_shared_static_ "")
+			ENDIF()
+		ENDIF()	
 		
 		# GCC on Windows doesn't support -fvisibility, but doesn't reject it either,
 		# printing warnings instead.
@@ -31,16 +53,12 @@ MACRO(ST_SET_DEFAULT_GCC_FLAGS)
 			# Flags common for all build configurations.
 			SET(
 				CMAKE_C_FLAGS
-				"-Wall -Wno-unused -ffast-math"
+				"-Wall -Wno-unused -ffast-math ${no_inline_dllexport_cflags_}"
 				CACHE STRING "Common C flags for all build configurations." FORCE
 			)
 			SET(
-				CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}"
+				CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${stdlibs_shared_static_}"
 				CACHE STRING "Common C++ flags for all build configurations." FORCE
-			)
-			SET(
-				CMAKE_EXE_LINKER_FLAGS "" CACHE STRING
-				"Common link flags for all build configurations." FORCE
 			)
 		
 			# Release
