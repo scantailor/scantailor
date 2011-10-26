@@ -16,18 +16,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef APPLICATION_H_
-#define APPLICATION_H_
+#include "NonOwningWidget.h"
+#include <boost/foreach.hpp>
 
-#include <QApplication>
-
-class Application : public QApplication
+NonOwningWidget::NonOwningWidget(QWidget* parent)
+:	QWidget(parent)
 {
-	Q_OBJECT
-public:
-	Application(int& argc, char** argv);
+}
 
-	virtual bool notify(QObject* receiver, QEvent* e);
-};
-
-#endif
+NonOwningWidget::~NonOwningWidget()
+{
+	BOOST_FOREACH(QObject* child, children()) {
+		if (QWidget* widget = dynamic_cast<QWidget*>(child)) {
+			widget->setParent(0);
+		}
+	}
+}

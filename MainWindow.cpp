@@ -54,9 +54,13 @@
 #include "SystemLoadWidget.h"
 #include "ProcessingIndicationWidget.h"
 #include "ImageMetadataLoader.h"
+#include "SmartFilenameOrdering.h"
 #include "OrthogonalRotation.h"
-#include "FixDpiSinglePageDialog.h"
+#include "FixDpiDialog.h"
+#include "LoadFilesStatusDialog.h"
 #include "SettingsDialog.h"
+#include "OutOfMemoryHandler.h"
+#include "OutOfMemoryDialog.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -128,6 +132,7 @@ MainWindow::MainWindow()
 	m_ptrStages(new StageSequence(m_ptrPages, PageSelectionAccessor(this))),
 	m_ptrWorkerThread(new WorkerThread),
 	m_ptrInteractiveQueue(new ProcessingTaskQueue(ProcessingTaskQueue::RANDOM_ORDER)),
+	m_ptrOutOfMemoryDialog(new OutOfMemoryDialog),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
@@ -166,7 +171,10 @@ MainWindow::MainWindow()
 	addAction(actionPrevPage);
 	addAction(actionPrevPageQ);
 	addAction(actionNextPageW);
-	
+
+	// Should be enough to save a project.
+	OutOfMemoryHandler::instance().allocateEmergencyMemory(3*1024*1024);
+
 	connect(actionFirstPage, SIGNAL(triggered(bool)), SLOT(goFirstPage()));
 	connect(actionLastPage, SIGNAL(triggered(bool)), SLOT(goLastPage()));
 	connect(actionPrevPage, SIGNAL(triggered(bool)), SLOT(goPrevPage()));
@@ -174,6 +182,10 @@ MainWindow::MainWindow()
 	connect(actionPrevPageQ, SIGNAL(triggered(bool)), this, SLOT(goPrevPage()));
 	connect(actionNextPageW, SIGNAL(triggered(bool)), this, SLOT(goNextPage()));
 	connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(showAboutDialog()));
+	connect(
+		&OutOfMemoryHandler::instance(),
+		SIGNAL(outOfMemory()), SLOT(handleOutOfMemorySituation())
+	);
 	
 	connect(
 		filterList->selectionModel(),
@@ -224,6 +236,11 @@ MainWindow::MainWindow()
 		this, SLOT(pageOrderingChanged(int))
 	);
 	
+	connect(
+		actionFixDpi, SIGNAL(triggered(bool)),
+		this, SLOT(fixDpiDialogRequested())
+	);
+
 	connect(
 		actionDebug, SIGNAL(toggled(bool)),
 		this, SLOT(debugToggled(bool))
@@ -1186,6 +1203,51 @@ MainWindow::debugToggled(bool const enabled)
 }
 
 void
+MainWindow::fixDpiDialogRequested()
+{
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
+		return;
+	}
+
+	assert(!m_ptrFixDpiDialog);
+	m_ptrFixDpiDialog = new FixDpiDialog(m_ptrPages->toImageFileInfo(), this);
+	m_ptrFixDpiDialog->setAttribute(Qt::WA_DeleteOnClose);
+	m_ptrFixDpiDialog->setWindowModality(Qt::WindowModal);
+
+	connect(m_ptrFixDpiDialog, SIGNAL(accepted()), SLOT(fixedDpiSubmitted()));
+
+	m_ptrFixDpiDialog->show();
+}
+
+void
+MainWindow::fixedDpiSubmitted()
+{
+	assert(m_ptrFixDpiDialog);
+	assert(m_ptrPages);
+	assert(m_ptrThumbSequence.get());
+
+	PageInfo const selected_page_before(m_ptrThumbSequence->selectionLeader());
+
+	m_ptrPages->updateMetadataFrom(m_ptrFixDpiDialog->files());
+	
+	// The thumbnail list also stores page metadata, including the DPI.
+	m_ptrThumbSequence->reset(
+		m_ptrPages->toPageSequence(getCurrentView()),
+		ThumbnailSequence::KEEP_SELECTION, m_ptrThumbSequence->pageOrderProvider()
+	);
+
+	PageInfo const selected_page_after(m_ptrThumbSequence->selectionLeader());
+
+	// Reload if the current page was affected.
+	// Note that imageId() isn't supposed to change - we check just in case.
+	if (selected_page_before.imageId() != selected_page_after.imageId() ||
+		selected_page_before.metadata() != selected_page_after.metadata()) {
+		
+		reloadRequested();
+	}
+}
+
+void
 MainWindow::saveProjectTriggered()
 {
 	if (m_projectFile.isEmpty()) {
@@ -1201,6 +1263,8 @@ MainWindow::saveProjectTriggered()
 void
 MainWindow::saveProjectAsTriggered()
 {
+	// XXX: this function is duplicated in OutOfMemoryDialog.
+
 	QString project_dir;
 	if (!m_projectFile.isEmpty()) {
 		project_dir = QFileInfo(m_projectFile).absolutePath();
@@ -1369,6 +1433,24 @@ MainWindow::showAboutDialog()
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->show();
+}
+
+/**
+ * This function is called asynchronously, always from the main thread.
+ */
+void
+MainWindow::handleOutOfMemorySituation()
+{
+	deleteLater();
+
+	m_ptrOutOfMemoryDialog->setParams(
+		m_projectFile, m_ptrStages, m_ptrPages, m_selectedPage, m_outFileNameGen
+	);
+
+	closeProjectWithoutSaving();
+
+	m_ptrOutOfMemoryDialog->setAttribute(Qt::WA_DeleteOnClose);
+	m_ptrOutOfMemoryDialog.release()->show();
 }
 
 /**
@@ -1646,6 +1728,10 @@ MainWindow::saveProjectWithFeedback(QString const& project_file)
 void
 MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& existing)
 {
+	if (isBatchProcessingInProgress() || !isProjectLoaded()) {
+		return;
+	}
+
 	// We need to filter out files already in project.
 	class ProxyModel : public QSortFilterProxyModel
 	{
@@ -1686,57 +1772,83 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	dialog->setFileMode(QFileDialog::ExistingFiles);
 	dialog->setProxyModel(new ProxyModel(*m_ptrPages));
 	dialog->setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));
-	
-	if (dialog->exec() == QDialog::Rejected) {
+	// XXX: Adding individual pages from a multi-page TIFF where
+	// some of the pages are already in project is not supported right now.
+
+	if (dialog->exec() != QDialog::Accepted) {
 		return;
 	}
 	
-	QStringList const files(dialog->selectedFiles());
-	if (files.size() < 1) {
-		assert(files.empty());
+	QStringList files(dialog->selectedFiles());
+	if (files.empty()) {
 		return;
 	}
+
+	// The order of items returned by QFileDialog is platform-dependent,
+	// so we enforce our own ordering.
+	std::sort(files.begin(), files.end(), SmartFilenameOrdering());
 	
 	using namespace boost::lambda;
 	
+	std::vector<ImageFileInfo> new_files;
+	std::vector<QString> loaded_files;
+	std::vector<QString> failed_files; // Those we failed to read metadata from.
+
 	// dialog->selectedFiles() returns file list in reverse order.
-	for (int i=files.count()-1; i>=0 ;i--) {
-		ImageId const image_id(files.at(i), 0);
-		
-		std::vector<ImageMetadata> metadata_list;
+	for (int i = files.size() - 1; i >= 0; --i) {
+		QFileInfo const file_info(files[i]);
+		ImageFileInfo image_file_info(file_info, std::vector<ImageMetadata>());
+
 		ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
-			files.at(i), bind(&std::vector<ImageMetadata>::push_back, var(metadata_list), _1)
+			files.at(i), bind(&std::vector<ImageMetadata>::push_back,
+			boost::ref(image_file_info.imageInfo()), _1)
 		);
-		if (status != ImageMetadataLoader::LOADED) {
-			QMessageBox::warning(
-				0, tr("Error"),
-				tr("Error opening the image file.")
-			);
+
+		if (status == ImageMetadataLoader::LOADED) {
+			new_files.push_back(image_file_info);
+			loaded_files.push_back(file_info.absoluteFilePath());
+		} else {
+			failed_files.push_back(file_info.absoluteFilePath());
+		}
+	}
+
+	if (!failed_files.empty()) {
+		std::auto_ptr<LoadFilesStatusDialog> err_dialog(new LoadFilesStatusDialog(this));
+		err_dialog->setLoadedFiles(loaded_files);
+		err_dialog->setFailedFiles(failed_files);
+		err_dialog->setOkButtonName(QString(" %1 ").arg(tr("Skip failed files")));
+		if (err_dialog->exec() != QDialog::Accepted || loaded_files.empty()) {
 			return;
 		}
-		
-		ImageMetadata& metadata = metadata_list.front();
-		
-		if (!metadata.isDpiOK()) {
-			std::auto_ptr<FixDpiSinglePageDialog> dpi_dialog(
-				new FixDpiSinglePageDialog(
-					image_id, metadata, this
-				)
-			);
-			if (dpi_dialog->exec() != QDialog::Accepted) {
-				return;
-			}
-			metadata.setDpi(dpi_dialog->dpi());
+	}
+
+	// Check if there is at least one DPI that's not OK.
+	if (std::find_if(new_files.begin(), new_files.end(), !bind(&ImageFileInfo::isDpiOK, _1)) != new_files.end()) {
+
+		std::auto_ptr<FixDpiDialog> dpi_dialog(new FixDpiDialog(new_files, this));
+		dpi_dialog->setWindowModality(Qt::WindowModal);
+		if (dpi_dialog->exec() != QDialog::Accepted) {
+			return;
 		}
-		
-		// This has to be done after metadata.setDpi() call above.
-		int const num_sub_pages = ProjectPages::adviseNumberOfLogicalPages(
-			metadata, OrthogonalRotation()
-		);
-		ImageInfo const image_info(
-			image_id, metadata, num_sub_pages, false, false
-		);
-		insertImage(image_info, before_or_after, existing);
+
+		new_files = dpi_dialog->files();
+	}
+
+	// Actually insert the new pages.
+	BOOST_FOREACH(ImageFileInfo const& file, new_files) {
+		int image_num = -1; // Zero-based image number in a multi-page TIFF.
+
+		BOOST_FOREACH(ImageMetadata const& metadata, file.imageInfo()) {
+			++image_num;
+
+			int const num_sub_pages = ProjectPages::adviseNumberOfLogicalPages(
+				metadata, OrthogonalRotation()
+			);
+			ImageInfo const image_info(
+				ImageId(file.fileInfo(), image_num), metadata, num_sub_pages, false, false
+			);
+			insertImage(image_info, before_or_after, existing);
+		}
 	}
 }
 

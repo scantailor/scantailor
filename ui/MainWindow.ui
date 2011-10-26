@@ -93,11 +93,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="filterOptions">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-         </widget>
+         <widget class="NonOwningWidget" name="filterOptions" native="true"/>
         </item>
        </layout>
       </widget>
@@ -181,13 +177,15 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionFixDpi"/>
+    <addaction name="separator"/>
     <addaction name="actionDebug"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
@@ -343,12 +341,23 @@
     <string>About</string>
    </property>
   </action>
+  <action name="actionFixDpi">
+   <property name="text">
+    <string>Fix DPI</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>StageListView</class>
    <extends>QTableView</extends>
    <header>StageListView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NonOwningWidget</class>
+   <extends>QWidget</extends>
+   <header>NonOwningWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

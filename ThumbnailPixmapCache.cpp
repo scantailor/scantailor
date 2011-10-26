@@ -20,6 +20,7 @@
 #include "ImageId.h"
 #include "ImageLoader.h"
 #include "AtomicFileOverwriter.h"
+#include "OutOfMemoryHandler.h"
 #include "imageproc/Scale.h"
 #include "imageproc/GrayImage.h"
 #include <QCoreApplication>
@@ -43,6 +44,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/foreach.hpp>
 #include <vector>
+#include <new>
 
 using namespace ::boost;
 using namespace ::boost::multi_index;
@@ -561,66 +563,70 @@ ThumbnailPixmapCache::Impl::backgroundProcessing()
 	assert(QCoreApplication::instance()->thread() != QThread::currentThread());
 	
 	for (;;) {
-		// We are going to initialize these while holding the mutex.
-		LoadQueue::iterator lq_it;
-		ImageId image_id;
-		QString thumb_dir;
-		QSize max_thumb_size;
-		
-		{
-			QMutexLocker const locker(&m_mutex);
-			
-			if (m_shuttingDown || m_items.empty()) {
-				break;
-			}
-			
-			lq_it = m_loadQueue.begin();
-			image_id = lq_it->imageId;
-			
-			if (lq_it->status != Item::QUEUED) {
-				// All QUEUED items precede any other items
-				// in the load queue, so it means there are no
-				// QUEUED items at all.
-				assert(m_numQueuedItems == 0);
-				break;
-			}
-			
-			// By marking the item as IN_PROGRESS, we prevent it
-			// from being processed again before the GUI thread
-			// receives our LoadResultEvent.
-			queuedToInProgress(lq_it);
-			
-			if (m_totalLoadAttempts - lq_it->precedingLoadAttempts
-					> m_expirationThreshold) {
-				
-				// Expire this request.  The reasoning behind
-				// request expiration is described in
-				// ThumbnailLoadResult::REQUEST_EXPIRED
-				// documentation.
-				
-				postLoadResult(
-					lq_it, QImage(),
-					ThumbnailLoadResult::REQUEST_EXPIRED
-				);
-				continue;
-			}
-			
-			// Expired requests don't count as load attempts.
-			++m_totalLoadAttempts;
-			
-			// Copy those while holding the mutex.
-			thumb_dir = m_thumbDir;
-			max_thumb_size = m_maxThumbSize;
-		} // mutex scope
-		
-		QImage const image(
-			loadSaveThumbnail(image_id, thumb_dir, max_thumb_size)
-		);
-		
-		ThumbnailLoadResult::Status const status = image.isNull()
-			? ThumbnailLoadResult::LOAD_FAILED
-			: ThumbnailLoadResult::LOADED;
-		postLoadResult(lq_it, image, status);
+		try {
+			// We are going to initialize these while holding the mutex.
+			LoadQueue::iterator lq_it;
+			ImageId image_id;
+			QString thumb_dir;
+			QSize max_thumb_size;
+
+			{
+				QMutexLocker const locker(&m_mutex);
+
+				if (m_shuttingDown || m_items.empty()) {
+					break;
+				}
+
+				lq_it = m_loadQueue.begin();
+				image_id = lq_it->imageId;
+
+				if (lq_it->status != Item::QUEUED) {
+					// All QUEUED items precede any other items
+					// in the load queue, so it means there are no
+					// QUEUED items at all.
+					assert(m_numQueuedItems == 0);
+					break;
+				}
+
+				// By marking the item as IN_PROGRESS, we prevent it
+				// from being processed again before the GUI thread
+				// receives our LoadResultEvent.
+				queuedToInProgress(lq_it);
+
+				if (m_totalLoadAttempts - lq_it->precedingLoadAttempts
+						> m_expirationThreshold) {
+
+					// Expire this request.  The reasoning behind
+					// request expiration is described in
+					// ThumbnailLoadResult::REQUEST_EXPIRED
+					// documentation.
+
+					postLoadResult(
+						lq_it, QImage(),
+						ThumbnailLoadResult::REQUEST_EXPIRED
+					);
+					continue;
+				}
+
+				// Expired requests don't count as load attempts.
+				++m_totalLoadAttempts;
+
+				// Copy those while holding the mutex.
+				thumb_dir = m_thumbDir;
+				max_thumb_size = m_maxThumbSize;
+			} // mutex scope
+
+			QImage const image(
+				loadSaveThumbnail(image_id, thumb_dir, max_thumb_size)
+			);
+
+			ThumbnailLoadResult::Status const status = image.isNull()
+				? ThumbnailLoadResult::LOAD_FAILED
+				: ThumbnailLoadResult::LOADED;
+			postLoadResult(lq_it, image, status);
+		} catch (std::bad_alloc const&) {
+			OutOfMemoryHandler::instance().handleOutOfMemorySituation();
+		}
 	}
 }
 

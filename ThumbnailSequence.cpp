@@ -134,6 +134,8 @@ public:
 		SelectionAction const selection_action,
 		IntrusivePtr<PageOrderProvider const> const& provider);
 
+	IntrusivePtr<PageOrderProvider const> pageOrderProvider() const;
+
 	PageSequence toPageSequence() const;
 	
 	void invalidateThumbnail(PageId const& page_id);
@@ -364,6 +366,12 @@ ThumbnailSequence::reset(
 	m_ptrImpl->reset(pages, selection_action, order_provider);
 }
 
+IntrusivePtr<PageOrderProvider const>
+ThumbnailSequence::pageOrderProvider() const
+{
+	return m_ptrImpl->pageOrderProvider();
+}
+
 PageSequence
 ThumbnailSequence::toPageSequence() const
 {
@@ -561,6 +569,12 @@ ThumbnailSequence::Impl::reset(
 			selection_leader, m_pSelectionLeader->composite, DEFAULT_SELECTION_FLAGS
 		);
 	}
+}
+
+IntrusivePtr<PageOrderProvider const>
+ThumbnailSequence::Impl::pageOrderProvider() const
+{
+	return m_ptrOrderProvider;
 }
 
 PageSequence

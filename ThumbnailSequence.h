@@ -94,6 +94,9 @@ public:
 		SelectionAction const selection_action,
 		IntrusivePtr<PageOrderProvider const> const& order_provider
 			= IntrusivePtr<PageOrderProvider const>());
+
+	/** Returns the current page order provider, which may be null. */
+	IntrusivePtr<PageOrderProvider const> pageOrderProvider() const;
 	
 	PageSequence toPageSequence() const;
 
