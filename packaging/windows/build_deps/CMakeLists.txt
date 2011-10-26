@@ -18,6 +18,8 @@ ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 INCLUDE(../../../cmake/SetDefaultBuildType.cmake)
 INCLUDE(../../../cmake/SetDefaultGccFlags.cmake)
 INCLUDE(../../../cmake/ToNativePath.cmake)
+INCLUDE(../../../cmake/PatchFile.cmake)
+INCLUDE(TestCXXAcceptsFlag)
 
 ST_SET_DEFAULT_BUILD_TYPE(Release)
 ST_SET_DEFAULT_GCC_FLAGS()
@@ -43,8 +45,6 @@ FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
 FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
 FILE(GLOB boost_dirs1 "${build_outer_dir}/boost_1_[0-9]*_[0-9]*")
 FILE(GLOB boost_dirs2 "${source_outer_dir}/boost_1_[0-9]*_[0-9]*")
-FILE(GLOB boost_jam_dirs1 "${build_outer_dir}/boost-jam-*")
-FILE(GLOB boost_jam_dirs2 "${source_outer_dir}/boost-jam-*")
 
 FIND_PATH(
 	JPEG_DIR jpeglib.h HINTS ${jpeg_dirs1} ${jpeg_dirs2}
@@ -71,10 +71,6 @@ FIND_PATH(
 	BOOST_DIR boost/foreach.hpp HINTS ${boost_dirs1} ${boost_dirs2}
 	DOC "Path to top-level Boost source directory."
 )
-FIND_PROGRAM(
-	BJAM_EXECUTABLE bjam HINTS ${boost_jam_dirs1} ${boost_jam_dirs2}
-	DOC "Path to a directory containing bjam executable."
-)
 
 IF(NOT JPEG_DIR)
 	MESSAGE(FATAL_ERROR "JPEG source directory not found. You may specify it manually.")
@@ -88,9 +84,7 @@ ELSEIF(NOT QT_DIR)
 	MESSAGE(FATAL_ERROR "Qt source directory not found. You may specify it manually.")
 ELSEIF(NOT BOOST_DIR)
 	MESSAGE(FATAL_ERROR "Boost source directory not found. You may specify it manually.")
-ELSEIF(NOT BJAM_EXECUTABLE)
-	MESSAGE(FATAL_ERROR "bjam executable not found. You may specify it manually.")
-ENDIF(NOT JPEG_DIR)
+ENDIF()
 
 
 IF(MINGW)
@@ -291,15 +285,17 @@ ENDIF(MINGW)
 
 SET(boost_64bit_flags "")
 IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
-	LIST(APPEND boost_64bit_flags "architecture=x86" "address-model=64")
+	LIST(APPEND boost_64bit_flags "address-model=64")
 ENDIF()
 
 ADD_CUSTOM_TARGET(
-	boost ALL "${BJAM_EXECUTABLE}" --with-test toolset=${boost_toolset}
+	boost ALL
+	COMMAND bootstrap && b2 --with-test toolset=${boost_toolset}
 	threading=multi link=static variant=debug,release ${boost_64bit_flags}
 	define=_BIND_TO_CURRENT_VCLIBS_VERSION=1
 	stage
 	WORKING_DIRECTORY "${BOOST_DIR}"
+	VERBATIM
 )
 
 
@@ -347,7 +343,7 @@ ENDIF(EXISTS "${QT_DIR}/bin/designer.exe")
 
 IF(MINGW)
 	SET(platform win32-g++)
-	SET(make_command mingw32-make)
+	SET(make_command "mingw32-make -j$ENV{NUMBER_OF_PROCESSORS}")
 ELSEIF(MSVC)
 	#MESSAGE("MSVC=${MSVC} | MSVC10=${MSVC10} | MSVC80=${MSVC80}" )
 	SET(make_command nmake)
@@ -370,37 +366,82 @@ ELSE(MINGW)
 	MESSAGE(FATAL_ERROR "Unsupported platform.")
 ENDIF(MINGW)
 
-# We disable frame pointer ommission in release mode to ensure
-# good stack traces from our built-in crash reporter.
-IF(MSVC AND force_frame_pointer)
-	SET(conf_file "${QT_DIR}/mkspecs/${platform}/qmake.conf")
-	FILE(READ "${conf_file}" contents)
-	STRING(REGEX REPLACE "(QMAKE_CFLAGS_RELEASE[ \\t]*=)" "\\1 -Oy-" new_contents "${contents}")
-	STRING(REGEX REPLACE "( -Oy-)+" " -Oy-" new_contents "${new_contents}")
-	IF(NOT "${contents}" STREQUAL "${new_contents}")
-		# Make a backup copy, if not already there.
-		IF(NOT EXISTS "${conf_file}.orig")
-			CONFIGURE_FILE("${conf_file}" "${conf_file}.orig" COPYONLY)
-		ENDIF()
 
-		FILE(WRITE "${conf_file}" "${new_contents}")
-	ENDIF()
+IF(MINGW)
+	# Figure out the correct values for -*-libgcc and -*-libstdc++
+	# An empty value doesn't mean it's incorrect.
+	SET(static_shared_libgcc "")
+	SET(static_shared_libstdcpp "")
+	STRING(REGEX MATCH "-(static|shared)-libgcc" static_shared_libgcc "${CMAKE_CXX_FLAGS}")
+	STRING(REGEX MATCH "-(static|shared)-libstdc\\+\\+" static_shared_libstdcpp "${CMAKE_CXX_FLAGS}")
 ENDIF()
 
-# We also force debugging symbols even for release builds.
-IF(NOT EXISTS "${QT_DIR}/mkspecs/features/release.prf.orig")
-	CONFIGURE_FILE(
-		"${QT_DIR}/mkspecs/features/release.prf"
-		"${QT_DIR}/mkspecs/features/release.prf.orig" COPYONLY
+# Patch qmake.conf
+SET(CHANGES "")
+IF(MINGW)
+	# Set correct -*-libgcc and -*-libstdc++ flags.
+	LIST(
+		APPEND CHANGES
+		
+		# Get rid of existing flags, if any.
+		"/-(static|shared)-lib(gcc|stdc\\+\\+)//"
+			
+		# Add the flags we want.
+		"/(QMAKE_LFLAGS[ \t]*=)[ \t]*/\\1 ${static_shared_libgcc} ${static_shared_libstdcpp} /"
+	)
+	
+	IF (CMAKE_C_FLAGS MATCHES ".*-fno-keep-inline-dllexport.*")
+		# This option is needed to prevent out-of-memory situations when linking large DLLs.
+		LIST(
+			APPEND CHANGES
+			
+			# Get rid of the existing flag, if present.
+			"/-f(no)?-keep-inline-dllexport//"
+			
+			# Add the flag to QMAKE_CFLAGS and QMAKE_LFLAGS.
+			"/(QMAKE_(C|L)FLAGS[ \t]*=)[ \t]*/\\1 -fno-keep-inline-dllexport /"
+		)
+	ENDIF()
+ELSEIF(MSVC AND force_frame_pointer)
+	# Disable frame pointer ommission in release mode to ensure
+	# good stack traces from our built-in crash reporter.
+	LIST(
+		APPEND CHANGES
+		
+		# Add the flag.
+		"/(QMAKE_CFLAGS_RELEASE[ \t]*=)/\\1 -Oy-/"
+		
+		# Get rid of duplicates, in case it was already there.
+		"/( -Oy-)+/ -Oy-/"
 	)
 ENDIF()
-FILE(READ "${QT_DIR}/mkspecs/features/release.prf.orig" contents)
-STRING(
-	REGEX REPLACE "(\\$\\$QMAKE_(C|CXX|L)FLAGS_RELEASE)([ \t\r\n]|$)"
-	"\\1_WITH_DEBUGINFO\\3" contents "${contents}"
-)
-FILE(WRITE "${QT_DIR}/mkspecs/features/release.prf" "${contents}")
+PATCH_FILE("${QT_DIR}/mkspecs/${platform}/qmake.conf" ${CHANGES})
+	
 
+# We also force debugging symbols even for release builds.
+PATCH_FILE(
+	"${QT_DIR}/mkspecs/features/release.prf"
+	
+	# Clone *FLAGS_RELEASE into *FLAGS_RELEASE_WITH_DEBUGINFO
+	"/(\\$\\$QMAKE_(C|CXX|L)FLAGS_RELEASE)([ \t\r\n]|$)/\\1_WITH_DEBUGINFO\\3/"
+)
+
+
+# Set correct -*-libgcc and -*-libstdc++ flags.
+IF(MINGW)
+	FOREACH(file_ Makefile.win32-g++ Makefile.win32-g++-sh)
+		SET(conf_file_ "${QT_DIR}/qmake/${file_}")
+		PATCH_FILE(
+			"${conf_file_}"
+			
+			# Get rid of existing flags, if any.
+			"/-(static|shared)-lib(gcc|stdc\\+\\+)//"
+			
+			# Add the flags we want.
+			"/(LFLAGS[ \t]*=)[ \t]*/\\1 ${static_shared_libgcc} ${static_shared_libstdcpp} /"
+		)
+	ENDFOREACH()
+ENDIF()
 
 SET(qt_build_script "${CMAKE_BINARY_DIR}/build-qt.bat")
 
@@ -449,7 +490,7 @@ MESSAGE(STATUS "----------------------------")
 # Dump symbols of all DLLs we are going to link to.
 OPTION(DUMP_DLL_SYMBOLS "Enable if you are going to build crash reporter." OFF)
 IF(DUMP_DLL_SYMBOLS)
-		FIND_PATH(
+	FIND_PATH(
 		SYMBOLS_PATH . PATHS "${build_outer_dir}/symbols"
 		"${source_outer_dir}/symbols" NO_DEFAULT_PATH
 		DOC "The directory to write symbol information into."
