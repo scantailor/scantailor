@@ -30,6 +30,7 @@
 #include "DespeckleLevel.h"
 #include "Dpi.h"
 #include "ImageViewTab.h"
+#include "Params.h"
 #include <set>
 
 namespace dewarping
@@ -83,6 +84,8 @@ private slots:
 
 	void colorModeChanged(int idx);
 	
+	void pictureShapeChanged(int idx);
+	
 	void whiteMarginsToggled(bool checked);
 	
 	void equalizeIlluminationToggled(bool checked);
@@ -134,6 +137,7 @@ private:
 	PageId m_pageId;
 	Dpi m_outputDpi;
 	ColorParams m_colorParams;
+	PictureShape m_pictureShape;
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;

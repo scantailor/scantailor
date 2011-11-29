@@ -21,6 +21,7 @@
 
 #include "Dpi.h"
 #include "ColorParams.h"
+#include "Params.h"
 #include "DewarpingMode.h"
 #include "dewarping/DistortionModel.h"
 #include "DepthPerception.h"
@@ -47,7 +48,7 @@ public:
 		Dpi const& dpi, ColorParams const& color_params,
 		DewarpingMode const& dewarping_mode,
 		dewarping::DistortionModel const& distortion_model,
-		DepthPerception const& depth_perception, DespeckleLevel despeckle_level);
+		DepthPerception const& depth_perception, DespeckleLevel despeckle_level, PictureShape picture_shape);
 	
 	explicit OutputImageParams(QDomElement const& el);
 
@@ -113,6 +114,9 @@ private:
 	/** Non-geometric parameters used to generate the output image. */
 	ColorParams m_colorParams;
 
+	/** Shape of the pictures in image */
+	PictureShape m_pictureShape;
+	
 	/** Two curves and two lines connecting their endpoints.  Used for dewarping. */
 	dewarping::DistortionModel m_distortionModel;
 

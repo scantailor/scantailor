@@ -36,11 +36,13 @@ OutputImageParams::OutputImageParams(
 	DewarpingMode const& dewarping_mode,
 	dewarping::DistortionModel const& distortion_model,
 	DepthPerception const& depth_perception,
-	DespeckleLevel const despeckle_level)
+	DespeckleLevel const despeckle_level,
+	PictureShape const picture_shape)
 :	m_size(out_image_size),
 	m_contentRect(content_rect),
 	m_dpi(dpi),
 	m_colorParams(color_params),
+	m_pictureShape(picture_shape),
 	m_distortionModel(distortion_model),
 	m_depthPerception(depth_perception),
 	m_dewarpingMode(dewarping_mode),
@@ -107,6 +109,10 @@ OutputImageParams::matches(OutputImageParams const& other) const
 		return false;
 	}
 
+	if (m_pictureShape != other.m_pictureShape) {
+		return false;
+	}
+	
 	if (m_dewarpingMode != other.m_dewarpingMode) {
 		return false;
 	} else if (m_dewarpingMode != DewarpingMode::OFF) {

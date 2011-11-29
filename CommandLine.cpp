@@ -132,6 +132,7 @@ CommandLine::setup()
 	m_layoutType = fetchLayoutType();
 	m_layoutDirection = fetchLayoutDirection();
 	m_colorMode = fetchColorMode();
+	m_pictureShape = fetchPictureShape();
 	m_dpi = fetchDpi();
 	m_outputDpi = fetchDpi("output-dpi");
 	m_margins = fetchMargins();
@@ -200,6 +201,7 @@ CommandLine::printHelp()
 	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
 	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
+	std::cout << "\t--picture-shape=<free|rectangular>\n\t\t\t\t\t\t-- default: free" << "\n";
 	std::cout << "\t--white-margins\t\t\t\t-- default: false" << "\n";
 	std::cout << "\t--normalize-illumination\t\t-- default: false" << "\n";
 	std::cout << "\t--threshold=<n>\t\t\t\t-- n<0 thinner, n>0 thicker; default: 0" << "\n";
@@ -276,6 +278,17 @@ CommandLine::fetchColorMode()
 		return output::ColorParams::MIXED;
 
 	return output::ColorParams::BLACK_AND_WHITE;
+}
+
+output::PictureShape
+CommandLine::fetchPictureShape()
+{
+	QString ps = m_options["picture-shape"].toLower();
+	
+	if (ps == "rectangular")
+		return output::RECTANGULAR_SHAPE;
+
+	return output::FREE_SHAPE;
 }
 
 

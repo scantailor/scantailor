@@ -375,6 +375,10 @@ ConsoleBatch::setupOutput(std::set<PageId> allPages)
 			params.setOutputDpi(outputDpi);
 		}
 
+		if (cli.hasPictureShape()) {
+			params.setPictureShape(cli.getPictureShape());
+		}
+		
 		output::ColorParams colorParams = params.colorParams();
 		if (cli.hasColorMode())
 			colorParams.setColorMode(cli.getColorMode());

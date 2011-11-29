@@ -200,6 +200,8 @@ public:
 	 */
 	QRect contentBoundingBox(BWColor content_color = BLACK) const;
 	
+	void rectangularizeAreas(BWColor content_color = BLACK);
+	
 	int width() const { return m_width; }
 	
 	int height() const { return m_height; }

@@ -25,3 +25,9 @@ The problem happened in Color / Grayscale mode with "White margins" turned on.
 4) файл автосохранения Project.Scantailor.as переименовываем в файл проекта Project.Scantailor
 5) бэкап файла проекта Project.Scantailor.bak не удаляем
 4. При Создании Нового проекта, Открытии существующего, Сохранении проекта, Закрытии проекта или при открытии Диалога Настроек автосохранение отключается, а после завершении операции - снова запускается. При выходе из программы и интерактивном сохранении проекта автосохранение отключается.
+
+29.11.2011
+1. Все улучшения основной ветки master внесены в код ветки plus.
+2. Портирован код обработки выделения картинок в Смешанном режиме вывода форка scantailor-enhanced Петра Ковара (Petr Kovar). В режиме Free картинки выделяются страндартно. В режиме Rectangular выделенние картинки заключается в прямоугольник-выделение.
+Описание от Petr Kovar:
+Pictureshape patch adds option for mixed pages to choose from free shape and rectangular shape images. This patch does not improve the original algoritm but creates from the detected "blobs" rectangular shapes and the rectangles that intersects joins to one.

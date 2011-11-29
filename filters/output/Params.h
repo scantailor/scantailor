@@ -31,7 +31,8 @@ class QDomElement;
 
 namespace output
 {
-
+	enum PictureShape { FREE_SHAPE, RECTANGULAR_SHAPE };
+	
 class Params
 {
 public:
@@ -44,6 +45,9 @@ public:
 	void setOutputDpi(Dpi const& dpi) { m_dpi = dpi; }
 	
 	ColorParams const& colorParams() const { return m_colorParams; }
+	
+	PictureShape pictureShape() const { return m_pictureShape; }
+	void setPictureShape(PictureShape ps) { m_pictureShape = ps; }
 
 	void setColorParams(ColorParams const& params) { m_colorParams = params; }
 
@@ -73,6 +77,7 @@ private:
 	
 	Dpi m_dpi;
 	ColorParams m_colorParams;
+	PictureShape m_pictureShape;
 	dewarping::DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
