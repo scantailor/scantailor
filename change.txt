@@ -31,3 +31,6 @@ The problem happened in Color / Grayscale mode with "White margins" turned on.
 2. Портирован код обработки выделения картинок в Смешанном режиме вывода форка scantailor-enhanced Петра Ковара (Petr Kovar). В режиме Free картинки выделяются страндартно. В режиме Rectangular выделенние картинки заключается в прямоугольник-выделение.
 Описание от Petr Kovar:
 Pictureshape patch adds option for mixed pages to choose from free shape and rectangular shape images. This patch does not improve the original algoritm but creates from the detected "blobs" rectangular shapes and the rectangles that intersects joins to one.
+
+30.11.2011
+Исправил bug - при открытии ранее сохраненного и отработанного проекта на Стадии Вывод. весь проект требовал прогонки заново. Т.е. все миниатюры на ленте имели знак вопроса. Исправлено.
