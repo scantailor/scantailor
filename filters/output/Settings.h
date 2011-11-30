@@ -56,7 +56,7 @@ public:
 
 	void setColorParams(PageId const& page_id, ColorParams const& prms);
 	
-	void setPictureShape(PageId const& page_id, PictureShape picture_shape);
+        void setPictureShape(PageId const& page_id, PictureShape picture_shape);
 
 	void setDpi(PageId const& page_id, Dpi const& dpi);
 

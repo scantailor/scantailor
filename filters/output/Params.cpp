@@ -46,9 +46,7 @@ Params::Params(QDomElement const& el)
 :	m_dpi(XmlUnmarshaller::dpi(el.namedItem("dpi").toElement())),
 	m_distortionModel(el.namedItem("distortion-model").toElement()),
 	m_depthPerception(el.attribute("depthPerception")),
-	m_dewarpingMode(el.attribute("dewarpingMode")),
-	m_despeckleLevel(despeckleLevelFromString(el.attribute("despeckleLevel"))),
-	m_pictureShape((PictureShape)(el.attribute("pictureShape").toInt()))
+        m_dewarpingMode(el.attribute("dewarpingMode"))
 {
 	QDomElement const cp(el.namedItem("color-params").toElement());
 	m_colorParams.setColorMode(parseColorMode(cp.attribute("colorMode")));
@@ -60,6 +58,8 @@ Params::Params(QDomElement const& el)
 	m_colorParams.setBlackWhiteOptions(
 		BlackWhiteOptions(cp.namedItem("bw").toElement())
 	);
+        m_despeckleLevel = despeckleLevelFromString(el.attribute("despeckleLevel")),
+        m_pictureShape = (PictureShape)(el.attribute("pictureShape").toInt());
 }
 
 QDomElement

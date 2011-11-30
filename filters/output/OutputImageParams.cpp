@@ -25,7 +25,6 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <math.h>
-
 namespace output
 {
 
@@ -59,7 +58,7 @@ OutputImageParams::OutputImageParams(QDomElement const& el)
 	m_partialXform(el.namedItem("partial-xform").toElement()),
 	m_dpi(XmlUnmarshaller::dpi(el.namedItem("dpi").toElement())),
 	m_colorParams(el.namedItem("color-params").toElement()),
-	m_distortionModel(el.namedItem("distortion-model").toElement()),
+        m_distortionModel(el.namedItem("distortion-model").toElement()),
 	m_depthPerception(el.attribute("depthPerception")),
 	m_dewarpingMode(el.attribute("dewarpingMode")),
 	m_despeckleLevel(despeckleLevelFromString(el.attribute("despeckleLevel")))
@@ -78,7 +77,7 @@ OutputImageParams::toXml(QDomDocument& doc, QString const& name) const
 	el.appendChild(marshaller.dpi(m_dpi, "dpi"));
 	el.appendChild(m_colorParams.toXml(doc, "color-params"));
 	el.appendChild(m_distortionModel.toXml(doc, "distortion-model"));
-	el.setAttribute("depthPerception", m_depthPerception.toString());
+        el.setAttribute("depthPerception", m_depthPerception.toString());
 	el.setAttribute("dewarpingMode", m_dewarpingMode.toString());
 	el.setAttribute("despeckleLevel", despeckleLevelToString(m_despeckleLevel));
 	
@@ -109,9 +108,11 @@ OutputImageParams::matches(OutputImageParams const& other) const
 		return false;
 	}
 
-	if (m_pictureShape != other.m_pictureShape) {
-		return false;
-	}
+        if(m_pictureShape==0 || m_pictureShape==1) {
+            if (m_pictureShape != other.m_pictureShape) {
+                    return false;
+            }
+        }
 	
 	if (m_dewarpingMode != other.m_dewarpingMode) {
 		return false;
