@@ -25,6 +25,8 @@
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "PageId.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <QString>
@@ -59,6 +61,12 @@ PageView
 Filter::getView() const
 {
 	return PAGE_VIEW;
+}
+
+void
+Filter::performRelinking(AbstractRelinker const& relinker)
+{
+	m_ptrSettings->performRelinking(relinker);
 }
 
 void

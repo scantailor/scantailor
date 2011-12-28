@@ -16,18 +16,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ErrorWidget.h"
-#include "ErrorWidget.h.moc"
-#include <QStyle>
-#include <QIcon>
+#ifndef PAYLOAD_EVENT_H_
+#define PAYLOAD_EVENT_H_
 
-ErrorWidget::ErrorWidget(QString const& text, Qt::TextFormat fmt)
+#include <QEvent>
+
+template<typename T>
+class PayloadEvent : public QEvent
 {
-	setupUi(this);
-	textLabel->setTextFormat(fmt);
-	textLabel->setText(text);
-	QIcon icon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning));
-	imageLabel->setPixmap(icon.pixmap(48, 48));
+public:
+	PayloadEvent(T const& payload) : QEvent(User), m_payload(payload) {}
+	
+	T const& payload() const { return m_payload; }
+	
+	T& payload() { return m_payload; } 
+private:
+	T m_payload;
+};
 
-	connect(textLabel, SIGNAL(linkActivated(QString const&)), SLOT(linkActivated(QString const&)));
-}
+#endif

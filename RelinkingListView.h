@@ -16,18 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ErrorWidget.h"
-#include "ErrorWidget.h.moc"
-#include <QStyle>
-#include <QIcon>
+#ifndef RELINKING_LIST_VIEW_H_
+#define RELINKING_LIST_VIEW_H_
 
-ErrorWidget::ErrorWidget(QString const& text, Qt::TextFormat fmt)
+#include <QListView>
+
+class QPainter;
+class QRect;
+class QModelIndex;
+
+class RelinkingListView : public QListView
 {
-	setupUi(this);
-	textLabel->setTextFormat(fmt);
-	textLabel->setText(text);
-	QIcon icon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning));
-	imageLabel->setPixmap(icon.pixmap(48, 48));
+public:
+	RelinkingListView(QWidget* parent = 0);
+protected:
+	virtual void paintEvent(QPaintEvent* e);
+private:
+	class Delegate;
+	class IndicationGroup;
+	class GroupAggregator;
 
-	connect(textLabel, SIGNAL(linkActivated(QString const&)), SLOT(linkActivated(QString const&)));
-}
+	void maybeDrawStatusLayer(QPainter* painter,
+		QModelIndex const& item_index, QRect const& item_paint_rect);
+
+	void drawStatusLayer(QPainter* painter);
+
+	bool m_statusLayerDrawn;
+};
+
+#endif

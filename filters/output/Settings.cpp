@@ -20,6 +20,8 @@
 #include "Params.h"
 #include "PictureLayerProperty.h"
 #include "FillColorProperty.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include "../../Utils.h"
 #include <boost/foreach.hpp>
 #include <Qt>
@@ -50,6 +52,50 @@ Settings::clear()
 	m_perPageOutputParams.clear();
 	m_perPagePictureZones.clear();
 	m_perPageFillZones.clear();
+}
+
+void
+Settings::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker const locker(&m_mutex);
+
+	PerPageParams new_params;
+	PerPageOutputParams new_output_params;
+	PerPageZones new_picture_zones;
+	PerPageZones new_fill_zones;
+
+	BOOST_FOREACH(PerPageParams::value_type const& kv, m_perPageParams) {
+		RelinkablePath const old_path(kv.first.imageId().filePath(), RelinkablePath::File);
+		PageId new_page_id(kv.first);
+		new_page_id.imageId().setFilePath(relinker.substitutionPathFor(old_path));
+		new_params.insert(PerPageParams::value_type(new_page_id, kv.second));
+	}
+
+	BOOST_FOREACH(PerPageOutputParams::value_type const& kv, m_perPageOutputParams) {
+		RelinkablePath const old_path(kv.first.imageId().filePath(), RelinkablePath::File);
+		PageId new_page_id(kv.first);
+		new_page_id.imageId().setFilePath(relinker.substitutionPathFor(old_path));
+		new_output_params.insert(PerPageOutputParams::value_type(new_page_id, kv.second));
+	}
+
+	BOOST_FOREACH(PerPageZones::value_type const& kv, m_perPagePictureZones) {
+		RelinkablePath const old_path(kv.first.imageId().filePath(), RelinkablePath::File);
+		PageId new_page_id(kv.first);
+		new_page_id.imageId().setFilePath(relinker.substitutionPathFor(old_path));
+		new_picture_zones.insert(PerPageZones::value_type(new_page_id, kv.second));
+	}
+
+	BOOST_FOREACH(PerPageZones::value_type const& kv, m_perPageFillZones) {
+		RelinkablePath const old_path(kv.first.imageId().filePath(), RelinkablePath::File);
+		PageId new_page_id(kv.first);
+		new_page_id.imageId().setFilePath(relinker.substitutionPathFor(old_path));
+		new_fill_zones.insert(PerPageZones::value_type(new_page_id, kv.second));
+	}
+
+	m_perPageParams.swap(new_params);
+	m_perPageOutputParams.swap(new_output_params);
+	m_perPagePictureZones.swap(new_picture_zones);
+	m_perPageFillZones.swap(new_fill_zones);
 }
 
 Params

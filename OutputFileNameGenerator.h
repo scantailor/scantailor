@@ -25,6 +25,7 @@
 #include <Qt>
 
 class PageId;
+class AbstractRelinker;
 
 class OutputFileNameGenerator
 {
@@ -35,6 +36,8 @@ public:
 	OutputFileNameGenerator(
 		IntrusivePtr<FileNameDisambiguator> const& disambiguator,
 		QString const& out_dir, Qt::LayoutDirection layout_direction);
+
+	void performRelinking(AbstractRelinker const& relinker);
 
 	Qt::LayoutDirection layoutDirection() const { return m_layoutDirection; }
 

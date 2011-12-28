@@ -445,6 +445,13 @@ SET(
 	NonOwningWidget.cpp NonOwningWidget.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
+	AbstractRelinker.h
+	RelinkablePath.cpp RelinkablePath.h
+	RelinkablePathVisualization.cpp RelinkablePathVisualization.h
+	RelinkingModel.cpp RelinkingModel.h
+	RelinkingSortingModel.cpp RelinkingSortingModel.h
+	RelinkingListView.cpp RelinkingListView.h
+	RelinkingDialog.cpp RelinkingDialog.h
 	ImageInfo.cpp ImageInfo.h
 	ImageFileInfo.cpp ImageFileInfo.h
 	ImageMetadata.cpp ImageMetadata.h
@@ -528,6 +535,7 @@ SET(
 	ChangedStateItemDelegate.h
 	PageOrderProvider.h
 	PageOrderOption.h
+	PayloadEvent.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h

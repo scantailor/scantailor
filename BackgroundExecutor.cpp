@@ -25,20 +25,6 @@
 #include <new>
 #include <assert.h>
 
-template<typename T>
-class BackgroundExecutor::PayloadEvent : public QEvent
-{
-public:
-	PayloadEvent(T const& payload) : QEvent(User), m_payload(payload) {}
-	
-	T const& payload() const { return m_payload; }
-	
-	T& payload() { return m_payload; } 
-private:
-	T m_payload;
-};
-
-
 class BackgroundExecutor::Dispatcher : public QObject
 {
 public:

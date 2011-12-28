@@ -16,18 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ErrorWidget.h"
-#include "ErrorWidget.h.moc"
-#include <QStyle>
-#include <QIcon>
+#ifndef ABSTRACT_RELINKER_H_
+#define ABSTRACT_RELINKER_H_
 
-ErrorWidget::ErrorWidget(QString const& text, Qt::TextFormat fmt)
+#include "RefCountable.h"
+
+class RelinkablePath;
+class QString;
+
+class AbstractRelinker : public RefCountable
 {
-	setupUi(this);
-	textLabel->setTextFormat(fmt);
-	textLabel->setText(text);
-	QIcon icon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning));
-	imageLabel->setPixmap(icon.pixmap(48, 48));
+public:
+	virtual ~AbstractRelinker() {}
 
-	connect(textLabel, SIGNAL(linkActivated(QString const&)), SLOT(linkActivated(QString const&)));
-}
+	/**
+	 * Returns the path to be used instead of the given path.
+	 * The same path will be returned if no substitution is to be made.
+	 */
+	virtual QString substitutionPathFor(RelinkablePath const& orig_path) const = 0;
+};
+
+#endif

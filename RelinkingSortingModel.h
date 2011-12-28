@@ -16,18 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ErrorWidget.h"
-#include "ErrorWidget.h.moc"
-#include <QStyle>
-#include <QIcon>
+#ifndef RELINKING_SORTING_MODEL_H_
+#define RELINKING_SORTING_MODEL_H_
 
-ErrorWidget::ErrorWidget(QString const& text, Qt::TextFormat fmt)
+#include <QSortFilterProxyModel>
+
+class RelinkingSortingModel : public QSortFilterProxyModel
 {
-	setupUi(this);
-	textLabel->setTextFormat(fmt);
-	textLabel->setText(text);
-	QIcon icon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning));
-	imageLabel->setPixmap(icon.pixmap(48, 48));
+public:
+	RelinkingSortingModel(QObject* parent = 0);
+protected:
+	virtual bool lessThan(QModelIndex const& left, QModelIndex const& right) const;
+};
 
-	connect(textLabel, SIGNAL(linkActivated(QString const&)), SLOT(linkActivated(QString const&)));
-}
+#endif

@@ -22,6 +22,8 @@
 #include "Params.h"
 #include "Margins.h"
 #include "Alignment.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <QSizeF>
 #include <QMutex>
 #include <QMutexLocker>
@@ -115,6 +117,8 @@ public:
 	~Impl();
 	
 	void clear();
+
+	void performRelinking(AbstractRelinker const& relinker);
 	
 	void removePagesMissingFrom(PageSequence const& pages);
 	
@@ -219,6 +223,12 @@ void
 Settings::clear()
 {
 	return m_ptrImpl->clear();
+}
+
+void
+Settings::performRelinking(AbstractRelinker const& relinker)
+{
+	m_ptrImpl->performRelinking(relinker);
 }
 
 void
@@ -368,6 +378,22 @@ Settings::Impl::clear()
 {
 	QMutexLocker const locker(&m_mutex);
 	m_items.clear();
+}
+
+void
+Settings::Impl::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker locker(&m_mutex);
+	Container new_items;
+
+	BOOST_FOREACH(Item const& item, m_unorderedItems) {
+		RelinkablePath const old_path(item.pageId.imageId().filePath(), RelinkablePath::File);
+		Item new_item(item);
+		new_item.pageId.imageId().setFilePath(relinker.substitutionPathFor(old_path));
+		new_items.insert(new_item);
+	}
+
+	m_items.swap(new_items);
 }
 
 void

@@ -31,16 +31,19 @@
 #include "Dpm.h"
 #include "FilterData.h"
 #include "ImageLoader.h"
-#include "imageproc/BinaryThreshold.h"
 #include <QCoreApplication>
+#include <QFile>
+#include <QDir>
 #include <QImage>
 #include <QString>
+#include <QTextDocument> // for Qt::escape()
 #include <assert.h>
 
 using namespace imageproc;
 
 class LoadFileTask::ErrorResult : public FilterResult
 {
+	Q_DECLARE_TR_FUNCTIONS(LoadFileTask) 
 public:
 	ErrorResult(QString const& file_path);
 	
@@ -51,6 +54,7 @@ public:
 	}
 private:
 	QString m_filePath;
+	bool m_fileExists;
 };
 
 
@@ -125,19 +129,41 @@ LoadFileTask::overrideDpi(QImage& image) const
 /*======================= LoadFileTask::ErrorResult ======================*/
 
 LoadFileTask::ErrorResult::ErrorResult(QString const& file_path)
-:	m_filePath(file_path)
+:	m_filePath(QDir::toNativeSeparators(file_path))
+,	m_fileExists(QFile::exists(file_path))
 {
 }
 
 void
 LoadFileTask::ErrorResult::updateUI(FilterUiInterface* ui)
 {
-	QString const err_msg(
-		QCoreApplication::translate(
-			"LoadFileTask",
-			"The following file could not be loaded:\n%1"
-		).arg(m_filePath)
-	);
-	ui->setImageWidget(new ErrorWidget(err_msg), ui->TRANSFER_OWNERSHIP);
+	class ErrWidget : public ErrorWidget
+	{
+	public:
+		ErrWidget(IntrusivePtr<AbstractCommand0<void> > const& relinking_dialog_requester,
+			QString const& text, Qt::TextFormat fmt = Qt::AutoText)
+			: ErrorWidget(text, fmt), m_ptrRelinkingDialogRequester(relinking_dialog_requester) {}
+	private:
+		virtual void linkActivated(QString const&) {
+			(*m_ptrRelinkingDialogRequester)();
+		}
+
+		IntrusivePtr<AbstractCommand0<void> > m_ptrRelinkingDialogRequester;
+	};
+
+	QString err_msg;
+	Qt::TextFormat fmt = Qt::AutoText;
+	if (m_fileExists) {
+		err_msg = tr("The following file could not be loaded:\n%1").arg(m_filePath);
+		fmt = Qt::PlainText;
+	} else {
+		err_msg = tr(
+			"The following file doesn't exist:<br>%1<br>"
+			"<br>"
+			"Use the <a href=\"#relink\">Relinking Tool</a> to locate it."
+		).arg(Qt::escape(m_filePath));
+		fmt = Qt::RichText;
+	}
+	ui->setImageWidget(new ErrWidget(ui->relinkingDialogRequester(), err_msg, fmt), ui->TRANSFER_OWNERSHIP);
 	ui->setOptionsWidget(new FilterOptionsWidget, ui->TRANSFER_OWNERSHIP);
 }

@@ -17,6 +17,8 @@
 */
 
 #include "FileNameDisambiguator.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <QString>
 #include <QFileInfo>
 #include <QDomDocument>
@@ -46,6 +48,8 @@ public:
 	int getLabel(QString const& file_path) const;
 
 	int registerFile(QString const& file_path);
+
+	void performRelinking(AbstractRelinker const& relinker);
 private:
 	class ItemsByFilePathTag;
 	class ItemsByFileNameLabelTag;
@@ -137,6 +141,12 @@ int
 FileNameDisambiguator::registerFile(QString const& file_path)
 {
 	return m_ptrImpl->registerFile(file_path);
+}
+
+void
+FileNameDisambiguator::performRelinking(AbstractRelinker const& relinker)
+{
+	m_ptrImpl->performRelinking(relinker);
 }
 
 
@@ -248,6 +258,21 @@ FileNameDisambiguator::Impl::registerFile(QString const& file_path)
 	m_itemsByFileNameLabel.insert(fn_it, new_item);
 
 	return label;
+}
+
+void
+FileNameDisambiguator::Impl::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker const locker(&m_mutex);
+	Container new_items;
+
+	BOOST_FOREACH(Item const& item, m_unorderedItems) {
+		RelinkablePath const old_path(item.filePath, RelinkablePath::File);
+		Item new_item(relinker.substitutionPathFor(old_path), item.label);
+		new_items.insert(new_item);
+	}
+
+	m_items.swap(new_items);
 }
 
 

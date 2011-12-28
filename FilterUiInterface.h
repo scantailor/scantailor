@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #define FILTERUIINTERFACE_H_
 
 #include "PageId.h"
+#include "AbstractCommand.h"
+#include "IntrusivePtr.h"
 
 class DebugImages;
 class FilterOptionsWidget;
@@ -45,6 +47,11 @@ public:
 	virtual void invalidateThumbnail(PageId const& page_id) = 0;
 	
 	virtual void invalidateAllThumbnails() = 0;
+
+	/**
+	 * Returns a callable object that when called will open a relinking dialog.
+	 */
+	virtual IntrusivePtr<AbstractCommand0<void> > relinkingDialogRequester() = 0;
 };
 
 #endif

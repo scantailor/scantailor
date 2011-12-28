@@ -59,8 +59,11 @@
 #include "FixDpiDialog.h"
 #include "LoadFilesStatusDialog.h"
 #include "SettingsDialog.h"
+#include "AbstractRelinker.h"
+#include "RelinkingDialog.h"
 #include "OutOfMemoryHandler.h"
 #include "OutOfMemoryDialog.h"
+#include "QtSignalForwarder.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -92,6 +95,7 @@
 #include <boost/lambda/bind.hpp>
 #include <QApplication>
 #include <QLineF>
+#include <QPointer>
 #include <QWidget>
 #include <QDialog>
 #include <QCloseEvent>
@@ -236,15 +240,9 @@ MainWindow::MainWindow()
 		this, SLOT(pageOrderingChanged(int))
 	);
 	
-	connect(
-		actionFixDpi, SIGNAL(triggered(bool)),
-		this, SLOT(fixDpiDialogRequested())
-	);
-
-	connect(
-		actionDebug, SIGNAL(toggled(bool)),
-		this, SLOT(debugToggled(bool))
-	);
+	connect(actionFixDpi, SIGNAL(triggered(bool)), SLOT(fixDpiDialogRequested()));
+	connect(actionRelinking, SIGNAL(triggered(bool)), SLOT(showRelinkingDialog()));
+	connect(actionDebug, SIGNAL(toggled(bool)), SLOT(debugToggled(bool)));
 
 	connect(
 		actionSettings, SIGNAL(triggered(bool)),
@@ -797,6 +795,68 @@ void
 MainWindow::invalidateAllThumbnails()
 {
 	m_ptrThumbSequence->invalidateAllThumbnails();
+}
+
+IntrusivePtr<AbstractCommand0<void> >
+MainWindow::relinkingDialogRequester()
+{
+	class Requester : public AbstractCommand0<void>
+	{
+	public:
+		Requester(MainWindow* wnd) : m_ptrWnd(wnd) {}
+
+		virtual void operator()() {
+			if (MainWindow* wnd = m_ptrWnd) {
+				wnd->showRelinkingDialog();
+			}
+		}
+	private:
+		QPointer<MainWindow> m_ptrWnd;
+	};
+
+	return IntrusivePtr<AbstractCommand0<void> >(new Requester(this));
+}
+
+void
+MainWindow::showRelinkingDialog()
+{
+	if (!isProjectLoaded()) {
+		return;
+	}
+
+	RelinkingDialog* dialog = new RelinkingDialog(this);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowModality(Qt::WindowModal);
+
+	m_ptrPages->listRelinkablePaths(dialog->pathCollector());
+	dialog->pathCollector()(RelinkablePath(m_outFileNameGen.outDir(), RelinkablePath::Dir));
+	
+	new QtSignalForwarder(
+		dialog, SIGNAL(accepted()),
+		boost::lambda::bind(&MainWindow::performRelinking, this, dialog->relinker())
+	);
+
+	dialog->show();
+}
+
+void
+MainWindow::performRelinking(IntrusivePtr<AbstractRelinker> const& relinker)
+{
+	assert(relinker.get());
+
+	if (!isProjectLoaded()) {
+		return;
+	}
+
+	m_ptrPages->performRelinking(*relinker);
+	m_ptrStages->performRelinking(*relinker);
+	m_outFileNameGen.performRelinking(*relinker);
+
+	m_ptrThumbnailCache->setThumbDir(Utils::outputDirToThumbDir(m_outFileNameGen.outDir()));
+	resetThumbSequence(currentPageOrderProvider());
+	m_selectedPage.set(m_ptrThumbSequence->selectionLeader().id(), getCurrentView());
+
+	reloadRequested();
 }
 
 void
@@ -1482,6 +1542,8 @@ MainWindow::updateProjectActions()
 	bool const loaded = isProjectLoaded();
 	actionSaveProject->setEnabled(loaded);
 	actionSaveProjectAs->setEnabled(loaded);
+	actionFixDpi->setEnabled(loaded);
+	actionRelinking->setEnabled(loaded);
 }
 
 bool

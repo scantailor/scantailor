@@ -64,6 +64,8 @@ public:
 	virtual QString getName() const;
 	
 	virtual PageView getView() const;
+
+	virtual void performRelinking(AbstractRelinker const& relinker);
 	
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
