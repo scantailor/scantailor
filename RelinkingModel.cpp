@@ -25,6 +25,8 @@
 #include <QMutexLocker>
 #include <QWaitCondition>
 #include <QCoreApplication>
+#include <QColor>
+#include <Qt>
 #include <boost/foreach.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -149,6 +151,8 @@ RelinkingModel::data(QModelIndex const& index, int role) const
 			return QDir::toNativeSeparators(item.uncommittedPath);
 		case Qt::DecorationRole:
 			return (item.type == RelinkablePath::Dir) ? m_folderIcon : m_fileIcon;
+		case Qt::BackgroundColorRole:
+			return QColor(Qt::transparent);
 	}
 
 	return QVariant();

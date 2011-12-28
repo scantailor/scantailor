@@ -161,7 +161,7 @@ RelinkablePathVisualization::stylePathComponentButton(QAbstractButton* btn, bool
 		"QAbstractButton {\n"
 		"	border: 2px solid " + border_color.name() + ";\n"
 		"	border-radius: 0.5em;\n"
-		"	padding: 4px;\n"
+		"	padding: 0.2em;\n"
 		"	margin-left: 1px;\n"
 		"	margin-right: 1px;\n"
 		"	min-width: 2em;\n"

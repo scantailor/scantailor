@@ -30,6 +30,7 @@
 #include <QPixmap>
 #include <QThread>
 #include <Qt>
+#include <memory>
 #include <vector>
 #include <set>
 #include <map>
