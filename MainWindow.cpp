@@ -1827,7 +1827,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	
 	std::auto_ptr<QFileDialog> dialog(
 		new QFileDialog(
-			this, tr("File to insert"),
+			this, tr("Files to insert"),
 			QFileInfo(existing.filePath()).absolutePath()
 		)
 	);
@@ -1849,6 +1849,10 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	// The order of items returned by QFileDialog is platform-dependent,
 	// so we enforce our own ordering.
 	std::sort(files.begin(), files.end(), SmartFilenameOrdering());
+
+	// I suspect on some platforms it may be possible to select the same file twice,
+	// so to be safe, remove duplicates.
+	files.erase(std::unique(files.begin(), files.end()), files.end());
 	
 	using namespace boost::lambda;
 	
