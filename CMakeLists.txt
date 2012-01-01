@@ -445,6 +445,13 @@ SET(
 	NonOwningWidget.cpp NonOwningWidget.h
 	Dpi.cpp Dpi.h Dpm.cpp Dpm.h
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
+	AbstractRelinker.h
+	RelinkablePath.cpp RelinkablePath.h
+	RelinkablePathVisualization.cpp RelinkablePathVisualization.h
+	RelinkingModel.cpp RelinkingModel.h
+	RelinkingSortingModel.cpp RelinkingSortingModel.h
+	RelinkingListView.cpp RelinkingListView.h
+	RelinkingDialog.cpp RelinkingDialog.h
 	ImageInfo.cpp ImageInfo.h
 	ImageFileInfo.cpp ImageFileInfo.h
 	ImageMetadata.cpp ImageMetadata.h
@@ -528,6 +535,7 @@ SET(
 	ChangedStateItemDelegate.h
 	PageOrderProvider.h
 	PageOrderOption.h
+	PayloadEvent.h
 	filter_dc/AbstractFilterDataCollector.h
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h
@@ -732,6 +740,10 @@ IF(WIN32)
 	)
 	LIB_TO_DLL(libs_copy_nondebug ${libs_copy_nondebug})
 	COPY_TO_BUILD_DIR(${libs_copy_nondebug} CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
+	
+	# Qt's imageformat plugins. Note that png is built-in and for tiff we have our own code.
+	COPY_TO_BUILD_DIR("${QT_QJPEG_PLUGIN_RELEASE}" SUBDIR imageformats CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
+	COPY_TO_BUILD_DIR("${QT_QJPEG_PLUGIN_DEBUG}" SUBDIR imageformats CONFIGURATIONS Debug)
 	
 	IF(MINGW)
 		SET(zlib_dll "${QT_BIN_DIR}/libz.dll")

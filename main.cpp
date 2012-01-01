@@ -141,6 +141,9 @@ int main(int argc, char** argv)
 
 	Application app(argc, argv);
 
+	// Get rid of all references to Qt's installation directory.
+	app.setLibraryPaths(QStringList(app.applicationDirPath()));
+
 	// parse command line arguments
 	CommandLine cli(app.arguments());
 	CommandLine::set(cli);

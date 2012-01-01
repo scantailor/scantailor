@@ -25,6 +25,7 @@
 #include <memory>
 #include <set>
 
+class AbstractRelinker;
 class QString;
 class QDomElement;
 class QDomDocument;
@@ -79,6 +80,8 @@ public:
 	int getLabel(QString const& file_path) const;
 
 	int registerFile(QString const& file_path);
+
+	void performRelinking(AbstractRelinker const& relinker);
 private:
 	class Impl;
 

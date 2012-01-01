@@ -18,6 +18,8 @@
 */
 
 #include <QCoreApplication>
+#include <QString>
+#include <QStringList>
 #include <iostream>
 
 #include "CommandLine.h"
@@ -27,6 +29,9 @@
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
+
+	// Get rid of all references to Qt's installation directory.
+	app.setLibraryPaths(QStringList(app.applicationDirPath()));
 
 	// parse command line arguments
 	CommandLine cli(app.arguments(), false);

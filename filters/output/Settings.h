@@ -35,6 +35,8 @@
 #include <map>
 #include <memory>
 
+class AbstractRelinker;
+
 namespace output
 {
 
@@ -49,6 +51,8 @@ public:
 	virtual ~Settings();
 	
 	void clear();
+
+	void performRelinking(AbstractRelinker const& relinker);
 	
 	Params getParams(PageId const& page_id) const;
 	

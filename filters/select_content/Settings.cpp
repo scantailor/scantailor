@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,10 @@
 
 #include "Settings.h"
 #include "Utils.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <QMutexLocker>
+#include <boost/foreach.hpp>
 
 namespace select_content
 {
@@ -36,6 +39,22 @@ Settings::clear()
 {
 	QMutexLocker locker(&m_mutex);
 	m_pageParams.clear();
+}
+
+void
+Settings::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker locker(&m_mutex);
+	PageParams new_params;
+
+	BOOST_FOREACH(PageParams::value_type const& kv, m_pageParams) {
+		RelinkablePath const old_path(kv.first.imageId().filePath(), RelinkablePath::File);
+		PageId new_page_id(kv.first);
+		new_page_id.imageId().setFilePath(relinker.substitutionPathFor(old_path));
+		new_params.insert(PageParams::value_type(new_page_id, kv.second));
+	}
+
+	m_pageParams.swap(new_params);
 }
 
 void

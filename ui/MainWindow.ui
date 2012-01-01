@@ -177,7 +177,7 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug">
@@ -185,6 +185,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionFixDpi"/>
+    <addaction name="actionRelinking"/>
     <addaction name="separator"/>
     <addaction name="actionDebug"/>
     <addaction name="separator"/>
@@ -223,7 +224,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Debug</string>
+    <string>Debug Mode</string>
    </property>
   </action>
   <action name="actionSaveProject">
@@ -343,7 +344,12 @@
   </action>
   <action name="actionFixDpi">
    <property name="text">
-    <string>Fix DPI</string>
+    <string>Fix DPI ...</string>
+   </property>
+  </action>
+  <action name="actionRelinking">
+   <property name="text">
+    <string>Relinking ...</string>
    </property>
   </action>
  </widget>

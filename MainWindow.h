@@ -22,6 +22,7 @@
 #include "ui_MainWindow.h"
 #include "FilterUiInterface.h"
 #include "NonCopyable.h"
+#include "AbstractCommand.h"
 #include "IntrusivePtr.h"
 #include "BackgroundTask.h"
 #include "FilterResult.h"
@@ -46,6 +47,7 @@
 #include <set>
 
 class AbstractFilter;
+class AbstractRelinker;
 class ThumbnailPixmapCache;
 class ProjectPages;
 class PageSequence;
@@ -137,6 +139,8 @@ private slots:
 	void invalidateThumbnail(PageInfo const& page_info);
 	
 	void invalidateAllThumbnails();
+
+	void showRelinkingDialog();
 	
 	void filterResult(
 		BackgroundTaskPtr const& task,
@@ -184,6 +188,8 @@ private:
 	virtual void setImageWidget(
 		QWidget* widget, Ownership ownership,
 		DebugImages* debug_images = 0);
+
+	virtual IntrusivePtr<AbstractCommand0<void> > relinkingDialogRequester();
 	
 	void switchToNewProject(
 		IntrusivePtr<ProjectPages> const& pages,
@@ -267,6 +273,8 @@ private:
 	void createBatchProcessingWidget();
 
 	void updateDisambiguationRecords(PageSequence const& pages);
+
+	void performRelinking(IntrusivePtr<AbstractRelinker> const& relinker);
 	
 	bool copyFileTo(const QString &sFromPath, const QString &sToPath);
 	
