@@ -740,6 +740,10 @@ IF(WIN32)
 	LIB_TO_DLL(libs_copy_nondebug ${libs_copy_nondebug})
 	COPY_TO_BUILD_DIR(${libs_copy_nondebug} CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
 	
+	# Qt's imageformat plugins. Note that png is built-in and for tiff we have our own code.
+	COPY_TO_BUILD_DIR("${QT_QJPEG_PLUGIN_RELEASE}" SUBDIR imageformats CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
+	COPY_TO_BUILD_DIR("${QT_QJPEG_PLUGIN_DEBUG}" SUBDIR imageformats CONFIGURATIONS Debug)
+	
 	IF(MINGW)
 		SET(zlib_dll "${QT_BIN_DIR}/libz.dll")
 	ELSE()
