@@ -18,52 +18,27 @@
 
 #include "PageSelectionAccessor.h"
 #include "PageSequence.h"
-#include "MainWindow.h"
 
-PageSelectionAccessor::PageSelectionAccessor(MainWindow* main_window)
-:	m_ptrMainWindow(main_window)
+PageSelectionAccessor::PageSelectionAccessor(
+	IntrusivePtr<PageSelectionProvider const> const& provider)
+:	m_ptrProvider(provider)
 {
-}
-
-PageSelectionAccessor::PageSelectionAccessor(PageSelectionAccessor const& other)
-:	m_ptrMainWindow(other.m_ptrMainWindow)
-{
-}
-
-PageSelectionAccessor&
-PageSelectionAccessor::operator=(PageSelectionAccessor const& rhs)
-{
-	m_ptrMainWindow = rhs.m_ptrMainWindow;
-	return *this;
 }
 
 PageSequence
 PageSelectionAccessor::allPages() const
 {
-	if (m_ptrMainWindow) {
-		return m_ptrMainWindow->allPages();
-	}
-
-	return PageSequence();
+	return m_ptrProvider->allPages();
 }
 
 std::set<PageId>
 PageSelectionAccessor::selectedPages() const
 {
-	if (m_ptrMainWindow) {
-		return m_ptrMainWindow->selectedPages();
-	}
-	
-	return std::set<PageId>();
+	return m_ptrProvider->selectedPages();
 }
 
 std::vector<PageRange>
 PageSelectionAccessor::selectedRanges() const
 {
-	if (m_ptrMainWindow) {
-		return m_ptrMainWindow->selectedRanges();
-	}
-	
-	return std::vector<PageRange>();
+	return m_ptrProvider->selectedRanges();
 }
-

@@ -409,10 +409,16 @@ ADD_SUBDIRECTORY(interaction)
 ADD_SUBDIRECTORY(zones)
 ADD_SUBDIRECTORY(tests)
 
-FILE(GLOB ui_files "ui/*.ui")
-SOURCE_GROUP("UI Files" FILES ${ui_files})
-QT4_WRAP_UI(ui_sources ${ui_files})
-SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
+FILE(GLOB common_ui_files ui/ErrorWidget.ui)
+FILE(GLOB gui_only_ui_files "ui/*.ui")
+FOREACH(ui_file ${common_ui_files})
+	LIST(REMOVE_ITEM gui_only_ui_files "${ui_file}")
+ENDFOREACH()
+
+SOURCE_GROUP("UI Files" FILES ${common_ui_files} ${gui_only_ui_files})
+QT4_WRAP_UI(common_ui_sources ${common_ui_files})
+QT4_WRAP_UI(gui_only_ui_sources ${gui_only_ui_files})
+SET_SOURCE_FILES_PROPERTIES(${common_ui_sources} ${gui_only_ui_files} PROPERTIES GENERATED TRUE)
 ADD_SUBDIRECTORY(ui)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}") # for ui files
 
@@ -427,19 +433,17 @@ ADD_SUBDIRECTORY(filters/output)
 
 SET(resource_sources)
 QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
-SOURCE_GROUP("Generated" FILES ${ui_sources} ${resource_sources})
+SOURCE_GROUP("Generated" FILES ${common_ui_sources} ${gui_only_ui_sources} ${resource_sources})
 SOURCE_GROUP("Resources" FILES resources/resources.qrc resources/icons/COPYING)
 IF(WIN32)
 	SOURCE_GROUP("Resources" FILES resources/win32/resources.rc)
 ENDIF()
 
 SET(
-	sources
-	Application.cpp Application.h
+	common_sources
 	BackgroundExecutor.cpp BackgroundExecutor.h
 	OpenGLSupport.cpp OpenGLSupport.h
 	PixmapRenderer.cpp PixmapRenderer.h
-	SkinnedButton.cpp SkinnedButton.h
 	BubbleAnimation.cpp BubbleAnimation.h
 	ProcessingIndicationWidget.cpp ProcessingIndicationWidget.h
 	NonOwningWidget.cpp NonOwningWidget.h
@@ -447,26 +451,14 @@ SET(
 	SmartFilenameOrdering.cpp SmartFilenameOrdering.h
 	AbstractRelinker.h
 	RelinkablePath.cpp RelinkablePath.h
-	RelinkablePathVisualization.cpp RelinkablePathVisualization.h
-	RelinkingModel.cpp RelinkingModel.h
-	RelinkingSortingModel.cpp RelinkingSortingModel.h
-	RelinkingListView.cpp RelinkingListView.h
-	RelinkingDialog.cpp RelinkingDialog.h
 	ImageInfo.cpp ImageInfo.h
 	ImageFileInfo.cpp ImageFileInfo.h
 	ImageMetadata.cpp ImageMetadata.h
 	RecentProjects.cpp RecentProjects.h
-	SettingsDialog.cpp SettingsDialog.h
-	FixDpiDialog.cpp FixDpiDialog.h
-	LoadFilesStatusDialog.cpp LoadFilesStatusDialog.h
-	ProjectCreationContext.cpp ProjectCreationContext.h
-	ProjectOpeningContext.cpp ProjectOpeningContext.h
 	OutOfMemoryHandler.cpp OutOfMemoryHandler.h
-	OutOfMemoryDialog.cpp OutOfMemoryDialog.h
-	MainWindow.cpp MainWindow.h
-	ConsoleBatch.cpp ConsoleBatch.h
 	CommandLine.cpp CommandLine.h
 	PageSelectionAccessor.cpp PageSelectionAccessor.h
+	PageSelectionProvider.h
 	ContentSpanFinder.cpp ContentSpanFinder.h
 	PhysicalTransformation.cpp PhysicalTransformation.h
 	ImageTransformation.cpp ImageTransformation.h
@@ -474,25 +466,24 @@ SET(
 	ImageViewBase.cpp ImageViewBase.h
 	BasicImageView.cpp BasicImageView.h
 	StageListView.cpp StageListView.h
+	DebugImageView.cpp DebugImageView.h
+	TabbedDebugImages.cpp TabbedDebugImages.h
 	ThumbnailLoadResult.h
 	ThumbnailPixmapCache.cpp ThumbnailPixmapCache.h
 	ThumbnailBase.cpp ThumbnailBase.h
-	ThumbnailSequence.cpp ThumbnailSequence.h
 	ThumbnailFactory.cpp ThumbnailFactory.h
 	IncompleteThumbnail.cpp IncompleteThumbnail.h
 	ContentBoxPropagator.cpp ContentBoxPropagator.h
 	PageOrientationPropagator.cpp PageOrientationPropagator.h
 	DebugImages.cpp DebugImages.h
-	DebugImageView.cpp DebugImageView.h
-	TabbedDebugImages.cpp TabbedDebugImages.h
 	ImageId.cpp ImageId.h
 	PageId.cpp PageId.h
 	PageInfo.cpp PageInfo.h
 	BackgroundTask.cpp BackgroundTask.h
 	ProcessingTaskQueue.cpp ProcessingTaskQueue.h
 	PageSequence.cpp PageSequence.h
-	ProjectPages.cpp ProjectPages.h
 	StageSequence.cpp StageSequence.h
+	ProjectPages.cpp ProjectPages.h
 	FilterData.cpp FilterData.h
 	ImageMetadataLoader.cpp ImageMetadataLoader.h
 	TiffReader.cpp TiffReader.h
@@ -503,8 +494,6 @@ SET(
 	ImageLoader.cpp ImageLoader.h
 	ErrorWidget.cpp ErrorWidget.h
 	OrthogonalRotation.cpp OrthogonalRotation.h
-	NewOpenProjectPanel.cpp NewOpenProjectPanel.h
-	ProjectFilesDialog.cpp ProjectFilesDialog.h
 	WorkerThread.cpp WorkerThread.h
 	LoadFileTask.cpp LoadFileTask.h
 	FilterOptionsWidget.cpp FilterOptionsWidget.h
@@ -516,9 +505,7 @@ SET(
 	AtomicFileOverwriter.cpp AtomicFileOverwriter.h
 	EstimateBackground.cpp EstimateBackground.h
 	Despeckle.cpp Despeckle.h
-	#Undistort.cpp Undistort.h
 	ThreadPriority.cpp ThreadPriority.h
-	SystemLoadWidget.cpp SystemLoadWidget.h
 	FileNameDisambiguator.cpp FileNameDisambiguator.h
 	OutputFileNameGenerator.cpp OutputFileNameGenerator.h
 	PageRange.cpp PageRange.h
@@ -540,10 +527,42 @@ SET(
 	filter_dc/ThumbnailCollector.h
 	filter_dc/ContentBoxCollector.h
 	filter_dc/PageOrientationCollector.h
+	version.h
 	config.h.in
+	${common_ui_files}
 )
-SOURCE_GROUP("Sources" FILES ${sources} main.cpp main-cli.cpp)
-QT4_AUTOMOC(${sources})
+
+SET(
+	gui_only_sources
+	Application.cpp Application.h
+	SkinnedButton.cpp SkinnedButton.h
+	RelinkablePathVisualization.cpp RelinkablePathVisualization.h
+	RelinkingModel.cpp RelinkingModel.h
+	RelinkingSortingModel.cpp RelinkingSortingModel.h
+	RelinkingListView.cpp RelinkingListView.h
+	RelinkingDialog.cpp RelinkingDialog.h
+	SettingsDialog.cpp SettingsDialog.h
+	FixDpiDialog.cpp FixDpiDialog.h
+	LoadFilesStatusDialog.cpp LoadFilesStatusDialog.h
+	ProjectCreationContext.cpp ProjectCreationContext.h
+	ProjectOpeningContext.cpp ProjectOpeningContext.h
+	OutOfMemoryDialog.cpp OutOfMemoryDialog.h
+	ThumbnailSequence.cpp ThumbnailSequence.h
+	ProjectFilesDialog.cpp ProjectFilesDialog.h
+	NewOpenProjectPanel.cpp NewOpenProjectPanel.h
+	SystemLoadWidget.cpp SystemLoadWidget.h
+	MainWindow.cpp MainWindow.h
+	main.cpp
+)
+
+SET(
+	cli_only_sources
+	ConsoleBatch.cpp ConsoleBatch.h
+	main-cli.cpp
+)
+
+SOURCE_GROUP("Sources" FILES ${common_sources} ${gui_only_sources} ${cli_only_sources})
+QT4_AUTOMOC(${sources} ${common_sources} ${gui_only_sources} ${cli_only_sources})
 
 SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
 
@@ -581,28 +600,28 @@ IF(WIN32)
 	ENDIF(MINGW)
 ENDIF(WIN32)
 
+ADD_LIBRARY(stcore STATIC ${common_sources})
+
 ADD_EXECUTABLE(
-	scantailor WIN32 ${sources} ${ui_sources} version.h main.cpp
+	scantailor WIN32 ${gui_only_sources} ${gui_only_ui_sources}
 	${resource_sources} ${win32_resource_file} resources/icons/COPYING
 )
 
-ADD_EXECUTABLE(
-	scantailor-cli ${sources} version.h main-cli.cpp ${TIFF_INCLUDE_DIR}
-)
+ADD_EXECUTABLE(scantailor-cli ${cli_only_sources})
 
 # Note that order of static libraries matters with gcc.  Specifically,
 # QJPEG_LIBRARIES needs to go before Qt libraries and EXTRA_LIBS needs
 # to go after both of them.
 TARGET_LINK_LIBRARIES(
 	scantailor
-	fix_orientation page_split deskew select_content page_layout
-	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
+	fix_orientation page_split deskew select_content page_layout output stcore
+	dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 TARGET_LINK_LIBRARIES(
 	scantailor-cli
-	fix_orientation page_split deskew select_content page_layout
-	output dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
+	fix_orientation page_split deskew select_content page_layout output
+	stcore dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor scantailor-cli RUNTIME DESTINATION bin)

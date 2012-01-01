@@ -50,6 +50,7 @@ class ProjectPages;
 class PageSequence;
 class StageSequence;
 class PageOrderProvider;
+class PageSelectionAccessor;
 class FilterOptionsWidget;
 class ProcessingIndicationWidget;
 class ImageInfo;
@@ -168,6 +169,7 @@ private slots:
 
 	void handleOutOfMemorySituation();
 private:
+	class PageSelectionProviderImpl;
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
@@ -265,6 +267,8 @@ private:
 	void updateDisambiguationRecords(PageSequence const& pages);
 
 	void performRelinking(IntrusivePtr<AbstractRelinker> const& relinker);
+
+	PageSelectionAccessor newPageSelectionAccessor();
 	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<ProjectPages> m_ptrPages;
