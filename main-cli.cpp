@@ -30,8 +30,10 @@ int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
 
+#ifdef _WIN32
 	// Get rid of all references to Qt's installation directory.
 	app.setLibraryPaths(QStringList(app.applicationDirPath()));
+#endif
 
 	// parse command line arguments
 	CommandLine cli(app.arguments(), false);
