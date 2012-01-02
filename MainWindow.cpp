@@ -2284,6 +2284,7 @@ MainWindow::copyFileTo(const QString &sFromPath, const QString &sToPath) {
         }
     }
     return false;
+}
 
 PageSelectionAccessor
 MainWindow::newPageSelectionAccessor()
