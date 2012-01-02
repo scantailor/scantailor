@@ -51,13 +51,22 @@ MACRO(GENERATE_COPY_TO_BUILD_DIR_TARGET target_name_)
 	SET(script_ "${CMAKE_BINARY_DIR}/copy_to_build_dir.cmake")
 	CONFIGURE_FILE("cmake/copy_to_build_dir.cmake.in" "${script_}" @ONLY)
 	
+	SET(
+		src_files_
+		${COPY_TO_BUILD_DIR_Debug} ${COPY_TO_BUILD_DIR_Release}
+		${COPY_TO_BUILD_DIR_MinSizeRel} ${COPY_TO_BUILD_DIR_RelWithDebInfo}
+	)
+	SET(deps_ "")
+	FOREACH(src_file_ ${src_files_})
+		STRING(REGEX REPLACE "(.*)=>.*" "\\1" src_file_ "${src_file_}")
+		LIST(APPEND deps_ "${src_file_}")
+	ENDFOREACH()
+	
 	# Copy DLLs and other stuff to ${CMAKE_BINARY_DIR}/<configuration>
 	ADD_CUSTOM_TARGET(
 		"${target_name_}" ALL
 		COMMAND "${CMAKE_COMMAND}" "-DTARGET_DIR=$<TARGET_FILE_DIR:scantailor>"
 		"-DCFG=$<CONFIGURATION>" -P "${script_}"
-		DEPENDS "${script_}" ${COPY_TO_BUILD_DIR_Debug}
-		${COPY_TO_BUILD_DIR_Release} ${COPY_TO_BUILD_DIR_MinSizeRel}
-		${COPY_TO_BUILD_DIR_RelWithDebInfo}
+		DEPENDS "${script_}" ${deps_}
     )
 ENDMACRO()

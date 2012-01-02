@@ -78,7 +78,7 @@ ConsoleBatch::ConsoleBatch(std::vector<ImageFileInfo> const& images, QString con
 	m_ptrDisambiguator(new FileNameDisambiguator),
 	m_ptrPages(new ProjectPages(images, ProjectPages::AUTO_PAGES, layout))
 {
-	PageSelectionAccessor const accessor(0);
+	PageSelectionAccessor const accessor((IntrusivePtr<PageSelectionProvider>())); // Won't really be used anyway.
 	m_ptrStages = IntrusivePtr<StageSequence>(new StageSequence(m_ptrPages, accessor));
 
 	//m_ptrThumbnailCache = IntrusivePtr<ThumbnailPixmapCache>(new ThumbnailPixmapCache(output_dir+"/cache/thumbs", QSize(200,200), 40, 5));
@@ -104,7 +104,7 @@ ConsoleBatch::ConsoleBatch(QString const project_file)
 	m_ptrReader.reset(new ProjectReader(doc));
 	m_ptrPages = m_ptrReader->pages();
 
-	PageSelectionAccessor const accessor(0);
+	PageSelectionAccessor const accessor((IntrusivePtr<PageSelectionProvider>())); // Won't be used anyway.
 	m_ptrDisambiguator = m_ptrReader->namingDisambiguator();
 
 	m_ptrStages = IntrusivePtr<StageSequence>(new StageSequence(m_ptrPages, accessor));

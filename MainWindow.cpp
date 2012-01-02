@@ -24,6 +24,7 @@
 #include "ProjectPages.h"
 #include "PageSequence.h"
 #include "PageSelectionAccessor.h"
+#include "PageSelectionProvider.h"
 #include "StageSequence.h"
 #include "ThumbnailSequence.h"
 #include "PageOrderOption.h"
@@ -134,9 +135,30 @@
 #include <assert.h>
 #include <qtimer.h>
 
+class MainWindow::PageSelectionProviderImpl : public PageSelectionProvider
+{
+public:
+	PageSelectionProviderImpl(MainWindow* wnd) : m_ptrWnd(wnd) {}
+	
+	virtual PageSequence allPages() const {
+		return m_ptrWnd ? m_ptrWnd->allPages() : PageSequence();
+	}
+
+	virtual std::set<PageId> selectedPages() const {
+		return m_ptrWnd ? m_ptrWnd->selectedPages() : std::set<PageId>();
+	}
+	
+	std::vector<PageRange> selectedRanges() const {
+		return m_ptrWnd ? m_ptrWnd->selectedRanges() : std::vector<PageRange>();
+	}
+private:
+	QPointer<MainWindow> m_ptrWnd;
+};
+
+
 MainWindow::MainWindow()
 :	m_ptrPages(new ProjectPages),
-	m_ptrStages(new StageSequence(m_ptrPages, PageSelectionAccessor(this))),
+	m_ptrStages(new StageSequence(m_ptrPages, newPageSelectionAccessor())),
 	m_ptrWorkerThread(new WorkerThread),
 	m_ptrInteractiveQueue(new ProcessingTaskQueue(ProcessingTaskQueue::RANDOM_ORDER)),
 	m_ptrOutOfMemoryDialog(new OutOfMemoryDialog),
@@ -365,7 +387,7 @@ MainWindow::switchToNewProject(
 	updateDisambiguationRecords(pages->toPageSequence(IMAGE_VIEW));
 
 	// Recreate the stages and load their state.
-	m_ptrStages.reset(new StageSequence(pages, this));
+	m_ptrStages.reset(new StageSequence(pages, newPageSelectionAccessor()));
 	if (project_reader) {
 		project_reader->readFilterSettings(m_ptrStages->filters());
 	}
@@ -2262,4 +2284,10 @@ MainWindow::copyFileTo(const QString &sFromPath, const QString &sToPath) {
         }
     }
     return false;
+
+PageSelectionAccessor
+MainWindow::newPageSelectionAccessor()
+{
+	IntrusivePtr<PageSelectionProvider const> provider(new PageSelectionProviderImpl(this));
+	return PageSelectionAccessor(provider);
 }

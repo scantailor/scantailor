@@ -16,32 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PAGE_SELECTION_ACCESSOR_H_
-#define PAGE_SELECTION_ACCESSOR_H_
+#ifndef PAGE_SELECTION_PROVIDER_H_
+#define PAGE_SELECTION_PROVIDER_H_
 
-#include "PageSelectionProvider.h"
-#include "PageId.h"
-#include "PageRange.h"
-#include "IntrusivePtr.h"
+#include "RefCountable.h"
 #include <set>
 #include <vector>
 
 class PageSequence;
+class PageId;
+class PageRange;
 
-class PageSelectionAccessor
+class PageSelectionProvider : public RefCountable
 {
-	// Member-wise copying is OK.
 public:
-	explicit PageSelectionAccessor(
-		IntrusivePtr<PageSelectionProvider const> const& provider);
-	
-	PageSequence allPages() const;
+	virtual PageSequence allPages() const = 0;
 
-	std::set<PageId> selectedPages() const;
+	virtual std::set<PageId> selectedPages() const = 0;
 	
-	std::vector<PageRange> selectedRanges() const;
-private:
-	IntrusivePtr<PageSelectionProvider const> m_ptrProvider;
+	virtual std::vector<PageRange> selectedRanges() const = 0;
 };
 
 #endif
