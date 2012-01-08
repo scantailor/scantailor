@@ -105,7 +105,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Flavio Benelli - スペイン語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
@@ -115,7 +115,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation>Yuri Chornoivan - ウクライナ語<translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
@@ -463,17 +463,17 @@ Andrey Bergman - システム負荷調整
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation>いくつかのファイルの読み込みに失敗しました。</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み成功: %1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み失敗: %1</translation>
     </message>
 </context>
 <context>
@@ -616,7 +616,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="227"/>
         <source>Debug Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>デバッグモード</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="235"/>
@@ -728,12 +728,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation>DPI を訂正...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>再リンク...</translation>
     </message>
     <message>
         <source>Stop batch processing</source>
@@ -862,93 +862,93 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation type="unfinished"></translation>
+        <translation>メモリ不足</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor でメモリ不足が発生</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation>考えられる理由</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>元画像の DPI を訂正しなければならないですか？　入力した値は本当に正しいですか？</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>元画像に埋め込まれた DPI が間違っている場合もあります。Scan Tailor はそれらの画像を検出しようとしますが、必ずしも簡単に判断できるとは限りません。プロジェクト作成時に「DPI が正しそうな場合でも訂正する」にチェックを付け、「DPI を訂正」ダイアログの「全てのページ」タブを調べる必要があるでしょう。「DPI を訂正」ダイアログは「ツール」メニューからも開けます。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation type="unfinished"></translation>
+        <translation>出力 DPI を高くしすぎではないですか？　通常は 600 dpi 以上にする必要はありません。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation type="unfinished"></translation>
+        <translation>役立つ可能性がある手段</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>DPI を訂正します。方法は&lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;DPI が分からない場合の見積もり方&lt;/a&gt;の解説動画（英語）で学ぶことができます。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>ハードウェアも OS も 64 ビット対応なら、64 ビット版の Scan Tailor への切り替えを検討します。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>グレースケール画像を処理する場合には、本当にグレースケール画像かを確認します。実際はカラーなのにたまたまグレースケールのように見えているだけの画像だった場合は、一括処理ができる画像変換ソフトなどを用いてグレースケール画像に変換します。それによってメモリ消費を減らすとともにパフォーマンスを向上させられます。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation type="unfinished"></translation>
+        <translation>最後の手段として、サムネイルをその時々で生成させるのではなく前もって生成させておくことでメモリをいくらか節約できます。そのためには、実際の作業に入る前にサムネイルリストをいちばん上からいちばん下までゆっくりスクロールしておきます。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation type="unfinished"></translation>
+        <translation>役立つ可能性がない手段</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>驚くべきことに、RAM を増設しても解決にはなりません。RAM の不足はスワップによって補われるため、処理が遅くはなるものの、プログラムは動作しつづけます。一方、メモリ不足とはメモリアドレス空間を使い果たしたことを意味し、RAM の容量とは無関係です。メモリアドレス空間を増やす唯一の手段はハードウェアと OS と Scan Tailor とを 64 ビット版に移行することです。</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation type="unfinished">プロジェクトを保存する</translation>
+        <translation>プロジェクトを保存する</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation type="unfinished">プロジェクトを別名で保存…</translation>
+        <translation>プロジェクトを別名で保存…</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存しない</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトは正しく保存されました</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>注意：Scan Tailor はメモリ不足を検知してプロジェクトを保存する機会を作ろうとはしますが、必ずしもそれが可能だとは限りません。今回は成功しましたが、次はいきなりクラッシュするかも知れません。</translation>
     </message>
 </context>
 <context>
@@ -1572,7 +1572,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="178"/>
         <source>Fix DPIs, even if they look OK</source>
-        <translation>DPI が正しそうな場合でも、訂正する。</translation>
+        <translation>DPI が正しそうな場合でも訂正する</translation>
     </message>
 </context>
 <context>
@@ -1591,17 +1591,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>再リンク</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>元に戻す</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1921,7 +1921,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">実行できません：複数のグループが選択されています。</translation>
+        <translation>実行できません：複数のグループが選択されています。</translation>
     </message>
 </context>
 <context>
