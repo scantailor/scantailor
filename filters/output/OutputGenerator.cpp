@@ -24,7 +24,6 @@
 #include "DebugImages.h"
 #include "EstimateBackground.h"
 #include "Despeckle.h"
-#include "Undistort.h"
 #include "RenderParams.h"
 #include "dewarping/DistortionModel.h"
 #include "Dpi.h"
