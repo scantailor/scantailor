@@ -101,7 +101,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Flavio Benelli — іспанська</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
@@ -111,7 +111,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation>Юрій Чорноіван — українська</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
@@ -380,17 +380,17 @@
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити деякі з файлів</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Успішно завантажено: %1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити: %1</translation>
     </message>
 </context>
 <context>
@@ -511,7 +511,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     <message>
         <location filename="../ui/MainWindow.ui" line="227"/>
         <source>Debug Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим діагностики</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="235"/>
@@ -623,12 +623,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Виправити щільність…</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Повторне з’єднання…</translation>
     </message>
     <message>
         <source>Stop batch processing</source>
@@ -757,93 +757,93 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вистачає пам’яті</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor не вистачає пам’яті</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Можливі причини</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Чи виправляли ви роздільність початкових зображень? Чи впевнені ви, що вказані значення є правильними?</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Іноді дані щодо роздільності, вбудовані до зображень, є помилковими. Scan Tailor намагається виявити файли з помилковими даними, але визначення не завжди спрацьовує. Ймовірно, вам варто позначити пункт «Виправляти щільність, навіть якщо програма вважає її правильною» під час створення проекту, а потім скористатися вкладкою «Всі сторінки» діалогового вікна «Виправити щільність», доступ до якого можна також отримати за допомогою меню «Інструменти».</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation type="unfinished"></translation>
+        <translation>Можливо, встановлено велике значення остаточної щільності? Зазвичай, це значення має не перевищувати 600 точок на дюйм.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation type="unfinished"></translation>
+        <translation>Як виправити</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Виправте значення щільностей. Настанови щодо визначення належних щільностей можна знайти &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;тут&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Якщо ви користуєтеся обладнанням і операційною системою з підтримкою 64-бітового режиму, скористайтеся 64-бітовою версією Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Якщо ви працюєте у режимі зображень у тонах сірого, переконайтеся, що зображення справді є зображеннями у тонах сірого. Якщо зображення насправді є кольоровими, які виглядають як сірі, виконайте пакетне перетворення зображень на зображення у тонах сірого. Таке перетворення надасть змогу заощадити пам’ять і підвищити швидкодію.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Якщо вказані вище способи не допомагають, ви можете заощадити пам’ять попереднім створенням мініатюр, замість створення мініатюр на вимогу. Для створення мініатюр просто виконайте повільне гортання списку мініатюр згори вниз до того, як розпочнете обробку.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation type="unfinished"></translation>
+        <translation>Способи, які не допоможуть</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Як не дивно, збільшення об’єму оперативної пам’яті не допоможе. Нестача оперативної пам’яті компенсується створенням резервної пам’яті на диску, що уповільнює, але не заважає роботі програми. Нестача пам’яті виникає, коли вичерпується простір адрес, тому збільшення об’єму оперативної пам’яті не вирішить проблеми. Єдиним способом розширення простору адрес у пам’яті є використання 64-бітового апаратного забезпечення, 64-бітової операційної системи та 64-бітової версії Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation type="unfinished">Зберегти проект</translation>
+        <translation>Зберегти проект</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation type="unfinished">Зберегти проект як…</translation>
+        <translation>Зберегти проект як…</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Не зберігати</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Проект успішно збережено</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Будь ласка, зауважте, що хоча Scan Tailor намагається виявити ситуації, коли програмі не вистачає пам’яті, і надає вам змогу зберегти ваш проект, таке збереження не завжди можливе. Цього разу все минулося, але наступного разу все може завершитися втратою даних.</translation>
     </message>
 </context>
 <context>
@@ -1454,17 +1454,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Повторне з’єднання</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Скасувати</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished">…</translation>
+        <translation>…</translation>
     </message>
 </context>
 <context>
