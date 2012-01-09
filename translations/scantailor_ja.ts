@@ -115,7 +115,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation>Yuri Chornoivan - ウクライナ語<translation>
+        <translation>Yuri Chornoivan - ウクライナ語</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
