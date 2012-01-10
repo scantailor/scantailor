@@ -41,87 +41,87 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="157"/>
         <source>U235 - Picture auto-detection algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>U235 - Алгоритъм за откриване на картинки.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="164"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Robert B. - Първо поколение алгоритъм за корекция на изкривявания.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Andrey Bergman - System load adjustment.</source>
-        <translation type="unfinished"></translation>
+        <translation>Andrey Bergman - Настройка натоварването на системата.</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>Petr Kovář - Command line interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>Petr Kovář - Работа през командния ред.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
-        <translation type="unfinished"></translation>
+        <translation>Svetoslav Sashkov, Mandor - Български</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="212"/>
         <source>Petr Kovář - Czech</source>
-        <translation type="unfinished"></translation>
+        <translation>Petr Kovář - Чешки</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="219"/>
         <source>Stefan Birkner - German</source>
-        <translation type="unfinished"></translation>
+        <translation>Stefan Birkner - Немски</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>Angelo Gemmi - Italian</source>
-        <translation type="unfinished"></translation>
+        <translation>Angelo Gemmi - Италиански</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="233"/>
         <source>Masahiro Kitagawa - Japanese</source>
-        <translation type="unfinished"></translation>
+        <translation>Masahiro Kitagawa - Японски</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="240"/>
         <source>Patrick Pascal - French</source>
-        <translation type="unfinished"></translation>
+        <translation>Patrick Pascal - Френски</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="247"/>
         <source>Daniel Koć - Polish</source>
-        <translation type="unfinished"></translation>
+        <translation>Daniel Koć - Полски</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="254"/>
         <source>Joseph Artsimovich - Russian</source>
-        <translation type="unfinished"></translation>
+        <translation>Joseph Artsimovich - Руски</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="261"/>
         <source>Marián Hvolka - Slovak</source>
-        <translation type="unfinished"></translation>
+        <translation>Marián Hvolka - Словашки</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Flavio Benelli - Испански</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation>Davidson Wang - Традиционен китайски</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation>Yuri Chornoivan - Украински</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
         <source>denver 22</source>
-        <translation type="unfinished"></translation>
+        <translation>denver 22</translation>
     </message>
     <message utf8="true">
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -223,7 +223,7 @@ Taxman</translation>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="36"/>
@@ -277,7 +277,7 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="20"/>
@@ -342,17 +342,17 @@ Taxman</translation>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="23"/>
         <source>Tab 1</source>
-        <translation></translation>
+        <translation>Tab 1</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="33"/>
         <source>Tab 2</source>
-        <translation></translation>
+        <translation>Tab 2</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="46"/>
         <source>DPI</source>
-        <translation></translation>
+        <translation>DPI</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="69"/>
@@ -362,7 +362,7 @@ Taxman</translation>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="90"/>
         <source>x</source>
-        <translation></translation>
+        <translation>x</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="113"/>
@@ -444,17 +444,17 @@ Taxman</translation>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation>Някои файлове не успяха да се заредят</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Успешно заредени: %1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Неуспешно заредени: %1</translation>
     </message>
 </context>
 <context>
@@ -557,7 +557,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="20"/>
         <source>MainWindow</source>
-        <translation></translation>
+        <translation>MainWindow</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="130"/>
@@ -595,12 +595,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="227"/>
         <source>Debug Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Тестов режим</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="235"/>
         <source>Ctrl+S</source>
-        <translation></translation>
+        <translation>Ctrl+S</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="240"/>
@@ -616,7 +616,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="248"/>
         <source>PgDown</source>
-        <translation></translation>
+        <translation>PgDown</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="256"/>
@@ -627,7 +627,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="259"/>
         <source>PgUp</source>
-        <translation></translation>
+        <translation>PgUp</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="267"/>
@@ -637,7 +637,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="270"/>
         <source>Ctrl+N</source>
-        <translation></translation>
+        <translation>Ctrl+N</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="275"/>
@@ -647,17 +647,17 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Ctrl+O</source>
-        <translation></translation>
+        <translation>Ctrl+O</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="286"/>
         <source>Q</source>
-        <translation></translation>
+        <translation>Q</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="297"/>
         <source>W</source>
-        <translation></translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="305"/>
@@ -667,7 +667,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="308"/>
         <source>Ctrl+W</source>
-        <translation></translation>
+        <translation>Ctrl+W</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="313"/>
@@ -677,7 +677,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="316"/>
         <source>Ctrl+Q</source>
-        <translation></translation>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="326"/>
@@ -687,7 +687,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="329"/>
         <source>Home</source>
-        <translation></translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="334"/>
@@ -697,7 +697,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="337"/>
         <source>End</source>
-        <translation></translation>
+        <translation>End</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="342"/>
@@ -707,12 +707,12 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Поправка на DPI ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Свързване ...</translation>
     </message>
     <message>
         <source>Stop batch processing</source>
@@ -729,7 +729,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="19"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="52"/>
@@ -807,7 +807,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="19"/>
@@ -841,93 +841,93 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостиг на памет</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостиг на памет в Scan Tailor</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Възможни причини</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Поправихте ли DPI на изходните си изображения? Сигурни ли сте, че въведените стойности са правилни?</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Понякога изходните изображения могат да имат грешно зададен DPI. Scan Tailor се опитва да открива такива ситуации, но не винаги е възможно да се определят. Може да се наложи да включите &quot;Поправи DPI дори да изглежда коректен&quot; при създаване на нов проект и да прегледате раздела &quot;Всички страници&quot; в диалоговия прозорец &quot;Поправка на DPI&quot;, който е достъпен и от менюто &quot;Инструменти&quot;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation type="unfinished"></translation>
+        <translation>Може би сте задали твърде висока стойност за изходното DPI? Обикновено не се налага задаване на стойности над 600.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation type="unfinished"></translation>
+        <translation>Какво може да помогне</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Поправете DPI за всички страници. Вижте как да &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;определите неизвестно DPIs&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ако вашите хардуер и операционна система са 64-битови, обмислете обновяване към 64-битовата версия на Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Когато работите с изображения в степени на сивото, уверете се, че те наистина са такива. Ако са цветни изображения само със сиви цветове, преобразувайте ги с някой пакетен конвертор. Това ще спести памет и ще увеличи производителността.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Като последно средство можете да спестите малко памет като генерирате всички умалени изображения на страниците, вместо да се създават при нужда. Това може да се извърши чрез плавно скролиране на списъка с умалени картинки от началото до края преди да започнете истинската работа.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation type="unfinished"></translation>
+        <translation>Кое няма да помогне</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Изненадващо, но увеличаването на RAM-а няма да помогне. Недостигът на памет се компенсира от дисковия буфер, който забавя изпълнението, но държи програмата работоспособна. Ситуацията с недостига на памет означава, че е свършило адресното пространство, което няма нищо общо с наличната RAM. Единственият начин да увеличите адресното пространство е да използвате 64-битов хардуер, 64-битова операционна система и 64-битов Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation type="unfinished">Запазване на проект</translation>
+        <translation>Запазване на проект</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation type="unfinished">Запазване на проекта като...</translation>
+        <translation>Запазване на проекта като...</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Не записвай</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Проектът е записан успешно</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Моля, обърнете внимание: Независимо, че Scan Tailor се опитва да прихване ситуациите с недостиг на памет, за да ви даде възможност да запазите проекта си, това не винаги е възможно. Този път успя, но следващият път може просто да се срине.</translation>
     </message>
 </context>
 <context>
@@ -1036,7 +1036,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="23"/>
         <source>DPI</source>
-        <translation></translation>
+        <translation>DPI</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="68"/>
@@ -1074,7 +1074,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="20"/>
@@ -1196,13 +1196,13 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Всяка втора страница спрямо текущата</translation>
+        <translation>Всяка втора страница спрямо текущата</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">Текущата страница ще бъде включена.</translation>
+        <translation>Текущата страница ще бъде включена.</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
@@ -1217,7 +1217,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Всяка втора избрана страница</translation>
+        <translation>Всяка втора избрана страница</translation>
     </message>
 </context>
 <context>
@@ -1225,7 +1225,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="20"/>
@@ -1291,7 +1291,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
-        <translation>Подравняване с другите страници</translation>
+        <translation>Преоразмеряване спрямо останалите страници</translation>
     </message>
     <message>
         <source>Align with other pages</source>
@@ -1372,7 +1372,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="20"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="26"/>
@@ -1572,17 +1572,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Свързване</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Отказ</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1682,7 +1682,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="19"/>
@@ -1743,7 +1743,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="23"/>
@@ -1754,7 +1754,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <location filename="../ui/SystemLoadWidget.ui" line="46"/>
         <location filename="../ui/SystemLoadWidget.ui" line="73"/>
         <source>...</source>
-        <translation></translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Minimal</source>
@@ -1902,7 +1902,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Не може да се изпълни: избрана е повече от една група.</translation>
+        <translation>Не може да се изпълни: избрана е повече от една група.</translation>
     </message>
 </context>
 <context>
@@ -2045,7 +2045,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Не може да се изпълни: избрана е повече от една група.</translation>
+        <translation>Не може да се изпълни: избрана е повече от една група.</translation>
     </message>
 </context>
 <context>
@@ -2101,12 +2101,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="65"/>
         <source>Natural order</source>
-        <translation type="unfinished">Естествено подреждане</translation>
+        <translation>Естествено подреждане</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split type</source>
-        <translation type="unfinished"></translation>
+        <translation>Подреди по тип разделяне</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
@@ -2127,7 +2127,7 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
     <message>
         <location filename="../filters/page_split/ImageView.cpp" line="85"/>
         <source>Drag the line or the handles.</source>
-        <translation>Завлачете линията или манипулаторите.</translation>
+        <translation>Влачете линията или манипулаторите.</translation>
     </message>
 </context>
 <context>
