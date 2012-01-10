@@ -30,22 +30,22 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="157"/>
         <source>U235 - Picture auto-detection algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="164"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Andrey Bergman - System load adjustment.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>Petr Kovář - Command line interface.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="190"/>
@@ -55,57 +55,57 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="212"/>
         <source>Petr Kovář - Czech</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="219"/>
         <source>Stefan Birkner - German</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>Angelo Gemmi - Italian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="233"/>
         <source>Masahiro Kitagawa - Japanese</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="240"/>
         <source>Patrick Pascal - French</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="247"/>
         <source>Daniel Koć - Polish</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="254"/>
         <source>Joseph Artsimovich - Russian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="261"/>
         <source>Marián Hvolka - Slovak</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="142"/>
@@ -115,7 +115,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="294"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
         <source>denver 22</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="350"/>
@@ -148,7 +148,7 @@
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="36"/>
@@ -246,7 +246,7 @@ English or Russian please.</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="20"/>
@@ -274,7 +274,7 @@ English or Russian please.</source>
     <message>
         <location filename="../interaction/DragHandler.cpp" line="46"/>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
-        <translation></translation>
+        <translation>Neomezené posouvání je možné při stlačené klávese Shift.</translation>
     </message>
 </context>
 <context>
@@ -408,17 +408,17 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation>Některé soubory se nepodařilo načíst</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Úspěšně načteno: %1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Neúspěšně načteno: %1</translation>
     </message>
 </context>
 <context>
@@ -460,7 +460,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="227"/>
         <source>Debug Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladící mód</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="232"/>
@@ -582,7 +582,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Opravit DPI ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
@@ -781,93 +781,93 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation type="unfinished"></translation>
+        <translation>Nedostatek paměti</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Když dojde Scan Tailoru paměť</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Možné důvody</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Museli jste nastavit DPI u některých obrázků. Jste si jisti, že zadané hodnoty byly správné?</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Někdy může být v obrázku špatně uložená informace o DPI. Scan Tailor se snaží takovéto chyby detekovat, ale to není vždy snadné. Zkuste nastavit správné DPI ikdyž vypadá správně při vytváření projektu (nebo z nabídky Nástroje) v dialogu &quot;Opravit DPI&quot;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation type="unfinished"></translation>
+        <translation>Není výstupní DPI příliš vysoké? Obvykle není potřeba nastavovat hodnotu větší než 600.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation type="unfinished"></translation>
+        <translation>Co může pomoci</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Opravte DPI. Jak určit &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;neznámé DPI&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jestliže váš hardware a operační systém je 64-bitový, zvažte použití 64-bitové verze Scan Tailoru.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokud pracujete s obrázky v odstínech šedi, ujistěte se, že jsou opravdu v odstínech šedi. Pokud se jedná o obrázky, které jsou barevné, přestože obsahují pouze šedé odstíny, převeďte je do odstínu šedi nějakým nástrojem pro hromadnou konverzi obrázků. To sníží paměťové nároky a zvýší výkon.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jako poslední možnost, jak ušetřit paměť, se ujistěte, že náhlady stránek jsou předvytvořeny. Pomalu rolujte seznamem náhledu od shora dolů.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation type="unfinished"></translation>
+        <translation>Co nepomůže</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Překvapivě nepomůže přidání paměti. Nedostatek paměti je kompenzován využíváním odkládacího prostoru, což sice zpomaluje, ale program nespadne. Nedostatek paměti zde znamená nedostatek adresového prostoru, což nemá nic společného s množstvím operační paměti. Jediný způsob jak zvýšit adresní prostor je přejít na 64 bitový hardware, operační systém a Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation type="unfinished">Uložit projekt</translation>
+        <translation>Uložit projekt</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation type="unfinished">Uložit projekt jako ...</translation>
+        <translation>Uložit projekt jako ...</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Neukládat</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Projekt byl úspěšně uložen</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vemte, prosím, na vědomí, že Scan Tailor vám dává příležitost uložit rozdělaný projekt při nedostatku paměti, což není vždy možné. Jednou se to může podařit a podruhé může jen spadnout.</translation>
     </message>
 </context>
 <context>
@@ -1128,13 +1128,13 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Každá druhá strana</translation>
+        <translation>Každá druhá strana</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">Současná strana bude zahrnuta.</translation>
+        <translation>Současná strana bude zahrnuta.</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
@@ -1149,7 +1149,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Každá druhá vybraná strana</translation>
+        <translation>Každá druhá vybraná strana</translation>
     </message>
 </context>
 <context>
@@ -1477,7 +1477,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpět</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
@@ -1735,7 +1735,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/deskew/Filter.cpp" line="57"/>
         <source>Deskew</source>
-        <translation type="unfinished">Natočení</translation>
+        <translation>Natočení</translation>
     </message>
 </context>
 <context>
@@ -1764,7 +1764,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Nelze provést: je vybrána více než jedna skupina.</translation>
+        <translation>Nelze provést: je vybrána více než jedna skupina.</translation>
     </message>
 </context>
 <context>
@@ -1907,7 +1907,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Nelze provést: je vybrána více než jedna skupina.</translation>
+        <translation>Nelze provést: je vybrána více než jedna skupina.</translation>
     </message>
 </context>
 <context>
@@ -1938,7 +1938,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/page_layout/ImageView.cpp" line="76"/>
         <source>Resize margins by dragging any of the solid lines.</source>
-        <translation type="unfinished">Změňte okraje tažením za libovolný okraj.</translation>
+        <translation>Změňte okraje tažením za libovolný okraj.</translation>
     </message>
 </context>
 <context>
@@ -1959,12 +1959,12 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="65"/>
         <source>Natural order</source>
-        <translation type="unfinished">Přirozené řazení</translation>
+        <translation>Přirozené řazení</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Řadit podle typu řezu</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
