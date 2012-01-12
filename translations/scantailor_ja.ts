@@ -104,11 +104,21 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
+        <source>Flavio Benelli - Spanish</source>
+        <translation>Flavio Benelli - スペイン語</translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Davidson Wang - Traditional Chinese</source>
         <translation>Davidson Wang - 繁体字中国語</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="295"/>
+        <location filename="../ui/AboutDialog.ui" line="282"/>
+        <source>Yuri Chornoivan - Ukrainian</source>
+        <translation>Yuri Chornoivan - ウクライナ語</translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="309"/>
         <source>denver 22</source>
         <translation>denver 22</translation>
     </message>
@@ -206,12 +216,12 @@ Andrey Bergman - システム負荷調整
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="280"/>
+        <location filename="../ui/AboutDialog.ui" line="294"/>
         <source>Documentation</source>
         <translation>ドキュメント化</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="336"/>
+        <location filename="../ui/AboutDialog.ui" line="350"/>
         <source>License</source>
         <translation>ライセンス</translation>
     </message>
@@ -309,53 +319,39 @@ Andrey Bergman - システム負荷調整
 <context>
     <name>ErrorWidget</name>
     <message>
-        <location filename="../ui/ErrorWidget.ui" line="13"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ui/ErrorWidget.ui" line="54"/>
         <source>ImageLabel</source>
-        <translation>画像ラベル</translation>
+        <translation type="obsolete">画像ラベル</translation>
     </message>
     <message>
-        <location filename="../ui/ErrorWidget.ui" line="61"/>
         <source>TextLabel</source>
-        <translation>文章ラベル</translation>
+        <translation type="obsolete">文章ラベル</translation>
     </message>
 </context>
 <context>
     <name>FixDpiDialog</name>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="241"/>
         <source>Need Fixing</source>
-        <translation>要訂正</translation>
+        <translation type="obsolete">要訂正</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="242"/>
-        <location filename="../FixDpiDialog.cpp" line="707"/>
         <source>All Pages</source>
-        <translation>全ページ</translation>
+        <translation type="obsolete">全ページ</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="476"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation>DPI が大きすぎます。恐らく正しくありません。</translation>
+        <translation type="obsolete">DPI が大きすぎます。恐らく正しくありません。</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="479"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation>DPI が小さすぎます。仮に正しい値だとしても、よい結果は得られないでしょう。</translation>
+        <translation type="obsolete">DPI が小さすぎます。仮に正しい値だとしても、よい結果は得られないでしょう。</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="482"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>ピクセルサイズに対して DPI が小さすぎます。そのような組合せはメモリ不足エラーの原因となることがあります。</translation>
+        <translation type="obsolete">ピクセルサイズに対して DPI が小さすぎます。そのような組合せはメモリ不足エラーの原因となることがあります。</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="733"/>
         <source>%1 (page %2)</source>
-        <translation>%1 （%2 ページ）</translation>
+        <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="13"/>
@@ -396,52 +392,43 @@ Andrey Bergman - システム負荷調整
 <context>
     <name>FixDpiSinglePageDialog</name>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="13"/>
         <source>Fix DPI</source>
-        <translation>DPI を訂正</translation>
+        <translation type="obsolete">DPI を訂正</translation>
     </message>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="19"/>
         <source>DPI for %1</source>
-        <translation>%1 の DPI</translation>
+        <translation type="obsolete">%1 の DPI</translation>
     </message>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="45"/>
         <source>Custom</source>
-        <translation>カスタム</translation>
+        <translation type="obsolete">カスタム</translation>
     </message>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="93"/>
         <source>x</source>
-        <translation>x</translation>
+        <translation type="obsolete">x</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="42"/>
         <source>%1 (page %2)</source>
-        <translation>%1 （%2 ページ）</translation>
+        <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="137"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation>DPI が大きすぎます。恐らく正しくありません。</translation>
+        <translation type="obsolete">DPI が大きすぎます。恐らく正しくありません。</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="140"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation>DPI が小さすぎます。仮に正しい値だとしても、よい結果は得られないでしょう。</translation>
+        <translation type="obsolete">DPI が小さすぎます。仮に正しい値だとしても、よい結果は得られないでしょう。</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="143"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>ピクセルサイズに対して DPI が小さすぎます。そのような組合せはメモリ不足エラーの原因となることがあります。</translation>
+        <translation type="obsolete">ピクセルサイズに対して DPI が小さすぎます。そのような組合せはメモリ不足エラーの原因となることがあります。</translation>
     </message>
 </context>
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
-        <translation>マウスホイールまたは +/- キーでズームできます。ズームしている場合、ドラッグで画像を動かせます。</translation>
+        <translation type="obsolete">マウスホイールまたは +/- キーでズームできます。ズームしている場合、ドラッグで画像を動かせます。</translation>
     </message>
 </context>
 <context>
@@ -465,11 +452,28 @@ Andrey Bergman - システム負荷調整
 <context>
     <name>LoadFileTask</name>
     <message>
-        <location filename="../LoadFileTask.cpp" line="136"/>
         <source>The following file could not be loaded:
 %1</source>
-        <translation>以下のファイルを読み込めませんでした：
+        <translation type="obsolete">以下のファイルを読み込めませんでした：
 %1</translation>
+    </message>
+</context>
+<context>
+    <name>LoadFilesStatusDialog</name>
+    <message>
+        <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
+        <source>Some files failed to load</source>
+        <translation>いくつかのファイルの読み込みに失敗しました。</translation>
+    </message>
+    <message>
+        <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
+        <source>Loaded successfully: %1</source>
+        <translation>読み込み成功: %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
+        <source>Failed to load: %1</source>
+        <translation>読み込み失敗: %1</translation>
     </message>
 </context>
 <context>
@@ -479,71 +483,54 @@ Andrey Bergman - システム負荷調整
         <translation type="obsolete">終了時にビープ音を鳴らす</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="536"/>
+        <location filename="../ui/MainWindow.ui" line="232"/>
         <source>Save Project</source>
         <translation>プロジェクトを保存する</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="536"/>
         <source>Save this project?</source>
-        <translation>プロジェクトを保存しますか？</translation>
+        <translation type="obsolete">プロジェクトを保存しますか？</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="909"/>
         <source>Insert before ...</source>
-        <translation>前に挿入…</translation>
+        <translation type="obsolete">前に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="912"/>
         <source>Insert after ...</source>
-        <translation>後に挿入…</translation>
+        <translation type="obsolete">後に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="918"/>
         <source>Remove from project ...</source>
-        <translation>プロジェクトから取り除く…</translation>
+        <translation type="obsolete">プロジェクトから取り除く…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="939"/>
         <source>Insert here ...</source>
-        <translation>ここに挿入…</translation>
+        <translation type="obsolete">ここに挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1234"/>
-        <location filename="../MainWindow.cpp" line="1315"/>
         <source>Scan Tailor Projects</source>
-        <translation>Scan Tailor プロジェクト</translation>
+        <translation type="obsolete">Scan Tailor プロジェクト</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1314"/>
         <source>Open Project</source>
-        <translation>プロジェクトを開く</translation>
+        <translation type="obsolete">プロジェクトを開く</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1334"/>
-        <location filename="../MainWindow.cpp" line="1343"/>
-        <location filename="../MainWindow.cpp" line="1657"/>
-        <location filename="../MainWindow.cpp" line="1688"/>
-        <location filename="../MainWindow.cpp" line="1765"/>
         <source>Error</source>
-        <translation>エラー</translation>
+        <translation type="obsolete">エラー</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1335"/>
         <source>Unable to open the project file.</source>
-        <translation>プロジェクトファイルを開けませんでした。</translation>
+        <translation type="obsolete">プロジェクトファイルを開けませんでした。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1344"/>
         <source>The project file is broken.</source>
-        <translation>プロジェクトファイルは破損しています。</translation>
+        <translation type="obsolete">プロジェクトファイルは破損しています。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1553"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation>ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
+        <translation type="obsolete">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1591"/>
@@ -556,43 +543,36 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1586"/>
         <source>Unnamed</source>
-        <translation>名前なし</translation>
+        <translation type="obsolete">名前なし</translation>
     </message>
     <message>
         <source>%1 - Scan Tailor %2</source>
         <translation type="obsolete">%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1658"/>
-        <location filename="../MainWindow.cpp" line="1689"/>
         <source>Error saving the project file!</source>
-        <translation>プロジェクトファイルを保存できません！</translation>
+        <translation type="obsolete">プロジェクトファイルを保存できません！</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1736"/>
         <source>File to insert</source>
-        <translation>挿入するファイル</translation>
+        <translation type="obsolete">挿入するファイル</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1742"/>
         <source>Images not in project (%1)</source>
-        <translation>プロジェクトに含まれない画像 (%1)</translation>
+        <translation type="obsolete">プロジェクトに含まれない画像 (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1766"/>
         <source>Error opening the image file.</source>
-        <translation>画像ファイルを開けません！</translation>
+        <translation type="obsolete">画像ファイルを開けません！</translation>
     </message>
     <message>
         <source>%1 (page %2)</source>
         <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1806"/>
         <source>Remove</source>
-        <translation>取り除く</translation>
+        <translation type="obsolete">取り除く</translation>
     </message>
     <message>
         <source>Unable to delete file:
@@ -606,7 +586,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>メインウインドウ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="134"/>
+        <location filename="../ui/MainWindow.ui" line="130"/>
         <source>Keep current page in view.</source>
         <translation>現在のページを常に表示します。</translation>
     </message>
@@ -615,144 +595,158 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">PgUp, PgDown または Q, W キーでページを移れます。</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="160"/>
+        <location filename="../ui/MainWindow.ui" line="156"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
         <translation>Home, End, PgUp（または Q）, PgDown（または W）キーでページを移れます。</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="189"/>
+        <location filename="../ui/MainWindow.ui" line="185"/>
         <source>Tools</source>
         <translation>ツール</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="197"/>
+        <location filename="../ui/MainWindow.ui" line="196"/>
         <source>File</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="211"/>
+        <location filename="../ui/MainWindow.ui" line="210"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="228"/>
         <source>Debug</source>
-        <translation>デバッグ</translation>
+        <translation type="obsolete">デバッグ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="236"/>
+        <location filename="../ui/MainWindow.ui" line="227"/>
+        <source>Debug Mode</source>
+        <translation>デバッグモード</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="235"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="241"/>
+        <location filename="../ui/MainWindow.ui" line="240"/>
         <source>Save Project As ...</source>
         <translation>プロジェクトを別名で保存…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="246"/>
-        <location filename="../ui/MainWindow.ui" line="295"/>
+        <location filename="../ui/MainWindow.ui" line="245"/>
+        <location filename="../ui/MainWindow.ui" line="294"/>
         <source>Next Page</source>
         <translation>次ページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="249"/>
+        <location filename="../ui/MainWindow.ui" line="248"/>
         <source>PgDown</source>
         <translation>PgDown</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="257"/>
-        <location filename="../ui/MainWindow.ui" line="284"/>
+        <location filename="../ui/MainWindow.ui" line="256"/>
+        <location filename="../ui/MainWindow.ui" line="283"/>
         <source>Previous Page</source>
         <translation>前ページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="260"/>
+        <location filename="../ui/MainWindow.ui" line="259"/>
         <source>PgUp</source>
         <translation>PgUp</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="268"/>
+        <location filename="../ui/MainWindow.ui" line="267"/>
         <source>New Project ...</source>
         <translation>新規プロジェクト...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="271"/>
+        <location filename="../ui/MainWindow.ui" line="270"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="276"/>
+        <location filename="../ui/MainWindow.ui" line="275"/>
         <source>Open Project ...</source>
         <translation>プロジェクトを開く...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="279"/>
+        <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="287"/>
+        <location filename="../ui/MainWindow.ui" line="286"/>
         <source>Q</source>
         <translation>Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="298"/>
+        <location filename="../ui/MainWindow.ui" line="297"/>
         <source>W</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="306"/>
+        <location filename="../ui/MainWindow.ui" line="305"/>
         <source>Close Project</source>
         <translation>プロジェクトを閉じる…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="309"/>
+        <location filename="../ui/MainWindow.ui" line="308"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="314"/>
+        <location filename="../ui/MainWindow.ui" line="313"/>
         <source>Quit</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="317"/>
+        <location filename="../ui/MainWindow.ui" line="316"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="327"/>
+        <location filename="../ui/MainWindow.ui" line="326"/>
         <source>First Page</source>
         <translation>最初のページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="330"/>
+        <location filename="../ui/MainWindow.ui" line="329"/>
         <source>Home</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="335"/>
+        <location filename="../ui/MainWindow.ui" line="334"/>
         <source>Last Page</source>
         <translation>最後のページ</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="338"/>
+        <location filename="../ui/MainWindow.ui" line="337"/>
         <source>End</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="343"/>
+        <location filename="../ui/MainWindow.ui" line="342"/>
         <source>About</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="462"/>
-        <source>Stop batch processing</source>
-        <translation>一括処理を停止</translation>
+        <location filename="../ui/MainWindow.ui" line="347"/>
+        <source>Fix DPI ...</source>
+        <translation>DPI を訂正...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="322"/>
+        <location filename="../ui/MainWindow.ui" line="352"/>
+        <source>Relinking ...</source>
+        <translation>再リンク...</translation>
+    </message>
+    <message>
+>>>>>>> master
+        <source>Stop batch processing</source>
+        <translation type="obsolete">一括処理を停止</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="321"/>
         <source>Settings ...</source>
         <translation>設定...</translation>
     </message>
@@ -867,6 +861,100 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="188"/>
         <source>Apply to ...</source>
         <translation>適用先...</translation>
+    </message>
+</context>
+<context>
+    <name>OutOfMemoryDialog</name>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
+        <source>Out of memory</source>
+        <translation>メモリ不足</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
+        <source>Out of Memory Situation in Scan Tailor</source>
+        <translation>Scan Tailor でメモリ不足が発生</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
+        <source>Possible reasons</source>
+        <translation>考えられる理由</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
+        <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
+        <translation>元画像の DPI を訂正しなければならないですか？　入力した値は本当に正しいですか？</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
+        <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
+        <translation>元画像に埋め込まれた DPI が間違っている場合もあります。Scan Tailor はそれらの画像を検出しようとしますが、必ずしも簡単に判断できるとは限りません。プロジェクト作成時に「DPI が正しそうな場合でも訂正する」にチェックを付け、「DPI を訂正」ダイアログの「全てのページ」タブを調べる必要があるでしょう。「DPI を訂正」ダイアログは「ツール」メニューからも開けます。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
+        <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
+        <translation>出力 DPI を高くしすぎではないですか？　通常は 600 dpi 以上にする必要はありません。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
+        <source>What can help</source>
+        <translation>役立つ可能性がある手段</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
+        <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
+        <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
+        <translation>DPI を訂正します。方法は&lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;DPI が分からない場合の見積もり方&lt;/a&gt;の解説動画（英語）で学ぶことができます。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
+        <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
+        <translation>ハードウェアも OS も 64 ビット対応なら、64 ビット版の Scan Tailor への切り替えを検討します。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
+        <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
+        <translation>グレースケール画像を処理する場合には、本当にグレースケール画像かを確認します。実際はカラーなのにたまたまグレースケールのように見えているだけの画像だった場合は、一括処理ができる画像変換ソフトなどを用いてグレースケール画像に変換します。それによってメモリ消費を減らすとともにパフォーマンスを向上させられます。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
+        <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
+        <translation>最後の手段として、サムネイルをその時々で生成させるのではなく前もって生成させておくことでメモリをいくらか節約できます。そのためには、実際の作業に入る前にサムネイルリストをいちばん上からいちばん下までゆっくりスクロールしておきます。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
+        <source>What won&apos;t help</source>
+        <translation>役立つ可能性がない手段</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
+        <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
+        <translation>驚くべきことに、RAM を増設しても解決にはなりません。RAM の不足はスワップによって補われるため、処理が遅くはなるものの、プログラムは動作しつづけます。一方、メモリ不足とはメモリアドレス空間を使い果たしたことを意味し、RAM の容量とは無関係です。メモリアドレス空間を増やす唯一の手段はハードウェアと OS と Scan Tailor とを 64 ビット版に移行することです。</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
+        <source>Save Project</source>
+        <translation>プロジェクトを保存する</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
+        <source>Save Project As ...</source>
+        <translation>プロジェクトを別名で保存…</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
+        <source>Don&apos;t Save</source>
+        <translation>保存しない</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
+        <source>Project Saved Successfully</source>
+        <translation>プロジェクトは正しく保存されました</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
+        <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
+        <translation>注意：Scan Tailor はメモリ不足を検知してプロジェクトを保存する機会を作ろうとはしますが、必ずしもそれが可能だとは限りません。今回は成功しましたが、次はいきなりクラッシュするかも知れません。</translation>
     </message>
 </context>
 <context>
@@ -1375,67 +1463,51 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
-        <location filename="../ProjectFilesDialog.cpp" line="334"/>
         <source>Input Directory</source>
         <translation>入力ディレクトリ</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="43"/>
-        <location filename="../ProjectFilesDialog.cpp" line="354"/>
         <source>Output Directory</source>
         <translation>出力ディレクトリ</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="526"/>
-        <location filename="../ProjectFilesDialog.cpp" line="534"/>
-        <location filename="../ProjectFilesDialog.cpp" line="543"/>
-        <location filename="../ProjectFilesDialog.cpp" line="565"/>
-        <location filename="../ProjectFilesDialog.cpp" line="574"/>
-        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Error</source>
-        <translation>エラー</translation>
+        <translation type="obsolete">エラー</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="526"/>
         <source>No files in project!</source>
-        <translation>プロジェクト内にファイルがありません！</translation>
+        <translation type="obsolete">プロジェクト内にファイルがありません！</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="535"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
-        <translation>入力ディレクトリが指定されていないか存在しません。</translation>
+        <translation type="obsolete">入力ディレクトリが指定されていないか存在しません。</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation>入力ディレクトリと出力ディレクトリを同じにはできません。</translation>
+        <translation type="obsolete">入力ディレクトリと出力ディレクトリを同じにはできません。</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="554"/>
         <source>Create Directory?</source>
-        <translation>ディレクトリを作成しますか？</translation>
+        <translation type="obsolete">ディレクトリを作成しますか？</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
-        <translation>出力ディレクトリが存在しません。作成しますか？</translation>
+        <translation type="obsolete">出力ディレクトリが存在しません。作成しますか？</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="566"/>
         <source>Unable to create output directory.</source>
-        <translation>出力ディレクトリを作成できません。</translation>
+        <translation type="obsolete">出力ディレクトリを作成できません。</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="575"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
-        <translation>出力ディレクトリが指定されていないか存在しません。</translation>
+        <translation type="obsolete">出力ディレクトリが指定されていないか存在しません。</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
-        <translation>いくつかのファイルを読み込めませんでした。
+        <translation type="obsolete">いくつかのファイルを読み込めませんでした。
 ファイル形式がサポートされていないか、ファイルが壊れています。
 これらをプロジェクトから取り除いてください。</translation>
     </message>
@@ -1506,20 +1578,36 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="178"/>
         <source>Fix DPIs, even if they look OK</source>
-        <translation>DPI が正しそうな場合でも、訂正する。</translation>
+        <translation>DPI が正しそうな場合でも訂正する</translation>
     </message>
 </context>
 <context>
     <name>ProjectOpeningContext</name>
     <message>
-        <location filename="../ProjectOpeningContext.cpp" line="51"/>
         <source>Error</source>
-        <translation>エラー</translation>
+        <translation type="obsolete">エラー</translation>
     </message>
     <message>
-        <location filename="../ProjectOpeningContext.cpp" line="52"/>
         <source>Unable to interpret the project file.</source>
-        <translation>プロジェクトファイルを変換できませんでした。</translation>
+        <translation type="obsolete">プロジェクトファイルを変換できませんでした。</translation>
+    </message>
+</context>
+<context>
+    <name>RelinkingDialog</name>
+    <message>
+        <location filename="../ui/RelinkingDialog.ui" line="14"/>
+        <source>Relinking</source>
+        <translation>再リンク</translation>
+    </message>
+    <message>
+        <location filename="../ui/RelinkingDialog.ui" line="97"/>
+        <source>Undo</source>
+        <translation>元に戻す</translation>
+    </message>
+    <message>
+        <location filename="../ui/RelinkingDialog.ui" line="100"/>
+        <source>...</source>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1657,14 +1745,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="101"/>
         <source>Compiled without OpenGL support.</source>
-        <translation>OpenGL サポート無しでコンパイルされています。</translation>
+        <translation type="obsolete">OpenGL サポート無しでコンパイルされています。</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="106"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation>必要な機能をハードウェアやドライバが持っていません。</translation>
+        <translation type="obsolete">必要な機能をハードウェアやドライバが持っていません。</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
@@ -1793,9 +1879,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>StageListView</name>
     <message>
-        <location filename="../StageListView.cpp" line="130"/>
         <source>Launch batch processing</source>
-        <translation>一括処理を開始</translation>
+        <translation type="obsolete">一括処理を開始</translation>
     </message>
 </context>
 <context>
@@ -1817,22 +1902,19 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation>最小</translation>
+        <translation type="obsolete">最小</translation>
     </message>
     <message>
-        <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation>通常</translation>
+        <translation type="obsolete">通常</translation>
     </message>
 </context>
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1345"/>
         <source>%1 (page %2)</source>
-        <translation>%1 （%2 ページ）</translation>
+        <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
 </context>
 <context>
@@ -1934,7 +2016,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="55"/>
+        <location filename="../filters/deskew/Filter.cpp" line="57"/>
         <source>Deskew</source>
         <translation>傾きを修正</translation>
     </message>
@@ -1962,10 +2044,6 @@ p, li { white-space: pre-wrap; }
 </context>
 <context>
     <name>fix_orientation::ApplyDialog</name>
-    <message>
-        <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="obsolete">実行できません：複数のグループが選択されています。</translation>
-    </message>
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>

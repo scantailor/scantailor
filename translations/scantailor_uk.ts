@@ -100,11 +100,21 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
+        <source>Flavio Benelli - Spanish</source>
+        <translation>Flavio Benelli — іспанська</translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Davidson Wang - Traditional Chinese</source>
         <translation>Davidson Wang — традиційна китайська</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="295"/>
+        <location filename="../ui/AboutDialog.ui" line="282"/>
+        <source>Yuri Chornoivan - Ukrainian</source>
+        <translation>Юрій Чорноіван — українська</translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="309"/>
         <source>denver 22</source>
         <translation>denver 22</translation>
     </message>
@@ -119,12 +129,12 @@
         <translation>Учасники розробки</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="280"/>
+        <location filename="../ui/AboutDialog.ui" line="294"/>
         <source>Documentation</source>
         <translation>Документація</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="336"/>
+        <location filename="../ui/AboutDialog.ui" line="350"/>
         <source>License</source>
         <translation>Ліцензування</translation>
     </message>
@@ -222,53 +232,43 @@
 <context>
     <name>ErrorWidget</name>
     <message>
-        <location filename="../ui/ErrorWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>Форма</translation>
+        <translation type="obsolete">Форма</translation>
     </message>
     <message>
-        <location filename="../ui/ErrorWidget.ui" line="54"/>
         <source>ImageLabel</source>
-        <translation>Мітка-зображення</translation>
+        <translation type="obsolete">Мітка-зображення</translation>
     </message>
     <message>
-        <location filename="../ui/ErrorWidget.ui" line="61"/>
         <source>TextLabel</source>
-        <translation>Мітка-текст</translation>
+        <translation type="obsolete">Мітка-текст</translation>
     </message>
 </context>
 <context>
     <name>FixDpiDialog</name>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="241"/>
         <source>Need Fixing</source>
-        <translation>Потребують виправлення</translation>
+        <translation type="obsolete">Потребують виправлення</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="242"/>
-        <location filename="../FixDpiDialog.cpp" line="707"/>
         <source>All Pages</source>
-        <translation>Всі сторінки</translation>
+        <translation type="obsolete">Всі сторінки</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="476"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation>Значення щільності завелике, ймовірно помилкове.</translation>
+        <translation type="obsolete">Значення щільності завелике, ймовірно помилкове.</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="479"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation>Значення щільності замале. Навіть якщо воно є правильним, вам не вдасться отримати з ним прийнятних результатів.</translation>
+        <translation type="obsolete">Значення щільності замале. Навіть якщо воно є правильним, вам не вдасться отримати з ним прийнятних результатів.</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="482"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>Значення щільності є надто малим для цього розміру точок. Таке поєднання, ймовірно, призведе до вичерпання об’єму пам’яті.</translation>
+        <translation type="obsolete">Значення щільності є надто малим для цього розміру точок. Таке поєднання, ймовірно, призведе до вичерпання об’єму пам’яті.</translation>
     </message>
     <message>
-        <location filename="../FixDpiDialog.cpp" line="733"/>
         <source>%1 (page %2)</source>
-        <translation>%1 (сторінка %2)</translation>
+        <translation type="obsolete">%1 (сторінка %2)</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="13"/>
@@ -309,52 +309,43 @@
 <context>
     <name>FixDpiSinglePageDialog</name>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="13"/>
         <source>Fix DPI</source>
-        <translation>Виправлення щільності</translation>
+        <translation type="obsolete">Виправлення щільності</translation>
     </message>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="19"/>
         <source>DPI for %1</source>
-        <translation>Щільність %1</translation>
+        <translation type="obsolete">Щільність %1</translation>
     </message>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="45"/>
         <source>Custom</source>
-        <translation>Нетипова</translation>
+        <translation type="obsolete">Нетипова</translation>
     </message>
     <message>
-        <location filename="../ui/FixDpiSinglePageDialog.ui" line="93"/>
         <source>x</source>
-        <translation>x</translation>
+        <translation type="obsolete">x</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="42"/>
         <source>%1 (page %2)</source>
-        <translation>%1 (сторінка %2)</translation>
+        <translation type="obsolete">%1 (сторінка %2)</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="137"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation>Значення щільності завелике, ймовірно помилкове.</translation>
+        <translation type="obsolete">Значення щільності завелике, ймовірно помилкове.</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="140"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation>Значення щільності замале. Навіть якщо воно є правильним, вам не вдасться отримати з ним прийнятних результатів.</translation>
+        <translation type="obsolete">Значення щільності замале. Навіть якщо воно є правильним, вам не вдасться отримати з ним прийнятних результатів.</translation>
     </message>
     <message>
-        <location filename="../FixDpiSinglePageDialog.cpp" line="143"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation>Значення щільності є надто малим для цього розміру точок. Таке поєднання, ймовірно, призведе до вичерпання об’єму пам’яті.</translation>
+        <translation type="obsolete">Значення щільності є надто малим для цього розміру точок. Таке поєднання, ймовірно, призведе до вичерпання об’єму пам’яті.</translation>
     </message>
 </context>
 <context>
     <name>ImageViewBase</name>
     <message>
-        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
-        <translation>Для зміни масштабу скористайтеся коліщатком миші або кнопками +/-. У режимі збільшеного масштабу можливе перетягування перегляду.</translation>
+        <translation type="obsolete">Для зміни масштабу скористайтеся коліщатком миші або кнопками +/-. У режимі збільшеного масштабу можливе перетягування перегляду.</translation>
     </message>
 </context>
 <context>
@@ -378,118 +369,110 @@
 <context>
     <name>LoadFileTask</name>
     <message>
-        <location filename="../LoadFileTask.cpp" line="136"/>
         <source>The following file could not be loaded:
 %1</source>
-        <translation>Не вдалося завантажити вказаний нижче файл:
+        <translation type="obsolete">Не вдалося завантажити вказаний нижче файл:
 %1</translation>
+    </message>
+</context>
+<context>
+    <name>LoadFilesStatusDialog</name>
+    <message>
+        <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
+        <source>Some files failed to load</source>
+        <translation>Не вдалося завантажити деякі з файлів</translation>
+    </message>
+    <message>
+        <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
+        <source>Loaded successfully: %1</source>
+        <translation>Успішно завантажено: %1</translation>
+    </message>
+    <message>
+        <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
+        <source>Failed to load: %1</source>
+        <translation>Не вдалося завантажити: %1</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="520"/>
+        <location filename="../ui/MainWindow.ui" line="232"/>
         <source>Save Project</source>
         <translation>Зберегти проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="520"/>
         <source>Save this project?</source>
-        <translation>Зберегти цей проект?</translation>
+        <translation type="obsolete">Зберегти цей проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="893"/>
         <source>Insert before ...</source>
-        <translation>Вставити перед…</translation>
+        <translation type="obsolete">Вставити перед…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="896"/>
         <source>Insert after ...</source>
-        <translation>Вставити після…</translation>
+        <translation type="obsolete">Вставити після…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="902"/>
         <source>Remove from project ...</source>
-        <translation>Вилучити з проекту…</translation>
+        <translation type="obsolete">Вилучити з проекту…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="923"/>
         <source>Insert here ...</source>
-        <translation>Вставити тут…</translation>
+        <translation type="obsolete">Вставити тут…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1214"/>
-        <location filename="../MainWindow.cpp" line="1282"/>
         <source>Scan Tailor Projects</source>
-        <translation>проекти Scan Tailor</translation>
+        <translation type="obsolete">проекти Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1281"/>
         <source>Open Project</source>
-        <translation>Відкрити проект</translation>
+        <translation type="obsolete">Відкрити проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1299"/>
-        <location filename="../MainWindow.cpp" line="1308"/>
-        <location filename="../MainWindow.cpp" line="1598"/>
-        <location filename="../MainWindow.cpp" line="1629"/>
-        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Error</source>
-        <translation>Помилка</translation>
+        <translation type="obsolete">Помилка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1300"/>
         <source>Unable to open the project file.</source>
-        <translation>Не вдалося відкрити файл проекту.</translation>
+        <translation type="obsolete">Не вдалося відкрити файл проекту.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1309"/>
         <source>The project file is broken.</source>
-        <translation>Файл проекту пошкоджено.</translation>
+        <translation type="obsolete">Файл проекту пошкоджено.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1494"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation>Результатами обробки ще не можна скористатися, оскільки невідомі остаточні розміри сторінок.
+        <translation type="obsolete">Результатами обробки ще не можна скористатися, оскільки невідомі остаточні розміри сторінок.
 Щоб визначити ці розміри, виконайте пакетну обробку інструментами «Вибір вмісту» та «Поля».</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1527"/>
         <source>Unnamed</source>
-        <translation>Без назви</translation>
+        <translation type="obsolete">Без назви</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1532"/>
         <source>%1 - Scan Tailor %2</source>
-        <translation>%1 — Scan Tailor %2</translation>
+        <translation type="obsolete">%1 — Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1599"/>
-        <location filename="../MainWindow.cpp" line="1630"/>
         <source>Error saving the project file!</source>
-        <translation>Помилка під час збереження файла проекту!</translation>
+        <translation type="obsolete">Помилка під час збереження файла проекту!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1677"/>
         <source>File to insert</source>
-        <translation>Файл, який слід вставити</translation>
+        <translation type="obsolete">Файл, який слід вставити</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1683"/>
         <source>Images not in project (%1)</source>
-        <translation>Зображення поза проектом (%1)</translation>
+        <translation type="obsolete">Зображення поза проектом (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1707"/>
         <source>Error opening the image file.</source>
-        <translation>Помилка під час спроби відкрити файл зображення.</translation>
+        <translation type="obsolete">Помилка під час спроби відкрити файл зображення.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1747"/>
         <source>Remove</source>
-        <translation>Вилучити</translation>
+        <translation type="obsolete">Вилучити</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="20"/>
@@ -497,149 +480,162 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation>Головне вікно</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="134"/>
+        <location filename="../ui/MainWindow.ui" line="130"/>
         <source>Keep current page in view.</source>
         <translation>Утримувати перегляд поточної сторінки.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="160"/>
+        <location filename="../ui/MainWindow.ui" line="156"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
         <translation>Скористайтеся клавішами Home, End, PgUp (або Q), PgDown (або W) для переходу між сторінками.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="189"/>
+        <location filename="../ui/MainWindow.ui" line="185"/>
         <source>Tools</source>
         <translation>Інструменти</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="197"/>
+        <location filename="../ui/MainWindow.ui" line="196"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="211"/>
+        <location filename="../ui/MainWindow.ui" line="210"/>
         <source>Help</source>
         <translation>Довідка</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="228"/>
         <source>Debug</source>
-        <translation>Діагностика</translation>
+        <translation type="obsolete">Діагностика</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="236"/>
+        <location filename="../ui/MainWindow.ui" line="227"/>
+        <source>Debug Mode</source>
+        <translation>Режим діагностики</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="235"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="241"/>
+        <location filename="../ui/MainWindow.ui" line="240"/>
         <source>Save Project As ...</source>
         <translation>Зберегти проект як…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="246"/>
-        <location filename="../ui/MainWindow.ui" line="295"/>
+        <location filename="../ui/MainWindow.ui" line="245"/>
+        <location filename="../ui/MainWindow.ui" line="294"/>
         <source>Next Page</source>
         <translation>Наступна сторінка</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="249"/>
+        <location filename="../ui/MainWindow.ui" line="248"/>
         <source>PgDown</source>
         <translation>PgDown</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="257"/>
-        <location filename="../ui/MainWindow.ui" line="284"/>
+        <location filename="../ui/MainWindow.ui" line="256"/>
+        <location filename="../ui/MainWindow.ui" line="283"/>
         <source>Previous Page</source>
         <translation>Попередня сторінка</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="260"/>
+        <location filename="../ui/MainWindow.ui" line="259"/>
         <source>PgUp</source>
         <translation>PgUp</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="268"/>
+        <location filename="../ui/MainWindow.ui" line="267"/>
         <source>New Project ...</source>
         <translation>Створити проект…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="271"/>
+        <location filename="../ui/MainWindow.ui" line="270"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="276"/>
+        <location filename="../ui/MainWindow.ui" line="275"/>
         <source>Open Project ...</source>
         <translation>Відкрити проект…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="279"/>
+        <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="287"/>
+        <location filename="../ui/MainWindow.ui" line="286"/>
         <source>Q</source>
         <translation>Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="298"/>
+        <location filename="../ui/MainWindow.ui" line="297"/>
         <source>W</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="306"/>
+        <location filename="../ui/MainWindow.ui" line="305"/>
         <source>Close Project</source>
         <translation>Закрити проект</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="309"/>
+        <location filename="../ui/MainWindow.ui" line="308"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="314"/>
+        <location filename="../ui/MainWindow.ui" line="313"/>
         <source>Quit</source>
         <translation>Вийти</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="317"/>
+        <location filename="../ui/MainWindow.ui" line="316"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="327"/>
+        <location filename="../ui/MainWindow.ui" line="326"/>
         <source>First Page</source>
         <translation>Перша сторінка</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="330"/>
+        <location filename="../ui/MainWindow.ui" line="329"/>
         <source>Home</source>
         <translation>Home</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="335"/>
+        <location filename="../ui/MainWindow.ui" line="334"/>
         <source>Last Page</source>
         <translation>Остання сторінка</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="338"/>
+        <location filename="../ui/MainWindow.ui" line="337"/>
         <source>End</source>
         <translation>End</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="343"/>
+        <location filename="../ui/MainWindow.ui" line="342"/>
         <source>About</source>
         <translation>Про програму</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="448"/>
-        <source>Stop batch processing</source>
-        <translation>Припинити пакетну обробку</translation>
+        <location filename="../ui/MainWindow.ui" line="347"/>
+        <source>Fix DPI ...</source>
+        <translation>Виправити щільність…</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="322"/>
+        <location filename="../ui/MainWindow.ui" line="352"/>
+        <source>Relinking ...</source>
+        <translation>Повторне з’єднання…</translation>
+    </message>
+    <message>
+        <source>Stop batch processing</source>
+        <translation type="obsolete">Припинити пакетну обробку</translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="321"/>
         <source>Settings ...</source>
         <translation>Параметри…</translation>
     </message>
@@ -754,6 +750,100 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="188"/>
         <source>Apply to ...</source>
         <translation>Застосувати до…</translation>
+    </message>
+</context>
+<context>
+    <name>OutOfMemoryDialog</name>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
+        <source>Out of memory</source>
+        <translation>Не вистачає пам’яті</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
+        <source>Out of Memory Situation in Scan Tailor</source>
+        <translation>Scan Tailor не вистачає пам’яті</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
+        <source>Possible reasons</source>
+        <translation>Можливі причини</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
+        <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
+        <translation>Чи виправляли ви роздільність початкових зображень? Чи впевнені ви, що вказані значення є правильними?</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
+        <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
+        <translation>Іноді дані щодо роздільності, вбудовані до зображень, є помилковими. Scan Tailor намагається виявити файли з помилковими даними, але визначення не завжди спрацьовує. Ймовірно, вам варто позначити пункт «Виправляти щільність, навіть якщо програма вважає її правильною» під час створення проекту, а потім скористатися вкладкою «Всі сторінки» діалогового вікна «Виправити щільність», доступ до якого можна також отримати за допомогою меню «Інструменти».</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
+        <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
+        <translation>Можливо, встановлено велике значення остаточної щільності? Зазвичай, це значення має не перевищувати 600 точок на дюйм.</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
+        <source>What can help</source>
+        <translation>Як виправити</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
+        <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
+        <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
+        <translation>Виправте значення щільностей. Настанови щодо визначення належних щільностей можна знайти &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;тут&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
+        <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
+        <translation>Якщо ви користуєтеся обладнанням і операційною системою з підтримкою 64-бітового режиму, скористайтеся 64-бітовою версією Scan Tailor.</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
+        <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
+        <translation>Якщо ви працюєте у режимі зображень у тонах сірого, переконайтеся, що зображення справді є зображеннями у тонах сірого. Якщо зображення насправді є кольоровими, які виглядають як сірі, виконайте пакетне перетворення зображень на зображення у тонах сірого. Таке перетворення надасть змогу заощадити пам’ять і підвищити швидкодію.</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
+        <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
+        <translation>Якщо вказані вище способи не допомагають, ви можете заощадити пам’ять попереднім створенням мініатюр, замість створення мініатюр на вимогу. Для створення мініатюр просто виконайте повільне гортання списку мініатюр згори вниз до того, як розпочнете обробку.</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
+        <source>What won&apos;t help</source>
+        <translation>Способи, які не допоможуть</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
+        <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
+        <translation>Як не дивно, збільшення об’єму оперативної пам’яті не допоможе. Нестача оперативної пам’яті компенсується створенням резервної пам’яті на диску, що уповільнює, але не заважає роботі програми. Нестача пам’яті виникає, коли вичерпується простір адрес, тому збільшення об’єму оперативної пам’яті не вирішить проблеми. Єдиним способом розширення простору адрес у пам’яті є використання 64-бітового апаратного забезпечення, 64-бітової операційної системи та 64-бітової версії Scan Tailor.</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
+        <source>Save Project</source>
+        <translation>Зберегти проект</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
+        <source>Save Project As ...</source>
+        <translation>Зберегти проект як…</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
+        <source>Don&apos;t Save</source>
+        <translation>Не зберігати</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
+        <source>Project Saved Successfully</source>
+        <translation>Проект успішно збережено</translation>
+    </message>
+    <message>
+        <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
+        <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
+        <translation>Будь ласка, зауважте, що хоча Scan Tailor намагається виявити ситуації, коли програмі не вистачає пам’яті, і надає вам змогу зберегти ваш проект, таке збереження не завжди можливе. Цього разу все минулося, але наступного разу все може завершитися втратою даних.</translation>
     </message>
 </context>
 <context>
@@ -1230,67 +1320,51 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
-        <location filename="../ProjectFilesDialog.cpp" line="334"/>
         <source>Input Directory</source>
         <translation>Каталог початкових файлів</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="43"/>
-        <location filename="../ProjectFilesDialog.cpp" line="354"/>
         <source>Output Directory</source>
         <translation>Каталог результатів</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="526"/>
-        <location filename="../ProjectFilesDialog.cpp" line="534"/>
-        <location filename="../ProjectFilesDialog.cpp" line="543"/>
-        <location filename="../ProjectFilesDialog.cpp" line="565"/>
-        <location filename="../ProjectFilesDialog.cpp" line="574"/>
-        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Error</source>
-        <translation>Помилка</translation>
+        <translation type="obsolete">Помилка</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="526"/>
         <source>No files in project!</source>
-        <translation>У проекті немає файлів!</translation>
+        <translation type="obsolete">У проекті немає файлів!</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="535"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
-        <translation>Не встановлено каталогу початкових файлів або цей каталог не існує.</translation>
+        <translation type="obsolete">Не встановлено каталогу початкових файлів або цей каталог не існує.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation>Не можна вказувати однакові каталоги для початкових файлів і результатів.</translation>
+        <translation type="obsolete">Не можна вказувати однакові каталоги для початкових файлів і результатів.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="554"/>
         <source>Create Directory?</source>
-        <translation>Створити каталог?</translation>
+        <translation type="obsolete">Створити каталог?</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
-        <translation>Каталогу результатів не існує. Створити його?</translation>
+        <translation type="obsolete">Каталогу результатів не існує. Створити його?</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="566"/>
         <source>Unable to create output directory.</source>
-        <translation>Не вдалося створити каталог результатів.</translation>
+        <translation type="obsolete">Не вдалося створити каталог результатів.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="575"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
-        <translation>Не встановлено каталогу результатів або цей каталог не існує.</translation>
+        <translation type="obsolete">Не встановлено каталогу результатів або цей каталог не існує.</translation>
     </message>
     <message>
-        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
-        <translation>Частину файлів не вдалося завантажити.
+        <translation type="obsolete">Частину файлів не вдалося завантажити.
 Підтримки цього формату не передбачено або дані пошкоджено.
 Вам слід вилучити ці файли з проекту.</translation>
     </message>
@@ -1367,14 +1441,30 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ProjectOpeningContext</name>
     <message>
-        <location filename="../ProjectOpeningContext.cpp" line="51"/>
         <source>Error</source>
-        <translation>Помилка</translation>
+        <translation type="obsolete">Помилка</translation>
     </message>
     <message>
-        <location filename="../ProjectOpeningContext.cpp" line="52"/>
         <source>Unable to interpret the project file.</source>
-        <translation>Не вдалося обробити файл проекту.</translation>
+        <translation type="obsolete">Не вдалося обробити файл проекту.</translation>
+    </message>
+</context>
+<context>
+    <name>RelinkingDialog</name>
+    <message>
+        <location filename="../ui/RelinkingDialog.ui" line="14"/>
+        <source>Relinking</source>
+        <translation>Повторне з’єднання</translation>
+    </message>
+    <message>
+        <location filename="../ui/RelinkingDialog.ui" line="97"/>
+        <source>Undo</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <location filename="../ui/RelinkingDialog.ui" line="100"/>
+        <source>...</source>
+        <translation>…</translation>
     </message>
 </context>
 <context>
@@ -1486,14 +1576,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../SettingsDialog.cpp" line="36"/>
         <source>Compiled without OpenGL support.</source>
-        <translation>Зібрано без підтримки OpenGL.</translation>
+        <translation type="obsolete">Зібрано без підтримки OpenGL.</translation>
     </message>
     <message>
-        <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation>На вашому обладнанні або у драйвері до нього не передбачено відповідних можливостей.</translation>
+        <translation type="obsolete">На вашому обладнанні або у драйвері до нього не передбачено відповідних можливостей.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
@@ -1509,9 +1597,8 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>StageListView</name>
     <message>
-        <location filename="../StageListView.cpp" line="130"/>
         <source>Launch batch processing</source>
-        <translation>Почати пакетну обробку</translation>
+        <translation type="obsolete">Почати пакетну обробку</translation>
     </message>
 </context>
 <context>
@@ -1533,22 +1620,19 @@ p, li { white-space: pre-wrap; }
         <translation>…</translation>
     </message>
     <message>
-        <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation>Мінімальне</translation>
+        <translation type="obsolete">Мінімальне</translation>
     </message>
     <message>
-        <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation>Звичайне</translation>
+        <translation type="obsolete">Звичайне</translation>
     </message>
 </context>
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1345"/>
         <source>%1 (page %2)</source>
-        <translation>%1 (сторінка %2)</translation>
+        <translation type="obsolete">%1 (сторінка %2)</translation>
     </message>
 </context>
 <context>
@@ -1631,7 +1715,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>deskew::Filter</name>
     <message>
-        <location filename="../filters/deskew/Filter.cpp" line="55"/>
+        <location filename="../filters/deskew/Filter.cpp" line="57"/>
         <source>Deskew</source>
         <translation>Виправлення нахилу</translation>
     </message>
