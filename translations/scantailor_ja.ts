@@ -741,7 +741,6 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>再リンク...</translation>
     </message>
     <message>
->>>>>>> master
         <source>Stop batch processing</source>
         <translation type="obsolete">一括処理を停止</translation>
     </message>

@@ -462,7 +462,6 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
 請使用批次處理中的&quot;內容選擇&quot;或&quot;邊界&quot;項目來偵測與指定範圍.</translation>
     </message>
     <message>
-    <message>
         <location filename="../MainWindow.cpp" line="1591"/>
         <source>%1 - Scan Tailor Plus %2</source>
         <translation type="unfinished"></translation>

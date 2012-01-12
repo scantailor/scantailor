@@ -640,7 +640,6 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
 Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat Obsah&quot; nebo &quot;Okraje&quot;.</translation>
     </message>
     <message>
-    <message>
         <location filename="../MainWindow.cpp" line="1591"/>
         <source>%1 - Scan Tailor Plus %2</source>
         <translation type="unfinished"></translation>

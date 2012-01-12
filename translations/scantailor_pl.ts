@@ -725,7 +725,6 @@ Aby go ustalić uruchom przetwarzanie wsadowe w sekcji &quot;Wybierz zawartość
         <translation type="unfinished"></translation>
     </message>
     <message>
->>>>>>> master
         <source>Stop batch processing</source>
         <translation type="obsolete">Zatrzymaj przetwarzanie wsadowe</translation>
     </message>
