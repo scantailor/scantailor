@@ -26,11 +26,6 @@ Pictureshape patch adds option for mixed pages to choose from free shape and rec
 Изменения в коде автосохранения для запуска нескольких ST.
 
 15.06.2011
-Изменения кода основной ветки master:
-1. Fix failure to reserve pure white and pure black colors for B/W content. (Joseph Artsimovich <joseph.artsimovich@gmail.com>)
-The problem happened in Color / Grayscale mode with "White margins" turned on.
-2. Fixed deskew re-processing bug. (Masahiro Kitagawa <kitashi@users.sourceforge.net>)
-
 Изменения ветки plus: (Vadim Kuznetsov (DikBSD) <dikbsd@gmail.com>)
 ~ Небольшие улучшения диалога Настроек - дизайн.
 + Этап Разрезки сканов: Сортировка по числу резаков по убыванию. Т.е. сверху - страницы с 2 резаками, за ними - с одним резаком (2 страницы), и в самом низу - без резаков (1 страница).
