@@ -307,6 +307,9 @@ RelinkablePathVisualization::ComponentButton::paintEvent(QPaintEvent* evt)
 	if (property("forceHighlight").toBool() || property("stickHighlight").toBool()) {
 		option.state |= QStyle::State_MouseOver;
 	}
+
+	// Prevent weird looking font effects for disabled buttons with Windows XP style.
+	option.state |= QStyle::State_Enabled;
 	
 	QStylePainter painter(this);
 	painter.drawControl(QStyle::CE_PushButton, option);

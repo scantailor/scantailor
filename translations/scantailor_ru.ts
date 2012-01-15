@@ -107,7 +107,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
@@ -117,7 +117,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
@@ -396,17 +396,17 @@ Andrey Bergman - Регулировка загрузки системы.
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые файлы не удалось загрузить</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Загружено: %1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось загрузить: %1</translation>
     </message>
 </context>
 <context>
@@ -480,7 +480,7 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
     <message>
         <location filename="../ui/MainWindow.ui" line="227"/>
         <source>Debug Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим отладки</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="235"/>
@@ -542,12 +542,12 @@ First you need to process all of them with the &quot;Page Layout&quot; filter.</
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Исправить DPI ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Пути в проекте ...</translation>
     </message>
     <message>
         <source>Start Batch Processing</source>
@@ -862,93 +862,93 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan Tailor: Нехватка памяти</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостаточно памяти для продолжения работы</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Возможные причины</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Если вам пришлось исправлять DPI ваших исходных изображений, убедитесь в правильности этих исправлений.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Иногда неправильные DPI прописаны прямо в исходных изображениях. Scan Tailor пытается обнаруживать такие случаи, но это не всегда ему удается. Возможно вам стоило поставить галочку &quot;Править DPI, даже если они выглядят нормальными&quot; при создании проекта, и проверить файлы во вкладке &quot;Все страницы&quot; диалога исправления DPI. После создания проекта, этот диалог доступен из меню &quot;Инструменты&quot;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation type="unfinished"></translation>
+        <translation>Возможно DPI вывода чрезмерно высок? Обычно нет смысла выставлять его более чем 600.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation type="unfinished"></translation>
+        <translation>Что может помочь</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Исправьте неправильные DPI. Научитесь &lt;a href=&quot;http://vimeo.com/12527484&quot;&gt;расчитывать неизвестные DPI&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если ваше железо и операционная система 64х-битные, вам стоит перейти на 64х-битную версию Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если вы работаете с изображениями в оттенках серого, убедитесь что они в таком виде и сохранены. Если же они сохранены как цветные изображения, пересохраните их в режиме оттенков серого используя какой-нибудь пакетрый конвертер изображений. Это сократит расход памяти а также ускорит обработку.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation type="unfinished"></translation>
+        <translation>В качестве последней меры, можно сэкономить немного памяти, создав миниатюры страниц заблаговременно. Для этого, перед работой над проектом нужно медленно пройтись по всей ленте миниатюр, давая им возможность подгрузиться с диска.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation type="unfinished"></translation>
+        <translation>Что не поможет</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Удивительно, но покупка дополнительной памяти не решит данную проблему. Нехватка памяти компенсируется механизмом подкачки, который вызывает &quot;тормоза&quot;, но все-же позволяет программам продолжать работать. В данном случае произошла нехватка не просто памяти, а адресного пространства памяти, которое не имеет ничего общего с реальным объемом памяти, установленном на компьютере. Единственный способ увеличить адресное пространство - переход на 64х-битное железо, 64х-битную операционную систему и 64х-битный Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation type="unfinished">Сохранить проект</translation>
+        <translation>Сохранить проект</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation type="unfinished">Сохранить проект как ...</translation>
+        <translation>Сохранить проект как ...</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Не сохранять</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Проект успешно сохранен</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратите внимание на то, что хотя Scan Tailor и пытается обработать ситуации нехватки памяти, чтобы дать вам возможность сохранить проект, это не всегда бывает возможно. В этот раз все получилось, но в следующий раз программа может просто &quot;упасть&quot;.</translation>
     </message>
 </context>
 <context>
@@ -1651,17 +1651,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Пути проекта</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Откатить действие</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2130,7 +2130,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation type="unfinished">Невозможно: выбрано несколько групп страниц.</translation>
+        <translation>Невозможно: выбрано несколько групп страниц.</translation>
     </message>
 </context>
 <context>
