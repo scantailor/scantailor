@@ -422,7 +422,7 @@ SET_SOURCE_FILES_PROPERTIES(${common_ui_sources} ${gui_only_ui_files} PROPERTIES
 ADD_SUBDIRECTORY(ui)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}") # for ui files
 
-ADD_CUSTOM_TARGET(toplevel_ui_sources DEPENDS ${ui_sources})
+ADD_CUSTOM_TARGET(toplevel_ui_sources DEPENDS ${common_ui_sources} ${gui_only_ui_sources})
 
 ADD_SUBDIRECTORY(filters/fix_orientation)
 ADD_SUBDIRECTORY(filters/page_split)
@@ -601,14 +601,14 @@ IF(WIN32)
 	ENDIF(MINGW)
 ENDIF(WIN32)
 
-ADD_LIBRARY(stcore STATIC ${common_sources})
+ADD_LIBRARY(stcore STATIC ${common_sources} ${common_ui_sources})
 
 ADD_EXECUTABLE(
-	scantailor WIN32 ${gui_only_sources} ${gui_only_ui_sources}
+	scantailor WIN32 ${gui_only_sources} ${common_ui_sources} ${gui_only_ui_sources}
 	${resource_sources} ${win32_resource_file} resources/icons/COPYING
 )
 
-ADD_EXECUTABLE(scantailor-cli ${cli_only_sources})
+ADD_EXECUTABLE(scantailor-cli ${cli_only_sources} ${common_ui_sources})
 
 # Note that order of static libraries matters with gcc.  Specifically,
 # QJPEG_LIBRARIES needs to go before Qt libraries and EXTRA_LIBS needs
