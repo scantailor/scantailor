@@ -181,6 +181,7 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
+	std::cout << "\t--no-content-text\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << "\n";
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
@@ -346,7 +347,6 @@ CommandLine::fetchContentDetection()
 
 	return level;
 }
-
 
 QRectF
 CommandLine::fetchContentRect()

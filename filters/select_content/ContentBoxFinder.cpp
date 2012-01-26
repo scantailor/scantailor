@@ -308,7 +308,11 @@ ContentBoxFinder::findContentBox(
 		dbg->add(content_blocks, "except_bordering");
 	}
 	
-	BinaryImage text_mask(estimateTextMask(content, content_blocks, dbg));
+	BinaryImage text_mask(content_blocks);
+	if (cli.hasContentText()) {
+		text_mask = estimateTextMask(content, content_blocks, dbg);
+	}
+
 	if (dbg) {
 		QImage text_mask_visualized(content.size(), QImage::Format_ARGB32_Premultiplied);
 		text_mask_visualized.fill(0xffffffff); // Opaque white.
