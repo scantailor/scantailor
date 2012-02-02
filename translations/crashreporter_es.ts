@@ -6,12 +6,12 @@
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="71"/>
         <source>This file contains the internal state of the program when it crashed</source>
-        <translation>Este archivo contiene el estado interno del programa cuando se colgo</translation>
+        <translation>Este archivo contiene el estado interno del programa cuando se colgó</translation>
     </message>
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="77"/>
         <source>Dump file</source>
-        <translation>archivo basura</translation>
+        <translation>Archivo basura</translation>
     </message>
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="105"/>
@@ -46,7 +46,7 @@
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="20"/>
         <source>Scan Tailor crashed.  That&apos;s usually caused by errors in the software.  You can help us find and fix the problem by submitting this crash report.</source>
-        <translation>Scan Tailor se ha colgado.  Esto seguramente sea algun error en el programa. Tu puedes ayudarnos y arreglar el problema enviandonos este reporte de cuelgue.</translation>
+        <translation>Scan Tailor se ha colgado.  Esto seguramente sea algún error en el programa. Puedes ayudarnos a arreglar el problema enviandonos este reporte de cuelgue.</translation>
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="30"/>
@@ -62,7 +62,7 @@ English or Russian please.</source>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="71"/>
         <source>If you are willing to provide further assistance to developers to help fix this problem, please provide your email address.</source>
-        <translation>Si usted esta dispuesto a dar asistencia a los programadores a solucionar el error, por favor denos su direccion de email.</translation>
+        <translation>Si usted esta dispuesto a dar asistencia a los programadores a solucionar el error, por favor dénos su direccioón de email.</translation>
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="81"/>
