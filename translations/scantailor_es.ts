@@ -16,7 +16,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
-        <translation>Scan Tailor es una herramienta interactica de post procesado para imagenes escaneadas. Lleva a cabo operaciones tales como dividir paginas, correcion de inclinacion, agregar/eliminar margenes y otros.Usted le proporciona la imagen escaneada y obtiene imagenes lista para ser impresas o para crear un archivo PDF o DJVU. El escaneo y el reconocimiento optico de caracteres OCR estan fuera de la mira de este proyecto.</translation>
+        <translation>Scan Tailor es una herramienta interactiva de post procesado para imágenes escaneadas. Lleva a cabo operaciones tales como dividir paginas, corrección de inclinación, agregar/eliminar márgenes y otros.Usted le proporciona la imagen escaneada y obtiene imágenes lista para ser impresas o para crear un archivo PDF o DJVU. El escaneo y el reconocimiento óptico de caracteres OCR están fuera de la mira de este proyecto.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="101"/>
@@ -36,12 +36,13 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="157"/>
         <source>U235 - Picture auto-detection algorithm.</source>
-        <translation>U234 - Algoritmo de deteccion automatica de imagenes.</translation>
+        <translation>U234 - Algoritmo de detección automatica de imagenes.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="164"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
-        <translation>Robert B. - Primera generacion de correcion de deformacion.</translation>
+        <translation>Robert B. - Primera generación de corrección de deformación.
+ automática de imágenes.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
@@ -56,7 +57,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
-        <translation>Svetoslav Sashkov, Mandor - Bulgarian</translation>
+        <translation>Svetoslav Sashkov, Mandor - Búlgaro</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="212"/>
@@ -96,12 +97,12 @@
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="261"/>
         <source>Marián Hvolka - Slovak</source>
-        <translation>Marián Hvolka - Esloveco</translation>
+        <translation>Marián Hvolka - Eslovaco</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation>Flavio Benelli - Español</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
@@ -111,7 +112,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation>Yuri Chornoivan - Ucraniano</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="309"/>
@@ -131,7 +132,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="294"/>
         <source>Documentation</source>
-        <translation>Documentacion</translation>
+        <translation>Documentación</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="350"/>
@@ -157,7 +158,7 @@
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation>Haga click en un area para elegir su color o ESC para cancelar.</translation>
+        <translation>Haga click en un área para elegir su color o ESC para cancelar.</translation>
     </message>
 </context>
 <context>
@@ -385,17 +386,17 @@
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation>Algunos archivos fallaron al cargar</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga exitosa:%1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Falla al cargar:%1</translation>
     </message>
 </context>
 <context>
@@ -517,7 +518,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="227"/>
         <source>Debug Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo Debug</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="235"/>
@@ -629,12 +630,12 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Corregir DPI ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>re enlazar...</translation>
     </message>
     <message>
         <source>Stop batch processing</source>
@@ -656,17 +657,17 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="52"/>
         <source>New Project ...</source>
-        <translation>Nuevo Proyecto...</translation>
+        <translation>Nuevo Proyecto ...</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="78"/>
         <source>Open Project ...</source>
-        <translation>Abrir Proyecto...</translation>
+        <translation>Abrir Proyecto ...</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="103"/>
         <source>Recent Projects</source>
-        <translation>Proyecto Recientes</translation>
+        <translation>Proyectos Recientes</translation>
     </message>
 </context>
 <context>
@@ -674,7 +675,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="17"/>
         <source>Fix Orientation</source>
-        <translation>Corregir Orientacion</translation>
+        <translation>Corregir Orientación</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="23"/>
@@ -763,93 +764,93 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation type="unfinished"></translation>
+        <translation>Sin memoria disponible</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation type="unfinished"></translation>
+        <translation>Sin memoria disponible en Scan Tailor</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation>Posibles rasones</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Tienes que corregir los DPI de tu imagen original? ¿Estas seguro que los valores ingresados son correctos?</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Algunas veces las imágenes pueden tener un numero de DPI equivocado de origen. Scan Tailor intenta detectarlos, pero no es siempre fácil de discernir . Quizás necesites tildar &quot;Corregir DPI aun si parece estar bien&quot; cuando creas un proyecto y miras en la pestaña de &quot;Todas las paginas&quot; en el dialogo de &quot;DPI fijo&quot;, que también es accesible de menú Herramientas.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Es muy grande el DPI de salida? Normalmente no necesitas mas grande que 600.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation type="unfinished"></translation>
+        <translation>Que puede ayudar</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Corrija los DPI. Aprenda aqui &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;como estimar DPI desconocios&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si su hardware y su sistema operativo son 64-bits, considere cambiarse a la version de Scan Tailor de 64-bits.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuando trabaje con imágenes en escala de grises, asegurase de que son realmente grises. Si son imágenes a color que casualmente parecen grises, paselas a escala de grises usando algún tipo de conversor en lote, Esto ahorrara memoria e incrementara el rendimiento.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation type="unfinished"></translation>
+        <translation>En ultima instancia, puede ahorrar algo de memoria asegurandose que las vistas en miniatura son pre-creadas en vez de ser creadas automáticamente. Esto puede lograrse desplazando lentamente la lista de miniaturas de arriba hacia abajo antes de comenzar con algún trabajo intensivo.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation type="unfinished"></translation>
+        <translation>Que no ayuda</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorprendentemente, aumentar la RAM no ayudara aquí. La falta de RAM es compensada con el mecanismo swap que genera una memoria virtual en el disco duro y hace que todo vaya mas lento, pero mantiene al programa funcionando. Una situación de falta de memoria significa que nos quedamos sin direcciones de memoria disponibles, que no tiene nada que ver con la cantidad de RAM que tenga. La única manera de incrementar las direcciones de memoria es pasarse a un hardware de 64-bits, un sistema operativo de 64-bits y el Scan Tailor de 64-bits.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation type="unfinished">Guardar Proyecto</translation>
+        <translation>Guardar Proyecto</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation type="unfinished">Guardar el Proyecto como...</translation>
+        <translation>Guardar el Proyecto como...</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
+        <translation>No guardar</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>Proyecto guardado satisfactoriamente</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor note que mientras que Scan Tailor intenta alocar algo de memoria y le da la oportunidad de salvar su proyecto, no es siempre posible. Esta vez ha resultado con éxito, pero puede que la próxima se cuelgue.</translation>
     </message>
 </context>
 <context>
@@ -867,7 +868,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation>Solamente esta pagina (ya aplicado)</translation>
+        <translation>Solamente esta pagina (aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="39"/>
@@ -1110,7 +1111,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Todas las pares o impares, dependiendo si la pagina actual es par o impar.</translation>
+        <translation>Todas las demas</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
@@ -1205,7 +1206,8 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
-        <translation>Igualar en tamaño a las demas paginas</translation>
+        <translation>Igualar en tamaño a las 
+demas paginas</translation>
     </message>
 </context>
 <context>
@@ -1315,7 +1317,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation>Agregar aa la capa automatica</translation>
+        <translation>Agregar a la capa automatica</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
@@ -1457,17 +1459,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Revincular</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Deshacer </translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1485,7 +1487,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="72"/>
         <source>Corresponding output files will be deleted, while input files will remain.</source>
-        <translation>Los correspondientes archivos de salida seran borrados, mientras que los archivos de entrada se mantendran.</translation>
+        <translation>Los correspondientes archivos de salida seran borrados,
+ mientras que los archivos de entrada se mantendran.</translation>
     </message>
 </context>
 <context>
@@ -1503,7 +1506,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation>Solamente esta pagina (ya aplicado)</translation>
+        <translation>Solo esta pagina (ya aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
@@ -1520,7 +1523,7 @@ p, li { white-space: pre-wrap; }
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
         <translatorcomment>what should i translate?</translatorcomment>
-        <translation>Todas las demas(excepto esta)</translation>
+        <translation>Todas las pares o impares</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
@@ -1536,12 +1539,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para multiples paginas.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>Todas las demas seleccionadas (excepto esta)</translation>
+        <translation>Todas las demás seleccionadas</translation>
     </message>
 </context>
 <context>
@@ -1729,7 +1732,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="62"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
-        <translation>Use Ctrl+Rueda para girar o Ctrl+Shift+Rueda para una rotacion mas precisa.</translation>
+        <translation>Use Ctrl+Rueda para girar o Ctrl+Shift+Rueda para una rotación mas precisa.</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
@@ -1750,7 +1753,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>No se puede:has seleccionado mas de un grupo.</translation>
+        <translation>No se puede: has seleccionado mas de un grupo.</translation>
     </message>
 </context>
 <context>
@@ -1758,7 +1761,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
-        <translation>Corregiro Orientacion</translation>
+        <translation>Corregir Orientacion</translation>
     </message>
 </context>
 <context>
@@ -1855,7 +1858,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
-        <translation>Las zona de imagenes solo estan disponibles en el modo Combinado.</translation>
+        <translation>Las zona de imágenes solo estáan disponibles en el modo Combinado.</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="558"/>
