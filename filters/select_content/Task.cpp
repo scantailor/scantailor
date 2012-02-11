@@ -27,6 +27,7 @@
 #include "Settings.h"
 #include "TaskStatus.h"
 #include "ContentBoxFinder.h"
+#include "PageFinder.h"
 #include "FilterUiInterface.h"
 #include "ImageView.h"
 #include "OrthogonalRotation.h"
@@ -122,9 +123,15 @@ Task::process(TaskStatus const& status, FilterData const& data)
 			m_ptrSettings->setPageParams(m_pageId, new_params);
 		}
 	} else {
+		//QRectF const page_rect(
+		QRectF const page_rect(
+			PageFinder::findPageBox(
+				status, data, m_ptrDbg.get()
+			)
+		);
 		QRectF const content_rect(
 			ContentBoxFinder::findContentBox(
-				status, data, m_ptrDbg.get()
+				status, data, page_rect, m_ptrDbg.get()
 			)
 		);
 		ui_data.setContentRect(content_rect);

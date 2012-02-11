@@ -4,3 +4,4 @@ CMakeFiles
 *.h.moc
 build/
 *~
+*.swp
