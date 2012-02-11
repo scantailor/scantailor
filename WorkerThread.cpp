@@ -18,10 +18,12 @@
 #include "WorkerThread.h"
 #include "WorkerThread.h.moc"
 #include "ThreadPriority.h"
+#include "OutOfMemoryHandler.h"
 #include <QCoreApplication>
 #include <QThread>
 #include <QEvent>
 #include <QSettings>
+#include <new>
 #include <assert.h>
 
 #if defined(Q_OS_LINUX) // For Linux updatePriority()
@@ -235,11 +237,15 @@ WorkerThread::Dispatcher::processTask(BackgroundTaskPtr const& task)
 		return;
 	}
 
-	FilterResultPtr const result((*task)());
-	if (result) {
-		QCoreApplication::postEvent(
-			&m_rOwner, new TaskResultEvent(task, result)
-		);
+	try {
+		FilterResultPtr const result((*task)());
+		if (result) {
+			QCoreApplication::postEvent(
+				&m_rOwner, new TaskResultEvent(task, result)
+			);
+		}
+	} catch (std::bad_alloc const&) {
+		OutOfMemoryHandler::instance().handleOutOfMemorySituation();
 	}
 }
 

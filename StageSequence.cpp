@@ -48,6 +48,14 @@ StageSequence::StageSequence(IntrusivePtr<ProjectPages> const& pages,
 	m_filters.push_back(m_ptrOutputFilter);
 }
 
+void
+StageSequence::performRelinking(AbstractRelinker const& relinker)
+{
+	BOOST_FOREACH(FilterPtr& filter, m_filters) {
+		filter->performRelinking(relinker);
+	}
+}
+
 int
 StageSequence::findFilter(FilterPtr const& filter) const
 {

@@ -24,7 +24,6 @@
 #include "DebugImages.h"
 #include "EstimateBackground.h"
 #include "Despeckle.h"
-#include "Undistort.h"
 #include "RenderParams.h"
 #include "dewarping/DistortionModel.h"
 #include "Dpi.h"
@@ -81,6 +80,7 @@
 #include <Qt>
 #include <vector>
 #include <memory>
+#include <new>
 #include <algorithm>
 #include <assert.h>
 #include <string.h>
@@ -757,6 +757,10 @@ OutputGenerator::processWithoutDewarping(
 	status.throwIfCancelled();
 	
 	QImage dst(target_size, maybe_normalized.format());
+	if (!target_size.isEmpty() && dst.isNull()) {
+		throw std::bad_alloc();
+	}
+
 	if (maybe_normalized.format() == QImage::Format_Indexed8) {
 		dst.setColorTable(createGrayscalePalette());
 		// White.  0xff is reserved if in "Color / Grayscale" mode.

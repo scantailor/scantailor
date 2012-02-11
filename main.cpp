@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -140,6 +140,11 @@ int main(int argc, char** argv)
 #endif
 
 	Application app(argc, argv);
+
+#ifdef _WIN32
+	// Get rid of all references to Qt's installation directory.
+	app.setLibraryPaths(QStringList(app.applicationDirPath()));
+#endif
 
 	// parse command line arguments
 	CommandLine cli(app.arguments());

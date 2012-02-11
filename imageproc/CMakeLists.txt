@@ -10,7 +10,6 @@ SET(
 	ConnComp.h Connectivity.h
 	BitOps.cpp BitOps.h
 	SeedFill.cpp SeedFill.h
-	kFill.cpp kFill.h
 	ConnCompEraser.cpp ConnCompEraser.h
 	ConnCompEraserExt.cpp ConnCompEraserExt.h
 	GrayImage.cpp GrayImage.h
@@ -45,8 +44,6 @@ SET(
 	InfluenceMap.cpp InfluenceMap.h
 	MaxWhitespaceFinder.cpp MaxWhitespaceFinder.h
 	ColorInterpolation.cpp ColorInterpolation.h
-	LU.cpp LU.h
-	LM.cpp LM.h
 	LocalMinMaxGeneric.h
 	SeedFillGeneric.cpp SeedFillGeneric.h
 	FindPeaksGeneric.h

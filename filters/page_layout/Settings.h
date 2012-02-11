@@ -27,6 +27,7 @@
 class PageId;
 class Margins;
 class PageSequence;
+class AbstractRelinker;
 class QSizeF;
 class QRectF;
 
@@ -53,6 +54,8 @@ public:
 	 */
 	void clear();
 	
+	void performRelinking(AbstractRelinker const& relinker);
+
 	/**
 	 * \brief Removes all stored data for pages that are not in the provided list.
 	 */

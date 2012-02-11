@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 #include <map>
 #include <set>
 
+class AbstractRelinker;
+
 namespace deskew
 {
 
@@ -40,6 +42,8 @@ public:
 	virtual ~Settings();
 	
 	void clear();
+
+	void performRelinking(AbstractRelinker const& relinker);
 	
 	void setPageParams(PageId const& page_id, Params const& params);
 	

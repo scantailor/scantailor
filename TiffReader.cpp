@@ -18,6 +18,7 @@
 
 #include "TiffReader.h"
 #include "ImageMetadata.h"
+#include "NonCopyable.h"
 #include "Dpi.h"
 #include "Dpm.h"
 #include <QtGlobal>
@@ -27,6 +28,7 @@
 #include <QColor>
 #include <QSize>
 #include <QDebug>
+#include <algorithm>
 #include <tiff.h>
 #include <tiffio.h>
 #include <new>
@@ -67,7 +69,10 @@ private:
 template<typename T>
 class TiffReader::TiffBuffer
 {
+	DECLARE_NON_COPYABLE(TiffBuffer)
 public:
+	TiffBuffer() : m_pData(0) {}
+
 	TiffBuffer(tsize_t num_items) {
 		m_pData = (T*)_TIFFmalloc(num_items * sizeof(T));
 		if (!m_pData) {
@@ -76,10 +81,16 @@ public:
 	}
 	
 	~TiffBuffer() {
-		_TIFFfree(m_pData);
+		if (m_pData) {
+			_TIFFfree(m_pData);
+		}
 	}
 	
 	T* data() { return m_pData; }
+
+	void swap(TiffBuffer& other) {
+		std::swap(m_pData, other.m_pData);
+	}
 private:
 	T* m_pData;
 };
@@ -308,13 +319,6 @@ TiffReader::readImage(QIODevice& device, int const page_num)
 		image = extractBinaryOrIndexed8Image(tif, info);
 	} else {
 		// General case.
-		
-		TiffBuffer<uint32> raster(info.width * info.height);
-		
-		if (!TIFFReadRGBAImage(tif.handle(), info.width, info.height, raster.data(), 0)) {
-			return QImage();
-		}
-		
 		image = QImage(
 			info.width, info.height,
 			info.samples_per_pixel == 3
@@ -323,15 +327,34 @@ TiffReader::readImage(QIODevice& device, int const page_num)
 		if (image.isNull()) {
 			throw std::bad_alloc();
 		}
+
+		// For ABGR -> ARGB conversion.
+		TiffBuffer<uint32> tmp_buffer;
+		uint32 const* src_line = 0;
+
+		if (image.bytesPerLine() == 4 * info.width) {
+			// We can avoid creating a temporary buffer in this case.
+			if (!TIFFReadRGBAImageOriented(tif.handle(), info.width, info.height,
+			                               (uint32*)image.bits(), ORIENTATION_TOPLEFT, 0)) {
+				return QImage();
+			}
+			src_line = (uint32 const*)image.bits();
+		} else {
+			TiffBuffer<uint32>(info.width * info.height).swap(tmp_buffer);
+			if (!TIFFReadRGBAImageOriented(tif.handle(), info.width, info.height,
+				                           tmp_buffer.data(), ORIENTATION_TOPLEFT, 0)) {
+				return QImage();
+			}
+			src_line = tmp_buffer.data();
+		}
 		
-		uint32* src_line = raster.data() + (info.height - 1) * info.width;
 		uint32* dst_line = (uint32*)image.bits();
 		assert(image.bytesPerLine() % 4 == 0);
-		int const dst_wpl = image.bytesPerLine() / 4;
+		int const dst_stride = image.bytesPerLine() / 4;
 		for (int y = 0; y < info.height; ++y) {
 			convertAbgrToArgb(src_line, dst_line, info.width);
-			src_line -= info.width;
-			dst_line += dst_wpl;
+			src_line += info.width;
+			dst_line += dst_stride;
 		}
 	}
 	

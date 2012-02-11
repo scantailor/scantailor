@@ -18,6 +18,8 @@
 
 #include "OutputFileNameGenerator.h"
 #include "PageId.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <QFileInfo>
 #include <QDir>
 #include <assert.h>
@@ -37,6 +39,13 @@ OutputFileNameGenerator::OutputFileNameGenerator(
 	m_layoutDirection(layout_direction)
 {
 	assert(m_ptrDisambiguator.get());
+}
+
+void
+OutputFileNameGenerator::performRelinking(AbstractRelinker const& relinker)
+{
+	m_ptrDisambiguator->performRelinking(relinker);
+	m_outDir = relinker.substitutionPathFor(RelinkablePath(m_outDir, RelinkablePath::Dir));
 }
 
 QString

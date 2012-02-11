@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -68,6 +68,8 @@ public:
 	 */
 	virtual ~ThumbnailPixmapCache();
 	
+	void setThumbDir(QString const& thumb_dir);
+
 	/**
 	 * \brief Take the pixmap from cache, if it's there.
 	 *

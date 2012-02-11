@@ -34,7 +34,7 @@ public:
 			m_pObj->deleteLater();
 		}
 	}
-	
+
 	void reset(T* other) { SafeDeletingQObjectPtr(other).swap(*this); }
 	
 	T& operator*() const { return *m_pObj; }
@@ -42,7 +42,7 @@ public:
 	T* operator->() const { return m_pObj; }
 	
 	T* get() const { return m_pObj; }
-	
+
 	void swap(SafeDeletingQObjectPtr& other) {
 		T* tmp = m_pObj;
 		m_pObj = other.m_pObj;

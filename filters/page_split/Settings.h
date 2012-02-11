@@ -31,6 +31,8 @@
 #include <map>
 #include <set>
 
+class AbstractRelinker;
+
 namespace page_split
 {
 
@@ -137,6 +139,8 @@ public:
 	 * \brief Reset all settings to their initial state.
 	 */
 	void clear();
+
+	void performRelinking(AbstractRelinker const& relinker);
 	
 	LayoutType defaultLayoutType() const;
 	

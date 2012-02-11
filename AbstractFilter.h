@@ -28,10 +28,14 @@ class FilterUiInterface;
 class PageId;
 class ProjectReader;
 class ProjectWriter;
+class AbstractRelinker;
 class QString;
 class QDomDocument;
 class QDomElement;
 
+/**
+ * Filters represent processing stages, like "Deskew", "Margins" and "Output".
+ */
 class AbstractFilter : public RefCountable
 {
 public:
@@ -50,6 +54,8 @@ public:
 	virtual std::vector<PageOrderOption> pageOrderOptions() const {
 		return std::vector<PageOrderOption>();
 	}
+
+	virtual void performRelinking(AbstractRelinker const& relinker) = 0;
 
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id) = 0;
 	

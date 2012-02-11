@@ -16,37 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FIX_DPI_SINGLE_PAGE_DIALOG_H_
-#define FIX_DPI_SINGLE_PAGE_DIALOG_H_
+#ifndef RELINKING_SORTING_MODEL_H_
+#define RELINKING_SORTING_MODEL_H_
 
-#include "ui_FixDpiSinglePageDialog.h"
-#include "Dpi.h"
-#include "ImageMetadata.h"
-#include <QPalette>
+#include <QSortFilterProxyModel>
 
-class QPushButton;
-class ImageId;
-
-class FixDpiSinglePageDialog : public QDialog
+class RelinkingSortingModel : public QSortFilterProxyModel
 {
-	Q_OBJECT
 public:
-	FixDpiSinglePageDialog(ImageId const& image_id,
-		ImageMetadata const& image_metadata, QWidget* parent = 0);
-	
-	Dpi const& dpi() const { return m_metadata.dpi(); }
-private slots:
-	void dpiComboChangedByUser(int idx);
-	
-	void dpiValueChanged();
-private:
-	void decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpi_status) const;
-	
-	Ui::FixDpiSinglePageDialog ui;
-	ImageMetadata m_metadata;
-	QPalette m_normalPalette;
-	QPalette m_errorPalette;
-	QPushButton* m_pOkBtn;
+	RelinkingSortingModel(QObject* parent = 0);
+protected:
+	virtual bool lessThan(QModelIndex const& left, QModelIndex const& right) const;
 };
 
 #endif

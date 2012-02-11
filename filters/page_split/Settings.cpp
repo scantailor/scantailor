@@ -17,6 +17,8 @@
 */
 
 #include "Settings.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <QMutexLocker>
 #include <boost/foreach.hpp>
 #include <assert.h>
@@ -40,6 +42,22 @@ Settings::clear()
 	
 	m_perPageRecords.clear();
 	m_defaultLayoutType = AUTO_LAYOUT_TYPE;
+}
+
+void
+Settings::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker locker(&m_mutex);
+	PerPageRecords new_records;
+
+	BOOST_FOREACH(PerPageRecords::value_type const& kv, m_perPageRecords) {
+		RelinkablePath const old_path(kv.first.filePath(), RelinkablePath::File);
+		ImageId new_image_id(kv.first);
+		new_image_id.setFilePath(relinker.substitutionPathFor(old_path));
+		new_records.insert(PerPageRecords::value_type(new_image_id, kv.second));
+	}
+
+	m_perPageRecords.swap(new_records);
 }
 
 LayoutType

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,23 +16,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_KFILL_H_
-#define IMAGEPROC_KFILL_H_
+#ifndef RELINKING_LIST_VIEW_H_
+#define RELINKING_LIST_VIEW_H_
 
-namespace imageproc
+#include <QListView>
+
+class QPainter;
+class QRect;
+class QModelIndex;
+
+class RelinkingListView : public QListView
 {
+public:
+	RelinkingListView(QWidget* parent = 0);
+protected:
+	virtual void paintEvent(QPaintEvent* e);
+private:
+	class Delegate;
+	class IndicationGroup;
+	class GroupAggregator;
 
-class BinaryImage;
+	void maybeDrawStatusLayer(QPainter* painter,
+		QModelIndex const& item_index, QRect const& item_paint_rect);
 
-/**
- * \brief Performs noise reduction on binary images.
- *
- * \param src The input image.
- * \param k The window size.  Must be >= 3.
- * \return The resulting image.
- */
-BinaryImage kFill(BinaryImage src, int k);
+	void drawStatusLayer(QPainter* painter);
 
-} // namespace imageproc
+	bool m_statusLayerDrawn;
+};
 
 #endif

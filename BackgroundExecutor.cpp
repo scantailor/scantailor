@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,25 +17,13 @@
 */
 
 #include "BackgroundExecutor.h"
+#include "OutOfMemoryHandler.h"
 #include <QCoreApplication>
 #include <QObject>
 #include <QThread>
 #include <QEvent>
+#include <new>
 #include <assert.h>
-
-template<typename T>
-class BackgroundExecutor::PayloadEvent : public QEvent
-{
-public:
-	PayloadEvent(T const& payload) : QEvent(User), m_payload(payload) {}
-	
-	T const& payload() const { return m_payload; }
-	
-	T& payload() { return m_payload; } 
-private:
-	T m_payload;
-};
-
 
 class BackgroundExecutor::Dispatcher : public QObject
 {
@@ -103,17 +91,21 @@ BackgroundExecutor::Dispatcher::Dispatcher(Impl& owner)
 void
 BackgroundExecutor::Dispatcher::customEvent(QEvent* event)
 {
-	TaskEvent* evt = dynamic_cast<TaskEvent*>(event);
-	assert(evt);
-	
-	TaskPtr const& task = evt->payload();
-	assert(task);
-	
-	TaskResultPtr const result((*task)());
-	if (result) {
-		QCoreApplication::postEvent(
-			&m_rOwner, new ResultEvent(result)
-		);
+	try {
+		TaskEvent* evt = dynamic_cast<TaskEvent*>(event);
+		assert(evt);
+
+		TaskPtr const& task = evt->payload();
+		assert(task);
+
+		TaskResultPtr const result((*task)());
+		if (result) {
+			QCoreApplication::postEvent(
+				&m_rOwner, new ResultEvent(result)
+			);
+		}
+	} catch (std::bad_alloc const&) {
+		OutOfMemoryHandler::instance().handleOutOfMemorySituation();
 	}
 }
 
