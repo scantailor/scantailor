@@ -53,7 +53,7 @@ public:
 	
 	FilterResultPtr process(
 		TaskStatus const& status, FilterData const& data,
-		QRectF const& content_rect);
+		QRectF const& page_rect, QRectF const& content_rect);
 private:
 	class UiUpdater;
 	

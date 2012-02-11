@@ -27,9 +27,10 @@ namespace page_layout
 {
 
 Params::Params(
-	Margins const& hard_margins_mm, QRectF const& content_rect,
+	Margins const& hard_margins_mm, QRectF const& content_rect, QRectF const& page_rect,
 	QSizeF const& content_size_mm, Alignment const& alignment)
 :	m_hardMarginsMM(hard_margins_mm),
+	m_pageRect(page_rect),
 	m_contentRect(content_rect),
 	m_contentSizeMM(content_size_mm),
 	m_alignment(alignment)
@@ -40,6 +41,11 @@ Params::Params(QDomElement const& el)
 :	m_hardMarginsMM(
 		XmlUnmarshaller::margins(
 			el.namedItem("hardMarginsMM").toElement()
+		)
+	),
+	m_pageRect(
+		XmlUnmarshaller::rectF(
+			el.namedItem("pageRect").toElement()
 		)
 	),
 	m_contentRect(

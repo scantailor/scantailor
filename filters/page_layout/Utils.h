@@ -79,6 +79,9 @@ public:
 		QRectF const& contentRect,
 		QRectF const& agg_content_rect);
 	
+    static Margins calcMarginsMM(
+            ImageTransformation const& xform, QRectF const& page_rect, QRectF const& content_rect
+    );
 	/**
 	 * \brief Calculates the page rect (content + hard margins + soft margins)
 	 *

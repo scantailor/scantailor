@@ -93,10 +93,36 @@ Utils::extendPolyRectWithMargins(
 }
 
 Margins
+Utils::calcMarginsMM(ImageTransformation const& xform, QRectF const& page_rect, QRectF const& content_rect)
+{
+	QSizeF const content_size_mm(
+		Utils::calcRectSizeMM(xform, content_rect)
+	);
+
+	QSizeF const page_size_mm(
+		Utils::calcRectSizeMM(xform, page_rect)
+	);
+
+    double widthMM = page_size_mm.width() - content_size_mm.width();
+    double heightMM = page_size_mm.height() - content_size_mm.height();
+
+    double width = page_rect.width() - content_rect.width();
+    double height = page_rect.height() - content_rect.height();
+
+    double left = double(content_rect.left() - page_rect.left()) / double(page_rect.width());
+    double right = double(page_rect.right() - content_rect.right()) / double(page_rect.width());
+    double top = double(content_rect.top() - page_rect.top()) / double(page_rect.height());
+    double bottom = double(page_rect.bottom() - content_rect.bottom()) / double(page_rect.bottom());
+
+    return Margins(left * widthMM/(left+right), top * heightMM/(top+bottom), right * widthMM/(left+right), bottom * heightMM/(top+bottom));
+}
+
+Margins
 Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
 	Alignment const& alignment, QRectF const& contentRect, QRectF const& agg_content_rect)
 {
+	return Margins();
 	if (alignment.isNull()) {
 		std::cout << "\tskip soft margins: " <<  "\n";
 		// This means we are not aligning this page with others.
@@ -295,7 +321,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), params.contentRect(), agg_content_rect
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), params.pageRect(), agg_content_rect
 		)
 	);
 

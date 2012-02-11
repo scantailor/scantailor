@@ -35,7 +35,7 @@ class Params
 {
 	// Member-wise copying is OK.
 public:
-	Params(Margins const& hard_margins_mm, QRectF const& content_rect,
+	Params(Margins const& hard_margins_mm, QRectF const& page_rect, QRectF const& content_rect,
 		QSizeF const& content_size_mm, Alignment const& alignment);
 	
 	Params(QDomElement const& el);
@@ -43,6 +43,7 @@ public:
 	Margins const& hardMarginsMM() const { return m_hardMarginsMM; }
 	
 	QRectF const& contentRect() const { return m_contentRect; }
+	QRectF const& pageRect() const { return m_pageRect; }
 
 	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
 	
@@ -52,6 +53,7 @@ public:
 private:
 	Margins m_hardMarginsMM;
 	QRectF m_contentRect;
+	QRectF m_pageRect;
 	QSizeF m_contentSizeMM;
 	Alignment m_alignment;
 };

@@ -88,19 +88,23 @@ Task::~Task()
 FilterResultPtr
 Task::process(
 	TaskStatus const& status, FilterData const& data,
-	QRectF const& content_rect)
+	QRectF const& page_rect, QRectF const& content_rect)
 {
 	status.throwIfCancelled();
 	
 	QSizeF const content_size_mm(
 		Utils::calcRectSizeMM(data.xform(), content_rect)
 	);
-	
+
+    m_ptrSettings->setHardMarginsMM(
+        m_pageId, Utils::calcMarginsMM(data.xform(), page_rect, content_rect)
+    );
+    
 	QSizeF agg_hard_size_before;
 	QSizeF agg_hard_size_after;
 	Params const params(
 		m_ptrSettings->updateContentSizeAndGetParams(
-			m_pageId, content_rect, content_size_mm,
+			m_pageId, page_rect, content_rect, content_size_mm,
 			&agg_hard_size_before, &agg_hard_size_after
 		)
 	);

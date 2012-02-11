@@ -100,6 +100,13 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	OptionsWidget::UiData ui_data;
 	ui_data.setSizeCalc(PhysSizeCalc(data.xform()));
 
+	//QRectF const page_rect(
+	QRectF const page_rect(
+		PageFinder::findPageBox(
+			status, data, m_ptrDbg.get()
+		)
+	);
+
 	if (params.get()) {
 		ui_data.setContentRect(params->contentRect());
 		ui_data.setDependencies(deps);
@@ -123,12 +130,6 @@ Task::process(TaskStatus const& status, FilterData const& data)
 			m_ptrSettings->setPageParams(m_pageId, new_params);
 		}
 	} else {
-		//QRectF const page_rect(
-		QRectF const page_rect(
-			PageFinder::findPageBox(
-				status, data, m_ptrDbg.get()
-			)
-		);
 		QRectF const content_rect(
 			ContentBoxFinder::findContentBox(
 				status, data, page_rect, m_ptrDbg.get()
@@ -149,7 +150,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	if (m_ptrNextTask) {
 		return m_ptrNextTask->process(
 			status, FilterData(data, data.xform()),
-			ui_data.contentRect()
+			page_rect, ui_data.contentRect()
 		);
 	} else {
 		return FilterResultPtr(
