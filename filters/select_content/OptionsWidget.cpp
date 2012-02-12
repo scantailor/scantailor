@@ -36,7 +36,7 @@ OptionsWidget::OptionsWidget(
 {
 	setupUi(this);
 	
-//	connect(autoBtn, SIGNAL(pressed(bool)), this, SLOT(modeChanged(bool)));
+	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
 	connect(disableBtn, SIGNAL(pressed()), this, SLOT(contentDetectionDisabled()));
 	connect(pageDetectAutoBtn, SIGNAL(pressed()), this, SLOT(pageDetectionEnabled()));
 	connect(pageDetectDisableBtn, SIGNAL(pressed()), this, SLOT(pageDetectionDisabled()));
@@ -138,12 +138,12 @@ OptionsWidget::updateModeIndication(AutoManualMode const mode)
 {
 	ScopedIncDec<int> guard(m_ignoreAutoManualToggle);
 	
+	disableBtn->setChecked(false);
 	if (mode == MODE_AUTO) {
 		autoBtn->setChecked(true);
 	} else {
 		manualBtn->setChecked(true);
 	}
-	disableBtn->setChecked(false);
 }
 
 void

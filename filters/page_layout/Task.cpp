@@ -98,8 +98,8 @@ Task::process(
 
 	Alignment alignment(m_ptrSettings->getPageAlignment(m_pageId));
 	if (alignment.isAutoMarginsEnabled()) {
-	m_ptrSettings->setHardMarginsMM(
-	m_pageId, Utils::calcMarginsMM(data.xform(), page_rect, content_rect)
+		m_ptrSettings->setHardMarginsMM(
+			m_pageId, Utils::calcMarginsMM(data.xform(), page_rect, content_rect)
 		);
 	}
 

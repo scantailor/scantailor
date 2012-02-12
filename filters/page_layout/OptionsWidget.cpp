@@ -116,6 +116,10 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(horMarginsChanged(double))
 	);
 	connect(
+		autoMargins, SIGNAL(toggled(bool)),
+		this, SLOT(autoMarginsChanged(bool))
+	);
+	connect(
 		alignmentMode, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(alignmentModeChanged(int))
 	);
@@ -297,6 +301,14 @@ OptionsWidget::alignWithOthersToggled()
 {
 	m_alignment.setNull(!alignWithOthersCB->isChecked());
 	enableDisableAlignmentButtons();
+	emit alignmentChanged(m_alignment);
+}
+
+
+void
+OptionsWidget::autoMarginsChanged(bool checked)
+{
+	m_alignment.setAutoMargins(checked);
 	emit alignmentChanged(m_alignment);
 }
 
