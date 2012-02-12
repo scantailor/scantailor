@@ -327,15 +327,27 @@ ConsoleBatch::setupSelectContent(std::set<PageId> allPages)
 
 	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
 		PageId page = *i;
+	    select_content::Dependencies deps;
+
+        select_content::Params params(deps);
+        std::auto_ptr<select_content::Params> old_params = select_content->getSettings()->getPageParams(page);
+
+        if (old_params.get()) {
+            params = *old_params;
+        }
 
 		// SELECT CONTENT FILTER
 		if (cli.hasContentRect()) {
-			QRectF rect(cli.getContentRect());
-			QSizeF size_mm(rect.width(), rect.height());
-			select_content::Dependencies deps;
-			select_content::Params params(rect, size_mm, deps, MODE_MANUAL);
-			select_content->getSettings()->setPageParams(page, params);
+            params.setContentRect(cli.getContentRect());
+			//QRectF rect(cli.getContentRect());
+			//QSizeF size_mm(rect.width(), rect.height());
+			//select_content::Params params(rect, size_mm, deps, MODE_MANUAL);
 		}
+
+        params.setContentDetect(cli.isContentDetectionEnabled());
+        params.setPageDetect(cli.isPageDetectionEnabled());
+
+		select_content->getSettings()->setPageParams(page, params);
 	}
 }
 

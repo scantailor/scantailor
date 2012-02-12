@@ -96,9 +96,12 @@ Task::process(
 		Utils::calcRectSizeMM(data.xform(), content_rect)
 	);
 
-    m_ptrSettings->setHardMarginsMM(
-        m_pageId, Utils::calcMarginsMM(data.xform(), page_rect, content_rect)
-    );
+    Alignment alignment(m_ptrSettings->getPageAlignment(m_pageId));
+    if (alignment.isAutoMarginsEnabled()) {
+        m_ptrSettings->setHardMarginsMM(
+            m_pageId, Utils::calcMarginsMM(data.xform(), page_rect, content_rect)
+        );
+    }
     
 	QSizeF agg_hard_size_before;
 	QSizeF agg_hard_size_after;

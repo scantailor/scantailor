@@ -181,10 +181,13 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
+	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << "\n";
+	std::cout << "\t--disable-page-detection\t\t\t-- default: enabled" << "\n";
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
+	std::cout << "\t--enable-auto-margins\t\t\t-- sets the margins to original ones (based on detected page or image size)" << "\n";
 	std::cout << "\t--margins=<number>\t\t\t-- sets left, top, right and bottom margins to same number." << "\n";
 	std::cout << "\t\t--margins-left=<number>" << "\n";
 	std::cout << "\t\t--margins-right=<number>" << "\n";
@@ -342,6 +345,8 @@ CommandLine::fetchAlignment()
 		if (a == "auto") alignment.setHorizontal(page_layout::Alignment::HAUTO);
 	}
 
+    alignment.setAutoMargins(isAutoMarginsEnabled());
+
 	return alignment;
 }
 
@@ -493,7 +498,8 @@ CommandLine::hasAlignment() const
 	return(
 		m_options.contains("alignment") ||
 		m_options.contains("alignment-vertical") ||
-		m_options.contains("alignment-horizontal")
+		m_options.contains("alignment-horizontal") ||
+        isAutoMarginsEnabled()
 	);
 }
 

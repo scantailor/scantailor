@@ -60,6 +60,10 @@ public:
 	QString const& projectFile() const { return m_projectFile; }
 	QString const& outputProjectFile() const { return m_outputProjectFile; }
 
+    bool isContentDetectionEnabled() const { return !contains("disable-content-detection"); };
+    bool isPageDetectionEnabled() const { return !contains("disable-page-detection"); };
+    bool isAutoMarginsEnabled() const { return contains("enable-auto-margins"); };
+
 	bool hasMargins() const;
 	bool hasAlignment() const;
 	bool hasOutputDpi() const;

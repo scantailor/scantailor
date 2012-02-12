@@ -92,21 +92,42 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	
 	Dependencies const deps(data.xform().resultingPreCropArea());
 
-	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO)) {
-		params.reset();
-	}
-
 	OptionsWidget::UiData ui_data;
 	ui_data.setSizeCalc(PhysSizeCalc(data.xform()));
 
-	//QRectF const page_rect(
-	QRectF const page_rect(
-		PageFinder::findPageBox(
-			status, data, m_ptrDbg.get()
-		)
-	);
+	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
+    /*
+	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO)) {
+		params.reset();
+	}
+    */
 
+    Params new_params(deps);
+    if (params.get()) {
+        new_params = *params;
+    }
+
+	QRectF page_rect(data.xform().resultingRect());
+    if (new_params.isPageDetectionEnabled()) {
+		page_rect = PageFinder::findPageBox(status, data, m_ptrDbg.get());
+    }
+    new_params.setPageRect(page_rect);
+
+    QRectF content_rect(page_rect);
+    if (new_params.isContentDetectionEnabled()) {
+        content_rect = ContentBoxFinder::findContentBox(status, data, page_rect, m_ptrDbg.get());
+    }
+    new_params.setContentRect(content_rect);
+
+	ui_data.setContentRect(content_rect);
+	ui_data.setDependencies(deps);
+	ui_data.setMode(new_params.mode());
+
+    new_params.setContentSizeMM(ui_data.contentSizeMM());
+
+	m_ptrSettings->setPageParams(m_pageId, new_params);
+
+    /*
 	if (params.get()) {
 		ui_data.setContentRect(params->contentRect());
 		ui_data.setDependencies(deps);
@@ -144,6 +165,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		);
 		m_ptrSettings->setPageParams(m_pageId, new_params);
 	}
+    */
 	
 	status.throwIfCancelled();
 	
