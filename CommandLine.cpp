@@ -116,7 +116,7 @@ CommandLine::parseCli(QStringList const& argv)
 			// option with a value
 			QString key = rx.cap(1);
 			if (! opts.contains(key)) {
-				m_error = false;
+				m_error = true;
 				std::cout << "Unknown option '" << key.toStdString() << "'" << std::endl;
 				continue;
 			}
@@ -125,7 +125,7 @@ CommandLine::parseCli(QStringList const& argv)
 			// option without value
 			QString key = rx_switch.cap(1);
 			if (! opts.contains(key)) {
-				m_error = false;
+				m_error = true;
 				std::cout << "Unknown switch '" << key.toStdString() << "'" << std::endl;
 				continue;
 			}
@@ -205,6 +205,7 @@ CommandLine::setup()
 	m_deskewAngle = fetchDeskewAngle();
 	m_startFilterIdx = fetchStartFilterIdx();
 	m_endFilterIdx = fetchEndFilterIdx();
+	m_dewarpingMode = fetchDewarpingMode();
 }
 
 
