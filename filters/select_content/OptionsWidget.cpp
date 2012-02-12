@@ -36,7 +36,10 @@ OptionsWidget::OptionsWidget(
 {
 	setupUi(this);
 	
-	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+//	connect(autoBtn, SIGNAL(pressed(bool)), this, SLOT(modeChanged(bool)));
+	connect(disableBtn, SIGNAL(pressed()), this, SLOT(contentDetectionDisabled()));
+	connect(pageDetectAutoBtn, SIGNAL(pressed()), this, SLOT(pageDetectionEnabled()));
+	connect(pageDetectDisableBtn, SIGNAL(pressed()), this, SLOT(pageDetectionDisabled()));
 	connect(applyToBtn, SIGNAL(clicked()), this, SLOT(showApplyToDialog()));
 }
 
@@ -53,6 +56,9 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 	autoBtn->setChecked(true);
 	autoBtn->setEnabled(false);
 	manualBtn->setEnabled(false);
+	disableBtn->setEnabled(false);
+	pageDetectAutoBtn->setEnabled(false);
+	pageDetectDisableBtn->setEnabled(false);
 }
 
 void
@@ -62,6 +68,9 @@ OptionsWidget::postUpdateUI(UiData const& ui_data)
 	updateModeIndication(ui_data.mode());
 	autoBtn->setEnabled(true);
 	manualBtn->setEnabled(true);
+	disableBtn->setEnabled(true);
+	pageDetectAutoBtn->setEnabled(true);
+	pageDetectDisableBtn->setEnabled(true);
 }
 
 void
@@ -82,6 +91,7 @@ OptionsWidget::modeChanged(bool const auto_mode)
 		return;
 	}
 	
+	m_uiData.setContentDetection(true);
 	if (auto_mode) {
 		m_uiData.setMode(MODE_AUTO);
 		m_ptrSettings->clearPageParams(m_pageId);
@@ -90,6 +100,37 @@ OptionsWidget::modeChanged(bool const auto_mode)
 		m_uiData.setMode(MODE_MANUAL);
 		commitCurrentParams();
 	}
+}
+
+void
+OptionsWidget::contentDetectionDisabled(void)
+{
+	m_uiData.setContentDetection(false);
+	autoBtn->setChecked(false);
+	manualBtn->setChecked(false);
+	disableBtn->setChecked(true);
+	commitCurrentParams();
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::pageDetectionDisabled(void)
+{
+	m_uiData.setPageDetection(false);
+	pageDetectAutoBtn->setChecked(false);
+	pageDetectDisableBtn->setChecked(true);
+	commitCurrentParams();
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::pageDetectionEnabled(void)
+{
+	m_uiData.setPageDetection(true);
+	pageDetectAutoBtn->setChecked(true);
+	pageDetectDisableBtn->setChecked(false);
+	commitCurrentParams();
+	emit reloadRequested();
 }
 
 void
@@ -102,6 +143,7 @@ OptionsWidget::updateModeIndication(AutoManualMode const mode)
 	} else {
 		manualBtn->setChecked(true);
 	}
+	disableBtn->setChecked(false);
 }
 
 void
@@ -109,7 +151,7 @@ OptionsWidget::commitCurrentParams()
 {
 	Params const params(
 		m_uiData.contentRect(), m_uiData.contentSizeMM(),
-		m_uiData.dependencies(), m_uiData.mode()
+		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection()
 	);
 	m_ptrSettings->setPageParams(m_pageId, params);
 }
@@ -137,7 +179,7 @@ OptionsWidget::applySelection(std::set<PageId> const& pages)
 	
 	Params const params(
 		m_uiData.contentRect(), m_uiData.contentSizeMM(),
-		m_uiData.dependencies(), m_uiData.mode()
+		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection()
 	);
 
 	BOOST_FOREACH(PageId const& page_id, pages) {
@@ -149,7 +191,9 @@ OptionsWidget::applySelection(std::set<PageId> const& pages)
 /*========================= OptionsWidget::UiData ======================*/
 
 OptionsWidget::UiData::UiData()
-:	m_mode(MODE_AUTO)
+:	m_mode(MODE_AUTO),
+	m_contentDetection(true),
+	m_pageDetection(true)
 {
 }
 
@@ -203,6 +247,18 @@ AutoManualMode
 OptionsWidget::UiData::mode() const
 {
 	return m_mode;
+}
+
+void
+OptionsWidget::UiData::setContentDetection(bool detect)
+{
+	m_contentDetection = detect;
+}
+
+void
+OptionsWidget::UiData::setPageDetection(bool detect)
+{
+	m_pageDetection = detect;
 }
 
 } // namespace select_content

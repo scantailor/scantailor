@@ -27,14 +27,14 @@ namespace select_content
 
 Params::Params(
 	QRectF const& content_rect, QSizeF const& content_size_mm,
-	Dependencies const& deps, AutoManualMode const mode)
+	Dependencies const& deps, AutoManualMode const mode, bool contentDetect, bool pageDetect)
 :	m_contentRect(content_rect),
 	m_pageRect(content_rect),
 	m_contentSizeMM(content_size_mm),
 	m_deps(deps),
 	m_mode(mode),
-	m_contentDetect(true),
-	m_pageDetect(true)
+	m_contentDetect(contentDetect),
+	m_pageDetect(pageDetect)
 {
 }
 

@@ -122,6 +122,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setContentRect(content_rect);
 	ui_data.setDependencies(deps);
 	ui_data.setMode(new_params.mode());
+	ui_data.setContentDetection(new_params.isContentDetectionEnabled());
+	ui_data.setPageDetection(new_params.isPageDetectionEnabled());
 
 	new_params.setContentSizeMM(ui_data.contentSizeMM());
 

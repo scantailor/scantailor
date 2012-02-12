@@ -63,6 +63,12 @@ public:
 		Dependencies const& dependencies() const;
 		
 		void setMode(AutoManualMode mode);
+
+		bool contentDetection() const { return m_contentDetection; }
+		bool pageDetection() const { return m_pageDetection; }
+
+		void setContentDetection(bool detect);
+		void setPageDetection(bool detect);
 		
 		AutoManualMode mode() const;
 	private:
@@ -70,6 +76,8 @@ public:
 		PhysSizeCalc m_sizeCalc;
 		Dependencies m_deps;
 		AutoManualMode m_mode;
+		bool m_contentDetection;
+		bool m_pageDetection;
 	};
 	
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
@@ -88,6 +96,10 @@ private slots:
 	void applySelection(std::set<PageId> const& pages);
 
 	void modeChanged(bool auto_mode);
+	void contentDetectionDisabled(void);
+	void pageDetectionDisabled(void);
+	void pageDetectionEnabled(void);
+
 private:
 	void updateModeIndication(AutoManualMode const mode);
 	
