@@ -51,7 +51,7 @@ CommandLine::set(CommandLine const& cl)
 }
 
 
-void
+bool
 CommandLine::parseCli(QStringList const& argv)
 {
 	QRegExp rx("^--([^=]+)=(.*)$");
@@ -59,6 +59,45 @@ CommandLine::parseCli(QStringList const& argv)
 	QRegExp rx_short("^-([^=]+)=(.*)$");
 	QRegExp rx_short_switch("^-([^=]+)$");
 	QRegExp rx_project(".*\\.ScanTailor$", Qt::CaseInsensitive);
+
+	QList<QString> opts;
+	opts << "help";
+	opts << "verbose";
+	opts << "layout";
+	opts << "layout-direction";
+	opts << "orientation";
+	opts << "rotate";
+	opts << "deskew";
+	opts << "disable-content-detection";
+	opts << "disable-page-detection";
+	opts << "content-detection";
+	opts << "content-box";
+	opts << "enable-auto-margins";
+	opts << "margins";
+	opts << "margins-left";
+	opts << "margins-right";
+	opts << "margins-top";
+	opts << "margins-bottom";
+	opts << "alignment";
+	opts << "alignment-vertical";
+	opts << "alignment-horizontal";
+	opts << "alignment-tolerance";
+	opts << "dpi";
+	opts << "output-dpi";
+	opts << "dpi-x";
+	opts << "dpi-y";
+	opts << "output-dpi-x";
+	opts << "output-dpi-y";
+	opts << "color-mode";
+	opts << "white-margins";
+	opts << "normalize-illumination";
+	opts << "threshold";
+	opts << "despeckle";
+	opts << "dewarping";
+	opts << "depth-perception";
+	opts << "start-filter";
+	opts << "end-filter";
+	opts << "output-project";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -75,17 +114,38 @@ CommandLine::parseCli(QStringList const& argv)
 #endif
 		if (rx.exactMatch(argv[i])) {
 			// option with a value
-			m_options[rx.cap(1)] = rx.cap(2);
+			QString key = rx.cap(1);
+			if (! opts.contains(key)) {
+				m_error = false;
+				std::cout << "Unknown option '" << key.toStdString() << "'" << std::endl;
+				continue;
+			}
+			m_options[key] = rx.cap(2);
 		} else if (rx_switch.exactMatch(argv[i])) {
 			// option without value
-			m_options[rx_switch.cap(1)] = "true";
+			QString key = rx_switch.cap(1);
+			if (! opts.contains(key)) {
+				m_error = false;
+				std::cout << "Unknown switch '" << key.toStdString() << "'" << std::endl;
+				continue;
+			}
+			m_options[key] = "true";
 		} else if (rx_short.exactMatch(argv[i])) {
 			// option with a value
 			QString key = shortMap[rx_short.cap(1)];
+			if (key == "") {
+				std::cout << "Unknown option: '" << rx_short.cap(1).toStdString() << "'" << std::endl;
+				m_error = true;
+				continue;
+			}
 			m_options[key] = rx_short.cap(2);
 		} else if (rx_short_switch.exactMatch(argv[i])) {
 			QString key = shortMap[rx_short_switch.cap(1)];
-			if (key == "") continue;
+			if (key == "") {
+				std::cout << "Unknown switch: '" << rx_short_switch.cap(1).toStdString() << "'" << std::endl;
+				m_error = true;
+				continue;
+			}
 			m_options[key] = "true";
 		} else if (rx_project.exactMatch(argv[i])) {
 			// project file
@@ -122,6 +182,8 @@ CommandLine::parseCli(QStringList const& argv)
 	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options[params[i]].toAscii().constData() << "\n"; }
 	std::cout << "Images: " << CommandLine::m_images.size() << "\n";
 #endif
+
+	return m_error;
 }
 
 
@@ -345,7 +407,7 @@ CommandLine::fetchAlignment()
 		if (a == "auto") alignment.setHorizontal(page_layout::Alignment::HAUTO);
 	}
 
-    alignment.setAutoMargins(isAutoMarginsEnabled());
+	alignment.setAutoMargins(isAutoMarginsEnabled());
 
 	return alignment;
 }
@@ -499,7 +561,7 @@ CommandLine::hasAlignment() const
 		m_options.contains("alignment") ||
 		m_options.contains("alignment-vertical") ||
 		m_options.contains("alignment-horizontal") ||
-        isAutoMarginsEnabled()
+		isAutoMarginsEnabled()
 	);
 }
 
