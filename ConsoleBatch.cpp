@@ -411,8 +411,9 @@ ConsoleBatch::setupOutput(std::set<PageId> allPages)
 		if (cli.hasDespeckle())
 			params.setDespeckleLevel(cli.getDespeckleLevel());
 
-		if (cli.hasDewarping())
+		if (cli.hasDewarping()) {
 			params.setDewarpingMode(cli.getDewarpingMode());
+		}
 		if (cli.hasDepthPerception())
 			params.setDepthPerception(cli.getDepthPerception());
 

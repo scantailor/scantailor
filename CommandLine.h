@@ -85,7 +85,7 @@ public:
 	bool hasThreshold() const { return contains("threshold"); }
 	bool hasDespeckle() const { return contains("despeckle"); }
 	bool hasDewarping() const { return contains("dewarping"); }
-	bool hasDepthPerception() const { return contains("dewarping"); }
+	bool hasDepthPerception() const { return contains("depth-perception"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
