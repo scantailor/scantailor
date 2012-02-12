@@ -98,15 +98,15 @@ PageFinder::findPageBox(
 		dbg->add(gray150, "gray150");
 	}
 
-    BinaryImage bw150(binarizeOtsu(gray150));
-    if (dbg) {
-        dbg->add(bw150, "bw150O");
-    }
+	BinaryImage bw150(binarizeOtsu(gray150));
+	if (dbg) {
+	    dbg->add(bw150, "bw150O");
+	}
 
-    QImage bwimg(bw150.toQImage());
-    QRect content_rect(detectBorders(bwimg));
-    fineTuneCorners(bwimg, content_rect);
-    
+	QImage bwimg(bw150.toQImage());
+	QRect content_rect(detectBorders(bwimg));
+	fineTuneCorners(bwimg, content_rect);
+	
 
 	// Transform back from 150dpi.
 	QTransform combined_xform(xform_150dpi.transform().inverted());
@@ -117,16 +117,16 @@ PageFinder::findPageBox(
 QRect
 PageFinder::detectBorders(QImage const& img)
 {
-    int l=0, t=0, r=img.width()-1, b=img.height()-1;
-    int xmid = int(double(r) * 0.382);
-    int ymid = int(double(b) * 0.382);
+	int l=0, t=0, r=img.width()-1, b=img.height()-1;
+	int xmid = int(double(r) * 0.382);
+	int ymid = int(double(b) * 0.382);
 
-    l = detectEdge(img, l, r, 1, ymid, Qt::Horizontal);
-    t = detectEdge(img, t, b, 1, xmid, Qt::Vertical);
-    r = detectEdge(img, r, 0, -1, ymid, Qt::Horizontal);
-    b = detectEdge(img, b, t, -1, xmid, Qt::Vertical);
+	l = detectEdge(img, l, r, 1, ymid, Qt::Horizontal);
+	t = detectEdge(img, t, b, 1, xmid, Qt::Vertical);
+	r = detectEdge(img, r, 0, -1, ymid, Qt::Horizontal);
+	b = detectEdge(img, b, t, -1, xmid, Qt::Vertical);
 
-    return QRect(l, t, r-l+1, b-t+1);
+	return QRect(l, t, r-l+1, b-t+1);
 }
 
 /**
@@ -135,51 +135,51 @@ PageFinder::detectBorders(QImage const& img)
 int
 PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient)
 {
-    int min_size = 20;
-    int gap = 0;
-    int i=start, edge=start;
-    Qt::GlobalColor black = Qt::color1;
+	int min_size = 20;
+	int gap = 0;
+	int i=start, edge=start;
+	Qt::GlobalColor black = Qt::color1;
 
-    while (i != end) {
-        int ms = mid - int(double(mid) / 4.0);
-        int me = mid + int(double(mid) / 4.0);
-        int old_gap = gap;
+	while (i != end) {
+	    int ms = mid - int(double(mid) / 4.0);
+	    int me = mid + int(double(mid) / 4.0);
+	    int old_gap = gap;
 
-        for (int j=ms; j!=me; j++) {
-            int x=i, y=j;
-            if (orient == Qt::Vertical) { x=j; y=i; }
-            int pixel = img.pixelIndex(x, y);
-            if (pixel == black) {
-                edge = i;
-                gap = 0;
-                break;
-            } else {
-                if (gap == old_gap)
-                    ++gap;
-            }
-        }
-        if (gap > min_size)
-            break;
-        i += inc;
-    }
+	    for (int j=ms; j!=me; j++) {
+	        int x=i, y=j;
+	        if (orient == Qt::Vertical) { x=j; y=i; }
+	        int pixel = img.pixelIndex(x, y);
+	        if (pixel == black) {
+	            edge = i;
+	            gap = 0;
+	            break;
+	        } else {
+	            if (gap == old_gap)
+	                ++gap;
+	        }
+	    }
+	    if (gap > min_size)
+	        break;
+	    i += inc;
+	}
 
-    return edge;
+	return edge;
 }
 
 void
 PageFinder::fineTuneCorners(QImage const& img, QRect &rect)
 {
-    int l=rect.left(), t=rect.top(), r=rect.right(), b=rect.bottom();
+	int l=rect.left(), t=rect.top(), r=rect.right(), b=rect.bottom();
 
-    fineTuneCorner(img, l, t, 1, 1);
-    fineTuneCorner(img, r, t, -1, 1);
-    fineTuneCorner(img, l, b, 1, -1);
-    fineTuneCorner(img, r, b, -1, -1);
+	fineTuneCorner(img, l, t, 1, 1);
+	fineTuneCorner(img, r, t, -1, 1);
+	fineTuneCorner(img, l, b, 1, -1);
+	fineTuneCorner(img, r, b, -1, -1);
 
-    rect.setLeft(l);
-    rect.setTop(t);
-    rect.setRight(r);
-    rect.setBottom(b);
+	rect.setLeft(l);
+	rect.setTop(t);
+	rect.setRight(r);
+	rect.setBottom(b);
 }
 
 /**
@@ -188,16 +188,16 @@ PageFinder::fineTuneCorners(QImage const& img, QRect &rect)
 void
 PageFinder::fineTuneCorner(QImage const& img, int &x, int &y, int inc_x, int inc_y)
 {
-    Qt::GlobalColor black = Qt::color1;
-    while (1) {
-        int pixel = img.pixelIndex(x, y);
-        int tx = x + inc_x;
-        int ty = y + inc_y;
-        if (pixel!=black || tx<0 || tx>(img.width()-1) || ty<0 || ty>(img.height()-1))
-            break;
-        x = tx;
-        y = ty;
-    }
+	Qt::GlobalColor black = Qt::color1;
+	while (1) {
+	    int pixel = img.pixelIndex(x, y);
+	    int tx = x + inc_x;
+	    int ty = y + inc_y;
+	    if (pixel!=black || tx<0 || tx>(img.width()-1) || ty<0 || ty>(img.height()-1))
+	        break;
+	    x = tx;
+	    y = ty;
+	}
 }
 
 } // namespace

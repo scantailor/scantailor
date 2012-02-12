@@ -28,21 +28,20 @@ namespace select_content
 Params::Params(
 	QRectF const& content_rect, QSizeF const& content_size_mm,
 	Dependencies const& deps, AutoManualMode const mode)
-    :
-	m_contentRect(content_rect),
+:	m_contentRect(content_rect),
 	m_pageRect(content_rect),
 	m_contentSizeMM(content_size_mm),
 	m_deps(deps),
 	m_mode(mode),
-    m_contentDetect(true),
-    m_pageDetect(true)
+	m_contentDetect(true),
+	m_pageDetect(true)
 {
 }
 
 Params::Params(Dependencies const& deps)
 :	m_deps(deps),
-    m_contentDetect(true),
-    m_pageDetect(true)
+	m_contentDetect(true),
+	m_pageDetect(true)
 {
 }
 
@@ -59,8 +58,8 @@ Params::Params(QDomElement const& filter_el)
 	),
 	m_deps(filter_el.namedItem("dependencies").toElement()),
 	m_mode(filter_el.attribute("mode") == "manual" ? MODE_MANUAL : MODE_AUTO),
-    m_contentDetect(filter_el.attribute("content-detect") == "true" ? true : false),
-    m_pageDetect(filter_el.attribute("page-detect") == "true" ? true : false)
+	m_contentDetect(filter_el.attribute("content-detect") == "true" ? true : false),
+	m_pageDetect(filter_el.attribute("page-detect") == "true" ? true : false)
 {
 }
 

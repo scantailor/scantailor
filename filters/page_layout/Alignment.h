@@ -63,8 +63,8 @@ public:
 	double tolerance() const { return m_tolerance; };
 	void setTolerance(double t) { m_tolerance = t; };
 
-    bool isAutoMarginsEnabled() const { return m_autoMargins; };
-    void setAutoMargins(bool state) { m_autoMargins = state; };
+	bool isAutoMarginsEnabled() const { return m_autoMargins; };
+	void setAutoMargins(bool state) { m_autoMargins = state; };
 	
 	bool operator==(Alignment const& other) const {
 		return m_vert == other.m_vert && m_hor == other.m_hor
@@ -81,7 +81,7 @@ private:
 	Horizontal m_hor;
 	bool m_isNull;
 	double m_tolerance;
-    bool m_autoMargins;
+	bool m_autoMargins;
 };
 
 } // namespace page_layout

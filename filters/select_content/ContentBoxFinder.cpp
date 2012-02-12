@@ -143,7 +143,7 @@ ContentBoxFinder::findContentBox(
 		dbg->add(bw150, "bw150");
 	}
 	
-    QRectF page_rect150( xform_150dpi.transform().map(page_rect).boundingRect() );
+	QRectF page_rect150( xform_150dpi.transform().map(page_rect).boundingRect() );
 	PolygonRasterizer::fillExcept(
 		bw150, BLACK, page_rect150, Qt::WindingFill
 	);

@@ -555,18 +555,18 @@ Settings::Impl::updateContentRect()
 
 		QRectF icr(it->contentRect);
 
-        /*
+	/*
 		std::cout << "\tupateContentRect: " << it->pageId.imageId().filePath().toAscii().constData() << "\n";
-        std::cout << "m_contentRect.left(): " << m_contentRect.left() << " right(): " << m_contentRect.right() << " top: " << m_contentRect.top() << " bottom: " << m_contentRect.bottom() << std::endl;
-        std::cout << "icr.left(): " << icr.left() << " right(): " << icr.right() << " top: " << icr.top() << " bottom: " << icr.bottom() << std::endl;
-        */
+	std::cout << "m_contentRect.left(): " << m_contentRect.left() << " right(): " << m_contentRect.right() << " top: " << m_contentRect.top() << " bottom: " << m_contentRect.bottom() << std::endl;
+	std::cout << "icr.left(): " << icr.left() << " right(): " << icr.right() << " top: " << icr.top() << " bottom: " << icr.bottom() << std::endl;
+	*/
 
 		if (icr.left() < m_contentRect.left()) m_contentRect.setLeft(icr.left());
 		if (icr.right() > m_contentRect.right()) m_contentRect.setRight(icr.right());
 		if (icr.top() < m_contentRect.top()) m_contentRect.setTop(icr.top());
 		if (icr.bottom() > m_contentRect.bottom()) m_contentRect.setBottom(icr.bottom());
 
-        //std::cout << "icr.left(): " << icr.left() << " right(): " << icr.right() << " top: " << icr.top() << " bottom: " << icr.bottom() << std::endl;
+	//std::cout << "icr.left(): " << icr.left() << " right(): " << icr.right() << " top: " << icr.top() << " bottom: " << icr.bottom() << std::endl;
 	}
 
 	return m_contentRect;

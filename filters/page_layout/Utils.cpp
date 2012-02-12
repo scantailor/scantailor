@@ -103,27 +103,27 @@ Utils::calcMarginsMM(ImageTransformation const& xform, QRectF const& page_rect, 
 		Utils::calcRectSizeMM(xform, page_rect)
 	);
 
-    double widthMM = page_size_mm.width() - content_size_mm.width();
-    double heightMM = page_size_mm.height() - content_size_mm.height();
+	double widthMM = page_size_mm.width() - content_size_mm.width();
+	double heightMM = page_size_mm.height() - content_size_mm.height();
 
-    double width = page_rect.width() - content_rect.width();
-    double height = page_rect.height() - content_rect.height();
+	double width = page_rect.width() - content_rect.width();
+	double height = page_rect.height() - content_rect.height();
 
-    double left = double(content_rect.left() - page_rect.left());// / double(page_rect.width());
-    double right = double(page_rect.right() - content_rect.right());// / double(page_rect.width());
-    double top = double(content_rect.top() - page_rect.top());// / double(page_rect.height());
-    double bottom = double(page_rect.bottom() - content_rect.bottom());// / double(page_rect.bottom());
+	double left = double(content_rect.left() - page_rect.left());// / double(page_rect.width());
+	double right = double(page_rect.right() - content_rect.right());// / double(page_rect.width());
+	double top = double(content_rect.top() - page_rect.top());// / double(page_rect.height());
+	double bottom = double(page_rect.bottom() - content_rect.bottom());// / double(page_rect.bottom());
 
-    double hspace = left+right;
-    double vspace = top+bottom;
+	double hspace = left+right;
+	double vspace = top+bottom;
 
-    double lMM = (hspace < 1.0) ? 0.0 : (left * widthMM / hspace);
-    double rMM = (hspace < 1.0) ? 0.0 : (right * widthMM / hspace);
-    double tMM = (vspace < 1.0) ? 0.0 : (top * heightMM / vspace);
-    double bMM = (vspace < 1.0) ? 0.0 : (bottom * heightMM / vspace);
+	double lMM = (hspace < 1.0) ? 0.0 : (left * widthMM / hspace);
+	double rMM = (hspace < 1.0) ? 0.0 : (right * widthMM / hspace);
+	double tMM = (vspace < 1.0) ? 0.0 : (top * heightMM / vspace);
+	double bMM = (vspace < 1.0) ? 0.0 : (bottom * heightMM / vspace);
 
-    //return Margins(left * widthMM/hspace, top * heightMM/vspace, right * widthMM/hspace, bottom * heightMM/vspace);
-    return Margins(lMM, tMM, rMM, bMM);
+	//return Margins(left * widthMM/hspace, top * heightMM/vspace, right * widthMM/hspace, bottom * heightMM/vspace);
+	return Margins(lMM, tMM, rMM, bMM);
 }
 
 Margins
@@ -131,7 +131,6 @@ Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
 	Alignment const& alignment, QRectF const& contentRect, QRectF const& agg_content_rect)
 {
-	return Margins();
 	if (alignment.isNull()) {
 		std::cout << "\tskip soft margins: " <<  "\n";
 		// This means we are not aligning this page with others.
@@ -330,7 +329,7 @@ Utils::calcPageRectPhys(
 	);
 	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment(), params.pageRect(), agg_content_rect
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), params.contentRect(), agg_content_rect
 		)
 	);
 

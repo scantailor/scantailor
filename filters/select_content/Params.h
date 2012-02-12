@@ -53,16 +53,16 @@ public:
 	
 	AutoManualMode mode() const { return m_mode; }
 
-    bool isContentDetectionEnabled() const { return m_contentDetect; };
-    bool isPageDetectionEnabled() const { return m_pageDetect; };
+	bool isContentDetectionEnabled() const { return m_contentDetect; };
+	bool isPageDetectionEnabled() const { return m_pageDetect; };
 
-    void setMode(AutoManualMode const& mode) { m_mode = mode; };
-    void setContentRect(QRectF const& rect) { m_contentRect = rect; };
-    void setPageRect(QRectF const& rect) { m_pageRect = rect; };
-    void setContentSizeMM(QSizeF const& size) { m_contentSizeMM = size; };
-    void setDependencies(Dependencies const& deps) { m_deps = deps; };
-    void setContentDetect(bool detect) { m_contentDetect = detect; };
-    void setPageDetect(bool detect) { m_pageDetect = detect; };
+	void setMode(AutoManualMode const& mode) { m_mode = mode; };
+	void setContentRect(QRectF const& rect) { m_contentRect = rect; };
+	void setPageRect(QRectF const& rect) { m_pageRect = rect; };
+	void setContentSizeMM(QSizeF const& size) { m_contentSizeMM = size; };
+	void setDependencies(Dependencies const& deps) { m_deps = deps; };
+	void setContentDetect(bool detect) { m_contentDetect = detect; };
+	void setPageDetect(bool detect) { m_pageDetect = detect; };
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
@@ -71,8 +71,8 @@ private:
 	QSizeF m_contentSizeMM;
 	Dependencies m_deps;
 	AutoManualMode m_mode;
-    bool m_contentDetect;
-    bool m_pageDetect;
+	bool m_contentDetect;
+	bool m_pageDetect;
 };
 
 } // namespace select_content

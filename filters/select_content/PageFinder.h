@@ -46,10 +46,10 @@ public:
 		TaskStatus const& status, FilterData const& data,
 		DebugImages* dbg = 0);
 private:
-    static QRect detectBorders(QImage const& img);
-    static int detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient);
-    static void fineTuneCorners(QImage const& img, QRect &rect);
-    static void fineTuneCorner(QImage const& img, int &x, int &y, int inc_x, int inc_y);
+	static QRect detectBorders(QImage const& img);
+	static int detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient);
+	static void fineTuneCorners(QImage const& img, QRect &rect);
+	static void fineTuneCorner(QImage const& img, int &x, int &y, int inc_x, int inc_y);
 };
 
 } // namespace select_content
