@@ -135,31 +135,37 @@ PageFinder::detectBorders(QImage const& img)
 int
 PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient)
 {
-	int min_size = 20;
-	int gap = 0;
+	int min_size=20;
+	int gap=0;
 	int i=start, edge=start;
+	int ms = mid - int(double(mid) / 4.0);
+	int me = mid + int(double(mid) / 4.0);
+	int min_bp = int(double(me-ms) * 0.9);
 	Qt::GlobalColor black = Qt::color1;
 
 	while (i != end) {
-	    int ms = mid - int(double(mid) / 4.0);
-	    int me = mid + int(double(mid) / 4.0);
-	    int old_gap = gap;
+		int black_pixels=0;
+	    int old_gap=gap;
 
+		// count black pixels on the edge around given point
 	    for (int j=ms; j!=me; j++) {
 	        int x=i, y=j;
 	        if (orient == Qt::Vertical) { x=j; y=i; }
 	        int pixel = img.pixelIndex(x, y);
-	        if (pixel == black) {
-	            edge = i;
-	            gap = 0;
-	            break;
-	        } else {
-	            if (gap == old_gap)
-	                ++gap;
-	        }
+	        if (pixel == black)
+				++black_pixels;
 	    }
+
+		if (black_pixels < min_bp) {
+			++gap;
+		} else {
+			gap = 0;
+			edge = i;
+		}
+
 	    if (gap > min_size)
 	        break;
+
 	    i += inc;
 	}
 
