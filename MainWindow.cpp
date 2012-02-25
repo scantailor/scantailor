@@ -852,7 +852,7 @@ MainWindow::showRelinkingDialog()
 		return;
 	}
 
-	RelinkingDialog* dialog = new RelinkingDialog(this);
+	RelinkingDialog* dialog = new RelinkingDialog(m_projectFile, this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
 
