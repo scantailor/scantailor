@@ -20,6 +20,7 @@
 #include <QString>
 #include <QByteArray>
 #include <QFile>
+#include <QDir>
 #include <Qt>
 #include <QTextDocument> // Qt::escape() is actually declare there.
 
@@ -57,6 +58,15 @@ Utils::richTextForLink(
 		"margin-left:0px; margin-right:0px; -qt-block-indent:0;"
 		"text-indent:0px;\"><a href=\"%1\">%2</a></p></body></html>"
 	).arg(Qt::escape(target), Qt::escape(label));
+}
+
+void
+Utils::maybeCreateCacheDir(QString const& output_dir)
+{
+	QDir(output_dir).mkdir(QString::fromAscii("cache"));
+	
+	// QDir::mkdir() returns false if the directory already exists,
+	// so to prevent confusion this function return void.
 }
 
 QString
