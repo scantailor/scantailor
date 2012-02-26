@@ -104,10 +104,16 @@ void
 RelinkingListView::drawStatusLayer(QPainter* painter)
 {
 	QRect const drawing_rect(viewport()->rect());
-	QModelIndex const top_index(this->indexAt(drawing_rect.topLeft()));
+	QModelIndex top_index(this->indexAt(drawing_rect.topLeft()));
 	if (!top_index.isValid()) {
-		// No elements at all?
+		// No [visible] elements at all?
 		return;
+	}
+
+	if (top_index.row() > 0) {
+		// The appearence of any element actually depends on its neighbours,
+		// so we start with the element above our topmost visible one.
+		top_index = top_index.sibling(top_index.row() - 1, 0);
 	}
 
 	GroupAggregator group_aggregator;
@@ -116,9 +122,6 @@ RelinkingListView::drawStatusLayer(QPainter* painter)
 	for (int row = top_index.row(); row < rows; ++row) {
 		QModelIndex const index(top_index.sibling(row, 0));
 		QRect const item_rect(visualRect(index));
-		if (!item_rect.intersects(drawing_rect)) {
-			break;
-		}
 
 		QRect rect(drawing_rect);
 		rect.setTop(item_rect.top());
@@ -128,6 +131,15 @@ RelinkingListView::drawStatusLayer(QPainter* painter)
 		
 		int const status = index.data(RelinkingModel::UncommittedStatusRole).toInt();
 		group_aggregator.process(rect, status);
+
+		if (row != top_index.row() && !item_rect.intersects(drawing_rect)) {
+			// Note that we intentionally break *after* processing
+			// the first invisible item. That's because the appearence
+			// of its immediate predecessor depends on it. The topmost item
+			// is allowed to be invisible, as it's processed for the same reason,
+			// that is to make its immediate neighbour to display correctly.
+			break;
+		}
 	}
 
 	painter->setRenderHint(QPainter::Antialiasing);
