@@ -365,6 +365,8 @@ MainWindow::switchToNewProject(
 {
 	stopBatchProcessing(CLEAR_MAIN_AREA);
 	m_ptrInteractiveQueue->cancelAndClear();
+
+	Utils::maybeCreateCacheDir(out_dir);
 	
 	m_ptrPages = pages;
 	m_projectFile = project_file_path;
@@ -442,6 +444,10 @@ MainWindow::switchToNewProject(
 	updateProjectActions();
 	updateWindowTitle();
 	updateMainArea();
+
+	if (!QDir(out_dir).exists()) {
+		showRelinkingDialog();
+	}
 }
 
 void
@@ -862,7 +868,7 @@ MainWindow::showRelinkingDialog()
 		return;
 	}
 
-	RelinkingDialog* dialog = new RelinkingDialog(this);
+	RelinkingDialog* dialog = new RelinkingDialog(m_projectFile, this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
 
@@ -889,6 +895,8 @@ MainWindow::performRelinking(IntrusivePtr<AbstractRelinker> const& relinker)
 	m_ptrPages->performRelinking(*relinker);
 	m_ptrStages->performRelinking(*relinker);
 	m_outFileNameGen.performRelinking(*relinker);
+
+	Utils::maybeCreateCacheDir(m_outFileNameGen.outDir());
 
 	m_ptrThumbnailCache->setThumbDir(Utils::outputDirToThumbDir(m_outFileNameGen.outDir()));
 	resetThumbSequence(currentPageOrderProvider());

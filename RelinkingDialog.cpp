@@ -25,9 +25,10 @@
 #include <boost/foreach.hpp>
 #include <assert.h>
 
-RelinkingDialog::RelinkingDialog(QWidget* parent)
+RelinkingDialog::RelinkingDialog(QString const& project_file_path, QWidget* parent)
 :	QDialog(parent)
 ,	m_pSortingModel(new RelinkingSortingModel)
+,	m_projectFileDir(QFileInfo(project_file_path).path())
 {
 	ui.setupUi(this);
 	m_pSortingModel->setSourceModel(&m_model);
@@ -89,14 +90,18 @@ RelinkingDialog::pathButtonClicked(
 	QString replacement_path;
 
 	if (type == RelinkablePath::File) {
+		QDir const dir(QFileInfo(prefix_path).dir());
 		replacement_path = QFileDialog::getOpenFileName(
 			this, tr("Substitution File for %1").arg(QDir::toNativeSeparators(prefix_path)),
-			prefix_path, QString(), 0, QFileDialog::DontUseNativeDialog
+			dir.exists() ? dir.path() : m_projectFileDir,
+			QString(), 0, QFileDialog::DontUseNativeDialog
 		);
 	} else {
+		QDir const dir(prefix_path);
 		replacement_path = QFileDialog::getExistingDirectory(
 			this, tr("Substitution Directory for %1").arg(QDir::toNativeSeparators(prefix_path)),
-			prefix_path, QFileDialog::DontUseNativeDialog
+			dir.exists() ? prefix_path : m_projectFileDir,
+			QFileDialog::DontUseNativeDialog
 		);
 	}
 	// So what's wrong with native dialogs? The one for directory selection won't show files
