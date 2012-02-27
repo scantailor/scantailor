@@ -345,7 +345,7 @@ Task::process(
 			// Also note that QDir::mkdir() will fail if the directory already exists,
 			// so we ignore its return value here.
 
-			if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage(), m_bitonal_g4fax))) {
+			if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage(), m_bitonal_g4fax)) {
 				invalidate_params = true;
 			}
 		}
