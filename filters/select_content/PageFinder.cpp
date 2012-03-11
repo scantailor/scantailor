@@ -18,52 +18,27 @@
 */
 
 #include "PageFinder.h"
-#include "TaskStatus.h"
+
+#include "CommandLine.h"
+#include "Dpi.h"
 #include "DebugImages.h"
 #include "FilterData.h"
 #include "ImageTransformation.h"
-#include "Dpi.h"
-#include "Despeckle.h"
 #include "imageproc/BinaryImage.h"
-#include "imageproc/BinaryThreshold.h"
 #include "imageproc/Binarize.h"
-#include "imageproc/BWColor.h"
-#include "imageproc/Connectivity.h"
-#include "imageproc/ConnComp.h"
-#include "imageproc/ConnCompEraserExt.h"
 #include "imageproc/Transform.h"
-#include "imageproc/RasterOp.h"
 #include "imageproc/GrayRasterOp.h"
-#include "imageproc/SeedFill.h"
-#include "imageproc/Morphology.h"
 #include "imageproc/Grayscale.h"
-#include "imageproc/SlicedHistogram.h"
-#include "imageproc/PolygonRasterizer.h"
-#include "imageproc/MaxWhitespaceFinder.h"
-#include "imageproc/ConnectivityMap.h"
-#include "imageproc/InfluenceMap.h"
-#include "imageproc/SEDM.h"
-#include <boost/foreach.hpp>
+#include "TaskStatus.h"
+
+#include <Qt>
+#include <QColor>
+#include <QDebug>
+#include <QtGlobal>
+#include <QImage>
 #include <QRect>
 #include <QRectF>
-#include <QPolygonF>
-#include <QImage>
-#include <QColor>
-#include <QPainter>
-#include <QPainterPath>
 #include <QTransform>
-#include <QtGlobal>
-#include <Qt>
-#include <QDebug>
-#include <queue>
-#include <vector>
-#include <algorithm>
-#include <limits>
-#include <math.h>
-#include <stdlib.h>
-#include <limits.h>
-
-#include "CommandLine.h"
 
 namespace select_content
 {
