@@ -41,7 +41,7 @@ Params::Params(
 Params::Params(Dependencies const& deps)
 :	m_deps(deps),
 	m_contentDetect(true),
-	m_pageDetect(true)
+	m_pageDetect(false)
 {
 }
 

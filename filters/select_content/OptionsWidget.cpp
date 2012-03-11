@@ -193,7 +193,7 @@ OptionsWidget::applySelection(std::set<PageId> const& pages)
 OptionsWidget::UiData::UiData()
 :	m_mode(MODE_AUTO),
 	m_contentDetection(true),
-	m_pageDetection(true)
+	m_pageDetection(false)
 {
 }
 
