@@ -49,7 +49,7 @@ RenderParams::RenderParams(ColorParams const& cp)
 				cp.colorGrayscaleOptions()
 			);
 			m_mask |= WHITE_MARGINS;
-			if (opt.normalizeIllumination()) {
+			if (opt.normalizeIllumination_mixed()) {
 				m_mask |= NORMALIZE_ILLUMINATION;
 			}
 			m_mask |= NEED_BINARIZATION | MIXED_OUTPUT;

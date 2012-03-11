@@ -106,6 +106,10 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(equalizeIlluminationToggled(bool))
 	);
 	connect(
+		equalizeIlluminationMMCB, SIGNAL(clicked(bool)),
+		this, SLOT(equalizeIlluminationMixedToggled(bool))
+	);
+	connect(
 		lighterThresholdLink, SIGNAL(linkActivated(QString const&)),
 		this, SLOT(setLighterThreshold())
 	);
@@ -258,6 +262,16 @@ OptionsWidget::equalizeIlluminationToggled(bool const checked)
 {
 	ColorGrayscaleOptions opt(m_colorParams.colorGrayscaleOptions());
 	opt.setNormalizeIllumination(checked);
+	m_colorParams.setColorGrayscaleOptions(opt);
+	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+	emit reloadRequested();
+}
+
+void
+OptionsWidget::equalizeIlluminationMixedToggled(bool const checked)
+{
+	ColorGrayscaleOptions opt(m_colorParams.colorGrayscaleOptions());
+	opt.setNormalizeIllumination_mixed(checked);
 	m_colorParams.setColorGrayscaleOptions(opt);
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
 	emit reloadRequested();
@@ -622,6 +636,7 @@ OptionsWidget::updateColorsDisplay()
 	colorModeSelector->setCurrentIndex(color_mode_idx);
 	
 	bool color_grayscale_options_visible = false;
+	bool color_grayscale_Mixed_options_visible = false;
 	bool bw_options_visible = false;
 	bool picture_shape_visible = false;
 	switch (color_mode) {
@@ -632,25 +647,25 @@ OptionsWidget::updateColorsDisplay()
 			color_grayscale_options_visible = true;
 			break;
 		case ColorParams::MIXED:
-			color_grayscale_options_visible = true;
+			color_grayscale_Mixed_options_visible = true;
 			bw_options_visible = true;
 			picture_shape_visible = true;
 			break;
 	}
 	
 	colorGrayscaleOptions->setVisible(color_grayscale_options_visible);
+	ColorGrayscaleOptions const opt(
+		m_colorParams.colorGrayscaleOptions()
+	);
 	if (color_grayscale_options_visible) {
-		ColorGrayscaleOptions const opt(
-			m_colorParams.colorGrayscaleOptions()
-		);
-		if (color_mode == ColorParams::COLOR_GRAYSCALE) {
-			whiteMarginsCB->setVisible(color_grayscale_options_visible);
-			whiteMarginsCB->setChecked(opt.whiteMargins());
-			equalizeIlluminationCB->setEnabled(opt.whiteMargins());
-		} else if (color_mode == ColorParams::MIXED) {
-			whiteMarginsCB->setVisible(false);
-		}
+		whiteMarginsCB->setChecked(opt.whiteMargins());
 		equalizeIlluminationCB->setChecked(opt.normalizeIllumination());
+		equalizeIlluminationCB->setEnabled(opt.whiteMargins());
+	}
+	
+	equalizeIlluminationMMCB->setVisible(color_grayscale_Mixed_options_visible);
+	if (color_grayscale_Mixed_options_visible) {
+		 equalizeIlluminationMMCB->setChecked(opt.normalizeIllumination_mixed());
 	}
 	
 	modePanel->setVisible(m_lastTab != TAB_DEWARPING);

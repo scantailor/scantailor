@@ -50,6 +50,10 @@ ColorGrayscaleOptions::operator==(ColorGrayscaleOptions const& other) const
 		return false;
 	}
 	
+	if (m_normalizeIllumination_mixed != other.m_normalizeIllumination_mixed) {
+		return false;
+	}
+
 	return true;
 }
 

@@ -30,7 +30,7 @@ class ColorGrayscaleOptions
 {
 public:
 	ColorGrayscaleOptions()
-	: m_whiteMargins(false), m_normalizeIllumination(false) {}
+	: m_whiteMargins(false), m_normalizeIllumination(false), m_normalizeIllumination_mixed(true) {}
 	
 	ColorGrayscaleOptions(QDomElement const& el);
 	
@@ -44,12 +44,17 @@ public:
 	
 	void setNormalizeIllumination(bool val) { m_normalizeIllumination = val; }
 	
+	bool normalizeIllumination_mixed() const { return m_normalizeIllumination_mixed; }
+	
+	void setNormalizeIllumination_mixed(bool val) { m_normalizeIllumination_mixed = val; }
+	
 	bool operator==(ColorGrayscaleOptions const& other) const;
 	
 	bool operator!=(ColorGrayscaleOptions const& other) const;
 private:
 	bool m_whiteMargins;
 	bool m_normalizeIllumination;
+	bool m_normalizeIllumination_mixed;
 };
 
 } // namespace output
