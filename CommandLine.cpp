@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <iostream>
 
+#include <QDir>
 #include <QMap>
 #include <QRegExp>
 #include <QStringList>
@@ -91,9 +92,8 @@ CommandLine::parseCli(QStringList const& argv)
 			// project file
 			CommandLine::m_projectFile = argv[i];
 		} else {
-			// image and output directory
+			// handle input images and output directory
 			QFileInfo file(argv[i]);
-			CommandLine::m_files.push_back(file);
 			if (i==(argv.size()-1)) {
 				// output directory
 				if (file.isDir()) {
@@ -102,15 +102,23 @@ CommandLine::parseCli(QStringList const& argv)
 					std::cout << "Error: Last argument must be an existing directory" << "\n";
 					exit(1);
 				}
+			} else if (file.filePath() == "-") {
+				// file names from stdin
+				std::string fname;
+				while (! std::cin.eof()) {
+					std::cin >> fname;
+					addImage(fname.c_str());
+				}
+			} else if (file.isDir()) {
+				// add all files from given directory as images
+				QDir dir(argv[i]);
+				QStringList files = dir.entryList(QDir::Files, QDir::Name);
+				for (int f=0; f<files.count(); f++) {
+					addImage(dir.filePath(files[f]));
+				}
 			} else {
-				// create ImageFileInfo and push to images
-				ImageId const image_id(file.filePath());
-				ImageMetadata metadata;
-				metadata.setDpi(CommandLine::fetchDpi());
-				std::vector<ImageMetadata> vMetadata;
-				vMetadata.push_back(metadata);
-				ImageFileInfo image_info(file, vMetadata);
-				CommandLine::m_images.push_back(image_info);
+				// argument is image
+				addImage(file.filePath());
 			}
 		}
 	}
@@ -124,6 +132,21 @@ CommandLine::parseCli(QStringList const& argv)
 #endif
 }
 
+void
+CommandLine::addImage(QString const& path)
+{
+	QFileInfo file(path);
+
+	// create ImageFileInfo and push to images
+	ImageId const image_id(file.filePath());
+	ImageMetadata metadata;
+	metadata.setDpi(fetchDpi());
+	std::vector<ImageMetadata> vMetadata;
+	vMetadata.push_back(metadata);
+	ImageFileInfo image_info(file, vMetadata);
+	m_images.push_back(image_info);
+	m_files.push_back(file);
+}
 
 void
 CommandLine::setup()
@@ -156,7 +179,7 @@ CommandLine::printHelp()
 	std::cout << "ScanTailor usage: " << "\n";
 	std::cout << "\t1) scantailor" << "\n";
 	std::cout << "\t2) scantailor <project_file>" << "\n";
-	std::cout << "\t3) scantailor-cli [options] <image, image, ...> <output_directory>" << "\n";
+	std::cout << "\t3) scantailor-cli [options] <images|directory|-> <output_directory>" << "\n";
 	std::cout << "\t4) scantailor-cli [options] <project_file> [output_directory]" << "\n";
 	std::cout << "\n";
 	std::cout << "1)" << "\n";
@@ -165,6 +188,7 @@ CommandLine::printHelp()
 	std::cout << "\tstart ScanTailor's GUI interface and load project file" << "\n";
 	std::cout << "3)" << "\n";
 	std::cout << "\tbatch processing images from command line; no GUI" << "\n";
+	std::cout << "\tfile names are collected from arguments, input directory or stdin (-)" << "\n";
 	std::cout << "4)" << "\n";
 	std::cout << "\tbatch processing project from command line; no GUI" << "\n";
 	std::cout << "\tif output_directory is specified as last argument, it overwrites the one in project file" << "\n";
