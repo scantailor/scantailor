@@ -1487,7 +1487,7 @@ OutputGenerator::binarize(QImage const& image,
 	QPainterPath path;
 	path.addPolygon(crop_area);
 	
-	if (path.contains(image.rect())) {
+	if (path.contains(image.rect()) && !mask) {
 		BinaryThreshold const bw_thresh(BinaryThreshold::otsuThreshold(image));
 		return BinaryImage(image, adjustThreshold(bw_thresh));
 	} else {

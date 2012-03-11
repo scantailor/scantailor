@@ -339,7 +339,12 @@ ThumbnailPixmapCache::Impl::Impl(
 	m_threadStarted(false),
 	m_shuttingDown(false)
 {
-	QDir().mkpath(m_thumbDir);
+	// Note that QDir::mkdir() will fail if the parent directory,
+	// that is $OUT/cache doesn't exist. We want that behaviour,
+	// as otherwise when loading a project from a different machine,
+	// a whole bunch of bogus directories would be created.
+	QDir().mkdir(m_thumbDir);
+
 	m_backgroundLoader.moveToThread(this);
 }
 
