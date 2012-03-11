@@ -73,7 +73,8 @@ PageFinder::findPageBox(
 		dbg->add(gray150, "gray150");
 	}
 
-	BinaryImage bw150(binarizeOtsu(gray150));
+	BinaryImage bw150(peakThreshold(gray150));
+	//BinaryImage bw150(binarizeOtsu(gray150));
 	if (dbg) {
 	    dbg->add(bw150, "bw150O");
 	}
@@ -115,7 +116,7 @@ PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, 
 	int i=start, edge=start;
 	int ms = mid - int(double(mid) / 4.0);
 	int me = mid + int(double(mid) / 4.0);
-	int min_bp = int(double(me-ms) * 0.9);
+	int min_bp = int(double(me-ms) * 0.8);
 	Qt::GlobalColor black = Qt::color1;
 
 	while (i != end) {
