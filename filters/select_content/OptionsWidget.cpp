@@ -24,6 +24,8 @@
 #include "ScopedIncDec.h"
 #include <boost/foreach.hpp>
 
+#include <iostream>
+
 namespace select_content
 {
 
@@ -78,6 +80,7 @@ OptionsWidget::manualContentRectSet(QRectF const& content_rect)
 {
 	m_uiData.setContentRect(content_rect);
 	m_uiData.setMode(MODE_MANUAL);
+	m_uiData.setContentDetection(true);
 	updateModeIndication(MODE_MANUAL);
 	commitCurrentParams();
 	
@@ -90,11 +93,12 @@ OptionsWidget::modeChanged(bool const auto_mode)
 	if (m_ignoreAutoManualToggle) {
 		return;
 	}
-	
-	m_uiData.setContentDetection(true);
+
 	if (auto_mode) {
+		//m_ptrSettings->clearPageParams(m_pageId);
 		m_uiData.setMode(MODE_AUTO);
-		m_ptrSettings->clearPageParams(m_pageId);
+		m_uiData.setContentDetection(true);
+		commitCurrentParams();
 		emit reloadRequested();
 	} else {
 		m_uiData.setMode(MODE_MANUAL);
@@ -105,12 +109,17 @@ OptionsWidget::modeChanged(bool const auto_mode)
 void
 OptionsWidget::contentDetectionDisabled(void)
 {
+	bool old = m_ignoreAutoManualToggle;
+	m_ignoreAutoManualToggle = true;
+
 	m_uiData.setContentDetection(false);
+	commitCurrentParams();
 	autoBtn->setChecked(false);
 	manualBtn->setChecked(false);
 	disableBtn->setChecked(true);
-	commitCurrentParams();
 	emit reloadRequested();
+
+	m_ignoreAutoManualToggle = old;
 }
 
 void
@@ -138,11 +147,15 @@ OptionsWidget::updateModeIndication(AutoManualMode const mode)
 {
 	ScopedIncDec<int> guard(m_ignoreAutoManualToggle);
 	
-	disableBtn->setChecked(false);
-	if (mode == MODE_AUTO) {
-		autoBtn->setChecked(true);
+	if (! m_uiData.contentDetection()) {
+		disableBtn->setChecked(true);
 	} else {
-		manualBtn->setChecked(true);
+		disableBtn->setChecked(false);
+		if (mode == MODE_AUTO) {
+			autoBtn->setChecked(true);
+		} else {
+			manualBtn->setChecked(true);
+		}
 	}
 }
 
