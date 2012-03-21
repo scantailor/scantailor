@@ -120,6 +120,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	new_params.setContentRect(content_rect);
 
 	ui_data.setContentRect(content_rect);
+	ui_data.setPageRect(page_rect);
 	ui_data.setDependencies(deps);
 	ui_data.setMode(new_params.mode());
 	ui_data.setContentDetection(new_params.isContentDetectionEnabled());
@@ -222,7 +223,7 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 	
 	ImageView* view = new ImageView(
 		m_image, m_downscaledImage,
-		m_xform, m_uiData.contentRect()
+		m_xform, m_uiData.contentRect(), m_uiData.pageRect()
 	);
 	ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_ptrDbg.get());
 	

@@ -53,8 +53,10 @@ public:
 		void setSizeCalc(PhysSizeCalc const& calc);
 
 		void setContentRect(QRectF const& content_rect);
+		void setPageRect(QRectF const& content_rect);
 		
 		QRectF const& contentRect() const;
+		QRectF const& pageRect() const;
 
 		QSizeF contentSizeMM() const;
 		
@@ -73,6 +75,7 @@ public:
 		AutoManualMode mode() const;
 	private:
 		QRectF m_contentRect; // In virtual image coordinates.
+		QRectF m_pageRect;
 		PhysSizeCalc m_sizeCalc;
 		Dependencies m_deps;
 		AutoManualMode m_mode;

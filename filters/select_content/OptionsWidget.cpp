@@ -232,6 +232,18 @@ OptionsWidget::UiData::contentRect() const
 	return m_contentRect;
 }
 
+void
+OptionsWidget::UiData::setPageRect(QRectF const& page_rect)
+{
+	m_pageRect = page_rect;
+}
+
+QRectF const&
+OptionsWidget::UiData::pageRect() const
+{
+	return m_pageRect;
+}
+
 QSizeF
 OptionsWidget::UiData::contentSizeMM() const
 {
