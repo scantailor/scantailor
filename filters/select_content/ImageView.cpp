@@ -157,11 +157,11 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 
 	if (! m_pageRect.isNull()) {
 		// Draw detected page borders
-		QPen pen(QColor(0xee, 0xee, 0x00, 0x99));
+		QPen pen(QColor(0xee, 0xee, 0x00, 0xcc));
 		pen.setWidth(1);
 		pen.setCosmetic(true);
 		painter.setPen(pen);
-		painter.setBrush(QColor(0xee, 0xee, 0x00, 0x99));
+		painter.setBrush(QColor(0xee, 0xee, 0x00, 0xcc));
 
 		if (m_pageRect != virtualDisplayRect()) {
 			QRectF box;

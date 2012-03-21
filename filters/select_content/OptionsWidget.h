@@ -68,9 +68,11 @@ public:
 
 		bool contentDetection() const { return m_contentDetection; }
 		bool pageDetection() const { return m_pageDetection; }
+		bool fineTuning() const { return m_fineTuneCorners; }
 
 		void setContentDetection(bool detect);
 		void setPageDetection(bool detect);
+		void setFineTuneCorners(bool fine_tune);
 		
 		AutoManualMode mode() const;
 	private:
@@ -81,6 +83,7 @@ public:
 		AutoManualMode m_mode;
 		bool m_contentDetection;
 		bool m_pageDetection;
+		bool m_fineTuneCorners;
 	};
 	
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
@@ -99,6 +102,7 @@ private slots:
 	void applySelection(std::set<PageId> const& pages);
 
 	void modeChanged(bool auto_mode);
+	void fineTuningChanged(bool checked);
 	void contentDetectionDisabled(void);
 	void pageDetectionDisabled(void);
 	void pageDetectionEnabled(void);

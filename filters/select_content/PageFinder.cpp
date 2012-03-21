@@ -47,7 +47,7 @@ using namespace imageproc;
 
 QRectF
 PageFinder::findPageBox(
-	TaskStatus const& status, FilterData const& data, DebugImages* dbg)
+	TaskStatus const& status, FilterData const& data, bool fine_tune, DebugImages* dbg)
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
@@ -81,7 +81,8 @@ PageFinder::findPageBox(
 
 	QImage bwimg(bw150.toQImage());
 	QRect content_rect(detectBorders(bwimg));
-	fineTuneCorners(bwimg, content_rect);
+	if (fine_tune)
+		fineTuneCorners(bwimg, content_rect);
 	
 
 	// Transform back from 150dpi.

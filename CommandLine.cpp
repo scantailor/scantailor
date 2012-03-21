@@ -71,6 +71,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "deskew";
 	opts << "disable-content-detection";
 	opts << "enable-page-detection";
+	opts << "enable-fine-tuning";
 	opts << "content-detection";
 	opts << "content-box";
 	opts << "enable-auto-margins";
@@ -270,6 +271,7 @@ CommandLine::printHelp()
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
 	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << "\n";
 	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << "\n";
+	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << "\n";
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";

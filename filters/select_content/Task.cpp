@@ -108,8 +108,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	}
 
 	QRectF page_rect(data.xform().resultingRect());
-	if (new_params.isPageDetectionEnabled()) {
-		page_rect = PageFinder::findPageBox(status, data, m_ptrDbg.get());
+	if (new_params.isPageDetectionEnabled() && new_params.mode() == MODE_AUTO) {
+		page_rect = PageFinder::findPageBox(status, data, new_params.isFineTuningEnabled(), m_ptrDbg.get());
 	}
 	new_params.setPageRect(page_rect);
 
@@ -125,6 +125,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setMode(new_params.mode());
 	ui_data.setContentDetection(new_params.isContentDetectionEnabled());
 	ui_data.setPageDetection(new_params.isPageDetectionEnabled());
+	ui_data.setFineTuneCorners(new_params.isFineTuningEnabled());
 
 	new_params.setContentSizeMM(ui_data.contentSizeMM());
 

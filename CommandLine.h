@@ -63,6 +63,7 @@ public:
 
 	bool isContentDetectionEnabled() const { return !contains("disable-content-detection"); };
 	bool isPageDetectionEnabled() const { return contains("enable-page-detection"); };
+	bool isFineTuningEnabled() const { return contains("enable-fine-tuning"); };
 	bool isAutoMarginsEnabled() const { return contains("enable-auto-margins"); };
 
 	bool hasMargins() const;

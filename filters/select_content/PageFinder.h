@@ -43,7 +43,7 @@ class PageFinder
 {
 public:
 	static QRectF findPageBox(
-		TaskStatus const& status, FilterData const& data,
+		TaskStatus const& status, FilterData const& data, bool fine_tune=false,
 		DebugImages* dbg = 0);
 private:
 	static QRect detectBorders(QImage const& img);
