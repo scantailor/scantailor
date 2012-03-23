@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include <QDebug>
 #include <boost/foreach.hpp>
 #include <algorithm>
+#include <new>
 #include <math.h>
 #include <stdint.h>
 #include <assert.h>
@@ -121,6 +122,9 @@ HoughLineDetector::visualizeHoughSpace(unsigned const lower_bound) const
 {
 	QImage intensity(m_histWidth, m_histHeight, QImage::Format_Indexed8);
 	intensity.setColorTable(createGrayscalePalette());
+	if (m_histWidth > 0 && m_histHeight > 0 && intensity.isNull()) {
+		throw std::bad_alloc();
+	}
 	
 	unsigned max_value = 0;
 	unsigned const* hist_line = &m_histogram[0];

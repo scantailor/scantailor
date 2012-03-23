@@ -28,6 +28,8 @@
 #include <boost/foreach.hpp>
 #include <QPixmap>
 #include <QString>
+#include <QSettings>
+#include <QVariant>
 #include <assert.h>
 
 using namespace imageproc::constants;
@@ -46,6 +48,12 @@ OptionsWidget::OptionsWidget(
 	m_leftRightLinked(true),
 	m_topBottomLinked(true)
 {
+	{
+		QSettings app_settings;
+		m_leftRightLinked = app_settings.value("margins/leftRightLinked", true).toBool();
+		m_topBottomLinked = app_settings.value("margins/topBottomLinked", true).toBool();
+	}
+
 	m_chainIcon.addPixmap(
 		QPixmap(QString::fromAscii(":/icons/stock-vchain-24.png"))
 	);
@@ -172,8 +180,8 @@ OptionsWidget::preUpdateUI(
 	
 	enableDisableAlignmentButtons();
 	
-	m_leftRightLinked = (margins_mm.left() == margins_mm.right());
-	m_topBottomLinked = (margins_mm.top() == margins_mm.bottom());
+	m_leftRightLinked = m_leftRightLinked && (margins_mm.left() == margins_mm.right());
+	m_topBottomLinked = m_topBottomLinked && (margins_mm.top() == margins_mm.bottom());
 	updateLinkDisplay(topBottomLink, m_topBottomLinked);
 	updateLinkDisplay(leftRightLink, m_leftRightLinked);
 	
@@ -267,6 +275,7 @@ void
 OptionsWidget::topBottomLinkClicked()
 {
 	m_topBottomLinked = !m_topBottomLinked;
+	QSettings().setValue("margins/topBottomLinked", m_topBottomLinked);
 	updateLinkDisplay(topBottomLink, m_topBottomLinked);
 	topBottomLinkToggled(m_topBottomLinked);
 }
@@ -275,6 +284,7 @@ void
 OptionsWidget::leftRightLinkClicked()
 {
 	m_leftRightLinked = !m_leftRightLinked;
+	QSettings().setValue("margins/leftRightLinked", m_leftRightLinked);
 	updateLinkDisplay(leftRightLink, m_leftRightLinked);
 	leftRightLinkToggled(m_leftRightLinked);
 }
