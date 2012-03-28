@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>226</width>
-    <height>493</height>
+    <height>497</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,16 +49,6 @@
               <string>Inches (in)</string>
              </property>
             </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="autoMargins">
-            <property name="text">
-             <string>Auto Margins</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
            </widget>
           </item>
          </layout>
@@ -323,6 +313,16 @@
               <string comment="original">Original</string>
              </property>
             </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="autoMargins">
+            <property name="text">
+             <string>Auto Margins</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
           <item>

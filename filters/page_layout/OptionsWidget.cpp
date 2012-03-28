@@ -195,6 +195,7 @@ OptionsWidget::preUpdateUI(
 		alignmentMode->setCurrentIndex(1);
 	alignmentMode->blockSignals(false);
 	
+	autoMargins->setChecked(m_alignment.isAutoMarginsEnabled());
 	enableDisableAlignmentButtons();
 	
 	m_leftRightLinked = m_leftRightLinked && (margins_mm.left() == margins_mm.right());
@@ -318,7 +319,13 @@ OptionsWidget::alignWithOthersToggled()
 void
 OptionsWidget::autoMarginsChanged(bool checked)
 {
+	alignmentMode->setEnabled(!checked);
+	alignmentMode->setCurrentIndex(2);
+	enableDisableAlignmentButtons();
 	m_alignment.setAutoMargins(checked);
+	m_alignment.setVertical(Alignment::VORIGINAL);
+	m_alignment.setHorizontal(Alignment::HORIGINAL);
+	m_ptrSettings->updateContentRect();
 	emit alignmentChanged(m_alignment);
 }
 
