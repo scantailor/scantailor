@@ -315,8 +315,9 @@ OptionsWidget::autoMarginsChanged(bool checked)
 	m_alignment.setAutoMargins(checked);
 	m_alignment.setVertical(Alignment::VORIGINAL);
 	m_alignment.setHorizontal(Alignment::HORIGINAL);
+	m_ptrSettings->setPageAlignment(m_pageId, m_alignment);
 	m_ptrSettings->updateContentRect();
-	emit alignmentChanged(m_alignment);
+	emit reloadRequested();
 }
 
 void
