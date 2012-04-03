@@ -98,9 +98,13 @@ Task::process(
 
 	Alignment alignment(m_ptrSettings->getPageAlignment(m_pageId));
 	if (alignment.isAutoMarginsEnabled()) {
+		Margins const& margins_mm = Utils::calcMarginsMM(data.xform(), page_rect, content_rect);
 		m_ptrSettings->setHardMarginsMM(
-			m_pageId, Utils::calcMarginsMM(data.xform(), page_rect, content_rect)
+			m_pageId, margins_mm
 		);
+		if (m_ptrFilter->optionsWidget() != 0) {
+			m_ptrFilter->optionsWidget()->marginsSetExternally(margins_mm);
+		}
 	}
 
 	QSizeF agg_hard_size_before;

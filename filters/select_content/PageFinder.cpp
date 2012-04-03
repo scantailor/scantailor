@@ -76,7 +76,7 @@ PageFinder::findPageBox(
 	BinaryImage bw150(peakThreshold(gray150));
 	//BinaryImage bw150(binarizeOtsu(gray150));
 	if (dbg) {
-	    dbg->add(bw150, "bw150O");
+	    dbg->add(bw150, "peakThreshold");
 	}
 
 	QImage bwimg(bw150.toQImage());
@@ -112,7 +112,7 @@ PageFinder::detectBorders(QImage const& img)
 int
 PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient)
 {
-	int min_size=20;
+	int min_size=10;
 	int gap=0;
 	int i=start, edge=start;
 	int ms = mid - int(double(mid) / 4.0);
