@@ -778,7 +778,7 @@ OutputGenerator::processWithoutDewarping(
 		dst.fill(color);
 	}
 
-	if (!dst.isNull()) {
+	if (dst.isNull()) {
 		// Both the constructor and setColorTable() above can leave the image null.
 		throw std::bad_alloc();
 	}
