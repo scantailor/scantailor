@@ -41,8 +41,10 @@ Params::Params(
 
 Params::Params(Dependencies const& deps)
 :	m_deps(deps),
+	m_mode(MODE_AUTO),
 	m_contentDetect(true),
-	m_pageDetect(false)
+	m_pageDetect(false),
+	m_fineTuneCorners(false)
 {
 }
 
