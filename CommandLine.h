@@ -74,7 +74,7 @@ public:
 	bool hasDeskewAngle() const { return contains("rotate"); }
 	bool hasDeskew() const { return contains("deskew"); }
 	bool hasContentRect() const { return contains("content-box"); }
-	bool hasContentText() const { return !contains("no-content-text"); }
+	bool hasContentText() const { return !contains("disable-content-text-mask"); }
 	bool hasColorMode() const { return contains("color-mode"); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
 	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
