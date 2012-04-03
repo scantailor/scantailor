@@ -332,9 +332,15 @@ Task::process(
 		}
 
 		if (write_automask) {
-			if (!QDir().mkpath(automask_dir)) {
-				invalidate_params = true;
-			} else if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
+			// Note that QDir::mkdir() will fail if the parent directory,
+			// that is $OUT/cache doesn't exist. We want that behaviour,
+			// as otherwise when loading a project from a different machine,
+			// a whole bunch of bogus directories would be created.
+			QDir().mkdir(automask_dir);
+			// Also note that QDir::mkdir() will fail if the directory already exists,
+			// so we ignore its return value here.
+
+			if (!TiffWriter::writeImage(automask_file_path, automask_img.toQImage())) {
 				invalidate_params = true;
 			}
 		}

@@ -21,7 +21,9 @@
 
 #include "AutoRemovingFile.h"
 #include <QStackedWidget>
+#include <QWidget>
 #include <boost/intrusive/list.hpp>
+#include <boost/function.hpp>
 
 class QImage;
 
@@ -32,7 +34,9 @@ class DebugImageView :
 	>
 {
 public:
-	DebugImageView(AutoRemovingFile file, QWidget* parent = 0);
+	DebugImageView(AutoRemovingFile file,
+		boost::function<QWidget* (QImage const&)> const& image_view_factory =
+		boost::function<QWidget* (QImage const&)>(), QWidget* parent = 0);
 
 	/**
 	 * Tells this widget to either display the actual image or just
@@ -46,6 +50,7 @@ private:
 	void imageLoaded(QImage const& image);
 
 	AutoRemovingFile m_file;
+	boost::function<QWidget* (QImage const&)> m_imageViewFactory;
 	QWidget* m_pPlaceholderWidget;
 	bool m_isLive;
 };

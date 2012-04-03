@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es_ES">
+<TS version="2.0" language="pt_BR">
 <context>
     <name>AboutDialog</name>
     <message>
         <location filename="../ui/AboutDialog.ui" line="14"/>
         <source>About Scan Tailor</source>
-        <translation>Acerca de Scan Tailor</translation>
+        <translation>Sobre Scan Tailor</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="27"/>
         <source>About</source>
-        <translation>Acerca</translation>
+        <translation>Sobre</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
-        <translation>Scan Tailor es una herramienta interactiva de post procesado para imágenes escaneadas. Lleva a cabo operaciones tales como dividir paginas, corrección de inclinación, agregar/eliminar márgenes y otros.Usted le proporciona la imagen escaneada y obtiene imágenes lista para ser impresas o para crear un archivo PDF o DJVU. El escaneo y el reconocimiento óptico de caracteres OCR están fuera de la mira de este proyecto.</translation>
+        <translation>Scan Tailor é uma ferramenta interativa de pós-processamento para imagens escaneadas. Executa operações como dividir páginas, correção de inclinacão, agregar/eliminar margens e outras.Você fornece a imagem escaneada e obtem imagens prontas para impressão ou para criar um arquivo PDF ou DJVU. Digitalização e reconhecimento ótico de caracteres OCR estão fora do escopo deste projeto.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="101"/>
@@ -26,7 +26,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="125"/>
         <source>Lead Developer</source>
-        <translation>Desarrollador Principal</translation>
+        <translation>Líder de desenvolvimento</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="132"/>
@@ -36,23 +36,22 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="157"/>
         <source>U235 - Picture auto-detection algorithm.</source>
-        <translation>U234 - Algoritmo de detección automatica de imagenes.</translation>
+        <translation>U234 - Algorítmo de detecção automática de imagens.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="164"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
-        <translation>Robert B. - Primera generación de corrección de deformación.
- automática de imágenes.</translation>
+        <translation>Robert B. - Primera generação de correção de deformação.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Andrey Bergman - System load adjustment.</source>
-        <translation>Andrey Bergman - Ajuste de carga del sistema.</translation>
+        <translation>Andrey Bergman - Ajuste de carga de sistema.</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>Petr Kovář - Command line interface.</source>
-        <translation>Petr Kovář - Interface de linea de comando.</translation>
+        <translation>Petr Kovář - Interface de linha de comando.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
@@ -67,7 +66,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="219"/>
         <source>Stefan Birkner - German</source>
-        <translation>Stefan Birkner - Aleman</translation>
+        <translation>Stefan Birkner - Alemão</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="226"/>
@@ -77,22 +76,22 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="233"/>
         <source>Masahiro Kitagawa - Japanese</source>
-        <translation>Masahiro Kitagawa - Japones</translation>
+        <translation>Masahiro Kitagawa - Japonês</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="240"/>
         <source>Patrick Pascal - French</source>
-        <translation>Patrick Pascal - Frances</translation>
+        <translation>Patrick Pascal - Francês</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="247"/>
         <source>Daniel Koć - Polish</source>
-        <translation>Daniel Koć - Polaco</translation>
+        <translation>Daniel Koć - Polonês</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="254"/>
         <source>Joseph Artsimovich - Russian</source>
-        <translation>Joseph Artsimovich - Ruso</translation>
+        <translation>Joseph Artsimovich - Russo</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="261"/>
@@ -102,12 +101,12 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation>Flavio Benelli - Español</translation>
+        <translation>Flavio Benelli - Espanhol</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Davidson Wang - Traditional Chinese</source>
-        <translation>Davidson Wang - Chino Tradicional</translation>
+        <translation>Davidson Wang - Chinês Tradicional</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
@@ -122,7 +121,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="190"/>
         <source>Translators</source>
-        <translation>Traductores</translation>
+        <translation>Tradutores</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="142"/>
@@ -132,12 +131,12 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="294"/>
         <source>Documentation</source>
-        <translation>Documentación</translation>
+        <translation>Documentação</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="350"/>
         <source>License</source>
-        <translation>Licencia</translation>
+        <translation>Licença</translation>
     </message>
 </context>
 <context>
@@ -145,12 +144,12 @@
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../ui/BatchProcessingLowerPanel.ui" line="36"/>
         <source>Beep when finished</source>
-        <translation>Sonar al finalizar</translation>
+        <translation>Soar ao finalizar</translation>
     </message>
 </context>
 <context>
@@ -158,7 +157,7 @@
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation>Haga click en un área para elegir su color o ESC para cancelar.</translation>
+        <translation>Clique em uma área para escolher a cor ou ESC para cancelar.</translation>
     </message>
 </context>
 <context>
@@ -171,27 +170,27 @@
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
-        <translation>Solamente esta pagina (ya aplicado)</translation>
+        <translation>Somente esta página (já aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="43"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="59"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Paginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="92"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
 </context>
 <context>
@@ -199,12 +198,12 @@
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="20"/>
         <source>Deskew</source>
-        <translation>Alineación</translation>
+        <translation>Alinhamento</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="41"/>
@@ -227,8 +226,7 @@
     <message>
         <location filename="../interaction/DragHandler.cpp" line="46"/>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
-        <translatorcomment>i need a context, i&apos;m not shure or its this translation.</translatorcomment>
-        <translation>Manteniendo presionada la tecla Shift se puede arrastrar.</translation>
+        <translation>É possível movimentar a imagem pressionando a tecla Shift.</translation>
     </message>
 </context>
 <context>
@@ -277,17 +275,17 @@
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="13"/>
         <source>Fix DPI</source>
-        <translation>Corregir DPI</translation>
+        <translation>Corrigir DPI</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="23"/>
         <source>Tab 1</source>
-        <translation>Tab 1</translation>
+        <translation>Tabela 1</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="33"/>
         <source>Tab 2</source>
-        <translation>Tab 2</translation>
+        <translation>Tabela 2</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="46"/>
@@ -359,17 +357,17 @@
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
-        <translation>Haga click para crear un nuevo punto de control.</translation>
+        <translation>Clique para criar um novo ponto de controle.</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
         <source>This point can be dragged.</source>
-        <translation>Este punto puede ser arrastrado.</translation>
+        <translation>Este ponto pode ser arrastado.</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
-        <translation>Arrastre este punto o borrelo presionando Del o D.</translation>
+        <translation>Arraste este ponto ou apague-o pressionando Del ou D.</translation>
     </message>
 </context>
 <context>
@@ -386,17 +384,17 @@
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation>Algunos archivos fallaron al cargar</translation>
+        <translation>Alguns arquivos falharam ao carregar</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation>Carga exitosa:%1</translation>
+        <translation>Sucesso ao carregar:%1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation>Falla al cargar:%1</translation>
+        <translation>Falha ao carregar:%1</translation>
     </message>
 </context>
 <context>
@@ -404,7 +402,7 @@
     <message>
         <location filename="../ui/MainWindow.ui" line="232"/>
         <source>Save Project</source>
-        <translation>Guardar Proyecto</translation>
+        <translation>Salvar Projeto</translation>
     </message>
     <message>
         <source>Save this project?</source>
@@ -483,33 +481,32 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="20"/>
         <source>MainWindow</source>
-        <translatorcomment>why doesn&apos;t have any space between Main and Windows?</translatorcomment>
-        <translation>VentanaPrincipal</translation>
+        <translation>Janela Principal</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="130"/>
         <source>Keep current page in view.</source>
-        <translation>Mantener la presente ventana.</translation>
+        <translation>Manter a janela atual.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="156"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
-        <translation>Use Home, End, PgUp (or Q), PgDown (or W) para navegar entre paginas.</translation>
+        <translation>Use Home, End, PgUp (ou Q), PgDown (ou W) para navegar entre paginas.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="185"/>
         <source>Tools</source>
-        <translation>Herramientas</translation>
+        <translation>Ferramentas</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="196"/>
         <source>File</source>
-        <translation>Archivos</translation>
+        <translation>Arquivos</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="210"/>
         <source>Help</source>
-        <translation>Ayuda</translation>
+        <translation>Ajuda</translation>
     </message>
     <message>
         <source>Debug</source>
@@ -528,13 +525,13 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="240"/>
         <source>Save Project As ...</source>
-        <translation>Guardar el Proyecto como...</translation>
+        <translation>Salvar Projeto como...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="245"/>
         <location filename="../ui/MainWindow.ui" line="294"/>
         <source>Next Page</source>
-        <translation>Proxima Pagina</translation>
+        <translation>Próxima Página</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="248"/>
@@ -555,7 +552,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="267"/>
         <source>New Project ...</source>
-        <translation>Nuevo Proyecto...</translation>
+        <translation>Novo Projeto...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="270"/>
@@ -565,7 +562,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="275"/>
         <source>Open Project ...</source>
-        <translation>Abrir Proyecto...</translation>
+        <translation>Abrir Projeto...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="278"/>
@@ -585,7 +582,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="305"/>
         <source>Close Project</source>
-        <translation>Cerrar Proyecto</translation>
+        <translation>Fechar Projeto</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="308"/>
@@ -595,7 +592,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="313"/>
         <source>Quit</source>
-        <translation>Salir</translation>
+        <translation>Sair</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="316"/>
@@ -605,17 +602,17 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="326"/>
         <source>First Page</source>
-        <translation>Primera Pagina</translation>
+        <translation>Primeira Página</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="329"/>
         <source>Home</source>
-        <translation>Inicio</translation>
+        <translation>Início</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="334"/>
         <source>Last Page</source>
-        <translation>Ultima Pagina</translation>
+        <translation>Última Página</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="337"/>
@@ -625,17 +622,17 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="342"/>
         <source>About</source>
-        <translation>Acerca</translation>
+        <translation>Sobre</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation>Corregir DPI ...</translation>
+        <translation>Corrigir DPI ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation>re enlazar...</translation>
+        <translation>Religar ...</translation>
     </message>
     <message>
         <source>Stop batch processing</source>
@@ -644,7 +641,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/MainWindow.ui" line="321"/>
         <source>Settings ...</source>
-        <translation>Preferencias...</translation>
+        <translation>Preferencias ...</translation>
     </message>
 </context>
 <context>
@@ -652,22 +649,22 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="19"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="52"/>
         <source>New Project ...</source>
-        <translation>Nuevo Proyecto ...</translation>
+        <translation>Novo Projeto ...</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="78"/>
         <source>Open Project ...</source>
-        <translation>Abrir Proyecto ...</translation>
+        <translation>Abrir Projeto ...</translation>
     </message>
     <message>
         <location filename="../ui/NewOpenProjectPanel.ui" line="103"/>
         <source>Recent Projects</source>
-        <translation>Proyectos Recientes</translation>
+        <translation>Projetos Recentes</translation>
     </message>
 </context>
 <context>
@@ -675,7 +672,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="17"/>
         <source>Fix Orientation</source>
-        <translation>Corregir Orientación</translation>
+        <translation>Corrigir Orientação</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="23"/>
@@ -685,44 +682,44 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation>Solamente esta pagina (ya aplicado)</translation>
+        <translation>Somente esta página (já aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as seguintes</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Todas las demas(excepto esta)</translation>
+        <translation>Todas as demais(exceto esta)</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="101"/>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="206"/>
         <source>The current page will be included.</source>
-        <translation>La pagina actual sera inluida.</translation>
+        <translation>A página atual será incluida.</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="125"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Páginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>Todas las demas seleccionadas (excepto esta)</translation>
+        <translation>Todas as demais selecionadas (exceto esta)</translation>
     </message>
 </context>
 <context>
@@ -730,12 +727,12 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="19"/>
         <source>Rotate</source>
-        <translation>Rotar</translation>
+        <translation>Girar</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="40"/>
@@ -746,12 +743,12 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="142"/>
         <source>Reset</source>
-        <translation>Reset</translation>
+        <translation>Resetar</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="167"/>
         <source>Scope</source>
-        <translation>Extension</translation>
+        <translation>Escopo</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="188"/>
@@ -764,93 +761,93 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="14"/>
         <source>Out of memory</source>
-        <translation>Sin memoria disponible</translation>
+        <translation>Sem memória disponível</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="37"/>
         <source>Out of Memory Situation in Scan Tailor</source>
-        <translation>Sin memoria disponible en Scan Tailor</translation>
+        <translation>Sem memória disponível no Scan Tailor</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation>Posibles rasones</translation>
+        <translation>Possíveis razões</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
         <source>Did you have to fix the DPI of your source images? Are you sure the values you entered were correct?</source>
-        <translation>¿Tienes que corregir los DPI de tu imagen original? ¿Estas seguro que los valores ingresados son correctos?</translation>
+        <translation>Teve que corrigir o DPI da imagem original? Tem certeza que os valores inseridos são corretos?</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="123"/>
         <source>Sometimes your source images may have wrong DPI embedded into them. Scan Tailor tries to detect those, but it&apos;s not always easy to tell. You may need to check &quot;Fix DPI even if they look normal&quot; when creating a project and look into &quot;All pages&quot; tab in the &quot;Fix DPI&quot; dialog, which is also accessible from the Tools menu.</source>
-        <translation>Algunas veces las imágenes pueden tener un numero de DPI equivocado de origen. Scan Tailor intenta detectarlos, pero no es siempre fácil de discernir . Quizás necesites tildar &quot;Corregir DPI aun si parece estar bien&quot; cuando creas un proyecto y miras en la pestaña de &quot;Todas las paginas&quot; en el dialogo de &quot;DPI fijo&quot;, que también es accesible de menú Herramientas.</translation>
+        <translation>Às vezes as imagens podem ter um número de DPI errada de origem. Scan Tailor tenta detectá-lo, mas nem sempre é fácil. Pode ser necessário selecionar &quot;Corrigir DPI mesmo que pareça normal&quot; quando você cria um projeto e olhar na guia &quot;Todas as páginas&quot; na caixa de diálogo &quot;Corrigir DPI&quot;, que também é acessível a partir do menu Ferramentas.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="143"/>
         <source>Is your output DPI set too high? Usually you don&apos;t need it higher than 600.</source>
-        <translation>¿Es muy grande el DPI de salida? Normalmente no necesitas mas grande que 600.</translation>
+        <translation>Seu DPI de saída é muito grande? Normalmente não é necessário mais que 600.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="174"/>
         <source>What can help</source>
-        <translation>Que puede ayudar</translation>
+        <translation>O que pode ajudar</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="204"/>
         <source>Fix your DPIs. Learn how to &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;estimate unknown DPIs&lt;/a&gt;.</source>
         <extracomment>Feel free to change the URL to a localized video / text tutorial.</extracomment>
-        <translation>Corrija los DPI. Aprenda aqui &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;como estimar DPI desconocios&lt;/a&gt;.</translation>
+        <translation>Corrija seus DPIs. Aprenda aqui &lt;a href=&quot;http://vimeo.com/12524529&quot;&gt;como estimar DPIs desconhecidos&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="224"/>
         <source>If your hardware and operating system are 64-bit capable, consider switching to a 64-bit version of Scan Tailor.</source>
-        <translation>Si su hardware y su sistema operativo son 64-bits, considere cambiarse a la version de Scan Tailor de 64-bits.</translation>
+        <translation>Se seu hardware e seu sistema operacional são 64-bits, considere mudar para a versão de 64-bits do Scan Tailor.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="244"/>
         <source>When working with grayscale images, make sure they are really grayscale. If they are actually color images that just happen to look grayscale, convert them to grayscale using some kind of batch image converter. This will both save memory and increase performance.</source>
-        <translation>Cuando trabaje con imágenes en escala de grises, asegurase de que son realmente grises. Si son imágenes a color que casualmente parecen grises, paselas a escala de grises usando algún tipo de conversor en lote, Esto ahorrara memoria e incrementara el rendimiento.</translation>
+        <translation>Ao trabalhar com tons de cinza, certifique-se que eles são realmente cinza. Se são imagens coloridas que parecem cinza, convertelas em escala de cinza usando algum tipo de conversor de lote. Isto irá economizar memória e aumentar o desempenho.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="264"/>
         <source>As a last resort, you can save some memory by making sure thumbnails are pre-created rather than created on demand. This can be done by slowly scrolling the thumbnail list all the way from top to bottom before starting any real work.</source>
-        <translation>En ultima instancia, puede ahorrar algo de memoria asegurandose que las vistas en miniatura son pre-creadas en vez de ser creadas automáticamente. Esto puede lograrse desplazando lentamente la lista de miniaturas de arriba hacia abajo antes de comenzar con algún trabajo intensivo.</translation>
+        <translation>Finalmente, você pode economizar memória certificando-se que as miniaturas são pré-criadas, em vez de ser criada automaticamente. Isto pode ser conseguido movendo-se lentamente a lista de miniaturas de cima para baixo antes de iniciar qualquer trabalho.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="295"/>
         <source>What won&apos;t help</source>
-        <translation>Que no ayuda</translation>
+        <translation>O que não ajuda</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="325"/>
         <source>Surprisingly, upgrading your RAM won&apos;t help here. The lack of RAM is compensated by the swap mechanism, which makes things slow, but keeps programs running. An out of memory situation means we ran out of memory address space, which has nothing to do with the amount of RAM you have. The only way to increase the memory address space is to go 64-bit hardware, 64-bit operating system and 64-bit Scan Tailor.</source>
-        <translation>Sorprendentemente, aumentar la RAM no ayudara aquí. La falta de RAM es compensada con el mecanismo swap que genera una memoria virtual en el disco duro y hace que todo vaya mas lento, pero mantiene al programa funcionando. Una situación de falta de memoria significa que nos quedamos sin direcciones de memoria disponibles, que no tiene nada que ver con la cantidad de RAM que tenga. La única manera de incrementar las direcciones de memoria es pasarse a un hardware de 64-bits, un sistema operativo de 64-bits y el Scan Tailor de 64-bits.</translation>
+        <translation>Surpreendentemente, o aumento da RAM não vai ajudar aqui. A falta de RAM é compensado pelo mecanismo de troca que gera uma memória virtual no disco rígido e que torna as coisas lentas, mas mantém o programa em execução. A situação de falta de memória significa que o programa funciona fora de endereços de memória disponíveis, que não tem nada a ver com a quantidade de RAM que você tem. A única maneira de aumentar o endereço de memória é passado para um hardware de 64 bits, sistema operacional de 64 bits e Scan Tailor de 64 bits.</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="361"/>
         <source>Save Project</source>
-        <translation>Guardar Proyecto</translation>
+        <translation>Salvar Projeto</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="384"/>
         <source>Save Project As ...</source>
-        <translation>Guardar el Proyecto como...</translation>
+        <translation>Salvar Projeto Como...</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="404"/>
         <source>Don&apos;t Save</source>
-        <translation>No guardar</translation>
+        <translation>Não salvar</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="421"/>
         <source>Project Saved Successfully</source>
-        <translation>Proyecto guardado satisfactoriamente</translation>
+        <translation>Projeto salvo com sucesso</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
-        <translation>Por favor note que mientras que Scan Tailor intenta alocar algo de memoria y le da la oportunidad de salvar su proyecto, no es siempre posible. Esta vez ha resultado con éxito, pero puede que la próxima se cuelgue.</translation>
+        <translation>Observe que, enquanto o Scan Tailor tenta alocar alguma memoria e lhe dá a oportunidade de salvar seu projeto, nem sempre isso é possível. Desta vez ele conseguiu, mas pode ser que na próxima não consiga.</translation>
     </message>
 </context>
 <context>
@@ -858,7 +855,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="17"/>
         <source>Apply Mode</source>
-        <translation>Modo de Aplicar</translation>
+        <translation>Aplicar modo</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
@@ -868,27 +865,27 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation>Solamente esta pagina (aplicado)</translation>
+        <translation>Somente esta página (já aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="62"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Páginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="95"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
 </context>
 <context>
@@ -896,7 +893,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="17"/>
         <source>Apply Dewarping Mode</source>
-        <translation>Aplicar modo de antideformación</translation>
+        <translation>Aplicar modo de anti-deformação</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="23"/>
@@ -906,7 +903,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="29"/>
         <source>Off</source>
-        <translation>Apagado</translation>
+        <translation>Desligado</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="42"/>
@@ -921,32 +918,32 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
         <source>Scope</source>
-        <translation>Extension</translation>
+        <translation>Escopo</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
         <source>This page only</source>
-        <translation>Solamente esta pagina</translation>
+        <translation>Somente esta página</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Paginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
 </context>
 <context>
@@ -954,7 +951,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="17"/>
         <source>Apply Output Resolution</source>
-        <translation>Aplicar Resolucion de salida</translation>
+        <translation>Aplicar Resolução de saída</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="23"/>
@@ -964,32 +961,32 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="68"/>
         <source>Scope</source>
-        <translation>Extension</translation>
+        <translation>Escopo</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="74"/>
         <source>This page only</source>
-        <translation>Solamente esta pagina</translation>
+        <translation>Somente esta página</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="91"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="107"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Paginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="140"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="84"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
 </context>
 <context>
@@ -997,18 +994,18 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="20"/>
         <source>Output Resolution (DPI)</source>
-        <translation>Resolucion de Salida (DPI)</translation>
+        <translation>Resolução de Saída (DPI)</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="419"/>
         <source>Change ...</source>
-        <translation>Cambiar...</translation>
+        <translation>Mudar ...</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="103"/>
@@ -1018,27 +1015,27 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="169"/>
         <source>White margins</source>
-        <translation>Margenes Blancos</translation>
+        <translation>Margens Brancas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="176"/>
         <source>Equalize illumination</source>
-        <translation>Igualar Iluminacion</translation>
+        <translation>Equalizar Iluminação</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
         <source>Dewarping</source>
-        <translation>Antideformación</translation>
+        <translation>Anti-deformação</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
         <source>Depth perception</source>
-        <translation>Percepcion de profundidad</translation>
+        <translation>Percepção de profundidade</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
         <source>No despeckling</source>
-        <translation>No eliminar manchas</translation>
+        <translation>Não eliminar manchas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="336"/>
@@ -1055,7 +1052,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="558"/>
         <source>Cautious despeckling</source>
-        <translation>Eliminado de manchas cuidadoso</translation>
+        <translation>Eliminador de manchas fraco</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="561"/>
@@ -1067,22 +1064,22 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="584"/>
         <source>Normal despeckling</source>
-        <translation>Eliminado de manchas normal</translation>
+        <translation>Eliminador de manchas normal</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
         <source>Aggressive despeckling</source>
-        <translation>Eliminado de manchas agresivo</translation>
+        <translation>Eliminador de manchas forte</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="274"/>
         <source>Thinner</source>
-        <translation>Mas fino</translation>
+        <translation>Fino</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="306"/>
         <source>Thicker</source>
-        <translation>Mas grueso</translation>
+        <translation>Grosso</translation>
     </message>
 </context>
 <context>
@@ -1095,44 +1092,44 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
-        <translation>Solamente esta pagina (ya aplicado)</translation>
+        <translation>Somente esta página (já aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="43"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Todas las demas</translation>
+        <translation>Todas as demais</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="194"/>
         <source>The current page will be included.</source>
-        <translation>La pagina actual sera inluida.</translation>
+        <translation>A página atual será incluida.</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Páginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="143"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
         <source>Every other selected page</source>
-        <translation>Todas las demas seleccionadas (excepto esta)</translation>
+        <translation>Todas as demais selecionadas (exceto esta)</translation>
     </message>
 </context>
 <context>
@@ -1140,12 +1137,12 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="20"/>
         <source>Margins</source>
-        <translation>Margenes</translation>
+        <translation>Margens</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="42"/>
@@ -1155,12 +1152,12 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="47"/>
         <source>Inches (in)</source>
-        <translation>Pulgadas (in)</translation>
+        <translation>Polegadas (in)</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="87"/>
         <source>Top</source>
-        <translation>Arriba</translation>
+        <translation>Acima</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="100"/>
@@ -1180,17 +1177,17 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="121"/>
         <source>Bottom</source>
-        <translation>Abajo del todo</translation>
+        <translation>Abaixo</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="138"/>
         <source>Left</source>
-        <translation>Izquierda</translation>
+        <translation>Esquerda</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="185"/>
         <source>Right</source>
-        <translation>Derecha</translation>
+        <translation>Direita</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="244"/>
@@ -1201,13 +1198,12 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contendio&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="269"/>
         <source>Alignment</source>
-        <translation>Alineacion</translation>
+        <translation>Alinhamento</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="293"/>
         <source>Match size with other pages</source>
-        <translation>Igualar en tamaño a las 
-demas paginas</translation>
+        <translation>Igualar em tamanho as demais páginas</translation>
     </message>
 </context>
 <context>
@@ -1215,7 +1211,7 @@ demas paginas</translation>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="17"/>
         <source>Split Pages</source>
-        <translation>Dividir Paginas</translation>
+        <translation>Dividir Páginas</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="63"/>
@@ -1235,32 +1231,32 @@ demas paginas</translation>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="89"/>
         <source>Scope</source>
-        <translation>Extension</translation>
+        <translation>Escopo</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="95"/>
         <source>This page only</source>
-        <translation>Solamente esta pagina</translation>
+        <translation>Somente esta página</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="112"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="128"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Páginas selecionadas</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="161"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="105"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
 </context>
 <context>
@@ -1268,12 +1264,12 @@ demas paginas</translation>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="20"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="26"/>
         <source>Page Layout</source>
-        <translation>Distribucion de Pagina</translation>
+        <translation>Layout da Página</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="134"/>
@@ -1283,13 +1279,13 @@ demas paginas</translation>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="159"/>
         <source>Change ...</source>
-        <translation>Cambiar...</translation>
+        <translation>Mudar ...</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="184"/>
         <source>Split Line</source>
         <translatorcomment>need context</translatorcomment>
-        <translation>Linea Divisoria</translation>
+        <translation>Linha Divisória</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="214"/>
@@ -1307,22 +1303,22 @@ demas paginas</translation>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="14"/>
         <source>Zone Properties</source>
-        <translation>Propiedades de Zona</translation>
+        <translation>Propriedades da Zona</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="20"/>
         <source>Subtract from all layers</source>
-        <translation>Substraer de todas las capas</translation>
+        <translation>Subtrair de todas as camadas</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="27"/>
         <source>Add to auto layer</source>
-        <translation>Agregar a la capa automatica</translation>
+        <translation>Agregar a camada automatica</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/PictureZonePropDialog.ui" line="34"/>
         <source>Subtract from auto layer</source>
-        <translation>Sustraer de la capa automatica</translation>
+        <translation>Sustrair da camada automatica</translation>
     </message>
 </context>
 <context>
@@ -1330,12 +1326,12 @@ demas paginas</translation>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
         <source>Input Directory</source>
-        <translation>Carpeta de entrada</translation>
+        <translation>Pasta de entrada</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="43"/>
         <source>Output Directory</source>
-        <translation>Carpeta de salida</translation>
+        <translation>Pasta de saida</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1380,33 +1376,29 @@ Deberia quitarlos del proyecto.</translation>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="14"/>
         <source>Project Files</source>
-        <translation>Archivos del Proyecto</translation>
+        <translation>Arquivos do Projeto</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="33"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="52"/>
         <source>Browse</source>
-        <translation>Navegar</translation>
+        <translation>Procurar</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="64"/>
         <source>Files Not In Project</source>
-        <translation>Archivos fuera del proyecto</translation>
+        <translation>Arquivos fora do projeto</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="77"/>
         <location filename="../ui/ProjectFilesDialog.ui" line="159"/>
         <source>Select All</source>
-        <translation>Seleccionar todo</translation>
+        <translation>Selecionar tudo</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="102"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Add selected files to project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translatorcomment>i think here is a problem.</translatorcomment>
-        <translation type="unfinished"></translation>
+        <source>Add selected files to project.</source>
+        <translation>Adicionar arquivos selecionados ao projeto</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="108"/>
@@ -1415,12 +1407,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="115"/>
-        <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans Serif&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Remove selected files from project.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translatorcomment>i think here is a problem</translatorcomment>
-        <translation type="unfinished"></translation>
+        <source>Remove selected files from project./html&gt;</source>
+        <translation>Remover arquivos selecionados do projeto</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="121"/>
@@ -1430,17 +1418,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="143"/>
         <source>Files In Project</source>
-        <translation> Archivos en el proyecto</translation>
+        <translation> Arquivos no projeto</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="171"/>
         <source>Right to left layout (for Hebrew and Arabic)</source>
-        <translation>Distribucion de derecha a izquierda(para Hebreo y Arabe)</translation>
+        <translation>Layout da direita para esquerda(para Hebreu e Árabe)</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="178"/>
         <source>Fix DPIs, even if they look OK</source>
-        <translation>Corregir DPI, incluso si se ve bien</translation>
+        <translation>Corrigir DPI mesmo que pareça normal</translation>
     </message>
 </context>
 <context>
@@ -1464,7 +1452,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation>Deshacer </translation>
+        <translation>Desfazer</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
@@ -1477,18 +1465,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="14"/>
         <source>Remove Pages</source>
-        <translation>Quitar Paginas</translation>
+        <translation>Remover Páginas</translation>
     </message>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="57"/>
         <source>Remove %1 page(s) from project?</source>
-        <translation>Quitar %1 pagina(s) del proyecto?</translation>
+        <translation>Remover %1 página(s) do projeto?</translation>
     </message>
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="72"/>
         <source>Corresponding output files will be deleted, while input files will remain.</source>
-        <translation>Los correspondientes archivos de salida seran borrados,
- mientras que los archivos de entrada se mantendran.</translation>
+        <translation>Arquivos de saída correspondentes serão excluídos, enquanto os arquivos de entrada serão mantidos.</translation>
     </message>
 </context>
 <context>
@@ -1496,7 +1483,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="17"/>
         <source>Select Content</source>
-        <translation>Seleccione el Contenido</translation>
+        <translation>Selecione o Conteúdo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
@@ -1506,45 +1493,44 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation>Solo esta pagina (ya aplicado)</translation>
+        <translation>Somente esta página (já aplicado)</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
         <source>All pages</source>
-        <translation>Todas las paginas</translation>
+        <translation>Todas as páginas</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation>Esta pagina y las que le siguen</translation>
+        <translation>Esta página e as que seguem</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translatorcomment>what should i translate?</translatorcomment>
-        <translation>Todas las pares o impares</translation>
+        <translation>Todas as pares ou impares</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="206"/>
         <source>The current page will be included.</source>
-        <translation>La pagina actual sera inluida.</translation>
+        <translation>A página atual será incluida.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="125"/>
         <source>Selected pages</source>
-        <translation>Pagina seleccionada</translation>
+        <translation>Página selecionada</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para multiples paginas.</translation>
+        <translation>Usar Ctrl+Click / Shift+Click para selecionar multiplas páginas.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>Todas las demás seleccionadas</translation>
+        <translation>Todas as demais selecionadas</translation>
     </message>
 </context>
 <context>
@@ -1552,12 +1538,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="13"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="19"/>
         <source>Content Box</source>
-        <translation>Caja de contenido</translation>
+        <translation>Caixa de conteúdo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="38"/>
@@ -1572,7 +1558,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
         <source>Scope</source>
-        <translation>Extension</translation>
+        <translation>Escopo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
@@ -1593,12 +1579,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
         <source>Settings</source>
-        <translation>Preferencias</translation>
+        <translation>Preferências</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="20"/>
         <source>Use 3D acceleration for user interface</source>
-        <translation>Usar aceleracion 3D para la interface de usuario</translation>
+        <translation>Usar aceleração 3D para a interface de usuário</translation>
     </message>
 </context>
 <context>
@@ -1613,12 +1599,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="14"/>
         <source>Form</source>
-        <translation>Formulario</translation>
+        <translation>Modelo</translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="23"/>
         <source>System load</source>
-        <translation>Carga del sistema</translation>
+        <translation>Carga do sistema</translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="46"/>
@@ -1647,22 +1633,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../zones/ZoneContextMenuInteraction.cpp" line="275"/>
         <source>Properties</source>
-        <translation>Propiedades</translation>
+        <translation>Propriedades</translation>
     </message>
     <message>
         <location filename="../zones/ZoneContextMenuInteraction.cpp" line="265"/>
         <source>Delete</source>
-        <translation>Eliminar</translation>
+        <translation>Excluir</translation>
     </message>
     <message>
         <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Delete confirmation</source>
-        <translation>Confirmacion de eliminacion</translation>
+        <translation>Confirmação de exclusão</translation>
     </message>
     <message>
         <location filename="../zones/ZoneContextMenuInteraction.cpp" line="249"/>
         <source>Really delete this zone?</source>
-        <translation>¿Seguro que desea eliminar esta zona?</translation>
+        <translation>Realmente excluir esta zona?</translation>
     </message>
 </context>
 <context>
@@ -1670,17 +1656,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="206"/>
         <source>Click to finish this zone.  ESC to cancel.</source>
-        <translation>Haga click para finalizar esta zona. ESC para cancelar.</translation>
+        <translation>Clicar para finalizar esta zona. ESC para cancelar.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="208"/>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
-        <translation>Concete el primer y ultimo punto para terminar esta zona. ESC para cancelar.</translation>
+        <translation>Ligue o primeiro e último ponto para terminar esta zona. ESC para cancelar.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneCreationInteraction.cpp" line="211"/>
         <source>Zones need to have at least 3 points.  ESC to cancel.</source>
-        <translation>Las zonas necesitas al menos 3 puntos. ESC para cancelar.</translation>
+        <translation>Zonas precisa ter ao menos 3 pontos. ESC para cancelar.</translation>
     </message>
 </context>
 <context>
@@ -1688,22 +1674,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="45"/>
         <source>Drag the vertex.</source>
-        <translation>Arrastre el vertice.</translation>
+        <translation>Arraste o vértice.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="46"/>
         <source>Click to create a new vertex here.</source>
-        <translation>Haga click para crear un nuevo vertice.</translation>
+        <translation>Clique para criar um novo vértice.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="47"/>
         <source>Right click to edit zone properties.</source>
-        <translation>Haga click derecho para editar las propiedades de la zona.</translation>
+        <translation>Clique com o botão direito para editar as propriedades da zona.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="49"/>
         <source>Click to start creating a new picture zone.</source>
-        <translation>Haga click para crear una nueva zona de imagen.</translation>
+        <translation>Clique para criar uma nova imagem da zona.</translation>
     </message>
 </context>
 <context>
@@ -1711,12 +1697,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../zones/ZoneVertexDragInteraction.cpp" line="160"/>
         <source>Merge these two vertices.</source>
-        <translation>Fusionar estos dos vertices.</translation>
+        <translation>Mesclar estes dois vértices.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneVertexDragInteraction.cpp" line="162"/>
         <source>Move the vertex to one of its neighbors to merge them.</source>
-        <translation>Mueva el vertice hacia el vertice mas proximo para fusionarlos.</translation>
+        <translation>Mover o vértice para o vértice mais próximo e mescla-los.</translation>
     </message>
 </context>
 <context>
@@ -1724,7 +1710,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/Filter.cpp" line="57"/>
         <source>Deskew</source>
-        <translation>Alineación</translation>
+        <translation>Alinhamento</translation>
     </message>
 </context>
 <context>
@@ -1732,12 +1718,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="62"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
-        <translation>Use Ctrl+Rueda para girar o Ctrl+Shift+Rueda para una rotación mas precisa.</translation>
+        <translation>Use Ctrl+Roda para girar ou Ctrl+Shift+Roda para uma rotação mais precisa.</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
         <source>Drag this handle to rotate the image.</source>
-        <translation>Arrastre para rotar la imagen.</translation>
+        <translation>Arrastre para girar a imagem.</translation>
     </message>
 </context>
 <context>
@@ -1745,7 +1731,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/OptionsWidget.cpp" line="69"/>
         <source>Apply Deskew</source>
-        <translation>Aplicar Alineacion</translation>
+        <translation>Aplicar Alinhamento</translation>
     </message>
 </context>
 <context>
@@ -1753,7 +1739,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/fix_orientation/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>No se puede: has seleccionado mas de un grupo.</translation>
+        <translation>Impossível continuar: mais de um grupo está selecionado.</translation>
     </message>
 </context>
 <context>
@@ -1761,7 +1747,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/fix_orientation/Filter.cpp" line="64"/>
         <source>Fix Orientation</source>
-        <translation>Corregir Orientacion</translation>
+        <translation>Corrigir Orientação</translation>
     </message>
 </context>
 <context>
@@ -1776,22 +1762,22 @@ p, li { white-space: pre-wrap; }
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="140"/>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="148"/>
         <source>Error</source>
-        <translation>Error</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="132"/>
         <source>DPI is not set.</source>
-        <translation>No se han fijado valores de DPI.</translation>
+        <translation>DPI não configurado.</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="141"/>
         <source>DPI is too low!</source>
-        <translation>El DPI es muy pequeño!</translation>
+        <translation>DPI muito baixo!</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="149"/>
         <source>DPI is too high!</source>
-        <translation>El DPI es muy grande!</translation>
+        <translation>DPI muito alto!</translation>
     </message>
 </context>
 <context>
@@ -1799,7 +1785,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/FillZoneEditor.cpp" line="226"/>
         <source>Pick color</source>
-        <translation>Elegir color</translation>
+        <translation>Escolher cor</translation>
     </message>
 </context>
 <context>
@@ -1807,7 +1793,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Filter.cpp" line="63"/>
         <source>Output</source>
-        <translation>Salida</translation>
+        <translation>Saída</translation>
     </message>
 </context>
 <context>
@@ -1815,32 +1801,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="63"/>
         <source>Black and White</source>
-        <translation>Blanco y Negro</translation>
+        <translation>Branco e Preto</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="64"/>
         <source>Color / Grayscale</source>
-        <translation>Color / Escala de Grises</translation>
+        <translation>Cor / Tons de Cinza</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="65"/>
         <source>Mixed</source>
-        <translation>Combinado</translation>
+        <translation>Misto</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="407"/>
         <source>Apply Despeckling Level</source>
-        <translation>Aplicar nivel de eliminacion de manchas</translation>
+        <translation>Aplicar nivel de eliminação de manchas</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="487"/>
         <source>Apply Depth Perception</source>
-        <translation>Aplicar Profundidad de Percepcion</translation>
+        <translation>Aplicar Profundidade de Percepção</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="660"/>
         <source>Off</source>
-        <translation>Apagado</translation>
+        <translation>Desligado</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="663"/>
@@ -1858,32 +1844,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/output/Task.cpp" line="506"/>
         <source>Picture zones are only available in Mixed mode.</source>
-        <translation>Las zona de imágenes solo estáan disponibles en el modo Combinado.</translation>
+        <translation>Zonas de imagens só estão disponíveis no modo Misto.</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="558"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
-        <translation>La eliminacion de manchas no funciona en el modo Color / Escala de Grises.</translation>
+        <translation>Eliminação de manchas não funciona no modo Cor / Tons de Cinza.</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="575"/>
         <source>Output</source>
-        <translation>Salida</translation>
+        <translation>Saída</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="576"/>
         <source>Picture Zones</source>
-        <translation>Propiedades de ZonaZona de Imagen</translation>
+        <translation>Propriedades das Zonas da Imagem</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="577"/>
         <source>Fill Zones</source>
-        <translation>Zona de Relleno</translation>
+        <translation>Preenche Zonas</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="578"/>
         <source>Dewarping</source>
-        <translation>Antideformación</translation>
+        <translation>Anti-deformação</translation>
     </message>
     <message>
         <location filename="../filters/output/Task.cpp" line="579"/>
@@ -1896,7 +1882,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_layout/ApplyDialog.cpp" line="51"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>No se puede:has seleccionado mas de un grupo.</translation>
+        <translation>Impossível continuar: mais de um grupo está selecionado.</translation>
     </message>
 </context>
 <context>
@@ -1904,22 +1890,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="67"/>
         <source>Natural order</source>
-        <translation>Orden Natural</translation>
+        <translation>Ordem Natural</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="68"/>
         <source>Order by increasing width</source>
-        <translation>Ordenar por incremento de ancho</translation>
+        <translation>Ordenar por largura</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="69"/>
         <source>Order by increasing height</source>
-        <translation>Ordenar por incremento de alto</translation>
+        <translation>Ordenar por altura</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/Filter.cpp" line="79"/>
         <source>Margins</source>
-        <translation>Margenes</translation>
+        <translation>Margens</translation>
     </message>
 </context>
 <context>
@@ -1927,7 +1913,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_layout/ImageView.cpp" line="76"/>
         <source>Resize margins by dragging any of the solid lines.</source>
-        <translation>Modifique los margenes arrastrando cualquiera de las lineas.</translation>
+        <translation>Modifique as margens arrastrando qualquer das linhas.</translation>
     </message>
 </context>
 <context>
@@ -1935,12 +1921,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_layout/OptionsWidget.cpp" line="310"/>
         <source>Apply Margins</source>
-        <translation>Aplicar Margenes</translation>
+        <translation>Aplicar Margens</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/OptionsWidget.cpp" line="325"/>
         <source>Apply Alignment</source>
-        <translation>Aplicar Alineacion</translation>
+        <translation>Aplicar Alinhamento</translation>
     </message>
 </context>
 <context>
@@ -1948,12 +1934,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="65"/>
         <source>Natural order</source>
-        <translation>Orden Natural</translation>
+        <translation>Ordem Natural</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split type</source>
-        <translation>Ordenar por tipo de division</translation>
+        <translation>Ordenar por tipo de divisão</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
@@ -1966,7 +1952,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/ImageView.cpp" line="85"/>
         <source>Drag the line or the handles.</source>
-        <translation>Arrastre la linea o el asa.</translation>
+        <translation>Arraste a linha ou as alças.</translation>
     </message>
 </context>
 <context>
@@ -1976,13 +1962,13 @@ p, li { white-space: pre-wrap; }
         <location filename="../filters/page_split/OptionsWidget.cpp" line="208"/>
         <location filename="../filters/page_split/OptionsWidget.cpp" line="301"/>
         <source>Set manually</source>
-        <translation>Fijar Manualmente</translation>
+        <translation>Corrigir Manualmente</translation>
     </message>
     <message>
         <location filename="../filters/page_split/OptionsWidget.cpp" line="165"/>
         <location filename="../filters/page_split/OptionsWidget.cpp" line="298"/>
         <source>Auto detected</source>
-        <translation>Deteccion Automatica</translation>
+        <translation>Detecção Automatica</translation>
     </message>
 </context>
 <context>
@@ -1990,7 +1976,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/page_split/UnremoveButton.cpp" line="38"/>
         <source>Restore removed page.</source>
-        <translation>Restaurar Eliminar Pagina.</translation>
+        <translation>Restaurar página removida.</translation>
     </message>
 </context>
 <context>
@@ -1998,7 +1984,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ApplyDialog.cpp" line="53"/>
         <source>Can&apos;t do: more than one group is selected.</source>
-        <translation>No se puede:has seleccionado mas de un grupo.</translation>
+        <translation>Impossível continuar: mais de um grupo está selecionado.</translation>
     </message>
 </context>
 <context>
@@ -2006,22 +1992,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="59"/>
         <source>Natural order</source>
-        <translation>Orden Natural</translation>
+        <translation>Ordem Natural</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="60"/>
         <source>Order by increasing width</source>
-        <translation>Ordenar por incremento de ancho</translation>
+        <translation>Ordenar por largura</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="61"/>
         <source>Order by increasing height</source>
-        <translation>Ordenar por incremento de alto</translation>
+        <translation>Ordenar por altura</translation>
     </message>
     <message>
         <location filename="../filters/select_content/Filter.cpp" line="71"/>
         <source>Select Content</source>
-        <translation>Seleccione el Contenido</translation>
+        <translation>Selecione o Conteúdo</translation>
     </message>
 </context>
 <context>
@@ -2029,22 +2015,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="58"/>
         <source>Use the context menu to enable / disable the content box.</source>
-        <translation>Use el menu contextual para abilitar / desabilitar la caja de contenido.</translation>
+        <translation>Use o menu contextual para habilitar / desabilitar a caixa de conteúdo.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="61"/>
         <source>Drag lines or corners to resize the content box.</source>
-        <translation>Arrastre las lineas o esquinas para modificar la caja de contenido.</translation>
+        <translation>Arraste linhas ou cantos para redimencionar a caixa de conteúdo.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="107"/>
         <source>Create Content Box</source>
-        <translation>Crear una Caja de Contenido</translation>
+        <translation>Criar uma Caixa de Conteúdo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="108"/>
         <source>Remove Content Box</source>
-        <translation>Eliminar la Caja de Contenido</translation>
+        <translation>Remover a Caixa de Conteúdo</translation>
     </message>
 </context>
 </TS>

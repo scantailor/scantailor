@@ -143,6 +143,7 @@ private:
 	output::DepthPerception m_depthPerception;
 
 	void parseCli(QStringList const& argv);
+	void addImage(QString const& path);
 	void setup();
 	page_split::LayoutType fetchLayoutType();
 	output::ColorParams::ColorMode fetchColorMode();

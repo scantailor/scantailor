@@ -287,6 +287,7 @@ VecNT<N, T>::operator=(VecNT<N, OT> const& other)
 	for (size_t i = 0; i < N; ++i) {
 		m_data[i] = static_cast<T>(other[i]);
 	}
+	return *this;
 }
 
 template<size_t N, typename T>
