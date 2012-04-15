@@ -49,6 +49,9 @@ public:
 	 */
 	static BinaryThreshold otsuThreshold(GrayscaleHistogram const& pixels_by_color);
 	
+	static BinaryThreshold peakThreshold(QImage const& image);
+	static BinaryThreshold peakThreshold(GrayscaleHistogram const& pixels_by_color);
+
 	/**
 	 * \brief Image binarization using Mokji's global thresholding method.
 	 *

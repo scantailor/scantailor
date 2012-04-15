@@ -150,6 +150,11 @@ int main(int argc, char** argv)
 	CommandLine cli(app.arguments());
 	CommandLine::set(cli);
 
+	if (cli.isError()) {
+		cli.printHelp();
+		return 1;
+	}
+
 	if (cli.hasHelp()) {
 		cli.printHelp();
 		return 0;

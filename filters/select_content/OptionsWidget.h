@@ -53,8 +53,10 @@ public:
 		void setSizeCalc(PhysSizeCalc const& calc);
 
 		void setContentRect(QRectF const& content_rect);
+		void setPageRect(QRectF const& content_rect);
 		
 		QRectF const& contentRect() const;
+		QRectF const& pageRect() const;
 
 		QSizeF contentSizeMM() const;
 		
@@ -63,13 +65,25 @@ public:
 		Dependencies const& dependencies() const;
 		
 		void setMode(AutoManualMode mode);
+
+		bool contentDetection() const { return m_contentDetection; }
+		bool pageDetection() const { return m_pageDetection; }
+		bool fineTuning() const { return m_fineTuneCorners; }
+
+		void setContentDetection(bool detect);
+		void setPageDetection(bool detect);
+		void setFineTuneCorners(bool fine_tune);
 		
 		AutoManualMode mode() const;
 	private:
 		QRectF m_contentRect; // In virtual image coordinates.
+		QRectF m_pageRect;
 		PhysSizeCalc m_sizeCalc;
 		Dependencies m_deps;
 		AutoManualMode m_mode;
+		bool m_contentDetection;
+		bool m_pageDetection;
+		bool m_fineTuneCorners;
 	};
 	
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
@@ -88,6 +102,11 @@ private slots:
 	void applySelection(std::set<PageId> const& pages);
 
 	void modeChanged(bool auto_mode);
+	void fineTuningChanged(bool checked);
+	void contentDetectionDisabled(void);
+	void pageDetectionDisabled(void);
+	void pageDetectionEnabled(void);
+
 private:
 	void updateModeIndication(AutoManualMode const mode);
 	

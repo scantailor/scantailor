@@ -47,7 +47,7 @@ public:
 	ImageView(
 		QImage const& image, QImage const& downscaled_image,
 		ImageTransformation const& xform,
-		QRectF const& content_rect);
+		QRectF const& content_rect, QRectF const& page_rect);
 	
 	virtual ~ImageView();
 signals:
@@ -98,6 +98,7 @@ private:
 	 * Content box in virtual image coordinates.
 	 */
 	QRectF m_contentRect;
+	QRectF m_pageRect;
 
 	QSizeF m_minBoxSize;
 };

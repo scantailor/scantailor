@@ -112,7 +112,7 @@ struct PreferVertical
 
 QRectF
 ContentBoxFinder::findContentBox(
-	TaskStatus const& status, FilterData const& data, DebugImages* dbg)
+	TaskStatus const& status, FilterData const& data, QRectF const& page_rect, DebugImages* dbg)
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
@@ -143,6 +143,10 @@ ContentBoxFinder::findContentBox(
 		dbg->add(bw150, "bw150");
 	}
 	
+	QRectF page_rect150( xform_150dpi.transform().map(page_rect).boundingRect() );
+	PolygonRasterizer::fillExcept(
+		bw150, BLACK, page_rect150, Qt::WindingFill
+	);
 	PolygonRasterizer::fillExcept(
 		bw150, BLACK, xform_150dpi.resultingPreCropArea(), Qt::WindingFill
 	);

@@ -52,7 +52,7 @@ CommandLine::set(CommandLine const& cl)
 }
 
 
-void
+bool
 CommandLine::parseCli(QStringList const& argv)
 {
 	QRegExp rx("^--([^=]+)=(.*)$");
@@ -60,6 +60,46 @@ CommandLine::parseCli(QStringList const& argv)
 	QRegExp rx_short("^-([^=]+)=(.*)$");
 	QRegExp rx_short_switch("^-([^=]+)$");
 	QRegExp rx_project(".*\\.ScanTailor$", Qt::CaseInsensitive);
+
+	QList<QString> opts;
+	opts << "help";
+	opts << "verbose";
+	opts << "layout";
+	opts << "layout-direction";
+	opts << "orientation";
+	opts << "rotate";
+	opts << "deskew";
+	opts << "disable-content-detection";
+	opts << "enable-page-detection";
+	opts << "enable-fine-tuning";
+	opts << "content-detection";
+	opts << "content-box";
+	opts << "enable-auto-margins";
+	opts << "margins";
+	opts << "margins-left";
+	opts << "margins-right";
+	opts << "margins-top";
+	opts << "margins-bottom";
+	opts << "alignment";
+	opts << "alignment-vertical";
+	opts << "alignment-horizontal";
+	opts << "alignment-tolerance";
+	opts << "dpi";
+	opts << "output-dpi";
+	opts << "dpi-x";
+	opts << "dpi-y";
+	opts << "output-dpi-x";
+	opts << "output-dpi-y";
+	opts << "color-mode";
+	opts << "white-margins";
+	opts << "normalize-illumination";
+	opts << "threshold";
+	opts << "despeckle";
+	opts << "dewarping";
+	opts << "depth-perception";
+	opts << "start-filter";
+	opts << "end-filter";
+	opts << "output-project";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -76,17 +116,38 @@ CommandLine::parseCli(QStringList const& argv)
 #endif
 		if (rx.exactMatch(argv[i])) {
 			// option with a value
-			m_options[rx.cap(1)] = rx.cap(2);
+			QString key = rx.cap(1);
+			if (! opts.contains(key)) {
+				m_error = true;
+				std::cout << "Unknown option '" << key.toStdString() << "'" << std::endl;
+				continue;
+			}
+			m_options[key] = rx.cap(2);
 		} else if (rx_switch.exactMatch(argv[i])) {
 			// option without value
-			m_options[rx_switch.cap(1)] = "true";
+			QString key = rx_switch.cap(1);
+			if (! opts.contains(key)) {
+				m_error = true;
+				std::cout << "Unknown switch '" << key.toStdString() << "'" << std::endl;
+				continue;
+			}
+			m_options[key] = "true";
 		} else if (rx_short.exactMatch(argv[i])) {
 			// option with a value
 			QString key = shortMap[rx_short.cap(1)];
+			if (key == "") {
+				std::cout << "Unknown option: '" << rx_short.cap(1).toStdString() << "'" << std::endl;
+				m_error = true;
+				continue;
+			}
 			m_options[key] = rx_short.cap(2);
 		} else if (rx_short_switch.exactMatch(argv[i])) {
 			QString key = shortMap[rx_short_switch.cap(1)];
-			if (key == "") continue;
+			if (key == "") {
+				std::cout << "Unknown switch: '" << rx_short_switch.cap(1).toStdString() << "'" << std::endl;
+				m_error = true;
+				continue;
+			}
 			m_options[key] = "true";
 		} else if (rx_project.exactMatch(argv[i])) {
 			// project file
@@ -130,6 +191,8 @@ CommandLine::parseCli(QStringList const& argv)
 	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options[params[i]].toAscii().constData() << "\n"; }
 	std::cout << "Images: " << CommandLine::m_images.size() << "\n";
 #endif
+
+	return m_error;
 }
 
 void
@@ -168,6 +231,7 @@ CommandLine::setup()
 	m_startFilterIdx = fetchStartFilterIdx();
 	m_endFilterIdx = fetchEndFilterIdx();
 	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
+	m_dewarpingMode = fetchDewarpingMode();
 }
 
 
@@ -207,10 +271,14 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
+	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << "\n";
+	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << "\n";
+	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << "\n";
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
+	std::cout << "\t--enable-auto-margins\t\t\t-- sets the margins to original ones (based on detected page or image size)" << "\n";
 	std::cout << "\t--margins=<number>\t\t\t-- sets left, top, right and bottom margins to same number." << "\n";
 	std::cout << "\t\t--margins-left=<number>" << "\n";
 	std::cout << "\t\t--margins-right=<number>" << "\n";
@@ -388,6 +456,8 @@ CommandLine::fetchAlignment()
 		if (a == "auto") alignment.setHorizontal(page_layout::Alignment::HAUTO);
 	}
 
+	alignment.setAutoMargins(isAutoMarginsEnabled());
+
 	return alignment;
 }
 
@@ -550,7 +620,8 @@ CommandLine::hasAlignment() const
 		hasMatchLayoutTolerance() ||
 		m_options.contains("alignment") ||
 		m_options.contains("alignment-vertical") ||
-		m_options.contains("alignment-horizontal")
+		m_options.contains("alignment-horizontal") ||
+		isAutoMarginsEnabled()
 	);
 }
 

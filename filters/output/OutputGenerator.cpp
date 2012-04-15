@@ -247,6 +247,11 @@ OutputGenerator::OutputGenerator(
 	m_contentRect(xform.transform().map(content_rect_phys).boundingRect().toRect()),
 	m_despeckleLevel(despeckle_level)
 {	
+    /*
+    std::cout << "m_outRect.left(): " << m_outRect.left() << " right(): " << m_outRect.right() << " top: " << m_outRect.top() << " bottom: " << m_outRect.bottom() << std::endl;
+    std::cout << "m_contentRect.left(): " << m_contentRect.left() << " right(): " << m_contentRect.right() << " top: " << m_contentRect.top() << " bottom: " << m_contentRect.bottom() << std::endl;
+    */
+
 	assert(m_outRect.topLeft() == QPoint(0, 0));
 
 	// Note that QRect::contains(<empty rect>) always returns false, so we don't use it here.

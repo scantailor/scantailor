@@ -51,15 +51,21 @@ public:
 	static CommandLine const& get() { return m_globalInstance; }
 	static void set(CommandLine const& cl);
 
-	CommandLine(QStringList const& argv, bool g=true) : m_gui(g), m_global(false) { CommandLine::parseCli(argv); }
+	CommandLine(QStringList const& argv, bool g=true) : m_error(false), m_gui(g), m_global(false) { CommandLine::parseCli(argv); }
 
 	bool isGui() const { return m_gui; }
 	bool isVerbose() const { return contains("verbose"); }
+	bool isError() const { return m_error; }
 
 	std::vector<ImageFileInfo> const& images() const { return m_images; }
 	QString const& outputDirectory() const { return m_outputDirectory; }
 	QString const& projectFile() const { return m_projectFile; }
 	QString const& outputProjectFile() const { return m_outputProjectFile; }
+
+	bool isContentDetectionEnabled() const { return !contains("disable-content-detection"); };
+	bool isPageDetectionEnabled() const { return contains("enable-page-detection"); };
+	bool isFineTuningEnabled() const { return contains("enable-fine-tuning"); };
+	bool isAutoMarginsEnabled() const { return contains("enable-auto-margins"); };
 
 	bool hasMargins() const;
 	bool hasAlignment() const;
@@ -82,8 +88,8 @@ public:
 	bool hasThreshold() const { return contains("threshold"); }
 	bool hasDespeckle() const { return contains("despeckle"); }
 	bool hasDewarping() const { return contains("dewarping"); }
-	bool hasDepthPerception() const { return contains("dewarping"); }
 	bool hasMatchLayoutTolerance() const { return contains("match-layout-tolerance"); }
+	bool hasDepthPerception() const { return contains("depth-perception"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
@@ -112,7 +118,7 @@ private:
 	CommandLine() : m_gui(true), m_global(false) {}
 
 	static CommandLine m_globalInstance;
-
+	bool m_error;
 	bool m_gui;
 	bool m_global;
 
@@ -148,7 +154,7 @@ private:
 	output::DepthPerception m_depthPerception;
 	float m_matchLayoutTolerance;
 
-	void parseCli(QStringList const& argv);
+	bool parseCli(QStringList const& argv);
 	void addImage(QString const& path);
 	void setup();
 	page_split::LayoutType fetchLayoutType();

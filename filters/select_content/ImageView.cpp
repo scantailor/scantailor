@@ -40,7 +40,7 @@ namespace select_content
 
 ImageView::ImageView(
 	QImage const& image, QImage const& downscaled_image,
-	ImageTransformation const& xform, QRectF const& content_rect)
+	ImageTransformation const& xform, QRectF const& content_rect, QRectF const& page_rect)
 :	ImageViewBase(
 		image, downscaled_image,
 		ImagePresentation(xform.transform(), xform.resultingPreCropArea())
@@ -50,6 +50,7 @@ ImageView::ImageView(
 	m_pNoContentMenu(new QMenu(this)),
 	m_pHaveContentMenu(new QMenu(this)),
 	m_contentRect(content_rect),
+	m_pageRect(page_rect),
 	m_minBoxSize(10.0, 10.0)
 {
 	setMouseTracking(true);
@@ -153,6 +154,45 @@ ImageView::onPaint(QPainter& painter, InteractionState const& interaction)
 	if (m_contentRect.isNull()) {
 		return;
 	}
+
+	if (! m_pageRect.isNull()) {
+		// Draw detected page borders
+		QPen pen(QColor(0xee, 0xee, 0x00, 0xcc));
+		pen.setWidth(1);
+		pen.setCosmetic(true);
+		painter.setPen(pen);
+		painter.setBrush(QColor(0xee, 0xee, 0x00, 0xcc));
+
+		if (m_pageRect != virtualDisplayRect()) {
+			QRectF box;
+			QRectF r(virtualDisplayRect());
+
+			box.setLeft(m_pageRect.left());
+			box.setTop(r.top());
+			box.setRight(m_pageRect.right());
+			box.setBottom(m_pageRect.top());
+			painter.drawRect(box);
+
+			box.setLeft(r.left());
+			box.setTop(r.top());
+			box.setRight(m_pageRect.left());
+			box.setBottom(r.bottom());
+			painter.drawRect(box);
+
+			box.setLeft(m_pageRect.left());
+			box.setTop(m_pageRect.bottom());
+			box.setRight(m_pageRect.right());
+			box.setBottom(r.bottom());
+			painter.drawRect(box);
+
+			box.setLeft(m_pageRect.right());
+			box.setTop(r.top());
+			box.setRight(r.right());
+			box.setBottom(r.bottom());
+			painter.drawRect(box);
+		}
+	}
+
 
 	painter.setRenderHints(QPainter::Antialiasing, true);
 

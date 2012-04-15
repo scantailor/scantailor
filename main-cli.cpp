@@ -39,6 +39,11 @@ int main(int argc, char **argv)
 	CommandLine cli(app.arguments(), false);
 	CommandLine::set(cli);
 
+	if (cli.isError()) {
+		cli.printHelp();
+		return 1;
+	}
+
 	if (cli.hasHelp() || cli.outputDirectory().isEmpty() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
 		cli.printHelp();
 		return 0;

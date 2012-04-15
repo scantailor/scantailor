@@ -81,6 +81,8 @@ private slots:
 	void horMarginsChanged(double val);
 	
 	void vertMarginsChanged(double val);
+
+	void autoMarginsChanged(bool checked);
 	
 	void alignmentModeChanged(int idx);
 

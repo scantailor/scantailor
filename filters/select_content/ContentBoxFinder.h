@@ -42,7 +42,7 @@ class ContentBoxFinder
 {
 public:
 	static QRectF findContentBox(
-		TaskStatus const& status, FilterData const& data,
+		TaskStatus const& status, FilterData const& data, QRectF const& page_rect,
 		DebugImages* dbg = 0);
 private:
 	class Garbage;

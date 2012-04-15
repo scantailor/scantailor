@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
+#include <iostream>
 
 namespace imageproc
 {
@@ -88,6 +89,61 @@ BinaryThreshold::otsuThreshold(GrayscaleHistogram const& pixels_by_color)
 	
 	// The middle between the two.
 	return BinaryThreshold((first_best_threshold + last_best_threshold) >> 1);
+}
+
+
+BinaryThreshold
+BinaryThreshold::peakThreshold(QImage const& image)
+{
+	return peakThreshold(GrayscaleHistogram(image));
+}
+
+BinaryThreshold
+BinaryThreshold::peakThreshold(GrayscaleHistogram const& pixels_by_color)
+{
+	int ri=255, li=0;
+	int right_peak = pixels_by_color[ri];
+	int left_peak = pixels_by_color[li];
+
+	// get right peak
+	for (int i=254; i>=0; --i) {
+		//std::cout << right_peak << std::endl;
+		if (pixels_by_color[i] <= right_peak) {
+			if (double(pixels_by_color[i]) < (double(right_peak)*0.66))
+				break;
+			continue;
+		}
+		if (pixels_by_color[i] > right_peak) {
+			right_peak = pixels_by_color[i];
+			ri = i;
+		}
+	}
+
+	// get left peak
+	for (int i=1; i<=255; ++i) {
+		if (pixels_by_color[i] <= left_peak) {
+			if (double(pixels_by_color[i]) < (double(left_peak)*0.66))
+				break;
+			continue;
+		}
+		if (pixels_by_color[i] > left_peak) {
+			left_peak = pixels_by_color[i];
+			li = i;
+		}
+	}
+
+	// select threshold close to the right peak
+	int threshold = li + (ri-li)*0.75;
+
+#ifdef DEBUG
+	int otsuThreshold = BinaryThreshold::otsuThreshold(pixels_by_color);
+	std::cout << "li: " << li << " leftPeak: " << left_peak << std::endl;
+	std::cout << "ri: " << ri << " rightPeak: " << right_peak << std::endl;
+	std::cout << "threshold: " << threshold << std::endl;
+	std::cout << "otsuThreshold: " << otsuThreshold << std::endl;
+#endif
+
+	return BinaryThreshold(threshold);
 }
 
 BinaryThreshold

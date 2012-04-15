@@ -1,30 +1,87 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SelectContentOptionsWidget</class>
- <widget class="QWidget" name="SelectContentOptionsWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="SelectContentOptionsWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>218</width>
-    <height>202</height>
+    <width>236</width>
+    <height>294</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Page Box</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QCheckBox" name="fineTuneBtn">
+          <property name="toolTip">
+           <string>Shift with corners while they are in black. </string>
+          </property>
+          <property name="text">
+           <string>Fine Tune Page Corners</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="pageDetectDisableBtn">
+            <property name="text">
+             <string>Disable</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pageDetectAutoBtn">
+            <property name="text">
+             <string>Auto</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Content Box</string>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QHBoxLayout">
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>1</width>
           <height>20</height>
@@ -33,40 +90,53 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="autoBtn" >
-        <property name="text" >
-         <string>Auto</string>
+       <widget class="QPushButton" name="disableBtn">
+        <property name="text">
+         <string>Disable</string>
         </property>
-        <property name="checkable" >
+        <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-        <property name="autoExclusive" >
+        <property name="autoExclusive">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="manualBtn" >
-        <property name="text" >
-         <string>Manual</string>
+       <widget class="QPushButton" name="autoBtn">
+        <property name="text">
+         <string>Auto</string>
         </property>
-        <property name="checkable" >
+        <property name="checkable">
          <bool>true</bool>
         </property>
-        <property name="autoExclusive" >
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="manualBtn">
+        <property name="text">
+         <string>Manual</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>1</width>
           <height>20</height>
@@ -78,19 +148,19 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="scopeBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="scopeBox">
+     <property name="title">
       <string>Scope</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout">
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout">
         <item>
          <spacer>
-          <property name="orientation" >
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
             <height>20</height>
@@ -99,18 +169,18 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="applyToBtn" >
-          <property name="text" >
+         <widget class="QPushButton" name="applyToBtn">
+          <property name="text">
            <string>Apply to ...</string>
           </property>
          </widget>
         </item>
         <item>
          <spacer>
-          <property name="orientation" >
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
             <height>20</height>
@@ -124,11 +194,11 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer" >
-     <property name="orientation" >
+    <spacer name="verticalSpacer">
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
@@ -139,7 +209,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../resources/resources.qrc" />
+  <include location="../../../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
