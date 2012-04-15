@@ -148,7 +148,13 @@ RelinkingModel::data(QModelIndex const& index, int role) const
 		case UncommittedPathRole:
 			return item.uncommittedPath;
 		case Qt::DisplayRole:
-			return QDir::toNativeSeparators(item.uncommittedPath);
+			if (item.uncommittedPath.startsWith(QChar('/')) &&
+				!item.uncommittedPath.startsWith(QLatin1String("//"))) {
+				// "//" indicates a network path.
+				return item.uncommittedPath;
+			} else {
+				return QDir::toNativeSeparators(item.uncommittedPath);
+			}
 		case Qt::DecorationRole:
 			return (item.type == RelinkablePath::Dir) ? m_folderIcon : m_fileIcon;
 		case Qt::BackgroundColorRole:

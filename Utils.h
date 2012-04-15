@@ -29,6 +29,14 @@ public:
 	static typename M::iterator mapSetValue(
 		M& map, K const& key, V const& val);
 	
+	/**
+	 * \brief If \p output_dir exists, creates a "cache" subdirectory under it.
+	 *
+	 * The idea is to prevent creating a bogus directory structure when loading
+	 * a project created on another machine.
+	 */
+	static void maybeCreateCacheDir(QString const& output_dir);
+
 	static QString outputDirToThumbDir(QString const& output_dir);
 
 	static IntrusivePtr<ThumbnailPixmapCache> createThumbnailCache(QString const& output_dir);
