@@ -81,6 +81,7 @@ public:
 	bool hasDespeckle() const { return contains("despeckle"); }
 	bool hasDewarping() const { return contains("dewarping"); }
 	bool hasDepthPerception() const { return contains("dewarping"); }
+	bool hasMatchLayoutTolerance() const { return contains("match-layout-tolerance"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
@@ -99,6 +100,7 @@ public:
 	output::DewarpingMode getDewarpingMode() const { return m_dewarpingMode; }
 	output::DespeckleLevel getDespeckleLevel() const { return m_despeckleLevel; }
 	output::DepthPerception getDepthPerception() const { return m_depthPerception; }
+	float getMatchLayoutTolerance() const { return m_matchLayoutTolerance; }
 
 	bool help() { return m_options.contains("help"); }
 	void printHelp();
@@ -140,6 +142,7 @@ private:
 	output::DewarpingMode m_dewarpingMode;
 	output::DespeckleLevel m_despeckleLevel;
 	output::DepthPerception m_depthPerception;
+	float m_matchLayoutTolerance;
 
 	void parseCli(QStringList const& argv);
 	void addImage(QString const& path);
@@ -161,6 +164,7 @@ private:
 	output::DewarpingMode fetchDewarpingMode();
 	output::DespeckleLevel fetchDespeckleLevel();
 	output::DepthPerception fetchDepthPerception();
+	float fetchMatchLayoutTolerance();
 };
 
 #endif
