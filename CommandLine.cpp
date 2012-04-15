@@ -80,6 +80,8 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "margins-right";
 	opts << "margins-top";
 	opts << "margins-bottom";
+	opts << "match-layout";
+	opts << "match-layout-tolerance";
 	opts << "alignment";
 	opts << "alignment-vertical";
 	opts << "alignment-horizontal";
