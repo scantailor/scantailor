@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,23 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef IMAGEPROC_KFILL_H_
-#define IMAGEPROC_KFILL_H_
+#ifndef RELINKING_SORTING_MODEL_H_
+#define RELINKING_SORTING_MODEL_H_
 
-namespace imageproc
+#include <QSortFilterProxyModel>
+
+class RelinkingSortingModel : public QSortFilterProxyModel
 {
-
-class BinaryImage;
-
-/**
- * \brief Performs noise reduction on binary images.
- *
- * \param src The input image.
- * \param k The window size.  Must be >= 3.
- * \return The resulting image.
- */
-BinaryImage kFill(BinaryImage src, int k);
-
-} // namespace imageproc
+public:
+	RelinkingSortingModel(QObject* parent = 0);
+protected:
+	virtual bool lessThan(QModelIndex const& left, QModelIndex const& right) const;
+};
 
 #endif

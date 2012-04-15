@@ -20,6 +20,7 @@
 #include "ImageId.h"
 #include "ImageLoader.h"
 #include "AtomicFileOverwriter.h"
+#include "RelinkablePath.h"
 #include "OutOfMemoryHandler.h"
 #include "imageproc/Scale.h"
 #include "imageproc/GrayImage.h"
@@ -43,6 +44,7 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/foreach.hpp>
+#include <algorithm>
 #include <vector>
 #include <new>
 
@@ -112,6 +114,8 @@ public:
 		int max_cached_pixmaps, int expiration_threshold);
 	
 	~Impl();
+
+	void setThumbDir(QString const& thumb_dir);
 	
 	Status request(
 		ImageId const& image_id, QPixmap& pixmap, bool load_now = false,
@@ -262,7 +266,7 @@ ThumbnailPixmapCache::ThumbnailPixmapCache(
 	int const max_cached_pixmaps, int const expiration_threshold)
 :	m_ptrImpl(
 		new Impl(
-			thumb_dir, max_thumb_size,
+			RelinkablePath::normalize(thumb_dir), max_thumb_size,
 			max_cached_pixmaps, expiration_threshold
 		)
 	)
@@ -271,6 +275,12 @@ ThumbnailPixmapCache::ThumbnailPixmapCache(
 
 ThumbnailPixmapCache::~ThumbnailPixmapCache()
 {
+}
+
+void
+ThumbnailPixmapCache::setThumbDir(QString const& thumb_dir)
+{
+	m_ptrImpl->setThumbDir(RelinkablePath::normalize(thumb_dir));
 }
 
 ThumbnailPixmapCache::Status
@@ -329,7 +339,12 @@ ThumbnailPixmapCache::Impl::Impl(
 	m_threadStarted(false),
 	m_shuttingDown(false)
 {
-	QDir().mkpath(m_thumbDir);
+	// Note that QDir::mkdir() will fail if the parent directory,
+	// that is $OUT/cache doesn't exist. We want that behaviour,
+	// as otherwise when loading a project from a different machine,
+	// a whole bunch of bogus directories would be created.
+	QDir().mkdir(m_thumbDir);
+
 	m_backgroundLoader.moveToThread(this);
 }
 
@@ -347,6 +362,26 @@ ThumbnailPixmapCache::Impl::~Impl()
 	
 	quit();
 	wait();
+}
+
+void
+ThumbnailPixmapCache::Impl::setThumbDir(QString const& thumb_dir)
+{
+	QMutexLocker locker(&m_mutex);
+
+	if (thumb_dir == m_thumbDir) {
+		return;
+	}
+
+	m_thumbDir = thumb_dir;
+
+	BOOST_FOREACH(Item const& item, m_loadQueue) {
+		// This trick will make all queued tasks to expire.
+		m_totalLoadAttempts = std::max(
+			m_totalLoadAttempts,
+			item.precedingLoadAttempts + m_expirationThreshold + 1
+		);
+	}
 }
 
 ThumbnailPixmapCache::Status

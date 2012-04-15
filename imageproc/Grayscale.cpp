@@ -25,6 +25,7 @@
 #include <QtGlobal>
 #include <stdexcept>
 #include <algorithm>
+#include <new>
 #include <string.h>
 #include <stdint.h>
 
@@ -38,6 +39,9 @@ static QImage monoMsbToGrayscale(QImage const& src)
 	
 	QImage dst(width, height, QImage::Format_Indexed8);
 	dst.setColorTable(createGrayscalePalette());
+	if (width > 0 && height > 0 && dst.isNull()) {
+		throw std::bad_alloc();
+	}
 	
 	uint8_t const* src_line = src.bits();
 	uint8_t* dst_line = dst.bits();
@@ -78,6 +82,9 @@ static QImage monoLsbToGrayscale(QImage const& src)
 	
 	QImage dst(width, height, QImage::Format_Indexed8);
 	dst.setColorTable(createGrayscalePalette());
+	if (width > 0 && height > 0 && dst.isNull()) {
+		throw std::bad_alloc();
+	}
 	
 	uint8_t const* src_line = src.bits();
 	uint8_t* dst_line = dst.bits();
@@ -118,6 +125,9 @@ static QImage anyToGrayscale(QImage const& src)
 	
 	QImage dst(width, height, QImage::Format_Indexed8);
 	dst.setColorTable(createGrayscalePalette());
+	if (width > 0 && height > 0 && dst.isNull()) {
+		throw std::bad_alloc();
+	}
 	
 	uint8_t* dst_line = dst.bits();
 	int const dst_bpl = dst.bytesPerLine();
@@ -162,6 +172,9 @@ QImage toGrayscale(QImage const& src)
 			} else {
 				QImage dst(src);
 				dst.setColorTable(createGrayscalePalette());
+				if (!src.isNull() && dst.isNull()) {
+					throw std::bad_alloc();
+				}
 				return dst;
 			}
 		}

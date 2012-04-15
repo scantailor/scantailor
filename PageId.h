@@ -46,6 +46,8 @@ public:
 	
 	bool isNull() const { return m_imageId.isNull(); }
 	
+	ImageId& imageId() { return m_imageId; }
+
 	ImageId const& imageId() const { return m_imageId; }
 	
 	SubPage subPage() const { return m_subPage; }

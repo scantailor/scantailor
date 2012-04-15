@@ -111,6 +111,12 @@ Filter::pageOrderOptions() const
 }
 
 void
+Filter::performRelinking(AbstractRelinker const& relinker)
+{
+	m_ptrSettings->performRelinking(relinker);
+}
+
+void
 Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
 	Margins const margins_mm(m_ptrSettings->getHardMarginsMM(page_id));

@@ -68,6 +68,14 @@ void fillAccumulator(
 	}
 }
 
+template<typename T>
+void fillWithConstant(T* from, T* to, T constant)
+{
+	for (++to; from != to; ++from) {
+		*from = constant;
+	}
+}
+
 template<typename T, typename MinMaxSelector>
 void horizontalPass(
 	MinMaxSelector selector, QRect const neighborhood, T const outside_values,
@@ -96,7 +104,11 @@ void horizontalPass(
 				(src_segment_first + src_segment_last) >> 1;
 
 			// Fill the first half of the accumulator buffer.
-			{
+			if (src_segment_first > width_m1 || src_segment_middle < 0) {
+				// This half is completely outside the image.
+				// Note that the branch below can't deal with such a case.
+				fillWithConstant(&accum.front(), accum_middle, outside_values);
+			} else {
 				// after <- [to <- within <- from] <- before
 				int const from = std::min(width_m1, src_segment_middle);
 				int const to = std::max(0, src_segment_first);
@@ -114,7 +126,11 @@ void horizontalPass(
 			}
 
 			// Fill the second half of the accumulator buffer.
-			{
+			if (src_segment_last < 0 || src_segment_middle > width_m1) {
+				// This half is completely outside the image.
+				// Note that the branch below can't deal with such a case.
+				fillWithConstant(accum_middle, &accum.back(), outside_values);
+			} else {
 				// before -> [from -> within -> to] -> after
 				int const from = std::max(0, src_segment_middle);
 				int const to = std::min(width_m1, src_segment_last);
@@ -171,7 +187,11 @@ void verticalPass(
 				(src_segment_first + src_segment_last) >> 1;
 
 			// Fill the first half of accumulator buffer.
-			{
+			if (src_segment_first > height_m1 || src_segment_middle < 0) {
+				// This half is completely outside the image.
+				// Note that the branch below can't deal with such a case.
+				fillWithConstant(&accum.front(), accum_middle, outside_values);
+			} else {
 				// after <- [to <- within <- from] <- before
 				int const from = std::min(height_m1, src_segment_middle);
 				int const to = std::max(0, src_segment_first);
@@ -190,7 +210,11 @@ void verticalPass(
 			}
 
 			// Fill the second half of accumulator buffer.
-			{
+			if (src_segment_last < 0 || src_segment_middle > height_m1) {
+				// This half is completely outside the image.
+				// Note that the branch below can't deal with such a case.
+				fillWithConstant(accum_middle, &accum.back(), outside_values);
+			} else {
 				// before -> [from -> within -> to] -> after
 				int const from = std::max(0, src_segment_middle);
 				int const to = std::min(height_m1, src_segment_last);

@@ -83,6 +83,12 @@ Filter::getView() const
 }
 
 void
+Filter::performRelinking(AbstractRelinker const& relinker)
+{
+	m_ptrSettings->performRelinking(relinker);
+}
+
+void
 Filter::preUpdateUI(FilterUiInterface* ui, PageId const& page_id)
 {
 	m_ptrOptionsWidget->preUpdateUI(page_id);

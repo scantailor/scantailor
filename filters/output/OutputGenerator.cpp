@@ -24,7 +24,6 @@
 #include "DebugImages.h"
 #include "EstimateBackground.h"
 #include "Despeckle.h"
-#include "Undistort.h"
 #include "RenderParams.h"
 #include "dewarping/DistortionModel.h"
 #include "Dpi.h"
@@ -497,6 +496,9 @@ OutputGenerator::processAsIs(
 		if (m_outRect.isEmpty()) {
 			QImage image(1, 1, QImage::Format_Indexed8);
 			image.setColorTable(createGrayscalePalette());
+			if (image.isNull()) {
+				throw std::bad_alloc();
+			}
 			image.fill(dominant_gray);
 			return image;
 		}
@@ -763,10 +765,8 @@ OutputGenerator::processWithoutDewarping(
 	
 	status.throwIfCancelled();
 	
+	assert(!target_size.isEmpty());
 	QImage dst(target_size, maybe_normalized.format());
-	if (!target_size.isEmpty() && dst.isNull()) {
-		throw std::bad_alloc();
-	}
 
 	if (maybe_normalized.format() == QImage::Format_Indexed8) {
 		dst.setColorTable(createGrayscalePalette());
@@ -777,6 +777,11 @@ OutputGenerator::processWithoutDewarping(
 		// White.  0x[ff]ffffff is reserved if in "Color / Grayscale" mode.
 		uint32_t const color = render_params.mixedOutput() ? 0xffffffff : 0xfffefefe;
 		dst.fill(color);
+	}
+
+	if (dst.isNull()) {
+		// Both the constructor and setColorTable() above can leave the image null.
+		throw std::bad_alloc();
 	}
 
 	if (!m_contentRect.isEmpty()) {
@@ -1498,7 +1503,7 @@ OutputGenerator::binarize(QImage const& image,
 	QPainterPath path;
 	path.addPolygon(crop_area);
 	
-	if (path.contains(image.rect())) {
+	if (path.contains(image.rect()) && !mask) {
 		BinaryThreshold const bw_thresh(BinaryThreshold::otsuThreshold(image));
 		return BinaryImage(image, adjustThreshold(bw_thresh));
 	} else {

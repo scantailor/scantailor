@@ -19,23 +19,21 @@
 #ifndef PAGE_SELECTION_ACCESSOR_H_
 #define PAGE_SELECTION_ACCESSOR_H_
 
+#include "PageSelectionProvider.h"
 #include "PageId.h"
 #include "PageRange.h"
-#include <QPointer>
+#include "IntrusivePtr.h"
 #include <set>
 #include <vector>
 
 class PageSequence;
-class MainWindow;
 
 class PageSelectionAccessor
 {
+	// Member-wise copying is OK.
 public:
-	PageSelectionAccessor(MainWindow* main_window);
-	
-	PageSelectionAccessor(PageSelectionAccessor const& other);
-	
-	PageSelectionAccessor& operator=(PageSelectionAccessor const& rhs);
+	explicit PageSelectionAccessor(
+		IntrusivePtr<PageSelectionProvider const> const& provider);
 	
 	PageSequence allPages() const;
 
@@ -43,7 +41,7 @@ public:
 	
 	std::vector<PageRange> selectedRanges() const;
 private:
-	QPointer<MainWindow> m_ptrMainWindow;
+	IntrusivePtr<PageSelectionProvider const> m_ptrProvider;
 };
 
 #endif

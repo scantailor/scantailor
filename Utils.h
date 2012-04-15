@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #define UTILS_H_
 
 #include <QString>
-
 #include "ThumbnailPixmapCache.h"
 
 class Utils
@@ -30,7 +29,17 @@ public:
 	static typename M::iterator mapSetValue(
 		M& map, K const& key, V const& val);
 	
-	static IntrusivePtr<ThumbnailPixmapCache> createThumbnailCache(QString output_directory);
+	/**
+	 * \brief If \p output_dir exists, creates a "cache" subdirectory under it.
+	 *
+	 * The idea is to prevent creating a bogus directory structure when loading
+	 * a project created on another machine.
+	 */
+	static void maybeCreateCacheDir(QString const& output_dir);
+
+	static QString outputDirToThumbDir(QString const& output_dir);
+
+	static IntrusivePtr<ThumbnailPixmapCache> createThumbnailCache(QString const& output_dir);
 
 	/**
 	 * Unlike QFile::rename(), this one overwrites existing files.

@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2009  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 #include "Settings.h"
 #include "Utils.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <boost/foreach.hpp>
 
 namespace fix_orientation
@@ -36,6 +38,22 @@ Settings::clear()
 {
 	QMutexLocker locker(&m_mutex);
 	m_perImageRotation.clear();
+}
+
+void
+Settings::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker locker(&m_mutex);
+	PerImageRotation new_rotations;
+
+	BOOST_FOREACH(PerImageRotation::value_type const& kv, m_perImageRotation) {
+		RelinkablePath const old_path(kv.first.filePath(), RelinkablePath::File);
+		ImageId new_image_id(kv.first);
+		new_image_id.setFilePath(relinker.substitutionPathFor(old_path));
+		new_rotations.insert(PerImageRotation::value_type(new_image_id, kv.second));
+	}
+
+	m_perImageRotation.swap(new_rotations);
 }
 
 void

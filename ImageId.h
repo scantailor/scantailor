@@ -36,8 +36,12 @@ public:
 	bool isNull() const { return m_filePath.isNull(); }
 	
 	QString const& filePath() const { return m_filePath; }
+
+	void setFilePath(QString const& path) { m_filePath = path; }
 	
 	int page() const { return m_page; }
+
+	void setPage(int page) { m_page = page; }
 
 	int zeroBasedPage() const { return m_page > 0 ? m_page - 1 : 0; } 
 

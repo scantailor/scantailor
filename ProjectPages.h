@@ -27,6 +27,7 @@
 #include "PageInfo.h"
 #include "PageView.h"
 #include "BeforeOrAfter.h"
+#include "VirtualFunction.h"
 #include <QObject>
 #include <QMutex>
 #include <QString>
@@ -39,6 +40,8 @@ class ImageFileInfo;
 class ImageInfo;
 class OrthogonalRotation;
 class PageSequence;
+class RelinkablePath;
+class AbstractRelinker;
 class QDomElement;
 
 class ProjectPages : public QObject, public RefCountable
@@ -62,6 +65,14 @@ public:
 	Qt::LayoutDirection layoutDirection() const;
 	
 	PageSequence toPageSequence(PageView view) const;
+
+	void listRelinkablePaths(VirtualFunction1<void, RelinkablePath const&>& sink) const;
+
+	/**
+	 * \note It's up to the caller to make sure different paths aren't collapsed into one.
+	 *       Having the same page more the once in a project is not supported by Scan Tailor.
+	 */
+	void performRelinking(AbstractRelinker const& relinker);
 	
 	void setLayoutTypeFor(ImageId const& image_id, LayoutType layout);
 	

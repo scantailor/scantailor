@@ -66,6 +66,8 @@ public:
 
 	virtual std::vector<PageOrderOption> pageOrderOptions() const;
 
+	virtual void performRelinking(AbstractRelinker const& relinker);
+
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
 	
 	virtual QDomElement saveSettings(

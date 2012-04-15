@@ -16,12 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ProjectPages.h"
 #include "ProjectPages.h.moc"
 #include "ImageFileInfo.h"
 #include "ImageMetadata.h"
 #include "ImageInfo.h"
 #include "OrthogonalRotation.h"
 #include "PageSequence.h"
+#include "RelinkablePath.h"
+#include "AbstractRelinker.h"
 #include <boost/foreach.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -161,6 +164,39 @@ ProjectPages::toPageSequence(PageView const view) const
 	}
 	
 	return pages;
+}
+
+void
+ProjectPages::listRelinkablePaths(VirtualFunction1<void, RelinkablePath const&>& sink) const
+{
+	// It's generally a bad idea to do callbacks while holding an internal mutex,
+	// so we accumulate results into this vector first.
+	std::vector<QString> files;
+	
+	{
+		QMutexLocker locker(&m_mutex);
+		
+		files.reserve(m_images.size());
+		BOOST_FOREACH(ImageDesc const& image, m_images) {
+			files.push_back(image.id.filePath());
+		}
+	}
+
+	BOOST_FOREACH(QString const& file, files) {
+		sink(RelinkablePath(file, RelinkablePath::File));
+	}
+}
+
+void
+ProjectPages::performRelinking(AbstractRelinker const& relinker)
+{
+	QMutexLocker locker(&m_mutex);
+
+	BOOST_FOREACH(ImageDesc& image, m_images) {
+		RelinkablePath const old_path(image.id.filePath(), RelinkablePath::File);
+		QString const new_path(relinker.substitutionPathFor(old_path));
+		image.id.setFilePath(new_path);
+	}
 }
 
 void

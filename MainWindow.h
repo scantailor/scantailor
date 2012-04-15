@@ -22,6 +22,7 @@
 #include "ui_MainWindow.h"
 #include "FilterUiInterface.h"
 #include "NonCopyable.h"
+#include "AbstractCommand.h"
 #include "IntrusivePtr.h"
 #include "BackgroundTask.h"
 #include "FilterResult.h"
@@ -43,11 +44,13 @@
 #include <set>
 
 class AbstractFilter;
+class AbstractRelinker;
 class ThumbnailPixmapCache;
 class ProjectPages;
 class PageSequence;
 class StageSequence;
 class PageOrderProvider;
+class PageSelectionAccessor;
 class FilterOptionsWidget;
 class ProcessingIndicationWidget;
 class ImageInfo;
@@ -133,6 +136,8 @@ private slots:
 	void invalidateThumbnail(PageInfo const& page_info);
 	
 	void invalidateAllThumbnails();
+
+	void showRelinkingDialog();
 	
 	void filterResult(
 		BackgroundTaskPtr const& task,
@@ -164,6 +169,7 @@ private slots:
 
 	void handleOutOfMemorySituation();
 private:
+	class PageSelectionProviderImpl;
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
 	
 	typedef IntrusivePtr<AbstractFilter> FilterPtr;
@@ -174,6 +180,8 @@ private:
 	virtual void setImageWidget(
 		QWidget* widget, Ownership ownership,
 		DebugImages* debug_images = 0);
+
+	virtual IntrusivePtr<AbstractCommand0<void> > relinkingDialogRequester();
 	
 	void switchToNewProject(
 		IntrusivePtr<ProjectPages> const& pages,
@@ -257,6 +265,10 @@ private:
 	void createBatchProcessingWidget();
 
 	void updateDisambiguationRecords(PageSequence const& pages);
+
+	void performRelinking(IntrusivePtr<AbstractRelinker> const& relinker);
+
+	PageSelectionAccessor newPageSelectionAccessor();
 	
 	QSizeF m_maxLogicalThumbSize;
 	IntrusivePtr<ProjectPages> m_ptrPages;

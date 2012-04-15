@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-	Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,44 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "LU.h"
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#ifndef ABSTRACT_RELINKER_H_
+#define ABSTRACT_RELINKER_H_
 
-namespace imageproc
+#include "RefCountable.h"
+
+class RelinkablePath;
+class QString;
+
+class AbstractRelinker : public RefCountable
 {
+public:
+	virtual ~AbstractRelinker() {}
 
-namespace tests
-{
+	/**
+	 * Returns the path to be used instead of the given path.
+	 * The same path will be returned if no substitution is to be made.
+	 */
+	virtual QString substitutionPathFor(RelinkablePath const& orig_path) const = 0;
+};
 
-BOOST_AUTO_TEST_SUITE(LUTestSuite);
-
-BOOST_AUTO_TEST_CASE(test)
-{
-	static double const mat[] = {
-		1, 1, 1,
-		2, 4, -3,
-		3, 6, -5
-	};
-
-	static double const vec[] = {
-		9, 1, 0
-	};
-
-	static double const control[] = {
-		7, -1, 3
-	};
-
-	double res[3];
-	LU(3, 3, mat).solve(1, res, vec);
-
-	for (int i = 0; i < 3; ++i) {
-		BOOST_CHECK_CLOSE(res[i], control[i], 1e-6);
-	}
-}
-
-BOOST_AUTO_TEST_SUITE_END();
-
-} // namespace tests
-
-} // namespace imageproc
+#endif

@@ -24,6 +24,7 @@
 #include "ProcessingIndicationWidget.h"
 #include <QImage>
 #include <QPointer>
+#include <memory>
 
 class DebugImageView::ImageLoadResult : public AbstractCommand0<void>
 {
@@ -60,9 +61,11 @@ private:
 };
 
 
-DebugImageView::DebugImageView(AutoRemovingFile file, QWidget* parent)
+DebugImageView::DebugImageView(AutoRemovingFile file,
+	boost::function<QWidget* (QImage const&)> const& image_view_factory, QWidget* parent)
 :	QStackedWidget(parent),
 	m_file(file),
+	m_imageViewFactory(image_view_factory),
 	m_pPlaceholderWidget(new ProcessingIndicationWidget(this)),
 	m_isLive(false)
 {
@@ -96,6 +99,12 @@ DebugImageView::imageLoaded(QImage const& image)
 	}
 
 	if (currentWidget() == m_pPlaceholderWidget) {
-		setCurrentIndex(addWidget(new BasicImageView(image)));
+		std::auto_ptr<QWidget> image_view;
+		if (m_imageViewFactory.empty()) {
+			image_view.reset(new BasicImageView(image));
+		} else {
+			image_view.reset(m_imageViewFactory(image));
+		}
+		setCurrentIndex(addWidget(image_view.release()));
 	}
 }

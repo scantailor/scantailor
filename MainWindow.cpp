@@ -24,6 +24,7 @@
 #include "ProjectPages.h"
 #include "PageSequence.h"
 #include "PageSelectionAccessor.h"
+#include "PageSelectionProvider.h"
 #include "StageSequence.h"
 #include "ThumbnailSequence.h"
 #include "PageOrderOption.h"
@@ -59,8 +60,11 @@
 #include "FixDpiDialog.h"
 #include "LoadFilesStatusDialog.h"
 #include "SettingsDialog.h"
+#include "AbstractRelinker.h"
+#include "RelinkingDialog.h"
 #include "OutOfMemoryHandler.h"
 #include "OutOfMemoryDialog.h"
+#include "QtSignalForwarder.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -92,6 +96,7 @@
 #include <boost/lambda/bind.hpp>
 #include <QApplication>
 #include <QLineF>
+#include <QPointer>
 #include <QWidget>
 #include <QDialog>
 #include <QCloseEvent>
@@ -127,9 +132,30 @@
 #include <math.h>
 #include <assert.h>
 
+class MainWindow::PageSelectionProviderImpl : public PageSelectionProvider
+{
+public:
+	PageSelectionProviderImpl(MainWindow* wnd) : m_ptrWnd(wnd) {}
+	
+	virtual PageSequence allPages() const {
+		return m_ptrWnd ? m_ptrWnd->allPages() : PageSequence();
+	}
+
+	virtual std::set<PageId> selectedPages() const {
+		return m_ptrWnd ? m_ptrWnd->selectedPages() : std::set<PageId>();
+	}
+	
+	std::vector<PageRange> selectedRanges() const {
+		return m_ptrWnd ? m_ptrWnd->selectedRanges() : std::vector<PageRange>();
+	}
+private:
+	QPointer<MainWindow> m_ptrWnd;
+};
+
+
 MainWindow::MainWindow()
 :	m_ptrPages(new ProjectPages),
-	m_ptrStages(new StageSequence(m_ptrPages, PageSelectionAccessor(this))),
+	m_ptrStages(new StageSequence(m_ptrPages, newPageSelectionAccessor())),
 	m_ptrWorkerThread(new WorkerThread),
 	m_ptrInteractiveQueue(new ProcessingTaskQueue(ProcessingTaskQueue::RANDOM_ORDER)),
 	m_ptrOutOfMemoryDialog(new OutOfMemoryDialog),
@@ -236,15 +262,9 @@ MainWindow::MainWindow()
 		this, SLOT(pageOrderingChanged(int))
 	);
 	
-	connect(
-		actionFixDpi, SIGNAL(triggered(bool)),
-		this, SLOT(fixDpiDialogRequested())
-	);
-
-	connect(
-		actionDebug, SIGNAL(toggled(bool)),
-		this, SLOT(debugToggled(bool))
-	);
+	connect(actionFixDpi, SIGNAL(triggered(bool)), SLOT(fixDpiDialogRequested()));
+	connect(actionRelinking, SIGNAL(triggered(bool)), SLOT(showRelinkingDialog()));
+	connect(actionDebug, SIGNAL(toggled(bool)), SLOT(debugToggled(bool)));
 
 	connect(
 		actionSettings, SIGNAL(triggered(bool)),
@@ -331,6 +351,8 @@ MainWindow::switchToNewProject(
 {
 	stopBatchProcessing(CLEAR_MAIN_AREA);
 	m_ptrInteractiveQueue->cancelAndClear();
+
+	Utils::maybeCreateCacheDir(out_dir);
 	
 	m_ptrPages = pages;
 	m_projectFile = project_file_path;
@@ -353,7 +375,7 @@ MainWindow::switchToNewProject(
 	updateDisambiguationRecords(pages->toPageSequence(IMAGE_VIEW));
 
 	// Recreate the stages and load their state.
-	m_ptrStages.reset(new StageSequence(pages, this));
+	m_ptrStages.reset(new StageSequence(pages, newPageSelectionAccessor()));
 	if (project_reader) {
 		project_reader->readFilterSettings(m_ptrStages->filters());
 	}
@@ -408,6 +430,10 @@ MainWindow::switchToNewProject(
 	updateProjectActions();
 	updateWindowTitle();
 	updateMainArea();
+
+	if (!QDir(out_dir).exists()) {
+		showRelinkingDialog();
+	}
 }
 
 void
@@ -797,6 +823,70 @@ void
 MainWindow::invalidateAllThumbnails()
 {
 	m_ptrThumbSequence->invalidateAllThumbnails();
+}
+
+IntrusivePtr<AbstractCommand0<void> >
+MainWindow::relinkingDialogRequester()
+{
+	class Requester : public AbstractCommand0<void>
+	{
+	public:
+		Requester(MainWindow* wnd) : m_ptrWnd(wnd) {}
+
+		virtual void operator()() {
+			if (MainWindow* wnd = m_ptrWnd) {
+				wnd->showRelinkingDialog();
+			}
+		}
+	private:
+		QPointer<MainWindow> m_ptrWnd;
+	};
+
+	return IntrusivePtr<AbstractCommand0<void> >(new Requester(this));
+}
+
+void
+MainWindow::showRelinkingDialog()
+{
+	if (!isProjectLoaded()) {
+		return;
+	}
+
+	RelinkingDialog* dialog = new RelinkingDialog(m_projectFile, this);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+	dialog->setWindowModality(Qt::WindowModal);
+
+	m_ptrPages->listRelinkablePaths(dialog->pathCollector());
+	dialog->pathCollector()(RelinkablePath(m_outFileNameGen.outDir(), RelinkablePath::Dir));
+	
+	new QtSignalForwarder(
+		dialog, SIGNAL(accepted()),
+		boost::lambda::bind(&MainWindow::performRelinking, this, dialog->relinker())
+	);
+
+	dialog->show();
+}
+
+void
+MainWindow::performRelinking(IntrusivePtr<AbstractRelinker> const& relinker)
+{
+	assert(relinker.get());
+
+	if (!isProjectLoaded()) {
+		return;
+	}
+
+	m_ptrPages->performRelinking(*relinker);
+	m_ptrStages->performRelinking(*relinker);
+	m_outFileNameGen.performRelinking(*relinker);
+
+	Utils::maybeCreateCacheDir(m_outFileNameGen.outDir());
+
+	m_ptrThumbnailCache->setThumbDir(Utils::outputDirToThumbDir(m_outFileNameGen.outDir()));
+	resetThumbSequence(currentPageOrderProvider());
+	m_selectedPage.set(m_ptrThumbSequence->selectionLeader().id(), getCurrentView());
+
+	reloadRequested();
 }
 
 void
@@ -1482,6 +1572,8 @@ MainWindow::updateProjectActions()
 	bool const loaded = isProjectLoaded();
 	actionSaveProject->setEnabled(loaded);
 	actionSaveProjectAs->setEnabled(loaded);
+	actionFixDpi->setEnabled(loaded);
+	actionRelinking->setEnabled(loaded);
 }
 
 bool
@@ -1765,7 +1857,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	
 	std::auto_ptr<QFileDialog> dialog(
 		new QFileDialog(
-			this, tr("File to insert"),
+			this, tr("Files to insert"),
 			QFileInfo(existing.filePath()).absolutePath()
 		)
 	);
@@ -1787,6 +1879,10 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	// The order of items returned by QFileDialog is platform-dependent,
 	// so we enforce our own ordering.
 	std::sort(files.begin(), files.end(), SmartFilenameOrdering());
+
+	// I suspect on some platforms it may be possible to select the same file twice,
+	// so to be safe, remove duplicates.
+	files.erase(std::unique(files.begin(), files.end()), files.end());
 	
 	using namespace boost::lambda;
 	
@@ -2054,4 +2150,11 @@ MainWindow::updateDisambiguationRecords(PageSequence const& pages)
 	for (int i = 0; i < count; ++i) {
 		m_outFileNameGen.disambiguator()->registerFile(pages.pageAt(i).imageId().filePath());
 	}
+}
+
+PageSelectionAccessor
+MainWindow::newPageSelectionAccessor()
+{
+	IntrusivePtr<PageSelectionProvider const> provider(new PageSelectionProviderImpl(this));
+	return PageSelectionAccessor(provider);
 }

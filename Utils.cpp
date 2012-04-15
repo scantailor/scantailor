@@ -1,6 +1,6 @@
 /*
     Scan Tailor - Interactive post-processing tool for scanned pages.
-    Copyright (C) 2007-2008  Joseph Artsimovich <joseph_a@mail.ru>
+    Copyright (C)  Joseph Artsimovich <joseph.artsimovich@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include <QString>
 #include <QByteArray>
 #include <QFile>
+#include <QDir>
 #include <Qt>
 #include <QTextDocument> // Qt::escape() is actually declare there.
 
@@ -59,12 +60,26 @@ Utils::richTextForLink(
 	).arg(Qt::escape(target), Qt::escape(label));
 }
 
+void
+Utils::maybeCreateCacheDir(QString const& output_dir)
+{
+	QDir(output_dir).mkdir(QString::fromAscii("cache"));
+	
+	// QDir::mkdir() returns false if the directory already exists,
+	// so to prevent confusion this function return void.
+}
+
+QString
+Utils::outputDirToThumbDir(QString const& output_dir)
+{
+	return output_dir+QLatin1String("/cache/thumbs");
+}
 
 IntrusivePtr<ThumbnailPixmapCache>
-Utils::createThumbnailCache(QString output_directory)
+Utils::createThumbnailCache(QString const& output_dir)
 {
 	QSize const max_pixmap_size(200, 200);
-	QString const thumbs_cache_path(output_directory+"/cache/thumbs");
+	QString const thumbs_cache_path(outputDirToThumbDir(output_dir));
 	
 	return IntrusivePtr<ThumbnailPixmapCache>(
 		new ThumbnailPixmapCache(thumbs_cache_path, max_pixmap_size, 40, 5)
