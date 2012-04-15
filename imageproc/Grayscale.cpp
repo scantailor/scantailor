@@ -204,19 +204,27 @@ GrayImage stretchGrayRange(
 	GrayscaleHistogram const hist(dst);
 	
 	int min = 0;
-	for (; min <= 255; ++min) {
-		if (black_clip_pixels < hist[min]) {
-			break;
+	if (black_clip_fraction >= 1.0) {
+		min = qRound(black_clip_fraction);
+	} else {
+		for (; min <= 255; ++min) {
+			if (black_clip_pixels < hist[min]) {
+				break;
+			}
+			black_clip_pixels -= hist[min];
 		}
-		black_clip_pixels -= hist[min];
 	}
 	
 	int max = 255;
-	for (; max >= 0; --max) {
-		if (white_clip_pixels < hist[max]) {
-			break;
+	if (white_clip_fraction >= 1.0) {
+		max = qRound(white_clip_fraction);
+	} else {
+		for (; max >= 0; --max) {
+			if (white_clip_pixels < hist[max]) {
+				break;
+			}
+			white_clip_pixels -= hist[max];
 		}
-		white_clip_pixels -= hist[max];
 	}
 	
 	uint8_t gray_mapping[256];

@@ -28,6 +28,7 @@
 #include "Dpi.h"
 #include "filters/page_split/LayoutType.h"
 #include "filters/output/ColorParams.h"
+#include "filters/output/Params.h"
 #include "filters/output/DespeckleLevel.h"
 #include "filters/output/DewarpingMode.h"
 #include "filters/output/DepthPerception.h"
@@ -75,6 +76,7 @@ public:
 	bool hasDeskew() const { return contains("deskew"); }
 	bool hasContentRect() const { return contains("content-box"); }
 	bool hasColorMode() const { return contains("color-mode"); }
+	bool hasPictureShape() const { return contains("picture-shape"); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
 	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
 	bool hasThreshold() const { return contains("threshold"); }
@@ -86,6 +88,7 @@ public:
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
 	output::ColorParams::ColorMode getColorMode() const { return m_colorMode; }
+	output::PictureShape getPictureShape() const { return m_pictureShape; }
 	Dpi getInputDpi() const { return m_dpi; }
 	Dpi getOutputDpi() const { return m_outputDpi; }
 	Margins getMargins() const { return m_margins; }
@@ -128,6 +131,7 @@ private:
 	page_split::LayoutType m_layoutType;
 	Qt::LayoutDirection m_layoutDirection;
 	output::ColorParams::ColorMode m_colorMode;
+	output::PictureShape m_pictureShape;
 	Dpi m_dpi;
 	Dpi m_outputDpi;
 	Margins m_margins;
@@ -149,6 +153,7 @@ private:
 	void setup();
 	page_split::LayoutType fetchLayoutType();
 	output::ColorParams::ColorMode fetchColorMode();
+	output::PictureShape fetchPictureShape();
 	Qt::LayoutDirection fetchLayoutDirection();
 	Dpi fetchDpi(QString oname="dpi");
 	Margins fetchMargins();

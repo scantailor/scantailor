@@ -199,6 +199,8 @@ public:
 	 * \brief Calculates the bounding box of either black or white content.
 	 */
 	QRect contentBoundingBox(BWColor content_color = BLACK) const;
+
+	void rectangularizeAreas(BWColor content_color = BLACK);
 	
 	int width() const { return m_width; }
 	

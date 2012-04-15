@@ -262,13 +262,13 @@ OutputGenerator::process(
 	DepthPerception const& depth_perception,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* const dbg) const
+	DebugImages* const dbg, PictureShape picture_shape) const
 {
 	QImage image(
 		processImpl(
 			status, input, picture_zones, fill_zones,
 			dewarping_mode, distortion_model, depth_perception,
-			auto_picture_mask, speckles_image, dbg
+			auto_picture_mask, speckles_image, dbg, picture_shape
 		)
 	);
 	assert(!image.isNull());
@@ -396,7 +396,8 @@ OutputGenerator::estimateBinarizationMask(
 	status.throwIfCancelled();
 	
 	BinaryThreshold const threshold(
-		BinaryThreshold::mokjiThreshold(picture_areas, 5, 26)
+		//BinaryThreshold::mokjiThreshold(picture_areas, 5, 26)
+		48
 	);
 	
 	// Scale back to original size.
@@ -451,7 +452,7 @@ OutputGenerator::processImpl(
 	DepthPerception const& depth_perception,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* const dbg) const
+	DebugImages* const dbg, PictureShape picture_shape) const
 {
 	RenderParams const render_params(m_colorParams);
 
@@ -460,7 +461,7 @@ OutputGenerator::processImpl(
 		return processWithDewarping(
 			status, input, picture_zones, fill_zones,
 			dewarping_mode, distortion_model, depth_perception,
-			auto_picture_mask, speckles_image, dbg
+			auto_picture_mask, speckles_image, dbg, picture_shape
 		);
 	} else if (!render_params.whiteMargins()) {
 		return processAsIs(
@@ -469,7 +470,7 @@ OutputGenerator::processImpl(
 	} else {
 		return processWithoutDewarping(
 			status, input, picture_zones, fill_zones,
-			auto_picture_mask, speckles_image, dbg
+			auto_picture_mask, speckles_image, dbg, picture_shape
 		);
 	}
 }
@@ -531,7 +532,7 @@ OutputGenerator::processWithoutDewarping(
 	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* dbg) const
+	DebugImages* dbg, PictureShape picture_shape) const
 {
 	RenderParams const render_params(m_colorParams);
 	
@@ -660,6 +661,11 @@ OutputGenerator::processWithoutDewarping(
 			normalize_illumination_rect,
 			small_margins_rect, dbg
 		);
+
+		if (picture_shape == RECTANGULAR_SHAPE) {
+			bw_mask.rectangularizeAreas(WHITE);
+		}
+
 		if (dbg) {
 			dbg->add(bw_mask, "bw_mask");
 		}
@@ -797,7 +803,7 @@ OutputGenerator::processWithDewarping(
 	DepthPerception const& depth_perception,
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* dbg) const
+	DebugImages* dbg, PictureShape picture_shape) const
 {
 	QSize const target_size(m_outRect.size().expandedTo(QSize(1, 1)));
 	if (m_outRect.isEmpty()) {
@@ -943,6 +949,10 @@ OutputGenerator::processWithDewarping(
 		).swap(warped_bw_mask);
 		if (dbg) {
 			dbg->add(warped_bw_mask, "warped_bw_mask");
+		}
+
+		if (picture_shape == RECTANGULAR_SHAPE) {
+			warped_bw_mask.rectangularizeAreas(WHITE);
 		}
 
 		status.throwIfCancelled();
@@ -1402,7 +1412,12 @@ OutputGenerator::detectPictures(
 		dbg->add(holes_filled, "holes_filled");
 	}
 	
-	return holes_filled;
+	GrayImage stretched2(stretchGrayRange(holes_filled , 5.0, 0.01));
+	if (dbg) {
+		dbg->add(stretched2, "stretched2");
+	}
+
+	return stretched2;
 }
 
 QImage

@@ -183,7 +183,7 @@ Task::process(
 		generator.outputImageSize(), generator.outputContentRect(),
 		new_xform, params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
-		params.depthPerception(), params.despeckleLevel() 
+		params.depthPerception(), params.despeckleLevel(), params.pictureShape()
 	);
 
 	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
@@ -305,7 +305,7 @@ Task::process(
 			params.depthPerception(),
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
-			m_ptrDbg.get()
+			m_ptrDbg.get(), params.pictureShape()
 		);
 
 		if (params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid()) {
