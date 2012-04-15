@@ -42,18 +42,28 @@ public:
 	
 	void clear();
 	
-	void performRelinking(AbstractRelinker const& relinker);
+    void performRelinking(AbstractRelinker const& relinker);
+
+    void updateDeviation();
 
 	void setPageParams(PageId const& page_id, Params const& params);
 	
 	void clearPageParams(PageId const& page_id);
 	
-	std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
+    std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
+
+    double avg() const { return m_avg; };
+    void setAvg(double a) { m_avg = a; };
+
+    double std() const { return m_sigma; };
+    void setStd(double s) { m_sigma = s; };
 private:
 	typedef std::map<PageId, Params> PageParams;
 	
 	mutable QMutex m_mutex;
-	PageParams m_pageParams;
+    PageParams m_pageParams;
+    double m_avg;
+    double m_sigma;
 };
 
 } // namespace select_content

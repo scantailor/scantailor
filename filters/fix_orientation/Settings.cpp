@@ -53,7 +53,7 @@ Settings::performRelinking(AbstractRelinker const& relinker)
 		new_rotations.insert(PerImageRotation::value_type(new_image_id, kv.second));
 	}
 
-	m_perImageRotation.swap(new_rotations);
+    m_perImageRotation.swap(new_rotations);
 }
 
 void

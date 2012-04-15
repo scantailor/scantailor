@@ -23,6 +23,7 @@
 #include "AutoManualMode.h"
 #include <QRectF>
 #include <QSizeF>
+#include <cmath>
 
 class QDomDocument;
 class QDomElement;
@@ -51,7 +52,10 @@ public:
 	
 	Dependencies const& dependencies() const { return m_deps; }
 	
-	AutoManualMode mode() const { return m_mode; }
+    AutoManualMode mode() const { return m_mode; }
+
+    double deviation() const { return m_deviation; }
+    void computeDeviation(double avg) { m_deviation = avg - sqrt(m_contentSizeMM.width() * m_contentSizeMM.height()); }
 
 	bool isContentDetectionEnabled() const { return m_contentDetect; };
 	bool isPageDetectionEnabled() const { return m_pageDetect; };
@@ -75,7 +79,8 @@ private:
 	AutoManualMode m_mode;
 	bool m_contentDetect;
 	bool m_pageDetect;
-	bool m_fineTuneCorners;
+    bool m_fineTuneCorners;
+    double m_deviation;
 };
 
 } // namespace select_content
