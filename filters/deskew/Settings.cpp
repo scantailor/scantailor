@@ -23,10 +23,15 @@
 #include <QMutexLocker>
 #include <boost/foreach.hpp>
 
+#include <cmath>
+#include <iostream>
+
 namespace deskew
 {
 
-Settings::Settings()
+Settings::Settings() :
+    m_avg(0.0),
+    m_sigma(0.0)
 {
 }
 
@@ -54,7 +59,31 @@ Settings::performRelinking(AbstractRelinker const& relinker)
 		new_params.insert(PerPageParams::value_type(new_page_id, kv.second));
 	}
 
-	m_perPageParams.swap(new_params);
+    m_perPageParams.swap(new_params);
+}
+
+void Settings::updateDeviation()
+{
+    m_avg = 0.0;
+    BOOST_FOREACH(PerPageParams::value_type const& kv, m_perPageParams) {
+        m_avg += kv.second.deskewAngle();
+    }
+    m_avg = m_avg / m_perPageParams.size();
+#ifdef DEBUG
+    std::cout << "avg skew = " << m_avg << std::endl;
+#endif
+
+    double sigma2 = 0.0;
+    BOOST_FOREACH(PerPageParams::value_type & kv, m_perPageParams) {
+        kv.second.computeDeviation(m_avg);
+        sigma2 += kv.second.deviation() * kv.second.deviation();
+    }
+    sigma2 = sigma2 / m_perPageParams.size();
+    m_sigma = sqrt(sigma2);
+#ifdef DEBUG
+    std::cout << "sigma2 = " << sigma2 << std::endl;
+    std::cout << "sigma = " << m_sigma << std::endl;
+#endif
 }
 
 void

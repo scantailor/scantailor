@@ -43,8 +43,8 @@ public:
 	
 	void clear();
 
-	void performRelinking(AbstractRelinker const& relinker);
-	
+    void performRelinking(AbstractRelinker const& relinker);
+
 	void applyRotation(ImageId const& image_id, OrthogonalRotation rotation);
 	
 	void applyRotation(std::set<PageId> const& pages, OrthogonalRotation rotation);

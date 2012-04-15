@@ -35,7 +35,8 @@ Params::Params(
 	m_mode(mode),
 	m_contentDetect(contentDetect),
 	m_pageDetect(pageDetect),
-	m_fineTuneCorners(fineTuning)
+    m_fineTuneCorners(fineTuning),
+    m_deviation(0.0)
 {
 }
 
@@ -44,7 +45,8 @@ Params::Params(Dependencies const& deps)
 	m_mode(MODE_AUTO),
 	m_contentDetect(true),
 	m_pageDetect(false),
-	m_fineTuneCorners(false)
+    m_fineTuneCorners(false),
+    m_deviation(0.0)
 {
 }
 
@@ -63,7 +65,8 @@ Params::Params(QDomElement const& filter_el)
 	m_mode(filter_el.attribute("mode") == "manual" ? MODE_MANUAL : MODE_AUTO),
 	m_contentDetect(filter_el.attribute("content-detect") == "false" ? false : true),
 	m_pageDetect(filter_el.attribute("page-detect") == "true" ? true : false),
-	m_fineTuneCorners(filter_el.attribute("fine-tune-corners") == "true" ? true : false)
+    m_fineTuneCorners(filter_el.attribute("fine-tune-corners") == "true" ? true : false),
+    m_deviation(filter_el.attribute("deviation").toDouble())
 {
 }
 
@@ -81,7 +84,8 @@ Params::toXml(QDomDocument& doc, QString const& name) const
 	el.setAttribute("content-detect", m_contentDetect ? "true" : "false");
 	el.setAttribute("page-detect", m_pageDetect ? "true" : "false");
 	el.setAttribute("fine-tune-corners", m_fineTuneCorners ? "true" : "false");
-	el.appendChild(marshaller.rectF(m_contentRect, "content-rect"));
+    el.setAttribute("deviation", m_deviation);
+    el.appendChild(marshaller.rectF(m_contentRect, "content-rect"));
 	el.appendChild(marshaller.sizeF(m_contentSizeMM, "content-size-mm"));
 	el.appendChild(m_deps.toXml(doc, "dependencies"));
 	return el;
