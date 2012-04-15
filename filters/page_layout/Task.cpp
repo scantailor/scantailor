@@ -100,7 +100,7 @@ Task::process(
 	QSizeF agg_hard_size_after;
 	Params const params(
 		m_ptrSettings->updateContentSizeAndGetParams(
-			m_pageId, content_size_mm,
+			m_pageId, content_rect, content_size_mm,
 			&agg_hard_size_before, &agg_hard_size_after
 		)
 	);
@@ -116,7 +116,7 @@ Task::process(
 		QPolygonF const page_rect_phys(
 			Utils::calcPageRectPhys(
 				data.xform(), content_rect_phys,
-				params, agg_hard_size_after
+				params, agg_hard_size_after, m_ptrSettings->getContentRect()
 			)
 		);
 

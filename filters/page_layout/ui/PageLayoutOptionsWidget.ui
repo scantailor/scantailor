@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>262</width>
-    <height>499</height>
+    <width>226</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -268,8 +268,8 @@
      <property name="title">
       <string>Alignment</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="spacing">
          <number>0</number>
@@ -281,21 +281,47 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>0</width>
-            <height>0</height>
+            <width>40</width>
+            <height>20</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="QCheckBox" name="alignWithOthersCB">
-          <property name="text">
-           <string>Match size with other pages</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QComboBox" name="alignmentMode">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <item>
+             <property name="text">
+              <string comment="auto">Auto</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string comment="manual">Manual</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string comment="original">Original</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="alignWithOthersCB">
+            <property name="text">
+             <string>Match size with other pages</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <spacer name="horizontalSpacer_8">
@@ -304,15 +330,15 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>0</width>
-            <height>0</height>
+            <width>40</width>
+            <height>20</height>
            </size>
           </property>
          </spacer>
         </item>
        </layout>
       </item>
-      <item>
+      <item row="5" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
          <spacer name="horizontalSpacer_6">
@@ -559,7 +585,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="6" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <spacer name="horizontalSpacer_11">
@@ -596,21 +622,21 @@
         </item>
        </layout>
       </item>
+      <item row="7" column="0">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>1</width>
-       <height>1</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
@@ -623,7 +649,6 @@
   <tabstop>leftMarginSpinBox</tabstop>
   <tabstop>rightMarginSpinBox</tabstop>
   <tabstop>applyMarginsBtn</tabstop>
-  <tabstop>alignWithOthersCB</tabstop>
   <tabstop>alignTopLeftBtn</tabstop>
   <tabstop>alignTopBtn</tabstop>
   <tabstop>alignTopRightBtn</tabstop>

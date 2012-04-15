@@ -218,9 +218,10 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-bottom=<number>" << "\n";
 	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << "\n";
 	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << "\n";
-	std::cout << "\t--alignment=center\t\t\t-- sets vertical and horizontal alignment to center" << "\n";
-	std::cout << "\t\t--alignment-vertical=<top|center|bottom>" << "\n";
-	std::cout << "\t\t--alignment-horizontal=<left|center|right>" << "\n";
+	std::cout << "\t--alignment=<center|original|auto>\t-- sets vertical to original and horizontal to center" << "\n";
+	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << "\n";
+	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << "\n";
+	std::cout << "\t--alignment-tolerance=<float>\t\t-- sets tolerance for auto alignment" << "\n";
 	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << "\n";
 	std::cout << "\t\t--dpi-x=<number>" << "\n";
 	std::cout << "\t\t--dpi-y=<number>" << "\n";
@@ -355,8 +356,17 @@ CommandLine::fetchAlignment()
 		if (m_options["match-layout"] == "true") alignment.setNull(false);
 	}
 
+	if (m_options.contains("alignment-tolerance")) {
+		alignment.setTolerance(m_options["alignment-tolerance"].toFloat());
+	}
+
 	if (m_options.contains("alignment")) {
-		alignment.setVertical(page_layout::Alignment::VCENTER);
+		if (m_options["alignment"] == "original")
+			alignment.setVertical(page_layout::Alignment::VORIGINAL);
+		else if (m_options["alignment"] == "auto")
+			alignment.setVertical(page_layout::Alignment::VAUTO);
+		else
+			alignment.setVertical(page_layout::Alignment::VCENTER);
 		alignment.setHorizontal(page_layout::Alignment::HCENTER);
 	}
 
@@ -365,6 +375,8 @@ CommandLine::fetchAlignment()
 		if (a == "top") alignment.setVertical(page_layout::Alignment::TOP);
 		if (a == "center") alignment.setVertical(page_layout::Alignment::VCENTER);
 		if (a == "bottom") alignment.setVertical(page_layout::Alignment::BOTTOM);
+		if (a == "original") alignment.setVertical(page_layout::Alignment::VORIGINAL);
+		if (a == "auto") alignment.setVertical(page_layout::Alignment::VAUTO);
 	}
 
 	if (m_options.contains("alignment-horizontal")) {
@@ -372,6 +384,8 @@ CommandLine::fetchAlignment()
 		if (a == "left") alignment.setHorizontal(page_layout::Alignment::LEFT);
 		if (a == "center") alignment.setHorizontal(page_layout::Alignment::HCENTER);
 		if (a == "right") alignment.setHorizontal(page_layout::Alignment::RIGHT);
+		if (a == "original") alignment.setHorizontal(page_layout::Alignment::HORIGINAL);
+		if (a == "auto") alignment.setHorizontal(page_layout::Alignment::HAUTO);
 	}
 
 	return alignment;

@@ -82,12 +82,14 @@ private slots:
 	
 	void vertMarginsChanged(double val);
 	
+	void alignmentModeChanged(int idx);
+
 	void topBottomLinkClicked();
 	
 	void leftRightLinkClicked();
 	
 	void alignWithOthersToggled();
-	
+
 	void alignmentButtonClicked();
 	
 	void showApplyMarginsDialog();

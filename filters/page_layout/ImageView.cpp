@@ -24,6 +24,7 @@
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
 #include "Utils.h"
+#include "Params.h"
 #include "imageproc/PolygonUtils.h"
 #include <QPointF>
 #include <QLineF>
@@ -58,6 +59,7 @@ ImageView::ImageView(
 		ImagePresentation(xform.transform(), xform.resultingPreCropArea()),
 		Margins(5, 5, 5, 5)
 	),
+	m_xform(xform),
 	m_dragHandler(*this),
 	m_zoomHandler(*this),
 	m_ptrSettings(settings),
@@ -549,6 +551,8 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	QPolygonF poly_mm(virt_to_mm.map(m_innerRect));
 	Utils::extendPolyRectWithMargins(poly_mm, margins_mm);
 
+	m_ptrSettings->updateContentRect();
+
 	QRectF const middle_rect(mm_to_virt.map(poly_mm).boundingRect());
 	
 	QSizeF const hard_size_mm(
@@ -557,7 +561,9 @@ ImageView::recalcBoxesAndFit(Margins const& margins_mm)
 	);
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_alignment
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_ptrSettings->getPageParams(m_pageId)->contentRect(), m_ptrSettings->getContentRect()
+			//hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_middleRect, m_ptrSettings->getContentRect()
+//			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_xform.resultingRect(), m_ptrSettings->getPageParams(m_pageId)->contentRect()
 		)
 	);
 	
@@ -657,13 +663,17 @@ ImageView::recalcOuterRect()
 
 	QPolygonF poly_mm(virt_to_mm.map(m_middleRect));
 	
+	m_ptrSettings->updateContentRect();
+
 	QSizeF const hard_size_mm(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
 		QLineF(poly_mm[0], poly_mm[3]).length()
 	);
 	Margins const soft_margins_mm(
 		Utils::calcSoftMarginsMM(
-			hard_size_mm, m_aggregateHardSizeMM, m_alignment
+			hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_ptrSettings->getPageParams(m_pageId)->contentRect(), m_ptrSettings->getContentRect()
+			//hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_middleRect, m_ptrSettings->getContentRect()
+			//hard_size_mm, m_aggregateHardSizeMM, m_alignment, m_xform.resultingRect(), m_ptrSettings->getPageParams(m_pageId)->contentRect()
 		)
 	);
 	

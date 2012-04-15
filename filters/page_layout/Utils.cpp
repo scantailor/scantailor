@@ -28,6 +28,8 @@
 #include <QSizeF>
 #include <QRectF>
 #include <assert.h>
+#include <iostream>
+#include <cmath>
 
 namespace page_layout
 {
@@ -93,13 +95,30 @@ Utils::extendPolyRectWithMargins(
 Margins
 Utils::calcSoftMarginsMM(
 	QSizeF const& hard_size_mm, QSizeF const& aggregate_hard_size_mm,
-	Alignment const& alignment)
+	Alignment const& alignment, QRectF const& contentRect, QRectF const& agg_content_rect)
 {
 	if (alignment.isNull()) {
+		std::cout << "\tskip soft margins: " <<  "\n";
 		// This means we are not aligning this page with others.
 		return Margins();
 	}
 
+#ifdef DEBUG
+	std::cout << "left: " << agg_content_rect.left() << " ";
+	std::cout << "top: " << agg_content_rect.top() << " ";
+	std::cout << "right: " << agg_content_rect.right() << " ";
+	std::cout << "bottom: " << agg_content_rect.bottom() << " ";
+	std::cout << "\n";
+
+	std::cout << "contentLeft: " << contentRect.left() << " ";
+	std::cout << "contentTop: " << contentRect.top() << " ";
+	std::cout << "contentRight: " << contentRect.right() << " ";
+	std::cout << "contentBottom: " << contentRect.bottom() << " ";
+	std::cout << "\n";
+#endif
+
+	Alignment myAlign = alignment;
+	
 	double top = 0.0;
 	double bottom = 0.0;
 	double left = 0.0;
@@ -107,32 +126,152 @@ Utils::calcSoftMarginsMM(
 
 	double const delta_width =
 			aggregate_hard_size_mm.width() - hard_size_mm.width();
+	double const delta_height =
+			aggregate_hard_size_mm.height() - hard_size_mm.height();
+
+	// detect original borders in page mirror
+	double leftBorder = double(contentRect.left() - agg_content_rect.left() + 1) / double(agg_content_rect.width() + 1);
+	double rightBorder = double(agg_content_rect.right() - contentRect.right() + 1) / double(agg_content_rect.width() + 1);
+	double topBorder = double(contentRect.top() - agg_content_rect.top() + 1) / double(agg_content_rect.height() + 1);
+	double bottomBorder = double(agg_content_rect.bottom() - contentRect.bottom() + 1) / double(agg_content_rect.height() + 1);
+	
+	// borders in new page layout in mm
+	double aggLeftBorder = 0.0;
+	double aggRightBorder = 0.0;
+	double aggTopBorder = 0.0;
+	double aggBottomBorder = 0.0;
+
+	if (delta_width > 0.1) {
+		aggLeftBorder = (delta_width / (leftBorder + rightBorder)) * (leftBorder);
+		aggRightBorder = delta_width - aggLeftBorder;
+	}
+	if (delta_height > 0.1) {
+		aggTopBorder = (delta_height / (topBorder + bottomBorder)) * (topBorder);
+		aggBottomBorder = delta_height - aggTopBorder;
+	}
+
+#ifdef DEBUG
+	std::cout << "delta_width: " << delta_width << " " << "delta_height: " << delta_height << "\n";
+	std::cout << aggLeftBorder << " " << aggRightBorder << " " << aggTopBorder << " " << aggBottomBorder << ":" << "\n";
+	std::cout << leftBorder << " " << rightBorder << " " << topBorder << " " << bottomBorder << ":" << "\n";
+#endif
+
+	// if align auto and not empty page
+	if (contentRect.width() > 1.0 && (myAlign.horizontal() == Alignment::HAUTO || myAlign.vertical() == Alignment::VAUTO)) {
+		// new borders ratio
+		double newLeftBorder = aggLeftBorder / aggregate_hard_size_mm.width();
+		double newRightBorder = aggRightBorder / aggregate_hard_size_mm.width();
+		double newTopBorder = aggTopBorder / aggregate_hard_size_mm.height();
+		double newBottomBorder = aggBottomBorder / aggregate_hard_size_mm.height();
+
+		// content mass index
+		double cmi = double(contentRect.width() * contentRect.height()) / double(agg_content_rect.width() * agg_content_rect.height());
+
+		double hTolerance = myAlign.tolerance();
+		double vTolerance = myAlign.tolerance() * 0.7;
+		double hShift = newRightBorder - newLeftBorder;
+		double habsShift = std::abs(hShift);
+		double vShift = newBottomBorder - newTopBorder;
+		double vabsShift = std::abs(vShift);
+
+#ifdef DEBUG 
+	std::cout << newLeftBorder << " " << newRightBorder << " " << newTopBorder << " " << newBottomBorder << "\n";
+	std::cout << vabsShift << " " << habsShift << std::endl;
+	std::cout << cmi << std::endl;
+		std::cout << hTolerance << " " << vTolerance << "\n";
+#endif
+		if (myAlign.horizontal() == Alignment::HAUTO) {
+			if ((1.0-cmi) < alignment.tolerance()) {
+				myAlign.setHorizontal(Alignment::HCENTER);
+			} else if (habsShift < hTolerance){
+				myAlign.setHorizontal(Alignment::HCENTER);
+			} else {
+				if (hShift > 0 && newLeftBorder > 1.4*hTolerance) {
+					myAlign.setHorizontal(Alignment::RIGHT);
+				} else if (hShift <=0 && newRightBorder > 1.4*hTolerance) {
+					myAlign.setHorizontal(Alignment::LEFT);
+				} else {
+					myAlign.setHorizontal(Alignment::HORIGINAL);
+				}
+			}
+		}
+
+		if (myAlign.vertical() == Alignment::VAUTO) {
+			if ((1.0-cmi) < alignment.tolerance()) {
+				myAlign.setVertical(Alignment::TOP);
+			} else if (vabsShift < vTolerance) {
+				myAlign.setVertical(Alignment::VCENTER);
+			} else {
+				if (vShift > 0 && newBottomBorder > 1.4*vTolerance) {
+					myAlign.setVertical(Alignment::TOP);
+				} else if (vShift <= 0 && newTopBorder > 1.4*vTolerance) {
+					myAlign.setVertical(Alignment::BOTTOM);
+				} else {
+					myAlign.setVertical(Alignment::VORIGINAL);
+				}
+			}
+		}
+	}
+#ifdef DEBUG
+	std::cout << "\n";
+#endif
+
 	if (delta_width > 0.0) {
-		switch (alignment.horizontal()) {
+		switch (myAlign.horizontal()) {
 			case Alignment::LEFT:
+#ifdef DEBUG
+				std::cout << "align:left" << std::endl;
+#endif
 				right = delta_width;
 				break;
 			case Alignment::HCENTER:
+#ifdef DEBUG
+				std::cout << "align:hcenter" << std::endl;
+#endif
 				left = right = 0.5 * delta_width;
 				break;
 			case Alignment::RIGHT:
+#ifdef DEBUG
+				std::cout << "align:right" << std::endl;
+#endif
 				left = delta_width;
+				break;
+			default:
+#ifdef DEBUG
+				std::cout << "align:horiginal" << std::endl;
+#endif
+				left = aggLeftBorder;
+				right = aggRightBorder;
 				break;
 		}
 	}
 
-	double const delta_height =
-		aggregate_hard_size_mm.height() - hard_size_mm.height();
 	if (delta_height > 0.0) {
-		switch (alignment.vertical()) {
+		switch (myAlign.vertical()) {
 			case Alignment::TOP:
+#ifdef DEBUG
+				std::cout << "align:top" << std::endl;
+#endif
 				bottom = delta_height;
 				break;
 			case Alignment::VCENTER:
+#ifdef DEBUG
+				std::cout << "align:vcenter" << std::endl;
+#endif
 				top = bottom = 0.5 * delta_height;
 				break;
 			case Alignment::BOTTOM:
+#ifdef DEBUG
+				std::cout << "align:bottom" << std::endl;
+#endif
 				top = delta_height;
+				break;
+			default:
+#ifdef DEBUG
+				std::cout << "align:voriginal" << std::endl;
+#endif
+				top = aggTopBorder;
+				bottom = aggBottomBorder;
 				break;
 		}
 	}
@@ -143,7 +282,7 @@ Utils::calcSoftMarginsMM(
 QPolygonF
 Utils::calcPageRectPhys(
 	ImageTransformation const& xform, QPolygonF const& content_rect_phys,
-	Params const& params, QSizeF const& aggregate_hard_size_mm)
+	Params const& params, QSizeF const& aggregate_hard_size_mm, QRectF const& agg_content_rect)
 {
 	PhysicalTransformation const phys_xform(xform.origDpi());
 	
@@ -154,9 +293,9 @@ Utils::calcPageRectPhys(
 		QLineF(poly_mm[0], poly_mm[1]).length(),
 		QLineF(poly_mm[0], poly_mm[3]).length()
 	);
-	Margins const soft_margins_mm(
+	Margins soft_margins_mm(
 		calcSoftMarginsMM(
-			hard_size_mm, aggregate_hard_size_mm, params.alignment()
+			hard_size_mm, aggregate_hard_size_mm, params.alignment(), params.contentRect(), agg_content_rect
 		)
 	);
 

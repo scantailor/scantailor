@@ -100,4 +100,5 @@ Thumbnail::paintOverImage(
 	painter.drawRect(inner_rect.toRect());
 }
 
+
 } // namespace page_layout

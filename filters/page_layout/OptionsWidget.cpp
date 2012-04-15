@@ -124,6 +124,10 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(horMarginsChanged(double))
 	);
 	connect(
+		alignmentMode, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(alignmentModeChanged(int))
+	);
+	connect(
 		topBottomLink, SIGNAL(clicked()),
 		this, SLOT(topBottomLinkClicked())
 	);
@@ -177,6 +181,15 @@ OptionsWidget::preUpdateUI(
 	alignWithOthersCB->blockSignals(true);
 	alignWithOthersCB->setChecked(!alignment.isNull());
 	alignWithOthersCB->blockSignals(false);
+
+	alignmentMode->blockSignals(true);
+	if (alignment.vertical() == Alignment::VAUTO)
+		alignmentMode->setCurrentIndex(0);
+	else if (alignment.vertical() == Alignment::VORIGINAL)
+		alignmentMode->setCurrentIndex(2);
+	else
+		alignmentMode->setCurrentIndex(1);
+	alignmentMode->blockSignals(false);
 	
 	enableDisableAlignmentButtons();
 	
@@ -298,6 +311,30 @@ OptionsWidget::alignWithOthersToggled()
 }
 
 void
+OptionsWidget::alignmentModeChanged(int idx)
+{
+	switch (idx) {
+		case 0:
+			m_alignment.setVertical(Alignment::VAUTO);
+			m_alignment.setHorizontal(Alignment::HCENTER);
+			break;
+		case 1:
+			m_alignment.setVertical(Alignment::TOP);
+			m_alignment.setHorizontal(Alignment::HCENTER);
+			break;
+		case 2:
+			m_alignment.setVertical(Alignment::VORIGINAL);
+			m_alignment.setHorizontal(Alignment::HCENTER);
+			break;
+	}
+
+	m_ptrSettings->updateContentRect();
+	enableDisableAlignmentButtons();
+	emit alignmentChanged(m_alignment);
+}
+
+
+void
 OptionsWidget::alignmentButtonClicked()
 {
 	QToolButton* const button = dynamic_cast<QToolButton*>(sender());
@@ -389,7 +426,7 @@ OptionsWidget::updateLinkDisplay(QToolButton* button, bool const linked)
 void
 OptionsWidget::enableDisableAlignmentButtons()
 {
-	bool const enabled = alignWithOthersCB->isChecked();
+	bool const enabled = alignWithOthersCB->isChecked() && (alignmentMode->currentIndex() == 1);
 	
 	alignTopLeftBtn->setEnabled(enabled);
 	alignTopBtn->setEnabled(enabled);

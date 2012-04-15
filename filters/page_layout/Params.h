@@ -22,6 +22,7 @@
 #include "Margins.h"
 #include "Alignment.h"
 #include <QSizeF>
+#include <QRectF>
 
 class QDomDocument;
 class QDomElement;
@@ -34,13 +35,15 @@ class Params
 {
 	// Member-wise copying is OK.
 public:
-	Params(Margins const& hard_margins_mm,
+	Params(Margins const& hard_margins_mm, QRectF const& content_rect,
 		QSizeF const& content_size_mm, Alignment const& alignment);
 	
 	Params(QDomElement const& el);
 	
 	Margins const& hardMarginsMM() const { return m_hardMarginsMM; }
 	
+	QRectF const& contentRect() const { return m_contentRect; }
+
 	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
 	
 	Alignment const& alignment() const { return m_alignment; }
@@ -48,6 +51,7 @@ public:
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
 	Margins m_hardMarginsMM;
+	QRectF m_contentRect;
 	QSizeF m_contentSizeMM;
 	Alignment m_alignment;
 };
