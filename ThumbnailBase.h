@@ -69,6 +69,8 @@ protected:
 	virtual void paintOverImage(
 		QPainter& painter, QTransform const& image_to_display,
 		QTransform const& thumb_to_display) {}
+
+	virtual void paintDeviant(QPainter& painter);
 	
 	/**
 	 * By default, the image is clipped by both the crop area (as defined

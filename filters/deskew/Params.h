@@ -34,17 +34,18 @@ class Params
 public:
 	// Member-wise copying is OK.
 	
-    Params(double deskew_angle_deg,
+	Params(double deskew_angle_deg,
 		Dependencies const& deps, AutoManualMode mode);
 	
 	Params(QDomElement const& deskew_el);
 	
 	~Params();
 	
-    double deskewAngle() const { return m_deskewAngleDeg; }
+	double deskewAngle() const { return m_deskewAngleDeg; }
 
-    double deviation() const { return m_deviation; }
-    void computeDeviation(double avg) { m_deviation = avg - m_deskewAngleDeg; }
+	double deviation() const { return m_deviation; }
+	void computeDeviation(double avg) { m_deviation = avg - m_deskewAngleDeg; }
+	bool isDeviant(double std) const { return (std*std) < (m_deviation*m_deviation); }
 	
 	Dependencies const& dependencies() const { return m_deps; }
 	
@@ -53,9 +54,9 @@ public:
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
 	double m_deskewAngleDeg;
-    Dependencies m_deps;
-    AutoManualMode m_mode;
-    double m_deviation;
+	Dependencies m_deps;
+	AutoManualMode m_mode;
+	double m_deviation;
 };
 
 } // namespace deskew

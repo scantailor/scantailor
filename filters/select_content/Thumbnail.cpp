@@ -25,15 +25,17 @@
 #include <QBrush>
 #include <QColor>
 
+#include <iostream>
+
 namespace select_content
 {
 
 Thumbnail::Thumbnail(
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	QSizeF const& max_size, ImageId const& image_id,
-	ImageTransformation const& xform, QRectF const& content_rect)
+	ImageTransformation const& xform, QRectF const& content_rect, bool deviant)
 :	ThumbnailBase(thumbnail_cache, max_size, image_id, xform),
-	m_contentRect(content_rect)
+	m_contentRect(content_rect), m_deviant(deviant)
 {
 }
 
@@ -45,7 +47,7 @@ Thumbnail::paintOverImage(
 	if (m_contentRect.isNull()) {
 		return;
 	}
-	
+
 	painter.setRenderHint(QPainter::Antialiasing, false);
 	
 	QPen pen(QColor(0x00, 0x00, 0xff));
@@ -64,6 +66,10 @@ Thumbnail::paintOverImage(
 	// For some reason, if we let Qt round the coordinates,
 	// the result is slightly different.
 	painter.drawRect(content_rect.toRect());
+
+	if (m_deviant) {
+		paintDeviant(painter);
+	}
 }
 
 } // namespace select_content

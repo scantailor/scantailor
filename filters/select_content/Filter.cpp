@@ -115,10 +115,10 @@ Filter::saveSettings(
 {
 	using namespace boost::lambda;
 	
-    QDomElement filter_el(doc.createElement("select-content"));
-    filter_el.setAttribute("average", m_ptrSettings->avg());
-    filter_el.setAttribute("sigma", m_ptrSettings->std());
-    writer.enumPages(
+	QDomElement filter_el(doc.createElement("select-content"));
+	filter_el.setAttribute("average", m_ptrSettings->avg());
+	filter_el.setAttribute("sigma", m_ptrSettings->std());
+	writer.enumPages(
 		bind(
 			&Filter::writePageSettings,
 			this, boost::ref(doc), var(filter_el), _1, _2
@@ -149,15 +149,16 @@ void
 Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 {
 	m_ptrSettings->clear();
-	
+
+
 	QDomElement const filter_el(
 		filters_el.namedItem("select-content").toElement()
 	);
 
-    m_ptrSettings->setAvg(filters_el.attribute("average").toDouble());
-    m_ptrSettings->setStd(filters_el.attribute("sigma").toDouble());
+	m_ptrSettings->setAvg(filter_el.attribute("average").toDouble());
+	m_ptrSettings->setStd(filter_el.attribute("sigma").toDouble());
 
-    QString const page_tag_name("page");
+	QString const page_tag_name("page");
 	QDomNode node(filter_el.firstChild());
 	for (; !node.isNull(); node = node.nextSibling()) {
 		if (!node.isElement()) {
@@ -167,7 +168,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 			continue;
 		}
 		QDomElement const el(node.toElement());
-		
+
 		bool ok = true;
 		int const id = el.attribute("id").toInt(&ok);
 		if (!ok) {

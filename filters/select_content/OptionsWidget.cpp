@@ -186,6 +186,7 @@ OptionsWidget::commitCurrentParams()
 		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection(), m_uiData.fineTuning()
 	);
 	m_ptrSettings->setPageParams(m_pageId, params);
+	m_ptrSettings->updateDeviation();
 }
 
 void
