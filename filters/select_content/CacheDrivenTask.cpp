@@ -28,6 +28,8 @@
 #include "filter_dc/ContentBoxCollector.h"
 #include "filters/page_layout/CacheDrivenTask.h"
 
+#include <iostream>
+
 namespace select_content
 {
 
@@ -83,7 +85,8 @@ CacheDrivenTask::process(
 					thumb_col->thumbnailCache(),
 					thumb_col->maxLogicalThumbSize(),
 					page_info.imageId(), xform,
-					params->contentRect()
+					params->contentRect(),
+					params->isDeviant(m_ptrSettings->std())
 				)
 			)
 		);

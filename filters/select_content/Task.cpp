@@ -38,6 +38,8 @@
 #include <QTransform>
 #include <QDebug>
 
+#include <iostream>
+
 namespace select_content
 {
 
@@ -104,7 +106,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 	Params new_params(deps);
 	if (params.get()) {
-	    new_params = *params;
+		new_params = *params;
 	}
 
 	QRectF page_rect(data.xform().resultingRect());
@@ -115,7 +117,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 	QRectF content_rect(page_rect);
 	if (new_params.isContentDetectionEnabled() && new_params.mode() == MODE_AUTO) {
-	    content_rect = ContentBoxFinder::findContentBox(status, data, page_rect, m_ptrDbg.get());
+		content_rect = ContentBoxFinder::findContentBox(status, data, page_rect, m_ptrDbg.get());
 	} else if (params.get() && new_params.mode() == MODE_MANUAL) {
 		content_rect = new_params.contentRect();
 	}
@@ -172,7 +174,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		m_ptrSettings->setPageParams(m_pageId, new_params);
 	}
 	*/
-	
+
 	status.throwIfCancelled();
 	
 	if (m_ptrNextTask) {

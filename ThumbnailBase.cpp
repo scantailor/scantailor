@@ -223,6 +223,18 @@ ThumbnailBase::paint(QPainter* painter,
 	painter->drawPixmap(display_rect.topLeft(), temp_pixmap);
 }
 
+void ThumbnailBase::paintDeviant(QPainter &painter)
+{
+	QPen pen(QColor(0xff, 0x00, 0x00, 0x99));
+	pen.setWidth(1);
+	pen.setCosmetic(true);
+	painter.setPen(pen);
+
+	painter.setBrush(QColor(0xff, 0x00, 0x00, 0x99));
+
+	painter.drawRect(boundingRect());
+}
+
 void
 ThumbnailBase::setImageXform(ImageTransformation const& image_xform)
 {

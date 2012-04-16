@@ -33,8 +33,8 @@ namespace deskew
 Thumbnail::Thumbnail(
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	QSizeF const& max_size, ImageId const& image_id,
-	ImageTransformation const& xform)
-:	ThumbnailBase(thumbnail_cache, max_size, image_id, xform)
+	ImageTransformation const& xform, bool deviant)
+:	ThumbnailBase(thumbnail_cache, max_size, image_id, xform), m_deviant(deviant)
 {
 }
 
@@ -75,6 +75,10 @@ Thumbnail::paintOverImage(
 		lines.push_back(QLineF(x, top, x, bottom));
 	}
 	painter.drawLines(lines);
+
+	if (m_deviant) {
+		paintDeviant(painter);
+	}
 }
 
 } // namespace deskew
