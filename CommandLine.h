@@ -82,6 +82,7 @@ public:
 	bool hasDeskew() const { return contains("deskew"); }
 	bool hasSkewDeviation() const { return contains("skew-deviation"); }
 	bool hasContentRect() const { return contains("content-box"); }
+	bool hasContentDeviation() const { return contains("content-deviation"); }
 	bool hasColorMode() const { return contains("color-mode"); }
 	bool hasPictureShape() const { return contains("picture-shape"); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
@@ -102,6 +103,7 @@ public:
 	page_layout::Alignment getAlignment() const { return m_alignment; }
 	Despeckle::Level getContentDetection() const { return m_contentDetection; }
 	QRectF getContentRect() const { return m_contentRect; }
+	double getContentDeviation() const { return m_contentDeviation; }
 	Orientation getOrientation() const { return m_orientation; }
 	int getThreshold() const { return m_threshold; }
 	double getDeskewAngle() const { return m_deskewAngle; }
@@ -146,6 +148,7 @@ private:
 	page_layout::Alignment m_alignment;
 	Despeckle::Level m_contentDetection;
 	QRectF m_contentRect;
+	double m_contentDeviation;
 	Orientation m_orientation;
 	int m_threshold;
 	double m_deskewAngle;
@@ -169,6 +172,7 @@ private:
 	page_layout::Alignment fetchAlignment();
 	Despeckle::Level fetchContentDetection();
 	QRectF fetchContentRect();
+	double fetchContentDeviation();
 	Orientation fetchOrientation();
 	QString fetchOutputProjectFile();
 	int fetchThreshold();

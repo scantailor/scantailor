@@ -57,7 +57,7 @@ public:
 	double deviation() const { return m_deviation; }
 	void setDeviation(double d) { m_deviation = d; }
 	void computeDeviation(double avg) { m_deviation = avg - sqrt(m_contentSizeMM.width() * m_contentSizeMM.height()); }
-	bool isDeviant(double std) { return (std*std) < (m_deviation*m_deviation); }
+	bool isDeviant(double std, double max_dev) { return (max_dev*std) < m_deviation; }
 
 	bool isContentDetectionEnabled() const { return m_contentDetect; };
 	bool isPageDetectionEnabled() const { return m_pageDetect; };

@@ -359,6 +359,10 @@ ConsoleBatch::setupSelectContent(std::set<PageId> allPages)
 
 		select_content->getSettings()->setPageParams(page, params);
 	}
+
+	if (cli.hasContentDeviation()) {
+		select_content->getSettings()->setMaxDeviation(cli.getContentDeviation());
+	}
 }
 
 
