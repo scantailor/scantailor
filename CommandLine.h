@@ -80,6 +80,7 @@ public:
 	bool hasOrientation() const { return contains("orientation"); }
 	bool hasDeskewAngle() const { return contains("rotate"); }
 	bool hasDeskew() const { return contains("deskew"); }
+	bool hasSkewDeviation() const { return contains("skew-deviation"); }
 	bool hasContentRect() const { return contains("content-box"); }
 	bool hasColorMode() const { return contains("color-mode"); }
 	bool hasPictureShape() const { return contains("picture-shape"); }
@@ -104,6 +105,7 @@ public:
 	Orientation getOrientation() const { return m_orientation; }
 	int getThreshold() const { return m_threshold; }
 	double getDeskewAngle() const { return m_deskewAngle; }
+	double getSkewDeviation() const { return m_skewDeviation; }
 	int getStartFilterIdx() const { return m_startFilterIdx; }
 	int getEndFilterIdx() const { return m_endFilterIdx; }
 	output::DewarpingMode getDewarpingMode() const { return m_dewarpingMode; }
@@ -147,6 +149,7 @@ private:
 	Orientation m_orientation;
 	int m_threshold;
 	double m_deskewAngle;
+	double m_skewDeviation;
 	int m_startFilterIdx;
 	int m_endFilterIdx;
 	output::DewarpingMode m_dewarpingMode;
@@ -170,6 +173,7 @@ private:
 	QString fetchOutputProjectFile();
 	int fetchThreshold();
 	double fetchDeskewAngle();
+	double fetchSkewDeviation();
 	int fetchStartFilterIdx();
 	int fetchEndFilterIdx();
 	output::DewarpingMode fetchDewarpingMode();

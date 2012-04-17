@@ -69,6 +69,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "orientation";
 	opts << "rotate";
 	opts << "deskew";
+	opts << "skew-deviation";
 	opts << "disable-content-detection";
 	opts << "enable-page-detection";
 	opts << "enable-fine-tuning";
@@ -230,6 +231,7 @@ CommandLine::setup()
 	m_orientation = fetchOrientation();
 	m_threshold = fetchThreshold();
 	m_deskewAngle = fetchDeskewAngle();
+	m_skewDeviation = fetchSkewDeviation();
 	m_startFilterIdx = fetchStartFilterIdx();
 	m_endFilterIdx = fetchEndFilterIdx();
 	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
@@ -546,6 +548,15 @@ CommandLine::fetchDeskewAngle()
 		return 0.0;
 
 	return m_options["rotate"].toDouble();
+}
+
+double
+CommandLine::fetchSkewDeviation()
+{
+	if (!hasSkewDeviation())
+		return 0.0;
+
+	return m_options["skew-deviation"].toDouble();
 }
 
 int
