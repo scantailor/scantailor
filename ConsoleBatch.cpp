@@ -342,6 +342,10 @@ ConsoleBatch::setupDeskew(std::set<PageId> allPages)
 			deskew->getSettings()->setPageParams(page, params);
 		}
 	}
+
+	if (cli.hasSkewDeviation()) {
+		deskew->getSettings()->setMaxDeviation(cli.getSkewDeviation());
+	}
 }
 
 

@@ -79,7 +79,7 @@ CacheDrivenTask::process(
 				new Thumbnail(
 					thumb_col->thumbnailCache(),
 					thumb_col->maxLogicalThumbSize(),
-					page_info.imageId(), new_xform, params->isDeviant(m_ptrSettings->std())
+					page_info.imageId(), new_xform, params->isDeviant(m_ptrSettings->std(), m_ptrSettings->maxDeviation())
 				)
 			)
 		);

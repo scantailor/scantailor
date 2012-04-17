@@ -85,6 +85,7 @@ Filter::saveSettings(ProjectWriter const& writer, QDomDocument& doc) const
 
     filter_el.setAttribute("average", m_ptrSettings->avg());
     filter_el.setAttribute("sigma", m_ptrSettings->std());
+    filter_el.setAttribute("maxDeviation", m_ptrSettings->maxDeviation());
 
     writer.enumPages(
 		bind(
@@ -105,6 +106,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 
     m_ptrSettings->setAvg(filter_el.attribute("average").toDouble());
     m_ptrSettings->setStd(filter_el.attribute("sigma").toDouble());
+    m_ptrSettings->setMaxDeviation(filter_el.attribute("maxDeviation").toDouble());
 
     QString const page_tag_name("page");
 	QDomNode node(filter_el.firstChild());

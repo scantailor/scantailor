@@ -55,6 +55,9 @@ public:
 	
     void setDegress(std::set<PageId> const& pages, Params const& params);
 
+	double maxDeviation() const { return m_maxDeviation; }
+	double setMaxDeviation(double md) { m_maxDeviation = md; }
+
     double avg() const { return m_avg; };
     void setAvg(double a) { m_avg = a; };
 
@@ -68,6 +71,7 @@ private:
     PerPageParams m_perPageParams;
     double m_avg;
     double m_sigma;
+	double m_maxDeviation;
 };
 
 } // namespace deskew
