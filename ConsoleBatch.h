@@ -52,7 +52,6 @@ public:
 
 	void process();
     void saveProject(QString const project_file);
-    void finishFilter(int idx, std::set<PageId> allPages);
 private:
 	bool batch;
 	bool debug;

@@ -56,7 +56,7 @@ public:
     void setDegress(std::set<PageId> const& pages, Params const& params);
 
 	double maxDeviation() const { return m_maxDeviation; }
-	double setMaxDeviation(double md) { m_maxDeviation = md; }
+	void setMaxDeviation(double md) { m_maxDeviation = md; }
 
     double avg() const { return m_avg; };
     void setAvg(double a) { m_avg = a; };

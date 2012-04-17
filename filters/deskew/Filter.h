@@ -25,6 +25,7 @@
 #include "IntrusivePtr.h"
 #include "FilterResult.h"
 #include "SafeDeletingQObjectPtr.h"
+#include "Settings.h"
 
 class PageId;
 class QString;
@@ -59,6 +60,8 @@ public:
 	virtual void performRelinking(AbstractRelinker const& relinker);
 
 	virtual void preUpdateUI(FilterUiInterface* ui, PageId const& page_id);
+
+	virtual void updateStatistics() { m_ptrSettings->updateDeviation(); }
 	
 	virtual QDomElement saveSettings(
 		ProjectWriter const& writer, QDomDocument& doc) const;
