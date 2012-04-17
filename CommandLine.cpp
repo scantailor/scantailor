@@ -507,7 +507,7 @@ double
 CommandLine::fetchContentDeviation()
 {
 	if (!hasContentDeviation())
-		return 0.0;
+		return 1.0;
 
 	return m_options["content-deviation"].toDouble();
 }

@@ -160,7 +160,7 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 
 	m_ptrSettings->setAvg(filter_el.attribute("average").toDouble());
 	m_ptrSettings->setStd(filter_el.attribute("sigma").toDouble());
-	m_ptrSettings->setMaxDeviation(filter_el.attribute("maxDeviation").toDouble());
+	m_ptrSettings->setMaxDeviation(filter_el.attribute("maxDeviation", "1.0").toDouble());
 
 	QString const page_tag_name("page");
 	QDomNode node(filter_el.firstChild());

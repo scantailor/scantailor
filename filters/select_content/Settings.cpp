@@ -66,10 +66,11 @@ Settings::performRelinking(AbstractRelinker const& relinker)
 void Settings::updateDeviation()
 {
     m_avg = 0.0;
-    BOOST_FOREACH(PageParams::value_type const& kv, m_pageParams) {
-        m_avg += sqrt(kv.second.contentSizeMM().width() * kv.second.contentSizeMM().height());
+    BOOST_FOREACH(PageParams::value_type & kv, m_pageParams) {
+		kv.second.computeDeviation(0.0);
+		m_avg += -1 * kv.second.deviation();
     }
-    m_avg = m_avg / m_pageParams.size();
+    m_avg = m_avg / double(m_pageParams.size());
 #ifdef DEBUG
     std::cout << "avg_content = " << m_avg << std::endl;
 #endif
@@ -79,7 +80,7 @@ void Settings::updateDeviation()
         kv.second.computeDeviation(m_avg);
         sigma2 += kv.second.deviation() * kv.second.deviation();
     }
-    sigma2 = sigma2 / m_pageParams.size();
+    sigma2 = sigma2 / double(m_pageParams.size());
     m_sigma = sqrt(sigma2);
 #if DEBUG
     std::cout << "sigma2 = " << sigma2 << std::endl;
