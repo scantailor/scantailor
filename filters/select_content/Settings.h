@@ -52,6 +52,9 @@ public:
 	
     std::auto_ptr<Params> getPageParams(PageId const& page_id) const;
 
+	double maxDeviation() const { return m_maxDeviation; }
+	void setMaxDeviation(double md) { m_maxDeviation = md; }
+
     double avg() const { return m_avg; };
     void setAvg(double a) { m_avg = a; };
 
@@ -64,6 +67,7 @@ private:
     PageParams m_pageParams;
     double m_avg;
     double m_sigma;
+	double m_maxDeviation;
 };
 
 } // namespace select_content
