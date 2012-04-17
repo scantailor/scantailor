@@ -223,10 +223,10 @@ ConsoleBatch::process()
         }
     }
     for (int j=0; j<=endFilterIdx; j++) {
-        PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
-        finishFilter(j, page_sequence.selectAll());
+		m_ptrStages->filterAt(j)->updateStatistics();
     }
 }
+
 
 void
 ConsoleBatch::saveProject(QString const project_file)
@@ -235,27 +235,6 @@ ConsoleBatch::saveProject(QString const project_file)
 	SelectedPage sPage(fpage.id(), IMAGE_VIEW);
 	ProjectWriter writer(m_ptrPages, sPage, m_outFileNameGen);
 	writer.write(project_file, m_ptrStages->filters());
-}
-
-
-void
-ConsoleBatch::finishFilter(int idx, std::set<PageId> allPages)
-{
-    /*
-    if (idx == m_ptrStages->fixOrientationFilterIdx())
-    else if (idx == m_ptrStages->pageSplitFilterIdx())
-        finishPageSplit(allPages);
-    */
-    if (idx == m_ptrStages->deskewFilterIdx())
-        m_ptrStages->deskewFilter()->getSettings()->updateDeviation();
-    else if (idx == m_ptrStages->selectContentFilterIdx())
-        m_ptrStages->selectContentFilter()->getSettings()->updateDeviation();
-    /*
-    else if (idx == m_ptrStages->pageLayoutFilterIdx())
-        finishPageLayout(allPages);
-    else if (idx == m_ptrStages->outputFilterIdx())
-        finishOutput(allPages);
-    */
 }
 
 

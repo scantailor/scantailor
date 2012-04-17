@@ -181,12 +181,12 @@ OptionsWidget::updateModeIndication(AutoManualMode const mode)
 void
 OptionsWidget::commitCurrentParams()
 {
-	Params const params(
+	Params params(
 		m_uiData.contentRect(), m_uiData.contentSizeMM(),
 		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection(), m_uiData.fineTuning()
 	);
+	params.computeDeviation(m_ptrSettings->avg());
 	m_ptrSettings->setPageParams(m_pageId, params);
-	m_ptrSettings->updateDeviation();
 }
 
 void
