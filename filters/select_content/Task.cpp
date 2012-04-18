@@ -96,14 +96,13 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setSizeCalc(PhysSizeCalc(data.xform()));
 
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
-	/*
-	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO)) {
-		params.reset();
-	}
-	*/
-
 	Params new_params(deps);
-	if (params.get()) {
+	if (params.get() && !params->dependencies().matches(deps) && (params->mode() == MODE_AUTO || params->isPageDetectionEnabled())) {
+		new_params.setMode(params->mode());
+		new_params.setPageDetect(params->isPageDetectionEnabled());
+		new_params.setFineTuneCorners(params->isFineTuningEnabled());
+		new_params.setContentDetect(params->isContentDetectionEnabled());
+	} else if (params.get()) {
 	    new_params = *params;
 	}
 
