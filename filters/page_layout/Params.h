@@ -48,6 +48,8 @@ public:
 	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
 	
 	Alignment const& alignment() const { return m_alignment; }
+
+	bool isDeviant() const { return m_alignment.isNull(); }
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 private:
