@@ -172,7 +172,10 @@ OptionsWidget::preUpdateUI(
 	m_pageId = page_id;
 	m_marginsMM = margins_mm;
 	m_alignment = alignment;
-	
+
+	bool old_ignore = m_ignoreMarginChanges;
+	m_ignoreMarginChanges = true;
+
 	typedef AlignmentByButton::value_type KeyVal;
 	BOOST_FOREACH (KeyVal const& kv, m_alignmentByButton) {
 		if (kv.second == m_alignment) {
@@ -205,6 +208,8 @@ OptionsWidget::preUpdateUI(
 	
 	marginsGroup->setEnabled(false);
 	alignmentGroup->setEnabled(false);
+
+	m_ignoreMarginChanges = old_ignore;
 }
 
 void
@@ -319,6 +324,10 @@ OptionsWidget::alignWithOthersToggled()
 void
 OptionsWidget::autoMarginsChanged(bool checked)
 {
+	if (m_ignoreMarginChanges) {
+		return;
+	}
+
 	alignmentMode->setEnabled(!checked);
 	alignmentMode->setCurrentIndex(2);
 	enableDisableAlignmentButtons();

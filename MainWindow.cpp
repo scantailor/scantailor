@@ -132,6 +132,8 @@
 #include <math.h>
 #include <assert.h>
 
+#include <iostream>
+
 class MainWindow::PageSelectionProviderImpl : public PageSelectionProvider
 {
 public:
@@ -969,7 +971,7 @@ MainWindow::currentPageChanged(
 			thumbView->ensureVisible(thumb_rect, 0, 0);
 		}
 	}
-	
+
 	if (flags & ThumbnailSequence::SELECTED_BY_USER) {
 		if (isBatchProcessingInProgress()) {
 			stopBatchProcessing();
