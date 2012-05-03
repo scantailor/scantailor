@@ -43,26 +43,21 @@ IF(NOT "${PROJECT_BINARY_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}")
 	FILE(REMOVE "${PROJECT_BINARY_DIR}/version.h")
 ENDIF()
 
-# Extract VERSION and VERSION_QUAD from version.h
-FILE(READ "${PROJECT_SOURCE_DIR}/version.h" version_h_contents)
-STRING(
-	REGEX REPLACE
-	".*#define[ \\t]+VERSION[ \\t]+\"([^\"]*)\".*"
-	"\\1" VERSION "${version_h_contents}"
-)
-IF("${VERSION}" STREQUAL "${version_h_contents}")
-	MESSAGE(FATAL_ERROR "Failed to extract VERSION from version.h")
-ENDIF()
+MACRO (TODAY RESULT)
+    IF (WIN32)
+        EXECUTE_PROCESS(COMMAND "date" "/T" OUTPUT_VARIABLE ${RESULT})
+        string(REGEX REPLACE "(..)/(..)/..(..).*" "\\3\\2\\1"
+${RESULT} ${${RESULT}})
+    ELSEIF(UNIX)
+        EXECUTE_PROCESS(COMMAND "date" "+%Y%m%d" OUTPUT_VARIABLE ${RESULT})
+		string(REGEX REPLACE "(\\d\\d\\d\\d)(\\d\\d)(\\d\\d).*" "\\1\\2\\3" ${RESULT} ${${RESULT}})
+    ELSE (WIN32)
+        MESSAGE(SEND_ERROR "date not implemented")
+        SET(${RESULT} 000000)
+    ENDIF (WIN32)
+ENDMACRO (TODAY)
 
-# VERSION_QUAD must be either empty or be in the form of X.Y.Z.Y
-STRING(
-	REGEX REPLACE
-	".*#define[ \\t]+VERSION_QUAD[ \\t]+\"(([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)?)\".*"
-	"\\1" VERSION_QUAD "${version_h_contents}"
-)
-IF("${VERSION_QUAD}" STREQUAL "${version_h_contents}")
-	MESSAGE(FATAL_ERROR "Failed to extract VERSION_QUAD from version.h")
-ENDIF()
+TODAY(VERSION)
 
 # This has to go quite early on, as otherwise we risk picking
 # up an identically named header from a system include path.
@@ -688,7 +683,7 @@ ADD_TEST(ScanTaylorTests tests/tests --log_level=message)
 # Source code packaging
 SET(CPACK_CMAKE_GENERATOR "")
 SET(CPACK_SOURCE_GENERATOR "TGZ")
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "scantailor-${VERSION}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "scantailor-enhanced-${VERSION}")
 SET(
 	CPACK_SOURCE_IGNORE_FILES
 	"/\\\\.svn/"
