@@ -27,13 +27,15 @@
 #include <Qt>
 #include <QColor>
 #include <QMutexLocker>
+#include <tiff.h>
 
 namespace output
 {
 
 Settings::Settings()
 :	m_defaultPictureZoneProps(initialPictureZoneProps()),
-	m_defaultFillZoneProps(initialFillZoneProps())
+	m_defaultFillZoneProps(initialFillZoneProps()),
+	m_compression(COMPRESSION_LZW)
 {
 }
 

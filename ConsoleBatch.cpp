@@ -468,4 +468,7 @@ ConsoleBatch::setupOutput(std::set<PageId> allPages)
 
 		output->getSettings()->setParams(page, params);
 	}
+	
+	if (cli.hasTiffCompression())
+		output->getSettings()->setTiffCompression(cli.getTiffCompression());
 }

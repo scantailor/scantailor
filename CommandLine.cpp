@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <assert.h>
 #include <iostream>
+#include <tiff.h>
 
 #include <QDir>
 #include <QMap>
@@ -104,6 +105,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "start-filter";
 	opts << "end-filter";
 	opts << "output-project";
+	opts << "tiff-compression";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -238,6 +240,7 @@ CommandLine::setup()
 	m_endFilterIdx = fetchEndFilterIdx();
 	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
 	m_dewarpingMode = fetchDewarpingMode();
+	m_compression = fetchCompression();
 }
 
 
@@ -315,6 +318,7 @@ CommandLine::printHelp()
 	std::cout << "\t--start-filter=<1...6>\t\t\t-- default: 4" << "\n";
 	std::cout << "\t--end-filter=<1...6>\t\t\t-- default: 6" << "\n";
 	std::cout << "\t--output-project=, -o=<project_name>" << "\n";
+	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << "\n";
 	std::cout << "\n";
 }
 
@@ -659,4 +663,26 @@ CommandLine::hasOutputDpi() const
 		m_options.contains("output-dpi-x") ||
 		m_options.contains("output-dpi-y")
 	);
+}
+
+int
+CommandLine::fetchCompression() const
+{
+	if (!m_options.contains("tiff-compression"))
+	    return COMPRESSION_LZW;
+	
+	QString c(m_options["tiff-compression"].toLower());
+	if (c == "lzw")
+	    return COMPRESSION_LZW;
+	else if (c == "none")
+	    return COMPRESSION_NONE;
+	else if (c == "jpeg")
+	    return COMPRESSION_JPEG;	
+	else if (c == "deflate")
+	    return COMPRESSION_DEFLATE;	
+	else if (c == "packbits")
+	    return COMPRESSION_PACKBITS;
+	
+	std::cout << "Unknown compression" << std::endl;
+	throw("Unknown compression");
 }

@@ -60,7 +60,7 @@ public:
 
 	ImageViewTab lastTab() const { return m_lastTab; }
 
-	DepthPerception const& depthPerception() const { return m_depthPerception; }
+    DepthPerception const& depthPerception() const { return m_depthPerception; }
 signals:
 	void despeckleLevelChanged(DespeckleLevel level, bool* handled);
 
@@ -81,6 +81,8 @@ private slots:
 	void colorModeChanged(int idx);
 
 	void pictureShapeChanged(int idx);
+	
+	void tiffCompressionChanged(int idx);
 	
 	void whiteMarginsToggled(bool checked);
 	
