@@ -107,6 +107,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "output-project";
 	opts << "tiff-compression";
 	opts << "picture-shape";
+	opts << "disable-content-text-mask";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
