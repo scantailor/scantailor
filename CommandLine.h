@@ -83,6 +83,7 @@ public:
 	bool hasSkewDeviation() const { return contains("skew-deviation"); }
 	bool hasContentRect() const { return contains("content-box"); }
 	bool hasContentDeviation() const { return contains("content-deviation"); }
+	bool hasContentText() const { return !contains("disable-content-text-mask"); }
 	bool hasColorMode() const { return contains("color-mode"); }
 	bool hasPictureShape() const { return contains("picture-shape"); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
