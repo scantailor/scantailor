@@ -106,6 +106,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "end-filter";
 	opts << "output-project";
 	opts << "tiff-compression";
+	opts << "picture-shape";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
