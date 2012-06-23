@@ -107,6 +107,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "output-project";
 	opts << "tiff-compression";
 	opts << "picture-shape";
+        opts << "language";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -242,6 +243,7 @@ CommandLine::setup()
 	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
 	m_dewarpingMode = fetchDewarpingMode();
 	m_compression = fetchCompression();
+        m_language = fetchLanguage();
 }
 
 
@@ -272,6 +274,7 @@ CommandLine::printHelp()
 	std::cout << "Options:" << "\n";
 	std::cout << "\t--help, -h" << "\n";
 	std::cout << "\t--verbose, -v" << "\n";
+	std::cout << "\t--languge=<cs|de|...>\t-- default: system language" << "\n";
 	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
 	std::cout << "\t\t\t  0: auto detect" << "\n";
 	std::cout << "\t\t\t  1: one page layout" << "\n";
@@ -663,7 +666,12 @@ CommandLine::hasOutputDpi() const
 		m_options.contains("output-dpi") ||
 		m_options.contains("output-dpi-x") ||
 		m_options.contains("output-dpi-y")
-	);
+                );
+}
+
+bool CommandLine::hasLanguage() const
+{
+	return m_options.contains("language");
 }
 
 int
@@ -685,5 +693,14 @@ CommandLine::fetchCompression() const
 	    return COMPRESSION_PACKBITS;
 	
 	std::cout << "Unknown compression" << std::endl;
-	throw("Unknown compression");
+    throw("Unknown compression");
+}
+
+QString CommandLine::fetchLanguage() const
+{
+	if (hasLanguage()) {
+		return m_options["language"];
+	}
+    
+	return "untranslated";
 }

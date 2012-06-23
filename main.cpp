@@ -160,7 +160,11 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	
-	QString const translation("scantailor_"+QLocale::system().name());
+	QString translation("scantailor_"+QLocale::system().name());
+        if (cli.hasLanguage()) {
+            translation = "scantailor_" + cli.getLanguage();
+        }
+        
 	QTranslator translator;
 	
 	// Try loading from the current directory.

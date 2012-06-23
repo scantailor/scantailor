@@ -70,6 +70,7 @@ public:
 	bool hasMargins() const;
 	bool hasAlignment() const;
 	bool hasOutputDpi() const;
+        bool hasLanguage() const;
 
 	bool hasHelp() const { return contains("help"); }
 	bool hasOutputProject() const { return contains("output-project"); }
@@ -116,6 +117,7 @@ public:
 	output::DepthPerception getDepthPerception() const { return m_depthPerception; }
 	float getMatchLayoutTolerance() const { return m_matchLayoutTolerance; }
 	int getTiffCompression() const { return m_compression; }
+	QString getLanguage() const { return m_language; }
 
 	bool help() { return m_options.contains("help"); }
 	void printHelp();
@@ -127,6 +129,7 @@ private:
 	bool m_error;
 	bool m_gui;
 	bool m_global;
+	QString m_language;
 
 	bool isGlobal() { return m_global; }
 	void setGlobal() { m_global = true; }
@@ -188,6 +191,7 @@ private:
 	output::DepthPerception fetchDepthPerception();
 	float fetchMatchLayoutTolerance();
 	int fetchCompression() const;
+	QString fetchLanguage() const;
 };
 
 #endif
