@@ -30,6 +30,7 @@ Alignment::Alignment(QDomElement const& el)
 	QString const hor(el.attribute("hor"));
 	m_isNull = el.attribute("null").toInt() != 0;
 	m_tolerance = el.attribute("tolerance", QString::number(DEFAULT_TOLERANCE)).toDouble();
+	m_autoMargins = el.attribute("autoMargins") == "true" ? true: false;
 	
 	if (vert == "top") {
 		m_vert = TOP;
@@ -102,6 +103,7 @@ Alignment::toXml(QDomDocument& doc, QString const& name) const
 	el.setAttribute("hor", QString::fromAscii(hor));
 	el.setAttribute("null", m_isNull ? 1 : 0);
 	el.setAttribute("tolerance", QString::number(m_tolerance));
+	el.setAttribute("autoMargins", m_autoMargins ? "true" : "false");
 	return el;
 }
 
