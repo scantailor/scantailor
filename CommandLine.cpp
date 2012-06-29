@@ -107,7 +107,8 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "output-project";
 	opts << "tiff-compression";
 	opts << "picture-shape";
-        opts << "language";
+ 	opts << "language";
+	opts << "disable-content-text-mask";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -288,6 +289,7 @@ CommandLine::printHelp()
 	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << "\n";
 	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << "\n";
 	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << "\n";
+	std::cout << "\t--disable-content-text-mask\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << "\n";
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
 	std::cout << "\t--content-deviation=<0.0...)\t\t\t-- default: 2.0; pages with bigger content deviation will be painted in red" << "\n";
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
@@ -492,7 +494,6 @@ CommandLine::fetchContentDetection()
 
 	return level;
 }
-
 
 QRectF
 CommandLine::fetchContentRect()
