@@ -244,7 +244,7 @@ CommandLine::setup()
 	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
 	m_dewarpingMode = fetchDewarpingMode();
 	m_compression = fetchCompression();
-        m_language = fetchLanguage();
+    m_language = fetchLanguage();
 }
 
 
