@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "CommandLine.h"
 #include "MainWindow.h"
 #include "MainWindow.h.moc"
 #include "NewOpenProjectPanel.h"
@@ -1707,9 +1708,13 @@ void
 MainWindow::updateWindowTitle()
 {
 	QString project_name;
+    CommandLine cli = CommandLine::get();
+    
 	if (m_projectFile.isEmpty()) {
 		project_name = tr("Unnamed");
-	} else {
+    } else if (cli.hasWindowTitle()) {
+        project_name = cli.getWindowTitle();
+    } else {
 		project_name = QFileInfo(m_projectFile).baseName();
 	}
 	QString const version(QString::fromUtf8(VERSION));

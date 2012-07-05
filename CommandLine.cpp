@@ -1,5 +1,4 @@
-/*
-    Scan Tailor - Interactive post-processing tool for scanned pages.
+/*    Scan Tailor - Interactive post-processing tool for scanned pages.
 
     CommandLine - Interface for ScanTailor's parameters provided on CL.
     Copyright (C) 2011 Petr Kovar <pejuko@gmail.com>
@@ -109,6 +108,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "picture-shape";
  	opts << "language";
 	opts << "disable-content-text-mask";
+    opts << "window-title";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -121,7 +121,7 @@ CommandLine::parseCli(QStringList const& argv)
 	// skip first argument (scantailor)
 	for (int i=1; i<argv.size(); i++) {
 #ifdef DEBUG_CLI
-	std::cout << "arg[" << i << "]=" << argv[i].toAscii().constData() << "\n";
+	std::cout << "arg[" << i << "]=" << argv[i].toAscii().constData() << std::endl;
 #endif
 		if (rx.exactMatch(argv[i])) {
 			// option with a value
@@ -169,7 +169,7 @@ CommandLine::parseCli(QStringList const& argv)
 				if (file.isDir()) {
 					CommandLine::m_outputDirectory = file.filePath();
 				} else {
-					std::cout << "Error: Last argument must be an existing directory" << "\n";
+					std::cout << "Error: Last argument must be an existing directory" << std::endl;
 					exit(1);
 				}
 			} else if (file.filePath() == "-") {
@@ -197,8 +197,8 @@ CommandLine::parseCli(QStringList const& argv)
 
 #ifdef DEBUG_CLI
 	QStringList params = m_options.keys();
-	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options[params[i]].toAscii().constData() << "\n"; }
-	std::cout << "Images: " << CommandLine::m_images.size() << "\n";
+	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options[params[i]].toAscii().constData() << std::endl; }
+	std::cout << "Images: " << CommandLine::m_images.size() << std::endl;
 #endif
 
 	return m_error;
@@ -245,87 +245,89 @@ CommandLine::setup()
 	m_dewarpingMode = fetchDewarpingMode();
 	m_compression = fetchCompression();
     m_language = fetchLanguage();
+    m_windowTitle = fetchWindowTitle();
 }
 
 
 void
 CommandLine::printHelp()
 {
-	std::cout << "\n";
-	std::cout << "Scan Tailor is a post-processing tool for scanned pages." << "\n";
-	std::cout << "Version: " << VERSION << "\n";
-	std::cout << "\n";
-	std::cout << "ScanTailor usage: " << "\n";
-	std::cout << "\t1) scantailor" << "\n";
-	std::cout << "\t2) scantailor <project_file>" << "\n";
-	std::cout << "\t3) scantailor-cli [options] <images|directory|-> <output_directory>" << "\n";
-	std::cout << "\t4) scantailor-cli [options] <project_file> [output_directory]" << "\n";
-	std::cout << "\n";
-	std::cout << "1)" << "\n";
-	std::cout << "\tstart ScanTailor's GUI interface" << "\n";
-	std::cout << "2)" << "\n";
-	std::cout << "\tstart ScanTailor's GUI interface and load project file" << "\n";
-	std::cout << "3)" << "\n";
-	std::cout << "\tbatch processing images from command line; no GUI" << "\n";
-	std::cout << "\tfile names are collected from arguments, input directory or stdin (-)" << "\n";
-	std::cout << "4)" << "\n";
-	std::cout << "\tbatch processing project from command line; no GUI" << "\n";
-	std::cout << "\tif output_directory is specified as last argument, it overwrites the one in project file" << "\n";
-	std::cout << "\n";
-	std::cout << "Options:" << "\n";
-	std::cout << "\t--help, -h" << "\n";
-	std::cout << "\t--verbose, -v" << "\n";
-	std::cout << "\t--languge=<cs|de|...>\t-- default: system language" << "\n";
-	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << "\n";
-	std::cout << "\t\t\t  0: auto detect" << "\n";
-	std::cout << "\t\t\t  1: one page layout" << "\n";
-	std::cout << "\t\t\t1.5: one page layout but cutting is needed" << "\n";
-	std::cout << "\t\t\t  2: two page layout" << "\n";
-	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << "\n";
-	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << "\n";
-	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << "\n";
-	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << "\n";
-	std::cout << "\t--skew-deviation=<0.0...)\t\t\t-- default: 1.0; pages with bigger skew deviation will be painted in red" << "\n";
-	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << "\n";
-	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << "\n";
-	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << "\n";
-	std::cout << "\t--disable-content-text-mask\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << "\n";
-	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
-	std::cout << "\t--content-deviation=<0.0...)\t\t\t-- default: 2.0; pages with bigger content deviation will be painted in red" << "\n";
-	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << "\n";
-	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << "\n";
-	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << "\n";
-	std::cout << "\t--enable-auto-margins\t\t\t-- sets the margins to original ones (based on detected page or image size)" << "\n";
-	std::cout << "\t--margins=<number>\t\t\t-- sets left, top, right and bottom margins to same number." << "\n";
-	std::cout << "\t\t--margins-left=<number>" << "\n";
-	std::cout << "\t\t--margins-right=<number>" << "\n";
-	std::cout << "\t\t--margins-top=<number>" << "\n";
-	std::cout << "\t\t--margins-bottom=<number>" << "\n";
-	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << "\n";
-	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << "\n";
-	std::cout << "\t--alignment=<center|original|auto>\t-- sets vertical to original and horizontal to center" << "\n";
-	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << "\n";
-	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << "\n";
-	std::cout << "\t--alignment-tolerance=<float>\t\t-- sets tolerance for auto alignment" << "\n";
-	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << "\n";
-	std::cout << "\t\t--dpi-x=<number>" << "\n";
-	std::cout << "\t\t--dpi-y=<number>" << "\n";
-	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 600" << "\n";
-	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
-	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
-	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
-	std::cout << "\t--picture-shape=<free|rectangular>\n\t\t\t\t\t\t-- default: free" << "\n";
-	std::cout << "\t--white-margins\t\t\t\t-- default: false" << "\n";
-	std::cout << "\t--normalize-illumination\t\t-- default: false" << "\n";
-	std::cout << "\t--threshold=<n>\t\t\t\t-- n<0 thinner, n>0 thicker; default: 0" << "\n";
-	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << "\n";
-	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << "\n";
-	std::cout << "\t--depth-perception=<1.0...3.0>\t\t-- default: 2.0" << "\n";
-	std::cout << "\t--start-filter=<1...6>\t\t\t-- default: 4" << "\n";
-	std::cout << "\t--end-filter=<1...6>\t\t\t-- default: 6" << "\n";
-	std::cout << "\t--output-project=, -o=<project_name>" << "\n";
-	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << "\n";
-	std::cout << "\n";
+	std::cout << std::endl;
+	std::cout << "Scan Tailor is a post-processing tool for scanned pages." << std::endl;
+	std::cout << "Version: " << VERSION << std::endl;
+	std::cout << std::endl;
+	std::cout << "ScanTailor usage: " << std::endl;
+	std::cout << "\t1) scantailor" << std::endl;
+	std::cout << "\t2) scantailor <project_file>" << std::endl;
+	std::cout << "\t3) scantailor-cli [options] <images|directory|-> <output_directory>" << std::endl;
+	std::cout << "\t4) scantailor-cli [options] <project_file> [output_directory]" << std::endl;
+	std::cout << std::endl;
+	std::cout << "1)" << std::endl;
+	std::cout << "\tstart ScanTailor's GUI interface" << std::endl;
+	std::cout << "2)" << std::endl;
+	std::cout << "\tstart ScanTailor's GUI interface and load project file" << std::endl;
+	std::cout << "3)" << std::endl;
+	std::cout << "\tbatch processing images from command line; no GUI" << std::endl;
+	std::cout << "\tfile names are collected from arguments, input directory or stdin (-)" << std::endl;
+	std::cout << "4)" << std::endl;
+	std::cout << "\tbatch processing project from command line; no GUI" << std::endl;
+	std::cout << "\tif output_directory is specified as last argument, it overwrites the one in project file" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Options:" << std::endl;
+	std::cout << "\t--help, -h" << std::endl;
+	std::cout << "\t--verbose, -v" << std::endl;
+	std::cout << "\t--languge=<cs|de|...>\t-- default: system language" << std::endl;
+	std::cout << "\t--layout=, -l=<0|1|1.5|2>\t\t-- default: 0" << std::endl;
+	std::cout << "\t\t\t  0: auto detect" << std::endl;
+	std::cout << "\t\t\t  1: one page layout" << std::endl;
+	std::cout << "\t\t\t1.5: one page layout but cutting is needed" << std::endl;
+	std::cout << "\t\t\t  2: two page layout" << std::endl;
+	std::cout << "\t--layout-direction=, -ld=<lr|rl>\t-- default: lr" << std::endl;
+	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << std::endl;
+	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << std::endl;
+	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << std::endl;
+	std::cout << "\t--skew-deviation=<0.0...)\t\t\t-- default: 1.0; pages with bigger skew deviation will be painted in red" << std::endl;
+	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << std::endl;
+	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << std::endl;
+	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << std::endl;
+	std::cout << "\t--disable-content-text-mask\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << std::endl;
+	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << std::endl;
+	std::cout << "\t--content-deviation=<0.0...)\t\t\t-- default: 2.0; pages with bigger content deviation will be painted in red" << std::endl;
+	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << std::endl;
+	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << std::endl;
+	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << std::endl;
+	std::cout << "\t--enable-auto-margins\t\t\t-- sets the margins to original ones (based on detected page or image size)" << std::endl;
+	std::cout << "\t--margins=<number>\t\t\t-- sets left, top, right and bottom margins to same number." << std::endl;
+	std::cout << "\t\t--margins-left=<number>" << std::endl;
+	std::cout << "\t\t--margins-right=<number>" << std::endl;
+	std::cout << "\t\t--margins-top=<number>" << std::endl;
+	std::cout << "\t\t--margins-bottom=<number>" << std::endl;
+	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << std::endl;
+	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << std::endl;
+	std::cout << "\t--alignment=<center|original|auto>\t-- sets vertical to original and horizontal to center" << std::endl;
+	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << std::endl;
+	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << std::endl;
+	std::cout << "\t--alignment-tolerance=<float>\t\t-- sets tolerance for auto alignment" << std::endl;
+	std::cout << "\t--dpi=<number>\t\t\t\t-- sets x and y dpi. default: 600" << std::endl;
+	std::cout << "\t\t--dpi-x=<number>" << std::endl;
+	std::cout << "\t\t--dpi-y=<number>" << std::endl;
+	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 600" << std::endl;
+	std::cout << "\t\t--output-dpi-x=<number>" << std::endl;
+	std::cout << "\t\t--output-dpi-y=<number>" << std::endl;
+	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << std::endl;
+	std::cout << "\t--picture-shape=<free|rectangular>\n\t\t\t\t\t\t-- default: free" << std::endl;
+	std::cout << "\t--white-margins\t\t\t\t-- default: false" << std::endl;
+	std::cout << "\t--normalize-illumination\t\t-- default: false" << std::endl;
+	std::cout << "\t--threshold=<n>\t\t\t\t-- n<0 thinner, n>0 thicker; default: 0" << std::endl;
+	std::cout << "\t--despeckle=<off|cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << std::endl;
+	std::cout << "\t--dewarping=<off|auto>\t\t\t-- default: off" << std::endl;
+	std::cout << "\t--depth-perception=<1.0...3.0>\t\t-- default: 2.0" << std::endl;
+	std::cout << "\t--start-filter=<1...6>\t\t\t-- default: 4" << std::endl;
+	std::cout << "\t--end-filter=<1...6>\t\t\t-- default: 6" << std::endl;
+	std::cout << "\t--output-project=, -o=<project_name>" << std::endl;
+	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << std::endl;
+    std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
+	std::cout << std::endl;
 }
 
 
@@ -507,7 +509,7 @@ CommandLine::fetchContentRect()
 		return QRectF(rx.cap(1).toFloat(), rx.cap(2).toFloat(), rx.cap(3).toFloat(), rx.cap(4).toFloat());
 	}
 
-	std::cout << "invalid --content-box=" << m_options["content-box"].toAscii().constData() << "\n";
+	std::cout << "invalid --content-box=" << m_options["content-box"].toAscii().constData() << std::endl;
 	exit(1);
 }
 
@@ -537,7 +539,7 @@ CommandLine::fetchOrientation()
 	} else if (cli_orient == "upsidedown") {
 		orient = UPSIDEDOWN;
 	} else {
-		std::cout << "Wrong orientation " << m_options["orientation"].toAscii().constData() << "\n";
+		std::cout << "Wrong orientation " << m_options["orientation"].toAscii().constData() << std::endl;
 		exit(1);
 	}
 
@@ -703,5 +705,14 @@ QString CommandLine::fetchLanguage() const
 		return m_options["language"];
 	}
     
-	return "untranslated";
+    return "untranslated";
+}
+
+QString CommandLine::fetchWindowTitle() const
+{
+    if (hasWindowTitle()) {
+        return m_options["window-title"];
+    }
+    
+    return "";
 }

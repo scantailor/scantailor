@@ -70,7 +70,7 @@ public:
 	bool hasMargins() const;
 	bool hasAlignment() const;
 	bool hasOutputDpi() const;
-        bool hasLanguage() const;
+	bool hasLanguage() const;
 
 	bool hasHelp() const { return contains("help"); }
 	bool hasOutputProject() const { return contains("output-project"); }
@@ -95,6 +95,7 @@ public:
 	bool hasMatchLayoutTolerance() const { return contains("match-layout-tolerance"); }
 	bool hasDepthPerception() const { return contains("depth-perception"); }
 	bool hasTiffCompression() const { return contains("tiff-compression"); }
+    bool hasWindowTitle() const { return contains("window-title"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
@@ -119,6 +120,7 @@ public:
 	float getMatchLayoutTolerance() const { return m_matchLayoutTolerance; }
 	int getTiffCompression() const { return m_compression; }
 	QString getLanguage() const { return m_language; }
+    QString getWindowTitle() const { return m_windowTitle; }
 
 	bool help() { return m_options.contains("help"); }
 	void printHelp();
@@ -131,6 +133,7 @@ private:
 	bool m_gui;
 	bool m_global;
 	QString m_language;
+    QString m_windowTitle;
 
 	bool isGlobal() { return m_global; }
 	void setGlobal() { m_global = true; }
@@ -193,6 +196,7 @@ private:
 	float fetchMatchLayoutTolerance();
 	int fetchCompression() const;
 	QString fetchLanguage() const;
+    QString fetchWindowTitle() const;
 };
 
 #endif
