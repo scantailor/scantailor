@@ -110,7 +110,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 
 	QRectF page_rect(data.xform().resultingRect());
 	if (new_params.isPageDetectionEnabled()) {
-		page_rect = PageFinder::findPageBox(status, data, new_params.isFineTuningEnabled(), m_ptrDbg.get());
+		page_rect = PageFinder::findPageBox(status, data, new_params.isFineTuningEnabled(), m_ptrSettings->pageDetectionBox(), m_ptrSettings->pageDetectionTolerance(), m_ptrDbg.get());
 	}
 	new_params.setPageRect(page_rect);
 

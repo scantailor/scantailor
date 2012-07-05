@@ -209,12 +209,6 @@ ConsoleBatch::process()
 			throw std::runtime_error("End filter out of range");
 		endFilterIdx = ef;
 	}
-
-    // setup filters with params from cli
-    for (int j=0; j<= m_ptrStages->count(); j++) {
-        PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
-		setupFilter(j, page_sequence.selectAll());
-    }
     
     // run filters
 	for (int j=startFilterIdx; j<=endFilterIdx; j++) {
@@ -223,6 +217,7 @@ ConsoleBatch::process()
 
         // process pages
 		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
+        setupFilter(j, page_sequence.selectAll());
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
 			if (cli.isVerbose())
@@ -230,6 +225,12 @@ ConsoleBatch::process()
 			BackgroundTaskPtr bgTask = createCompositeTask(page, j);
 			(*bgTask)();
         }
+    }
+    
+    // setup rest filters with params from cli
+    for (int j=endFilterIdx+1; j<= m_ptrStages->count(); j++) {
+        PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
+		setupFilter(j, page_sequence.selectAll());
     }
     
     // update statistics for executed filters
@@ -371,9 +372,14 @@ ConsoleBatch::setupSelectContent(std::set<PageId> allPages)
 		select_content->getSettings()->setPageParams(page, params);
 	}
 
-	if (cli.hasContentDeviation()) {
+	if (cli.hasContentDeviation())
 		select_content->getSettings()->setMaxDeviation(cli.getContentDeviation());
-	}
+
+    if (cli.hasPageDetectionBox())
+        select_content->getSettings()->setPageDetectionBox(cli.getPageDetectionBox());
+    
+    if (cli.hasPageDetectionTolerance())
+        select_content->getSettings()->setPageDetectionTolerance(cli.getPageDetectionTolerance());
 }
 
 

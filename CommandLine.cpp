@@ -109,6 +109,8 @@ CommandLine::parseCli(QStringList const& argv)
  	opts << "language";
 	opts << "disable-content-text-mask";
     opts << "window-title";
+    opts << "page-detection-box";
+    opts << "page-detection-tolerance";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -208,21 +210,13 @@ void
 CommandLine::addImage(QString const& path)
 {
 	QFileInfo file(path);
-
-	// create ImageFileInfo and push to images
-	ImageId const image_id(file.filePath());
-	ImageMetadata metadata;
-	metadata.setDpi(fetchDpi());
-	std::vector<ImageMetadata> vMetadata;
-	vMetadata.push_back(metadata);
-	ImageFileInfo image_info(file, vMetadata);
-	m_images.push_back(image_info);
-	m_files.push_back(file);
+    m_files.push_back(file);
 }
 
 void
 CommandLine::setup()
 {
+    // setup parameters
 	m_outputProjectFile = fetchOutputProjectFile();
 	m_layoutType = fetchLayoutType();
 	m_layoutDirection = fetchLayoutDirection();
@@ -246,6 +240,20 @@ CommandLine::setup()
 	m_compression = fetchCompression();
     m_language = fetchLanguage();
     m_windowTitle = fetchWindowTitle();
+    m_pageDetectionBox = fetchPageDetectionBox();
+    m_pageDetectionTolerance = fetchPageDetectionTolerance();
+
+    // setup images
+    for (int i=0; i<m_files.size(); ++i) {
+        // create ImageFileInfo and push to images
+        ImageId const image_id(m_files[i].filePath());
+        ImageMetadata metadata;
+        metadata.setDpi(m_dpi);
+        std::vector<ImageMetadata> vMetadata;
+        vMetadata.push_back(metadata);
+        ImageFileInfo image_info(m_files[i], vMetadata);
+        m_images.push_back(image_info);
+    }
 }
 
 
@@ -286,13 +294,13 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << std::endl;
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << std::endl;
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << std::endl;
-	std::cout << "\t--skew-deviation=<0.0...)\t\t\t-- default: 1.0; pages with bigger skew deviation will be painted in red" << std::endl;
-	std::cout << "\t--disable-content-detection\t\t\t-- default: enabled" << std::endl;
+	std::cout << "\t--skew-deviation=<0.0...)\t\t-- default: 1.0; pages with bigger skew deviation will be painted in red" << std::endl;
+	std::cout << "\t--disable-content-detection\t\t-- default: enabled" << std::endl;
 	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << std::endl;
 	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << std::endl;
 	std::cout << "\t--disable-content-text-mask\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << std::endl;
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << std::endl;
-	std::cout << "\t--content-deviation=<0.0...)\t\t\t-- default: 2.0; pages with bigger content deviation will be painted in red" << std::endl;
+	std::cout << "\t--content-deviation=<0.0...)\t\t-- default: 2.0; pages with bigger content deviation will be painted in red" << std::endl;
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << std::endl;
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << std::endl;
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << std::endl;
@@ -327,6 +335,8 @@ CommandLine::printHelp()
 	std::cout << "\t--output-project=, -o=<project_name>" << std::endl;
 	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << std::endl;
     std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
+    std::cout << "\t--page-detection-box=<widthxheight>" << std::endl;
+    std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t--default: 0.1" << std::endl;
 	std::cout << std::endl;
 }
 
@@ -715,4 +725,28 @@ QString CommandLine::fetchWindowTitle() const
     }
     
     return "";
+}
+
+QSizeF CommandLine::fetchPageDetectionBox() const
+{
+    if (! hasPageDetectionBox()) {
+        return QSizeF();
+    }
+    
+    QRegExp rx("([\\d\\.]+)x([\\d\\.]+)");
+	if (rx.exactMatch(m_options["page-detection-box"])) {
+		return QSizeF(rx.cap(1).toFloat(), rx.cap(2).toFloat());
+	}
+    
+    std::cout << "invalid --page-detection-box=" << m_options["page-detection-box"].toAscii().constData() << std::endl;
+    exit(1);    
+}
+
+double CommandLine::fetchPageDetectionTolerance() const
+{
+    if (hasPageDetectionTolerance()) {
+        return m_options["page-detection-tolerance"].toFloat();
+    }
+    
+    return 0.1;
 }

@@ -47,15 +47,21 @@ using namespace imageproc;
 
 QRectF
 PageFinder::findPageBox(
-	TaskStatus const& status, FilterData const& data, bool fine_tune, DebugImages* dbg)
+	TaskStatus const& status, FilterData const& data, bool fine_tune, QSizeF const& box, double tolerance, DebugImages* dbg)
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
-
+    
+    std::cout << "dpi: " << data.xform().origDpi().horizontal() << std::endl;
+    
 	if (xform_150dpi.resultingRect().toRect().isEmpty()) {
 		return QRectF();
 	}
-	
+
+    double exp_width = 150.0 * box.width() / 25.4;
+    double exp_height = 150.0 * box.height() / 25.4;
+    std::cout << "exp_width = " << exp_width << "; exp_height" << exp_height << std::endl;
+    
 	uint8_t const darkest_gray_level = darkestGrayLevel(data.grayImage());
 	QColor const outside_color(darkest_gray_level, darkest_gray_level, darkest_gray_level);
 
@@ -73,19 +79,56 @@ PageFinder::findPageBox(
 		dbg->add(gray150, "gray150");
 	}
 
-	BinaryImage bw150(peakThreshold(gray150));
-	//BinaryImage bw150(binarizeOtsu(gray150));
+    
+    /*
+     * Get rect with peakThreshold
+     */
+	BinaryImage bwPeak(peakThreshold(gray150));
 	if (dbg) {
-	    dbg->add(bw150, "peakThreshold");
+	    dbg->add(bwPeak, "peakThreshold");
 	}
 
-	QImage bwimg(bw150.toQImage());
+	QImage bwimg(bwPeak.toQImage());
 	QRect content_rect(detectBorders(bwimg));
 	if (fine_tune)
 		fineTuneCorners(bwimg, content_rect);
-	
+    std::cout << "width = " << content_rect.width() << "; height=" << content_rect.height() << std::endl;
+    
+    /*
+     * Get rect with otsu
+     */
+    BinaryImage bwOtsu(binarizeOtsu(gray150));
+    if (dbg) {
+	    dbg->add(bwOtsu, "OtsuThreshold");
+	}
 
-	// Transform back from 150dpi.
+	QImage bwimg_otsu(bwOtsu.toQImage());
+	QRect content_rect_otsu(detectBorders(bwimg_otsu));
+	if (fine_tune)
+		fineTuneCorners(bwimg_otsu, content_rect_otsu);
+    std::cout << "otsu_width = " << content_rect_otsu.width() << "; otsu_height=" << content_rect_otsu.height() << std::endl;
+
+    
+    /*
+     * Select box which is closer to expected
+     */
+    if (! box.isEmpty()) {
+        double err_width = double(abs(exp_width - content_rect.width())) / double(exp_width);
+        double err_height = double(abs(exp_height - content_rect.height())) / double(exp_height);
+        double err_width_otsu = double(abs(exp_width - content_rect_otsu.width())) / double(exp_width);
+        double err_height_otsu = double(abs(exp_height - content_rect_otsu.height())) / double(exp_width);
+        std::cout << "err_width=" << err_width << "; err_height" << err_height << std::endl;
+        std::cout << "err_width_otsu=" << err_width_otsu << "; err_height_otsu" << err_height_otsu << std::endl;
+        
+        if ((err_width > tolerance || err_height > tolerance) && err_width_otsu <= err_width && err_height_otsu <= err_height) {
+            std::cout << "using otsu" << std::endl;
+            content_rect = content_rect_otsu;
+        } else {
+            std::cout << "using peakThreshold" << std::endl;
+        }
+    }
+    
+    // Transform back from 150dpi.
 	QTransform combined_xform(xform_150dpi.transform().inverted());
 	combined_xform *= data.xform().transform();
 	return combined_xform.map(QRectF(content_rect)).boundingRect();

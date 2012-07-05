@@ -32,7 +32,9 @@ namespace select_content
 Settings::Settings() :
     m_avg(0.0),
     m_sigma(0.0),
-	m_maxDeviation(1.0)
+	m_maxDeviation(1.0),
+    m_pageDetectionBox(0.0, 0.0),
+    m_pageDetectionTolerance(0.1)
 {
 }
 

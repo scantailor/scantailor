@@ -96,6 +96,8 @@ public:
 	bool hasDepthPerception() const { return contains("depth-perception"); }
 	bool hasTiffCompression() const { return contains("tiff-compression"); }
     bool hasWindowTitle() const { return contains("window-title"); }
+    bool hasPageDetectionBox() const { return contains("page-detection-box"); }
+    bool hasPageDetectionTolerance() const { return contains("page-detection-tolerance"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
@@ -121,6 +123,8 @@ public:
 	int getTiffCompression() const { return m_compression; }
 	QString getLanguage() const { return m_language; }
     QString getWindowTitle() const { return m_windowTitle; }
+    QSizeF getPageDetectionBox() const { return m_pageDetectionBox; }
+    double getPageDetectionTolerance() const { return m_pageDetectionTolerance; }
 
 	bool help() { return m_options.contains("help"); }
 	void printHelp();
@@ -134,6 +138,8 @@ private:
 	bool m_global;
 	QString m_language;
     QString m_windowTitle;
+    QSizeF m_pageDetectionBox;
+    double m_pageDetectionTolerance;
 
 	bool isGlobal() { return m_global; }
 	void setGlobal() { m_global = true; }
@@ -197,6 +203,8 @@ private:
 	int fetchCompression() const;
 	QString fetchLanguage() const;
     QString fetchWindowTitle() const;
+    QSizeF fetchPageDetectionBox() const;
+    double fetchPageDetectionTolerance() const;
 };
 
 #endif

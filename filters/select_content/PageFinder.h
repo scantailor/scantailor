@@ -30,6 +30,7 @@ class FilterData;
 class QImage;
 class QRect;
 class QRectF;
+class QSizeF;
 
 namespace imageproc
 {
@@ -43,8 +44,8 @@ class PageFinder
 {
 public:
 	static QRectF findPageBox(
-		TaskStatus const& status, FilterData const& data, bool fine_tune=false,
-		DebugImages* dbg = 0);
+        TaskStatus const& status, FilterData const& data, bool fine_tune, QSizeF const& box, double tolerance=0.1,
+        DebugImages* dbg = 0);
 private:
 	static QRect detectBorders(QImage const& img);
 	static int detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient);
