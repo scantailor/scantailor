@@ -108,9 +108,9 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "picture-shape";
  	opts << "language";
 	opts << "disable-content-text-mask";
-    opts << "window-title";
-    opts << "page-detection-box";
-    opts << "page-detection-tolerance";
+	opts << "window-title";
+	opts << "page-detection-box";
+	opts << "page-detection-tolerance";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -210,7 +210,7 @@ void
 CommandLine::addImage(QString const& path)
 {
 	QFileInfo file(path);
-    m_files.push_back(file);
+	m_files.push_back(file);
 }
 
 void
@@ -238,10 +238,10 @@ CommandLine::setup()
 	m_matchLayoutTolerance = fetchMatchLayoutTolerance();
 	m_dewarpingMode = fetchDewarpingMode();
 	m_compression = fetchCompression();
-    m_language = fetchLanguage();
-    m_windowTitle = fetchWindowTitle();
-    m_pageDetectionBox = fetchPageDetectionBox();
-    m_pageDetectionTolerance = fetchPageDetectionTolerance();
+	m_language = fetchLanguage();
+	m_windowTitle = fetchWindowTitle();
+	m_pageDetectionBox = fetchPageDetectionBox();
+	m_pageDetectionTolerance = fetchPageDetectionTolerance();
 
     // setup images
     for (int i=0; i<m_files.size(); ++i) {
@@ -261,7 +261,7 @@ void
 CommandLine::printHelp()
 {
 	std::cout << std::endl;
-	std::cout << "Scan Tailor is a post-processing tool for scanned pages." << std::endl;
+	std::cout << "Scan Tailor is a post-processing tool for scanned pages." << std::endl;    
 	std::cout << "Version: " << VERSION << std::endl;
 	std::cout << std::endl;
 	std::cout << "ScanTailor usage: " << std::endl;
@@ -334,9 +334,9 @@ CommandLine::printHelp()
 	std::cout << "\t--end-filter=<1...6>\t\t\t-- default: 6" << std::endl;
 	std::cout << "\t--output-project=, -o=<project_name>" << std::endl;
 	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << std::endl;
-    std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
-    std::cout << "\t--page-detection-box=<widthxheight>" << std::endl;
-    std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t--default: 0.1" << std::endl;
+	std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
+	std::cout << "\t--page-detection-box=<widthxheight>\t\t-- in mm" << std::endl;
+	std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t-- default: 0.1" << std::endl;
 	std::cout << std::endl;
 }
 

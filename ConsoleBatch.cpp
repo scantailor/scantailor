@@ -192,7 +192,7 @@ ConsoleBatch::process()
 {
 	CommandLine const& cli = CommandLine::get();
 
-    // get first filter id
+	// get first filter id
 	int startFilterIdx = m_ptrStages->fixOrientationFilterIdx();
 	if (cli.hasStartFilterIdx()) {
 		unsigned int sf = cli.getStartFilterIdx();
@@ -201,7 +201,7 @@ ConsoleBatch::process()
 		startFilterIdx = sf;
 	}
 
-    // get last filter id
+	// get last filter id
 	int endFilterIdx = m_ptrStages->outputFilterIdx();
 	if (cli.hasEndFilterIdx()) {
 		unsigned int ef = cli.getEndFilterIdx();
@@ -210,13 +210,13 @@ ConsoleBatch::process()
 		endFilterIdx = ef;
 	}
     
-    // run filters
+	// run filters
 	for (int j=startFilterIdx; j<=endFilterIdx; j++) {
 		if (cli.isVerbose())
 			std::cout << "Filter: " << (j+1) << "\n";
 
         // process pages
-		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
+	PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
         setupFilter(j, page_sequence.selectAll());
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
@@ -224,8 +224,8 @@ ConsoleBatch::process()
 				std::cout << "\tProcessing: " << page.imageId().filePath().toAscii().constData() << "\n";
 			BackgroundTaskPtr bgTask = createCompositeTask(page, j);
 			(*bgTask)();
-        }
-    }
+		}
+	}
     
     // setup rest filters with params from cli
     for (int j=endFilterIdx+1; j<= m_ptrStages->count(); j++) {

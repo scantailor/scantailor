@@ -51,17 +51,17 @@ PageFinder::findPageBox(
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
-    
-    std::cout << "dpi: " << data.xform().origDpi().horizontal() << std::endl;
-    
+	
+	std::cout << "dpi: " << data.xform().origDpi().horizontal() << std::endl;
+	
 	if (xform_150dpi.resultingRect().toRect().isEmpty()) {
 		return QRectF();
 	}
 
-    double exp_width = 150.0 * box.width() / 25.4;
-    double exp_height = 150.0 * box.height() / 25.4;
-    std::cout << "exp_width = " << exp_width << "; exp_height" << exp_height << std::endl;
-    
+	double exp_width = 150.0 * box.width() / 25.4;
+	double exp_height = 150.0 * box.height() / 25.4;
+	std::cout << "exp_width = " << exp_width << "; exp_height" << exp_height << std::endl;
+	
 	uint8_t const darkest_gray_level = darkestGrayLevel(data.grayImage());
 	QColor const outside_color(darkest_gray_level, darkest_gray_level, darkest_gray_level);
 
@@ -79,56 +79,78 @@ PageFinder::findPageBox(
 		dbg->add(gray150, "gray150");
 	}
 
-    
-    /*
-     * Get rect with peakThreshold
-     */
-	BinaryImage bwPeak(peakThreshold(gray150));
+
+	std::vector<QRect> rects;
+	std::vector<BinaryImage> bwimages;
+	
+	
+	// get binary images from gray150 using different algorithm
+	bwimages.push_back(peakThreshold(gray150));
+	bwimages.push_back(binarizeOtsu(gray150));
+	bwimages.push_back(binarizeMokji(gray150));
+	bwimages.push_back(binarizeSauvola(gray150, gray150.size()));
+	bwimages.push_back(binarizeWolf(gray150, gray150.size()));
 	if (dbg) {
-	    dbg->add(bwPeak, "peakThreshold");
+			dbg->add(bwimages[0], "peakThreshold");
+			dbg->add(bwimages[1], "OtsuThreshold");
+			dbg->add(bwimages[2], "MokjiThreshold");
+			dbg->add(bwimages[3], "SauvolaThreshold");
+			dbg->add(bwimages[4], "WolfThreshold");
 	}
 
-	QImage bwimg(bwPeak.toQImage());
-	QRect content_rect(detectBorders(bwimg));
-	if (fine_tune)
-		fineTuneCorners(bwimg, content_rect);
-    std::cout << "width = " << content_rect.width() << "; height=" << content_rect.height() << std::endl;
-    
-    /*
-     * Get rect with otsu
-     */
-    BinaryImage bwOtsu(binarizeOtsu(gray150));
-    if (dbg) {
-	    dbg->add(bwOtsu, "OtsuThreshold");
+	QRect content_rect(0,0,0,0);
+	double err_width = 1.0;
+	double err_height = 1.0;
+	
+	if (box.isEmpty()) {
+		// detect content box with otsu
+		QImage bwimg(bwimages[1].toQImage());
+		content_rect = detectBorders(bwimg);
+		if (fine_tune)
+			fineTuneCorners(bwimg, content_rect);
+	} else {
+		// detect content box using different binarized images
+		for (int i=0; i<bwimages.size(); ++i) {
+			// detect content box
+			QImage bwimg(bwimages[i].toQImage());
+			rects.push_back(QRect(detectBorders(bwimg)));
+			if (fine_tune)
+				fineTuneCorners(bwimg, rects[i]);
+#ifdef DEBUG
+			std::cout << "width = " << rects[i].width() << "; height=" << rects[i].height() << std::endl;
+#endif
+			
+			double err_w = double(abs(exp_width - rects[i].width())) / double(exp_width);
+			double err_h = double(abs(exp_height - rects[i].height())) / double(exp_height);
+#ifdef DEBUG
+			std::cout << "err_w=" << err_w << "; err_h" << err_h << std::endl;
+#endif
+			// if detected box has lower error, change it
+			if ((err_width > tolerance || err_height > tolerance) && err_w <= err_width && err_h <= err_height) {
+				std::cout << "using: " << i << std::endl;
+				content_rect = rects[i];
+				err_width = err_w;
+				err_height = err_h;
+			}
+			/*
+			if (err_w < err_width) {
+				content_rect.setLeft(rects[i].left());
+				content_rect.setRight(rects[i].right());
+				err_width = err_w;
+			}
+			if (err_h < err_height) {
+				content_rect.setTop(rects[i].top());
+				content_rect.setBottom(rects[i].bottom());
+				err_height = err_h;
+			}
+			*/
+		}
 	}
-
-	QImage bwimg_otsu(bwOtsu.toQImage());
-	QRect content_rect_otsu(detectBorders(bwimg_otsu));
-	if (fine_tune)
-		fineTuneCorners(bwimg_otsu, content_rect_otsu);
-    std::cout << "otsu_width = " << content_rect_otsu.width() << "; otsu_height=" << content_rect_otsu.height() << std::endl;
-
-    
-    /*
-     * Select box which is closer to expected
-     */
-    if (! box.isEmpty()) {
-        double err_width = double(abs(exp_width - content_rect.width())) / double(exp_width);
-        double err_height = double(abs(exp_height - content_rect.height())) / double(exp_height);
-        double err_width_otsu = double(abs(exp_width - content_rect_otsu.width())) / double(exp_width);
-        double err_height_otsu = double(abs(exp_height - content_rect_otsu.height())) / double(exp_width);
-        std::cout << "err_width=" << err_width << "; err_height" << err_height << std::endl;
-        std::cout << "err_width_otsu=" << err_width_otsu << "; err_height_otsu" << err_height_otsu << std::endl;
-        
-        if ((err_width > tolerance || err_height > tolerance) && err_width_otsu <= err_width && err_height_otsu <= err_height) {
-            std::cout << "using otsu" << std::endl;
-            content_rect = content_rect_otsu;
-        } else {
-            std::cout << "using peakThreshold" << std::endl;
-        }
-    }
-    
-    // Transform back from 150dpi.
+#ifdef DEBUG
+	std::cout << "width = " << content_rect.width() << "; height=" << content_rect.height() << std::endl;
+#endif
+			
+	// Transform back from 150dpi.
 	QTransform combined_xform(xform_150dpi.transform().inverted());
 	combined_xform *= data.xform().transform();
 	return combined_xform.map(QRectF(content_rect)).boundingRect();
@@ -165,16 +187,16 @@ PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, 
 
 	while (i != end) {
 		int black_pixels=0;
-	    int old_gap=gap;
+		int old_gap=gap;
 
 		// count black pixels on the edge around given point
-	    for (int j=ms; j!=me; j++) {
-	        int x=i, y=j;
-	        if (orient == Qt::Vertical) { x=j; y=i; }
-	        int pixel = img.pixelIndex(x, y);
-	        if (pixel == black)
+		for (int j=ms; j!=me; j++) {
+			int x=i, y=j;
+			if (orient == Qt::Vertical) { x=j; y=i; }
+			int pixel = img.pixelIndex(x, y);
+			if (pixel == black)
 				++black_pixels;
-	    }
+		}
 
 		if (black_pixels < min_bp) {
 			++gap;
@@ -183,10 +205,10 @@ PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, 
 			edge = i;
 		}
 
-	    if (gap > min_size)
-	        break;
+		if (gap > min_size)
+			break;
 
-	    i += inc;
+		i += inc;
 	}
 
 	return edge;
@@ -216,13 +238,13 @@ PageFinder::fineTuneCorner(QImage const& img, int &x, int &y, int inc_x, int inc
 {
 	Qt::GlobalColor black = Qt::color1;
 	while (1) {
-	    int pixel = img.pixelIndex(x, y);
-	    int tx = x + inc_x;
-	    int ty = y + inc_y;
-	    if (pixel!=black || tx<0 || tx>(img.width()-1) || ty<0 || ty>(img.height()-1))
-	        break;
-	    x = tx;
-	    y = ty;
+		int pixel = img.pixelIndex(x, y);
+		int tx = x + inc_x;
+		int ty = y + inc_y;
+		if (pixel!=black || tx<0 || tx>(img.width()-1) || ty<0 || ty>(img.height()-1))
+			break;
+		x = tx;
+		y = ty;
 	}
 }
 
