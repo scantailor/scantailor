@@ -58,8 +58,8 @@ PageFinder::findPageBox(
 		return QRectF();
 	}
 
-	double exp_width = 150.0 * box.width() / 25.4;
-	double exp_height = 150.0 * box.height() / 25.4;
+	int exp_width = int( 150.0 * box.width() / 25.4 );
+	int exp_height = int( 150.0 * box.height() / 25.4 );
 	std::cout << "exp_width = " << exp_width << "; exp_height" << exp_height << std::endl;
 	
 	uint8_t const darkest_gray_level = darkestGrayLevel(data.grayImage());
@@ -107,7 +107,7 @@ PageFinder::findPageBox(
 		QImage bwimg(bwimages[1].toQImage());
 		content_rect = detectBorders(bwimg);
 		if (fine_tune)
-			fineTuneCorners(bwimg, content_rect);
+			fineTuneCorners(bwimg, content_rect, QSize(0,0), 1.0);
 	} else {
 		// detect content box using different binarized images
 		for (int i=0; i<bwimages.size(); ++i) {
@@ -115,7 +115,7 @@ PageFinder::findPageBox(
 			QImage bwimg(bwimages[i].toQImage());
 			rects.push_back(QRect(detectBorders(bwimg)));
 			if (fine_tune)
-				fineTuneCorners(bwimg, rects[i]);
+				fineTuneCorners(bwimg, rects[i], QSize(exp_width, exp_height), tolerance);
 #ifdef DEBUG
 			std::cout << "width = " << rects[i].width() << "; height=" << rects[i].height() << std::endl;
 #endif
@@ -215,14 +215,14 @@ PageFinder::detectEdge(QImage const& img, int start, int end, int inc, int mid, 
 }
 
 void
-PageFinder::fineTuneCorners(QImage const& img, QRect &rect)
+PageFinder::fineTuneCorners(QImage const& img, QRect &rect, QSize const& size, double tolerance)
 {
 	int l=rect.left(), t=rect.top(), r=rect.right(), b=rect.bottom();
 
-	fineTuneCorner(img, l, t, 1, 1);
-	fineTuneCorner(img, r, t, -1, 1);
-	fineTuneCorner(img, l, b, 1, -1);
-	fineTuneCorner(img, r, b, -1, -1);
+	fineTuneCorner(img, l, t, r, b, 1, 1, size, tolerance);
+	fineTuneCorner(img, r, t, l, b, -1, 1, size, tolerance);
+	fineTuneCorner(img, l, b, r, t, 1, -1, size, tolerance);
+	fineTuneCorner(img, r, b, l, t, -1, -1, size, tolerance);
 
 	rect.setLeft(l);
 	rect.setTop(t);
@@ -234,13 +234,18 @@ PageFinder::fineTuneCorners(QImage const& img, QRect &rect)
  * shift edges until given corner is out of black
  */
 void
-PageFinder::fineTuneCorner(QImage const& img, int &x, int &y, int inc_x, int inc_y)
+PageFinder::fineTuneCorner(QImage const& img, int &x, int &y, int max_x, int max_y, int inc_x, int inc_y, QSize const& size, double tolerance)
 {
 	Qt::GlobalColor black = Qt::color1;
 	while (1) {
 		int pixel = img.pixelIndex(x, y);
 		int tx = x + inc_x;
 		int ty = y + inc_y;
+		int w = abs(max_x - x);
+		int h = abs(max_y - y);
+		
+		if (!size.isEmpty() && (w > size.width()*tolerance || h > size.height()*tolerance))
+			break;
 		if (pixel!=black || tx<0 || tx>(img.width()-1) || ty<0 || ty>(img.height()-1))
 			break;
 		x = tx;
