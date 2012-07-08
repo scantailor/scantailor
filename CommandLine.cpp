@@ -243,17 +243,24 @@ CommandLine::setup()
 	m_pageDetectionBox = fetchPageDetectionBox();
 	m_pageDetectionTolerance = fetchPageDetectionTolerance();
 
-    // setup images
-    for (int i=0; i<m_files.size(); ++i) {
-        // create ImageFileInfo and push to images
-        ImageId const image_id(m_files[i].filePath());
-        ImageMetadata metadata;
-        metadata.setDpi(m_dpi);
-        std::vector<ImageMetadata> vMetadata;
-        vMetadata.push_back(metadata);
-        ImageFileInfo image_info(m_files[i], vMetadata);
-        m_images.push_back(image_info);
-    }
+	QRegExp exp(".*(tif|tiff|jpg|jpeg|bmp|gif|png|pbm|pgm|ppm|xbm|xpm)$", Qt::CaseInsensitive);
+	// setup images
+	for (int i=0; i<m_files.size(); ++i) {
+		if (! exp.exactMatch(m_files[i].filePath())) {
+#ifdef DEBUG
+			std::cout << "Skipping file: " << m_files[i].filePath().toStdString() << std::endl;
+#endif
+			continue;
+		}
+		// create ImageFileInfo and push to images
+		ImageId const image_id(m_files[i].filePath());
+		ImageMetadata metadata;
+		metadata.setDpi(m_dpi);
+		std::vector<ImageMetadata> vMetadata;
+		vMetadata.push_back(metadata);
+		ImageFileInfo image_info(m_files[i], vMetadata);
+		m_images.push_back(image_info);
+	}
 }
 
 
