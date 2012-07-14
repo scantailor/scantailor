@@ -339,12 +339,15 @@ FixDpiDialog::dpiValueChanged()
 		return;
 	}
 	
+	/*
 	if (metadata.isDpiOK()) {
 		applyBtn->setEnabled(true);
 		return;
 	}
+	*/
 	
-	applyBtn->setEnabled(false);
+	//applyBtn->setEnabled(false);
+	applyBtn->setEnabled(true);
 }
 
 void
@@ -374,7 +377,8 @@ FixDpiDialog::applyClicked()
 void
 FixDpiDialog::enableDisableOkButton()
 {
-	bool const enable = m_ptrPages->allDpisOK();
+	//bool const enable = m_ptrPages->allDpisOK();
+	bool const enable = true;
 	buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enable);
 }
 
