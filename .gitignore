@@ -5,3 +5,13 @@ CMakeFiles
 build/
 *~
 *.swp
+.vimprj/
+*.patch
+ScanTailor.config
+ScanTailor.creator
+ScanTailor.creator.user
+ScanTailor.files
+ScanTailor.includes
+build-*/
+samples/
+
