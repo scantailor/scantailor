@@ -66,6 +66,7 @@
 #include "OutOfMemoryHandler.h"
 #include "OutOfMemoryDialog.h"
 #include "QtSignalForwarder.h"
+#include "StartBatchProcessingDialog.h"
 #include "filters/fix_orientation/Filter.h"
 #include "filters/fix_orientation/Task.h"
 #include "filters/fix_orientation/CacheDrivenTask.h"
@@ -90,6 +91,7 @@
 #include "ui_AboutDialog.h"
 #include "ui_RemovePagesDialog.h"
 #include "ui_BatchProcessingLowerPanel.h"
+#include "ui_StartBatchProcessingDialog.h"
 #include "config.h"
 #include "version.h"
 #include <boost/foreach.hpp>
@@ -1172,7 +1174,18 @@ MainWindow::startBatchProcessing()
 			: ProcessingTaskQueue::SEQUENTIAL_ORDER
 		)
 	);
-	PageInfo page(m_ptrThumbSequence->selectionLeader());
+
+	StartBatchProcessingDialog dialog(this);
+	
+	dialog.show();
+	if (! dialog.exec()) {
+        return;
+	}
+
+    bool processAll = dialog.isAllPagesChecked();
+    
+	PageInfo start_page = processAll ? m_ptrThumbSequence->firstPage() : m_ptrThumbSequence->selectionLeader();
+	PageInfo page = start_page;
 	for (; !page.isNull(); page = m_ptrThumbSequence->nextPage(page.id())) {
 		m_ptrBatchQueue->addProcessingTask(
 			page, createCompositeTask(page, m_curFilter, /*batch=*/true, m_debug)
