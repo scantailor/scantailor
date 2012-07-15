@@ -348,26 +348,26 @@ ConsoleBatch::setupSelectContent(std::set<PageId> allPages)
 
 	for (std::set<PageId>::iterator i=allPages.begin(); i!=allPages.end(); i++) {
 		PageId page = *i;
-	    select_content::Dependencies deps;
+		select_content::Dependencies deps;
 
-        select_content::Params params(deps);
-        std::auto_ptr<select_content::Params> old_params = select_content->getSettings()->getPageParams(page);
+		select_content::Params params(deps);
+		std::auto_ptr<select_content::Params> old_params = select_content->getSettings()->getPageParams(page);
 
-        if (old_params.get()) {
-            params = *old_params;
-        }
+		if (old_params.get()) {
+			params = *old_params;
+		}
 
 		// SELECT CONTENT FILTER
 		if (cli.hasContentRect()) {
-            params.setContentRect(cli.getContentRect());
+			params.setContentRect(cli.getContentRect());
 			//QRectF rect(cli.getContentRect());
 			//QSizeF size_mm(rect.width(), rect.height());
 			//select_content::Params params(rect, size_mm, deps, MODE_MANUAL);
 		}
 
-        params.setContentDetect(cli.isContentDetectionEnabled());
-        params.setPageDetect(cli.isPageDetectionEnabled());
-        params.setFineTuneCorners(cli.isFineTuningEnabled());
+		params.setContentDetect(cli.isContentDetectionEnabled());
+		params.setPageDetect(cli.isPageDetectionEnabled());
+		params.setFineTuneCorners(cli.isFineTuningEnabled());
 
 		select_content->getSettings()->setPageParams(page, params);
 	}
@@ -375,11 +375,11 @@ ConsoleBatch::setupSelectContent(std::set<PageId> allPages)
 	if (cli.hasContentDeviation())
 		select_content->getSettings()->setMaxDeviation(cli.getContentDeviation());
 
-    if (cli.hasPageDetectionBox())
-        select_content->getSettings()->setPageDetectionBox(cli.getPageDetectionBox());
-    
-    if (cli.hasPageDetectionTolerance())
-        select_content->getSettings()->setPageDetectionTolerance(cli.getPageDetectionTolerance());
+	if (cli.hasPageDetectionBox())
+		select_content->getSettings()->setPageDetectionBox(cli.getPageDetectionBox());
+
+	if (cli.hasPageDetectionTolerance())
+		select_content->getSettings()->setPageDetectionTolerance(cli.getPageDetectionTolerance());
 }
 
 

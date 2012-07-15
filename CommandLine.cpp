@@ -122,7 +122,7 @@ CommandLine::parseCli(QStringList const& argv)
 
 	// skip first argument (scantailor)
 	for (int i=1; i<argv.size(); i++) {
-#ifdef DEBUG_CLI
+#ifdef DEBUG
 	std::cout << "arg[" << i << "]=" << argv[i].toAscii().constData() << std::endl;
 #endif
 		if (rx.exactMatch(argv[i])) {
@@ -403,6 +403,9 @@ CommandLine::fetchDpi(QString oname)
 output::ColorParams::ColorMode
 CommandLine::fetchColorMode()
 {
+	if (! hasColorMode())
+		return output::ColorParams::BLACK_AND_WHITE;
+	
 	QString cm = m_options["color-mode"].toLower();
 	
 	if (cm == "color_grayscale")
@@ -417,6 +420,9 @@ CommandLine::fetchColorMode()
 output::PictureShape
 CommandLine::fetchPictureShape()
 {
+	if (! hasPictureShape())
+		return output::FREE_SHAPE;
+	
 	QString ps = m_options["picture-shape"].toLower();
 	
 	if (ps == "rectangular")
@@ -503,7 +509,7 @@ CommandLine::fetchContentDetection()
 {
 	Despeckle::Level level = Despeckle::NORMAL;
 
-	if (m_options["content-detection"] != "") {
+	if (hasContentDetection()) {
 		QString cm = m_options["content-detection"].toLower();
 		if (cm == "cautious")
 			level = Despeckle::CAUTIOUS;
@@ -648,7 +654,7 @@ CommandLine::fetchDepthPerception()
 float
 CommandLine::fetchMatchLayoutTolerance()
 {
-	if (!m_options.contains("match-layout-tolerance"))
+	if (! hasMatchLayoutTolerance())
 		return 0.2;
 
 	return m_options["match-layout-tolerance"].toFloat();
