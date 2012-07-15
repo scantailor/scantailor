@@ -215,9 +215,9 @@ ConsoleBatch::process()
 		if (cli.isVerbose())
 			std::cout << "Filter: " << (j+1) << "\n";
 
-        // process pages
+	// process pages
 	PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
-        setupFilter(j, page_sequence.selectAll());
+ 	setupFilter(j, page_sequence.selectAll());
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
 			if (cli.isVerbose())
@@ -227,16 +227,16 @@ ConsoleBatch::process()
 		}
 	}
     
-    // setup rest filters with params from cli
-    for (int j=endFilterIdx+1; j<= m_ptrStages->count(); j++) {
-        PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
+	// setup rest filters with params from cli
+	for (int j=endFilterIdx+1; j<= m_ptrStages->count(); j++) {
+		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
 		setupFilter(j, page_sequence.selectAll());
-    }
+	}
     
-    // update statistics for executed filters
-    for (int j=0; j<=endFilterIdx; j++) {
+	// update statistics for executed filters
+	for (int j=0; j<=endFilterIdx; j++) {
 		m_ptrStages->filterAt(j)->updateStatistics();
-    }
+	}
 }
 
 
@@ -471,7 +471,7 @@ ConsoleBatch::setupOutput(std::set<PageId> allPages)
 			bwo.setThresholdAdjustment(cli.getThreshold());
 			colorParams.setBlackWhiteOptions(bwo);
 		}
-
+        
 		params.setColorParams(colorParams);
 
 		if (cli.hasDespeckle())

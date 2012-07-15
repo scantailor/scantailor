@@ -24,6 +24,7 @@
 #include <QMap>
 #include <QRectF>
 #include <QStringList>
+#include <iostream>
 
 #include "Dpi.h"
 #include "filters/page_split/LayoutType.h"
@@ -73,31 +74,31 @@ public:
 	bool hasLanguage() const;
 
 	bool hasHelp() const { return contains("help"); }
-	bool hasOutputProject() const { return contains("output-project"); }
-	bool hasLayout() const { return contains("layout"); }
-	bool hasLayoutDirection() const { return contains("layout-direction"); }
-	bool hasStartFilterIdx() const { return contains("start-filter"); }
-	bool hasEndFilterIdx() const { return contains("end-filter"); }
-	bool hasOrientation() const { return contains("orientation"); }
-	bool hasDeskewAngle() const { return contains("rotate"); }
-	bool hasDeskew() const { return contains("deskew"); }
-	bool hasSkewDeviation() const { return contains("skew-deviation"); }
-	bool hasContentRect() const { return contains("content-box"); }
-	bool hasContentDeviation() const { return contains("content-deviation"); }
+	bool hasOutputProject() const { return contains("output-project") && !m_options["output-project"].isEmpty(); }
+	bool hasLayout() const { return contains("layout") && !m_options["layout"].isEmpty(); }
+	bool hasLayoutDirection() const { return contains("layout-direction") && !m_options["layout-direction"].isEmpty(); }
+	bool hasStartFilterIdx() const { return contains("start-filter") && !m_options["start-filter"].isEmpty(); }
+	bool hasEndFilterIdx() const { return contains("end-filter") && !m_options["end-filter"].isEmpty(); }
+	bool hasOrientation() const { return contains("orientation") && !m_options["orientation"].isEmpty(); }
+	bool hasDeskewAngle() const { return contains("rotate") && !m_options["rotate"].isEmpty(); }
+	bool hasDeskew() const { return contains("deskew") && !m_options["deskew"].isEmpty(); }
+	bool hasSkewDeviation() const { return contains("skew-deviation") && !m_options["skew-deviation"].isEmpty(); }
+	bool hasContentRect() const { return contains("content-box") && !m_options["content-box"].isEmpty(); }
+	bool hasContentDeviation() const { return contains("content-deviation") && !m_options["content-deviation"].isEmpty(); }
 	bool hasContentText() const { return !contains("disable-content-text-mask"); }
-	bool hasColorMode() const { return contains("color-mode"); }
-	bool hasPictureShape() const { return contains("picture-shape"); }
+	bool hasColorMode() const { return contains("color-mode") && !m_options["color-mode"].isEmpty(); }
+	bool hasPictureShape() const { return contains("picture-shape") && !m_options["picture-shape"].isEmpty(); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
 	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
-	bool hasThreshold() const { return contains("threshold"); }
-	bool hasDespeckle() const { return contains("despeckle"); }
+	bool hasThreshold() const { return contains("threshold") && !m_options["threshold"].isEmpty(); }
+	bool hasDespeckle() const { return contains("despeckle") && !m_options["despeckle"].isEmpty(); }
 	bool hasDewarping() const { return contains("dewarping"); }
-	bool hasMatchLayoutTolerance() const { return contains("match-layout-tolerance"); }
-	bool hasDepthPerception() const { return contains("depth-perception"); }
-	bool hasTiffCompression() const { return contains("tiff-compression"); }
-    bool hasWindowTitle() const { return contains("window-title"); }
-    bool hasPageDetectionBox() const { return contains("page-detection-box"); }
-    bool hasPageDetectionTolerance() const { return contains("page-detection-tolerance"); }
+	bool hasMatchLayoutTolerance() const { return contains("match-layout-tolerance") && !m_options["match-layout-tolerance"].isEmpty(); }
+	bool hasDepthPerception() const { return contains("depth-perception") && !m_options["depth-perception"].isEmpty(); }
+	bool hasTiffCompression() const { return contains("tiff-compression") && !m_options["tiff-compression"].isEmpty(); }
+	bool hasWindowTitle() const { return contains("window-title") && !m_options["window-title"].isEmpty(); }
+	bool hasPageDetectionBox() const { return contains("page-detection-box") && !m_options["page-detection-box"].isEmpty(); }
+	bool hasPageDetectionTolerance() const { return contains("page-detection-tolerance") && !m_options["page-detection-tolerance"].isEmpty(); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
@@ -122,9 +123,9 @@ public:
 	float getMatchLayoutTolerance() const { return m_matchLayoutTolerance; }
 	int getTiffCompression() const { return m_compression; }
 	QString getLanguage() const { return m_language; }
-    QString getWindowTitle() const { return m_windowTitle; }
-    QSizeF getPageDetectionBox() const { return m_pageDetectionBox; }
-    double getPageDetectionTolerance() const { return m_pageDetectionTolerance; }
+	QString getWindowTitle() const { return m_windowTitle; }
+	QSizeF getPageDetectionBox() const { return m_pageDetectionBox; }
+	double getPageDetectionTolerance() const { return m_pageDetectionTolerance; }
 
 	bool help() { return m_options.contains("help"); }
 	void printHelp();
@@ -137,9 +138,9 @@ private:
 	bool m_gui;
 	bool m_global;
 	QString m_language;
-    QString m_windowTitle;
-    QSizeF m_pageDetectionBox;
-    double m_pageDetectionTolerance;
+	QString m_windowTitle;
+	QSizeF m_pageDetectionBox;
+	double m_pageDetectionTolerance;
 
 	bool isGlobal() { return m_global; }
 	void setGlobal() { m_global = true; }
@@ -202,9 +203,9 @@ private:
 	float fetchMatchLayoutTolerance();
 	int fetchCompression() const;
 	QString fetchLanguage() const;
-    QString fetchWindowTitle() const;
-    QSizeF fetchPageDetectionBox() const;
-    double fetchPageDetectionTolerance() const;
+	QString fetchWindowTitle() const;
+	QSizeF fetchPageDetectionBox() const;
+	double fetchPageDetectionTolerance() const;
 };
 
 #endif

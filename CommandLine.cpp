@@ -194,10 +194,10 @@ CommandLine::parseCli(QStringList const& argv)
 			}
 		}
 	}
-
+            
 	setup();
 
-#ifdef DEBUG_CLI
+#ifdef DEBUG
 	QStringList params = m_options.keys();
 	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options[params[i]].toAscii().constData() << std::endl; }
 	std::cout << "Images: " << CommandLine::m_images.size() << std::endl;
