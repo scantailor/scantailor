@@ -40,16 +40,19 @@ ApplyDialog::ApplyDialog(QWidget* parent, PageId const& cur_page,
 	m_pScopeGroup->addButton(thisPageAndFollowersRB);
 	m_pScopeGroup->addButton(selectedPagesRB);
 	m_pScopeGroup->addButton(everyOtherRB);
+	m_pScopeGroup->addButton(thisEveryOtherRB);
 	m_pScopeGroup->addButton(everyOtherSelectedRB);
 
+	/*
 	if (m_selectedPages.size() <= 1) {
 		selectedPagesWidget->setEnabled(false);
 		everyOtherSelectedWidget->setEnabled(false);
-		everyOtherSelectedHint->setText(selectedPagesHint->text());
+		//everyOtherSelectedHint->setText(selectedPagesHint->text());
 	} else if (m_selectedRanges.size() > 1) {
 		everyOtherSelectedWidget->setEnabled(false);
 		everyOtherSelectedHint->setText(tr("Can't do: more than one group is selected."));
 	}
+	*/
 	
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }
@@ -74,6 +77,15 @@ ApplyDialog::onSubmit()
 		return;
 	} else if (everyOtherRB->isChecked()) {
 		m_pages.selectEveryOther(m_curPage).swap(pages);
+	} else if (thisEveryOtherRB->isChecked()) {
+		std::set<PageId> tmp;
+		m_pages.selectPagePlusFollowers(m_curPage).swap(tmp);
+		std::set<PageId>::iterator it = tmp.begin();
+		for (int i=0; it != tmp.end(); ++it, ++i) {
+			if (i % 2 == 0) {
+				pages.insert(*it);
+			}
+		}
 	} else if (everyOtherSelectedRB->isChecked()) {
 		assert(m_selectedRanges.size() == 1);
 		PageRange const& range = m_selectedRanges.front();
