@@ -66,43 +66,11 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QRadioButton" name="everyOtherRB">
+             <widget class="QRadioButton" name="thisEveryOtherRB">
               <property name="text">
-               <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page</string>
+               <string extracomment="All odd or even pages, depending on the current page being odd or even.">This page and the following every other page</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>30</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_2">
-                <property name="font">
-                 <font>
-                  <pointsize>7</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>The current page will be included.</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </item>
            </layout>
           </widget>
@@ -119,6 +87,13 @@
          <property name="margin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="QRadioButton" name="everyOtherRB">
+           <property name="text">
+            <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page for all pages (include this page)</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QRadioButton" name="selectedPagesRB">
            <property name="text">
