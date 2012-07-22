@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>355</width>
-    <height>308</height>
+    <height>333</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -45,9 +45,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QRadioButton" name="thisEveryOtherRB">
+        <property name="text">
+         <string extracomment="All odd or even pages, depending on the current page being odd or even.">This page and the following every other page</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="everyOtherRB">
         <property name="text">
-         <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page</string>
+         <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page from the first one</string>
         </property>
        </widget>
       </item>

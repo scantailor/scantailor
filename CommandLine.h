@@ -85,6 +85,7 @@ public:
 	bool hasSkewDeviation() const { return contains("skew-deviation") && !m_options["skew-deviation"].isEmpty(); }
 	bool hasContentRect() const { return contains("content-box") && !m_options["content-box"].isEmpty(); }
 	bool hasContentDeviation() const { return contains("content-deviation") && !m_options["content-deviation"].isEmpty(); }
+	bool hasContentDetection() const { return ! contains("disable-content-detection"); }
 	bool hasContentText() const { return !contains("disable-content-text-mask"); }
 	bool hasColorMode() const { return contains("color-mode") && !m_options["color-mode"].isEmpty(); }
 	bool hasPictureShape() const { return contains("picture-shape") && !m_options["picture-shape"].isEmpty(); }
