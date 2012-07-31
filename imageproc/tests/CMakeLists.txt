@@ -18,6 +18,7 @@ SET(
 	TestPolygonRasterizer.cpp
 	TestSeedFill.cpp
 	TestSEDM.cpp
+	TestRastLineFinder.cpp
 	Utils.cpp Utils.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
