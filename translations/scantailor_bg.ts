@@ -60,66 +60,71 @@
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
+        <source>Neco Torquato - Brazilian Portuguese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="212"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
         <translation>Svetoslav Sashkov, Mandor - Български</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="212"/>
+        <location filename="../ui/AboutDialog.ui" line="219"/>
         <source>Petr Kovář - Czech</source>
         <translation>Petr Kovář - Чешки</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="219"/>
+        <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>Stefan Birkner - German</source>
         <translation>Stefan Birkner - Немски</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <location filename="../ui/AboutDialog.ui" line="233"/>
         <source>Angelo Gemmi - Italian</source>
         <translation>Angelo Gemmi - Италиански</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="233"/>
+        <location filename="../ui/AboutDialog.ui" line="240"/>
         <source>Masahiro Kitagawa - Japanese</source>
         <translation>Masahiro Kitagawa - Японски</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="240"/>
+        <location filename="../ui/AboutDialog.ui" line="247"/>
         <source>Patrick Pascal - French</source>
         <translation>Patrick Pascal - Френски</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="247"/>
+        <location filename="../ui/AboutDialog.ui" line="254"/>
         <source>Daniel Koć - Polish</source>
         <translation>Daniel Koć - Полски</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="254"/>
+        <location filename="../ui/AboutDialog.ui" line="261"/>
         <source>Joseph Artsimovich - Russian</source>
         <translation>Joseph Artsimovich - Руски</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="261"/>
+        <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Marián Hvolka - Slovak</source>
         <translation>Marián Hvolka - Словашки</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="268"/>
+        <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Flavio Benelli - Spanish</source>
         <translation>Flavio Benelli - Испански</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="275"/>
+        <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Davidson Wang - Traditional Chinese</source>
         <translation>Davidson Wang - Традиционен китайски</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="282"/>
+        <location filename="../ui/AboutDialog.ui" line="289"/>
         <source>Yuri Chornoivan - Ukrainian</source>
         <translation>Yuri Chornoivan - Украински</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="309"/>
+        <location filename="../ui/AboutDialog.ui" line="316"/>
         <source>denver 22</source>
         <translation>denver 22</translation>
     </message>
@@ -200,7 +205,7 @@ Andrey Bergman - Настройка натоварването на систем
 </translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="294"/>
+        <location filename="../ui/AboutDialog.ui" line="301"/>
         <source>Documentation</source>
         <translation>Документация</translation>
     </message>
@@ -213,7 +218,7 @@ phaedrus
 Taxman</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="350"/>
+        <location filename="../ui/AboutDialog.ui" line="357"/>
         <source>License</source>
         <translation>Лиценз</translation>
     </message>
@@ -309,30 +314,45 @@ Taxman</translation>
     </message>
 </context>
 <context>
+    <name>ErrorWidget</name>
+    <message>
+        <location filename="../ui/ErrorWidget.ui" line="14"/>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+</context>
+<context>
     <name>FixDpiDialog</name>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="241"/>
         <source>Need Fixing</source>
-        <translation type="obsolete">Има нужда от поправка</translation>
+        <translation type="unfinished">Има нужда от поправка</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="242"/>
+        <location filename="../FixDpiDialog.cpp" line="707"/>
         <source>All Pages</source>
-        <translation type="obsolete">Всички страници</translation>
+        <translation type="unfinished">Всички страници</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="476"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="obsolete">DPI е твърде голямо и най-вероятно е грешно.</translation>
+        <translation type="unfinished">DPI е твърде голямо и най-вероятно е грешно.</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="479"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation type="obsolete">Стойността на DPI е прекалено малка. Дори и да е правилна, няма да получите задоволителни резултати.</translation>
+        <translation type="unfinished">Стойността на DPI е прекалено малка. Дори и да е правилна, няма да получите задоволителни резултати.</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="482"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation type="obsolete">Стойността на DPI е прекалено малка за този размер в пиксели. Такава комбинация вероятно ще доведе до препълване на паметта.</translation>
+        <translation type="unfinished">Стойността на DPI е прекалено малка за този размер в пиксели. Такава комбинация вероятно ще доведе до препълване на паметта.</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="733"/>
         <source>%1 (page %2)</source>
-        <translation type="obsolete">%1 (страница %2)</translation>
+        <translation type="unfinished">%1 (страница %2)</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="13"/>
@@ -404,8 +424,9 @@ Taxman</translation>
 <context>
     <name>ImageViewBase</name>
     <message>
+        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
-        <translation type="obsolete">Използвайте колелцето на мишката или +/- за мащабиране. При увеличен изглед е възможно влачене.</translation>
+        <translation type="unfinished">Използвайте колелцето на мишката или +/- за мащабиране. При увеличен изглед е възможно влачене.</translation>
     </message>
     <message>
         <source>Unrestricted dragging is possible by holding down the Shift key.</source>
@@ -433,10 +454,16 @@ Taxman</translation>
 <context>
     <name>LoadFileTask</name>
     <message>
+        <location filename="../LoadFileTask.cpp" line="157"/>
         <source>The following file could not be loaded:
 %1</source>
-        <translation type="obsolete">Следния файл не може да бъде зареден:
+        <translation type="unfinished">Следния файл не може да бъде зареден:
 %1</translation>
+    </message>
+    <message>
+        <location filename="../LoadFileTask.cpp" line="160"/>
+        <source>The following file doesn&apos;t exist:&lt;br&gt;%1&lt;br&gt;&lt;br&gt;Use the &lt;a href=&quot;#relink&quot;&gt;Relinking Tool&lt;/a&gt; to locate it.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -465,54 +492,80 @@ Taxman</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="232"/>
+        <location filename="../MainWindow.cpp" line="564"/>
         <source>Save Project</source>
         <translation>Запазване на проект</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="564"/>
         <source>Save this project?</source>
-        <translation type="obsolete">Да се запази ли този проект?</translation>
+        <translation type="unfinished">Да се запази ли този проект?</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1001"/>
         <source>Insert before ...</source>
-        <translation type="obsolete">Вмъкни преди...</translation>
+        <translation type="unfinished">Вмъкни преди...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1004"/>
         <source>Insert after ...</source>
-        <translation type="obsolete">Вмъкни след...</translation>
+        <translation type="unfinished">Вмъкни след...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1010"/>
         <source>Remove from project ...</source>
-        <translation type="obsolete">Премахване от проекта...</translation>
+        <translation type="unfinished">Премахване от проекта...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1031"/>
         <source>Insert here ...</source>
-        <translation type="obsolete">Вмъкни тук ...</translation>
+        <translation type="unfinished">Вмъкни тук ...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1369"/>
+        <location filename="../MainWindow.cpp" line="1437"/>
         <source>Scan Tailor Projects</source>
-        <translation type="obsolete">Проекти на Scan Tailor</translation>
+        <translation type="unfinished">Проекти на Scan Tailor</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1436"/>
         <source>Open Project</source>
-        <translation type="obsolete">Отваряне на проект</translation>
+        <translation type="unfinished">Отваряне на проект</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1454"/>
+        <location filename="../MainWindow.cpp" line="1463"/>
+        <location filename="../MainWindow.cpp" line="1777"/>
+        <location filename="../MainWindow.cpp" line="1808"/>
         <source>Error</source>
-        <translation type="obsolete">Грешка</translation>
+        <translation type="unfinished">Грешка</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1455"/>
         <source>Unable to open the project file.</source>
-        <translation type="obsolete">Проектният файл не може да бъде отворен.</translation>
+        <translation type="unfinished">Проектният файл не може да бъде отворен.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1464"/>
         <source>The project file is broken.</source>
-        <translation type="obsolete">Проектният файл е повреден.</translation>
+        <translation type="unfinished">Проектният файл е повреден.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1673"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="obsolete">Изходният резулат все още не е възможен, тъй като не се знае крайният размер на страниците.
+        <translation type="unfinished">Изходният резулат все още не е възможен, тъй като не се знае крайният размер на страниците.
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1860"/>
+        <source>Files to insert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1915"/>
+        <source>Skip failed files</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Output is not yet possible, as the final size of pages is not yet known.
@@ -521,20 +574,29 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1706"/>
         <source>Unnamed</source>
-        <translation type="obsolete">Без име</translation>
+        <translation type="unfinished">Без име</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1711"/>
+        <source>%2 - Scan Tailor %3 [%1bit]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1778"/>
+        <location filename="../MainWindow.cpp" line="1809"/>
         <source>Error saving the project file!</source>
-        <translation type="obsolete">Грешка при запазване на проектния файл!</translation>
+        <translation type="unfinished">Грешка при запазване на проектния файл!</translation>
     </message>
     <message>
         <source>File to insert</source>
         <translation type="obsolete">Файл за вмъкване</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1866"/>
         <source>Images not in project (%1)</source>
-        <translation type="obsolete">Изображения, които не са в проекта (%1)</translation>
+        <translation type="unfinished">Изображения, които не са в проекта (%1)</translation>
     </message>
     <message>
         <source>Error opening the image file.</source>
@@ -545,8 +607,9 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страница %2)</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1962"/>
         <source>Remove</source>
-        <translation type="obsolete">Премахване</translation>
+        <translation type="unfinished">Премахване</translation>
     </message>
     <message>
         <source>Unable to delete file:
@@ -715,8 +778,9 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Свързване ...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="492"/>
         <source>Stop batch processing</source>
-        <translation type="obsolete">Спиране на масовата обработка</translation>
+        <translation type="unfinished">Спиране на масовата обработка</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="321"/>
@@ -928,6 +992,21 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <location filename="../ui/OutOfMemoryDialog.ui" line="453"/>
         <source>Please note that while Scan Tailor tries to catch out-of-memory situations and give you the opportunity to save your project, it&apos;s not always possible. This time it succeeded, but the next time it might just crash.</source>
         <translation>Моля, обърнете внимание: Независимо, че Scan Tailor се опитва да прихване ситуациите с недостиг на памет, за да ви даде възможност да запазите проекта си, това не винаги е възможно. Този път успя, но следващият път може просто да се срине.</translation>
+    </message>
+    <message>
+        <location filename="../OutOfMemoryDialog.cpp" line="88"/>
+        <source>Scan Tailor Projects</source>
+        <translation type="unfinished">Проекти на Scan Tailor</translation>
+    </message>
+    <message>
+        <location filename="../OutOfMemoryDialog.cpp" line="123"/>
+        <source>Error</source>
+        <translation type="unfinished">Грешка</translation>
+    </message>
+    <message>
+        <location filename="../OutOfMemoryDialog.cpp" line="124"/>
+        <source>Error saving the project file!</source>
+        <translation type="unfinished">Грешка при запазване на проектния файл!</translation>
     </message>
 </context>
 <context>
@@ -1436,51 +1515,67 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
+        <location filename="../ProjectFilesDialog.cpp" line="334"/>
         <source>Input Directory</source>
         <translation>Входна папка</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="43"/>
+        <location filename="../ProjectFilesDialog.cpp" line="354"/>
         <source>Output Directory</source>
         <translation>Изходна папка</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="526"/>
+        <location filename="../ProjectFilesDialog.cpp" line="534"/>
+        <location filename="../ProjectFilesDialog.cpp" line="543"/>
+        <location filename="../ProjectFilesDialog.cpp" line="565"/>
+        <location filename="../ProjectFilesDialog.cpp" line="574"/>
+        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Error</source>
-        <translation type="obsolete">Грешка</translation>
+        <translation type="unfinished">Грешка</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="526"/>
         <source>No files in project!</source>
-        <translation type="obsolete">Няма файлове в проекта!</translation>
+        <translation type="unfinished">Няма файлове в проекта!</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="535"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
-        <translation type="obsolete">Входната папка не е зададена или не съществува.</translation>
+        <translation type="unfinished">Входната папка не е зададена или не съществува.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation type="obsolete">Входната и изходната папка не могат да съвпадат.</translation>
+        <translation type="unfinished">Входната и изходната папка не могат да съвпадат.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="554"/>
         <source>Create Directory?</source>
-        <translation type="obsolete">Създаване на папка?</translation>
+        <translation type="unfinished">Създаване на папка?</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
-        <translation type="obsolete">Изходната папка не съществува.  Да се създаде ли?</translation>
+        <translation type="unfinished">Изходната папка не съществува.  Да се създаде ли?</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="566"/>
         <source>Unable to create output directory.</source>
-        <translation type="obsolete">Не може да се създаде изходната папка.</translation>
+        <translation type="unfinished">Не може да се създаде изходната папка.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="575"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
-        <translation type="obsolete">Изходната папка не е зададена или не съществува.</translation>
+        <translation type="unfinished">Изходната папка не е зададена или не съществува.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
-        <translation type="obsolete">Някои от файловете не успяха да се заредят.
+        <translation type="unfinished">Някои от файловете не успяха да се заредят.
 Или са в неподдържан формат, или са повредени.
 Трябва да ги махнете от проекта.</translation>
     </message>
@@ -1559,12 +1654,14 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ProjectOpeningContext</name>
     <message>
+        <location filename="../ProjectOpeningContext.cpp" line="51"/>
         <source>Error</source>
-        <translation type="obsolete">Грешка</translation>
+        <translation type="unfinished">Грешка</translation>
     </message>
     <message>
+        <location filename="../ProjectOpeningContext.cpp" line="52"/>
         <source>Unable to interpret the project file.</source>
-        <translation type="obsolete">Проектният файл не може да се интерпретира.</translation>
+        <translation type="unfinished">Проектният файл не може да се интерпретира.</translation>
     </message>
 </context>
 <context>
@@ -1583,6 +1680,21 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
         <translation>...</translation>
+    </message>
+    <message>
+        <location filename="../RelinkingDialog.cpp" line="95"/>
+        <source>Substitution File for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RelinkingDialog.cpp" line="102"/>
+        <source>Substitution Directory for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RelinkingDialog.cpp" line="130"/>
+        <source>This change would merge several files into one.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1713,12 +1825,14 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>SettingsDialog</name>
     <message>
+        <location filename="../SettingsDialog.cpp" line="36"/>
         <source>Compiled without OpenGL support.</source>
-        <translation type="obsolete">Компилирано без поддръжка на OpenGL.</translation>
+        <translation type="unfinished">Компилирано без поддръжка на OpenGL.</translation>
     </message>
     <message>
+        <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation type="obsolete">Вашият хардуер (или драйвер) няма нужните характеристики.</translation>
+        <translation type="unfinished">Вашият хардуер (или драйвер) няма нужните характеристики.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
@@ -1734,8 +1848,9 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>StageListView</name>
     <message>
+        <location filename="../StageListView.cpp" line="130"/>
         <source>Launch batch processing</source>
-        <translation type="obsolete">Стартиране на пакетна обработка</translation>
+        <translation type="unfinished">Стартиране на пакетна обработка</translation>
     </message>
 </context>
 <context>
@@ -1757,19 +1872,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <translation>...</translation>
     </message>
     <message>
+        <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation type="obsolete">Минимално</translation>
+        <translation type="unfinished">Минимално</translation>
     </message>
     <message>
+        <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation type="obsolete">Нормално</translation>
+        <translation type="unfinished">Нормално</translation>
     </message>
 </context>
 <context>
     <name>ThumbnailSequence</name>
     <message>
+        <location filename="../ThumbnailSequence.cpp" line="1359"/>
         <source>%1 (page %2)</source>
-        <translation type="obsolete">%1 (страница %2)</translation>
+        <translation type="unfinished">%1 (страница %2)</translation>
     </message>
 </context>
 <context>
@@ -2005,37 +2123,37 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="506"/>
+        <location filename="../filters/output/Task.cpp" line="512"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="558"/>
+        <location filename="../filters/output/Task.cpp" line="564"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="575"/>
+        <location filename="../filters/output/Task.cpp" line="581"/>
         <source>Output</source>
         <translation>Краен резултат</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="576"/>
+        <location filename="../filters/output/Task.cpp" line="582"/>
         <source>Picture Zones</source>
         <translation>Зони за изображения</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="577"/>
+        <location filename="../filters/output/Task.cpp" line="583"/>
         <source>Fill Zones</source>
         <translation>Запълване на зони</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="578"/>
+        <location filename="../filters/output/Task.cpp" line="584"/>
         <source>Dewarping</source>
         <translation>Корекция изкривявания</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="579"/>
+        <location filename="../filters/output/Task.cpp" line="585"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
     </message>
@@ -2086,12 +2204,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>page_layout::OptionsWidget</name>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="310"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="320"/>
         <source>Apply Margins</source>
         <translation>Прилагане на граници</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/OptionsWidget.cpp" line="325"/>
+        <location filename="../filters/page_layout/OptionsWidget.cpp" line="335"/>
         <source>Apply Alignment</source>
         <translation>Прилагане на подравняване</translation>
     </message>
