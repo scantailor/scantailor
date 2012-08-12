@@ -21,11 +21,31 @@
 #include <QDomElement>
 #include <QString>
 
+#include "CommandLine.h"
+
 namespace page_layout
 {
 
+    
+Alignment::Alignment()
+	: m_vert(VCENTER), m_hor(HCENTER), m_tolerance(DEFAULT_TOLERANCE), m_autoMargins(false)
+{
+    CommandLine cli = CommandLine::get();
+    m_isNull = cli.getDefaultNull(); 
+}
+    
+Alignment::Alignment(Vertical vert, Horizontal hor)
+	: m_vert(vert), m_hor(hor), m_tolerance(DEFAULT_TOLERANCE), m_autoMargins(false)
+{
+    CommandLine cli = CommandLine::get();
+    m_isNull = cli.getDefaultNull(); 
+}
+
 Alignment::Alignment(QDomElement const& el)
 {
+    CommandLine cli = CommandLine::get();
+    m_isNull = cli.getDefaultNull(); 
+    
 	QString const vert(el.attribute("vert"));
 	QString const hor(el.attribute("hor"));
 	m_isNull = el.attribute("null").toInt() != 0;

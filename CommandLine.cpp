@@ -84,6 +84,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "margins-bottom";
 	opts << "match-layout";
 	opts << "match-layout-tolerance";
+	opts << "match-layout-default";
 	opts << "alignment";
 	opts << "alignment-vertical";
 	opts << "alignment-horizontal";
@@ -242,6 +243,7 @@ CommandLine::setup()
 	m_windowTitle = fetchWindowTitle();
 	m_pageDetectionBox = fetchPageDetectionBox();
 	m_pageDetectionTolerance = fetchPageDetectionTolerance();
+    m_defaultNull = fetchDefaultNull();
 
 	QRegExp exp(".*(tif|tiff|jpg|jpeg|bmp|gif|png|pbm|pgm|ppm|xbm|xpm)$", Qt::CaseInsensitive);
 	// setup images
@@ -319,6 +321,7 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-bottom=<number>" << std::endl;
 	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << std::endl;
 	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << std::endl;
+	std::cout << "\t--match-layout-default=<true|false>\t-- default: true" << std::endl;
 	std::cout << "\t--alignment=<center|original|auto>\t-- sets vertical to original and horizontal to center" << std::endl;
 	std::cout << "\t\t--alignment-vertical=<top|center|bottom|original>" << std::endl;
 	std::cout << "\t\t--alignment-horizontal=<left|center|right|original>" << std::endl;
@@ -463,8 +466,12 @@ CommandLine::fetchAlignment()
 	page_layout::Alignment alignment(page_layout::Alignment::TOP, page_layout::Alignment::HCENTER);
 
 	if (m_options.contains("match-layout")) {
+        m_defaultNull = false;
 		if (m_options["match-layout"] == "false") alignment.setNull(true);
-		if (m_options["match-layout"] == "true") alignment.setNull(false);
+		if (m_options["match-layout"] == "true") {
+            alignment.setNull(false);
+            m_defaultNull = true;
+        }
 	}
 
 	if (m_options.contains("alignment-tolerance")) {
@@ -762,4 +769,15 @@ double CommandLine::fetchPageDetectionTolerance() const
     }
     
     return 0.1;
+}
+
+bool CommandLine::fetchDefaultNull() 
+{
+    m_defaultNull = false;
+    
+    if (contains("match-layout-default") && m_options["match-layout-default"] == "false") {
+        m_defaultNull = true;
+    }
+    
+    return m_defaultNull;
 }

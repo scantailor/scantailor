@@ -25,6 +25,8 @@ class QString;
 
 #include <iostream>
 
+class CommandLine;
+
 namespace page_layout
 {
 
@@ -40,11 +42,9 @@ public:
 	/**
 	 * \brief Constructs a null alignment.
 	 */
-	Alignment()
-	: m_vert(VCENTER), m_hor(HCENTER), m_isNull(true), m_tolerance(DEFAULT_TOLERANCE), m_autoMargins(false) {}
-	
-	Alignment(Vertical vert, Horizontal hor)
-	: m_vert(vert), m_hor(hor), m_isNull(false), m_tolerance(DEFAULT_TOLERANCE), m_autoMargins(false) {}
+	Alignment();
+    
+    Alignment(Vertical vert, Horizontal hor);
 	
 	Alignment(QDomElement const& el);
 	

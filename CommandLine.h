@@ -38,6 +38,10 @@
 #include "Margins.h"
 #include "Despeckle.h"
 
+namespace page_layout {
+    class Alignment;
+}
+
 /**
  * CommandLine is a singleton simulation.
  * use CommandLine::get() to get access to global class
@@ -52,7 +56,7 @@ public:
 	static CommandLine const& get() { return m_globalInstance; }
 	static void set(CommandLine const& cl);
 
-	CommandLine(QStringList const& argv, bool g=true) : m_error(false), m_gui(g), m_global(false) { CommandLine::parseCli(argv); }
+	CommandLine(QStringList const& argv, bool g=true) : m_error(false), m_gui(g), m_global(false), m_defaultNull(false) { CommandLine::parseCli(argv); }
 
 	bool isGui() const { return m_gui; }
 	bool isVerbose() const { return contains("verbose"); }
@@ -127,6 +131,7 @@ public:
 	QString getWindowTitle() const { return m_windowTitle; }
 	QSizeF getPageDetectionBox() const { return m_pageDetectionBox; }
 	double getPageDetectionTolerance() const { return m_pageDetectionTolerance; }
+    bool getDefaultNull() const { return m_defaultNull; }
 
 	bool help() { return m_options.contains("help"); }
 	void printHelp();
@@ -142,6 +147,7 @@ private:
 	QString m_windowTitle;
 	QSizeF m_pageDetectionBox;
 	double m_pageDetectionTolerance;
+    bool m_defaultNull;
 
 	bool isGlobal() { return m_global; }
 	void setGlobal() { m_global = true; }
@@ -207,6 +213,7 @@ private:
 	QString fetchWindowTitle() const;
 	QSizeF fetchPageDetectionBox() const;
 	double fetchPageDetectionTolerance() const;
+    bool fetchDefaultNull();
 };
 
 #endif
