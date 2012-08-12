@@ -86,10 +86,12 @@ OptionsWidget::manualContentRectSet(QRectF const& content_rect)
 	m_uiData.setContentRect(content_rect);
 	m_uiData.setMode(MODE_MANUAL);
 	m_uiData.setContentDetection(true);
+    m_uiData.setPageDetection(false);
 	updateModeIndication(MODE_MANUAL);
 	commitCurrentParams();
 	
 	emit invalidateThumbnail(m_pageId);
+	emit reloadRequested();
 }
 
 void
@@ -106,8 +108,10 @@ OptionsWidget::modeChanged(bool const auto_mode)
 		commitCurrentParams();
 		emit reloadRequested();
 	} else {
+        m_uiData.setPageDetection(false);
 		m_uiData.setMode(MODE_MANUAL);
 		commitCurrentParams();
+		emit reloadRequested();
 	}
 }
 
@@ -174,6 +178,8 @@ OptionsWidget::updateModeIndication(AutoManualMode const mode)
 		} else {
 			autoBtn->setChecked(false);
 			manualBtn->setChecked(true);
+            pageDetectDisableBtn->setChecked(true);
+            pageDetectAutoBtn->setChecked(false);
 		}
 	}
 }
