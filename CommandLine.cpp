@@ -303,13 +303,13 @@ CommandLine::printHelp()
 	std::cout << "\t--orientation=<left|right|upsidedown|none>\n\t\t\t\t\t\t-- default: none" << std::endl;
 	std::cout << "\t--rotate=<0.0...360.0>\t\t\t-- it also sets deskew to manual mode" << std::endl;
 	std::cout << "\t--deskew=<auto|manual>\t\t\t-- default: auto" << std::endl;
-	std::cout << "\t--skew-deviation=<0.0...)\t\t-- default: 1.0; pages with bigger skew deviation will be painted in red" << std::endl;
+	std::cout << "\t--skew-deviation=<0.0...)\t\t-- default: 5.0; pages with bigger skew deviation will be painted in red" << std::endl;
 	std::cout << "\t--disable-content-detection\t\t-- default: enabled" << std::endl;
 	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << std::endl;
 	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << std::endl;
 	std::cout << "\t--disable-content-text-mask\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << std::endl;
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << std::endl;
-	std::cout << "\t--content-deviation=<0.0...)\t\t-- default: 2.0; pages with bigger content deviation will be painted in red" << std::endl;
+	std::cout << "\t--content-deviation=<0.0...)\t\t-- default: 1.0; pages with bigger content deviation will be painted in red" << std::endl;
 	std::cout << "\t--content-box=<<left_offset>x<top_offset>:<width>x<height>>" << std::endl;
 	std::cout << "\t\t\t\t\t\t-- if set the content detection is se to manual mode" << std::endl;
 	std::cout << "\t\t\t\t\t\t   example: --content-box=100x100:1500x2500" << std::endl;
@@ -608,7 +608,7 @@ double
 CommandLine::fetchSkewDeviation()
 {
 	if (!hasSkewDeviation())
-		return 0.0;
+		return 5.0;
 
 	return m_options["skew-deviation"].toDouble();
 }
