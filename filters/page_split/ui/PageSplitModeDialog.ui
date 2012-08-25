@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>331</height>
+    <width>317</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,7 +38,7 @@
         <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="pixmap">
-        <pixmap resource="../../../resources/resources.qrc">:/icons/layout_type_auto.png</pixmap>
+        <pixmap>:/icons/layout_type_auto.png</pixmap>
        </property>
       </widget>
      </item>
@@ -114,6 +114,20 @@
        </widget>
       </item>
       <item>
+       <widget class="QRadioButton" name="everyOtherRB">
+        <property name="text">
+         <string>Every other page</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="thisEveryOtherRB">
+        <property name="text">
+         <string>This page and the following every other page</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QWidget" name="selectedPagesWidget" native="true">
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
@@ -164,6 +178,13 @@
            </item>
           </layout>
          </item>
+         <item>
+          <widget class="QRadioButton" name="everyOtherSelectedRB">
+           <property name="text">
+            <string>Every other selected page</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -195,10 +216,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../resources/resources.qrc"/>
-  <include location="../../../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
