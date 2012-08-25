@@ -11,20 +11,12 @@ StartBatchProcessingDialog::StartBatchProcessingDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     
-    QSettings settings;
-    if (settings.value("StartBatchProcessing/pages").toBool()) {
-        ui->allPages->setChecked(true);
-        ui->fromSelected->setChecked(false);
-    } else {
-        ui->allPages->setChecked(false);
-        ui->fromSelected->setChecked(true);
-    }
+    ui->allPages->setChecked(true);
+    ui->fromSelected->setChecked(false);
 }
 
 StartBatchProcessingDialog::~StartBatchProcessingDialog()
 {
-    QSettings settings;
-    settings.setValue("StartBatchProcessing/pages", ui->allPages->isChecked());
     delete ui;
 }
 
