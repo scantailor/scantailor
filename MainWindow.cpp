@@ -530,6 +530,16 @@ MainWindow::setupThumbView()
 	
 	thumbView->setBackgroundBrush(palette().color(QPalette::Window));
 	m_ptrThumbSequence->attachView(thumbView);
+    
+    thumbView->installEventFilter(this);
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *ev)
+{
+    if (obj == thumbView && ev->type() == QEvent::Resize) {
+        emit invalidateAllThumbnails();
+    }
+    return false;
 }
 
 void
@@ -1080,6 +1090,7 @@ MainWindow::thumbViewScrolled()
 	} else {
 		focusButton->setChecked(false);
 	}
+    emit invalidateAllThumbnails();
 }
 
 void

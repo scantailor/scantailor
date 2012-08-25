@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>625</width>
-    <height>452</height>
+    <width>783</width>
+    <height>464</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -56,8 +56,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>625</width>
-     <height>21</height>
+     <width>783</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug">
@@ -144,6 +144,12 @@
        </item>
        <item>
         <widget class="QGraphicsView" name="thumbView">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>150</width>
@@ -152,7 +158,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>249</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>
@@ -180,7 +186,7 @@
    <property name="minimumSize">
     <size>
      <width>250</width>
-     <height>132</height>
+     <height>134</height>
     </size>
    </property>
    <property name="features">
@@ -250,8 +256,8 @@
       <widget class="NonOwningWidget" name="filterOptions" native="true"/>
      </item>
     </layout>
-    <zorder></zorder>
-    <zorder>imageViewFrame</zorder>
+    <zorder>filterOptions</zorder>
+    <zorder>filterList</zorder>
    </widget>
   </widget>
   <action name="actionDebug">

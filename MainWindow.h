@@ -88,8 +88,9 @@ public:
 
 	std::set<PageId> selectedPages() const;
 	
-	std::vector<PageRange> selectedRanges() const;
+    std::vector<PageRange> selectedRanges() const;
 protected:
+    bool eventFilter(QObject *obj, QEvent *ev);
 	virtual void closeEvent(QCloseEvent* event);
 	
 	virtual void timerEvent(QTimerEvent* event);

@@ -611,99 +611,7 @@ ThumbnailSequence::Impl::invalidateThumbnail(PageInfo const& page_info)
 void
 ThumbnailSequence::Impl::invalidateThumbnailImpl(ItemsById::iterator const id_it)
 {
-	std::auto_ptr<CompositeItem> composite(
-		getCompositeItem(&*id_it, id_it->pageInfo)
-	);
-	CompositeItem* const new_composite = composite.get();
-	CompositeItem* const old_composite = id_it->composite;
-	QSizeF const old_size(old_composite->boundingRect().size());
-	QSizeF const new_size(new_composite->boundingRect().size());
-	QPointF const old_pos(new_composite->pos());
-	
-	new_composite->updateAppearence(id_it->isSelected(), id_it->isSelectionLeader());
-	
-	m_graphicsScene.addItem(composite.release());
-	id_it->composite = new_composite;
-	id_it->incompleteThumbnail = new_composite->incompleteThumbnail();
-	delete old_composite;
-	
-	ItemsInOrder::iterator after_old(m_items.project<ItemsInOrderTag>(id_it));
-	// Notice after_old++ below.
-
-	// Move our item to the beginning of m_itemsInOrder, to make it out of range
-	// we are going to pass to itemInsertPosition().
-	m_itemsInOrder.relocate(m_itemsInOrder.begin(), after_old++);
-
-	int dist = 0;
-	ItemsInOrder::iterator const after_new(
-		itemInsertPosition(
-			++m_itemsInOrder.begin(), m_itemsInOrder.end(),
-			id_it->pageInfo.id(), id_it->incompleteThumbnail,
-			after_old, &dist
-		)
-	);
-
-	// Move our item to its intended position.
-	m_itemsInOrder.relocate(after_new, m_itemsInOrder.begin());
-
-
-	// Now let's reposition the items on the scene.
-	
-	ItemsInOrder::iterator ord_it, ord_end;
-
-	// The range of [ord_it, ord_end) is supposed to contain all items
-	// between the old and new positions of our item, with the new
-	// position in range.
-
-	if (dist <= 0) { // New position is before or equals to the old one.
-		ord_it = after_new;
-		--ord_it; // Include new item position in the range.
-		ord_end = after_old;
-	} else { // New position is after the old one.
-		ord_it = after_old;
-		ord_end = after_new;
-	}
-	
-	double offset = 0;
-
-	if (ord_it != m_itemsInOrder.begin()) {
-		ItemsInOrder::iterator prev(ord_it);
-		--prev;
-		offset = prev->composite->pos().y() + prev->composite->boundingRect().height() + SPACING;
-	}
-
-	// Reposition items between the old and the new position of our item,
-	// including the item itself.
-	for (; ord_it != ord_end; ++ord_it) {
-		ord_it->composite->setPos(0.0, offset);
-		offset += ord_it->composite->boundingRect().height() + SPACING;
-	}
-
-	// Reposition the items following both the new and the old position
-	// of the item, if the item size has changed.
-	if (old_size != new_size) {
-		for (; ord_it != m_itemsInOrder.end(); ++ord_it) {
-			ord_it->composite->setPos(0.0, offset);
-			offset += ord_it->composite->boundingRect().height() + SPACING;
-		}
-	}
-	
-	// Update scene rect.
-	m_sceneRect.setTop(m_sceneRect.bottom());
-	m_itemsInOrder.front().composite->updateSceneRect(m_sceneRect);
-	m_sceneRect.setBottom(m_sceneRect.top());
-	m_itemsInOrder.back().composite->updateSceneRect(m_sceneRect);
-	id_it->composite->updateSceneRect(m_sceneRect);
-	commitSceneRect();
-
-	// Possibly emit the newSelectionLeader() signal.
-	if (m_pSelectionLeader == &*id_it) {
-		if (old_size != new_size || old_pos != id_it->composite->pos()) {
-			m_rOwner.emitNewSelectionLeader(
-				id_it->pageInfo, id_it->composite, REDUNDANT_SELECTION
-			);
-		}
-	}
+    invalidateAllThumbnails();
 }
 
 void
@@ -732,15 +640,22 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	}
 	
 	m_sceneRect = QRectF(0.0, 0.0, 0.0, 0.0);
-	double offset = 0;
+	double xoffset = SPACING;
+    double yoffset = SPACING;
 
-	for (ord_it = m_itemsInOrder.begin(); ord_it != ord_end; ++ord_it) {
+    int num_items = 0;
+    int view_width = m_graphicsScene.views().first()->width();
+	for (ord_it = m_itemsInOrder.begin(); ord_it != ord_end; ++ord_it, ++num_items) {
 		CompositeItem* composite = ord_it->composite;
-		composite->setPos(0.0, offset);
+		composite->setPos(xoffset, yoffset);
 		composite->updateSceneRect(m_sceneRect);
 		composite->updateAppearence(ord_it->isSelected(), ord_it->isSelectionLeader());
 
-		offset += composite->boundingRect().height() + SPACING;
+        xoffset += composite->boundingRect().width() + SPACING;
+        if (xoffset > view_width) {
+            xoffset = SPACING;
+    		yoffset += composite->boundingRect().height() + SPACING;
+        }
 		m_graphicsScene.addItem(composite);
 	}
 	
