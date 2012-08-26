@@ -99,7 +99,7 @@ public slots:
 private slots:
 	void showApplyToDialog();
 
-	void applySelection(std::set<PageId> const& pages);
+	void applySelection(std::set<PageId> const& pages, bool apply_content_box);
 
 	void modeChanged(bool auto_mode);
 	void fineTuningChanged(bool checked);

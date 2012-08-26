@@ -9,14 +9,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>364</width>
-    <height>316</height>
+    <width>362</width>
+    <height>314</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Select Content</string>
   </property>
-  <layout class="QVBoxLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_7">
+   <item>
+    <widget class="QGroupBox" name="optionsBox">
+     <property name="title">
+      <string>Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QCheckBox" name="applyContentBoxOption">
+        <property name="text">
+         <string>Apply content box</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">

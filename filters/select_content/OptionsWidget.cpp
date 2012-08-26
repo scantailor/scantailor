@@ -203,25 +203,32 @@ OptionsWidget::showApplyToDialog()
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(applySelection(std::set<PageId> const&)),
-		this, SLOT(applySelection(std::set<PageId> const&))
+		dialog, SIGNAL(applySelection(std::set<PageId> const&, bool)),
+		this, SLOT(applySelection(std::set<PageId> const&, bool))
 	);
 	dialog->show();
 }
 
 void
-OptionsWidget::applySelection(std::set<PageId> const& pages)
+OptionsWidget::applySelection(std::set<PageId> const& pages, bool apply_content_box)
 {
 	if (pages.empty()) {
 		return;
 	}
 	
-	Params const params(
+	Params params(
 		m_uiData.contentRect(), m_uiData.contentSizeMM(),
 		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection(), m_uiData.fineTuning()
 	);
 
 	BOOST_FOREACH(PageId const& page_id, pages) {
+        std::auto_ptr<Params> old_params = m_ptrSettings->getPageParams(page_id);
+        
+        if (!apply_content_box && old_params.get()) {
+            params.setContentRect(old_params->contentRect());
+            params.setContentSizeMM(old_params->contentSizeMM());
+        }
+        
 		m_ptrSettings->setPageParams(page_id, params);
 		emit invalidateThumbnail(page_id);
 	}

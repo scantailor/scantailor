@@ -71,15 +71,10 @@ ApplyDialog::onSubmit()
 	// thisPageOnlyRB is intentionally not handled.
 	if (allPagesRB->isChecked()) {
 		m_pages.selectAll().swap(pages);
-		emit applySelection(pages);
-		accept();
-		return;
 	} else if (thisPageAndFollowersRB->isChecked()) {
 		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {
-		emit applySelection(m_selectedPages);
-		accept();
-		return;
+        m_selectedPages.swap(pages);
 	} else if (everyOtherRB->isChecked()) {
 		m_pages.selectEveryOther(m_curPage).swap(pages);
 	} else if (thisEveryOtherRB->isChecked()) {
@@ -97,7 +92,7 @@ ApplyDialog::onSubmit()
 		range.selectEveryOther(m_curPage).swap(pages);
 	}
 	
-	emit applySelection(pages);
+	emit applySelection(pages, applyContentBoxOption->isChecked());
 	
 	// We assume the default connection from accept() to accepted() was removed.
 	accept();

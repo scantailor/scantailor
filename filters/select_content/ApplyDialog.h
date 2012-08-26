@@ -45,7 +45,7 @@ public:
 	
 	virtual ~ApplyDialog();
 signals:
-	void applySelection(std::set<PageId> const& pages);
+	void applySelection(std::set<PageId> const& pages, bool apply_content_box);
 private slots:
 	void onSubmit();
 private:
