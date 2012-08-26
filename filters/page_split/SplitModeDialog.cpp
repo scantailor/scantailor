@@ -96,8 +96,8 @@ SplitModeDialog::onSubmit()
 		pages.insert(m_curPage);
 	} else if (allPagesRB->isChecked()) {
 		m_pages.selectAll().swap(pages);
-		emit accepted(m_selectedPages, true, layout_type, applyCutOption->isChecked());
-		accept();
+		//emit accepted(m_selectedPages, true, layout_type, applyCutOption->isChecked());
+		//accept();
 	} else if (thisPageAndFollowersRB->isChecked()) {
 		m_pages.selectPagePlusFollowers(m_curPage).swap(pages);
 	} else if (selectedPagesRB->isChecked()) {
