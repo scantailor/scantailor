@@ -270,51 +270,26 @@ OptionsWidget::layoutTypeSet(
 	}
     
     Params const params = *( m_ptrSettings->getPageRecord(m_pageId.imageId()).params() );
-    
-	ProjectPages::LayoutType const plt = (layout_type == TWO_PAGES)
-		? ProjectPages::TWO_PAGE_LAYOUT : ProjectPages::ONE_PAGE_LAYOUT;
 
-	if (all_pages) {
-		m_ptrSettings->setLayoutTypeForAllPages(layout_type);
-		if (layout_type != AUTO_LAYOUT_TYPE) {
-			m_ptrPages->setLayoutTypeForAllPages(plt);
-            if (apply_cut) {
-			    BOOST_FOREACH(PageId const& page_id, pages) {
-                    Settings::UpdateAction update_params;
-                	update_params.setParams(params);
-                	m_ptrSettings->updatePage(page_id.imageId(), update_params);
-                }
-            }
-		}
-	} else {
-		m_ptrSettings->setLayoutTypeFor(layout_type, pages);
-		if (layout_type != AUTO_LAYOUT_TYPE) {
-			BOOST_FOREACH(PageId const& page_id, pages) {
-				m_ptrPages->setLayoutTypeFor(page_id.imageId(), plt);
-                
-                if (apply_cut) {
-                	Settings::UpdateAction update_params;
-                	update_params.setParams(params);
-                	m_ptrSettings->updatePage(page_id.imageId(), update_params);
-                }
-			}
-		}
-	}
-	
-	if (all_pages) {
-		emit invalidateAllThumbnails();
-	} else {
+	if (layout_type != AUTO_LAYOUT_TYPE) {
 		BOOST_FOREACH(PageId const& page_id, pages) {
-			emit invalidateThumbnail(page_id);
-		}
+            Settings::UpdateAction update_params;
+            update_params.setLayoutType(layout_type);
+            if (apply_cut) {
+              	update_params.setParams(params);
+            }
+            m_ptrSettings->updatePage(page_id.imageId(), update_params);
+        }
 	}
-	
+    
 	if (layout_type == AUTO_LAYOUT_TYPE) {
 		scopeLabel->setText(tr("Auto detected"));
 		emit reloadRequested();
 	} else {
 		scopeLabel->setText(tr("Set manually"));
 	}
+    
+	emit invalidateAllThumbnails();
 }
 
 void
