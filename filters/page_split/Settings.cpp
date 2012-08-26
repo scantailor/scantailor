@@ -92,7 +92,7 @@ Settings::setLayoutTypeFor(LayoutType const layout_type, std::set<PageId> const&
 	QMutexLocker locker(&m_mutex);
 	
 	UpdateAction action;
-	action.setLayoutType(layout_type);
+	//action.setLayoutType(layout_type);
 	
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		updatePageLocked(page_id.imageId(), action);

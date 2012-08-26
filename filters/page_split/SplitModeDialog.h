@@ -47,7 +47,7 @@ public:
 	virtual ~SplitModeDialog();
 signals:
 	void accepted(std::set<PageId> const& pages,
-		bool all_pages, LayoutType layout_type);
+		bool all_pages, LayoutType layout_type, bool apply_cut);
 private slots:
 	void autoDetectionSelected();
 	

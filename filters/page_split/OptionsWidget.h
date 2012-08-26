@@ -94,7 +94,7 @@ private slots:
 	
 	void layoutTypeSet(
 		std::set<PageId> const& pages,
-		bool all_pages, LayoutType layout_type);
+		bool all_pages, LayoutType layout_type, bool apply_cut);
 	
 	void splitLineModeChanged(bool auto_mode);
 private:

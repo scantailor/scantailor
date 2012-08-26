@@ -255,20 +255,22 @@ OptionsWidget::showChangeDialog()
 	);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	connect(
-		dialog, SIGNAL(accepted(std::set<PageId> const&, bool, LayoutType)),
-		this, SLOT(layoutTypeSet(std::set<PageId> const&, bool, LayoutType))
+		dialog, SIGNAL(accepted(std::set<PageId> const&, bool, LayoutType, bool)),
+		this, SLOT(layoutTypeSet(std::set<PageId> const&, bool, LayoutType, bool))
 	);
 	dialog->show();
 }
 
 void
 OptionsWidget::layoutTypeSet(
-	std::set<PageId> const& pages, bool all_pages, LayoutType const layout_type)
+	std::set<PageId> const& pages, bool all_pages, LayoutType const layout_type, bool apply_cut)
 {
 	if (pages.empty()) {
 		return;
 	}
-	
+    
+    Params const params = *( m_ptrSettings->getPageRecord(m_pageId.imageId()).params() );
+    
 	ProjectPages::LayoutType const plt = (layout_type == TWO_PAGES)
 		? ProjectPages::TWO_PAGE_LAYOUT : ProjectPages::ONE_PAGE_LAYOUT;
 
@@ -276,12 +278,25 @@ OptionsWidget::layoutTypeSet(
 		m_ptrSettings->setLayoutTypeForAllPages(layout_type);
 		if (layout_type != AUTO_LAYOUT_TYPE) {
 			m_ptrPages->setLayoutTypeForAllPages(plt);
+            if (apply_cut) {
+			    BOOST_FOREACH(PageId const& page_id, pages) {
+                    Settings::UpdateAction update_params;
+                	update_params.setParams(params);
+                	m_ptrSettings->updatePage(page_id.imageId(), update_params);
+                }
+            }
 		}
 	} else {
 		m_ptrSettings->setLayoutTypeFor(layout_type, pages);
 		if (layout_type != AUTO_LAYOUT_TYPE) {
 			BOOST_FOREACH(PageId const& page_id, pages) {
 				m_ptrPages->setLayoutTypeFor(page_id.imageId(), plt);
+                
+                if (apply_cut) {
+                	Settings::UpdateAction update_params;
+                	update_params.setParams(params);
+                	m_ptrSettings->updatePage(page_id.imageId(), update_params);
+                }
 			}
 		}
 	}
