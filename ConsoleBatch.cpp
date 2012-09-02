@@ -368,6 +368,8 @@ ConsoleBatch::setupSelectContent(std::set<PageId> allPages)
 		params.setContentDetect(cli.isContentDetectionEnabled());
 		params.setPageDetect(cli.isPageDetectionEnabled());
 		params.setFineTuneCorners(cli.isFineTuningEnabled());
+        if (cli.hasPageBorders())
+			params.setPageBorders(cli.getPageBorders());
 
 		select_content->getSettings()->setPageParams(page, params);
 	}

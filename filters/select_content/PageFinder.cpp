@@ -47,7 +47,7 @@ using namespace imageproc;
 
 QRectF
 PageFinder::findPageBox(
-	TaskStatus const& status, FilterData const& data, bool fine_tune, QSizeF const& box, double tolerance, DebugImages* dbg)
+	TaskStatus const& status, FilterData const& data, bool fine_tune, QSizeF const& box, double tolerance, Margins borders, DebugImages* dbg)
 {
 	ImageTransformation xform_150dpi(data.xform());
 	xform_150dpi.preScaleToDpi(Dpi(150, 150));
@@ -56,8 +56,9 @@ PageFinder::findPageBox(
 		return QRectF();
 	}
 
-	int exp_width = int( 150.0 * box.width() / 25.4 );
-	int exp_height = int( 150.0 * box.height() / 25.4 );
+    double to150 = 150.0 / 25.4;
+	int exp_width = int( to150 * box.width() );
+	int exp_height = int( to150 * box.height() );
 	
 #ifdef DEBUG
 	std::cout << "dpi: " << data.xform().origDpi().horizontal() << std::endl;
@@ -152,11 +153,19 @@ PageFinder::findPageBox(
 #ifdef DEBUG
 	std::cout << "width = " << content_rect.width() << "; height=" << content_rect.height() << std::endl;
 #endif
-			
+        
+    // increase page rect with borders
+    content_rect.setLeft( content_rect.left() + to150 * borders.left() );
+    content_rect.setTop( content_rect.top() + to150 * borders.top() );
+    content_rect.setRight( content_rect.right() - to150 * borders.right() );
+    content_rect.setBottom( content_rect.bottom() - to150 * borders.bottom() );
+
 	// Transform back from 150dpi.
 	QTransform combined_xform(xform_150dpi.transform().inverted());
 	combined_xform *= data.xform().transform();
-	return combined_xform.map(QRectF(content_rect)).boundingRect();
+	QRectF result = combined_xform.map(QRectF(content_rect)).boundingRect();
+
+    return result;
 }
 
 QRect

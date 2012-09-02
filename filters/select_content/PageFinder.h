@@ -21,6 +21,7 @@
 #define SELECT_CONTENT_PAGEFINDER_H_
 
 #include "imageproc/BinaryThreshold.h"
+#include "Margins.h"
 
 #include <Qt>
 
@@ -45,8 +46,7 @@ class PageFinder
 {
 public:
 	static QRectF findPageBox(
-        TaskStatus const& status, FilterData const& data, bool fine_tune, QSizeF const& box, double tolerance,
-        DebugImages* dbg = 0);
+        TaskStatus const& status, FilterData const& data, bool fine_tune, QSizeF const& box, double tolerance, Margins borders, DebugImages* dbg = 0);
 private:
 	static QRect detectBorders(QImage const& img);
 	static int detectEdge(QImage const& img, int start, int end, int inc, int mid, Qt::Orientation orient);

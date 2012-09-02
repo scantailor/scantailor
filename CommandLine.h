@@ -33,6 +33,7 @@
 #include "filters/output/DespeckleLevel.h"
 #include "filters/output/DewarpingMode.h"
 #include "filters/output/DepthPerception.h"
+#include "filters/page_layout/Settings.h"
 #include "filters/page_layout/Alignment.h"
 #include "ImageFileInfo.h"
 #include "Margins.h"
@@ -72,7 +73,8 @@ public:
 	bool isFineTuningEnabled() const { return contains("enable-fine-tuning"); };
 	bool isAutoMarginsEnabled() const { return contains("enable-auto-margins"); };
 
-	bool hasMargins() const;
+	bool hasMargins(QString base="margins") const;
+    bool hasPageBorders() const { return hasMargins("page-borders"); };
 	bool hasAlignment() const;
 	bool hasOutputDpi() const;
 	bool hasLanguage() const;
@@ -112,6 +114,7 @@ public:
 	Dpi getInputDpi() const { return m_dpi; }
 	Dpi getOutputDpi() const { return m_outputDpi; }
 	Margins getMargins() const { return m_margins; }
+    Margins getPageBorders() const { return m_pageBorders; }
 	page_layout::Alignment getAlignment() const { return m_alignment; }
 	Despeckle::Level getContentDetection() const { return m_contentDetection; }
 	QRectF getContentRect() const { return m_contentRect; }
@@ -168,6 +171,7 @@ private:
 	Dpi m_dpi;
 	Dpi m_outputDpi;
 	Margins m_margins;
+    Margins m_pageBorders;
 	page_layout::Alignment m_alignment;
 	Despeckle::Level m_contentDetection;
 	QRectF m_contentRect;
@@ -192,7 +196,8 @@ private:
 	output::PictureShape fetchPictureShape();
 	Qt::LayoutDirection fetchLayoutDirection();
 	Dpi fetchDpi(QString oname="dpi");
-	Margins fetchMargins();
+	Margins fetchMargins(QString base="margins", Margins def=page_layout::Settings::defaultHardMarginsMM());
+    Margins fetchPageBorders() { return fetchMargins("page-borders", Margins(0,0,0,0)); }
 	page_layout::Alignment fetchAlignment();
 	Despeckle::Level fetchContentDetection();
 	QRectF fetchContentRect();

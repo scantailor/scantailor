@@ -21,6 +21,7 @@
 
 #include "Dependencies.h"
 #include "AutoManualMode.h"
+#include "Margins.h"
 #include <QRectF>
 #include <QSizeF>
 #include <cmath>
@@ -62,6 +63,9 @@ public:
 	bool isContentDetectionEnabled() const { return m_contentDetect; };
 	bool isPageDetectionEnabled() const { return m_pageDetect; };
 	bool isFineTuningEnabled() const { return m_fineTuneCorners; };
+    
+    Margins pageBorders() const { return m_pageBorders; };
+    void setPageBorders(Margins borders) { m_pageBorders = borders; };
 
 	void setMode(AutoManualMode const& mode) { m_mode = mode; };
 	void setContentRect(QRectF const& rect) { m_contentRect = rect; };
@@ -76,6 +80,7 @@ public:
 private:
 	QRectF m_contentRect;
 	QRectF m_pageRect;
+    Margins m_pageBorders;
 	QSizeF m_contentSizeMM;
 	Dependencies m_deps;
 	AutoManualMode m_mode;

@@ -112,6 +112,11 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "window-title";
 	opts << "page-detection-box";
 	opts << "page-detection-tolerance";
+	opts << "page-borders";
+	opts << "page-borders-left";
+	opts << "page-borders-top";
+	opts << "page-borders-right";
+	opts << "page-borders-bottom";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -226,6 +231,7 @@ CommandLine::setup()
 	m_dpi = fetchDpi();
 	m_outputDpi = fetchDpi("output-dpi");
 	m_margins = fetchMargins();
+    m_pageBorders = fetchPageBorders();
 	m_alignment = fetchAlignment();
 	m_contentDetection = fetchContentDetection();
 	m_contentRect = fetchContentRect();
@@ -436,29 +442,36 @@ CommandLine::fetchPictureShape()
 
 
 Margins
-CommandLine::fetchMargins()
+CommandLine::fetchMargins(QString base, Margins def)
 {
-	Margins margins(page_layout::Settings::defaultHardMarginsMM());
+	Margins margins(def);
 
-	if (m_options.contains("margins")) {
-		double m = m_options["margins"].toDouble();
+	if (m_options.contains(base)) {
+		double m = m_options[base].toDouble();
 		margins.setTop(m);
 		margins.setBottom(m);
 		margins.setLeft(m);
 		margins.setRight(m);
 	}
+    
+    QString lstr = base + "-left",
+            tstr = base + "-top",
+            rstr = base + "-right",
+            bstr = base + "-bottom";
+    
 
-	if (m_options.contains("margins-left"))
-		margins.setLeft(m_options["margins-left"].toFloat());
-	if (m_options.contains("margins-right"))
-		margins.setRight(m_options["margins-right"].toFloat());
-	if (m_options.contains("margins-top"))
-		margins.setTop(m_options["margins-top"].toFloat());
-	if (m_options.contains("margins-bottom"))
-		margins.setBottom(m_options["margins-bottom"].toFloat());
+	if (m_options.contains(lstr))
+		margins.setLeft(m_options[lstr].toFloat());
+	if (m_options.contains(rstr))
+		margins.setRight(m_options[rstr].toFloat());
+	if (m_options.contains(tstr))
+		margins.setTop(m_options[tstr].toFloat());
+	if (m_options.contains(bstr))
+		margins.setBottom(m_options[bstr].toFloat());
 
 	return margins;
 }
+
 
 page_layout::Alignment
 CommandLine::fetchAlignment()
@@ -669,14 +682,14 @@ CommandLine::fetchMatchLayoutTolerance()
 
 
 bool
-CommandLine::hasMargins() const
+CommandLine::hasMargins(QString base) const
 {
 	return(
-		m_options.contains("margins") ||
-		m_options.contains("margins-left") ||
-		m_options.contains("margins-right") ||
-		m_options.contains("margins-top") ||
-		m_options.contains("margins-bottom")
+		m_options.contains(base) ||
+		m_options.contains(base+"-left") ||
+		m_options.contains(base+"-right") ||
+		m_options.contains(base+"-top") ||
+		m_options.contains(base+"-bottom")
 	);
 }
 
