@@ -74,6 +74,10 @@ public:
 		void setPageDetection(bool detect);
 		void setFineTuneCorners(bool fine_tune);
 		
+        void setPageBorders(double left, double top, double right, double bottom);
+        void setPageBorders(Margins const& borders) { m_borders = borders; };
+        Margins pageBorders() const { return m_borders; }
+        
 		AutoManualMode mode() const;
 	private:
 		QRectF m_contentRect; // In virtual image coordinates.
@@ -84,6 +88,7 @@ public:
 		bool m_contentDetection;
 		bool m_pageDetection;
 		bool m_fineTuneCorners;
+        Margins m_borders;
 	};
 	
 	OptionsWidget(IntrusivePtr<Settings> const& settings,
@@ -106,6 +111,8 @@ private slots:
 	void contentDetectionDisabled(void);
 	void pageDetectionDisabled(void);
 	void pageDetectionEnabled(void);
+    
+    void borderChanged();
 
 private:
 	void updateModeIndication(AutoManualMode const mode);

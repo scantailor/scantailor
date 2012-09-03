@@ -130,6 +130,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	ui_data.setContentDetection(new_params.isContentDetectionEnabled());
 	ui_data.setPageDetection(new_params.isPageDetectionEnabled());
 	ui_data.setFineTuneCorners(new_params.isFineTuningEnabled());
+    ui_data.setPageBorders(new_params.pageBorders());
 
 	new_params.setContentSizeMM(ui_data.contentSizeMM());
 

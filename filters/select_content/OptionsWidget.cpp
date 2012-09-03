@@ -44,6 +44,11 @@ OptionsWidget::OptionsWidget(
 	connect(pageDetectDisableBtn, SIGNAL(pressed()), this, SLOT(pageDetectionDisabled()));
 	connect(applyToBtn, SIGNAL(clicked()), this, SLOT(showApplyToDialog()));
 	connect(fineTuneBtn, SIGNAL(toggled(bool)), this, SLOT(fineTuningChanged(bool)));
+    
+    connect(leftBorder, SIGNAL(valueChanged(double)), this, SLOT(borderChanged()));
+    connect(rightBorder, SIGNAL(valueChanged(double)), this, SLOT(borderChanged()));
+    connect(topBorder, SIGNAL(valueChanged(double)), this, SLOT(borderChanged()));
+    connect(bottomBorder, SIGNAL(valueChanged(double)), this, SLOT(borderChanged()));
 }
 
 OptionsWidget::~OptionsWidget()
@@ -67,7 +72,15 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 void
 OptionsWidget::postUpdateUI(UiData const& ui_data)
 {
+    Margins m = ui_data.pageBorders();
+    
 	m_uiData = ui_data;
+    
+    leftBorder->setValue(m.left());
+    topBorder->setValue(m.top());
+    rightBorder->setValue(m.right());
+    bottomBorder->setValue(m.bottom());
+    
 	updateModeIndication(ui_data.mode());
 	fineTuneBtn->setChecked(ui_data.fineTuning());
 	pageDetectAutoBtn->setChecked(ui_data.pageDetection());
@@ -158,7 +171,14 @@ OptionsWidget::pageDetectionEnabled(void)
 	pageDetectAutoBtn->setChecked(true);
 	pageDetectDisableBtn->setChecked(false);
 	commitCurrentParams();
-	emit reloadRequested();
+    emit reloadRequested();
+}
+
+void OptionsWidget::borderChanged()
+{
+    m_uiData.setPageBorders(leftBorder->value(), topBorder->value(), rightBorder->value(), bottomBorder->value());
+    commitCurrentParams();
+    emit reloadRequested();
 }
 
 void
@@ -191,6 +211,7 @@ OptionsWidget::commitCurrentParams()
 		m_uiData.contentRect(), m_uiData.contentSizeMM(),
 		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection(), m_uiData.fineTuning()
 	);
+    params.setPageBorders(m_uiData.pageBorders());
 	params.computeDeviation(m_ptrSettings->avg());
 	m_ptrSettings->setPageParams(m_pageId, params);
 }
@@ -229,6 +250,8 @@ OptionsWidget::applySelection(std::set<PageId> const& pages, bool apply_content_
             params.setContentSizeMM(old_params->contentSizeMM());
         }
         
+        params.setPageBorders( Margins(leftBorder->value(), topBorder->value(), rightBorder->value(), bottomBorder->value()) );
+        
 		m_ptrSettings->setPageParams(page_id, params);
 		emit invalidateThumbnail(page_id);
 	}
@@ -240,7 +263,8 @@ OptionsWidget::UiData::UiData()
 :	m_mode(MODE_AUTO),
 	m_contentDetection(true),
 	m_pageDetection(false),
-	m_fineTuneCorners(false)
+	m_fineTuneCorners(false),
+    m_borders(0,0,0,0)
 {
 }
 
@@ -323,7 +347,15 @@ OptionsWidget::UiData::setPageDetection(bool detect)
 void
 OptionsWidget::UiData::setFineTuneCorners(bool fine_tune)
 {
-	m_fineTuneCorners = fine_tune;
+    m_fineTuneCorners = fine_tune;
+}
+
+void OptionsWidget::UiData::setPageBorders(double left, double top, double right, double bottom)
+{
+    m_borders.setLeft(left);
+    m_borders.setTop(top);
+    m_borders.setRight(right);
+    m_borders.setBottom(bottom);
 }
 
 
