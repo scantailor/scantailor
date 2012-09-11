@@ -253,8 +253,9 @@ OptionsWidget::applySelection(std::set<PageId> const& pages, bool apply_content_
         params.setPageBorders( Margins(leftBorder->value(), topBorder->value(), rightBorder->value(), bottomBorder->value()) );
         
 		m_ptrSettings->setPageParams(page_id, params);
-		emit invalidateThumbnail(page_id);
+		//emit invalidateThumbnail(page_id);
 	}
+    invalidateAllThumbnails();
 }
 
 /*========================= OptionsWidget::UiData ======================*/

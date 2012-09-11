@@ -108,7 +108,7 @@ PageFinder::findPageBox(
 	
 	if (box.isEmpty()) {
 		// detect content box with otsu
-		QImage bwimg(bwimages[1].toQImage());
+		QImage bwimg(bwimages[3].toQImage());
 		content_rect = detectBorders(bwimg);
 		if (fine_tune)
 			fineTuneCorners(bwimg, content_rect, QSize(0,0), 1.0);

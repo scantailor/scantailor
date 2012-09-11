@@ -367,8 +367,8 @@ OptionsWidget::dpiChanged(std::set<PageId> const& pages, Dpi const& dpi)
 {
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setDpi(page_id, dpi);
-		emit invalidateThumbnail(page_id);
 	}
+	emit invalidateAllThumbnails();
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		m_outputDpi = dpi;
@@ -383,8 +383,8 @@ OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setColorParams(page_id, m_colorParams);
 		m_ptrSettings->setPictureShape(page_id, m_pictureShape);
-		emit invalidateThumbnail(page_id);
 	}
+	emit invalidateAllThumbnails();
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		emit reloadRequested();
@@ -452,8 +452,8 @@ OptionsWidget::applyDespeckleConfirmed(std::set<PageId> const& pages)
 {
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setDespeckleLevel(page_id, m_despeckleLevel);
-		emit invalidateThumbnail(page_id);
 	}
+	emit invalidateAllThumbnails();
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		emit reloadRequested();
@@ -479,8 +479,8 @@ OptionsWidget::dewarpingChanged(std::set<PageId> const& pages, DewarpingMode con
 {
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setDewarpingMode(page_id, mode);
-		emit invalidateThumbnail(page_id);
 	}
+	emit invalidateAllThumbnails();
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		if (m_dewarpingMode != mode) {
@@ -532,8 +532,8 @@ OptionsWidget::applyDepthPerceptionConfirmed(std::set<PageId> const& pages)
 {
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setDepthPerception(page_id, m_depthPerception);
-		emit invalidateThumbnail(page_id);
 	}
+	emit invalidateAllThumbnails();
 	
 	if (pages.find(m_pageId) != pages.end()) {
 		emit reloadRequested();
