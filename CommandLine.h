@@ -106,6 +106,7 @@ public:
 	bool hasWindowTitle() const { return contains("window-title") && !m_options["window-title"].isEmpty(); }
 	bool hasPageDetectionBox() const { return contains("page-detection-box") && !m_options["page-detection-box"].isEmpty(); }
 	bool hasPageDetectionTolerance() const { return contains("page-detection-tolerance") && !m_options["page-detection-tolerance"].isEmpty(); }
+ 	bool hasDisableCheckOutput() const { return contains("disable-check-output"); }
 
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }

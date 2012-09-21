@@ -117,6 +117,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "page-borders-top";
 	opts << "page-borders-right";
 	opts << "page-borders-bottom";
+	opts << "disable-check-output";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";

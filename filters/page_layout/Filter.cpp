@@ -219,6 +219,8 @@ Filter::invalidateContentBox(PageId const& page_id)
 bool
 Filter::checkReadyForOutput(ProjectPages const& pages, PageId const* ignore)
 {
+ 	if (CommandLine::get().hasDisableCheckOutput())
+  		return true;
 	PageSequence const snapshot(pages.toPageSequence(PAGE_VIEW));
 	return m_ptrSettings->checkEverythingDefined(snapshot, ignore);
 }
