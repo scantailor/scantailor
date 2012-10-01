@@ -17,12 +17,19 @@
 */
 
 #include "ColorParams.h"
+#include "CommandLine.h"
+
 #include <QDomDocument>
 #include <QDomElement>
 #include <QString>
 
 namespace output
 {
+
+ColorParams::ColorParams()
+: m_colorMode(CommandLine::get().getDefaultColorMode())
+{
+}
 
 ColorParams::ColorParams(QDomElement const& el)
 :	m_colorMode(parseColorMode(el.attribute("colorMode"))),

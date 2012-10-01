@@ -118,6 +118,8 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "page-borders-right";
 	opts << "page-borders-bottom";
 	opts << "disable-check-output";
+	opts << "default-output-dpi";
+	opts << "default-color-mode";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -228,9 +230,11 @@ CommandLine::setup()
 	m_layoutType = fetchLayoutType();
 	m_layoutDirection = fetchLayoutDirection();
 	m_colorMode = fetchColorMode();
+	m_defaultColorMode = fetchDefaultColorMode();
 	m_pictureShape = fetchPictureShape();
 	m_dpi = fetchDpi();
 	m_outputDpi = fetchDpi("output-dpi");
+    m_defaultOutputDpi = fetchDpi("default-output-dpi");
 	m_margins = fetchMargins();
     m_pageBorders = fetchPageBorders();
 	m_alignment = fetchAlignment();
@@ -339,7 +343,9 @@ CommandLine::printHelp()
 	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 600" << std::endl;
 	std::cout << "\t\t--output-dpi-x=<number>" << std::endl;
 	std::cout << "\t\t--output-dpi-y=<number>" << std::endl;
+	std::cout << "\t--default-output-dpi=<number>\t\t-- default output dpi for pages created by split filter in gui";
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << std::endl;
+	std::cout << "\t--default-color-mode=<...>\t\t-- sets default value for new images created by split filter" << std::endl;
 	std::cout << "\t--picture-shape=<free|rectangular>\n\t\t\t\t\t\t-- default: free" << std::endl;
 	std::cout << "\t--white-margins\t\t\t\t-- default: false" << std::endl;
 	std::cout << "\t--normalize-illumination\t\t-- default: false" << std::endl;
@@ -354,6 +360,7 @@ CommandLine::printHelp()
 	std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
 	std::cout << "\t--page-detection-box=<widthxheight>\t\t-- in mm" << std::endl;
 	std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t-- default: 0.1" << std::endl;
+    std::cout << "\t--disable-check-output\t\t\t-- don't check if page is valid when switching to step 6";
 	std::cout << std::endl;
 }
 
@@ -426,6 +433,21 @@ CommandLine::fetchColorMode()
 	return output::ColorParams::BLACK_AND_WHITE;
 }
 
+output::ColorParams::ColorMode
+CommandLine::fetchDefaultColorMode()
+{
+	if (! hasDefaultColorMode())
+		return output::ColorParams::BLACK_AND_WHITE;
+	
+	QString cm = m_options["default-color-mode"].toLower();
+	
+	if (cm == "color_grayscale")
+		return output::ColorParams::COLOR_GRAYSCALE;
+	else if (cm == "mixed")
+		return output::ColorParams::MIXED;
+
+	return output::ColorParams::BLACK_AND_WHITE;
+}
 
 output::PictureShape
 CommandLine::fetchPictureShape()

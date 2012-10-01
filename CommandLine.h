@@ -94,6 +94,7 @@ public:
 	bool hasContentDetection() const { return ! contains("disable-content-detection"); }
 	bool hasContentText() const { return !contains("disable-content-text-mask"); }
 	bool hasColorMode() const { return contains("color-mode") && !m_options["color-mode"].isEmpty(); }
+	bool hasDefaultColorMode() const { return contains("default-color-mode") && !m_options["default-color-mode"].isEmpty(); }
 	bool hasPictureShape() const { return contains("picture-shape") && !m_options["picture-shape"].isEmpty(); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
 	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
@@ -111,9 +112,11 @@ public:
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
 	output::ColorParams::ColorMode getColorMode() const { return m_colorMode; }
+	output::ColorParams::ColorMode getDefaultColorMode() const { return m_defaultColorMode; }
 	output::PictureShape getPictureShape() const { return m_pictureShape; }
 	Dpi getInputDpi() const { return m_dpi; }
 	Dpi getOutputDpi() const { return m_outputDpi; }
+    Dpi getDefaultOutputDpi() const { return m_defaultOutputDpi; }
 	Margins getMargins() const { return m_margins; }
     Margins getPageBorders() const { return m_pageBorders; }
 	page_layout::Alignment getAlignment() const { return m_alignment; }
@@ -168,9 +171,11 @@ private:
 	page_split::LayoutType m_layoutType;
 	Qt::LayoutDirection m_layoutDirection;
 	output::ColorParams::ColorMode m_colorMode;
+	output::ColorParams::ColorMode m_defaultColorMode;
 	output::PictureShape m_pictureShape;
 	Dpi m_dpi;
 	Dpi m_outputDpi;
+    Dpi m_defaultOutputDpi;
 	Margins m_margins;
     Margins m_pageBorders;
 	page_layout::Alignment m_alignment;
@@ -194,6 +199,7 @@ private:
 	void setup();
 	page_split::LayoutType fetchLayoutType();
 	output::ColorParams::ColorMode fetchColorMode();
+	output::ColorParams::ColorMode fetchDefaultColorMode();
 	output::PictureShape fetchPictureShape();
 	Qt::LayoutDirection fetchLayoutDirection();
 	Dpi fetchDpi(QString oname="dpi");

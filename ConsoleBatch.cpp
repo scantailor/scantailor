@@ -215,9 +215,9 @@ ConsoleBatch::process()
 		if (cli.isVerbose())
 			std::cout << "Filter: " << (j+1) << "\n";
 
-	// process pages
-	PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
- 	setupFilter(j, page_sequence.selectAll());
+		// process pages
+		PageSequence page_sequence = m_ptrPages->toPageSequence(PAGE_VIEW);
+ 		setupFilter(j, page_sequence.selectAll());
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
 			if (cli.isVerbose())

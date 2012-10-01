@@ -21,6 +21,7 @@
 #include "BlackWhiteOptions.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "CommandLine.h"
 #include <QDomDocument>
 #include <QDomElement>
 #include <QByteArray>
@@ -30,7 +31,7 @@ namespace output
 {
 
 Params::Params()
-:	m_dpi(600, 600),
+:	m_dpi(CommandLine::get().getDefaultOutputDpi()),
 	m_despeckleLevel(DESPECKLE_CAUTIOUS),
 	m_pictureShape(FREE_SHAPE)
 {
