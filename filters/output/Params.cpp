@@ -101,7 +101,7 @@ Params::parseColorMode(QString const& str)
 	} else if (str == "mixed") {
 		return ColorParams::MIXED;
 	} else {
-		return ColorParams::BLACK_AND_WHITE;
+		return ColorParams::DefaultColorMode();
 	}
 }
 

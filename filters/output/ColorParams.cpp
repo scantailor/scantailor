@@ -27,7 +27,7 @@ namespace output
 {
 
 ColorParams::ColorParams()
-: m_colorMode(CommandLine::get().getDefaultColorMode())
+: m_colorMode(DefaultColorMode())
 {
 }
 
@@ -36,6 +36,12 @@ ColorParams::ColorParams(QDomElement const& el)
 	m_colorGrayscaleOptions(el.namedItem("color-or-grayscale").toElement()),
 	m_bwOptions(el.namedItem("bw").toElement())
 {
+}
+
+ColorParams::ColorMode
+ColorParams::DefaultColorMode()
+{
+    return CommandLine::get().getDefaultColorMode();
 }
 
 QDomElement
@@ -61,7 +67,7 @@ ColorParams::parseColorMode(QString const& str)
 	} else if (str == "mixed") {
 		return MIXED;
 	} else {
-		return BLACK_AND_WHITE;
+		return DefaultColorMode();
 	}
 }
 

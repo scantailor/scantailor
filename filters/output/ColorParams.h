@@ -38,6 +38,8 @@ public:
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
+	static ColorMode DefaultColorMode();
+    
 	ColorMode colorMode() const { return m_colorMode; }
 	
 	void setColorMode(ColorMode mode) { m_colorMode = mode; }
@@ -56,7 +58,8 @@ public:
 	
 	void setBlackWhiteOptions(BlackWhiteOptions const& opt) {
 		m_bwOptions = opt;
-	}
+    }
+    
 private:
 	static ColorMode parseColorMode(QString const& str);
 	
