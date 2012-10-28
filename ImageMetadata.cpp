@@ -36,7 +36,7 @@ ImageMetadata::operator==(ImageMetadata const& other) const
 bool
 ImageMetadata::isDpiOK() const
 {
-	return horizontalDpiStatus() == DPI_OK && verticalDpiStatus() == DPI_OK;
+	return horizontalDpiStatus() != DPI_UNDEFINED && verticalDpiStatus() != DPI_UNDEFINED;
 }
 
 ImageMetadata::DpiStatus
