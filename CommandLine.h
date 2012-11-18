@@ -118,6 +118,7 @@ public:
 	Dpi getOutputDpi() const { return m_outputDpi; }
     Dpi getDefaultOutputDpi() const { return m_defaultOutputDpi; }
 	Margins getMargins() const { return m_margins; }
+	Margins getDefaultMargins() const { return m_defaultMargins; }
     Margins getPageBorders() const { return m_pageBorders; }
 	page_layout::Alignment getAlignment() const { return m_alignment; }
 	Despeckle::Level getContentDetection() const { return m_contentDetection; }
@@ -177,6 +178,7 @@ private:
 	Dpi m_outputDpi;
     Dpi m_defaultOutputDpi;
 	Margins m_margins;
+	Margins m_defaultMargins;
     Margins m_pageBorders;
 	page_layout::Alignment m_alignment;
 	Despeckle::Level m_contentDetection;
@@ -203,7 +205,7 @@ private:
 	output::PictureShape fetchPictureShape();
 	Qt::LayoutDirection fetchLayoutDirection();
 	Dpi fetchDpi(QString oname="dpi");
-	Margins fetchMargins(QString base="margins", Margins def=page_layout::Settings::defaultHardMarginsMM());
+	Margins fetchMargins(QString base="margins", Margins def=Margins(10.0, 5.0, 10.0, 5.0));
     Margins fetchPageBorders() { return fetchMargins("page-borders", Margins(0,0,0,0)); }
 	page_layout::Alignment fetchAlignment();
 	Despeckle::Level fetchContentDetection();

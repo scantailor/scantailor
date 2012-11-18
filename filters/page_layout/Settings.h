@@ -43,7 +43,7 @@ class Settings : public RefCountable
 public:
 	enum AggregateSizeChanged { AGGREGATE_SIZE_UNCHANGED, AGGREGATE_SIZE_CHANGED };
 	
-	static Margins defaultHardMarginsMM() { return Margins(10.0, 5.0, 10.0, 5.0); }
+	static Margins defaultHardMarginsMM();
 
 	Settings();
 	

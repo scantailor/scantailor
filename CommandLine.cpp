@@ -82,6 +82,11 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "margins-right";
 	opts << "margins-top";
 	opts << "margins-bottom";
+	opts << "default-margins";
+	opts << "default-margins-left";
+	opts << "default-margins-right";
+	opts << "default-margins-top";
+	opts << "default-margins-bottom";
 	opts << "match-layout";
 	opts << "match-layout-tolerance";
 	opts << "match-layout-default";
@@ -236,6 +241,7 @@ CommandLine::setup()
 	m_outputDpi = fetchDpi("output-dpi");
     m_defaultOutputDpi = fetchDpi("default-output-dpi");
 	m_margins = fetchMargins();
+	m_defaultMargins = fetchMargins("default-margins");
     m_pageBorders = fetchPageBorders();
 	m_alignment = fetchAlignment();
 	m_contentDetection = fetchContentDetection();
@@ -330,6 +336,11 @@ CommandLine::printHelp()
 	std::cout << "\t\t--margins-right=<number>" << std::endl;
 	std::cout << "\t\t--margins-top=<number>" << std::endl;
 	std::cout << "\t\t--margins-bottom=<number>" << std::endl;
+	std::cout << "\t--default-margins=<number>\t\t\t-- sets left, top, right and bottom margins, for new pages, to same number." << std::endl;
+	std::cout << "\t\t--default-margins-left=<number>" << std::endl;
+	std::cout << "\t\t--default-margins-right=<number>" << std::endl;
+	std::cout << "\t\t--default-margins-top=<number>" << std::endl;
+	std::cout << "\t\t--default-margins-bottom=<number>" << std::endl;
 	std::cout << "\t--match-layout=<true|false>\t\t-- default: true" << std::endl;
 	std::cout << "\t--match-layout-tolerance=<0.0...)\t-- default: off" << std::endl;
 	std::cout << "\t--match-layout-default=<true|false>\t-- default: true" << std::endl;
