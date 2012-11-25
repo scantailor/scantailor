@@ -51,6 +51,7 @@ public:
 	~Params();
 	
 	QRectF const& contentRect() const { return m_contentRect; }
+	QRectF const& pageRect() const { return m_pageRect; }
 
 	QSizeF const& contentSizeMM() const { return m_contentSizeMM; }
 	

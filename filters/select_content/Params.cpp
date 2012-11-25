@@ -76,6 +76,11 @@ Params::Params(QDomElement const& filter_el)
 			filter_el.namedItem("content-rect").toElement()
 		)
 	),
+    m_pageRect(
+		XmlUnmarshaller::rectF(
+			filter_el.namedItem("page-rect").toElement()
+		)		
+	),
 	m_contentSizeMM(
 		XmlUnmarshaller::sizeF(
 			filter_el.namedItem("content-size-mm").toElement()
@@ -111,6 +116,7 @@ Params::toXml(QDomDocument& doc, QString const& name) const
 	el.setAttribute("fine-tune-corners", m_fineTuneCorners ? "true" : "false");
 	el.setAttribute("deviation", m_deviation);
 	el.appendChild(marshaller.rectF(m_contentRect, "content-rect"));
+	el.appendChild(marshaller.rectF(m_pageRect, "page-rect"));
 	el.appendChild(marshaller.sizeF(m_contentSizeMM, "content-size-mm"));
 	el.appendChild(marshaller.margins(m_pageBorders, "page-borders"));
 	el.appendChild(m_deps.toXml(doc, "dependencies"));
