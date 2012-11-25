@@ -22,8 +22,26 @@
 #include <QDomDocument>
 #include <QDomElement>
 
+#include "CommandLine.h"
+
 namespace select_content
 {
+
+Params::Params(
+	QRectF const& content_rect, QSizeF const& content_size_mm,
+	Dependencies const& deps, AutoManualMode const mode)
+:	m_contentRect(content_rect),
+	m_pageRect(content_rect),
+    m_pageBorders(0,0,0,0),
+	m_contentSizeMM(content_size_mm),
+	m_deps(deps),
+	m_mode(mode),
+	m_deviation(0.0)
+{
+	m_contentDetect = CommandLine::get().isContentDetectionEnabled();
+	m_pageDetect = CommandLine::get().isPageDetectionEnabled();
+	m_fineTuneCorners = CommandLine::get().isFineTuningEnabled();
+}
 
 Params::Params(
 	QRectF const& content_rect, QSizeF const& content_size_mm,
@@ -45,11 +63,11 @@ Params::Params(Dependencies const& deps)
 :	m_deps(deps),
 	m_mode(MODE_AUTO),
     m_pageBorders(0,0,0,0),
-	m_contentDetect(true),
-	m_pageDetect(false),
-	m_fineTuneCorners(false),
 	m_deviation(0.0)
 {
+	m_contentDetect = CommandLine::get().isContentDetectionEnabled();
+	m_pageDetect = CommandLine::get().isPageDetectionEnabled();
+	m_fineTuneCorners = CommandLine::get().isFineTuningEnabled();
 }
 
 Params::Params(QDomElement const& filter_el)

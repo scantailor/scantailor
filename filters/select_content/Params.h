@@ -39,7 +39,10 @@ public:
 	// Member-wise copying is OK.
 	
 	Params(QRectF const& rect, QSizeF const& size_mm,
-		Dependencies const& deps, AutoManualMode mode, bool contentDetect=true, bool pageDetect=false, bool fineTuning=false);
+		Dependencies const& deps, AutoManualMode mode);
+	
+	Params(QRectF const& rect, QSizeF const& size_mm,
+		Dependencies const& deps, AutoManualMode mode, bool contentDetect, bool pageDetect, bool fineTuning);
 	
 	Params(Dependencies const& deps);
 	
