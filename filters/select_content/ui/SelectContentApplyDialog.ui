@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>362</width>
-    <height>314</height>
+    <height>345</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -106,7 +106,7 @@
          <item>
           <widget class="QRadioButton" name="everyOtherRB">
            <property name="text">
-            <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page for all pages (include this page)</string>
+            <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page</string>
            </property>
           </widget>
          </item>

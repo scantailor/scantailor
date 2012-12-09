@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
+    <width>331</width>
     <height>398</height>
    </rect>
   </property>
@@ -147,16 +147,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="everyOtherRB">
+       <widget class="QRadioButton" name="thisEveryOtherRB">
         <property name="text">
-         <string>Every other page</string>
+         <string>This page and the following every other page</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="thisEveryOtherRB">
+       <widget class="QRadioButton" name="everyOtherRB">
         <property name="text">
-         <string>This page and the following every other page</string>
+         <string>Every other page</string>
         </property>
        </widget>
       </item>

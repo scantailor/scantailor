@@ -54,7 +54,7 @@
       <item>
        <widget class="QRadioButton" name="everyOtherRB">
         <property name="text">
-         <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page from the first one</string>
+         <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page</string>
         </property>
        </widget>
       </item>
