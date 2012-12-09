@@ -54,7 +54,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>Neco Torquato - Brazilian Portuguese</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="212"/>
@@ -119,7 +119,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="14"/>
         <source>About Scan Tailor &quot;Enhanced&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>O programu Scan Tailor &quot;Enhanced&quot;</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="289"/>
@@ -243,13 +243,13 @@ English or Russian please.</source>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="50"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="57"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Každá druhá strana</translation>
+        <translation>Každá druhá strana</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="67"/>
@@ -264,12 +264,12 @@ English or Russian please.</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="106"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Každá druhá vybraná strana</translation>
+        <translation>Každá druhá vybraná strana</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="136"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">Současná strana bude zahrnuta.</translation>
+        <translation>Současná strana bude zahrnuta.</translation>
     </message>
 </context>
 <context>
@@ -333,7 +333,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="69"/>
         <source>Custom</source>
-        <translation type="unfinished">Vlastní</translation>
+        <translation>Vlastní</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="90"/>
@@ -628,7 +628,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="396"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Opravit cesty ...</translation>
     </message>
     <message>
         <source>Stop batch processing</source>
@@ -759,7 +759,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="93"/>
@@ -1101,7 +1101,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="339"/>
         <source>Picture Shape</source>
-        <translation type="unfinished"></translation>
+        <translation>Tvar obrázků</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="412"/>
@@ -1118,7 +1118,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="785"/>
         <source>Tiff Compression</source>
-        <translation type="unfinished"></translation>
+        <translation>TIFF Komprese</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="437"/>
@@ -1184,7 +1184,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="69"/>
@@ -1285,24 +1285,24 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="303"/>
         <source>Auto</source>
         <comment>auto</comment>
-        <translation type="unfinished">Automaticky</translation>
+        <translation>Automaticky</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="308"/>
         <source>Manual</source>
         <comment>manual</comment>
-        <translation type="unfinished">Ručně</translation>
+        <translation>Ručně</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="313"/>
         <source>Original</source>
         <comment>original</comment>
-        <translation type="unfinished"></translation>
+        <translation>Původní</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="321"/>
         <source>Auto Margins</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatické okraje</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="331"/>
@@ -1335,12 +1335,12 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="91"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="97"/>
         <source>Apply cut</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplikovat řez</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="122"/>
@@ -1365,12 +1365,12 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="152"/>
         <source>This page and the following every other page</source>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="159"/>
         <source>Every other page</source>
-        <translation type="unfinished">Každá druhá strana</translation>
+        <translation>Každá druhá strana</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="175"/>
@@ -1385,7 +1385,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="217"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Každá druhá vybraná strana</translation>
+        <translation>Každá druhá vybraná strana</translation>
     </message>
 </context>
 <context>
@@ -1581,7 +1581,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Opravit cesty</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
@@ -1591,7 +1591,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1622,12 +1622,12 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>Apply content box</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplikovat obsah strany</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
@@ -1653,7 +1653,7 @@ Vyjměte je z projektu.</translation>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="87"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="109"/>
@@ -1703,48 +1703,48 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="20"/>
         <source>Page Box</source>
-        <translation type="unfinished"></translation>
+        <translation>Strana</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="28"/>
         <source>Shift with corners while they are in black. </source>
-        <translation type="unfinished"></translation>
+        <translation>Posouvá rohy strany dokud jsou v černém okraji. </translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="31"/>
         <source>Fine Tune Page Corners</source>
-        <translation type="unfinished"></translation>
+        <translation>Doladit rohy strany</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="40"/>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="178"/>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>Vypnout</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="73"/>
         <source>Borders in MM</source>
-        <translation type="unfinished"></translation>
+        <translation>Vnějsí okraj v milimetrech</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="96"/>
         <source>Left</source>
-        <translation type="unfinished">Vlevo</translation>
+        <translation>Vlevo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="106"/>
         <source>Top</source>
-        <translation type="unfinished">Nahoře</translation>
+        <translation>Nahoře</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="116"/>
         <source>Right</source>
-        <translation type="unfinished">Vpravo</translation>
+        <translation>Vpravo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="126"/>
         <source>Bottom</source>
-        <translation type="unfinished">Dole</translation>
+        <translation>Dole</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="207"/>
@@ -1800,17 +1800,17 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="26"/>
         <source>Batch Process</source>
-        <translation type="unfinished"></translation>
+        <translation>Hromadně zpracovat</translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="33"/>
         <source>All pages</source>
-        <translation type="unfinished">Všechny strany</translation>
+        <translation>Všechny strany</translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="43"/>
         <source>Start from selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Začít vybranou stranou</translation>
     </message>
 </context>
 <context>
@@ -2034,37 +2034,37 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="68"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Volný</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Rectangular</source>
-        <translation type="unfinished"></translation>
+        <translation>Čtverec</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Žádná</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
         <source>LZW</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="73"/>
         <source>Deflate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
         <source>Packbits</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
         <source>JPEG</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="442"/>
@@ -2191,7 +2191,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split type</source>
-        <translation type="unfinished">Řadit podle typu řezu</translation>
+        <translation>Řadit podle typu řezu</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
