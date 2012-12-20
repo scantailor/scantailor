@@ -119,8 +119,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	QRectF content_rect(page_rect);
 	if (new_params.isContentDetectionEnabled() && new_params.mode() == MODE_AUTO) {
 		content_rect = ContentBoxFinder::findContentBox(status, data, page_rect, m_ptrDbg.get());
-	} else if (new_params.isContentDetectionEnabled() && new_params.mode() == MODE_MANUAL) {
-		content_rect = new_params.contentRect();
+	} else if (params.get() && new_params.isContentDetectionEnabled() && new_params.mode() == MODE_MANUAL) {
+		content_rect = params->contentRect();
 	}
 	new_params.setContentRect(content_rect);
 
