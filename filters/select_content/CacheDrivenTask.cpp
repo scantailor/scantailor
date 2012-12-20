@@ -52,7 +52,7 @@ CacheDrivenTask::process(
 {
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(page_info.id()));
 	Dependencies const deps(xform.resultingPreCropArea());
-	if (!params.get() || !params->dependencies().matches(deps)) {
+	if (!params.get() || (!params->dependencies().matches(deps) && (params->mode() == MODE_AUTO || !params->isContentDetectionEnabled()))) {
 		
 		if (ThumbnailCollector* thumb_col = dynamic_cast<ThumbnailCollector*>(collector)) {
 			thumb_col->processThumbnail(
