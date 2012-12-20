@@ -107,6 +107,8 @@ private slots:
 	void applySelection(std::set<PageId> const& pages, bool apply_content_box);
 
 	void modeChanged(bool auto_mode);
+	void autoMode();
+	void manualMode();
 	void fineTuningChanged(bool checked);
 	void contentDetectionDisabled(void);
 	void pageDetectionDisabled(void);

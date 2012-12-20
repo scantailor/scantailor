@@ -38,7 +38,8 @@ OptionsWidget::OptionsWidget(
 {
 	setupUi(this);
 	
-	connect(autoBtn, SIGNAL(toggled(bool)), this, SLOT(modeChanged(bool)));
+	connect(autoBtn, SIGNAL(pressed()), this, SLOT(autoMode()));
+	connect(manualBtn, SIGNAL(pressed()), this, SLOT(manualMode()));
 	connect(disableBtn, SIGNAL(pressed()), this, SLOT(contentDetectionDisabled()));
 	connect(pageDetectAutoBtn, SIGNAL(pressed()), this, SLOT(pageDetectionEnabled()));
 	connect(pageDetectDisableBtn, SIGNAL(pressed()), this, SLOT(pageDetectionDisabled()));
@@ -110,9 +111,9 @@ OptionsWidget::manualContentRectSet(QRectF const& content_rect)
 void
 OptionsWidget::modeChanged(bool const auto_mode)
 {
-	if (m_ignoreAutoManualToggle) {
-		return;
-	}
+	//if (m_ignoreAutoManualToggle) {
+	//	return;
+	//}
 
 	if (auto_mode) {
 		//m_ptrSettings->clearPageParams(m_pageId);
@@ -123,9 +124,20 @@ OptionsWidget::modeChanged(bool const auto_mode)
 	} else {
         m_uiData.setPageDetection(false);
 		m_uiData.setMode(MODE_MANUAL);
+		m_uiData.setContentDetection(true);
 		commitCurrentParams();
 		emit reloadRequested();
 	}
+}
+
+void OptionsWidget::autoMode()
+{
+	modeChanged(true);
+}
+
+void OptionsWidget::manualMode()
+{
+	modeChanged(false);
 }
 
 void
