@@ -107,6 +107,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
         new_params.setPageBorders(params->pageBorders());
 	} else if (params.get()) {
 	    new_params = *params;
+	    new_params.setDependencies(deps);
 	}
 
 	QRectF page_rect(data.xform().resultingRect());
