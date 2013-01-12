@@ -250,6 +250,7 @@ CommandLine::setup()
 	m_orientation = fetchOrientation();
 	m_threshold = fetchThreshold();
 	m_deskewAngle = fetchDeskewAngle();
+	m_deskewMode = fetchDeskewMode();
 	m_skewDeviation = fetchSkewDeviation();
 	m_startFilterIdx = fetchStartFilterIdx();
 	m_endFilterIdx = fetchEndFilterIdx();
@@ -649,6 +650,13 @@ CommandLine::fetchDeskewAngle()
 		return 0.0;
 
 	return m_options["rotate"].toDouble();
+}
+
+AutoManualMode CommandLine::fetchDeskewMode()
+{
+	if (!hasDeskew())
+		return MODE_AUTO;
+	return (m_options["deskew"].toLower() == "manual") ? MODE_MANUAL : MODE_AUTO;
 }
 
 double

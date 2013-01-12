@@ -39,6 +39,11 @@ Params::Params(QDomElement const& deskew_el)
     m_mode(deskew_el.attribute("mode") == "manual" ? MODE_MANUAL : MODE_AUTO),
     m_deviation(deskew_el.attribute("deviation").toDouble())
 {
+	CommandLine const& cli = CommandLine::get();
+
+	if (cli.hasDeskew()) {
+		m_mode = cli.getDeskewMode();
+	}
 }
 
 Params::~Params()

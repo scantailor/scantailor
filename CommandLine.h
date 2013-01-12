@@ -36,6 +36,7 @@
 #include "filters/page_layout/Settings.h"
 #include "filters/page_layout/Alignment.h"
 #include "ImageFileInfo.h"
+#include "AutoManualMode.h"
 #include "Margins.h"
 #include "Despeckle.h"
 
@@ -127,6 +128,7 @@ public:
 	Orientation getOrientation() const { return m_orientation; }
 	int getThreshold() const { return m_threshold; }
 	double getDeskewAngle() const { return m_deskewAngle; }
+	AutoManualMode getDeskewMode() const { return m_deskewMode; }
 	double getSkewDeviation() const { return m_skewDeviation; }
 	int getStartFilterIdx() const { return m_startFilterIdx; }
 	int getEndFilterIdx() const { return m_endFilterIdx; }
@@ -187,6 +189,7 @@ private:
 	Orientation m_orientation;
 	int m_threshold;
 	double m_deskewAngle;
+	AutoManualMode m_deskewMode;
 	double m_skewDeviation;
 	int m_startFilterIdx;
 	int m_endFilterIdx;
@@ -215,6 +218,7 @@ private:
 	QString fetchOutputProjectFile();
 	int fetchThreshold();
 	double fetchDeskewAngle();
+	AutoManualMode fetchDeskewMode();
 	double fetchSkewDeviation();
 	int fetchStartFilterIdx();
 	int fetchEndFilterIdx();
