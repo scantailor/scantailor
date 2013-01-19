@@ -73,6 +73,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "disable-content-detection";
 	opts << "enable-page-detection";
 	opts << "enable-fine-tuning";
+	opts << "force-disable-page-detection";
 	opts << "content-detection";
 	opts << "content-box";
 	opts << "content-deviation";
@@ -325,6 +326,7 @@ CommandLine::printHelp()
 	std::cout << "\t--disable-content-detection\t\t-- default: enabled" << std::endl;
 	std::cout << "\t--enable-page-detection\t\t\t-- default: disabled" << std::endl;
 	std::cout << "\t--enable-fine-tuning\t\t\t-- default: disabled; if page detection enabled it moves edges while corners are in black" << std::endl;
+	std::cout << "\t--force-disable-page-detection\t\t-- switch page detection from page project off if enabled and set content detection to manual mode" << std::endl;
 	std::cout << "\t--disable-content-text-mask\n\t\t\t\t\t\t-- disable using text mask to estimate a content box" << std::endl;
 	std::cout << "\t--content-detection=<cautious|normal|aggressive>\n\t\t\t\t\t\t-- default: normal" << std::endl;
 	std::cout << "\t--content-deviation=<0.0...)\t\t-- default: 1.0; pages with bigger content deviation will be painted in red" << std::endl;

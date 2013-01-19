@@ -98,6 +98,14 @@ Params::Params(QDomElement const& filter_el)
 	m_fineTuneCorners(filter_el.attribute("fine-tune-corners") == "true" ? true : false),
 	m_deviation(filter_el.attribute("deviation").toDouble())
 {
+	// ! m_contentDetect means content detection is disabled and should be the same as pageRect
+	// turn off pagedetection if page detection was enabled and set content detection to manual
+	if (m_pageDetect && !m_contentDetect && CommandLine::get().isForcePageDetectionDisabled()) {
+		m_pageDetect = false;
+		m_contentRect = m_pageRect;
+		m_contentDetect = true;
+		m_mode = MODE_MANUAL;
+	}
 }
 
 Params::~Params()

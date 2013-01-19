@@ -71,6 +71,7 @@ public:
 
 	bool isContentDetectionEnabled() const { return !contains("disable-content-detection"); };
 	bool isPageDetectionEnabled() const { return contains("enable-page-detection"); };
+	bool isForcePageDetectionDisabled() const { return contains("force-disable-page-detection"); };
 	bool isFineTuningEnabled() const { return contains("enable-fine-tuning"); };
 	bool isAutoMarginsEnabled() const { return contains("enable-auto-margins"); };
 
