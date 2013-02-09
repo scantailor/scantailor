@@ -126,6 +126,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "disable-check-output";
 	opts << "default-output-dpi";
 	opts << "default-color-mode";
+	opts << "tiff-force-rgb";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -371,6 +372,7 @@ CommandLine::printHelp()
 	std::cout << "\t--end-filter=<1...6>\t\t\t-- default: 6" << std::endl;
 	std::cout << "\t--output-project=, -o=<project_name>" << std::endl;
 	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << std::endl;
+	std::cout << "\t--tiff-force-rgb\t\t\t-- all output tiffs will be rgb" << std::endl;
 	std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
 	std::cout << "\t--page-detection-box=<widthxheight>\t\t-- in mm" << std::endl;
 	std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t-- default: 0.1" << std::endl;

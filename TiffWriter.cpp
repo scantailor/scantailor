@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "CommandLine.h"
 #include "TiffWriter.h"
 #include "Dpm.h"
 #include "imageproc/Constants.h"
@@ -195,12 +196,16 @@ TiffWriter::writeImage(QIODevice& device, QImage const& image, int compression)
 	TIFFSetField(tif.handle(), TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
 	setDpm(tif, Dpm(image));
 	
-	switch (image.format()) {
-		case QImage::Format_Mono:
-		case QImage::Format_MonoLSB:
-		case QImage::Format_Indexed8:
-			return writeBitonalOrIndexed8Image(tif, image, compression);
-		default:;
+	CommandLine const& cli = CommandLine::get();
+
+	if (! cli.hasTiffForceRGB()) {
+		switch (image.format()) {
+			case QImage::Format_Mono:
+			case QImage::Format_MonoLSB:
+			case QImage::Format_Indexed8:
+				return writeBitonalOrIndexed8Image(tif, image, compression);
+			default:;
+		}
 	}
 	
 	if (image.hasAlphaChannel()) {
