@@ -119,8 +119,8 @@ Task::process(TaskStatus const& status, FilterData const& data)
 	std::auto_ptr<Params> params(m_ptrSettings->getPageParams(m_pageId));
 	if (params.get()) {
 		if (!deps.matches(params->dependencies())) {
-			std::cout << "Deskew: " << "reset params" << std::endl;
-			std::cout << (deps.matches(params->dependencies())) << std::endl;
+			//std::cout << "Deskew: " << "reset params" << std::endl;
+			//std::cout << (deps.matches(params->dependencies())) << std::endl;
 			params.reset();
 		} else {
 			ui_data.setEffectiveDeskewAngle(params->deskewAngle());
@@ -174,7 +174,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 				(double)rotated_dpm.horizontal() / rotated_dpm.vertical()
 			);
 			Skew const skew(skew_finder.findSkew(rotated_image));
-			std::cout << "deskew: SkewFinder" << std::endl;
+			//std::cout << "deskew: SkewFinder" << std::endl;
 
 			if (skew.confidence() >= skew.GOOD_CONFIDENCE) {
 				ui_data.setEffectiveDeskewAngle(-skew.angle());

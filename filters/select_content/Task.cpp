@@ -124,12 +124,12 @@ create_new_content:
 		QRectF content_rect(page_rect);
 
 		if (new_params.isPageDetectionEnabled()) {
-			std::cout << "PageFinder" << std::endl;
+			//std::cout << "PageFinder" << std::endl;
 			page_rect = PageFinder::findPageBox(status, data, new_params.isFineTuningEnabled(), m_ptrSettings->pageDetectionBox(), m_ptrSettings->pageDetectionTolerance(), new_params.pageBorders(), m_ptrDbg.get());
 		}
 
 		if (new_params.isContentDetectionEnabled() && new_params.mode() == MODE_AUTO) {
-			std::cout << "ContentBoxFinder" << std::endl;
+			//std::cout << "ContentBoxFinder" << std::endl;
 			content_rect = ContentBoxFinder::findContentBox(status, data, page_rect, m_ptrDbg.get());
 		} else if (new_params.isContentDetectionEnabled() && new_params.mode() == MODE_MANUAL && new_params.contentRect().isValid()) {
 			content_rect = new_params.contentRect();
