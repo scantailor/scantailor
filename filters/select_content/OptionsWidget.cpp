@@ -257,16 +257,18 @@ OptionsWidget::applySelection(std::set<PageId> const& pages, bool apply_content_
 	);
 
 	BOOST_FOREACH(PageId const& page_id, pages) {
-        std::auto_ptr<Params> old_params = m_ptrSettings->getPageParams(page_id);
-        
-        if (!apply_content_box && old_params.get()) {
-            params.setContentRect(old_params->contentRect());
-            params.setContentSizeMM(old_params->contentSizeMM());
-        }
-        
-        params.setPageBorders( Margins(leftBorder->value(), topBorder->value(), rightBorder->value(), bottomBorder->value()) );
-		params.setPageRect(old_params->pageRect());
-        
+		std::auto_ptr<Params> old_params = m_ptrSettings->getPageParams(page_id);
+
+		if (old_params.get()) {
+			if (!apply_content_box) {
+				params.setContentRect(old_params->contentRect());
+				params.setContentSizeMM(old_params->contentSizeMM());
+			}
+			params.setPageRect(old_params->pageRect());
+		}
+		params.setPageBorders( Margins(leftBorder->value(), topBorder->value(), rightBorder->value(), bottomBorder->value()) );
+
+
 		m_ptrSettings->setPageParams(page_id, params);
 		//emit invalidateThumbnail(page_id);
 	}
