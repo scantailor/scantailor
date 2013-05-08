@@ -127,6 +127,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "default-output-dpi";
 	opts << "default-color-mode";
 	opts << "tiff-force-rgb";
+	opts << "tiff-force-grayscale";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -358,7 +359,7 @@ CommandLine::printHelp()
 	std::cout << "\t--output-dpi=<number>\t\t\t-- sets x and y output dpi. default: 600" << std::endl;
 	std::cout << "\t\t--output-dpi-x=<number>" << std::endl;
 	std::cout << "\t\t--output-dpi-y=<number>" << std::endl;
-	std::cout << "\t--default-output-dpi=<number>\t\t-- default output dpi for pages created by split filter in gui";
+	std::cout << "\t--default-output-dpi=<number>\t\t-- default output dpi for pages created by split filter in gui" << std::endl;
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << std::endl;
 	std::cout << "\t--default-color-mode=<...>\t\t-- sets default value for new images created by split filter" << std::endl;
 	std::cout << "\t--picture-shape=<free|rectangular>\n\t\t\t\t\t\t-- default: free" << std::endl;
@@ -373,6 +374,7 @@ CommandLine::printHelp()
 	std::cout << "\t--output-project=, -o=<project_name>" << std::endl;
 	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << std::endl;
 	std::cout << "\t--tiff-force-rgb\t\t\t-- all output tiffs will be rgb" << std::endl;
+	std::cout << "\t--tiff-force-grayscale\t\t\t-- all output tiffs will be grayscale" << std::endl;
 	std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
 	std::cout << "\t--page-detection-box=<widthxheight>\t\t-- in mm" << std::endl;
 	std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t-- default: 0.1" << std::endl;

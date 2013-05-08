@@ -18,6 +18,7 @@
 
 #include "CommandLine.h"
 #include "TiffWriter.h"
+#include "imageproc/Grayscale.h"
 #include "Dpm.h"
 #include "imageproc/Constants.h"
 #include <QtGlobal>
@@ -199,6 +200,9 @@ TiffWriter::writeImage(QIODevice& device, QImage const& image, int compression)
 	CommandLine const& cli = CommandLine::get();
 
 	if (! cli.hasTiffForceRGB()) {
+		if (cli.hasTiffForceGrayscale()) {
+			return writeBitonalOrIndexed8Image(tif, imageproc::toGrayscale(image), compression);
+		}
 		switch (image.format()) {
 			case QImage::Format_Mono:
 			case QImage::Format_MonoLSB:
