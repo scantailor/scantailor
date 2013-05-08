@@ -128,6 +128,7 @@ CommandLine::parseCli(QStringList const& argv)
 	opts << "default-color-mode";
 	opts << "tiff-force-rgb";
 	opts << "tiff-force-grayscale";
+	opts << "tiff-force-keep-color-space";
 
 	QMap<QString, QString> shortMap;
 	shortMap["h"] = "help";
@@ -375,6 +376,7 @@ CommandLine::printHelp()
 	std::cout << "\t--tiff-compression=<lzw|deflate|packbits|jpeg|none>\t-- default: lzw" << std::endl;
 	std::cout << "\t--tiff-force-rgb\t\t\t-- all output tiffs will be rgb" << std::endl;
 	std::cout << "\t--tiff-force-grayscale\t\t\t-- all output tiffs will be grayscale" << std::endl;
+	std::cout << "\t--tiff-force-keep-color-space\t\t-- output tiffs will be in original color space" << std::endl;
 	std::cout << "\t--window-title=WindowTitle\t\t-- default: project name" << std::endl;
 	std::cout << "\t--page-detection-box=<widthxheight>\t\t-- in mm" << std::endl;
 	std::cout << "\t\t--page-detection-tolerance=<0.0..1.0>\t-- default: 0.1" << std::endl;

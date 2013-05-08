@@ -108,6 +108,7 @@ public:
 	bool hasTiffCompression() const { return contains("tiff-compression") && !m_options["tiff-compression"].isEmpty(); }
 	bool hasTiffForceRGB() const { return contains("tiff-force-rgb"); }
 	bool hasTiffForceGrayscale() const { return contains("tiff-force-grayscale"); }
+	bool hasTiffForceKeepColorSpace() const { return contains("tiff-force-keep-color-space"); }
 	bool hasWindowTitle() const { return contains("window-title") && !m_options["window-title"].isEmpty(); }
 	bool hasPageDetectionBox() const { return contains("page-detection-box") && !m_options["page-detection-box"].isEmpty(); }
 	bool hasPageDetectionTolerance() const { return contains("page-detection-tolerance") && !m_options["page-detection-tolerance"].isEmpty(); }

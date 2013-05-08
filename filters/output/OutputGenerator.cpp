@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "CommandLine.h"
 #include "OutputGenerator.h"
 #include "ImageTransformation.h"
 #include "FilterData.h"
@@ -496,8 +497,9 @@ OutputGenerator::processAsIs(
 	QColor const bg_color(dominant_gray, dominant_gray, dominant_gray);
 	
 	QImage out;
+	CommandLine const& cli = CommandLine::get();
 
-	if (input.origImage().allGray()) {
+	if (input.origImage().allGray() && !cli.hasTiffForceKeepColorSpace()) {
 		if (m_outRect.isEmpty()) {
 			QImage image(1, 1, QImage::Format_Indexed8);
 			image.setColorTable(createGrayscalePalette());
