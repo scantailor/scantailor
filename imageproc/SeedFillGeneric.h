@@ -21,6 +21,7 @@
 
 #include "Connectivity.h"
 #include "FastQueue.h"
+#include "BinaryImage.h"
 #include <QSize>
 #include <vector>
 #include <assert.h>
@@ -95,8 +96,8 @@ void seedFillSingleLine(
 template<typename T, typename SpreadOp, typename MaskOp>
 inline void processNeighbor(
 	SpreadOp spread_op, MaskOp mask_op,
-	FastQueue<Position<T> >& queue, T const this_val,
-	T* const neighbor, T const* const neighbor_mask,
+	FastQueue<Position<T> >& queue, uint32_t* in_queue_line,
+	T const this_val, T* const neighbor, T const* const neighbor_mask,
 	Position<T> const& base_pos, int const x_delta, int const y_delta)
 {
 	T const new_val(mask_op(*neighbor_mask, spread_op(this_val, *neighbor)));
@@ -104,7 +105,12 @@ inline void processNeighbor(
 		*neighbor = new_val;
 		int const x = base_pos.x + x_delta;
 		int const y = base_pos.y + y_delta;
-		queue.push(Position<T>(neighbor, neighbor_mask, x, y));
+		uint32_t& in_queue_word = in_queue_line[x >> 5];
+		uint32_t const in_queue_mask = (uint32_t(1) << 31) >> (x & 31);
+		if (!(in_queue_word & in_queue_mask)) { // If not already in the queue.
+			queue.push(Position<T>(neighbor, neighbor_mask, x, y));
+			in_queue_word |= in_queue_mask; // Mark as already in the queue.
+		}
 	}
 }
 
@@ -112,6 +118,7 @@ template<typename T, typename SpreadOp, typename MaskOp>
 void spread4(
 	SpreadOp spread_op, MaskOp mask_op,
 	FastQueue<Position<T> >& queue,
+	uint32_t* const in_queue_data, int const in_queue_stride,
 	HTransition const* h_transitions,
 	VTransition const* v_transitions,
 	int const seed_stride, int const mask_stride)
@@ -123,6 +130,7 @@ void spread4(
 		T const this_val(*pos.seed);
 		HTransition const ht(h_transitions[pos.x]);
 		VTransition const vt(v_transitions[pos.y]);
+		uint32_t* const in_queue_line = in_queue_data + in_queue_stride * pos.y;
 		T* seed;
 		T const* mask;
 
@@ -130,28 +138,32 @@ void spread4(
 		seed = pos.seed + ht.west_delta;
 		mask = pos.mask + ht.west_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, ht.west_delta, 0
+			spread_op, mask_op, queue, in_queue_line,
+			this_val, seed, mask, pos, ht.west_delta, 0
 		);
 
 		// Eastern neighbor.
 		seed = pos.seed + ht.east_delta;
 		mask = pos.mask + ht.east_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, ht.east_delta, 0
+			spread_op, mask_op, queue, in_queue_line,
+			this_val, seed, mask, pos, ht.east_delta, 0
 		);
 
 		// Northern neighbor.
 		seed = pos.seed - (seed_stride & vt.north_mask);
 		mask = pos.mask - (mask_stride & vt.north_mask);
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, 0, -1 & vt.north_mask
+			spread_op, mask_op, queue, in_queue_line - (in_queue_stride & vt.north_mask),
+			this_val, seed, mask, pos, 0, -1 & vt.north_mask
 		);
 
 		// Southern neighbor.
 		seed = pos.seed + (seed_stride & vt.south_mask);
 		mask = pos.mask + (mask_stride & vt.south_mask);
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, 0, 1 & vt.south_mask
+			spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+			this_val, seed, mask, pos, 0, 1 & vt.south_mask
 		);
 	}
 }
@@ -160,6 +172,7 @@ template<typename T, typename SpreadOp, typename MaskOp>
 void spread8(
 	SpreadOp spread_op, MaskOp mask_op,
 	FastQueue<Position<T> >& queue,
+	uint32_t* const in_queue_data, int const in_queue_stride, 
 	HTransition const* h_transitions,
 	VTransition const* v_transitions,
 	int const seed_stride, int const mask_stride)
@@ -171,6 +184,7 @@ void spread8(
 		T const this_val(*pos.seed);
 		HTransition const ht(h_transitions[pos.x]);
 		VTransition const vt(v_transitions[pos.y]);
+		uint32_t* const in_queue_line = in_queue_data + in_queue_stride * pos.y;
 		T* seed;
 		T const* mask;
 
@@ -178,61 +192,64 @@ void spread8(
 		seed = pos.seed - (seed_stride & vt.north_mask);
 		mask = pos.mask - (mask_stride & vt.north_mask);
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask,
-			pos, 0, -1 & vt.north_mask
+			spread_op, mask_op, queue, in_queue_line - (in_queue_stride & vt.north_mask),
+			this_val, seed, mask, pos, 0, -1 & vt.north_mask
 		);
 
 		// North-Western neighbor.
 		seed = pos.seed - (seed_stride & vt.north_mask) + ht.west_delta;
 		mask = pos.mask - (mask_stride & vt.north_mask) + ht.west_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask,
-			pos, ht.west_delta, -1 & vt.north_mask
+			spread_op, mask_op, queue, in_queue_line - (in_queue_stride & vt.north_mask),
+			this_val, seed, mask, pos, ht.west_delta, -1 & vt.north_mask
 		);
 
 		// North-Eastern neighbor.
 		seed = pos.seed - (seed_stride & vt.north_mask) + ht.east_delta;
 		mask = pos.mask - (mask_stride & vt.north_mask) + ht.east_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask,
-			pos, ht.east_delta, -1 & vt.north_mask
+			spread_op, mask_op, queue,  in_queue_line - (in_queue_stride & vt.north_mask),
+			this_val, seed, mask, pos, ht.east_delta, -1 & vt.north_mask
 		);
 
 		// Eastern neighbor.
 		seed = pos.seed + ht.east_delta;
 		mask = pos.mask + ht.east_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, ht.east_delta, 0
+			spread_op, mask_op, queue, in_queue_line,
+			this_val, seed, mask, pos, ht.east_delta, 0
 		);
 
 		// Western neighbor.
 		seed = pos.seed + ht.west_delta;
 		mask = pos.mask + ht.west_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, ht.west_delta, 0
+			spread_op, mask_op, queue, in_queue_line,
+			this_val, seed, mask, pos, ht.west_delta, 0
 		);
 
 		// Southern neighbor.
 		seed = pos.seed + (seed_stride & vt.south_mask);
 		mask = pos.mask + (mask_stride & vt.south_mask);
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask, pos, 0, 1 & vt.south_mask
+			spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+			this_val, seed, mask, pos, 0, 1 & vt.south_mask
 		);
 
 		// South-Eastern neighbor.
 		seed = pos.seed + (seed_stride & vt.south_mask) + ht.east_delta;
 		mask = pos.mask + (mask_stride & vt.south_mask) + ht.east_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask,
-			pos, ht.east_delta, 1 & vt.south_mask
+			spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+			this_val, seed, mask, pos, ht.east_delta, 1 & vt.south_mask
 		);
 
 		// South-Western neighbor.
 		seed = pos.seed + (seed_stride & vt.south_mask) + ht.west_delta;
 		mask = pos.mask + (seed_stride & vt.south_mask) + ht.west_delta;
 		processNeighbor(
-			spread_op, mask_op, queue, this_val, seed, mask,
-			pos, ht.west_delta, 1 & vt.south_mask
+			spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+			this_val, seed, mask, pos, ht.west_delta, 1 & vt.south_mask
 		);
 	}
 }
@@ -273,12 +290,16 @@ void seedFill4(
 	mask_line -= mask_stride;
 
 	FastQueue<Position<T> > queue;
+	BinaryImage in_queue(size, WHITE);
+	uint32_t* const in_queue_data = in_queue.data();
+	int const in_queue_stride = in_queue.wordsPerLine();
 	std::vector<HTransition> h_transitions;
 	std::vector<VTransition> v_transitions;
 	initHorTransitions(h_transitions, w);
 	initVertTransitions(v_transitions, h);
 
 	// Bottom to top.
+	uint32_t* in_queue_line = in_queue_data + in_queue_stride * (h - 1);
 	for (int y = h - 1; y >= 0; --y) {
 		VTransition const vt(v_transitions[y]);
 
@@ -310,24 +331,25 @@ void seedFill4(
 
 			// Eastern neighbor.
 			processNeighbor(
-				spread_op, mask_op, queue, new_val,
+				spread_op, mask_op, queue, in_queue_line, new_val,
 				p_east_seed, p_east_mask, pos, ht.east_delta, 0
 			);
 
 			// Southern neighbor.
 			processNeighbor(
-				spread_op, mask_op, queue, new_val,
-				p_south_seed, p_south_mask, pos, 0, 1 & vt.south_mask
+				spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+				new_val, p_south_seed, p_south_mask, pos, 0, 1 & vt.south_mask
 			);
 		}
 
 		seed_line -= seed_stride;
 		mask_line -= mask_stride;
+		in_queue_line -= in_queue_stride;
 	}
 
 	spread4(
-		spread_op, mask_op, queue, &h_transitions[0],
-		&v_transitions[0], seed_stride, mask_stride
+		spread_op, mask_op, queue, in_queue_data, in_queue_stride,
+		&h_transitions[0], &v_transitions[0], seed_stride, mask_stride
 	);
 }
 
@@ -411,12 +433,16 @@ void seedFill8(
 	}
 
 	FastQueue<Position<T> > queue;
+	BinaryImage in_queue(size, WHITE);
+	uint32_t* const in_queue_data = in_queue.data();
+	int const in_queue_stride = in_queue.wordsPerLine();
 	std::vector<HTransition> h_transitions;
 	std::vector<VTransition> v_transitions;
 	initHorTransitions(h_transitions, w);
 	initVertTransitions(v_transitions, h);
 
 	// Bottom to top.
+	uint32_t* in_queue_line = in_queue_data + in_queue_stride * (h - 1);
 	for (int y = h - 1; y >= 0; --y) {
 		VTransition const vt(v_transitions[y]);
 
@@ -455,38 +481,39 @@ void seedFill8(
 
 			// Eastern neighbor.
 			processNeighbor(
-				spread_op, mask_op, queue, new_val,
+				spread_op, mask_op, queue, in_queue_line, new_val,
 				p_east_seed, p_east_mask, pos, ht.east_delta, 0
 			);
 
 			// South-eastern neighbor.
 			processNeighbor(
-				spread_op, mask_op, queue, new_val,
-				p_south_east_seed, p_south_east_mask, pos,
+				spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+				new_val, p_south_east_seed, p_south_east_mask, pos,
 				ht.east_delta, 1 & vt.south_mask
 			);
 
 			// Southern neighbor.
 			processNeighbor(
-				spread_op, mask_op, queue, new_val,
-				p_south_seed, p_south_mask, pos, 0, 1 & vt.south_mask
+				spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+				new_val, p_south_seed, p_south_mask, pos, 0, 1 & vt.south_mask
 			);
 
 			// South-western neighbor.
 			processNeighbor(
-				spread_op, mask_op, queue, new_val,
-				p_south_west_seed, p_south_west_mask, pos,
+				spread_op, mask_op, queue, in_queue_line + (in_queue_stride & vt.south_mask),
+				new_val, p_south_west_seed, p_south_west_mask, pos,
 				ht.west_delta, 1 & vt.south_mask
 			);
 		}
 
 		seed_line -= seed_stride;
 		mask_line -= mask_stride;
+		in_queue_line -= in_queue_stride;
 	}
 
 	spread8(
-		spread_op, mask_op, queue, &h_transitions[0],
-		&v_transitions[0], seed_stride, mask_stride
+		spread_op, mask_op, queue, in_queue_data, in_queue_stride,
+		&h_transitions[0], &v_transitions[0], seed_stride, mask_stride
 	);
 }
 
