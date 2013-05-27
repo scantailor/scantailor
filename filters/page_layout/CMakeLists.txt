@@ -2,12 +2,6 @@ PROJECT("Page Layout Filter")
 
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
 
-FILE(GLOB ui_files "ui/*.ui")
-QT4_WRAP_UI(ui_sources ${ui_files})
-SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
-SOURCE_GROUP("UI Files" FILES ${ui_files})
-SOURCE_GROUP("Generated" FILES ${ui_sources})
-
 SET(
 	sources
 	Utils.cpp Utils.h
@@ -25,8 +19,13 @@ SET(
 	OrderByHeightProvider.cpp OrderByHeightProvider.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
-QT4_AUTOMOC(${sources})
+
+FILE(GLOB ui_files "ui/*.ui")
+SOURCE_GROUP("UI Files" FILES ${ui_files})
+
+QT5_WRAP_UI(ui_sources ${ui_files})
 
 ADD_LIBRARY(page_layout STATIC ${sources} ${ui_sources})
+QT5_USE_MODULES(page_layout Widgets Xml)
 
 TRANSLATION_SOURCES(scantailor ${sources} ${ui_files})

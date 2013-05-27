@@ -587,7 +587,7 @@ BinaryImage::toQImage() const
 	
 	QImage dst(m_width, m_height, QImage::Format_Mono);
 	assert(dst.bytesPerLine() % 4 == 0);
-	dst.setNumColors(2);
+	dst.setColorCount(2);
 	dst.setColor(0, 0xffffffff);
 	dst.setColor(1, 0xff000000);
 	int const dst_wpl = dst.bytesPerLine() / 4;
@@ -716,7 +716,7 @@ BinaryImage::fromMono(QImage const& image)
 	uint32_t* dst_line = dst.data();
 	
 	uint32_t modifier = ~uint32_t(0);
-	if (image.numColors() >= 2) {
+	if (image.colorCount() >= 2) {
 		if (qGray(image.color(0)) > qGray(image.color(1))) {
 			// if color 0 is lighter than color 1
 			modifier = ~modifier;
@@ -754,7 +754,7 @@ BinaryImage::fromMono(QImage const& image, QRect const& rect)
 	int const dst_last_word_unused_bits = (dst_wpl << 5) - width;
 	
 	uint32_t modifier = ~uint32_t(0);
-	if (image.numColors() >= 2) {
+	if (image.colorCount() >= 2) {
 		if (qGray(image.color(0)) > qGray(image.color(1))) {
 			// if color 0 is lighter than color 1
 			modifier = ~modifier;
@@ -831,7 +831,7 @@ BinaryImage::fromIndexed8(
 	int const last_word_bits = width - (last_word_idx << 5);
 	int const last_word_unused_bits = 32 - last_word_bits;
 	
-	int const num_colors = image.numColors();
+	int const num_colors = image.colorCount();
 	assert(num_colors <= 256);
 	int color_to_gray[256];
 	int color_idx = 0;

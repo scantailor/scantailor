@@ -44,7 +44,7 @@ IncompleteThumbnail::~IncompleteThumbnail()
 void
 IncompleteThumbnail::drawQuestionMark(QPainter& painter, QRectF const& bounding_rect)
 {
-	QString const text(QString::fromAscii("?"));
+	QString const text(QString::fromLatin1("?"));
 	
 	// Because painting happens only from the main thread, we don't
 	// need to care about concurrent access.

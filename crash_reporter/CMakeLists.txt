@@ -30,23 +30,21 @@ SET(
 	MultipartFormData.cpp MultipartFormData.h
 )
 SOURCE_GROUP("Sources" FILES ${crash_reporter_sources})
-QT4_AUTOMOC(${crash_reporter_sources})
 
 FILE(GLOB ui_files "ui/*.ui")
 SOURCE_GROUP("Ui Files" FILES ${ui_files})
-QT4_WRAP_UI(ui_sources ${ui_files})
-SET_SOURCE_FILES_PROPERTIES(${ui_sources} PROPERTIES GENERATED TRUE)
+
 ADD_SUBDIRECTORY(ui)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}") # for ui files
 
 IF(ENABLE_CRASH_REPORTER)
-	ADD_EXECUTABLE(CrashReporter WIN32 ${crash_reporter_sources} ${ui_sources})
+	QT5_WRAP_UI(ui_sources ${ui_files})
 
+	ADD_EXECUTABLE(CrashReporter WIN32 ${crash_reporter_sources} ${ui_sources})
+	QT5_USE_MODULES(CrashReporter Widgets Xml Network)
 	TARGET_LINK_LIBRARIES(
-		CrashReporter ${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTNETWORK_LIBRARY}
-		${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY} ${PNG_LIBRARY}
-		${JPEG_LIBRARY} winmm imm32 ws2_32
+		CrashReporter ${MAYBE_QTMAIN_LIBRARIES} ${PNG_LIBRARY} ${JPEG_LIBRARY} winmm imm32 ws2_32
 	)
-ENDIF(ENABLE_CRASH_REPORTER)
+ENDIF()
 
 TRANSLATION_SOURCES(crashreporter ${crash_reporter_sources} ${ui_files})

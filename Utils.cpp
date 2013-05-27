@@ -50,20 +50,15 @@ QString
 Utils::richTextForLink(
 	QString const& label, QString const& target)
 {
-	return QString::fromAscii(
-		"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\""
-		"\"http://www.w3.org/TR/REC-html40/strict.dtd\">"
-		"<html><head><meta name=\"qrichtext\" content=\"1\" />"
-		"</head><body><p style=\"margin-top:0px; margin-bottom:0px;"
-		"margin-left:0px; margin-right:0px; -qt-block-indent:0;"
-		"text-indent:0px;\"><a href=\"%1\">%2</a></p></body></html>"
-	).arg(Qt::escape(target), Qt::escape(label));
+	return QString::fromLatin1(
+		"<a href=\"%1\">%2</a>"
+	).arg(target.toHtmlEscaped(), label.toHtmlEscaped());
 }
 
 void
 Utils::maybeCreateCacheDir(QString const& output_dir)
 {
-	QDir(output_dir).mkdir(QString::fromAscii("cache"));
+	QDir(output_dir).mkdir(QString::fromLatin1("cache"));
 	
 	// QDir::mkdir() returns false if the directory already exists,
 	// so to prevent confusion this function return void.

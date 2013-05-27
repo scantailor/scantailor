@@ -87,7 +87,7 @@ Section
 
   # Register the ".ScanTailor" file extension.
   ${registerExtension} "$INSTDIR\scantailor.exe" ".ScanTailor" \
-  "Scan Tailor Project" "$INSTDIR\scantailor.exe,0"
+  "Scan Tailor Project" "$INSTDIR\scantailor.exe"
 SectionEnd
 
 
@@ -116,6 +116,8 @@ Section "Uninstall"
   Delete "$INSTDIR\libpng.dll"
   Delete "$INSTDIR\libjpeg.dll"
   Delete "$INSTDIR\libtiff.dll"
+  Delete "$INSTDIR\msvc*.dll"
+  Delete "$INSTDIR\vccorlib*.dll"
   Delete "$INSTDIR\Uninstaller.exe"
   RMDir /r "$INSTDIR\Microsoft.VC80.CRT"
   RMDir /r "$INSTDIR\Microsoft.VC90.CRT"
@@ -125,9 +127,18 @@ Section "Uninstall"
   Delete "$INSTDIR\translations\*.qm"
   RMDir "$INSTDIR\translations"
   
-  # Remove imageformats.
+  # Remove imageformats plugins.
+  # We no longer ship any, but it's a good idea to cleanup after previous version.
   Delete "$INSTDIR\imageformats\*.dll"
   RMDir "$INSTDIR\imageformats"
+
+  # Remove platform plugins.
+  Delete "$INSTDIR\platforms\*.dll"
+  RMDir "$INSTDIR\platforms"
+
+  # Remove accessible plugins.
+  Delete "$INSTDIR\accessible\*.dll"
+  RMDir "$INSTDIR\accessible"
   
   # Remove the installation directory.
   RMDir "$INSTDIR"

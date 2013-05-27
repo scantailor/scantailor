@@ -49,7 +49,7 @@ static QImage monoMsbToGrayscale(QImage const& src)
 	int const dst_bpl = dst.bytesPerLine();
 	
 	uint8_t bin2gray[2] = { 0, 0xff };
-	if (src.numColors() >= 2) {
+	if (src.colorCount() >= 2) {
 		if (qGray(src.color(0)) > qGray(src.color(1))) {
 			// if color 0 is lighter than color 1
 			bin2gray[0] = 0xff;
@@ -92,7 +92,7 @@ static QImage monoLsbToGrayscale(QImage const& src)
 	int const dst_bpl = dst.bytesPerLine();
 	
 	uint8_t bin2gray[2] = { 0, 0xff };
-	if (src.numColors() >= 2) {
+	if (src.colorCount() >= 2) {
 		if (qGray(src.color(0)) > qGray(src.color(1))) {
 			// if color 0 is lighter than color 1
 			bin2gray[0] = 0xff;
@@ -167,7 +167,7 @@ QImage toGrayscale(QImage const& src)
 		return monoLsbToGrayscale(src);
 	case QImage::Format_Indexed8:
 		if (src.isGrayscale()) {
-			if (src.numColors() == 256) {
+			if (src.colorCount() == 256) {
 				return src;
 			} else {
 				QImage dst(src);
@@ -384,7 +384,7 @@ GrayscaleHistogram::fromMonoImage(QImage const& img)
 	
 	QRgb color0 = 0xffffffff;
 	QRgb color1 = 0xff000000;
-	if (img.numColors() >= 2) {
+	if (img.colorCount() >= 2) {
 		color0 = img.color(0);
 		color1 = img.color(1);
 	}
@@ -424,7 +424,7 @@ GrayscaleHistogram::fromMonoMSBImage(QImage const& img, BinaryImage const& mask)
 	
 	QRgb color0 = 0xffffffff;
 	QRgb color1 = 0xff000000;
-	if (img.numColors() >= 2) {
+	if (img.colorCount() >= 2) {
 		color0 = img.color(0);
 		color1 = img.color(1);
 	}

@@ -17,7 +17,7 @@
 */
 
 #include "RelinkablePathVisualization.h"
-#include "RelinkablePathVisualization.h.moc"
+#include "RelinkablePathVisualization.moc"
 #include "RelinkablePath.h"
 #include "QtSignalForwarder.h"
 #include <QHBoxLayout>

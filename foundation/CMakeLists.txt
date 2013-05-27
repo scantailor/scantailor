@@ -30,6 +30,6 @@ SET(
 	ValueConv.h
 )
 SOURCE_GROUP("Sources" FILES ${sources})
-QT4_AUTOMOC(${sources})
 
 ADD_LIBRARY(foundation STATIC ${sources})
+QT5_USE_MODULES(foundation Core Xml)

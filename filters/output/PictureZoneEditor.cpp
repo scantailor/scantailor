@@ -17,7 +17,7 @@
 */
 
 #include "PictureZoneEditor.h"
-#include "PictureZoneEditor.h.moc"
+#include "PictureZoneEditor.moc"
 #include "NonCopyable.h"
 #include "Zone.h"
 #include "ZoneSet.h"

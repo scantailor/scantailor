@@ -17,7 +17,7 @@
 */
 
 #include "OptionsWidget.h"
-#include "OptionsWidget.h.moc"
+#include "OptionsWidget.moc"
 #include "Settings.h"
 #include "ScopedIncDec.h"
 #include <QString>

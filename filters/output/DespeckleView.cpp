@@ -17,7 +17,7 @@
 */
 
 #include "DespeckleView.h"
-#include "DespeckleView.h.moc"
+#include "DespeckleView.moc"
 #include "DespeckleVisualization.h"
 #include "Despeckle.h"
 #include "AbstractCommand.h"

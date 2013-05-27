@@ -16,4 +16,5 @@ SET(
 )
 
 ADD_EXECUTABLE(spfit_tests ${sources})
+QT5_USE_MODULES(spfit_tests Core)
 TARGET_LINK_LIBRARIES(spfit_tests ${libs})

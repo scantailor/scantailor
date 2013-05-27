@@ -53,7 +53,7 @@ QImage
 randomMonoQImage(int const width, int const height)
 {
 	QImage image(width, height, QImage::Format_Mono);
-	image.setNumColors(2);
+	image.setColorCount(2);
 	image.setColor(0, 0xffffffff);
 	image.setColor(1, 0xff000000);
 	uint32_t* pword = (uint32_t*)image.bits();
@@ -88,7 +88,7 @@ BinaryImage makeBinaryImage(int const* data, int const width, int const height)
 QImage makeMonoQImage(int const* data, int const width, int const height)
 {
 	QImage img(width, height, QImage::Format_Mono);
-	img.setNumColors(2);
+	img.setColorCount(2);
 	img.setColor(0, 0xffffffff);
 	img.setColor(1, 0xff000000);
 	for (int y = 0; y < height; ++y) {

@@ -216,7 +216,7 @@ ConsoleBatch::process()
 		for (unsigned i=0; i<page_sequence.numPages(); i++) {
 			PageInfo page = page_sequence.pageAt(i);
 			if (cli.isVerbose())
-				std::cout << "\tProcessing: " << page.imageId().filePath().toAscii().constData() << "\n";
+				std::cout << "\tProcessing: " << page.imageId().filePath().toLocal8Bit().constData() << "\n";
 			BackgroundTaskPtr bgTask = createCompositeTask(page, j);
 			(*bgTask)();
 		}

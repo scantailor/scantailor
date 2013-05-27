@@ -17,7 +17,7 @@
 */
 
 #include "MainWindow.h"
-#include "MainWindow.h.moc"
+#include "MainWindow.moc"
 #include "NewOpenProjectPanel.h"
 #include "RecentProjects.h"
 #include "WorkerThread.h"
@@ -1740,7 +1740,7 @@ MainWindow::closeProjectInteractive()
 	QFileInfo const project_file(m_projectFile);
 	QFileInfo const backup_file(
 		project_file.absoluteDir(),
-		QString::fromAscii("Backup.")+project_file.fileName()
+		QLatin1String("Backup.")+project_file.fileName()
 	);
 	QString const backup_file_path(backup_file.absoluteFilePath());
 	
@@ -1884,8 +1884,6 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	// so to be safe, remove duplicates.
 	files.erase(std::unique(files.begin(), files.end()), files.end());
 	
-	using namespace boost::lambda;
-	
 	std::vector<ImageFileInfo> new_files;
 	std::vector<QString> loaded_files;
 	std::vector<QString> failed_files; // Those we failed to read metadata from.
@@ -1896,8 +1894,9 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 		ImageFileInfo image_file_info(file_info, std::vector<ImageMetadata>());
 
 		ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
-			files.at(i), bind(&std::vector<ImageMetadata>::push_back,
-			boost::ref(image_file_info.imageInfo()), _1)
+			files.at(i), [&](ImageMetadata const& metadata) {
+				image_file_info.imageInfo().push_back(metadata);
+			}
 		);
 
 		if (status == ImageMetadataLoader::LOADED) {
@@ -1919,8 +1918,8 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	}
 
 	// Check if there is at least one DPI that's not OK.
-	if (std::find_if(new_files.begin(), new_files.end(), !bind(&ImageFileInfo::isDpiOK, _1)) != new_files.end()) {
-
+	auto dpi_ok_pred = [](ImageFileInfo const& info) { return info.isDpiOK(); };
+	if (std::find_if(new_files.begin(), new_files.end(), dpi_ok_pred) != new_files.end()) {
 		std::auto_ptr<FixDpiDialog> dpi_dialog(new FixDpiDialog(new_files, this));
 		dpi_dialog->setWindowModality(Qt::WindowModal);
 		if (dpi_dialog->exec() != QDialog::Accepted) {

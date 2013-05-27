@@ -57,10 +57,10 @@ OutputFileNameGenerator::fileNameFor(PageId const& page) const
 
 	QString name(QFileInfo(page.imageId().filePath()).completeBaseName());
 	if (label != 0) {
-		name += QString::fromAscii("(%1)").arg(label);
+		name += QString::fromLatin1("(%1)").arg(label);
 	}
 	if (page.imageId().isMultiPageFile()) {
-		name += QString::fromAscii("_page%1").arg(
+		name += QString::fromLatin1("_page%1").arg(
 			page.imageId().page(), 4, 10, QLatin1Char('0')
 		);
 	}
@@ -69,7 +69,7 @@ OutputFileNameGenerator::fileNameFor(PageId const& page) const
 		name += QLatin1Char(ltr == (sub_page == PageId::LEFT_PAGE) ? '1' : '2');
 		name += QLatin1Char(sub_page == PageId::LEFT_PAGE ? 'L' : 'R');
 	}
-	name += QString::fromAscii(".tif");
+	name += QString::fromLatin1(".tif");
 	
 	return name;
 }

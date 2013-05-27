@@ -11,18 +11,25 @@ IF(NOT MAKENSIS_EXE)
 ENDIF(NOT MAKENSIS_EXE)
 	
 IF(MSVC)
-	GET_FILENAME_COMPONENT(make_program_dir "${CMAKE_MAKE_PROGRAM}" PATH)
+	GET_FILENAME_COMPONENT(linker_dir "${CMAKE_LINKER}" PATH)
 	FIND_FILE(
-		VC_REDIST_DIR VC/redist PATHS "${make_program_dir}"
-		PATH_SUFFIXES .. ../.. DOC "VC/redist directory."
+		VC_REDIST_DIR VC/redist PATHS "${linker_dir}"
+		PATH_SUFFIXES .. ../.. ../../../ DOC "VC/redist directory."
 	)
 	IF(VC_REDIST_DIR)
 		# Get rid of .. components in the path.
 		GET_FILENAME_COMPONENT(VC_REDIST_DIR "${VC_REDIST_DIR}" ABSOLUTE)
 		SET(VC_REDIST_DIR "${VC_REDIST_DIR}" CACHE PATH "VC/redist directory." FORCE)
 
+		# x86 vs x64
+		IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+			SET(arch "x64")
+		ELSE()
+			SET(arch "x86")
+		ENDIF()
+		
 		# Find CRT redistributables.
-		FILE(GLOB crt_redist_dirs "${VC_REDIST_DIR}/x86/Microsoft.VC*.CRT")
+		FILE(GLOB crt_redist_dirs "${VC_REDIST_DIR}/${arch}/Microsoft.VC*.CRT")
 		IF(crt_redist_dirs)
 			LIST(GET crt_redist_dirs 0 CRT_REDIST_PATH)
 		ENDIF(crt_redist_dirs)
@@ -33,9 +40,9 @@ IF(MSVC)
 			FATAL_ERROR
 			"Could not find Visual Studio redistributables.\n"
 			"They are typically located in a directory like:\n"
-			"C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\n"
+			"C:\\Program Files\\Microsoft Visual Studio 9.0\\VC\\redist\n"
 			"Please set VC_REDIST_DIR accordinally.\n"
-			"Specifically, we are after redist\x86\Microsoft.VC*.CRT"
+			"Specifically, we are after redist\\x86\\Microsoft.VC*.CRT"
 		)
 	ENDIF(NOT CRT_REDIST_PATH)
 ENDIF()

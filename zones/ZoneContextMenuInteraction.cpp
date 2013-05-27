@@ -17,7 +17,7 @@
 */
 
 #include "ZoneContextMenuInteraction.h"
-#include "ZoneContextMenuInteraction.h.moc"
+#include "ZoneContextMenuInteraction.moc"
 #include "ZoneInteractionContext.h"
 #include "ImageViewBase.h"
 #include "EditableZoneSet.h"

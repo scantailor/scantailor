@@ -17,7 +17,7 @@
 */
 
 #include "OptionsWidget.h"
-#include "OptionsWidget.h.moc"
+#include "OptionsWidget.moc"
 #include "Filter.h"
 #include "SplitModeDialog.h"
 #include "Settings.h"

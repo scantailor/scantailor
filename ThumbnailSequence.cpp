@@ -17,7 +17,7 @@
 */
 
 #include "ThumbnailSequence.h"
-#include "ThumbnailSequence.h.moc"
+#include "ThumbnailSequence.moc"
 #include "ThumbnailFactory.h"
 #include "IncompleteThumbnail.h"
 #include "PageSequence.h"

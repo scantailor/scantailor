@@ -17,7 +17,7 @@
 */
 
 #include "StageListView.h"
-#include "StageListView.h.moc"
+#include "StageListView.moc"
 #include "StageSequence.h"
 #include "ChangedStateItemDelegate.h"
 #include "SkinnedButton.h"
@@ -114,12 +114,12 @@ StageListView::StageListView(QWidget* parent)
 	setItemDelegateForColumn(1, m_pSecondColDelegate);
 	
 	QHeaderView* h_header = horizontalHeader();
-	h_header->setResizeMode(QHeaderView::Stretch);
+	h_header->setSectionResizeMode(QHeaderView::Stretch);
 	h_header->hide();
 	
 	QHeaderView* v_header = verticalHeader();
-	v_header->setResizeMode(QHeaderView::ResizeToContents);
-	v_header->setMovable(false);
+	v_header->setSectionResizeMode(QHeaderView::ResizeToContents);
+	v_header->setSectionsMovable(false);
 	
 	m_pLaunchBtn = new SkinnedButton(
 		":/icons/play-small.png",
@@ -158,8 +158,8 @@ StageListView::setStages(IntrusivePtr<StageSequence> const& stages)
 	
 	QHeaderView* h_header = horizontalHeader();
 	QHeaderView* v_header = verticalHeader();
-	h_header->setResizeMode(0, QHeaderView::Stretch);
-	h_header->setResizeMode(1, QHeaderView::Fixed);
+	h_header->setSectionResizeMode(0, QHeaderView::Stretch);
+	h_header->setSectionResizeMode(1, QHeaderView::Fixed);
 	if (v_header->count() != 0) {
 		// Make the cells in the last column square.
 		int const square_side = v_header->sectionSize(0);

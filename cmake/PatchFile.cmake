@@ -7,7 +7,11 @@
 FUNCTION(PATCH_FILE file_)
 	MESSAGE(STATUS "Patching file ${file_}")
 	
-	FILE(READ "${file_}" contents_)
+	IF(EXISTS "${file_}.orig")
+		FILE(READ "${file_}.orig" contents_)
+	ELSE()
+		FILE(READ "${file_}" contents_)
+	ENDIF()
 	SET(orig_contents "${contents_}")
 	
 	FOREACH(search_replace_ ${ARGN})

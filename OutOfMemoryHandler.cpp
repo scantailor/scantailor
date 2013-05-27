@@ -17,7 +17,7 @@
 */
 
 #include "OutOfMemoryHandler.h"
-#include "OutOfMemoryHandler.h.moc"
+#include "OutOfMemoryHandler.moc"
 #include <QMutexLocker>
 #include <QMetaObject>
 #include <Qt>

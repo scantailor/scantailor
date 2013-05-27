@@ -31,4 +31,5 @@ SET(
 )
 
 ADD_EXECUTABLE(imageproc_tests ${sources})
+QT5_USE_MODULES(imageproc_tests Widgets Xml)
 TARGET_LINK_LIBRARIES(imageproc_tests ${libs})

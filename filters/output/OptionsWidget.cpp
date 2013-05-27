@@ -17,7 +17,7 @@
 */
 
 #include "OptionsWidget.h"
-#include "OptionsWidget.h.moc"
+#include "OptionsWidget.moc"
 #include "ChangeDpiDialog.h"
 #include "ChangeDewarpingDialog.h"
 #include "ApplyColorsDialog.h"
@@ -580,7 +580,7 @@ OptionsWidget::updateDpiDisplay()
 {
 	if (m_outputDpi.horizontal() != m_outputDpi.vertical()) {
 		dpiLabel->setText(
-			QString::fromAscii("%1 x %2")
+			QString::fromLatin1("%1 x %2")
 			.arg(m_outputDpi.horizontal()).arg(m_outputDpi.vertical())
 		);
 	} else {

@@ -268,7 +268,7 @@ TiffWriter::writeBitonalOrIndexed8Image(
 			// has problems with it.
 			//compression = COMPRESSION_CCITTFAX4;
 			bits_per_sample = 1;
-			if (image.numColors() < 2) {
+			if (image.colorCount() < 2) {
 				photometric = PHOTOMETRIC_MINISWHITE;
 			} else {
 				// Some programs don't understand

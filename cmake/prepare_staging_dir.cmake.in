@@ -13,13 +13,24 @@ FOREACH(file ${QM_FILES})
 ENDFOREACH()
 
 # Imageformat plugins for Qt
-FILE(GLOB imageformat_plugins "${CONF_BUILD_DIR}/imageformats/*.dll")
-FOREACH(file ${imageformat_plugins})
+#FILE(GLOB imageformat_plugins "${CONF_BUILD_DIR}/imageformats/*.dll")
+#FOREACH(file ${imageformat_plugins})
+#	GET_FILENAME_COMPONENT(fname "${file}" NAME)
+#	CONFIGURE_FILE("${file}" "${STAGING_DIR}/imageformats/${fname}" COPYONLY)
+#ENDFOREACH()
+
+# Platform plugins for Qt
+FILE(GLOB platforms_plugins "${CONF_BUILD_DIR}/platforms/*.dll")
+FOREACH(file ${platforms_plugins})
 	GET_FILENAME_COMPONENT(fname "${file}" NAME)
-	CONFIGURE_FILE("${file}" "${STAGING_DIR}/imageformats/${fname}" COPYONLY)
-	IF(MINGW)
-		EXECUTE_PROCESS(COMMAND "@CMAKE_STRIP@" "${STAGING_DIR}/imageformats/${fname}")
-	ENDIF()
+	CONFIGURE_FILE("${file}" "${STAGING_DIR}/platforms/${fname}" COPYONLY)
+ENDFOREACH()
+
+# Accessibility plugins for Qt
+FILE(GLOB accessible_plugins "${CONF_BUILD_DIR}/accessible/*.dll")
+FOREACH(file ${accessible_plugins})
+	GET_FILENAME_COMPONENT(fname "${file}" NAME)
+	CONFIGURE_FILE("${file}" "${STAGING_DIR}/accessible/${fname}" COPYONLY)
 ENDFOREACH()
 
 # Extra binaries (DLLs)
@@ -43,17 +54,12 @@ FOREACH(src_file ${EXECUTABLES} ${EXTRA_BINARIES})
 	SET(dst_file "${STAGING_DIR}${subdir}/${fname}")
 	
 	CONFIGURE_FILE("${src_file}" "${dst_file}" COPYONLY)
-	IF(MINGW AND fname MATCHES ".*\\.(([Dd][Ll][Ll])|([Ee][Xx][Ee]))$")
-		MESSAGE(STATUS "Stripping ${dst_file}")
-		EXECUTE_PROCESS(COMMAND "@CMAKE_STRIP@" "${dst_file}")
-	ENDIF()
 ENDFOREACH()
 
 # Microsoft CRT redistributable
 IF(CRT_REDIST_PATH)
-	GET_FILENAME_COMPONENT(CRT_REDIST_DIR "${CRT_REDIST_PATH}" NAME)
 	EXECUTE_PROCESS(
 		COMMAND "${CMAKE_COMMAND}" -E copy_directory
-		"${CRT_REDIST_PATH}" "${STAGING_DIR}/${CRT_REDIST_DIR}"
+		"${CRT_REDIST_PATH}" "${STAGING_DIR}"
 	)
 ENDIF()

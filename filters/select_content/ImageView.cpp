@@ -17,7 +17,7 @@
 */
 
 #include "ImageView.h"
-#include "ImageView.h.moc"
+#include "ImageView.moc"
 #include "ImageTransformation.h"
 #include "ImagePresentation.h"
 #include <QMouseEvent>

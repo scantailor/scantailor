@@ -116,7 +116,7 @@ Params::formatColorMode(ColorParams::ColorMode const mode)
 			str = "mixed";
 			break;
 	}
-	return QString::fromAscii(str);
+	return QString::fromLatin1(str);
 }
 
 } // namespace output

@@ -9,7 +9,7 @@ MultipartFormData::MultipartFormData()
 QString
 MultipartFormData::contentType() const
 {
-	return "multipart/form-data; boundary="+QString::fromAscii(m_boundary);
+	return "multipart/form-data; boundary="+QString::fromLatin1(m_boundary);
 }
 
 void

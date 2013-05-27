@@ -17,7 +17,7 @@
 */
 
 #include "DewarpingView.h"
-#include "DewarpingView.h.moc"
+#include "DewarpingView.moc"
 #include "ImagePresentation.h"
 #include "dewarping/Curve.h"
 #include "VecNT.h"

@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(test_from_to_qimage)
 	int const h = 64;
 	QImage qimg_argb32(w, h, QImage::Format_ARGB32);
 	QImage qimg_mono(w, h, QImage::Format_Mono);
-	qimg_mono.setNumColors(2);
+	qimg_mono.setColorCount(2);
 	qimg_mono.setColor(0, 0xffffffff);
 	qimg_mono.setColor(1, 0xff000000);
 	for (int y = 0; y < h; ++y) {
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_partial_fill_small)
 	BinaryImage image(q_image);
 	image.fill(rect, WHITE);
 	QImage white_rect(rect.width(), rect.height(), QImage::Format_Mono);
-	white_rect.setNumColors(2);
+	white_rect.setColorCount(2);
 	white_rect.setColor(0, 0xffffffff);
 	white_rect.setColor(1, 0xff000000);
 	white_rect.fill(0);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(test_partial_fill_large)
 	BinaryImage image(q_image);
 	image.fill(rect, WHITE);
 	QImage white_rect(rect.width(), rect.height(), QImage::Format_Mono);
-	white_rect.setNumColors(2);
+	white_rect.setColorCount(2);
 	white_rect.setColor(0, 0xffffffff);
 	white_rect.setColor(1, 0xff000000);
 	white_rect.fill(0);
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_fill_except)
 	image.fillExcept(rect, BLACK);
 	
 	QImage black_image(q_image.width(), q_image.height(), QImage::Format_Mono);
-	black_image.setNumColors(2);
+	black_image.setColorCount(2);
 	black_image.setColor(0, 0xffffffff);
 	black_image.setColor(1, 0xff000000);
 	black_image.fill(1);

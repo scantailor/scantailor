@@ -49,7 +49,7 @@ PageId::subPageToString(SubPage const sub_page)
 	}
 	
 	assert(str);
-	return QString::fromAscii(str);
+	return QString::fromLocal8Bit(str);
 }
 
 PageId::SubPage

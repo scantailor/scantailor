@@ -17,11 +17,12 @@
 */
 
 #include "CrashReportDialog.h"
-#include "CrashReportDialog.h.moc"
+#include "CrashReportDialog.moc"
 #include "MultipartFormData.h"
 #include "version.h"
 #include <QDir>
 #include <QUrl>
+#include <QUrlQuery>
 #include <QTextDocument> // for Qt::escape()
 #include <QToolTip>
 #include <QEvent>
@@ -73,8 +74,8 @@ CrashReportDialog::CrashReportDialog(
 	));
 	ui.dumpFile->setText(
 		QString("<a href=\"%1\">%2</a> (%3)").arg(
-			Qt::escape(QUrl::fromLocalFile(m_dumpFileInfo.absoluteFilePath()).toString()),
-			Qt::escape(tr("Dump file")),
+			QUrl::fromLocalFile(m_dumpFileInfo.absoluteFilePath()).toString().toHtmlEscaped(),
+			tr("Dump file").toHtmlEscaped(),
 			formatFileSize(m_dumpFileInfo.size())
 		)
 	);
@@ -108,8 +109,10 @@ CrashReportDialog::onSubmit()
 	ui.buttonBox->setEnabled(false);
 
 	QUrl url("http://scantailor.sourceforge.net/crash_dispatcher/");
-	url.addQueryItem("version", VERSION);
-	url.addQueryItem("locale", QLocale::system().name());
+	QUrlQuery query;
+	query.addQueryItem("version", VERSION);
+	query.addQueryItem("locale", QLocale::system().name());
+	url.setQuery(query);
 	
 	m_pDispatcher->get(QNetworkRequest(url));
 	connect(

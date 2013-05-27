@@ -17,7 +17,7 @@
 */
 
 #include "ImageView.h"
-#include "ImageView.h.moc"
+#include "ImageView.moc"
 #include "OptionsWidget.h"
 #include "Margins.h"
 #include "Settings.h"

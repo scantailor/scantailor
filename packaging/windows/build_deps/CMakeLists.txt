@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
 
 SET(
 	CMAKE_USER_MAKE_RULES_OVERRIDE
@@ -10,10 +10,6 @@ SET(
 )
 
 PROJECT("Scan Tailor Dependencies")
-
-# This forces Visual Studio 2008 SP1 to actually link to the versions of the
-# libraries it ships with!  It's harmless on other platforms.
-ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
 INCLUDE(../../../cmake/SetDefaultBuildType.cmake)
 INCLUDE(../../../cmake/SetDefaultGccFlags.cmake)
@@ -37,12 +33,11 @@ FILE(GLOB png_dirs3 "${build_outer_dir}/lpng[0-9]*")
 FILE(GLOB png_dirs4 "${source_outer_dir}/lpng[0-9]*")
 FILE(GLOB tiff_dirs1 "${build_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB tiff_dirs2 "${source_outer_dir}/tiff-[0-9]*.[0-9]*.[0-9]*")
-FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-4.[0-9]*")
-FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-4.[0-9]*")
-FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-4.[0-9]*")
-FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-4.[0-9]*")
-FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
-FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
+FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-5.[0-9]*")
+FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-5.[0-9]*")
+FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-5.[0-9]*")
+FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-5.[0-9]*")
+FILE(GLOB qt_dirs5 "C:/Qt/Qt5.*/*/Src")
 FILE(GLOB boost_dirs1 "${build_outer_dir}/boost_1_[0-9]*_[0-9]*")
 FILE(GLOB boost_dirs2 "${source_outer_dir}/boost_1_[0-9]*_[0-9]*")
 
@@ -63,9 +58,9 @@ FIND_PATH(
 	DOC "Path to top-level tiff source directory."
 )
 FIND_PATH(
-	QT_DIR projects.pro HINTS ${qt_dirs1} ${qt_dirs2}
-	${qt_dirs3} ${qt_dirs4} ${qt_dirs5} ${qt_dirs6}
-	DOC "Path to top-level Qt source directory."
+	QT_SRC_DIR NAMES qtbase/qtbase.pro HINTS ${qt_dirs1} ${qt_dirs2}
+	${qt_dirs3} ${qt_dirs4} ${qt_dirs5}
+	DOC "Path to top-level Qt5 source directory. If you installed a binary version, it will be something like C:\\Qt\\Qt5.0.2\\5.0.2\\Src"
 )
 FIND_PATH(
 	BOOST_DIR boost/foreach.hpp HINTS ${boost_dirs1} ${boost_dirs2}
@@ -80,24 +75,24 @@ ELSEIF(NOT PNG_DIR)
 	MESSAGE(FATAL_ERROR "LibPNG source directory not found. You may specify it manually.")
 ELSEIF(NOT TIFF_DIR)
 	MESSAGE(FATAL_ERROR "TIFF source directory not found. You may specify it manually.")
-ELSEIF(NOT QT_DIR)
-	MESSAGE(FATAL_ERROR "Qt source directory not found. You may specify it manually.")
+ELSEIF(NOT QT_SRC_DIR)
+	MESSAGE(FATAL_ERROR "Qt5 source directory not found. You may specify it manually. If you installed a binary version, it will be something like C:\\Qt\\Qt5.0.2\\5.0.2\\Src")
 ELSEIF(NOT BOOST_DIR)
 	MESSAGE(FATAL_ERROR "Boost source directory not found. You may specify it manually.")
 ENDIF()
 
+SET(QTBASE_DIR "${QT_SRC_DIR}/qtbase")
 
-IF(MINGW)
-	SET(ZLIB_LIBRARY_NAME z)
-	SET(PNG_LIBRARY_NAME png)
-	SET(JPEG_LIBRARY_NAME jpeg)
-	SET(TIFF_LIBRARY_NAME tiff)
-ELSE()
-	SET(ZLIB_LIBRARY_NAME zdll)
-	SET(PNG_LIBRARY_NAME libpng)
-	SET(JPEG_LIBRARY_NAME libjpeg)
-	SET(TIFF_LIBRARY_NAME libtiff)
-ENDIF()
+FILE(GLOB qt_possible_prebuilt_dirs "${QT_SRC_DIR}/../*")
+FIND_PATH(
+	QT_PREBUILT_DIR bin/qmake.exe HINTS ${qt_possible_prebuilt_dirs}
+	DOC "[optional] Installation path of a pre-built version of Qt5. If you installed a binary version, it will be something like C:\\Qt\\Qt5.0.2\\5.0.2\\msvc2012"
+)
+
+SET(ZLIB_LIBRARY_NAME zdll)
+SET(PNG_LIBRARY_NAME libpng)
+SET(JPEG_LIBRARY_NAME libjpeg)
+SET(TIFF_LIBRARY_NAME libtiff)
 
 MACRO(LIST_ITEMS_PREPEND LIST PREFIX)
 	SET(tmp_list_)
@@ -155,10 +150,10 @@ SET_TARGET_PROPERTIES(
 	ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/staging/libs"
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QT_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QTBASE_DIR}/bin"
 )
 
 
@@ -179,10 +174,10 @@ SET_TARGET_PROPERTIES(
 	ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/staging/libs"
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QT_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QTBASE_DIR}/bin"
 )
 
 
@@ -217,10 +212,10 @@ SET_TARGET_PROPERTIES(
 	ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/staging/libs"
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QT_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QTBASE_DIR}/bin"
 )
 
 
@@ -266,22 +261,20 @@ SET_TARGET_PROPERTIES(
 	ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/staging/libs"
 	ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_BINARY_DIR}/staging/libs"
-	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QT_DIR}/bin"
-	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QT_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${QTBASE_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${QTBASE_DIR}/bin"
 )
 
 
 #================================= Boost ================================#
 
-IF(MINGW)
-	SET(boost_toolset gcc)
-ELSEIF(MSVC)
+IF(MSVC)
 	SET(boost_toolset msvc)
-ELSE(MINGW)
-	MESSAGE(FATAL_ERROR "Unsupported platform.  MinGW and MSVC are supported.")
-ENDIF(MINGW)
+ELSE()
+	MESSAGE(FATAL_ERROR "Unsupported platform. Only Visual Studio is currently supported")
+ENDIF()
 
 SET(boost_64bit_flags "")
 IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -290,9 +283,9 @@ ENDIF()
 
 ADD_CUSTOM_TARGET(
 	boost ALL
-	COMMAND bootstrap && b2 --with-test toolset=${boost_toolset}
+	COMMAND cmd /c bootstrap
+	COMMAND b2 --with-test toolset=${boost_toolset}
 	threading=multi link=static variant=debug,release ${boost_64bit_flags}
-	define=_BIND_TO_CURRENT_VCLIBS_VERSION=1
 	stage
 	WORKING_DIRECTORY "${BOOST_DIR}"
 	VERBATIM
@@ -303,25 +296,25 @@ ADD_CUSTOM_TARGET(
 
 # Backward compatibility.  We used to patch projects.pro, but now we achieve
 # the same result by other means.
-IF(EXISTS "${QT_DIR}/projects.pro.orig")
+IF(EXISTS "${QTBASE_DIR}/projects.pro.orig")
 	CONFIGURE_FILE(
-		"${QT_DIR}/projects.pro.orig"
-		"${QT_DIR}/projects.pro" COPYONLY
+		"${QTBASE_DIR}/projects.pro.orig"
+		"${QTBASE_DIR}/projects.pro" COPYONLY
 	)
-	FILE(REMOVE "${QT_DIR}/projects.pro.orig")
-ENDIF(EXISTS "${QT_DIR}/projects.pro.orig")
+	FILE(REMOVE "${QTBASE_DIR}/projects.pro.orig")
+ENDIF(EXISTS "${QTBASE_DIR}/projects.pro.orig")
 
 
 TO_NATIVE_PATH("${JPEG_DIR}" JPEG_INCLUDE_DIR)
 TO_NATIVE_PATH("${ZLIB_DIR}" ZLIB_INCLUDE_DIR)
 TO_NATIVE_PATH("${PNG_DIR}" PNG_INCLUDE_DIR)
-TO_NATIVE_PATH("${QT_DIR}" QT_DIR_NATIVE)
+TO_NATIVE_PATH("${QTBASE_DIR}" QTBASE_DIR_NATIVE)
 
 
 # Find all *.conf files under mkspecs that mention -Zc:wchar_t- and remove
 # that minus at the end.  That's necessary to make Qt compatible with other
 # libraries that use wchar_t stuff.
-FILE(GLOB_RECURSE conf_files "${QT_DIR}/mkspecs/*.conf")
+FILE(GLOB_RECURSE conf_files "${QTBASE_DIR}/mkspecs/*.conf")
 FOREACH(conf_file ${conf_files})
 	FILE(READ "${conf_file}" contents)
 	STRING(REGEX REPLACE "-Zc:wchar_t-" "-Zc:wchar_t" new_contents "${contents}")
@@ -335,78 +328,29 @@ FOREACH(conf_file ${conf_files})
 	ENDIF()
 ENDFOREACH()
 
-SET(qt_maybe_skip_tools "")
-IF(EXISTS "${QT_DIR}/bin/designer.exe")
-	# Either the tools have already been built, or they came prepackaged.
-	SET(qt_maybe_skip_tools "-nomake tools")
-ENDIF(EXISTS "${QT_DIR}/bin/designer.exe")
-
-IF(MINGW)
-	SET(platform win32-g++)
-	SET(make_command "mingw32-make -j$ENV{NUMBER_OF_PROCESSORS}")
-ELSEIF(MSVC)
-	#MESSAGE("MSVC=${MSVC} | MSVC10=${MSVC10} | MSVC80=${MSVC80}" )
+IF(MSVC)
 	SET(make_command nmake)
-	IF(MSVC60 OR MSVC70)
+	IF(MSVC60 OR MSVC70 OR MSVC71 OR MSVC80 OR MSVC90)
 		MESSAGE(FATAL_ERROR "This Visual Studio version is too old and is not supported")
-	ELSEIF(MSVC71)
-		SET(platform win32-msvc2003)
-	ELSEIF(MSVC80)
-		SET(platform win32-msvc2005)
-		SET(force_frame_pointer TRUE)
-	ELSEIF(MSVC90)
-		SET(platform win32-msvc2008)
-		SET(force_frame_pointer TRUE)
-	ELSE()
-		# Visual Studio 2010 or above.
+	ELSEIF(MSVC100)
+		MESSAGE("Visual Studio 2010 may work but wasn't tested. Visual Studio 2012 is strongly recommended")
 		SET(platform win32-msvc2010)
 		SET(force_frame_pointer TRUE)
+	ELSE()
+		# Visual Studio 2012 or above
+		SET(platform win32-msvc2012)
+		SET(force_frame_pointer TRUE)
 	ENDIF()
-ELSE(MINGW)
+ELSE()
 	MESSAGE(FATAL_ERROR "Unsupported platform.")
-ENDIF(MINGW)
-
-
-IF(MINGW)
-	# Figure out the correct values for -*-libgcc and -*-libstdc++
-	# An empty value doesn't mean it's incorrect.
-	SET(static_shared_libgcc "")
-	SET(static_shared_libstdcpp "")
-	STRING(REGEX MATCH "-(static|shared)-libgcc" static_shared_libgcc "${CMAKE_CXX_FLAGS}")
-	STRING(REGEX MATCH "-(static|shared)-libstdc\\+\\+" static_shared_libstdcpp "${CMAKE_CXX_FLAGS}")
 ENDIF()
 
-# Patch qmake.conf
-SET(CHANGES "")
-IF(MINGW)
-	# Set correct -*-libgcc and -*-libstdc++ flags.
-	LIST(
-		APPEND CHANGES
-		
-		# Get rid of existing flags, if any.
-		"/-(static|shared)-lib(gcc|stdc\\+\\+)//"
-			
-		# Add the flags we want.
-		"/(QMAKE_LFLAGS[ \t]*=)[ \t]*/\\1 ${static_shared_libgcc} ${static_shared_libstdcpp} /"
-	)
-	
-	IF (CMAKE_C_FLAGS MATCHES ".*-fno-keep-inline-dllexport.*")
-		# This option is needed to prevent out-of-memory situations when linking large DLLs.
-		LIST(
-			APPEND CHANGES
-			
-			# Get rid of the existing flag, if present.
-			"/-f(no)?-keep-inline-dllexport//"
-			
-			# Add the flag to QMAKE_CFLAGS and QMAKE_LFLAGS.
-			"/(QMAKE_(C|L)FLAGS[ \t]*=)[ \t]*/\\1 -fno-keep-inline-dllexport /"
-		)
-	ENDIF()
-ELSEIF(MSVC AND force_frame_pointer)
+
+IF(MSVC AND force_frame_pointer)
 	# Disable frame pointer ommission in release mode to ensure
 	# good stack traces from our built-in crash reporter.
-	LIST(
-		APPEND CHANGES
+	PATCH_FILE(
+		"${QTBASE_DIR}/mkspecs/${platform}/qmake.conf"
 		
 		# Add the flag.
 		"/(QMAKE_CFLAGS_RELEASE[ \t]*=)/\\1 -Oy-/"
@@ -415,44 +359,33 @@ ELSEIF(MSVC AND force_frame_pointer)
 		"/( -Oy-)+/ -Oy-/"
 	)
 ENDIF()
-PATCH_FILE("${QT_DIR}/mkspecs/${platform}/qmake.conf" ${CHANGES})
 	
 
-# We also force debugging symbols even for release builds.
+# Force debugging symbols even for release builds.
+# Qt5 has a -force-debug-info configure option
+# but I had to do the following to make it actually work:
 PATCH_FILE(
-	"${QT_DIR}/mkspecs/features/release.prf"
+	"${QTBASE_DIR}/.qmake.conf"
 	
-	# Clone *FLAGS_RELEASE into *FLAGS_RELEASE_WITH_DEBUGINFO
-	"/(\\$\\$QMAKE_(C|CXX|L)FLAGS_RELEASE)([ \t\r\n]|$)/\\1_WITH_DEBUGINFO\\3/"
+	# Put "CONFIG += force_debug_info" at the end.
+	"/(.)$/\\1\nCONFIG += force_debug_info\n/"
 )
 
 
-# Set correct -*-libgcc and -*-libstdc++ flags.
-IF(MINGW)
-	FOREACH(file_ Makefile.win32-g++ Makefile.win32-g++-sh)
-		SET(conf_file_ "${QT_DIR}/qmake/${file_}")
-		PATCH_FILE(
-			"${conf_file_}"
-			
-			# Get rid of existing flags, if any.
-			"/-(static|shared)-lib(gcc|stdc\\+\\+)//"
-			
-			# Add the flags we want.
-			"/(LFLAGS[ \t]*=)[ \t]*/\\1 ${static_shared_libgcc} ${static_shared_libstdcpp} /"
-		)
-	ENDFOREACH()
-ENDIF()
-
 SET(qt_build_script "${CMAKE_BINARY_DIR}/build-qt.bat")
+
+SET(maybe_skip_building_tools "")
+IF(QT_PREBUILT_DIR)
+	SET(maybe_skip_building_tools "goto exit")
+ENDIF()
 
 ADD_CUSTOM_COMMAND(
 	OUTPUT "${qt_build_script}"
 	COMMAND "${CMAKE_COMMAND}"
 	"-DPROJECT_ROOT=${CMAKE_SOURCE_DIR}/../../.."
 	"-DTARGET_FILE=${qt_build_script}"
-	"-DQT_DIR=${QT_DIR}"
 	"-DPLATFORM=${platform}"
-	"-DMAYBE_SKIP_TOOLS=${qt_maybe_skip_tools}"
+	"-DMAYBE_SKIP_BUILDING_TOOLS=${maybe_skip_building_tools}"
 	"-DMAKE_COMMAND=${make_command}"
 	"-DJPEG_INCLUDE_DIR=${JPEG_INCLUDE_DIR}"
 	"-DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}"
@@ -469,7 +402,7 @@ ADD_CUSTOM_TARGET(
 	Qt ALL
 	COMMAND "${qt_build_script}"
 	DEPENDS "${qt_build_script}"
-	WORKING_DIRECTORY "${QT_DIR}"
+	WORKING_DIRECTORY "${QTBASE_DIR}"
 )
 
 # boost added so that boost is built before Qt. That's helpful if build
@@ -482,8 +415,13 @@ ADD_DEPENDENCIES(
 # If you have multiple versions of Qt installed, this script
 # can easily pick the wrong one.
 MESSAGE(STATUS "----------------------------")
-MESSAGE(STATUS "QT_DIR is ${QT_DIR}")
+MESSAGE(STATUS "QT_SRC_DIR is ${QT_SRC_DIR}")
 MESSAGE(STATUS "Check it's the one you want.")
+IF(QT_PREBUILT_DIR)
+	MESSAGE(STATUS "QT_PREBUILT_DIR is ${QT_PREBUILT_DIR}")
+ELSE()
+	MESSAGE(STATUS "QT_PREBUILT_DIR is not set. Using a source-only version of Qt? Fine, but building will take longer.")
+ENDIF()
 MESSAGE(STATUS "----------------------------")
 
 
@@ -519,7 +457,7 @@ IF(DUMP_DLL_SYMBOLS)
 		"-DMOVE_SYMBOLS_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/../../../cmake/move_sym_file.cmake"
 		-P "${CMAKE_CURRENT_SOURCE_DIR}/dump_dll_syms.cmake"
 		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/dump_dll_syms.cmake"
-		WORKING_DIRECTORY "${QT_DIR}/bin"
+		WORKING_DIRECTORY "${QTBASE_DIR}/bin"
 		VERBATIM
 	)
 	

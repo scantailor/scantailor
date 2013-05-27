@@ -17,7 +17,7 @@
 */
 
 #include "OptionsWidget.h"
-#include "OptionsWidget.h.moc"
+#include "OptionsWidget.moc"
 #include "Settings.h"
 #include "ApplyDialog.h"
 #include "../../Utils.h"
@@ -55,10 +55,10 @@ OptionsWidget::OptionsWidget(
 	}
 
 	m_chainIcon.addPixmap(
-		QPixmap(QString::fromAscii(":/icons/stock-vchain-24.png"))
+		QPixmap(QString::fromUtf8(":/icons/stock-vchain-24.png"))
 	);
 	m_brokenChainIcon.addPixmap(
-		QPixmap(QString::fromAscii(":/icons/stock-vchain-broken-24.png"))
+		QPixmap(QString::fromUtf8(":/icons/stock-vchain-broken-24.png"))
 	);
 	
 	setupUi(this);

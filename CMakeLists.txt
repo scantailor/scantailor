@@ -1,8 +1,4 @@
-IF(WIN32)
-	CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
-ELSE()
-	CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0)
-ENDIF()
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.9)
 
 IF(COMMAND cmake_policy)
 	# Suppress warnings.
@@ -20,9 +16,10 @@ SET(
 
 PROJECT("Scan Tailor")
 
-# This forces Visual Studio 2008 SP1 to actually link to the versions of the
-# libraries it ships with!  It's harmless on other platforms.
-ADD_DEFINITIONS(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+IF(MSVC)
+	# Disable checked iterators for extra performance.
+	ADD_DEFINITIONS(-D_SECURE_SCL=0)
+ENDIF()
 
 IF(DEBUG_CLI)
 	ADD_DEFINITIONS(-DDEBUG_CLI)
@@ -68,10 +65,12 @@ ENDIF()
 # up an identically named header from a system include path.
 INCLUDE_DIRECTORIES(. foundation math interaction zones)
 
+# For config.h
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
+
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 INCLUDE(TestCXXAcceptsFlag)
-INCLUDE(FindBoost)
 INCLUDE(cmake/FindPthreads.cmake)
 INCLUDE(cmake/SetDefaultBuildType.cmake)
 INCLUDE(cmake/SetDefaultGccFlags.cmake)
@@ -89,6 +88,17 @@ GET_FILENAME_COMPONENT(source_outer_dir "${PROJECT_SOURCE_DIR}/../../../.." ABSO
 GET_FILENAME_COMPONENT(build_outer_dir "${PROJECT_BINARY_DIR}/.." ABSOLUTE)
 
 SET(STAGING_LIBS_DIR "")
+
+
+INCLUDE(FindOpenGL)
+SET(use_opengl OFF)
+IF(OPENGL_FOUND AND QT_QTOPENGL_FOUND)
+	# Disabled for now due to various problems associated with it.
+	# SET(use_opengl ON)
+ENDIF()
+OPTION(ENABLE_OPENGL "OpenGL may be used for UI acceleration" ${use_opengl})
+
+
 IF(WIN32)
 	FIND_PATH(
 		DEPS_BUILD_DIR build-qt.bat
@@ -103,40 +113,57 @@ IF(WIN32)
 	ENDIF()
 	SET(STAGING_LIBS_DIR "${DEPS_BUILD_DIR}/staging/libs")
 	
-	IF (NOT EXISTS "${QT_QMAKE_EXECUTABLE}")
-		FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-4.[0-9]*")
-		FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-4.[0-9]*")
-		FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-4.[0-9]*")
-		FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-4.[0-9]*")
-		FILE(GLOB qt_dirs5 "C:/Qt/4.*.*")
-		FILE(GLOB qt_dirs6 "C:/Qt/20*/qt")
-		FIND_PROGRAM(
-			QT_QMAKE_EXECUTABLE qmake
-			PATHS dummy_dir ${qt_dirs1} ${qt_dirs2} ${qt_dirs3}
-			${qt_dirs4} ${qt_dirs5} ${qt_dirs6}
-			PATH_SUFFIXES bin
+	IF (NOT QT_SRC_DIR OR NOT EXISTS "${QT_SRC_DIR}")
+		FILE(GLOB qt_dirs1 "${build_outer_dir}/qt-win-*-5.[0-9]*")
+		FILE(GLOB qt_dirs2 "${build_outer_dir}/qt-everywhere-*-5.[0-9]*")
+		FILE(GLOB qt_dirs3 "${source_outer_dir}/qt-win-*-5.[0-9]*")
+		FILE(GLOB qt_dirs4 "${source_outer_dir}/qt-everywhere-*-5.[0-9]*")
+		FILE(GLOB qt_dirs5 "C:/Qt/Qt5.*/*/Src")
+		FIND_PATH(
+			QT_SRC_DIR qtbase/qtbase.pro
+			HINTS ${qt_dirs1} ${qt_dirs2} ${qt_dirs3}
+			${qt_dirs4} ${qt_dirs5} dummy_dir
+			DOC "Path to top-level Qt5 source directory. If you installed a binary version, it will be something like C:\\Qt\\Qt5.0.2\\5.0.2\\Src"
 		)
+	ENDIF()
+	
+	IF(NOT QT_SRC_DIR OR NOT EXISTS "${QT_SRC_DIR}")
+		MESSAGE(
+			FATAL_ERROR "Qt5 could not be found. "
+			"If it's installed in a non-standard location, specify it QT_SRC_DIR variable."
+		)
+	ENDIF()
+
+	FILE(GLOB qt_possible_prebuilt_dirs "${QT_SRC_DIR}/../*")
+	FIND_PATH(
+		QT_PREBUILT_DIR bin/qmake.exe HINTS ${qt_possible_prebuilt_dirs}
+		DOC "[optional] Installation path of a pre-built version of Qt5. If you installed a binary version, it will be something like C:\\Qt\\Qt5.0.2\\5.0.2\\msvc2012"
+	)
+	
+	
+	SET(Qt5Core_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5Core")
+	SET(Qt5Gui_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5Gui")
+	SET(Qt5Widgets_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5Widgets")
+	SET(Qt5Xml_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5Xml")
+	SET(Qt5Network_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5Network")
+	SET(Qt5OpenGL_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5OpenGL")
+	IF(QT_PREBUILT_DIR)
+		SET(Qt5LinguistTools_DIR "${QT_PREBUILT_DIR}/lib/cmake/Qt5LinguistTools")
+	ELSE()
+		SET(Qt5LinguistTools_DIR "${QT_SRC_DIR}/qtbase/lib/cmake/Qt5LinguistTools")
 	ENDIF()
 ENDIF()
 
-INCLUDE(FindQt4)
-IF(NOT QT4_FOUND)
-	MESSAGE(
-		FATAL_ERROR "Qt4 could not be found. "
-		"If it's installed in a non-standard location, specify the path to qmake in QT_QMAKE_EXECUTABLE. "
-		"You can do it in interactive mode (ccmake instead of cmake) or using -DVAR=VAL syntax."
-	)
-ENDIF(NOT QT4_FOUND)
-GET_FILENAME_COMPONENT(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
-
-
-INCLUDE(FindOpenGL)
-SET(use_opengl OFF)
-IF(OPENGL_FOUND AND QT_QTOPENGL_FOUND)
-	# Disabled for now due to various problems associated with it.
-	# SET(use_opengl ON)
+SET(CMAKE_AUTOMOC ON)
+FIND_PACKAGE(Qt5Core REQUIRED)
+FIND_PACKAGE(Qt5Gui REQUIRED)
+FIND_PACKAGE(Qt5Widgets REQUIRED)
+FIND_PACKAGE(Qt5Xml REQUIRED)
+FIND_PACKAGE(Qt5Network REQUIRED)
+FIND_PACKAGE(Qt5LinguistTools REQUIRED)
+IF(ENABLE_OPENGL)
+	FIND_PACKAGE(Qt5OpenGL REQUIRED)
 ENDIF()
-OPTION(ENABLE_OPENGL "OpenGL may be used for UI acceleration" ${use_opengl})
 
 
 FILE(GLOB jpeg_dirs1 "${build_outer_dir}/jpeg-[0-9]*")
@@ -296,8 +323,9 @@ FIND_PACKAGE(Boost 1.35.0 COMPONENTS unit_test_framework prg_exec_monitor)
 IF(NOT Boost_FOUND)
 	MESSAGE(
 		FATAL_ERROR
-		"Could not find boost headers or libraries.\n"
-		"You may need to install a package named libboost1.35-dev or similarly."
+		"Could not find boost headers or libraries. "
+		"You may need to install a package named libboost1.35-dev or similarly. "
+		"Hint: create a Boost_DEBUG variable in cmake and set it to YES." 
 	)
 ENDIF(NOT Boost_FOUND)
 
@@ -347,39 +375,23 @@ ELSE(NOT HAVE_STDINT_H)
 	FILE(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/stdint.h")
 ENDIF(NOT HAVE_STDINT_H)
 
-ADD_DEFINITIONS(
-	${QT_DEFINITIONS} -DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION
-)
+ADD_DEFINITIONS(-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION)
 
-INCLUDE_DIRECTORIES(${QT_INCLUDES})
-LINK_DIRECTORIES(${QT_LIBRARY_DIR})
-
-#SET(QJPEG_LIBRARIES "")
+SET(MAYBE_QTMAIN_LIBRARIES "")
 IF(WIN32)
-#	FIND_LIBRARY(QJPEG_RELEASE qjpeg PATHS "${QT_PLUGINS_DIR}/imageformats")
-#	FIND_LIBRARY(QJPEG_DEBUG qjpegd PATHS "${QT_PLUGINS_DIR}/imageformats")
-#	MARK_AS_ADVANCED(FORCE QJPEG_RELEASE QJPEG_DEBUG)
-#	IF(QJPEG_RELEASE AND NOT QJPEG_DEBUG)
-#		SET(QJPEG_DEBUG "${QJPEG_RELEASE}")
-#	ELSEIF(QJPEG_DEBUG AND NOT QJPEG_RELEASE)
-#		SET(QJPEG_RELEASE "${QJPEG_DEBUG}")
-#	ELSEIF(NOT QJPEG_DEBUG AND NOT QJPEG_RELEASE)
-#		MESSAGE(FATAL_ERROR "qjpeg plugin wasn't found!")
-#	ENDIF()
-#	SET(QJPEG_LIBRARIES "debug;${QJPEG_DEBUG};optimized;${QJPEG_RELEASE}")
-#
-	LIST(
-		APPEND EXTRA_LIBS "${QT_QTMAIN_LIBRARY}"
-		winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool
-	)
+	GET_TARGET_PROPERTY(winmaind Qt5::WinMain LOCATION_DEBUG)
+	GET_TARGET_PROPERTY(winmain Qt5::WinMain LOCATION_RELEASE)
+	SET(MAYBE_QTMAIN_LIBRARIES debug ${winmaind} optimized ${winmain})
+
+	LIST(APPEND EXTRA_LIBS winmm imm32 ws2_32 ole32 oleaut32 uuid gdi32 comdlg32 winspool)
 ENDIF()
 
-# Note that ${JPEG_LIBRARY} must go after qjpeg plugin, because otherwise
-# the GNU linker won't resolve symbols qjpeg needs from it.
 LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
 
+SET(MAYBE_QT_OPENGL_MODULE "")
 IF(ENABLE_OPENGL)
-	LIST(APPEND EXTRA_LIBS ${QT_QTOPENGL_LIBRARY} ${OPENGL_LIBRARIES})
+	LIST(APPEND EXTRA_LIBS ${OPENGL_LIBRARIES})
+	SET(MAYBE_QT_OPENGL_MODULE OpenGL)
 ENDIF()
 
 # Crash reporter, only Windows + MSVC supported for now.
@@ -399,6 +411,9 @@ SET(TRANSLATIONS_DIR_ABS "${CMAKE_INSTALL_PREFIX}/${TRANSLATIONS_DIR_REL}")
 
 CONFIGURE_FILE(config.h.in ${CMAKE_BINARY_DIR}/config.h @ONLY)
 
+ADD_SUBDIRECTORY(ui)
+INCLUDE_DIRECTORIES("${toplevel_ui_sources_BINARY_DIR}")
+
 # crash_reporter is included unconditionally to collect translation sources from there.
 ADD_SUBDIRECTORY(crash_reporter)
 ADD_SUBDIRECTORY(dewarping)
@@ -409,21 +424,6 @@ ADD_SUBDIRECTORY(interaction)
 ADD_SUBDIRECTORY(zones)
 ADD_SUBDIRECTORY(tests)
 
-FILE(GLOB common_ui_files ui/ErrorWidget.ui)
-FILE(GLOB gui_only_ui_files "ui/*.ui")
-FOREACH(ui_file ${common_ui_files})
-	LIST(REMOVE_ITEM gui_only_ui_files "${ui_file}")
-ENDFOREACH()
-
-SOURCE_GROUP("UI Files" FILES ${common_ui_files} ${gui_only_ui_files})
-QT4_WRAP_UI(common_ui_sources ${common_ui_files})
-QT4_WRAP_UI(gui_only_ui_sources ${gui_only_ui_files})
-SET_SOURCE_FILES_PROPERTIES(${common_ui_sources} ${gui_only_ui_files} PROPERTIES GENERATED TRUE)
-ADD_SUBDIRECTORY(ui)
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}") # for ui files
-
-ADD_CUSTOM_TARGET(toplevel_ui_sources DEPENDS ${common_ui_sources} ${gui_only_ui_sources})
-
 ADD_SUBDIRECTORY(filters/fix_orientation)
 ADD_SUBDIRECTORY(filters/page_split)
 ADD_SUBDIRECTORY(filters/deskew)
@@ -431,13 +431,14 @@ ADD_SUBDIRECTORY(filters/select_content)
 ADD_SUBDIRECTORY(filters/page_layout)
 ADD_SUBDIRECTORY(filters/output)
 
-SET(resource_sources)
-QT4_ADD_RESOURCES(resource_sources resources/resources.qrc)
-SOURCE_GROUP("Generated" FILES ${common_ui_sources} ${gui_only_ui_sources} ${resource_sources})
-SOURCE_GROUP("Resources" FILES resources/resources.qrc resources/icons/COPYING)
+SET(resource_files resources/resources.qrc resources/icons/COPYING)
 IF(WIN32)
-	SOURCE_GROUP("Resources" FILES resources/win32/resources.rc)
+	LIST(APPEND resource_files resources/win32/resources.rc)
 ENDIF()
+SOURCE_GROUP("Resources" FILES ${resource_files})
+
+QT5_ADD_RESOURCES(resource_sources resources/resources.qrc)
+SOURCE_GROUP("Generated" FILES ${resource_sources})
 
 SET(
 	common_sources
@@ -465,7 +466,6 @@ SET(
 	ImagePixmapUnion.h
 	ImageViewBase.cpp ImageViewBase.h
 	BasicImageView.cpp BasicImageView.h
-	StageListView.cpp StageListView.h
 	DebugImageView.cpp DebugImageView.h
 	TabbedDebugImages.cpp TabbedDebugImages.h
 	ThumbnailLoadResult.h
@@ -536,6 +536,7 @@ SET(
 	gui_only_sources
 	Application.cpp Application.h
 	SkinnedButton.cpp SkinnedButton.h
+	StageListView.cpp StageListView.h
 	RelinkablePathVisualization.cpp RelinkablePathVisualization.h
 	RelinkingModel.cpp RelinkingModel.h
 	RelinkingSortingModel.cpp RelinkingSortingModel.h
@@ -562,8 +563,6 @@ SET(
 )
 
 SOURCE_GROUP("Sources" FILES ${common_sources} ${gui_only_sources} ${cli_only_sources})
-QT4_AUTOMOC(${common_sources} ${gui_only_sources} ${cli_only_sources})
-
 SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -577,7 +576,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 	)
 ENDIF()
 
-SET(win32_resource_file)
+SET(win32_resource_file "")
 IF(WIN32)
 	SET(rc_file "${CMAKE_SOURCE_DIR}/resources/win32/resources.rc")
 	FILE(GLOB win32_resources resources/win32/*.ico)
@@ -585,45 +584,40 @@ IF(WIN32)
 		"${rc_file}" PROPERTIES
 		OBJECT_DEPENDS ${win32_resources}
 	)
-	IF(MINGW)
-		# CMake doesn't know how to process .rc files with MinGW.
-		SET(win32_resource_file "${CMAKE_BINARY_DIR}/win32_resources.o")
-		ADD_CUSTOM_COMMAND(
-			OUTPUT "${win32_resource_file}"
-			WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/resources/win32"
-			COMMAND windres -i "${rc_file}" -o "${win32_resource_file}"
-			MAIN_DEPENDENCY "${rc_file}"
-			DEPENDS ${win32_resources}
-		)
-	ELSE(MINGW)
-		SET(win32_resource_file "${rc_file}")
-	ENDIF(MINGW)
+	SET(win32_resource_file "${rc_file}")
 ENDIF(WIN32)
 
 ADD_LIBRARY(stcore STATIC ${common_sources} ${common_ui_sources})
+QT5_USE_MODULES(stcore Widgets Xml ${MAYBE_QT_OPENGL_MODULE})
+ADD_DEPENDENCIES(stcore toplevel_ui_sources)
 
 ADD_EXECUTABLE(
-	scantailor WIN32 ${gui_only_sources} ${common_ui_sources} ${gui_only_ui_sources}
-	${resource_sources} ${win32_resource_file} resources/icons/COPYING
+	scantailor WIN32 ${gui_only_sources} ${resource_sources} ${win32_resource_file}
 )
 
 ADD_EXECUTABLE(scantailor-cli ${cli_only_sources} ${common_ui_sources})
 
-# Note that order of static libraries matters with gcc.  Specifically,
-# QJPEG_LIBRARIES needs to go before Qt libraries and EXTRA_LIBS needs
-# to go after both of them.
 TARGET_LINK_LIBRARIES(
 	scantailor
 	fix_orientation page_split deskew select_content page_layout output stcore
-	dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
-	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
+	dewarping zones interaction imageproc math foundation ${MAYBE_QTMAIN_LIBRARIES}
 )
 TARGET_LINK_LIBRARIES(
 	scantailor-cli
-	fix_orientation page_split deskew select_content page_layout output
-	stcore dewarping zones interaction imageproc math foundation ${QJPEG_LIBRARIES}
-	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
+	fix_orientation page_split deskew select_content page_layout output stcore
+	dewarping zones interaction imageproc math foundation ${MAYBE_QTMAIN_LIBRARIES}
 )
+
+QT5_USE_MODULES(scantailor Widgets Xml ${MAYBE_QT_OPENGL_MODULE})
+
+# Widgets module is used statically but not at runtime.
+QT5_USE_MODULES(scantailor-cli Widgets Xml)
+
+IF(EXTRA_LIBS)
+	TARGET_LINK_LIBRARIES(scantailor ${EXTRA_LIBS})
+	TARGET_LINK_LIBRARIES(scantailor-cli ${EXTRA_LIBS})
+ENDIF()
+
 INSTALL(TARGETS scantailor scantailor-cli RUNTIME DESTINATION bin)
 
 IF(ENABLE_CRASH_REPORTER)
@@ -634,7 +628,7 @@ IF(ENABLE_CRASH_REPORTER)
 	)
 	IF(NOT SYMBOLS_PATH)
 		MESSAGE(FATAL_ERROR "SYMBOLS_PATH directory is not set.")
-	ENDIF(NOT SYMBOLS_PATH)
+	ENDIF()
 
 	# We can't build it, because it requires ATL, which is not part
 	# of the Visual Studio Express Edition, so we rely on a pre-built
@@ -647,17 +641,16 @@ IF(ENABLE_CRASH_REPORTER)
 		MESSAGE(
 			FATAL_ERROR "dump_syms.exe wasn't found.  Specify its location manually by setting the DUMP_SYMS_EXECUTABLE variable.  dump_syms.exe may be found in the Mozilla repository under /toolkit/crashreporter/tools/win32"
 		)
-	ENDIF(NOT DUMP_SYMS_EXECUTABLE)
+	ENDIF()
 
 	INCLUDE_DIRECTORIES(crash_reporter crash_reporter/google-breakpad)
 	TARGET_LINK_LIBRARIES(scantailor crash_handler)
-ENDIF(ENABLE_CRASH_REPORTER)
+ENDIF()
 
 # Translations
 TRANSLATION_SOURCES(
 	scantailor
 	${common_sources} ${gui_only_sources} ${cli_only_sources}
-	${common_ui_files} ${gui_only_ui_files}
 )
 FILE(GLOB TRANSLATION_FILES translations/scantailor_*.ts)
 FILE(GLOB CR_TRANSLATION_FILES translations/crashreporter_*.ts)
@@ -680,7 +673,8 @@ FOREACH(ts_file ${ts_files})
 		LIST(APPEND FILTERED_TRANSLATION_FILES "${ts_file}")
 	ENDIF("${ts_file}" MATCHES ".*untranslated.ts")
 ENDFOREACH(ts_file)
-QT4_ADD_TRANSLATION(QM_FILES ${FILTERED_TRANSLATION_FILES})
+
+QT5_ADD_TRANSLATION(QM_FILES ${FILTERED_TRANSLATION_FILES})
 ADD_CUSTOM_TARGET(compile_translations ALL DEPENDS ${QM_FILES})
 
 INSTALL(FILES ${QM_FILES} DESTINATION "${TRANSLATIONS_DIR_REL}/")
@@ -709,79 +703,49 @@ INCLUDE(CPack)
 IF(WIN32)
 	# Copy some DLLs to the staging dir.
 	
-	IF(MINGW)
-		CHECK_CXX_ACCEPTS_FLAG("-m64" MINGW64)
-		IF(NOT MINGW64)
-			FIND_FILE(
-				MINGWM10_DLL mingwm10.dll
-				PATHS c:/MinGW/bin ENV PATH
-				DOC "Full path to mingwm10.dll"
-			)
-			IF(NOT MINGWM10_DLL)
-				MESSAGE(
-					FATAL_ERROR
-					"Could not find mingwm10.dll\n"
-					"It shou 'bin' subdirectory of your MinGW installation."
-				)
-			ENDIF(NOT MINGWM10_DLL)
-			COPY_TO_BUILD_DIR("${MINGWM10_DLL}")
-
-			FIND_FILE(
-				GCC_DW2_DLL libgcc_s_dw2-1.dll
-				PATHS c:/MinGW/bin ENV PATH
-				DOC "Full path to libgcc_s_dw2-1.dll"
-			)
-			IF(NOT GCC_DW2_DLL)
-				SET(GCC_DW2_DLL "") # For NSIS
-				MESSAGE(
-					"Could not find libgcc_s_dw2-1.dll\n"
-					"That's fine if your MinGW is old and just doesn't have it."
-				)
-			ELSE()
-				COPY_TO_BUILD_DIR("${GCC_DW2_DLL}")
-			ENDIF()
-		ENDIF(NOT MINGW64)
-	ENDIF(MINGW)
-	
 	SET(
-		libs_copy_debug
-		"${QT_QTCORE_LIBRARY_DEBUG}"
-		"${QT_QTGUI_LIBRARY_DEBUG}"
-		"${QT_QTXML_LIBRARY_DEBUG}"
-		"${QT_QTNETWORK_LIBRARY_DEBUG}"
+		qt5_libs
+		${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}
+		${Qt5Core_LIBRARIES} ${Qt5Xml_LIBRARIES}
 	)
-	LIB_TO_DLL(libs_copy_debug ${libs_copy_debug})
-	COPY_TO_BUILD_DIR(${libs_copy_debug} CONFIGURATIONS Debug)
-	
-	SET(
-		libs_copy_nondebug
-		"${QT_QTCORE_LIBRARY_RELEASE}"
-		"${QT_QTGUI_LIBRARY_RELEASE}"
-		"${QT_QTXML_LIBRARY_RELEASE}"
-		"${QT_QTNETWORK_LIBRARY_RELEASE}"
-	)
-	LIB_TO_DLL(libs_copy_nondebug ${libs_copy_nondebug})
-	COPY_TO_BUILD_DIR(${libs_copy_nondebug} CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
-	
-	# Qt's imageformat plugins. Note that png is built-in and for tiff we have our own code.
-	COPY_TO_BUILD_DIR("${QT_QJPEG_PLUGIN_RELEASE}" SUBDIR imageformats CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
-	COPY_TO_BUILD_DIR("${QT_QJPEG_PLUGIN_DEBUG}" SUBDIR imageformats CONFIGURATIONS Debug)
-	
-	IF(MINGW)
-		SET(zlib_dll "${QT_BIN_DIR}/libz.dll")
-	ELSE()
-		SET(zlib_dll "${QT_BIN_DIR}/zdll.dll")
+	IF(ENABLE_OPENGL)
+		LIST(APPEND qt5_libs ${Qt5OpenGL_LIBRARIES})
 	ENDIF()
-	SET(
-		libs_copy_all_confs
-		"${QT_BIN_DIR}/libpng.dll" "${QT_BIN_DIR}/libjpeg.dll"
-		"${QT_BIN_DIR}/libtiff.dll" "${zlib_dll}"
+	FOREACH(target ${qt5_libs})
+		GET_TARGET_PROPERTY(debug_loc "${target}" LOCATION_DEBUG)
+		GET_TARGET_PROPERTY(release_loc "${target}" LOCATION_RELEASE)
+		COPY_TO_BUILD_DIR("${debug_loc}" CONFIGURATIONS Debug)
+		COPY_TO_BUILD_DIR("${release_loc}" CONFIGURATIONS Release MinSizeRel RelWithDebInfo)
+	ENDFOREACH()
+		
+	SET(DLL_DIR "${QT_SRC_DIR}/qtbase/bin")
+	COPY_TO_BUILD_DIR(
+		"${DLL_DIR}/libpng.dll" "${DLL_DIR}/libjpeg.dll"
+		"${DLL_DIR}/libtiff.dll" "${DLL_DIR}/zdll.dll"
 	)
-	COPY_TO_BUILD_DIR(${libs_copy_all_confs})
+
+	# Qt's plugins.
+	SET(PLUGINS_DIR "${QT_SRC_DIR}/qtbase/plugins")
+	COPY_TO_BUILD_DIR(
+		"${PLUGINS_DIR}/platforms/qwindows.dll" SUBDIR platforms
+		CONFIGURATIONS Release MinSizeRel RelWithDebInfo
+	)
+	COPY_TO_BUILD_DIR(
+		"${PLUGINS_DIR}/platforms/qwindowsd.dll" SUBDIR platforms
+		CONFIGURATIONS Debug
+	)
+	COPY_TO_BUILD_DIR(
+		"${PLUGINS_DIR}/accessible/qtaccessiblewidgets.dll" SUBDIR accessible
+		CONFIGURATIONS Release MinSizeRel RelWithDebInfo
+	)
+	COPY_TO_BUILD_DIR(
+		"${PLUGINS_DIR}/accessible/qtaccessiblewidgetsd.dll" SUBDIR accessible
+		CONFIGURATIONS Debug
+	)
 	
 	# Generate the target that will actually do the copying.
 	GENERATE_COPY_TO_BUILD_DIR_TARGET(copy_to_build_dir)
 	
-	# Installer for Windows.  Must go the last.
+	# Installer for Windows.  Must go last.
 	ADD_SUBDIRECTORY(packaging/windows)
 ENDIF(WIN32)

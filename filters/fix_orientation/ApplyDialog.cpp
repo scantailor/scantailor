@@ -17,7 +17,7 @@
 */
 
 #include "ApplyDialog.h"
-#include "ApplyDialog.h.moc"
+#include "ApplyDialog.moc"
 #include "PageSelectionAccessor.h"
 #include <QButtonGroup>
 #include <QDebug>

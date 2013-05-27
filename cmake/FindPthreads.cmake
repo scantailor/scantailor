@@ -67,6 +67,7 @@ MACRO(FindPthreads)
 			"	pthread_attr_init(0);\n"
 			"	pthread_cleanup_push(0, 0);\n"
 			"	pthread_cleanup_pop(0);\n"
+			"   return 0;\n"
 			"}\n"
 		)
 		

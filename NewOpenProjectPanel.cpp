@@ -16,7 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "NewOpenProjectPanel.h.moc"
+#include "NewOpenProjectPanel.h"
+#include "NewOpenProjectPanel.moc"
 #include "RecentProjects.h"
 #include "Utils.h"
 #include <boost/lambda/lambda.hpp>

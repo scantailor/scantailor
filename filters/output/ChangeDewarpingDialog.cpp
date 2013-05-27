@@ -17,7 +17,7 @@
 */
 
 #include "ChangeDewarpingDialog.h"
-#include "ChangeDewarpingDialog.h.moc"
+#include "ChangeDewarpingDialog.moc"
 #include "PageSelectionAccessor.h"
 #include "QtSignalForwarder.h"
 #include <boost/function.hpp>

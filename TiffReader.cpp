@@ -444,7 +444,7 @@ TiffReader::extractBinaryOrIndexed8Image(
 	}
 	
 	int const num_colors = 1 << info.bits_per_sample;
-	image.setNumColors(num_colors);
+	image.setColorCount(num_colors);
 	
 	if (info.photometric == PHOTOMETRIC_PALETTE) {
 		uint16* pr = 0;
