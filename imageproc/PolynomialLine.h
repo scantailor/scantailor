@@ -19,9 +19,7 @@
 #ifndef IMAGEPROC_POLYNOMIAL_LINE_H_
 #define IMAGEPROC_POLYNOMIAL_LINE_H_
 
-#include "LeastSquaresFit.h"
-#include <QSize>
-#include <vector>
+#include "VecT.h"
 #include <limits>
 #include <math.h>
 
@@ -122,11 +120,9 @@ private:
 	
 	static double calcScale(int num_values);
 	
-	static void prepareEquations(
-		std::vector<double>& equations,
-		int degree, int num_values);
+	static void doLeastSquares(VecT<double> const& data_points, VecT<double>& coeffs);
 	
-	std::vector<double> m_coeffs;
+	VecT<double> m_coeffs;
 };
 
 
@@ -169,19 +165,15 @@ PolynomialLine::PolynomialLine(
 		degree = num_values - 1;
 	}
 	
-	QSize const dimensions(degree + 1, num_values);
-	std::vector<double> equations;
-	std::vector<double> data_points;
-	data_points.resize(dimensions.height());
-	m_coeffs.resize(dimensions.width());
+	int const num_terms = degree + 1;
 	
-	prepareEquations(equations, degree, num_values);
-	
+	VecT<double> data_points(num_values);
 	for (int i = 0; i < num_values; ++i, values += step) {
 		data_points[i] = *values;
 	}
-	
-	leastSquaresFit(dimensions, &equations[0], &m_coeffs[0], &data_points[0]);
+
+	VecT<double>(num_terms).swap(m_coeffs);
+	doLeastSquares(data_points, m_coeffs);
 }
 
 template<typename T>
@@ -203,23 +195,23 @@ PolynomialLine::output(
 		return;
 	}
 	
-	// Pretend that data points are positioned in range of [1, 2].
+	// Pretend that data points are positioned in range of [0, 1].
 	double const scale = calcScale(num_values);
 	for (int i = 0; i < num_values; ++i, values += step) {
-		double const position = 1.0 + i * scale;
+		double const position = i * scale;
 		double sum = 0.0;
 		double pow = 1.0;
 		
-		std::vector<double>::const_iterator it(m_coeffs.begin());
-		std::vector<double>::const_iterator const end(m_coeffs.end());
-		for (; it != end; ++it, pow *= position) {
-			sum += *it * pow;
+		double const* p_coeffs = m_coeffs.data();
+		double const* const p_coeffs_end = p_coeffs + m_coeffs.size();
+		for (; p_coeffs != p_coeffs_end; ++p_coeffs, pow *= position) {
+			sum += *p_coeffs * pow;
 		}
 		
 		*values = pp(sum);
 	}
 }
 
-}
+} // namespace imageproc
 
 #endif

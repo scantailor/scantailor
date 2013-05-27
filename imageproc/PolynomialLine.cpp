@@ -17,6 +17,8 @@
 */
 
 #include "PolynomialLine.h"
+#include "MatT.h"
+#include "MatrixCalc.h"
 #include <stdexcept>
 
 namespace imageproc
@@ -45,21 +47,53 @@ PolynomialLine::calcScale(int const num_values)
 }
 
 void
-PolynomialLine::prepareEquations(
-	std::vector<double>& equations,
-	int const degree, int const num_values)
-{
-	equations.reserve((degree + 1) * num_values);
-	
-	// Pretend that data points are positioned in range of [1, 2].
+PolynomialLine::doLeastSquares(VecT<double> const& data_points, VecT<double>& coeffs)
+{	
+	int const num_terms = coeffs.size();
+	int const num_values = data_points.size();
+
+	// The least squares equation is A^T*A*x = A^T*b
+	// We will be building A^T*A and A^T*b incrementally.
+	// This allows us not to build matrix A at all.
+	MatT<double> AtA(num_terms, num_terms);
+	VecT<double> Atb(num_terms);
+
+	// 1, x, x^2, x^3, ...
+	VecT<double> powers(num_terms);
+
+	// Pretend that data points are positioned in range of [0, 1].
 	double const scale = calcScale(num_values);
-	for (int i = 0; i < num_values; ++i) {
-		double const position = 1.0 + i * scale;
+	for (int x = 0; x < num_values; ++x) {
+		double const position = x * scale;
+		double const data_point = data_points[x];
+		
+		// Fill the powers vector.
 		double pow = 1.0;
-		for (int j = 0; j <= degree; ++j, pow *= position) {
-			equations.push_back(pow);
+		for (int j = 0; j < num_terms; ++j) {
+			powers[j] = pow;
+			pow *= position;
+		}
+
+		// Update AtA and Atb.
+		for (int i = 0; i < num_terms; ++i) {
+			double const i_val = powers[i];
+			Atb[i] += i_val * data_point;
+			for (int j = 0; j < num_terms; ++j) {
+				double const j_val = powers[j];
+				AtA(i, j) += i_val * j_val;
+			}
 		}
 	}
+
+	// In case AtA is rank-deficient, we can usually fix it like this:
+	for (int i = 0; i < num_terms; ++i) {
+		AtA(i, i) += 1e-5; // Add a small value to the diagonal.
+	}
+
+	try {
+		DynamicMatrixCalc<double> mc;
+		mc(AtA).solve(mc(Atb)).write(coeffs.data());
+	} catch (std::runtime_error const&) {}
 }
 
-}
+} // namespace imageproc

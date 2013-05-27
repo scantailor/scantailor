@@ -19,8 +19,9 @@
 #ifndef IMAGEPROC_POLYNOMIAL_SURFACE_H_
 #define IMAGEPROC_POLYNOMIAL_SURFACE_H_
 
+#include "MatT.h"
+#include "VecT.h"
 #include <QSize>
-#include <vector>
 #include <stdint.h>
 
 namespace imageproc
@@ -90,29 +91,21 @@ private:
 	int calcNumTerms() const;
 	
 	static double calcScale(int dimension);
-	
-	void prepareEquationsAndDataPoints(
-		GrayImage const& image,
-		std::vector<double>& equations,
-		std::vector<double>& data_points) const;
-	
-	void prepareEquationsAndDataPoints(
+
+	static void prepareDataForLeastSquares(
+		GrayImage const& image, MatT<double>& AtA, VecT<double>& Atb, int h_degree, int v_degree);
+
+	static void prepareDataForLeastSquares(
 		GrayImage const& image, BinaryImage const& mask,
-		std::vector<double>& equations,
-		std::vector<double>& data_points) const;
+		MatT<double>& AtA, VecT<double>& Atb, int h_degree, int v_degree);
 	
-	void processMaskWord(
-		uint8_t const* image_line, uint32_t word,
-		int mask_word_idx, int y,
-		double y_adjusted, double xscale,
-		std::vector<double>& equations,
-		std::vector<double>& data_points) const;
+	static void fixSquareMatrixRankDeficiency(MatT<double>& mat);
 	
-	std::vector<double> m_coeffs;
+	VecT<double> m_coeffs;
 	int m_horDegree;
 	int m_vertDegree;
 };
 
-}
+} // namespace imageproc
 
 #endif

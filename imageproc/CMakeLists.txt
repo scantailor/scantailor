@@ -32,7 +32,6 @@ SET(
 	GaussBlur.cpp GaussBlur.h
 	Sobel.h
 	MorphGradientDetect.cpp MorphGradientDetect.h
-	LeastSquaresFit.cpp LeastSquaresFit.h
 	PolynomialLine.cpp PolynomialLine.h
 	PolynomialSurface.cpp PolynomialSurface.h
 	SavGolKernel.cpp SavGolKernel.h
