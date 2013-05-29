@@ -256,7 +256,7 @@ RelinkingModel::commitChanges()
 		return;
 	}
 
-	Relinker new_relinker;
+	Relinker new_relinker(*m_ptrRelinker);
 	int modified_rowspan_begin = -1;
 
 	int row = -1;
