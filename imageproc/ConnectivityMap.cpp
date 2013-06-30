@@ -157,7 +157,7 @@ void
 ConnectivityMap::addComponent(BinaryImage const& image)
 {
 	if (m_size != image.size()) {
-		throw std::invalid_argument("ConnectivityMap::addComponent: sizes dont match");
+		throw std::invalid_argument("ConnectivityMap::addComponent: sizes don't match");
 	}
 	if (m_size.isEmpty()) {
 		return;
