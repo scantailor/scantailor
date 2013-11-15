@@ -278,15 +278,16 @@ Task::UiUpdater::updateUI(FilterUiInterface* ui)
 {
 	// This function is executed from the GUI thread.
 	
+	if (m_batchProcessing) {
+		ui->invalidateThumbnail(m_pageId);
+		return;
+	}
+	
 	OptionsWidget* const opt_widget = m_ptrFilter->optionsWidget();
 	opt_widget->postUpdateUI(m_uiData);
 	ui->setOptionsWidget(opt_widget, ui->KEEP_OWNERSHIP);
 	
 	ui->invalidateThumbnail(m_pageId);
-	
-	if (m_batchProcessing) {
-		return;
-	}
 	
 	ImageView* view = new ImageView(
 		m_image, m_downscaledImage,
