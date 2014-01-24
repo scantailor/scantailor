@@ -202,6 +202,13 @@ MainWindow::MainWindow()
 	addAction(actionPrevPage);
 	addAction(actionPrevPageQ);
 	addAction(actionNextPageW);
+	
+	addAction(actionSwitchFilter1);
+	addAction(actionSwitchFilter2);
+	addAction(actionSwitchFilter3);
+	addAction(actionSwitchFilter4);
+	addAction(actionSwitchFilter5);
+	addAction(actionSwitchFilter6);
 
 	// Should be enough to save a project.
 	OutOfMemoryHandler::instance().allocateEmergencyMemory(3*1024*1024);
@@ -217,6 +224,13 @@ MainWindow::MainWindow()
 		&OutOfMemoryHandler::instance(),
 		SIGNAL(outOfMemory()), SLOT(handleOutOfMemorySituation())
 	);
+	
+	connect(actionSwitchFilter1, SIGNAL(triggered(bool)), SLOT(switchFilter1()));
+	connect(actionSwitchFilter2, SIGNAL(triggered(bool)), SLOT(switchFilter2()));
+	connect(actionSwitchFilter3, SIGNAL(triggered(bool)), SLOT(switchFilter3()));
+	connect(actionSwitchFilter4, SIGNAL(triggered(bool)), SLOT(switchFilter4()));
+	connect(actionSwitchFilter5, SIGNAL(triggered(bool)), SLOT(switchFilter5()));
+	connect(actionSwitchFilter6, SIGNAL(triggered(bool)), SLOT(switchFilter6()));
 	
 	connect(
 		filterList->selectionModel(),
@@ -1142,6 +1156,36 @@ MainWindow::filterSelectionChanged(QItemSelection const& selected)
 	resetThumbSequence(currentPageOrderProvider());
 	
 	updateMainArea();
+}
+
+void MainWindow::switchFilter1()
+{
+	filterList->selectRow(0);
+}
+
+void MainWindow::switchFilter2()
+{
+	filterList->selectRow(1);
+}
+
+void MainWindow::switchFilter3()
+{
+	filterList->selectRow(2);
+}
+
+void MainWindow::switchFilter4()
+{
+	filterList->selectRow(3);
+}
+
+void MainWindow::switchFilter5()
+{
+	filterList->selectRow(4);
+}
+
+void MainWindow::switchFilter6()
+{
+	filterList->selectRow(5);
 }
 
 void

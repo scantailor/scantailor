@@ -22,6 +22,7 @@
 #include "ImagePresentation.h"
 #include "InteractionState.h"
 #include "imageproc/Constants.h"
+#include <QAction>
 #include <QRect>
 #include <QSizeF>
 #include <QPainter>
@@ -87,10 +88,36 @@ ImageView::ImageView(
 	rootInteractionHandler().makeLastFollower(*this);
 	rootInteractionHandler().makeLastFollower(m_dragHandler);
 	rootInteractionHandler().makeLastFollower(m_zoomHandler);
+	
+	QAction *rotateLeft = new QAction(0);
+	rotateLeft->setShortcut(QKeySequence(","));
+	connect(rotateLeft, SIGNAL(triggered(bool)), SLOT(doRotateLeft()));
+	addAction(rotateLeft);
+	
+	QAction *rotateRight = new QAction(0);
+	rotateRight->setShortcut(QKeySequence("."));
+	connect(rotateRight, SIGNAL(triggered(bool)), SLOT(doRotateRight()));
+	addAction(rotateRight);
 }
 
 ImageView::~ImageView()
 {
+}
+
+void ImageView::doRotate(double deg)
+{
+	manualDeskewAngleSetExternally(m_xform.postRotation() + deg);
+	emit manualDeskewAngleSet(m_xform.postRotation());	
+}
+
+void ImageView::doRotateLeft()
+{
+	doRotate(-0.10);
+}
+
+void ImageView::doRotateRight()
+{
+	doRotate(0.10);
 }
 
 void

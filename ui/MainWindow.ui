@@ -57,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>783</width>
-     <height>20</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug">
@@ -394,6 +394,69 @@
   <action name="actionRelinking">
    <property name="text">
     <string>Relinking ...</string>
+   </property>
+  </action>
+  <action name="actionSwitchFilter1">
+   <property name="text">
+    <string>Switch filter to orientation</string>
+   </property>
+   <property name="shortcut">
+    <string>O</string>
+   </property>
+  </action>
+  <action name="actionSwitchFilter2">
+   <property name="text">
+    <string>Switch filter to orientation</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch filter to split pages</string>
+   </property>
+   <property name="shortcut">
+    <string>E</string>
+   </property>
+  </action>
+  <action name="actionSwitchFilter3">
+   <property name="text">
+    <string>Switch filter to orientation</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch filter to deskew</string>
+   </property>
+   <property name="shortcut">
+    <string>N</string>
+   </property>
+  </action>
+  <action name="actionSwitchFilter4">
+   <property name="text">
+    <string>Switch filter to orientation</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch filter to select content</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
+   </property>
+  </action>
+  <action name="actionSwitchFilter5">
+   <property name="text">
+    <string>Switch filter to orientation</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch filter to margins</string>
+   </property>
+   <property name="shortcut">
+    <string>K</string>
+   </property>
+  </action>
+  <action name="actionSwitchFilter6">
+   <property name="text">
+    <string>Switch filter to orientation</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch filter to output</string>
+   </property>
+   <property name="shortcut">
+    <string>P</string>
    </property>
   </action>
  </widget>

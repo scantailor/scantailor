@@ -107,6 +107,10 @@ ImageView::ImageView(
 	
 	QAction* create = m_pNoContentMenu->addAction(tr("Create Content Box"));
 	QAction* remove = m_pHaveContentMenu->addAction(tr("Remove Content Box"));
+	create->setShortcut(QKeySequence("Ins"));
+	remove->setShortcut(QKeySequence("Backspace"));
+	addAction(create);
+	addAction(remove);
 	connect(create, SIGNAL(triggered(bool)), this, SLOT(createContentBox()));
 	connect(remove, SIGNAL(triggered(bool)), this, SLOT(removeContentBox()));
 }
