@@ -279,7 +279,7 @@ ProjectFilesDialog::inProjectFiles() const
 	using namespace boost::lambda;
 	
 	std::vector<ImageFileInfo> files;
-	m_ptrInProjectFiles->items(bind(&pushFileInfo<Item>, ref(files), _1));
+	m_ptrInProjectFiles->items(bind(&pushFileInfo<Item>, boost::ref(files), _1));
 	
 	std::sort(files.begin(), files.end(), imageFileInfoLess);
 	
@@ -439,7 +439,7 @@ ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 		files.begin(), files.end(),
 		bind(
 			&pushItemWithFlags<Item, ItemList>,
-			_1, ref(items), cref(m_supportedExtensions)
+			_1, boost::ref(items), cref(m_supportedExtensions)
 		)
 	);
 	
@@ -510,7 +510,7 @@ ProjectFilesDialog::removeFromProject()
 	m_ptrInProjectFiles->items(
 		selection, bind(
 			&pushItemIfSameDir<Item, ItemList>,
-			ref(items), _1, cref(input_dir)
+			boost::ref(items), _1, cref(input_dir)
 		)
 	);
 	
