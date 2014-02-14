@@ -250,10 +250,11 @@ OptionsWidget::applySelection(std::set<PageId> const& pages, bool apply_content_
 	if (pages.empty()) {
 		return;
 	}
-	
+
+	Dependencies deps;
 	Params params(
 		m_uiData.contentRect(), m_uiData.contentSizeMM(),
-		m_uiData.dependencies(), m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection(), m_uiData.fineTuning()
+		deps, m_uiData.mode(), m_uiData.contentDetection(), m_uiData.pageDetection(), m_uiData.fineTuning()
 	);
 
 	BOOST_FOREACH(PageId const& page_id, pages) {
@@ -268,11 +269,11 @@ OptionsWidget::applySelection(std::set<PageId> const& pages, bool apply_content_
 		}
 		params.setPageBorders( Margins(leftBorder->value(), topBorder->value(), rightBorder->value(), bottomBorder->value()) );
 
-
 		m_ptrSettings->setPageParams(page_id, params);
 		//emit invalidateThumbnail(page_id);
 	}
-    invalidateAllThumbnails();
+    emit invalidateAllThumbnails();
+    emit reloadRequested();
 }
 
 /*========================= OptionsWidget::UiData ======================*/
