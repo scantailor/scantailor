@@ -36,6 +36,10 @@ p + p {
     margin-top: 1.2em;
 }
 
+p.byline {
+    font-size: .85em;
+}
+
 .site {
     margin-left: auto;
     margin-right: auto;
