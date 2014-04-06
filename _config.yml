@@ -1,0 +1,5 @@
+name: ScanTailor
+markdown: kramdown
+pygments: true
+timezone: America/New_York
+encoding: utf-8

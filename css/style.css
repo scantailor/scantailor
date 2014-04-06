@@ -1,0 +1,74 @@
+---
+---
+
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro);
+
+body {
+
+    font-family: "Source Sans Pro", sans-serif;
+
+    font-size: 1.25em;
+    color: #303030;
+    line-height: 135%;
+    text-rendering: optimizeLegibility;
+    text-align: left;
+
+    background-color: #ffffee;
+}
+
+h1 {
+    font-size: 1.5em;
+}
+
+h2 {
+    font-size: 1.4em;
+}
+
+h3 {
+    font-size: 1.3em;
+}
+
+h4 {
+    font-size: 1.25em;
+}
+
+p + p {
+    margin-top: 1.2em;
+}
+
+.site {
+    margin-left: auto;
+    margin-right: auto;
+    width: 35em;
+}
+
+.header {
+    background-color: ;
+}
+
+.header a {
+    text-decoration: none;
+    margin-left: 1em;
+    color: #999999;
+}
+
+.header a:hover {
+    color: #303030;
+}
+
+.header img {
+    display: inline;
+    vertical-align: text-top;
+}
+
+.title {
+    font-size: 1.25em;
+    display: inline-block;
+    margin-bottom: 1.25em;
+}
+
+.title a {
+    color: #cc0000;
+    margin-left: .5em;
+}
+
