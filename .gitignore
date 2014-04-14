@@ -1,6 +1,22 @@
-CMakeLists.txt.user*
-CMakeFiles
-*.qm
-*.h.moc
-build/
-*~
+#https://github.com/github/gitignore/blob/master/Qt.gitignore
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
