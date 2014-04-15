@@ -9,7 +9,9 @@ Scanning, optical character recognition, and assembling multi-page documents are
 Some Handy Links
 ----------------
 
-[Scan Tailor](http://www.scantailor.org) - Project Page
+[Github Project Page](https://github.com/scantailor/scantailor) - Github project page
+
+[Scan Tailor](http://www.scantailor.org) - Project page
 
 [DIY-forum](http://www.diybookscanner.org/forum/viewforum.php?f=21) - We've a section on DIY book scanner forums
 
