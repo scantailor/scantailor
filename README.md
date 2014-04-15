@@ -10,13 +10,16 @@ Some Handy Links
 ----------------
 
 [Scan Tailor](http://www.scantailor.org) - Project Page
-<!-- link to DIY? -->
+
+[DIY-forum](http://www.diybookscanner.org/forum/viewforum.php?f=21) - We've a section on DIY book scanner forums
 
 Get Support!
 ------------
 
 [#scantailor](http://webchat.freenode.net/?channels=#scantailor) on irc.freenode.net - Come chat with us
 
-<!-- [Google Group]() - Community mailing list and forum -->
+[Google User Group](https://groups.google.com/forum/#!forum/scantailor-users) - Users mailing list and forum
+
+[Google Dev Group](https://groups.google.com/forum/#!forum/scantailor-devel) - Developers mailing list and forum
 
 [GitHub Issues](https://github.com/scantailor/scantailor/issues) - Got issues? Please tell us!

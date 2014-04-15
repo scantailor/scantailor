@@ -4,7 +4,7 @@ Scan Tailor loves to welcome your contributions. There are several ways to help 
 * Create an [issue](https://github.com/scantailor/scantailor/issues) on GitHub, if you have found a bug
 * Write test cases for open bug issues
 * Write patches for open bug/feature issues, preferably with test cases included
-<!-- * Contribute to the [documentation](https://github.com/scantailor/docs) //need to setup sphinx first -->
+* Contribute to the [documentation](https://github.com/scantailor/docs)
 
 There are a few guidelines that we need contributors to follow so that we have a
 chance of keeping on top of things.
@@ -30,8 +30,8 @@ chance of keeping on top of things.
 * Make commits of logical units.
 * Check for unnecessary whitespace with `git diff --check` before committing.
 * Use descriptive commit messages and reference the #issue number.
-<!-- * Core test cases should continue to pass. Check this with travis-ci or whatever we're using
-* Your work should apply the Scan Tailor coding standards. -->
+* Core test cases should continue to pass and changed/added functions should ship there own test cases. Please check for valid build process before pulling to scantailor/scantailor repository.
+* Your work should apply the Scan Tailor coding standards(fit in with the currently used semantics).
 
 ## Which branch to base the work
 
@@ -46,14 +46,11 @@ chance of keeping on top of things.
 * Submit a pull request to the repository in the Scan Tailor organization, with the
   correct target branch.
 
-<!--
 ## Test cases and codesniffers
-Explanation for how to run sniffers for standard and test cases
--->
+* We are currently using boost for testing, so we recommend doing the same.
 
 # Additional Resources
 
-<!-- * [Scan Tailor coding standards](http://) do we use any standard? -->
 * [Existing issues](https://github.com/scantailor/scantailor/issues)
 * [General GitHub documentation](https://help.github.com/)
 * [GitHub pull request documentation](https://help.github.com/send-pull-requests/)
