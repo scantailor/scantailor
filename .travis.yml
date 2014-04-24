@@ -6,7 +6,7 @@ compiler:
 before_script:
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake .
   
 before_install:
   - sudo apt-get install libboost-dev
