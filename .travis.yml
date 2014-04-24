@@ -4,11 +4,11 @@ compiler:
   - gcc
 
 before_script:
+  - sudo add-apt-repository -y ppa:boost-latest/ppa
+  - sudo apt-get update
+  - sudo apt-get install libboost1.55-all-dev
   - mkdir build
   - cd build
   - cmake ..
-  
-before_install:
-  - sudo apt-get install libboost1.54-dev
   
 script: make
