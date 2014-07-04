@@ -151,21 +151,21 @@ CommandLine::addImage(QString const& path)
 void
 CommandLine::setup()
 {
-	m_outputProjectFile = fetchOutputProjectFile();
-	m_layoutType = fetchLayoutType();
-	m_layoutDirection = fetchLayoutDirection();
-	m_colorMode = fetchColorMode();
+	if (hasOutputProject()) m_outputProjectFile = fetchOutputProjectFile();
+	if (hasLayout()) m_layoutType = fetchLayoutType();
+	if (hasLayoutDirection()) m_layoutDirection = fetchLayoutDirection();
+	if (hasColorMode()) m_colorMode = fetchColorMode();
 	m_dpi = fetchDpi();
-	m_outputDpi = fetchDpi("output-dpi");
-	m_margins = fetchMargins();
-	m_alignment = fetchAlignment();
-	m_contentDetection = fetchContentDetection();
-	m_contentRect = fetchContentRect();
-	m_orientation = fetchOrientation();
-	m_threshold = fetchThreshold();
-	m_deskewAngle = fetchDeskewAngle();
-	m_startFilterIdx = fetchStartFilterIdx();
-	m_endFilterIdx = fetchEndFilterIdx();
+	if (hasOutputDpi()) m_outputDpi = fetchDpi("output-dpi");
+	if (hasMargins()) m_margins = fetchMargins();
+	if (hasAlignment()) m_alignment = fetchAlignment();
+	if (hasContentDetection()) m_contentDetection = fetchContentDetection();
+	if (hasContentRect()) m_contentRect = fetchContentRect();
+	if (hasOrientation()) m_orientation = fetchOrientation();
+	if (hasThreshold()) m_threshold = fetchThreshold();
+	if (hasDeskewAngle()) m_deskewAngle = fetchDeskewAngle();
+	if (hasStartFilterIdx()) m_startFilterIdx = fetchStartFilterIdx();
+	if (hasEndFilterIdx()) m_endFilterIdx = fetchEndFilterIdx();
 }
 
 
