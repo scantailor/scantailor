@@ -38,7 +38,6 @@
 #include "Margins.h"
 #include "Despeckle.h"
 
-
 CommandLine CommandLine::m_globalInstance;
 
 
@@ -292,12 +291,14 @@ CommandLine::fetchDpi(QString oname)
 output::ColorParams::ColorMode
 CommandLine::fetchColorMode()
 {
-	QString cm = m_options["color-mode"].toLower();
-	
-	if (cm == "color_grayscale")
-		return output::ColorParams::COLOR_GRAYSCALE;
-	else if (cm == "mixed")
-		return output::ColorParams::MIXED;
+    if (m_options.contains("color-mode")) {
+        QString cm = m_options["color-mode"].toLower();
+
+        if (cm == "color_grayscale")
+            return output::ColorParams::COLOR_GRAYSCALE;
+        else if (cm == "mixed")
+            return output::ColorParams::MIXED;
+    }
 
 	return output::ColorParams::BLACK_AND_WHITE;
 }
