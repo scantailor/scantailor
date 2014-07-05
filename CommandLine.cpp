@@ -127,7 +127,7 @@ CommandLine::parseCli(QStringList const& argv)
 
 #ifdef DEBUG_CLI
 	QStringList params = m_options.keys();
-	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options[params[i]].toAscii().constData() << "\n"; }
+	for (int i=0; i<params.size(); i++) { std::cout << params[i].toAscii().constData() << "=" << m_options.value(params[i]).toAscii().constData() << "\n"; }
 	std::cout << "Images: " << CommandLine::m_images.size() << "\n";
 #endif
 }
@@ -151,21 +151,21 @@ CommandLine::addImage(QString const& path)
 void
 CommandLine::setup()
 {
-	if (hasOutputProject()) m_outputProjectFile = fetchOutputProjectFile();
-	if (hasLayout()) m_layoutType = fetchLayoutType();
-	if (hasLayoutDirection()) m_layoutDirection = fetchLayoutDirection();
-	if (hasColorMode()) m_colorMode = fetchColorMode();
+	m_outputProjectFile = fetchOutputProjectFile();
+	m_layoutType = fetchLayoutType();
+	m_layoutDirection = fetchLayoutDirection();
+	m_colorMode = fetchColorMode();
 	m_dpi = fetchDpi();
-	if (hasOutputDpi()) m_outputDpi = fetchDpi("output-dpi");
-	if (hasMargins()) m_margins = fetchMargins();
-	if (hasAlignment()) m_alignment = fetchAlignment();
-	if (hasContentDetection()) m_contentDetection = fetchContentDetection();
-	if (hasContentRect()) m_contentRect = fetchContentRect();
-	if (hasOrientation()) m_orientation = fetchOrientation();
-	if (hasThreshold()) m_threshold = fetchThreshold();
-	if (hasDeskewAngle()) m_deskewAngle = fetchDeskewAngle();
-	if (hasStartFilterIdx()) m_startFilterIdx = fetchStartFilterIdx();
-	if (hasEndFilterIdx()) m_endFilterIdx = fetchEndFilterIdx();
+	m_outputDpi = fetchDpi("output-dpi");
+	m_margins = fetchMargins();
+	m_alignment = fetchAlignment();
+	m_contentDetection = fetchContentDetection();
+	m_contentRect = fetchContentRect();
+	m_orientation = fetchOrientation();
+	m_threshold = fetchThreshold();
+	m_deskewAngle = fetchDeskewAngle();
+	m_startFilterIdx = fetchStartFilterIdx();
+	m_endFilterIdx = fetchEndFilterIdx();
 }
 
 
@@ -245,11 +245,11 @@ CommandLine::fetchLayoutType()
 	if (!hasLayout())
 		return lt;
 
-	if (m_options["layout"] == "1")
+	if (m_options.value("layout") == "1")
 		lt = page_split::SINGLE_PAGE_UNCUT;
-	else if (m_options["layout"] == "1.5")
+	else if (m_options.value("layout") == "1.5")
 		lt = page_split::PAGE_PLUS_OFFCUT;
-	else if (m_options["layout"] == "2")
+	else if (m_options.value("layout") == "2")
 		lt = page_split::TWO_PAGES;
 
 	return lt;
@@ -262,7 +262,7 @@ CommandLine::fetchLayoutDirection()
 	if (!hasLayoutDirection())
 		return l;
 
-	QString ld = m_options["layout-direction"].toLower();
+	QString ld = m_options.value("layout-direction").toLower();
 	if (ld == "rl")
 		l = Qt::RightToLeft;
 
@@ -276,14 +276,14 @@ CommandLine::fetchDpi(QString oname)
 	int ydpi=600;
 
 	if (m_options.contains(oname+"-x")) {
-		xdpi = m_options[oname+"-x"].toInt();
+		xdpi = m_options.value(oname+"-x").toInt();
 	}
 	if (m_options.contains(oname+"-y")) {
-		ydpi = m_options[oname+"-y"].toInt();
+		ydpi = m_options.value(oname+"-y").toInt();
 	}
 	if (m_options.contains(oname)) {
-		xdpi = m_options[oname].toInt();
-		ydpi = m_options[oname].toInt();
+		xdpi = m_options.value(oname).toInt();
+		ydpi = m_options.value(oname).toInt();
 	}
 
 	return Dpi(xdpi, ydpi);
@@ -292,7 +292,7 @@ CommandLine::fetchDpi(QString oname)
 output::ColorParams::ColorMode
 CommandLine::fetchColorMode()
 {
-	QString cm = m_options["color-mode"].toLower();
+	QString cm = m_options.value("color-mode").toLower();
 	
 	if (cm == "color_grayscale")
 		return output::ColorParams::COLOR_GRAYSCALE;
@@ -309,7 +309,7 @@ CommandLine::fetchMargins()
 	Margins margins(page_layout::Settings::defaultHardMarginsMM());
 
 	if (m_options.contains("margins")) {
-		double m = m_options["margins"].toDouble();
+		double m = m_options.value("margins").toDouble();
 		margins.setTop(m);
 		margins.setBottom(m);
 		margins.setLeft(m);
@@ -317,13 +317,13 @@ CommandLine::fetchMargins()
 	}
 
 	if (m_options.contains("margins-left"))
-		margins.setLeft(m_options["margins-left"].toFloat());
+		margins.setLeft(m_options.value("margins-left").toFloat());
 	if (m_options.contains("margins-right"))
-		margins.setRight(m_options["margins-right"].toFloat());
+		margins.setRight(m_options.value("margins-right").toFloat());
 	if (m_options.contains("margins-top"))
-		margins.setTop(m_options["margins-top"].toFloat());
+		margins.setTop(m_options.value("margins-top").toFloat());
 	if (m_options.contains("margins-bottom"))
-		margins.setBottom(m_options["margins-bottom"].toFloat());
+		margins.setBottom(m_options.value("margins-bottom").toFloat());
 
 	return margins;
 }
@@ -339,14 +339,14 @@ CommandLine::fetchAlignment()
 	}
 
 	if (m_options.contains("alignment-vertical")) {
-		QString a = m_options["alignment-vertical"].toLower();
+		QString a = m_options.value("alignment-vertical").toLower();
 		if (a == "top") alignment.setVertical(page_layout::Alignment::TOP);
 		if (a == "center") alignment.setVertical(page_layout::Alignment::VCENTER);
 		if (a == "bottom") alignment.setVertical(page_layout::Alignment::BOTTOM);
 	}
 
 	if (m_options.contains("alignment-horizontal")) {
-		QString a = m_options["alignment-horizontal"].toLower();
+		QString a = m_options.value("alignment-horizontal").toLower();
 		if (a == "left") alignment.setHorizontal(page_layout::Alignment::LEFT);
 		if (a == "center") alignment.setHorizontal(page_layout::Alignment::HCENTER);
 		if (a == "right") alignment.setHorizontal(page_layout::Alignment::RIGHT);
@@ -360,8 +360,8 @@ CommandLine::fetchContentDetection()
 {
 	Despeckle::Level level = Despeckle::NORMAL;
 
-	if (m_options["content-detection"] != "") {
-		QString cm = m_options["content-detection"].toLower();
+	if (m_options.value("content-detection") != "") {
+		QString cm = m_options.value("content-detection").toLower();
 		if (cm == "cautious")
 			level = Despeckle::CAUTIOUS;
 		else if (cm == "aggressive")
@@ -380,11 +380,11 @@ CommandLine::fetchContentRect()
 
 	QRegExp rx("([\\d\\.]+)x([\\d\\.]+):([\\d\\.]+)x([\\d\\.]+)");
 
-	if (rx.exactMatch(m_options["content-box"])) {
+	if (rx.exactMatch(m_options.value("content-box"))) {
 		return QRectF(rx.cap(1).toFloat(), rx.cap(2).toFloat(), rx.cap(3).toFloat(), rx.cap(4).toFloat());
 	}
 
-	std::cout << "invalid --content-box=" << m_options["content-box"].toAscii().constData() << "\n";
+	std::cout << "invalid --content-box=" << m_options.value("content-box").toAscii().constData() << "\n";
 	exit(1);
 }
 
@@ -396,7 +396,7 @@ CommandLine::fetchOrientation()
 		return TOP;
 
 	Orientation orient;
-	QString cli_orient = m_options["orientation"];
+	QString cli_orient = m_options.value("orientation");
 
 	if (cli_orient == "left") {
 		orient = LEFT;
@@ -405,7 +405,7 @@ CommandLine::fetchOrientation()
 	} else if (cli_orient == "upsidedown") {
 		orient = UPSIDEDOWN;
 	} else {
-		std::cout << "Wrong orientation " << m_options["orientation"].toAscii().constData() << "\n";
+		std::cout << "Wrong orientation " << m_options.value("orientation").toAscii().constData() << "\n";
 		exit(1);
 	}
 
@@ -419,7 +419,7 @@ CommandLine::fetchOutputProjectFile()
 	if (!hasOutputProject())
 		return QString();
 
-	return m_options["output-project"];
+	return m_options.value("output-project");
 }
 
 int
@@ -428,7 +428,7 @@ CommandLine::fetchThreshold()
 	if (!hasThreshold())
 		return 0;
 
-	return m_options["threshold"].toInt();
+	return m_options.value("threshold").toInt();
 }
 
 double
@@ -437,7 +437,7 @@ CommandLine::fetchDeskewAngle()
 	if (!hasDeskewAngle())
 		return 0.0;
 
-	return m_options["rotate"].toDouble();
+	return m_options.value("rotate").toDouble();
 }
 
 int
@@ -446,7 +446,7 @@ CommandLine::fetchStartFilterIdx()
 	if (!hasStartFilterIdx())
 		return 0;
 
-	return m_options["start-filter"].toInt() - 1;
+	return m_options.value("start-filter").toInt() - 1;
 }
 
 int
@@ -455,7 +455,7 @@ CommandLine::fetchEndFilterIdx()
 	if (!hasEndFilterIdx())
 		return 5;
 
-	return m_options["end-filter"].toInt() - 1;
+	return m_options.value("end-filter").toInt() - 1;
 }
 
 output::DewarpingMode
@@ -464,7 +464,7 @@ CommandLine::fetchDewarpingMode()
 	if (!hasDewarping())
 		return output::DewarpingMode::OFF;
 
-	return output::DewarpingMode(m_options["dewarping"].toLower());
+	return output::DewarpingMode(m_options.value("dewarping").toLower());
 }
 
 output::DespeckleLevel
@@ -473,7 +473,7 @@ CommandLine::fetchDespeckleLevel()
 	if (!hasDespeckle())
 		return output::DESPECKLE_NORMAL;
 
-	return output::despeckleLevelFromString(m_options["despeckle"]);
+	return output::despeckleLevelFromString(m_options.value("despeckle"));
 }
 
 output::DepthPerception
@@ -482,7 +482,7 @@ CommandLine::fetchDepthPerception()
 	if (!hasDepthPerception())
 		return output::DepthPerception();
 
-	return output::DepthPerception(m_options["depth-perception"]);
+	return output::DepthPerception(m_options.value("depth-perception"));
 }
 
 bool
