@@ -12,8 +12,8 @@ Scan Tailor is [Free Software](https://www.gnu.org/philosophy/free-sw.html) (whi
 
 This project started in late 2007 and by mid 2010 it reached production quality. In 2014, the original developer Joseph Artsimovich stepped aside, and Nate Craun took over as the new maintainer.
 
-Scan Tailer is being used not just by enthusiasts, but also by libraries and other institutions. A few books processed by Scan Tailor even ended up on Google Books.
+Scan Tailor is being used not just by enthusiasts, but also by libraries and other institutions. A few books processed by Scan Tailor even ended up on Google Books.
 
 ## Project
 
-Contrabutions from other developers are welcomed and encouraged at the [Github project page](https://github.com/scantailor/scantailor).
+Contributions from other developers are welcomed and encouraged at the [Github project page](https://github.com/scantailor/scantailor).
