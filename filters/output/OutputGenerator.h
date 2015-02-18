@@ -40,6 +40,10 @@
 //begin of modified by monday2000
 //Picture_Shape
 #include "Params.h"
+//Quadro_Zoner
+#include "PageId.h"
+#include "IntrusivePtr.h"
+#include "Settings.h"
 //end of modified by monday2000
 
 class TaskStatus;
@@ -100,7 +104,9 @@ public:
 	 */
 	QImage process(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
@@ -117,6 +123,8 @@ public:
 //Picture_Shape
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
 //end of modified by monday2000
 	
@@ -129,11 +137,13 @@ public:
 private:
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//begin of modified by monday2000
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
-//begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //Original_Foreground_Mixed
 //added:		
@@ -147,6 +157,8 @@ private:
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0, 
 		PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
 //end of modified by monday2000
 
@@ -158,8 +170,10 @@ private:
 
 	QImage processWithoutDewarping(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 //begin of modified by monday2000
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 //Dont_Equalize_Illumination_Pic_Zones
 //added:		
 		bool dont_equalize_illumination_pic_zones,
@@ -170,12 +184,16 @@ private:
 //Picture_Shape
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
 //end of modified by monday2000
 
 	QImage processWithDewarping(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
@@ -192,6 +210,8 @@ private:
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0,
 		PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
 //end of modified by monday2000
 	

@@ -282,7 +282,9 @@ OutputGenerator::OutputGenerator(
 QImage
 OutputGenerator::process(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 	DewarpingMode dewarping_mode,
 	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
@@ -300,6 +302,9 @@ OutputGenerator::process(
 	//DebugImages* const dbg) const
 	DebugImages* const dbg,
 	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
 	) const
 //end of modified by monday2000
 {
@@ -318,6 +323,9 @@ OutputGenerator::process(
 //begin of modified by monday2000
 //Picture_Shape
 			, picture_shape
+//Quadro_Zoner
+			, p_pageId,
+			p_settings
 //end of modified by monday2000
 		)
 	);
@@ -495,7 +503,9 @@ OutputGenerator::modifyBinarizationMask(
 QImage
 OutputGenerator::processImpl(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 	DewarpingMode dewarping_mode,
 	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
@@ -513,6 +523,9 @@ OutputGenerator::processImpl(
 	//DebugImages* const dbg) const
 	DebugImages* const dbg,
 	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
 	) const
 //end of modified by monday2000
 {
@@ -535,6 +548,9 @@ OutputGenerator::processImpl(
 //begin of modified by monday2000
 //Picture_Shape
 					, picture_shape
+//Quadro_Zoner
+					, p_pageId,
+					p_settings
 //end of modified by monday2000
 					);
 		} else return processAsIs(
@@ -558,6 +574,9 @@ OutputGenerator::processImpl(
 //begin of modified by monday2000
 //Picture_Shape
 			, picture_shape
+//Quadro_Zoner
+			, p_pageId,
+			p_settings
 //end of modified by monday2000
 		);
 	} else if (!render_params.whiteMargins()) {
@@ -576,6 +595,9 @@ OutputGenerator::processImpl(
 //begin of modified by monday2000
 //Picture_Shape
 			, picture_shape
+//Quadro_Zoner
+			, p_pageId,
+			p_settings
 //end of modified by monday2000
 		);
 	}
@@ -635,7 +657,9 @@ OutputGenerator::processAsIs(
 QImage
 OutputGenerator::processWithoutDewarping(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 //begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //added:	
@@ -648,6 +672,9 @@ OutputGenerator::processWithoutDewarping(
 	//DebugImages* dbg) const
 	DebugImages* dbg,
 	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
 	) const
 //end of modified by monday2000
 {
@@ -789,10 +816,49 @@ QImage maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
 		);
 //begin of modified by monday2000
 //Picture_Shape
+//Quadro_Zoner
 		if (picture_shape == RECTANGULAR_SHAPE)
 		{
 			bw_mask.rectangularizeAreas(WHITE);
+
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
 		}		
+		else if (picture_shape == QUADRO_SHAPE)
+		{
+			if (picture_zones.auto_zones_found())
+				bw_mask.fill(BLACK);
+			else
+			{
+				std::vector<QRect> areas;
+				bw_mask.rectangularizeAreasTest(WHITE, areas);				
+
+				QTransform xform1(m_xform.transform());            
+				xform1 *= QTransform().translate(-small_margins_rect.x(), -small_margins_rect.y());
+
+				QTransform inv_xform(xform1.inverted()); 
+
+				for (int i=0; i<(int)areas.size(); i++)
+				{				
+					QRectF area0(areas[i]);
+					QPolygonF area1(area0);
+					QPolygonF area(inv_xform.map(area1));
+
+					Zone zone1(area);
+
+					picture_zones.add(zone1);
+				}
+
+				(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+			}
+		}
+		else
+		{
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+		}
 //end of modified by monday2000
 
 		if (dbg) {
@@ -938,7 +1004,9 @@ QImage maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
 QImage
 OutputGenerator::processWithDewarping(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 	DewarpingMode dewarping_mode,
 	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
@@ -956,6 +1024,9 @@ OutputGenerator::processWithDewarping(
 	//DebugImages* dbg) const
 	DebugImages* dbg,
 	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
 	) const
 //end of modified by monday2000
 {
@@ -1120,10 +1191,49 @@ OutputGenerator::processWithDewarping(
 
 //begin of modified by monday2000
 //Picture_Shape
+//Quadro_Zoner
 		if (picture_shape == RECTANGULAR_SHAPE)
 		{
 			warped_bw_mask.rectangularizeAreas(WHITE);
+
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
 		}		
+		else if (picture_shape == QUADRO_SHAPE)
+		{
+			if (picture_zones.auto_zones_found())
+				warped_bw_mask.fill(BLACK);
+			else
+			{
+				std::vector<QRect> areas;
+				warped_bw_mask.rectangularizeAreasTest(WHITE, areas);				
+
+				QTransform xform1(m_xform.transform());            
+				xform1 *= QTransform().translate(-small_margins_rect.x(), -small_margins_rect.y());
+
+				QTransform inv_xform(xform1.inverted()); 
+
+				for (int i=0; i<(int)areas.size(); i++)
+				{				
+					QRectF area0(areas[i]);
+					QPolygonF area1(area0);
+					QPolygonF area(inv_xform.map(area1));
+
+					Zone zone1(area);
+
+					picture_zones.add(zone1);
+				}			
+
+				(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+			}
+		}
+		else
+		{
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+		}
 //end of modified by monday2000
 
 		status.throwIfCancelled();

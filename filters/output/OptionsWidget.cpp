@@ -68,6 +68,7 @@ OptionsWidget::OptionsWidget(
 //Picture_Shape
 	pictureShapeSelector->addItem(tr("Free"), FREE_SHAPE);
 	pictureShapeSelector->addItem(tr("Surrounded"), RECTANGULAR_SHAPE);
+	pictureShapeSelector->addItem(tr("Quadro"), QUADRO_SHAPE);
 	labePictureShape->setText(tr("Picture Shape"));
 //end of modified by monday2000	
 	darkerThresholdLink->setText(

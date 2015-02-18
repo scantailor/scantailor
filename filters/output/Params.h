@@ -33,7 +33,9 @@ namespace output
 {
 //begin of modified by monday2000
 //Picture_Shape
-	enum PictureShape { FREE_SHAPE, RECTANGULAR_SHAPE};
+	enum PictureShape { FREE_SHAPE, RECTANGULAR_SHAPE, 
+//Quadro_Zoner		
+		QUADRO_SHAPE };
 //end of modified by monday2000
 
 class Params
@@ -85,7 +87,7 @@ private:
 	dewarping::DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
-	DespeckleLevel m_despeckleLevel;
+	DespeckleLevel m_despeckleLevel;	
 //begin of modified by monday2000
 //Picture_Shape
 	PictureShape m_pictureShape;
