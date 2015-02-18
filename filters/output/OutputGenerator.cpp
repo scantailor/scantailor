@@ -295,7 +295,13 @@ OutputGenerator::process(
 //end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* const dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* const dbg) const
+	DebugImages* const dbg,
+	PictureShape picture_shape
+	) const
+//end of modified by monday2000
 {
 	QImage image(
 		processImpl(
@@ -309,6 +315,10 @@ OutputGenerator::process(
 			keep_orig_fore_subscan,
 //end of modified by monday2000
 			auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+			, picture_shape
+//end of modified by monday2000
 		)
 	);
 	assert(!image.isNull());
@@ -498,7 +508,13 @@ OutputGenerator::processImpl(
 //end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* const dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* const dbg) const
+	DebugImages* const dbg,
+	PictureShape picture_shape
+	) const
+//end of modified by monday2000
 {
 	RenderParams const render_params(m_colorParams);
 
@@ -516,6 +532,10 @@ OutputGenerator::processImpl(
 					dont_equalize_illumination_pic_zones,
 					keep_orig_fore_subscan,
 					auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+					, picture_shape
+//end of modified by monday2000
 					);
 		} else return processAsIs(
 			input, status, fill_zones, depth_perception, dbg
@@ -535,6 +555,10 @@ OutputGenerator::processImpl(
 			false,
 //end of modified by monday2000
 			auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+			, picture_shape
+//end of modified by monday2000
 		);
 	} else if (!render_params.whiteMargins()) {
 		return processAsIs(
@@ -549,6 +573,10 @@ OutputGenerator::processImpl(
 			dont_equalize_illumination_pic_zones,
 //end of modified by monday2000
 			auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+			, picture_shape
+//end of modified by monday2000
 		);
 	}
 }
@@ -615,7 +643,13 @@ OutputGenerator::processWithoutDewarping(
 //end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* dbg) const
+	DebugImages* dbg,
+	PictureShape picture_shape
+	) const
+//end of modified by monday2000
 {
 	RenderParams const render_params(m_colorParams);
 	
@@ -753,6 +787,14 @@ QImage maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
 			normalize_illumination_rect,
 			small_margins_rect, dbg
 		);
+//begin of modified by monday2000
+//Picture_Shape
+		if (picture_shape == RECTANGULAR_SHAPE)
+		{
+			bw_mask.rectangularizeAreas(WHITE);
+		}		
+//end of modified by monday2000
+
 		if (dbg) {
 			dbg->add(bw_mask, "bw_mask");
 		}
@@ -909,7 +951,13 @@ OutputGenerator::processWithDewarping(
 //end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* dbg) const
+	DebugImages* dbg,
+	PictureShape picture_shape
+	) const
+//end of modified by monday2000
 {
 	QSize const target_size(m_outRect.size().expandedTo(QSize(1, 1)));
 	if (m_outRect.isEmpty()) {
@@ -1069,6 +1117,14 @@ OutputGenerator::processWithDewarping(
 		if (dbg) {
 			dbg->add(warped_bw_mask, "warped_bw_mask");
 		}
+
+//begin of modified by monday2000
+//Picture_Shape
+		if (picture_shape == RECTANGULAR_SHAPE)
+		{
+			warped_bw_mask.rectangularizeAreas(WHITE);
+		}		
+//end of modified by monday2000
 
 		status.throwIfCancelled();
 

@@ -199,7 +199,11 @@ Task::process(
 		generator.outputImageSize(), generator.outputContentRect(),
 		new_xform, params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
+//begin of modified by monday2000
+//Picture_Shape
 		params.depthPerception(), params.despeckleLevel() 
+		, params.pictureShape()
+//end of modified by monday2000
 	);
 
 	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
@@ -243,6 +247,10 @@ Task::process(
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
+//begin of modified by monday2000
+//Picture_Shape
+			, params.pictureShape()
+//end of modified by monday2000
 		);	
 
 //Original_Foreground_Mixed
@@ -375,6 +383,10 @@ Task::process(
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
+//begin of modified by monday2000
+//Picture_Shape
+			, params.pictureShape()
+//end of modified by monday2000
 		);
 
 		if (params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid()) {

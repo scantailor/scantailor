@@ -36,11 +36,20 @@ OutputImageParams::OutputImageParams(
 	DewarpingMode const& dewarping_mode,
 	dewarping::DistortionModel const& distortion_model,
 	DepthPerception const& depth_perception,
-	DespeckleLevel const despeckle_level)
+//begin of modified by monday2000
+//Picture_Shape
+	//DespeckleLevel const despeckle_level)
+	DespeckleLevel const despeckle_level,
+	PictureShape const picture_shape)
+//end of modified by monday2000
 :	m_size(out_image_size),
 	m_contentRect(content_rect),
 	m_dpi(dpi),
 	m_colorParams(color_params),
+//begin of modified by monday2000
+//Picture_Shape
+	m_pictureShape(picture_shape),
+//end of modified by monday2000
 	m_distortionModel(distortion_model),
 	m_depthPerception(depth_perception),
 	m_dewarpingMode(dewarping_mode),
@@ -106,6 +115,13 @@ OutputImageParams::matches(OutputImageParams const& other) const
 			other.m_colorParams, other.m_despeckleLevel)) {
 		return false;
 	}
+
+//begin of modified by monday2000
+//Picture_Shape
+	if (m_pictureShape != other.m_pictureShape) {
+		return false;
+	}
+//end of modified by monday2000
 
 	if (m_dewarpingMode != other.m_dewarpingMode) {
 		return false;

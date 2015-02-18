@@ -31,6 +31,10 @@ class QDomElement;
 
 namespace output
 {
+//begin of modified by monday2000
+//Picture_Shape
+	enum PictureShape { FREE_SHAPE, RECTANGULAR_SHAPE};
+//end of modified by monday2000
 
 class Params
 {
@@ -44,7 +48,11 @@ public:
 	void setOutputDpi(Dpi const& dpi) { m_dpi = dpi; }
 	
 	ColorParams const& colorParams() const { return m_colorParams; }
-
+//begin of modified by monday2000
+//Picture_Shape
+	PictureShape pictureShape() const { return m_pictureShape; }
+	void setPictureShape(PictureShape ps) { m_pictureShape = ps; }
+//end of modified by monday2000
 	void setColorParams(ColorParams const& params) { m_colorParams = params; }
 
 	DewarpingMode const& dewarpingMode() const { return m_dewarpingMode; }
@@ -71,12 +79,17 @@ private:
 	
 	static QString formatColorMode(ColorParams::ColorMode mode);
 	
-	Dpi m_dpi;
 	ColorParams m_colorParams;
+
+	Dpi m_dpi;
 	dewarping::DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;
+//begin of modified by monday2000
+//Picture_Shape
+	PictureShape m_pictureShape;
+//end of modified by monday2000	
 };
 
 } // namespace output

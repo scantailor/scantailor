@@ -37,6 +37,10 @@
 #include <vector>
 #include <utility>
 #include <stdint.h>
+//begin of modified by monday2000
+//Picture_Shape
+#include "Params.h"
+//end of modified by monday2000
 
 class TaskStatus;
 class DebugImages;
@@ -109,7 +113,12 @@ public:
 //end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0) const;
+//begin of modified by monday2000
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
+		) const;
+//end of modified by monday2000
 	
 	QSize outputImageSize() const;
 	
@@ -133,7 +142,13 @@ private:
 //end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0) const;
+//begin of modified by monday2000
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0, 
+		PictureShape picture_shape=FREE_SHAPE
+		) const;
+//end of modified by monday2000
 
 	QImage processAsIs(
 		FilterData const& input, TaskStatus const& status,
@@ -151,7 +166,12 @@ private:
 //end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0) const;
+//begin of modified by monday2000
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
+		) const;
+//end of modified by monday2000
 
 	QImage processWithDewarping(
 		TaskStatus const& status, FilterData const& input,
@@ -167,7 +187,13 @@ private:
 //end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0) const;
+//begin of modified by monday2000
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0,
+		PictureShape picture_shape=FREE_SHAPE
+		) const;
+//end of modified by monday2000
 	
 	void setupTrivialDistortionModel(dewarping::DistortionModel& distortion_model) const;
 
