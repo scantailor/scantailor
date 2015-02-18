@@ -58,7 +58,11 @@ public:
 		PictureShape picture_shape);
 //end of modified by monday2000
 	
-	explicit OutputImageParams(QDomElement const& el);
+//begin of modified by monday2000
+//Picture_Shape_Bug	
+	//explicit OutputImageParams(QDomElement const& el);
+	explicit OutputImageParams(QDomElement const& el, int picture_shape_int=0);
+//end of modified by monday2000
 
 	DewarpingMode const& dewarpingMode() const { return m_dewarpingMode; }
 

@@ -167,6 +167,8 @@ MainWindow::MainWindow()
 //Export_Subscans
 //added:
 	m_outpaths_vector(0),
+//Picture_Shape_Bug
+	//m_closing(false)
 	m_closing(false),
 //Export_Subscans
 	m_exportTimerId(0),
