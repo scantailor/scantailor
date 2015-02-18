@@ -638,121 +638,121 @@ Taxman</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="628"/>
+        <location filename="../MainWindow.cpp" line="622"/>
         <source>Save Project</source>
         <translation>Запазване на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="595"/>
+        <location filename="../MainWindow.cpp" line="589"/>
         <source>The files export is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="595"/>
-        <location filename="../MainWindow.cpp" line="2050"/>
+        <location filename="../MainWindow.cpp" line="589"/>
+        <location filename="../MainWindow.cpp" line="2044"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="628"/>
+        <location filename="../MainWindow.cpp" line="622"/>
         <source>Save this project?</source>
         <translation type="unfinished">Да се запази ли този проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1104"/>
+        <location filename="../MainWindow.cpp" line="1098"/>
         <source>Insert before ...</source>
         <translation type="unfinished">Вмъкни преди...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1107"/>
+        <location filename="../MainWindow.cpp" line="1101"/>
         <source>Insert after ...</source>
         <translation type="unfinished">Вмъкни след...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1113"/>
+        <location filename="../MainWindow.cpp" line="1107"/>
         <source>Remove from project ...</source>
         <translation type="unfinished">Премахване от проекта...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1134"/>
+        <location filename="../MainWindow.cpp" line="1128"/>
         <source>Insert here ...</source>
         <translation type="unfinished">Вмъкни тук ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1472"/>
-        <location filename="../MainWindow.cpp" line="1540"/>
+        <location filename="../MainWindow.cpp" line="1466"/>
+        <location filename="../MainWindow.cpp" line="1534"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished">Проекти на Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1533"/>
         <source>Open Project</source>
         <translation type="unfinished">Отваряне на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1557"/>
-        <location filename="../MainWindow.cpp" line="1566"/>
-        <location filename="../MainWindow.cpp" line="1840"/>
-        <location filename="../MainWindow.cpp" line="1918"/>
-        <location filename="../MainWindow.cpp" line="1925"/>
-        <location filename="../MainWindow.cpp" line="2058"/>
-        <location filename="../MainWindow.cpp" line="2065"/>
-        <location filename="../MainWindow.cpp" line="2342"/>
-        <location filename="../MainWindow.cpp" line="2373"/>
+        <location filename="../MainWindow.cpp" line="1551"/>
+        <location filename="../MainWindow.cpp" line="1560"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
+        <location filename="../MainWindow.cpp" line="1912"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
+        <location filename="../MainWindow.cpp" line="2052"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
+        <location filename="../MainWindow.cpp" line="2336"/>
+        <location filename="../MainWindow.cpp" line="2367"/>
         <source>Error</source>
         <translation type="unfinished">Грешка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1558"/>
+        <location filename="../MainWindow.cpp" line="1552"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished">Проектният файл не може да бъде отворен.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1567"/>
+        <location filename="../MainWindow.cpp" line="1561"/>
         <source>The project file is broken.</source>
         <translation type="unfinished">Проектният файл е повреден.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
         <source>is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1918"/>
-        <location filename="../MainWindow.cpp" line="2058"/>
+        <location filename="../MainWindow.cpp" line="1912"/>
+        <location filename="../MainWindow.cpp" line="2052"/>
         <source>Batch processing is in the progress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1925"/>
-        <location filename="../MainWindow.cpp" line="2065"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
         <source>No project is loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2050"/>
+        <location filename="../MainWindow.cpp" line="2044"/>
         <source>The files export is stopped by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2235"/>
+        <location filename="../MainWindow.cpp" line="2229"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation type="unfinished">Изходният резулат все още не е възможен, тъй като не се знае крайният размер на страниците.
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2425"/>
+        <location filename="../MainWindow.cpp" line="2419"/>
         <source>Files to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2480"/>
+        <location filename="../MainWindow.cpp" line="2474"/>
         <source>Skip failed files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -763,18 +763,18 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2268"/>
+        <location filename="../MainWindow.cpp" line="2262"/>
         <source>Unnamed</source>
         <translation type="unfinished">Без име</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2275"/>
+        <location filename="../MainWindow.cpp" line="2269"/>
         <source>%2 - Scan Tailor Featured %3 [%1bit]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2343"/>
-        <location filename="../MainWindow.cpp" line="2374"/>
+        <location filename="../MainWindow.cpp" line="2337"/>
+        <location filename="../MainWindow.cpp" line="2368"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished">Грешка при запазване на проектния файл!</translation>
     </message>
@@ -783,7 +783,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Файл за вмъкване</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2431"/>
+        <location filename="../MainWindow.cpp" line="2425"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished">Изображения, които не са в проекта (%1)</translation>
     </message>
@@ -796,7 +796,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страница %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2527"/>
+        <location filename="../MainWindow.cpp" line="2521"/>
         <source>Remove</source>
         <translation type="unfinished">Премахване</translation>
     </message>
@@ -972,7 +972,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="525"/>
+        <location filename="../MainWindow.cpp" line="519"/>
         <source>Stop batch processing</source>
         <translation type="unfinished">Спиране на масовата обработка</translation>
     </message>
@@ -1264,37 +1264,42 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>Автоматично (експериментален)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="52"/>
         <source>Manual</source>
         <translation>Ръчно</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="62"/>
+        <source>Marginal (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="72"/>
         <source>Scope</source>
         <translation>Обхват</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="78"/>
         <source>This page only</source>
         <translation>Само тази страница</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="88"/>
         <source>All pages</source>
         <translation>Всички страници</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="95"/>
         <source>This page and the following ones</source>
         <translation>Тази и следващите страници</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="111"/>
         <source>Selected pages</source>
         <translation>Избраните страници</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="144"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Използвайте Ctrl+Click / Shift+Click за да изберете множество страници.</translation>
     </message>
@@ -2344,60 +2349,65 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <translation>Прилагане почистването на шум</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="525"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="530"/>
         <source>Apply Depth Perception</source>
         <translation>Прилагане на дълбочина</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="718"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="728"/>
         <source>Off</source>
         <translation>Изключено</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="721"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
         <source>Auto</source>
         <translation>Автоматично</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="724"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
         <source>Manual</source>
         <translation>Ръчно</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="739"/>
+        <source>Marginal</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="599"/>
+        <location filename="../filters/output/Task.cpp" line="604"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="651"/>
+        <location filename="../filters/output/Task.cpp" line="656"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="668"/>
+        <location filename="../filters/output/Task.cpp" line="673"/>
         <source>Output</source>
         <translation>Краен резултат</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="669"/>
+        <location filename="../filters/output/Task.cpp" line="674"/>
         <source>Picture Zones</source>
         <translation>Зони за изображения</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="670"/>
+        <location filename="../filters/output/Task.cpp" line="675"/>
         <source>Fill Zones</source>
         <translation>Запълване на зони</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="671"/>
+        <location filename="../filters/output/Task.cpp" line="676"/>
         <source>Dewarping</source>
         <translation>Корекция изкривявания</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="672"/>
+        <location filename="../filters/output/Task.cpp" line="677"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
     </message>

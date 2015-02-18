@@ -585,137 +585,137 @@ Taxman</translation>
     <name>MainWindow</name>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="628"/>
+        <location filename="../MainWindow.cpp" line="622"/>
         <source>Save Project</source>
         <translation>儲存專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="595"/>
+        <location filename="../MainWindow.cpp" line="589"/>
         <source>The files export is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="595"/>
-        <location filename="../MainWindow.cpp" line="2050"/>
+        <location filename="../MainWindow.cpp" line="589"/>
+        <location filename="../MainWindow.cpp" line="2044"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="628"/>
+        <location filename="../MainWindow.cpp" line="622"/>
         <source>Save this project?</source>
         <translation type="unfinished">是否要儲存此專案?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1104"/>
+        <location filename="../MainWindow.cpp" line="1098"/>
         <source>Insert before ...</source>
         <translation type="unfinished">插入在此之前...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1107"/>
+        <location filename="../MainWindow.cpp" line="1101"/>
         <source>Insert after ...</source>
         <translation type="unfinished">插入在此之後...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1113"/>
+        <location filename="../MainWindow.cpp" line="1107"/>
         <source>Remove from project ...</source>
         <translation type="unfinished">從專案中移除...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1134"/>
+        <location filename="../MainWindow.cpp" line="1128"/>
         <source>Insert here ...</source>
         <translation type="unfinished">在此插入...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1472"/>
-        <location filename="../MainWindow.cpp" line="1540"/>
+        <location filename="../MainWindow.cpp" line="1466"/>
+        <location filename="../MainWindow.cpp" line="1534"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished">Scan Tailor 專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1533"/>
         <source>Open Project</source>
         <translation type="unfinished">開啟專案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1557"/>
-        <location filename="../MainWindow.cpp" line="1566"/>
-        <location filename="../MainWindow.cpp" line="1840"/>
-        <location filename="../MainWindow.cpp" line="1918"/>
-        <location filename="../MainWindow.cpp" line="1925"/>
-        <location filename="../MainWindow.cpp" line="2058"/>
-        <location filename="../MainWindow.cpp" line="2065"/>
-        <location filename="../MainWindow.cpp" line="2342"/>
-        <location filename="../MainWindow.cpp" line="2373"/>
+        <location filename="../MainWindow.cpp" line="1551"/>
+        <location filename="../MainWindow.cpp" line="1560"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
+        <location filename="../MainWindow.cpp" line="1912"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
+        <location filename="../MainWindow.cpp" line="2052"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
+        <location filename="../MainWindow.cpp" line="2336"/>
+        <location filename="../MainWindow.cpp" line="2367"/>
         <source>Error</source>
         <translation type="unfinished">錯誤</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1558"/>
+        <location filename="../MainWindow.cpp" line="1552"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished">無法開啟專案檔.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1567"/>
+        <location filename="../MainWindow.cpp" line="1561"/>
         <source>The project file is broken.</source>
         <translation type="unfinished">專案檔已毀損.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
         <source>is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1918"/>
-        <location filename="../MainWindow.cpp" line="2058"/>
+        <location filename="../MainWindow.cpp" line="1912"/>
+        <location filename="../MainWindow.cpp" line="2052"/>
         <source>Batch processing is in the progress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1925"/>
-        <location filename="../MainWindow.cpp" line="2065"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
         <source>No project is loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2050"/>
+        <location filename="../MainWindow.cpp" line="2044"/>
         <source>The files export is stopped by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2235"/>
+        <location filename="../MainWindow.cpp" line="2229"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation type="unfinished">目前無法輸出,因為沒有指定輸出的頁面範圍.
 請使用批次處理中的&quot;內容選擇&quot;或&quot;邊界&quot;項目來偵測與指定範圍.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2268"/>
+        <location filename="../MainWindow.cpp" line="2262"/>
         <source>Unnamed</source>
         <translation type="unfinished">未命名</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2275"/>
+        <location filename="../MainWindow.cpp" line="2269"/>
         <source>%2 - Scan Tailor Featured %3 [%1bit]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2343"/>
-        <location filename="../MainWindow.cpp" line="2374"/>
+        <location filename="../MainWindow.cpp" line="2337"/>
+        <location filename="../MainWindow.cpp" line="2368"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished">儲存時發生錯誤!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2425"/>
+        <location filename="../MainWindow.cpp" line="2419"/>
         <source>Files to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2480"/>
+        <location filename="../MainWindow.cpp" line="2474"/>
         <source>Skip failed files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -724,7 +724,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation type="obsolete">插入檔案</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2431"/>
+        <location filename="../MainWindow.cpp" line="2425"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished">專案外的圖片 (%1)</translation>
     </message>
@@ -733,7 +733,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation type="obsolete">開啟影像時發生錯誤.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2527"/>
+        <location filename="../MainWindow.cpp" line="2521"/>
         <source>Remove</source>
         <translation type="unfinished">移除</translation>
     </message>
@@ -899,7 +899,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="525"/>
+        <location filename="../MainWindow.cpp" line="519"/>
         <source>Stop batch processing</source>
         <translation type="unfinished">停止批次處理</translation>
     </message>
@@ -1192,37 +1192,42 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Mar
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="52"/>
         <source>Manual</source>
         <translation type="unfinished">手動</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="62"/>
+        <source>Marginal (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="72"/>
         <source>Scope</source>
         <translation type="unfinished">範圍</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="78"/>
         <source>This page only</source>
         <translation type="unfinished">只有這一頁</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="88"/>
         <source>All pages</source>
         <translation type="unfinished">所有頁面</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="95"/>
         <source>This page and the following ones</source>
         <translation type="unfinished">本頁及以下的頁面</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="111"/>
         <source>Selected pages</source>
         <translation type="unfinished">選擇的頁面</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="144"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation type="unfinished">使用 Ctrl或Shift+滑鼠左鍵來選擇多個頁面.</translation>
     </message>
@@ -2204,60 +2209,65 @@ p, li { white-space: pre-wrap; }
         <translation>套用雜點清除</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="525"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="530"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="718"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="728"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="721"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
         <source>Auto</source>
         <translation type="unfinished">自動</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="724"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
         <source>Manual</source>
         <translation type="unfinished">手動</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="739"/>
+        <source>Marginal</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="599"/>
+        <location filename="../filters/output/Task.cpp" line="604"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>圖形範圍只能在混合模式中.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="651"/>
+        <location filename="../filters/output/Task.cpp" line="656"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>雜點清除無法在 彩色/灰階 模式中使用.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="668"/>
+        <location filename="../filters/output/Task.cpp" line="673"/>
         <source>Output</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="669"/>
+        <location filename="../filters/output/Task.cpp" line="674"/>
         <source>Picture Zones</source>
         <translation>圖片區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="670"/>
+        <location filename="../filters/output/Task.cpp" line="675"/>
         <source>Fill Zones</source>
         <translation>填滿區域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="671"/>
+        <location filename="../filters/output/Task.cpp" line="676"/>
         <source>Dewarping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="672"/>
+        <location filename="../filters/output/Task.cpp" line="677"/>
         <source>Despeckling</source>
         <translation>雜點清除</translation>
     </message>

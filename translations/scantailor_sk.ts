@@ -650,7 +650,7 @@ English or Russian please.</source>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="628"/>
+        <location filename="../MainWindow.cpp" line="622"/>
         <source>Save Project</source>
         <translation>Uložiť projekt</translation>
     </message>
@@ -782,137 +782,137 @@ English or Russian please.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="525"/>
+        <location filename="../MainWindow.cpp" line="519"/>
         <source>Stop batch processing</source>
         <translation type="unfinished">Zastaviť dávkové spracovanie</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="595"/>
+        <location filename="../MainWindow.cpp" line="589"/>
         <source>The files export is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="595"/>
-        <location filename="../MainWindow.cpp" line="2050"/>
+        <location filename="../MainWindow.cpp" line="589"/>
+        <location filename="../MainWindow.cpp" line="2044"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="628"/>
+        <location filename="../MainWindow.cpp" line="622"/>
         <source>Save this project?</source>
         <translation type="unfinished">Uložiť projekt?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1104"/>
+        <location filename="../MainWindow.cpp" line="1098"/>
         <source>Insert before ...</source>
         <translation type="unfinished">Vložiť pred ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1107"/>
+        <location filename="../MainWindow.cpp" line="1101"/>
         <source>Insert after ...</source>
         <translation type="unfinished">Vložiť za ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1113"/>
+        <location filename="../MainWindow.cpp" line="1107"/>
         <source>Remove from project ...</source>
         <translation type="unfinished">Odstrániť z projektu ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1134"/>
+        <location filename="../MainWindow.cpp" line="1128"/>
         <source>Insert here ...</source>
         <translation type="unfinished">Vložiť sem ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1472"/>
-        <location filename="../MainWindow.cpp" line="1540"/>
+        <location filename="../MainWindow.cpp" line="1466"/>
+        <location filename="../MainWindow.cpp" line="1534"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished">Zoznam projektov</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1539"/>
+        <location filename="../MainWindow.cpp" line="1533"/>
         <source>Open Project</source>
         <translation type="unfinished">Otvoriť projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1557"/>
-        <location filename="../MainWindow.cpp" line="1566"/>
-        <location filename="../MainWindow.cpp" line="1840"/>
-        <location filename="../MainWindow.cpp" line="1918"/>
-        <location filename="../MainWindow.cpp" line="1925"/>
-        <location filename="../MainWindow.cpp" line="2058"/>
-        <location filename="../MainWindow.cpp" line="2065"/>
-        <location filename="../MainWindow.cpp" line="2342"/>
-        <location filename="../MainWindow.cpp" line="2373"/>
+        <location filename="../MainWindow.cpp" line="1551"/>
+        <location filename="../MainWindow.cpp" line="1560"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
+        <location filename="../MainWindow.cpp" line="1912"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
+        <location filename="../MainWindow.cpp" line="2052"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
+        <location filename="../MainWindow.cpp" line="2336"/>
+        <location filename="../MainWindow.cpp" line="2367"/>
         <source>Error</source>
         <translation type="unfinished">Chyba</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1558"/>
+        <location filename="../MainWindow.cpp" line="1552"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished">Nemožno otvoriť súbor s projektom.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1567"/>
+        <location filename="../MainWindow.cpp" line="1561"/>
         <source>The project file is broken.</source>
         <translation type="unfinished">Súbor s projektom je poškodený.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1834"/>
         <source>is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1918"/>
-        <location filename="../MainWindow.cpp" line="2058"/>
+        <location filename="../MainWindow.cpp" line="1912"/>
+        <location filename="../MainWindow.cpp" line="2052"/>
         <source>Batch processing is in the progress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1925"/>
-        <location filename="../MainWindow.cpp" line="2065"/>
+        <location filename="../MainWindow.cpp" line="1919"/>
+        <location filename="../MainWindow.cpp" line="2059"/>
         <source>No project is loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2050"/>
+        <location filename="../MainWindow.cpp" line="2044"/>
         <source>The files export is stopped by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2235"/>
+        <location filename="../MainWindow.cpp" line="2229"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation type="unfinished">Výstup zatiaľ nie je možný, lebo ešte nie je známa konečná veľkosť strán.
 Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obsah&quot; alebo &quot;Okraje&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2268"/>
+        <location filename="../MainWindow.cpp" line="2262"/>
         <source>Unnamed</source>
         <translation type="unfinished">Nepomenovaný</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2275"/>
+        <location filename="../MainWindow.cpp" line="2269"/>
         <source>%2 - Scan Tailor Featured %3 [%1bit]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2343"/>
-        <location filename="../MainWindow.cpp" line="2374"/>
+        <location filename="../MainWindow.cpp" line="2337"/>
+        <location filename="../MainWindow.cpp" line="2368"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished">Chyba pri ukladaní súboru s projektom!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2425"/>
+        <location filename="../MainWindow.cpp" line="2419"/>
         <source>Files to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2480"/>
+        <location filename="../MainWindow.cpp" line="2474"/>
         <source>Skip failed files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -921,7 +921,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
         <translation type="obsolete">Súbor na vloženie</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2431"/>
+        <location filename="../MainWindow.cpp" line="2425"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished">Obrázky, ktoré nie sú v projekte (%1)</translation>
     </message>
@@ -930,7 +930,7 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
         <translation type="obsolete">Chyba pri otváraní súboru s obrázkom.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2527"/>
+        <location filename="../MainWindow.cpp" line="2521"/>
         <source>Remove</source>
         <translation type="unfinished">Odstrániť</translation>
     </message>
@@ -1217,37 +1217,42 @@ Na určenie veľkosti strán spustite dávkové spracovanie pre &quot;Vybrat Obs
         <translation>Automaticky (experimentálne)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="52"/>
         <source>Manual</source>
         <translation>Ručne</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="62"/>
+        <source>Marginal (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="72"/>
         <source>Scope</source>
         <translation>Rozsah</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="78"/>
         <source>This page only</source>
         <translation>Len na túto stranu</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="88"/>
         <source>All pages</source>
         <translation>Všetky strany</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="95"/>
         <source>This page and the following ones</source>
         <translation>Táto a nasledujúce strany</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="111"/>
         <source>Selected pages</source>
         <translation>Vybrané strany</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="144"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Pre výber viacerých strán použite Ctr+Klik / Shift+Klik.</translation>
     </message>
@@ -2225,60 +2230,65 @@ Vyraďte ich z projektu.</translation>
         <translation>Použiť úroveň čistenia</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="525"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="530"/>
         <source>Apply Depth Perception</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="718"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="728"/>
         <source>Off</source>
         <translation>Vypnuté</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="721"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
         <source>Auto</source>
         <translation>Automaticky</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="724"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
         <source>Manual</source>
         <translation>Ručne</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="739"/>
+        <source>Marginal</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="599"/>
+        <location filename="../filters/output/Task.cpp" line="604"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Zóny obrázkov sú možné len v zmiešanom móde.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="651"/>
+        <location filename="../filters/output/Task.cpp" line="656"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Čistenie nemožno použiť vo farebnom / šedom móde.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="668"/>
+        <location filename="../filters/output/Task.cpp" line="673"/>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="669"/>
+        <location filename="../filters/output/Task.cpp" line="674"/>
         <source>Picture Zones</source>
         <translation>Zóny obrázkov</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="670"/>
+        <location filename="../filters/output/Task.cpp" line="675"/>
         <source>Fill Zones</source>
         <translation>Prázdne zóny</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="671"/>
+        <location filename="../filters/output/Task.cpp" line="676"/>
         <source>Dewarping</source>
         <translation>Deformácie</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="672"/>
+        <location filename="../filters/output/Task.cpp" line="677"/>
         <source>Despeckling</source>
         <translation>Čistenie</translation>
     </message>
