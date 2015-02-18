@@ -139,9 +139,16 @@ DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& 
 {
 	QLineF const line(p1, p2);
 	spline.appendControlPoint(line.p1(), 0);
-	spline.appendControlPoint(line.pointAt(1.0/4.0), 1);
-	spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
-	spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
+//begin of modified by monday2000
+// Delete_3_Red_Points
+// Deleting 3 unnecessary red points on the top-most and bottom-most
+// blue horizontal lines of the dewarping mesh.
+
+// Simply commented 3 lines of the original code:
+	//spline.appendControlPoint(line.pointAt(1.0/4.0), 1);
+	//spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
+	//spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
+//end of modified by monday2000
 	spline.appendControlPoint(line.p2(), 0);
 }
 
