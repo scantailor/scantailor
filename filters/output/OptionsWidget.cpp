@@ -198,7 +198,12 @@ OptionsWidget::distortionModelChanged(dewarping::DistortionModel const& model)
 	m_ptrSettings->setDistortionModel(m_pageId, model);
 	
 	// Note that OFF remains OFF while AUTO becomes MANUAL.
-	if (m_dewarpingMode == DewarpingMode::AUTO) {
+//begin of modified by monday2000
+// Manual_Dewarp_Auto_Switch
+// OFF becomes MANUAL too.
+// Commented the code below.
+	/*if (m_dewarpingMode == DewarpingMode::AUTO)*/ {
+//end of modified by monday2000
 		m_ptrSettings->setDewarpingMode(m_pageId, DewarpingMode::MANUAL);
 		m_dewarpingMode = DewarpingMode::MANUAL;
 		updateDewarpingDisplay();
