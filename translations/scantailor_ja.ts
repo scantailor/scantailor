@@ -358,19 +358,14 @@ Andrey Bergman - システム負荷調整
         <location filename="../ui/ExportDialog.ui" line="14"/>
         <location filename="../ui/ExportDialog.ui" line="136"/>
         <location filename="../ExportDialog.cpp" line="53"/>
-        <location filename="../ExportDialog.cpp" line="207"/>
-        <location filename="../ExportDialog.cpp" line="213"/>
+        <location filename="../ExportDialog.cpp" line="209"/>
+        <location filename="../ExportDialog.cpp" line="215"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="85"/>
         <source>Split mixed output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/ExportDialog.ui" line="149"/>
-        <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -394,6 +389,12 @@ Andrey Bergman - システム負荷調整
         <translation type="unfinished">参照</translation>
     </message>
     <message>
+        <location filename="../ui/ExportDialog.ui" line="149"/>
+        <location filename="../ExportDialog.cpp" line="54"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../ui/ExportDialog.ui" line="162"/>
         <source>TextLabel</source>
         <translation type="unfinished">文章ラベル</translation>
@@ -410,74 +411,74 @@ Andrey Bergman - システム負荷調整
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="195"/>
-        <source>Keep the original color and illumination in foreground subscans</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ExportDialog.cpp" line="54"/>
-        <source>Main</source>
+        <source>Keep the original color and illumination in foreground subscans (lengthy)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="55"/>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="56"/>
         <source>Rare options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="93"/>
-        <location filename="../ExportDialog.cpp" line="117"/>
-        <location filename="../ExportDialog.cpp" line="127"/>
+        <location filename="../ExportDialog.cpp" line="95"/>
+        <location filename="../ExportDialog.cpp" line="119"/>
+        <location filename="../ExportDialog.cpp" line="129"/>
         <source>Error</source>
         <translation type="unfinished">エラー</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="94"/>
+        <location filename="../ExportDialog.cpp" line="96"/>
         <source>The export output directory is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="106"/>
+        <location filename="../ExportDialog.cpp" line="108"/>
         <source>Create Directory?</source>
         <translation type="unfinished">ディレクトリを作成しますか？</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="107"/>
+        <location filename="../ExportDialog.cpp" line="109"/>
         <source>The export output directory doesn&apos;t exist.  Create it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="118"/>
+        <location filename="../ExportDialog.cpp" line="120"/>
         <source>Unable to create the export output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="128"/>
+        <location filename="../ExportDialog.cpp" line="130"/>
         <source>The export output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="137"/>
-        <location filename="../ExportDialog.cpp" line="223"/>
+        <location filename="../ExportDialog.cpp" line="139"/>
+        <location filename="../ExportDialog.cpp" line="225"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="154"/>
+        <location filename="../ExportDialog.cpp" line="156"/>
         <source>Export output directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="185"/>
+        <location filename="../ExportDialog.cpp" line="187"/>
         <source>Processed file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="185"/>
+        <location filename="../ExportDialog.cpp" line="187"/>
         <source>of</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="222"/>
+        <location filename="../ExportDialog.cpp" line="224"/>
         <source>Starting the export...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -653,125 +654,125 @@ Andrey Bergman - システム負荷調整
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="616"/>
+        <location filename="../MainWindow.cpp" line="628"/>
         <source>Save Project</source>
         <translation>プロジェクトを保存する</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="583"/>
+        <location filename="../MainWindow.cpp" line="595"/>
         <source>The files export is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="583"/>
-        <location filename="../MainWindow.cpp" line="1958"/>
+        <location filename="../MainWindow.cpp" line="595"/>
+        <location filename="../MainWindow.cpp" line="2050"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="616"/>
+        <location filename="../MainWindow.cpp" line="628"/>
         <source>Save this project?</source>
         <translation type="unfinished">プロジェクトを保存しますか？</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1092"/>
+        <location filename="../MainWindow.cpp" line="1104"/>
         <source>Insert before ...</source>
         <translation type="unfinished">前に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1095"/>
+        <location filename="../MainWindow.cpp" line="1107"/>
         <source>Insert after ...</source>
         <translation type="unfinished">後に挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1101"/>
+        <location filename="../MainWindow.cpp" line="1113"/>
         <source>Remove from project ...</source>
         <translation type="unfinished">プロジェクトから取り除く…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1122"/>
+        <location filename="../MainWindow.cpp" line="1134"/>
         <source>Insert here ...</source>
         <translation type="unfinished">ここに挿入…</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1460"/>
-        <location filename="../MainWindow.cpp" line="1528"/>
+        <location filename="../MainWindow.cpp" line="1472"/>
+        <location filename="../MainWindow.cpp" line="1540"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished">Scan Tailor プロジェクト</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1527"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Open Project</source>
         <translation type="unfinished">プロジェクトを開く</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1545"/>
-        <location filename="../MainWindow.cpp" line="1554"/>
-        <location filename="../MainWindow.cpp" line="1729"/>
-        <location filename="../MainWindow.cpp" line="1823"/>
-        <location filename="../MainWindow.cpp" line="1830"/>
-        <location filename="../MainWindow.cpp" line="1966"/>
-        <location filename="../MainWindow.cpp" line="1973"/>
-        <location filename="../MainWindow.cpp" line="2250"/>
-        <location filename="../MainWindow.cpp" line="2281"/>
+        <location filename="../MainWindow.cpp" line="1557"/>
+        <location filename="../MainWindow.cpp" line="1566"/>
+        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1918"/>
+        <location filename="../MainWindow.cpp" line="1925"/>
+        <location filename="../MainWindow.cpp" line="2058"/>
+        <location filename="../MainWindow.cpp" line="2065"/>
+        <location filename="../MainWindow.cpp" line="2342"/>
+        <location filename="../MainWindow.cpp" line="2373"/>
         <source>Error</source>
         <translation type="unfinished">エラー</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1546"/>
+        <location filename="../MainWindow.cpp" line="1558"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished">プロジェクトファイルを開けませんでした。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1555"/>
+        <location filename="../MainWindow.cpp" line="1567"/>
         <source>The project file is broken.</source>
         <translation type="unfinished">プロジェクトファイルは破損しています。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1729"/>
+        <location filename="../MainWindow.cpp" line="1840"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1729"/>
+        <location filename="../MainWindow.cpp" line="1840"/>
         <source>is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1823"/>
-        <location filename="../MainWindow.cpp" line="1966"/>
+        <location filename="../MainWindow.cpp" line="1918"/>
+        <location filename="../MainWindow.cpp" line="2058"/>
         <source>Batch processing is in the progress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1830"/>
-        <location filename="../MainWindow.cpp" line="1973"/>
+        <location filename="../MainWindow.cpp" line="1925"/>
+        <location filename="../MainWindow.cpp" line="2065"/>
         <source>No project is loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1958"/>
+        <location filename="../MainWindow.cpp" line="2050"/>
         <source>The files export is stopped by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2143"/>
+        <location filename="../MainWindow.cpp" line="2235"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation type="unfinished">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「余白」から一括処理を実行してください。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2183"/>
+        <location filename="../MainWindow.cpp" line="2275"/>
         <source>%2 - Scan Tailor Featured %3 [%1bit]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2333"/>
+        <location filename="../MainWindow.cpp" line="2425"/>
         <source>Files to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2388"/>
+        <location filename="../MainWindow.cpp" line="2480"/>
         <source>Skip failed files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -781,7 +782,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">ページの最終サイズが未確定のため、まだ出力できません。確定するには、「版面を選択」または「ページ配置」から一括処理を実行してください。</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2176"/>
+        <location filename="../MainWindow.cpp" line="2268"/>
         <source>Unnamed</source>
         <translation type="unfinished">名前なし</translation>
     </message>
@@ -790,8 +791,8 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 - Scan Tailor %2</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2251"/>
-        <location filename="../MainWindow.cpp" line="2282"/>
+        <location filename="../MainWindow.cpp" line="2343"/>
+        <location filename="../MainWindow.cpp" line="2374"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished">プロジェクトファイルを保存できません！</translation>
     </message>
@@ -800,7 +801,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">挿入するファイル</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2339"/>
+        <location filename="../MainWindow.cpp" line="2431"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished">プロジェクトに含まれない画像 (%1)</translation>
     </message>
@@ -813,7 +814,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 （%2 ページ）</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2435"/>
+        <location filename="../MainWindow.cpp" line="2527"/>
         <source>Remove</source>
         <translation type="unfinished">取り除く</translation>
     </message>
@@ -989,7 +990,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="513"/>
+        <location filename="../MainWindow.cpp" line="525"/>
         <source>Stop batch processing</source>
         <translation type="unfinished">一括処理を停止</translation>
     </message>
@@ -1373,7 +1374,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="419"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="504"/>
         <source>Change ...</source>
         <translation>変更...</translation>
     </message>
@@ -1393,17 +1394,22 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation>照明を均一化する</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="348"/>
+        <source>Picture Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="446"/>
         <source>Dewarping</source>
         <translation>歪み補正</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="529"/>
         <source>Depth perception</source>
         <translation>距離感</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="618"/>
         <source>No despeckling</source>
         <translation>スペックル除去なし</translation>
     </message>
@@ -1412,36 +1418,36 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">歪み補正</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="336"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="484"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="666"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="569"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="751"/>
         <source>Apply To ...</source>
         <translation>適用先...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="509"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="594"/>
         <source>Despeckling</source>
         <translation>スペックル除去</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="558"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="643"/>
         <source>Cautious despeckling</source>
         <translation>控えめなスペックル除去</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="561"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="587"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="613"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="646"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="672"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="698"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="584"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="669"/>
         <source>Normal despeckling</source>
         <translation>標準的なスペックル除去</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="695"/>
         <source>Aggressive despeckling</source>
         <translation>積極的なスペックル除去</translation>
     </message>
@@ -2336,27 +2342,47 @@ p, li { white-space: pre-wrap; }
         <translation>ミックス</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="412"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
+        <source>Surrounded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
+        <source>Quadro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
+        <source>Picture Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="445"/>
         <source>Apply Despeckling Level</source>
         <translation>スペックル除去レベルを適用する</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="492"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="525"/>
         <source>Apply Depth Perception</source>
         <translation>遠近感を適用</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="665"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="718"/>
         <source>Off</source>
         <translation>オフ</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="668"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="721"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="671"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="724"/>
         <source>Manual</source>
         <translation>手動</translation>
     </message>
@@ -2364,37 +2390,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="527"/>
+        <location filename="../filters/output/Task.cpp" line="599"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>画像領域はミックスモードでのみ有効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="579"/>
+        <location filename="../filters/output/Task.cpp" line="651"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>スペックル除去はカラー／グレースケールモードでは無効です。</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="596"/>
+        <location filename="../filters/output/Task.cpp" line="668"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="597"/>
+        <location filename="../filters/output/Task.cpp" line="669"/>
         <source>Picture Zones</source>
         <translation>画像領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="598"/>
+        <location filename="../filters/output/Task.cpp" line="670"/>
         <source>Fill Zones</source>
         <translation>塗り潰し領域</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="599"/>
+        <location filename="../filters/output/Task.cpp" line="671"/>
         <source>Dewarping</source>
         <translation>歪み補正</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="600"/>
+        <location filename="../filters/output/Task.cpp" line="672"/>
         <source>Despeckling</source>
         <translation>スペックル除去</translation>
     </message>

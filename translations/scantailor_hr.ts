@@ -263,19 +263,14 @@
         <location filename="../ui/ExportDialog.ui" line="14"/>
         <location filename="../ui/ExportDialog.ui" line="136"/>
         <location filename="../ExportDialog.cpp" line="53"/>
-        <location filename="../ExportDialog.cpp" line="207"/>
-        <location filename="../ExportDialog.cpp" line="213"/>
+        <location filename="../ExportDialog.cpp" line="209"/>
+        <location filename="../ExportDialog.cpp" line="215"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="85"/>
         <source>Split mixed output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/ExportDialog.ui" line="149"/>
-        <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -299,6 +294,12 @@
         <translation type="unfinished">Pretraži</translation>
     </message>
     <message>
+        <location filename="../ui/ExportDialog.ui" line="149"/>
+        <location filename="../ExportDialog.cpp" line="54"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../ui/ExportDialog.ui" line="162"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
@@ -315,74 +316,74 @@
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="195"/>
-        <source>Keep the original color and illumination in foreground subscans</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ExportDialog.cpp" line="54"/>
-        <source>Main</source>
+        <source>Keep the original color and illumination in foreground subscans (lengthy)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="55"/>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="56"/>
         <source>Rare options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="93"/>
-        <location filename="../ExportDialog.cpp" line="117"/>
-        <location filename="../ExportDialog.cpp" line="127"/>
+        <location filename="../ExportDialog.cpp" line="95"/>
+        <location filename="../ExportDialog.cpp" line="119"/>
+        <location filename="../ExportDialog.cpp" line="129"/>
         <source>Error</source>
         <translation type="unfinished">Greška</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="94"/>
+        <location filename="../ExportDialog.cpp" line="96"/>
         <source>The export output directory is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="106"/>
+        <location filename="../ExportDialog.cpp" line="108"/>
         <source>Create Directory?</source>
         <translation type="unfinished">Stvoriti putanju?</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="107"/>
+        <location filename="../ExportDialog.cpp" line="109"/>
         <source>The export output directory doesn&apos;t exist.  Create it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="118"/>
+        <location filename="../ExportDialog.cpp" line="120"/>
         <source>Unable to create the export output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="128"/>
+        <location filename="../ExportDialog.cpp" line="130"/>
         <source>The export output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="137"/>
-        <location filename="../ExportDialog.cpp" line="223"/>
+        <location filename="../ExportDialog.cpp" line="139"/>
+        <location filename="../ExportDialog.cpp" line="225"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="154"/>
+        <location filename="../ExportDialog.cpp" line="156"/>
         <source>Export output directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="185"/>
+        <location filename="../ExportDialog.cpp" line="187"/>
         <source>Processed file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="185"/>
+        <location filename="../ExportDialog.cpp" line="187"/>
         <source>of</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="222"/>
+        <location filename="../ExportDialog.cpp" line="224"/>
         <source>Starting the export...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -519,7 +520,7 @@
     <name>MainWindow</name>
     <message>
         <location filename="../ui/MainWindow.ui" line="233"/>
-        <location filename="../MainWindow.cpp" line="616"/>
+        <location filename="../MainWindow.cpp" line="628"/>
         <source>Save Project</source>
         <translation>Spremi projekt</translation>
     </message>
@@ -686,121 +687,121 @@
         <translation>Postavke...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="513"/>
+        <location filename="../MainWindow.cpp" line="525"/>
         <source>Stop batch processing</source>
         <translation>Zaustavite skupne obrade</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="583"/>
+        <location filename="../MainWindow.cpp" line="595"/>
         <source>The files export is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="583"/>
-        <location filename="../MainWindow.cpp" line="1958"/>
+        <location filename="../MainWindow.cpp" line="595"/>
+        <location filename="../MainWindow.cpp" line="2050"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="616"/>
+        <location filename="../MainWindow.cpp" line="628"/>
         <source>Save this project?</source>
         <translation>Spremiti ovaj projekt?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1092"/>
+        <location filename="../MainWindow.cpp" line="1104"/>
         <source>Insert before ...</source>
         <translation>Umetni prije...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1095"/>
+        <location filename="../MainWindow.cpp" line="1107"/>
         <source>Insert after ...</source>
         <translation>Umetni poslije...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1101"/>
+        <location filename="../MainWindow.cpp" line="1113"/>
         <source>Remove from project ...</source>
         <translation>Ukloni iz projekta...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1122"/>
+        <location filename="../MainWindow.cpp" line="1134"/>
         <source>Insert here ...</source>
         <translation>Umetni ovdije...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1460"/>
-        <location filename="../MainWindow.cpp" line="1528"/>
+        <location filename="../MainWindow.cpp" line="1472"/>
+        <location filename="../MainWindow.cpp" line="1540"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor projekti</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1527"/>
+        <location filename="../MainWindow.cpp" line="1539"/>
         <source>Open Project</source>
         <translation>Otvori projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1545"/>
-        <location filename="../MainWindow.cpp" line="1554"/>
-        <location filename="../MainWindow.cpp" line="1729"/>
-        <location filename="../MainWindow.cpp" line="1823"/>
-        <location filename="../MainWindow.cpp" line="1830"/>
-        <location filename="../MainWindow.cpp" line="1966"/>
-        <location filename="../MainWindow.cpp" line="1973"/>
-        <location filename="../MainWindow.cpp" line="2250"/>
-        <location filename="../MainWindow.cpp" line="2281"/>
+        <location filename="../MainWindow.cpp" line="1557"/>
+        <location filename="../MainWindow.cpp" line="1566"/>
+        <location filename="../MainWindow.cpp" line="1840"/>
+        <location filename="../MainWindow.cpp" line="1918"/>
+        <location filename="../MainWindow.cpp" line="1925"/>
+        <location filename="../MainWindow.cpp" line="2058"/>
+        <location filename="../MainWindow.cpp" line="2065"/>
+        <location filename="../MainWindow.cpp" line="2342"/>
+        <location filename="../MainWindow.cpp" line="2373"/>
         <source>Error</source>
         <translation>Greška</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1546"/>
+        <location filename="../MainWindow.cpp" line="1558"/>
         <source>Unable to open the project file.</source>
         <translation>Ne mogu otvoriti projekt datoteku.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1555"/>
+        <location filename="../MainWindow.cpp" line="1567"/>
         <source>The project file is broken.</source>
         <translation>Datoteka projekta je neispravna.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1729"/>
+        <location filename="../MainWindow.cpp" line="1840"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1729"/>
+        <location filename="../MainWindow.cpp" line="1840"/>
         <source>is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1823"/>
-        <location filename="../MainWindow.cpp" line="1966"/>
+        <location filename="../MainWindow.cpp" line="1918"/>
+        <location filename="../MainWindow.cpp" line="2058"/>
         <source>Batch processing is in the progress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1830"/>
-        <location filename="../MainWindow.cpp" line="1973"/>
+        <location filename="../MainWindow.cpp" line="1925"/>
+        <location filename="../MainWindow.cpp" line="2065"/>
         <source>No project is loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1958"/>
+        <location filename="../MainWindow.cpp" line="2050"/>
         <source>The files export is stopped by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2143"/>
+        <location filename="../MainWindow.cpp" line="2235"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Izlaz još nije moguć jer  konačna veličina stranice nije poznata.
 Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &quot;Margine&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2176"/>
+        <location filename="../MainWindow.cpp" line="2268"/>
         <source>Unnamed</source>
         <translation>Nema imena</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2183"/>
+        <location filename="../MainWindow.cpp" line="2275"/>
         <source>%2 - Scan Tailor Featured %3 [%1bit]</source>
         <translation type="unfinished"></translation>
     </message>
@@ -809,28 +810,28 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation type="obsolete">%2 - Scan Tailor %3 [%1bit]</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2251"/>
-        <location filename="../MainWindow.cpp" line="2282"/>
+        <location filename="../MainWindow.cpp" line="2343"/>
+        <location filename="../MainWindow.cpp" line="2374"/>
         <source>Error saving the project file!</source>
         <translation>Greška spremanja projekt datpteke!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2333"/>
+        <location filename="../MainWindow.cpp" line="2425"/>
         <source>Files to insert</source>
         <translation>Datoteke ze umetnuti</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2339"/>
+        <location filename="../MainWindow.cpp" line="2431"/>
         <source>Images not in project (%1)</source>
         <translation>Slike koje nisu u projektu (%1)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2388"/>
+        <location filename="../MainWindow.cpp" line="2480"/>
         <source>Skip failed files</source>
         <translation>Preskoči neispravne datoteke</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2435"/>
+        <location filename="../MainWindow.cpp" line="2527"/>
         <source>Remove</source>
         <translation>Ukloni</translation>
     </message>
@@ -1210,7 +1211,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="419"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="504"/>
         <source>Change ...</source>
         <translation>Promijeni...</translation>
     </message>
@@ -1230,51 +1231,56 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Izjednači osvjetljenje</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="361"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="348"/>
+        <source>Picture Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="446"/>
         <source>Dewarping</source>
         <translation>Poravnanje (Warp)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="444"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="529"/>
         <source>Depth perception</source>
         <translation>Dubina percepcije</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="533"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="618"/>
         <source>No despeckling</source>
         <translation>Bez čišćenja</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="336"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="484"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="666"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="569"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="751"/>
         <source>Apply To ...</source>
         <translation>Primijeni na...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="509"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="594"/>
         <source>Despeckling</source>
         <translation>Čišćenje</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="558"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="643"/>
         <source>Cautious despeckling</source>
         <translation>Čišćenje - oprezno</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="561"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="587"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="613"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="646"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="672"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="698"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="584"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="669"/>
         <source>Normal despeckling</source>
         <translation>Čišćenje - normalno</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="695"/>
         <source>Aggressive despeckling</source>
         <translation>Čišćenje - jako</translation>
     </message>
@@ -2099,27 +2105,47 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>Miješano</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="412"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
+        <source>Surrounded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
+        <source>Quadro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
+        <source>Picture Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="445"/>
         <source>Apply Despeckling Level</source>
         <translation>Prihvati razinu čišćenja</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="492"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="525"/>
         <source>Apply Depth Perception</source>
         <translation>Prihvati dubinu percepcije</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="665"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="718"/>
         <source>Off</source>
         <translation>Isključeno</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="668"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="721"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="671"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="724"/>
         <source>Manual</source>
         <translation>Ručno</translation>
     </message>
@@ -2127,37 +2153,37 @@ Trebali bi ih uklonili iz projekta.</translation>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="527"/>
+        <location filename="../filters/output/Task.cpp" line="599"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Zone slike su jedino moguće u mješanom načinu.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="579"/>
+        <location filename="../filters/output/Task.cpp" line="651"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Čišćenje se  ne može koristiti kod slika u boji / u sivim tonovima.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="596"/>
+        <location filename="../filters/output/Task.cpp" line="668"/>
         <source>Output</source>
         <translation>Izlaz</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="597"/>
+        <location filename="../filters/output/Task.cpp" line="669"/>
         <source>Picture Zones</source>
         <translation>Zone slike</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="598"/>
+        <location filename="../filters/output/Task.cpp" line="670"/>
         <source>Fill Zones</source>
         <translation>Popuni zone</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="599"/>
+        <location filename="../filters/output/Task.cpp" line="671"/>
         <source>Dewarping</source>
         <translation>Poravnanje</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="600"/>
+        <location filename="../filters/output/Task.cpp" line="672"/>
         <source>Despeckling</source>
         <translation>Čišćenje</translation>
     </message>
