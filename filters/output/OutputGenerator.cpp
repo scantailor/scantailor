@@ -85,6 +85,10 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
+//begin of modified by monday2000
+//Marginal_Dewarping
+#include "imageproc/OrthogonalRotation.h"
+//end of modified by monday2000
 
 using namespace imageproc;
 using namespace dewarping;
@@ -538,6 +542,10 @@ OutputGenerator::processImpl(
 	if (keep_orig_fore_subscan)
 	{
 		if (dewarping_mode == DewarpingMode::AUTO ||
+//begin of modified by monday2000
+//Marginal_Dewarping
+			dewarping_mode == DewarpingMode::MARGINAL ||
+//end of modified by monday2000
 			(dewarping_mode == DewarpingMode::MANUAL && distortion_model.isValid())) {
 				return processWithDewarping(
 					status, input, picture_zones, fill_zones,
@@ -560,6 +568,10 @@ OutputGenerator::processImpl(
 //end of modified by monday2000
 
 	if (dewarping_mode == DewarpingMode::AUTO ||
+//begin of modified by monday2000
+//Marginal_Dewarping
+		dewarping_mode == DewarpingMode::MARGINAL ||
+//end of modified by monday2000
 		(dewarping_mode == DewarpingMode::MANUAL && distortion_model.isValid())) {
 		return processWithDewarping(
 			status, input, picture_zones, fill_zones,
@@ -687,7 +699,11 @@ OutputGenerator::processWithoutDewarping(
 	
 	// For various reasons, we need some whitespace around the content
 	// area.  This is the number of pixels of such whitespace.
-	int const content_margin = m_dpi.vertical() * 20 / 300;
+//begin of modified by monday2000
+//Marginal_Dewarping
+	//int const content_margin = m_dpi.vertical() * 20 / 300;
+	int const content_margin = 40;
+//end of modified by monday2000
 	
 	// The content area (in output image coordinates) extended
 	// with content_margin.  Note that we prevent that extension
@@ -1055,7 +1071,11 @@ OutputGenerator::processWithDewarping(
 	
 	// For various reasons, we need some whitespace around the content
 	// area.  This is the number of pixels of such whitespace.
-	int const content_margin = m_dpi.vertical() * 20 / 300;
+//begin of modified by monday2000
+//Marginal_Dewarping
+	//int const content_margin = m_dpi.vertical() * 20 / 300;
+	int const content_margin = 40;
+//end of modified by monday2000
 	
 	// The content area (in output image coordinates) extended
 	// with content_margin.  Note that we prevent that extension
@@ -1134,7 +1154,12 @@ OutputGenerator::processWithDewarping(
 		} else {
 			normalized_original = input.grayImage();
 		}
-		if (dewarping_mode == DewarpingMode::AUTO) {
+		if (dewarping_mode == DewarpingMode::AUTO
+//begin of modified by monday2000
+//Marginal_Dewarping
+			|| dewarping_mode == DewarpingMode::MARGINAL
+//end of modified by monday2000			
+			) {
 			warped_gray_output = transformToGray(
 				input.grayImage(), m_xform.transform(), normalize_illumination_rect,
 				OutsidePixels::assumeWeakColor(Qt::white)
@@ -1299,6 +1324,95 @@ OutputGenerator::processWithDewarping(
 		if (!distortion_model.isValid()) {
 			setupTrivialDistortionModel(distortion_model);
 		}
+//begin of modified by monday2000
+//Marginal_Dewarping
+	}
+	else if (dewarping_mode == DewarpingMode::MARGINAL)
+	{
+		BinaryThreshold bw_threshold(64);	
+		BinaryImage bw_image(input.grayImage(), bw_threshold);
+
+		QTransform transform = m_xform.preRotation().transform(bw_image.size());
+		QTransform inv_transform = transform.inverted();
+
+		int degrees = m_xform.preRotation().toDegrees();
+		bw_image = orthogonalRotation(bw_image, degrees);
+
+		setupTrivialDistortionModel(distortion_model);
+
+		PageId const& pageId = *p_pageId;		
+
+		int max_red_points = 5; //the more the curling the more this value
+		
+		XSpline top_spline;
+
+		std::vector<QPointF> const& top_polyline = distortion_model.topCurve().polyline();
+
+		QLineF const top_line(transform.map(top_polyline.front()), transform.map(top_polyline.back()));
+
+		top_spline.appendControlPoint(top_line.p1(), 0);
+
+		if (pageId.subPage() == PageId::SINGLE_PAGE || pageId.subPage() == PageId::LEFT_PAGE)
+		{
+			for (int i=29-max_red_points; i<29; i++)
+				top_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}
+		else
+		{
+			for (int i=1; i<=max_red_points; i++)
+				top_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}		
+
+		top_spline.appendControlPoint(top_line.p2(), 0);
+
+		for (int i=0; i<=top_spline.numSegments(); i++) movePointToTopMargin(bw_image, top_spline, i);
+
+		for (int i=0; i<=top_spline.numSegments(); i++)
+			top_spline.moveControlPoint(i,inv_transform.map(top_spline.controlPointPosition(i)));
+
+		distortion_model.setTopCurve(dewarping::Curve(top_spline));
+
+//bottom:
+
+		XSpline bottom_spline;
+
+		std::vector<QPointF> const& bottom_polyline = distortion_model.bottomCurve().polyline();
+
+		QLineF const bottom_line(transform.map(bottom_polyline.front()), transform.map(bottom_polyline.back()));
+
+		bottom_spline.appendControlPoint(bottom_line.p1(), 0);
+
+		if (pageId.subPage() == PageId::SINGLE_PAGE || pageId.subPage() == PageId::LEFT_PAGE)
+		{
+			for (int i=29-max_red_points; i<29; i++)
+				bottom_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}
+		else
+		{
+			for (int i=1; i<=max_red_points; i++)
+				bottom_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}
+
+		bottom_spline.appendControlPoint(bottom_line.p2(), 0);
+
+		for (int i=0; i<=bottom_spline.numSegments(); i++) movePointToBottomMargin(bw_image, bottom_spline, i);
+
+		for (int i=0; i<=bottom_spline.numSegments(); i++)
+			bottom_spline.moveControlPoint(i,inv_transform.map(bottom_spline.controlPointPosition(i)));
+
+		distortion_model.setBottomCurve(dewarping::Curve(bottom_spline));
+
+		if (!distortion_model.isValid()) {		
+			setupTrivialDistortionModel(distortion_model);
+		}
+
+		if (dbg) {
+			QImage out_image(bw_image.toQImage().convertToFormat(QImage::Format_RGB32));
+			for (int i=0; i<=top_spline.numSegments(); i++) drawPoint(out_image, top_spline.controlPointPosition(i));
+			for (int i=0; i<=bottom_spline.numSegments(); i++) drawPoint(out_image, bottom_spline.controlPointPosition(i));
+			dbg->add(out_image, "marginal dewarping");
+		}
+//end of modified by monday2000
 	}
 
 	warped_gray_output = GrayImage(); // Save memory.
@@ -1359,7 +1473,8 @@ OutputGenerator::processWithDewarping(
 	);
 
 		applyFillZonesInPlace(dewarped_Dont_Equalize_Illumination_Pic_Zones, fill_zones, orig_to_output);
-	
+//Marginal_Dewarping
+		maybe_deskew(&dewarped_Dont_Equalize_Illumination_Pic_Zones, dewarping_mode);
 		return dewarped_Dont_Equalize_Illumination_Pic_Zones;	
 	}
 //end of modified by monday2000
@@ -1432,8 +1547,11 @@ OutputGenerator::processWithDewarping(
 		);
 
 		applyFillZonesInPlace(dewarped_bw_content, fill_zones, orig_to_output);
-
-		return dewarped_bw_content.toQImage();
+//begin of modified by monday2000
+		QImage tmp_image(dewarped_bw_content.toQImage()); 
+		maybe_deskew(&tmp_image, dewarping_mode);		
+		return tmp_image;		
+//end of modified by monday2000
 	}
 
 	if (!render_params.mixedOutput()) {
@@ -1531,8 +1649,11 @@ OutputGenerator::processWithDewarping(
 //end of modified by monday2000
 
 	applyFillZonesInPlace(dewarped, fill_zones, orig_to_output);
-
+//begin of modified by monday2000
+//Marginal_Dewarping	
+	maybe_deskew(&dewarped, dewarping_mode);
 	return dewarped;
+//end of modified by monday2000
 }
 
 /**
@@ -2212,5 +2333,130 @@ OutputGenerator::applyFillZonesInPlace(
 		img, zones, boost::bind((MapPointFunc)&QTransform::map, m_xform.transform(), _1)
 	);
 }
+
+//begin of modified by monday2000
+//Marginal_Dewarping
+void 
+OutputGenerator::movePointToTopMargin(BinaryImage& bw_image, XSpline& spline, int idx) const //added
+{
+	QPointF pos = spline.controlPointPosition(idx);
+
+	for (int j=0; j<pos.y(); j++)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj<(j+check_num); jj++)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;			
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);
+
+				spline.moveControlPoint(idx,pos);
+
+				break;
+			}
+		}
+	}
+}
+
+void 
+OutputGenerator::movePointToBottomMargin(BinaryImage& bw_image, XSpline& spline, int idx) const //added
+{
+	QPointF pos = spline.controlPointPosition(idx);
+
+	for (int j=bw_image.height()-1; j>pos.y(); j--)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj>(j-check_num); jj--)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);
+
+				spline.moveControlPoint(idx,pos);
+
+				break;
+			}
+		}
+	}
+}
+
+void
+OutputGenerator::drawPoint(QImage& image, QPointF const& pt) const
+{
+	QPoint pts = pt.toPoint();
+
+	for (int i=pts.x()-10;i<pts.x()+10;i++)
+	{
+		for (int j=pts.y()-10;j<pts.y()+10;j++)
+		{		
+		
+		QPoint p1(i,j);	
+		
+		image.setPixel(p1, qRgb(255, 0, 0));
+
+		}
+	}
+}
+
+void
+OutputGenerator::maybe_deskew(QImage* p_dewarped, DewarpingMode dewarping_mode) const
+{
+	if (dewarping_mode == DewarpingMode::MARGINAL 
+		|| dewarping_mode == DewarpingMode::MANUAL
+		)
+	{
+		//TiffWriter::writeImage("C:\\st\\dewarped.tif", dewarped);
+
+		BinaryThreshold bw_threshold(128);	
+		BinaryImage bw_image(*p_dewarped, bw_threshold);
+
+		SkewFinder skew_finder;
+		Skew const skew(skew_finder.findSkew(bw_image));
+		if (skew.angle() != 0.0 && skew.confidence() >= Skew::GOOD_CONFIDENCE)
+		{
+			double const angle_deg = skew.angle();
+
+			//QFile file("C:\\st\\scan_tailor.txt");
+			//file.open(QIODevice::WriteOnly | QIODevice::Text);
+			//QTextStream out(&file);
+			//QString stDeskewAngle;	
+			//stDeskewAngle.setNum(angle_deg);
+			//out << "deskew angle: " << stDeskewAngle << endl;
+			//QMessageBox::information(0,"i",stDeskewAngle);
+
+			QPointF center(p_dewarped->width()/2, p_dewarped->height()/2);
+
+			QTransform rot;		
+			rot.translate(center.x(),center.y());
+			rot.rotate(-angle_deg);		
+			rot.translate(-center.x(),-center.y());
+
+			*p_dewarped = imageproc::transform(*p_dewarped, rot, p_dewarped->rect(), OutsidePixels::assumeWeakColor(Qt::white));
+
+			//TiffWriter::writeImage("C:\\st\\dewarped2.tif", dewarped);
+			
+			//file.close();
+		}
+	}
+
+	//return dewarped;
+}
+//end of modified by monday2000
 
 } // namespace output

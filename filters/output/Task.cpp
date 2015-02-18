@@ -395,7 +395,12 @@ Task::process(
 //end of modified by monday2000
 		);
 
-		if (params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid()) {
+		if ((params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid())
+//begin of modified by monday2000
+//Marginal_Dewarping
+			|| (params.dewarpingMode() == DewarpingMode::MARGINAL && distortion_model.isValid())
+//end of modified by monday2000
+			) {
 			// A new distortion model was generated.
 			// We need to save it to be able to modify it manually.
 			params.setDistortionModel(distortion_model);

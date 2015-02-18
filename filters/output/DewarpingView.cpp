@@ -83,10 +83,18 @@ DewarpingView::DewarpingView(
 		std::vector<QPointF> const& polyline = m_distortionModel.topCurve().polyline();
 		
 		XSpline new_top_spline;
-		if (polyline.size() < 2) {
-			initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1]);
+		if (polyline.size() < 2) {			
+//begin of modified by monday2000
+//Marginal_Dewarping
+			//initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1]);
+			initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1], &dewarping_mode);
+//end of modified by monday2000
 		} else {
-			initNewSpline(new_top_spline, polyline.front(), polyline.back());
+//begin of modified by monday2000
+//Marginal_Dewarping
+			//initNewSpline(new_top_spline, polyline.front(), polyline.back());
+			initNewSpline(new_top_spline, polyline.front(), polyline.back(), &dewarping_mode);
+//end of modified by monday2000			
 			fitSpline(new_top_spline, polyline);
 		}
 
@@ -97,9 +105,17 @@ DewarpingView::DewarpingView(
 
 		XSpline new_bottom_spline;
 		if (polyline.size() < 2) {
-			initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2]);
+//begin of modified by monday2000
+//Marginal_Dewarping
+			//initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2]);
+			initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2], &dewarping_mode);
+//end of modified by monday2000			
 		} else {
-			initNewSpline(new_bottom_spline, polyline.front(), polyline.back());
+//begin of modified by monday2000
+//Marginal_Dewarping
+			//initNewSpline(new_bottom_spline, polyline.front(), polyline.back());
+			initNewSpline(new_bottom_spline, polyline.front(), polyline.back(), &dewarping_mode);
+//end of modified by monday2000			
 			fitSpline(new_bottom_spline, polyline);
 		}
 
@@ -135,7 +151,11 @@ DewarpingView::~DewarpingView()
 }
 
 void
-DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2)
+//begin of modified by monday2000
+//Marginal_Dewarping
+//DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2)
+DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2, DewarpingMode const* p_dewarpingMode)
+//end of modified by monday2000
 {
 	QLineF const line(p1, p2);
 	spline.appendControlPoint(line.p1(), 0);
@@ -143,11 +163,12 @@ DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& 
 // Delete_3_Red_Points
 // Deleting 3 unnecessary red points on the top-most and bottom-most
 // blue horizontal lines of the dewarping mesh.
-
-// Simply commented 3 lines of the original code:
-	//spline.appendControlPoint(line.pointAt(1.0/4.0), 1);
-	//spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
-	//spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
+if (*p_dewarpingMode == DewarpingMode::AUTO)
+{
+	spline.appendControlPoint(line.pointAt(1.0/4.0), 1);
+	spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
+	spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
+}
 //end of modified by monday2000
 	spline.appendControlPoint(line.p2(), 0);
 }
@@ -332,7 +353,12 @@ DewarpingView::curveModified(int curve_idx)
 void
 DewarpingView::dragFinished()
 {
-	if (m_dewarpingMode == DewarpingMode::AUTO) {
+	if (m_dewarpingMode == DewarpingMode::AUTO
+//begin of modified by monday2000
+//Marginal_Dewarping
+		|| m_dewarpingMode == DewarpingMode::MARGINAL
+//end of modified by monday2000		
+		) {
 		m_dewarpingMode = DewarpingMode::MANUAL;
 	}
 	emit distortionModelChanged(m_distortionModel);
