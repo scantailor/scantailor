@@ -51,8 +51,10 @@ ExportDialog::ExportDialog(QWidget* parent)
 	ui.DefaultOutputFolder->setChecked(settings.value("settings/default_output_folder").toBool());	
 	ui.labelFilesProcessed->clear();
 	ui.ExportButton->setText(tr("Export"));	
+	ui.OkButton->setText(tr("Close"));
 	ui.tabWidget->setTabText(0, tr("Main"));
 	ui.tabWidget->setTabText(1, tr("Rare options"));
+	//ui.tabWidget->setCurrentIndex(0);
 	//connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
 	connect(ui.GenerateBlankBackSubscans, SIGNAL(toggled(bool)), this, SLOT(OnCheckGenerateBlankBackSubscans(bool)));
@@ -60,7 +62,7 @@ ExportDialog::ExportDialog(QWidget* parent)
 
 	ui.GenerateBlankBackSubscans->setChecked(settings.value("settings/generate_blank_back_subscans").toBool());
 	ui.KeepOriginalColorIllumForeSubscans->setChecked(settings.value("settings/keep_original_color_illum_fore_subscans").toBool());
-	ui.KeepOriginalColorIllumForeSubscans->setVisible(false);
+	//ui.KeepOriginalColorIllumForeSubscans->setVisible(false);
 }
 
 ExportDialog::~ExportDialog()

@@ -146,7 +146,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>OK</string>
+        <string>Close</string>
        </property>
       </widget>
       <widget class="QLabel" name="labelFilesProcessed">
@@ -192,7 +192,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Keep the original color and illumination in foreground subscans</string>
+      <string>Keep the original color and illumination in foreground subscans (lengthy)</string>
      </property>
     </widget>
    </widget>

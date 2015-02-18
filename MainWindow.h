@@ -97,6 +97,9 @@ public:
 	std::set<PageId> selectedPages() const;
 	
 	std::vector<PageRange> selectedRanges() const;
+//begin of modified by monday2000
+	QImage m_orig_fore_subscan;	
+//end of modified by monday2000
 protected:
 	virtual void closeEvent(QCloseEvent* event);
 	
@@ -106,7 +109,7 @@ public slots:
 //begin of modified by monday2000
 //Export_Subscans
 	void ExportOutput(QString export_dir_path, bool default_out_dir, bool split_subscans,
-		bool generate_blank_back_subscans, bool keep_original_color_illum_fore_subscans);
+		bool generate_blank_back_subscans, bool orig_fore_subscan);
 	void ExportStop();
 	void SetStartExport();
 //Auto_Save_Project
@@ -116,6 +119,11 @@ public slots:
 //end of modified by monday2000
 private:
 	enum MainAreaAction { UPDATE_MAIN_AREA, CLEAR_MAIN_AREA };
+//begin of modified by monday2000
+//Original_Foreground_Mixed
+signals:
+	void StartExportTimerSignal();
+//end of modified by monday2000
 private slots:
 	void goFirstPage();
 
@@ -332,8 +340,10 @@ private:
 	QString m_export_dir;
 	bool m_split_subscans;
 	bool m_generate_blank_back_subscans;
-	bool m_keep_original_color_illum_fore_subscans;
 	int m_pos_export;
+//Original_Foreground_Mixed
+	bool m_keep_orig_fore_subscan;
+	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence_export;	
 //Auto_Save_Project
 	void autoSaveProject();
 	bool m_auto_save_project;
