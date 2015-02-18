@@ -34,7 +34,11 @@ public:
 	> PositionCallback;
 
 	typedef boost::function<
-		void (QLineF const& line)
+//begin of modified by monday2000
+//Blue_Dewarp_Line_Vert_Drag
+		//void (QLineF const& line)
+		void (QLineF const& line, Qt::KeyboardModifiers mask)
+//end of modified by monday2000
 	> MoveRequestCallback;
 
 	DraggableLineSegment();
@@ -46,9 +50,11 @@ public:
 	virtual Proximity proximity(QPointF const& mouse_pos);
 
 	virtual void dragInitiated(QPointF const& mouse_pos);
-
-	virtual void dragContinuation(QPointF const& mouse_pos);
-
+//begin of modified by monday2000
+//Blue_Dewarp_Line_Vert_Drag
+	//virtual void dragContinuation(QPointF const& mouse_pos);
+	virtual void dragContinuation(QPointF const& mouse_pos, Qt::KeyboardModifiers mask);
+//end of modified by monday2000
 	void setPositionCallback(PositionCallback const& callback) {
 		m_positionCallback = callback;
 	}
@@ -60,9 +66,13 @@ protected:
 	virtual QLineF lineSegmentPosition() const {
 		return m_positionCallback();
 	}
-
-	virtual void lineSegmentMoveRequest(QLineF const& line) {
-		m_moveRequestCallback(line);
+//begin of modified by monday2000
+//Blue_Dewarp_Line_Vert_Drag
+	//virtual void lineSegmentMoveRequest(QLineF const& line) {
+	virtual void lineSegmentMoveRequest(QLineF const& line, Qt::KeyboardModifiers mask) { 
+		//m_moveRequestCallback(line);
+		m_moveRequestCallback(line, mask);
+//end of modified by monday2000
 	}
 private:
 	PositionCallback m_positionCallback;
