@@ -68,8 +68,12 @@ public:
 		PageId const& page_id,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		OutputFileNameGenerator const& out_file_name_gen,
-		bool batch, bool debug);
-	
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+		//bool batch, bool debug);
+		bool batch, bool debug, bool dont_equalize_illumination_pic_zones=false); // "false" as cli workaround
+//end of modified by monday2000
+
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
 		OutputFileNameGenerator const& out_file_name_gen);
 	

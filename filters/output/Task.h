@@ -57,13 +57,22 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
-		ImageViewTab last_tab, bool batch, bool debug);
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+		//ImageViewTab last_tab, bool batch, bool debug);
+		ImageViewTab last_tab, bool batch, bool debug, bool dont_equalize_illumination_pic_zones);
+//end of modified by monday2000
 	
 	virtual ~Task();
 	
 	FilterResultPtr process(
 		TaskStatus const& status, FilterData const& data,
 		QPolygonF const& content_rect_phys);
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+	bool m_dont_equalize_illumination_pic_zones;
+//end of modified by monday2000
 private:
 	class UiUpdater;
 	

@@ -182,7 +182,12 @@ Filter::createTask(
 	PageId const& page_id,
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	OutputFileNameGenerator const& out_file_name_gen,
-	bool const batch, bool const debug)
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+	//bool const batch, bool const debug)
+	bool const batch, bool const debug,	
+	bool dont_equalize_illumination_pic_zones)
+//end of modified by monday2000
 {
 	ImageViewTab lastTab(TAB_OUTPUT);
 	if (m_ptrOptionsWidget.get() != 0)
@@ -191,7 +196,11 @@ Filter::createTask(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
 			thumbnail_cache, page_id, out_file_name_gen,
-			lastTab, batch, debug
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+			//lastTab, batch, debug
+			lastTab, batch, debug, dont_equalize_illumination_pic_zones
+//end of modified by monday2000
 		)
 	);
 }

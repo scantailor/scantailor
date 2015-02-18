@@ -33,12 +33,16 @@ public:
 signals:
 //Auto_Save_Project
 	void AutoSaveProjectStateSignal(bool auto_save);
+//Dont_Equalize_Illumination_Pic_Zones
+	void DontEqualizeIlluminationPicZonesSignal(bool state);
 //end of modified by monday2000
 private slots:
 	void commitChanges();
 //begin of modified by monday2000
 //Auto_Save_Project
 	void OnCheckAutoSaveProject(bool);
+//Dont_Equalize_Illumination_Pic_Zones
+	void OnCheckDontEqualizeIlluminationPicZones(bool);
 //end of modified by monday2000
 private:
 	Ui::SettingsDialog ui;

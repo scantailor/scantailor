@@ -327,6 +327,8 @@ MainWindow::MainWindow()
 //begin of modified by monday2000
 //Auto_Save_Project
 	m_auto_save_project = settings.value("settings/auto_save_project").toBool();
+//Dont_Equalize_Illumination_Pic_Zones
+	m_dont_equalize_illumination_pic_zones = settings.value("settings/dont_equalize_illumination_pic_zones").toBool();
 //end of modified by monday2000
 }
 
@@ -1061,6 +1063,12 @@ MainWindow::AutoSaveProjectState(bool auto_save)
 	m_auto_save_project = auto_save;
 }
 
+//Dont_Equalize_Illumination_Pic_Zones
+void 
+MainWindow::DontEqualizeIlluminationPicZones(bool state)
+{
+	m_dont_equalize_illumination_pic_zones = state;
+}
 //end of modified by monday2000
 
 void
@@ -1592,6 +1600,8 @@ MainWindow::openSettingsDialog()
 //begin of modified by monday2000
 //Auto_Save_Project
 	connect(dialog, SIGNAL(AutoSaveProjectStateSignal(bool)), this, SLOT(AutoSaveProjectState(bool)));
+//Dont_Equalize_Illumination_Pic_Zones
+	connect(dialog, SIGNAL(DontEqualizeIlluminationPicZonesSignal(bool)), this, SLOT(DontEqualizeIlluminationPicZones(bool)));
 //end of modified by monday2000
 	dialog->show();
 }
@@ -2524,7 +2534,12 @@ MainWindow::createCompositeTask(
 
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+			//page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
+			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug,
+			m_dont_equalize_illumination_pic_zones
+//end of modified by monday2000
 		);
 		debug = false;
 	}
