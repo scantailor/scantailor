@@ -164,13 +164,12 @@ MainWindow::MainWindow()
 	m_ignorePageOrderingChanges(0),
 	m_debug(false),
 //begin of modified by monday2000
-//Export_Subscans
 //added:
-	m_outpaths_vector(0),
 //Picture_Shape_Bug
 	//m_closing(false)
 	m_closing(false),
 //Export_Subscans
+	m_outpaths_vector(0),
 	m_exportTimerId(0),
 	m_keep_orig_fore_subscan(0),
 	m_dont_equalize_illumination_pic_zones(0)	
@@ -291,11 +290,6 @@ MainWindow::MainWindow()
 	connect(
 		actionExport, SIGNAL(triggered(bool)),
 		this, SLOT(openExportDialog())
-	);
-//Original_Foreground_Mixed
-	connect(
-		this, SIGNAL(StartExportTimerSignal()),
-		this, SLOT(StartExportTimer())
 	);
 //end of modified by monday2000
 	connect(
@@ -1672,10 +1666,10 @@ bool GenerateSubscans(QImage& source_img, QImage& subscan1, QImage& subscan2, bo
 	}
 	else
 	{
-	QVector<QRgb> bw_palette(2);	
-	bw_palette[0] = qRgb(0, 0, 0);
-	bw_palette[1] = qRgb(255, 255, 255);
-	subscan1.setColorTable(bw_palette);
+		QVector<QRgb> bw_palette(2);	
+		bw_palette[0] = qRgb(0, 0, 0);
+		bw_palette[1] = qRgb(255, 255, 255);
+		subscan1.setColorTable(bw_palette);
 	}
 
 	if (subscan2.format() == QImage::Format_Indexed8) 
@@ -1715,7 +1709,7 @@ bool GenerateSubscans(QImage& source_img, QImage& subscan1, QImage& subscan2, bo
 		for (int x = 0; x < width; ++x)
 		{	//this line of code was suggested by Tulon:		
 			if ((source_line[x] & mask) == 0 || (source_line[x] & mask) == mask) // BW
-			{				
+			{
 				if (keep_orig_fore_subscan)
 				{
 					subscan1_line[x] = orig_fore_line[x];
@@ -1738,7 +1732,7 @@ bool GenerateSubscans(QImage& source_img, QImage& subscan1, QImage& subscan2, bo
 					subscan1_line[x] = static_cast<MixedPixel>(tmp_white_pixel);
 				}
 				else
-			{
+				{
 				uint8_t value = static_cast<uint8_t>(tmp_white_pixel);
 				//BW SetPixel from http://djvu-soft.narod.ru/bookscanlib/023.htm
 				value ? subscan1_bw_line[x >> 3] |= (0x80 >> (x & 0x7)) : subscan1_bw_line[x >> 3] &= (0xFF7F >> (x & 0x7));
@@ -1747,7 +1741,7 @@ bool GenerateSubscans(QImage& source_img, QImage& subscan1, QImage& subscan2, bo
 				subscan2_line[x] = source_line[x];
 			}			
 		}
-		source_line += source_stride;
+		source_line += source_stride;		
 		subscan2_line += subscan2_stride;
 		if (keep_orig_fore_subscan)
 		{
@@ -1794,7 +1788,7 @@ QImage GenerateBlankImage(QImage& out_img, QImage::Format format)
 
 int 
 MainWindow::ExportNextFile()
-{		
+{
 	if (m_pos_export == m_outpaths_vector.size())
 		return 1; //all the files are processed
 
@@ -1846,15 +1840,15 @@ MainWindow::ExportNextFile()
 
 	if (m_split_subscans)
 	{
-		bool mixed_detected;
+		bool mixed_detected;		
 
 		if (out_img.format() == QImage::Format_Indexed8)
 		{
 			if (m_keep_orig_fore_subscan)
 				mixed_detected = GenerateSubscans<uint8_t>(out_img, subscan1, subscan2, m_keep_orig_fore_subscan, &m_orig_fore_subscan);
 			else				
-			mixed_detected = GenerateSubscans<uint8_t>(out_img, subscan1, subscan2);
-			
+				mixed_detected = GenerateSubscans<uint8_t>(out_img, subscan1, subscan2);
+
 			if (mixed_detected)
 			{
 				TiffWriter::writeImage(out_file_path1, subscan1);
@@ -1872,7 +1866,7 @@ MainWindow::ExportNextFile()
 			if (m_keep_orig_fore_subscan)			
 				mixed_detected = GenerateSubscans<uint32_t>(out_img, subscan1, subscan2, m_keep_orig_fore_subscan, &m_orig_fore_subscan);
 			else
-			mixed_detected = GenerateSubscans<uint32_t>(out_img, subscan1, subscan2);
+				mixed_detected = GenerateSubscans<uint32_t>(out_img, subscan1, subscan2);
 
 			if (mixed_detected)
 			{
