@@ -698,7 +698,7 @@ OutputGenerator::processWithoutDewarping(
 	);
 	
 	// For various reasons, we need some whitespace around the content
-	// area.  This is the number of pixels of such whitespace.
+	// area.  This is the number of pixels of such whitespace.	
 //begin of modified by monday2000
 //Marginal_Dewarping
 	//int const content_margin = m_dpi.vertical() * 20 / 300;
@@ -768,9 +768,9 @@ OutputGenerator::processWithoutDewarping(
                 );
         else
                 maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
-			input.origImage(), m_xform.transform(),
-			normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
-		);
+                input.origImage(), m_xform.transform(),
+                normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
+                );
 //end of modified by monday2000
 
 	status.throwIfCancelled();
@@ -1070,7 +1070,7 @@ OutputGenerator::processWithDewarping(
 	);
 	
 	// For various reasons, we need some whitespace around the content
-	// area.  This is the number of pixels of such whitespace.
+	// area.  This is the number of pixels of such whitespace.	
 //begin of modified by monday2000
 //Marginal_Dewarping
 	//int const content_margin = m_dpi.vertical() * 20 / 300;
@@ -1321,6 +1321,138 @@ OutputGenerator::processWithDewarping(
 		);
 		
 		distortion_model = model_builder.tryBuildModel(dbg, &input.grayImage().toQImage());
+
+//begin of modified by monday2000
+//Auto_Dewarping_Vert_Half_Correction
+
+		BinaryThreshold bw_threshold(64);	
+		BinaryImage bw_image(input.grayImage(), bw_threshold);
+
+		QTransform transform = m_xform.preRotation().transform(bw_image.size());
+		QTransform inv_transform = transform.inverted();
+
+		int degrees = m_xform.preRotation().toDegrees();
+		bw_image = orthogonalRotation(bw_image, degrees);
+
+		std::vector<QPointF> const& top_polyline0 = distortion_model.topCurve().polyline();
+		std::vector<QPointF> const& bottom_polyline0 = distortion_model.bottomCurve().polyline();
+
+		std::vector<QPointF> top_polyline;
+		std::vector<QPointF> bottom_polyline;
+
+		for (int i=0; i<(int)top_polyline0.size(); i++)
+			top_polyline.push_back(transform.map(top_polyline0[i]));
+
+		for (int i=0; i<(int)bottom_polyline0.size(); i++)
+			bottom_polyline.push_back(transform.map(bottom_polyline0[i]));
+
+		//QImage out_image(bw_image.toQImage().convertToFormat(QImage::Format_RGB32));
+		//for (int i=0; i<(int)top_polyline.size(); i++) drawPoint(out_image, top_polyline[i]);
+		//for (int i=0; i<(int)bottom_polyline.size(); i++) drawPoint(out_image, bottom_polyline[i]);
+		//TiffWriter::writeImage("C:\\bw_dewarp.tif", out_image);
+
+		PageId const& pageId = *p_pageId;
+
+		QString stAngle;
+
+		float max_angle = 2.75; // chosen empirically
+
+		//QFile file("C:\\st_angle.txt");
+		//file.open(QIODevice::WriteOnly | QIODevice::Text);
+		//QTextStream out(&file);
+		//out << "degrees = " << QString::number(degrees) << endl;
+
+		if (pageId.subPage() == PageId::SINGLE_PAGE || pageId.subPage() == PageId::LEFT_PAGE)
+		{
+			float vert_skew_angle_left = vert_border_skew_angle(top_polyline.front(), bottom_polyline.front());
+
+			stAngle.setNum(vert_skew_angle_left);
+
+			//out << "vert_skew_angle_left = " << stAngle << endl;
+
+			if (vert_skew_angle_left > max_angle)
+			{
+				//out << "vert_skew_angle_left correction" << endl;
+
+				float top_x = top_polyline.front().x();
+				float bottom_x = bottom_polyline.front().x();
+
+				if (top_x < bottom_x)
+				{
+					std::vector<QPointF> new_bottom_polyline;
+
+					QPointF pt(top_x, bottom_polyline.front().y());
+
+					new_bottom_polyline.push_back(pt);
+
+					for (int i=0; i<(int)bottom_polyline.size(); i++)
+						new_bottom_polyline.push_back(inv_transform.map(bottom_polyline[i]));
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_bottom_polyline));
+				}
+				else
+				{
+					std::vector<QPointF> new_top_polyline;
+
+					QPointF pt(bottom_x, top_polyline.front().y());
+
+					new_top_polyline.push_back(pt);
+
+					for (int i=0; i<(int)top_polyline.size(); i++)
+						new_top_polyline.push_back(inv_transform.map(top_polyline[i]));
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_top_polyline));
+				}
+			}
+		}
+		else
+		{
+			float vert_skew_angle_right = vert_border_skew_angle(top_polyline.back(), bottom_polyline.back());
+
+			stAngle.setNum(vert_skew_angle_right);
+			
+			//out << "vert_skew_angle_right = " << stAngle << endl;
+
+			if (vert_skew_angle_right > max_angle)
+			{				
+				//out << "vert_skew_angle_right correction" << endl;
+
+				float top_x = top_polyline.back().x();
+				float bottom_x = bottom_polyline.back().x();
+
+				if (top_x > bottom_x)
+				{
+					std::vector<QPointF> new_bottom_polyline;
+
+					QPointF pt(top_x, bottom_polyline.back().y());
+
+					for (int i=0; i<(int)bottom_polyline.size(); i++)
+						new_bottom_polyline.push_back(inv_transform.map(bottom_polyline[i]));
+
+					new_bottom_polyline.push_back(pt);
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_bottom_polyline));
+				}
+				else
+				{
+					std::vector<QPointF> new_top_polyline;
+
+					QPointF pt(bottom_x, top_polyline.back().y());					
+
+					for (int i=0; i<(int)top_polyline.size(); i++)
+						new_top_polyline.push_back(inv_transform.map(top_polyline[i]));
+
+					new_top_polyline.push_back(pt);
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_top_polyline));
+				}			
+			}	
+		}
+
+		//file.close();
+
+//end of modified by monday2000
+
 		if (!distortion_model.isValid()) {
 			setupTrivialDistortionModel(distortion_model);
 		}
@@ -1475,7 +1607,7 @@ OutputGenerator::processWithDewarping(
 		applyFillZonesInPlace(dewarped_Dont_Equalize_Illumination_Pic_Zones, fill_zones, orig_to_output);
 //Marginal_Dewarping
 		maybe_deskew(&dewarped_Dont_Equalize_Illumination_Pic_Zones, dewarping_mode);
-		return dewarped_Dont_Equalize_Illumination_Pic_Zones;	
+		return dewarped_Dont_Equalize_Illumination_Pic_Zones;
 	}
 //end of modified by monday2000
 
@@ -2412,6 +2544,68 @@ OutputGenerator::drawPoint(QImage& image, QPointF const& pt) const
 
 		}
 	}
+}
+
+void 
+OutputGenerator::movePointToTopMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const //added
+{
+	QPointF& pos = polyline[idx];
+
+	for (int j=0; j<pos.y(); j++)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj<(j+check_num); jj++)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;			
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);			
+
+				break;
+			}
+		}
+	}
+}
+
+void 
+OutputGenerator::movePointToBottomMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const //added
+{
+	QPointF& pos = polyline[idx];
+
+	for (int j=bw_image.height()-1; j>pos.y(); j--)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj>(j-check_num); jj--)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);				
+
+				break;
+			}
+		}
+	}
+}
+
+float
+OutputGenerator::vert_border_skew_angle(QPointF const& top, QPointF const& bottom) const
+{
+	 return qFabs(qAtan((bottom.x() - top.x()) / (bottom.y() - top.y())) * 180/M_PI);
 }
 
 void
