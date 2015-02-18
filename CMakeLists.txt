@@ -542,6 +542,7 @@ SET(
 	RelinkingListView.cpp RelinkingListView.h
 	RelinkingDialog.cpp RelinkingDialog.h
 	SettingsDialog.cpp SettingsDialog.h
+	ExportDialog.cpp ExportDialog.h
 	FixDpiDialog.cpp FixDpiDialog.h
 	LoadFilesStatusDialog.cpp LoadFilesStatusDialog.h
 	ProjectCreationContext.cpp ProjectCreationContext.h

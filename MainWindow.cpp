@@ -163,6 +163,11 @@ MainWindow::MainWindow()
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
 	m_debug(false),
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+	m_outpaths_vector(0),
+//end of modified by monday2000
 	m_closing(false)
 {
 	m_maxLogicalThumbSize = QSize(250, 160);
@@ -270,7 +275,14 @@ MainWindow::MainWindow()
 		actionSettings, SIGNAL(triggered(bool)),
 		this, SLOT(openSettingsDialog())
 	);
-	
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+	connect(
+		actionExport, SIGNAL(triggered(bool)),
+		this, SLOT(openExportDialog())
+	);
+//end of modified by monday2000
 	connect(
 		actionNewProject, SIGNAL(triggered(bool)),
 		this, SLOT(newProject())
@@ -541,6 +553,32 @@ MainWindow::closeEvent(QCloseEvent* const event)
 void
 MainWindow::timerEvent(QTimerEvent* const event)
 {
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+
+	if (event->timerId() == m_exportTimerId)
+	{
+		int res = ExportNextFile();
+
+		if (res)
+		{
+			killTimer(m_exportTimerId);
+
+			m_exportTimerId = 0;			
+
+			if (res == 1)
+			{
+				m_p_export_dialog->setExportLabel();
+
+				QMessageBox::information(0, tr("Information"), tr("The files export is finished."));
+			}
+		}		
+	}
+	else
+	{
+//end of modified by monday2000
+
 	// We only use the timer event for delayed closing of the window.
 	killTimer(event->timerId());
 	
@@ -555,6 +593,11 @@ MainWindow::timerEvent(QTimerEvent* const event)
 		}
 		close();
 	}
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+	}
+//end of modified by monday2000
 }
 
 MainWindow::SavePromptResult
@@ -1508,6 +1551,384 @@ MainWindow::openSettingsDialog()
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->show();
 }
+
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+void
+MainWindow::openExportDialog()
+{
+	m_p_export_dialog = new ExportDialog(this);	
+
+	m_p_export_dialog->setAttribute(Qt::WA_DeleteOnClose);
+	m_p_export_dialog->setWindowModality(Qt::WindowModal);
+	m_p_export_dialog->show();
+
+	connect(m_p_export_dialog, SIGNAL(ExportOutputSignal(QString, bool, bool, bool, bool)), this, SLOT(ExportOutput(QString, bool, bool, bool, bool)));
+	connect(m_p_export_dialog, SIGNAL(ExportStopSignal()), this, SLOT(ExportStop()));
+	connect(m_p_export_dialog, SIGNAL(SetStartExportSignal()), this, SLOT(SetStartExport()));
+}
+
+
+template<typename MixedPixel>
+bool GenerateSubscans(QImage& source_img, QImage& subscan1, QImage& subscan2)
+{
+	int const width = source_img.width();
+	int const height = source_img.height();
+
+	MixedPixel* source_line = reinterpret_cast<MixedPixel*>(source_img.bits());
+	int const source_stride = source_img.bytesPerLine() / sizeof(MixedPixel);
+
+	subscan1 = QImage(source_img.width(),source_img.height(),QImage::Format_Mono);
+	subscan2 = QImage(source_img.width(),source_img.height(),source_img.format());
+
+	subscan1.setDotsPerMeterX(source_img.dotsPerMeterX());
+	subscan1.setDotsPerMeterY(source_img.dotsPerMeterY());
+	subscan2.setDotsPerMeterX(source_img.dotsPerMeterX());
+	subscan2.setDotsPerMeterY(source_img.dotsPerMeterY());
+
+	QVector<QRgb> bw_palette(2);	
+	bw_palette[0] = qRgb(0, 0, 0);
+	bw_palette[1] = qRgb(255, 255, 255);
+	subscan1.setColorTable(bw_palette);
+
+	if (subscan2.format() == QImage::Format_Indexed8) 
+	{	//createGrayscalePalette() from C:\build\scantailor-0.9.11.1\imageproc\Grayscale.cpp
+		QVector<QRgb> palette(256);
+		for (int i = 0; i < 256; ++i) palette[i] = qRgb(i, i, i);
+		subscan2.setColorTable(palette);
+	}
+
+	uchar* subscan1_line = subscan1.bits();
+	int const subscan1_stride = subscan1.bytesPerLine();
+
+	MixedPixel* subscan2_line = reinterpret_cast<MixedPixel*>(subscan2.bits());
+	int const subscan2_stride = subscan2.bytesPerLine() / sizeof(MixedPixel);
+
+	uint32_t tmp_white_pixel = 0xffffffff;
+	uint32_t mask_pixel = 0x00ffffff;
+	
+	MixedPixel mask = static_cast<MixedPixel>(mask_pixel);
+
+	bool mixed_detected = false;
+
+	for (int y = 0; y < height; ++y) 
+	{
+		for (int x = 0; x < width; ++x)
+		{	//this line of code was suggested by Tulon:		
+			if ((source_line[x] & mask) == 0 || (source_line[x] & mask) == mask) // BW
+			{				
+				uint8_t value1 = static_cast<uint8_t>(source_line[x]);
+				//BW SetPixel from http://djvu-soft.narod.ru/bookscanlib/023.htm
+				value1 ? subscan1_line[x >> 3] |= (0x80 >> (x & 0x7)) : subscan1_line[x >> 3] &= (0xFF7F >> (x & 0x7));
+				subscan2_line[x] = static_cast<MixedPixel>(tmp_white_pixel);
+
+				mixed_detected = true;
+			}
+			else // non-BW
+			{
+				uint8_t value = static_cast<uint8_t>(tmp_white_pixel);
+				//BW SetPixel from http://djvu-soft.narod.ru/bookscanlib/023.htm
+				value ? subscan1_line[x >> 3] |= (0x80 >> (x & 0x7)) : subscan1_line[x >> 3] &= (0xFF7F >> (x & 0x7));
+				subscan2_line[x] = source_line[x];
+			}			
+		}
+		source_line += source_stride;
+		subscan1_line += subscan1_stride;
+		subscan2_line += subscan2_stride;
+	}
+
+	return mixed_detected;
+}
+
+QImage GenerateBlankImage(QImage& out_img, QImage::Format format)
+{
+	QImage blank_img = QImage(out_img.width(), out_img.height(), format);
+
+	blank_img.setDotsPerMeterX(out_img.dotsPerMeterX());
+	blank_img.setDotsPerMeterY(out_img.dotsPerMeterY());
+
+	blank_img.fill(0xFF);
+
+	if (format == QImage::Format_Mono)
+	{
+		QVector<QRgb> bw_palette(2);	
+		bw_palette[0] = qRgb(0, 0, 0);
+		bw_palette[1] = qRgb(255, 255, 255);
+		blank_img.setColorTable(bw_palette);		
+
+		return blank_img;
+	}
+
+	else if (format == QImage::Format_Indexed8)
+	{
+		QVector<QRgb> palette(256);
+		for (int i = 0; i < 256; ++i) palette[i] = qRgb(i, i, i);		
+		blank_img.setColorTable(palette);
+
+		return blank_img;
+	}
+	else
+		return blank_img;
+}
+
+int 
+MainWindow::ExportNextFile()
+{		
+	if (m_pos_export == m_outpaths_vector.size())
+		return 1; //all the files are processed
+
+	QImage subscan1;
+	QImage subscan2;
+
+	QString text_dir = m_export_dir + "\\1"; //folder for foreground subscans
+	QString pic_dir = m_export_dir + "\\2"; //folder for background subscans
+
+	QString out_file_path = m_outpaths_vector[m_pos_export];
+
+	QString st_num = QString::number(m_pos_export+1);
+
+	QString name;
+
+	for(int j=0;j<4-st_num.length();j++) name += "0";
+
+	name += st_num;
+
+	QString out_file_path1 = text_dir + "\\" + name + ".tif";
+	QString out_file_path2 = pic_dir + "\\" + name + ".tif";
+
+	QString out_file_path_no_split = m_export_dir + "\\" + name + ".tif";
+
+	if (!QFile().exists(out_file_path))
+	{
+		QMessageBox::critical(0, tr("Error"), tr("The file") + " \"" + out_file_path + "\" " + tr("is not found") + ".");
+
+		return -1;
+	}
+
+	QImage out_img = ImageLoader::load(out_file_path);
+
+	if (m_split_subscans)
+	{
+		bool mixed_detected;
+		bool back_written = false;
+
+		if (out_img.format() == QImage::Format_Indexed8)
+		{
+			mixed_detected = GenerateSubscans<uint8_t>(out_img, subscan1, subscan2);
+			
+			if (mixed_detected)
+			{
+				TiffWriter::writeImage(out_file_path1, subscan1);
+				TiffWriter::writeImage(out_file_path2, subscan2);
+			}
+			else
+			{
+				TiffWriter::writeImage(out_file_path1, GenerateBlankImage(out_img, QImage::Format_Mono));
+				TiffWriter::writeImage(out_file_path2, out_img);
+			}
+		}
+		else if(out_img.format() == QImage::Format_RGB32 
+			|| out_img.format() == QImage::Format_ARGB32)
+		{
+			mixed_detected = GenerateSubscans<uint32_t>(out_img, subscan1, subscan2);
+
+			if (mixed_detected)
+			{
+				TiffWriter::writeImage(out_file_path1, subscan1);
+				TiffWriter::writeImage(out_file_path2, subscan2);
+			}
+			else
+			{
+				TiffWriter::writeImage(out_file_path1, GenerateBlankImage(out_img, QImage::Format_Mono));
+				TiffWriter::writeImage(out_file_path2, out_img);
+			}
+		}
+		else if(out_img.format() == QImage::Format_Mono)
+		{
+			TiffWriter::writeImage(out_file_path1, out_img);
+
+			if(m_generate_blank_back_subscans)
+				TiffWriter::writeImage(out_file_path2, GenerateBlankImage(out_img, QImage::Format_Indexed8));
+		}
+	}
+	else
+	{
+		TiffWriter::writeImage(out_file_path_no_split, out_img);			
+	}			
+
+	m_p_export_dialog->StepProgress();
+
+	m_pos_export++;
+
+	return 0;
+}
+
+void 
+MainWindow::ExportOutput(QString export_dir_path, bool default_out_dir, bool split_subscans,
+						 bool generate_blank_back_subscans, 
+						 bool keep_original_color_illum_fore_subscans)
+{
+	if (isBatchProcessingInProgress())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("Batch processing is in the progress."));
+
+		return;	
+	}
+
+	if (!isProjectLoaded())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("No project is loaded."));
+
+		return;	
+	}
+
+	m_ptrInteractiveQueue->cancelAndClear();
+	if (m_ptrBatchQueue.get()) // Should not happen, but just in case.		
+		m_ptrBatchQueue->cancelAndClear();	
+
+// Checking whether all the output thumbnails don't have a question mark on them
+
+	std::auto_ptr<ThumbnailSequence> ptrThumbSequence;
+
+	ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
+
+	if (m_ptrThumbnailCache.get()) {
+		IntrusivePtr<CompositeCacheDrivenTask> const task(
+			createCompositeCacheDrivenTask(5)
+		);
+
+		ptrThumbSequence->setThumbnailFactory(
+			IntrusivePtr<ThumbnailFactory>(
+				new ThumbnailFactory(
+					m_ptrThumbnailCache,
+					m_maxLogicalThumbSize, task
+				)
+			)
+		);
+	}
+	
+	ptrThumbSequence->reset(
+		m_ptrPages->toPageSequence(m_ptrStages->filterAt(5)->getView()),
+		ThumbnailSequence::RESET_SELECTION, currentPageOrderProvider()
+	);
+
+	if (!ptrThumbSequence->AllThumbnailsComplete()) 
+	{
+		m_p_export_dialog->reset();
+
+		return;
+	}
+
+// Getting the output filenames	
+
+	if (default_out_dir)
+	{
+		m_export_dir = m_outFileNameGen.outDir() + "\\export";
+	}
+	else
+	{
+		m_export_dir = export_dir_path + "\\export";
+	}
+	QDir().mkdir(m_export_dir);
+
+	QString text_dir = m_export_dir + "\\1"; //folder for foreground subscans
+	QString pic_dir = m_export_dir + "\\2"; //folder for background subscans					
+
+	m_split_subscans = split_subscans;
+	m_generate_blank_back_subscans = generate_blank_back_subscans;
+	m_keep_original_color_illum_fore_subscans = keep_original_color_illum_fore_subscans;
+
+	
+	if (split_subscans) 
+	{
+		QDir().mkdir(text_dir);
+		QDir().mkdir(pic_dir);
+	}
+
+	std::vector<PageId::SubPage> erase_variations; 
+	erase_variations.reserve(3);
+
+	PageSequence const& pages = allPages(); // get all the pages (input pages)	
+
+	unsigned const count = pages.numPages(); // input pages number	
+
+	PageId page_id;	
+
+	m_outpaths_vector.clear();
+
+	for (unsigned i = 0; i < count; ++i)
+	{
+		page_id = pages.pageAt(i).id();
+
+		erase_variations.clear();
+
+		switch (page_id.subPage()) 
+		{
+		case PageId::SINGLE_PAGE:
+			erase_variations.push_back(PageId::SINGLE_PAGE);
+			erase_variations.push_back(PageId::LEFT_PAGE); //added
+			erase_variations.push_back(PageId::RIGHT_PAGE); //added
+			break;
+		case PageId::LEFT_PAGE:
+			erase_variations.push_back(PageId::SINGLE_PAGE); //added
+			erase_variations.push_back(PageId::LEFT_PAGE);
+			break;
+		case PageId::RIGHT_PAGE:
+			erase_variations.push_back(PageId::SINGLE_PAGE); //added
+			erase_variations.push_back(PageId::RIGHT_PAGE);
+			break;
+		}
+
+		BOOST_FOREACH(PageId::SubPage subpage, erase_variations)
+		{	
+			QString out_file_path = m_outFileNameGen.filePathFor(PageId(page_id.imageId(), subpage));
+			if (QFile().exists(out_file_path))			
+				m_outpaths_vector.append(out_file_path);
+		}
+	}	
+
+	// exporting pages
+	
+	m_pos_export = 0;
+
+	m_p_export_dialog->setCount(m_outpaths_vector.size());
+
+	m_exportTimerId = startTimer(0);
+}
+
+void 
+MainWindow::ExportStop()
+{
+	killTimer(m_exportTimerId);
+
+	m_exportTimerId = 0;
+
+	m_p_export_dialog->reset();
+
+	QMessageBox::information(0, tr("Information"), tr("The files export is stopped by the user."));
+}
+
+void
+MainWindow::SetStartExport()
+{
+	if (isBatchProcessingInProgress())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("Batch processing is in the progress."));
+
+		return;	
+	}
+
+	if (!isProjectLoaded())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("No project is loaded."));
+
+		return;	
+	}
+
+	m_p_export_dialog->setStartExport();
+}
+//end of modified by monday2000
 
 void
 MainWindow::showAboutDialog()
