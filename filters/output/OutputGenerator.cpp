@@ -740,7 +740,18 @@ OutputGenerator::processWithoutDewarping(
 //begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //added:
-QImage maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
+        QImage maybe_normalized_Dont_Equalize_Illumination_Pic_Zones;
+
+		bool const color_original = !input.origImage().allGray();
+
+        if (!color_original)
+
+                maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transformToGray(
+                input.grayImage(), m_xform.transform(),
+                normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
+                );
+        else
+                maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
 			input.origImage(), m_xform.transform(),
 			normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
 		);
