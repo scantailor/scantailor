@@ -47,6 +47,11 @@ SettingsDialog::SettingsDialog(QWidget* parent)
 #endif
 
 	connect(ui.buttonBox, SIGNAL(accepted()), SLOT(commitChanges()));
+//begin of modified by monday2000
+//Auto_Save_Project
+	ui.AutoSaveProject->setChecked(settings.value("settings/auto_save_project").toBool());
+	connect(ui.AutoSaveProject, SIGNAL(toggled(bool)), this, SLOT(OnCheckAutoSaveProject(bool)));
+//end of modified by monday2000
 }
 
 SettingsDialog::~SettingsDialog()
@@ -61,3 +66,17 @@ SettingsDialog::commitChanges()
 	settings.setValue("settings/use_3d_acceleration", ui.use3DAcceleration->isChecked());
 #endif
 }
+
+//begin of modified by monday2000
+//Auto_Save_Project
+void
+SettingsDialog::OnCheckAutoSaveProject(bool state)
+{
+	QSettings settings;	
+
+	settings.setValue("settings/auto_save_project", state);
+
+	emit AutoSaveProjectStateSignal(state);
+}
+
+//end of modified by monday2000

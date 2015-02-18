@@ -109,6 +109,8 @@ public slots:
 		bool generate_blank_back_subscans, bool keep_original_color_illum_fore_subscans);
 	void ExportStop();
 	void SetStartExport();
+//Auto_Save_Project
+	void AutoSaveProjectState(bool auto_save);
 //end of modified by monday2000
 private:
 	enum MainAreaAction { UPDATE_MAIN_AREA, CLEAR_MAIN_AREA };
@@ -330,6 +332,9 @@ private:
 	bool m_generate_blank_back_subscans;
 	bool m_keep_original_color_illum_fore_subscans;
 	int m_pos_export;
+//Auto_Save_Project
+	void autoSaveProject();
+	bool m_auto_save_project;
 //end of modified by monday2000
 };
 

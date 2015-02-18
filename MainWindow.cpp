@@ -179,7 +179,10 @@ MainWindow::MainWindow()
 #if !defined(ENABLE_OPENGL)
 	// Right now the only setting is 3D acceleration, so get rid of
 	// the whole Settings dialog, if it's inaccessible.
-	actionSettings->setVisible(false);
+//begin of modified by monday2000
+//Auto_Save_Project
+	//actionSettings->setVisible(false); // commented by monday2000
+//end of modified by monday2000
 #endif
 
 	createBatchProcessingWidget();
@@ -321,6 +324,10 @@ MainWindow::MainWindow()
 			resize(1014, 689); // A sensible value.
 		}
 	}
+//begin of modified by monday2000
+//Auto_Save_Project
+	m_auto_save_project = settings.value("settings/auto_save_project").toBool();
+//end of modified by monday2000
 }
 
 
@@ -998,6 +1005,11 @@ MainWindow::goToPage(PageId const& page_id)
 	// If the page was already selected, it will be reloaded.
 	// That's by design.
 	updateMainArea();
+
+//begin of modified by monday2000
+//Auto_Save_Project
+	autoSaveProject();
+//end of modified by monday2000
 }
 
 void
@@ -1021,7 +1033,35 @@ MainWindow::currentPageChanged(
 			updateMainArea();
 		}
 	}
+
+//begin of modified by monday2000
+//Auto_Save_Project
+	if (flags & ThumbnailSequence::SELECTED_BY_USER)
+		autoSaveProject();
+//end of modified by monday2000
 }
+
+//begin of modified by monday2000
+//Auto_Save_Project
+void
+MainWindow::autoSaveProject()
+{
+	if (m_projectFile.isEmpty()) 
+		return;	
+
+	if (!m_auto_save_project)
+		return;
+
+	saveProjectWithFeedback(m_projectFile);
+}
+
+void 
+MainWindow::AutoSaveProjectState(bool auto_save)
+{
+	m_auto_save_project = auto_save;
+}
+
+//end of modified by monday2000
 
 void
 MainWindow::pageContextMenuRequested(
@@ -1549,6 +1589,10 @@ MainWindow::openSettingsDialog()
 	SettingsDialog* dialog = new SettingsDialog(this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
+//begin of modified by monday2000
+//Auto_Save_Project
+	connect(dialog, SIGNAL(AutoSaveProjectStateSignal(bool)), this, SLOT(AutoSaveProjectState(bool)));
+//end of modified by monday2000
 	dialog->show();
 }
 
