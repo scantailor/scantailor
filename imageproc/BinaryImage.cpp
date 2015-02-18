@@ -652,7 +652,7 @@ BinaryImage::rectangularizeAreas(BWColor content_color)
 }
 
 void
-BinaryImage::rectangularizeAreasTest(BWColor content_color, std::vector<QRect>& areas)
+BinaryImage::rectangularizeAreasQuadro(BWColor content_color, std::vector<QRect>& areas)
 {
 	if (isNull()) {
 		return;
@@ -819,6 +819,8 @@ BinaryImage::rectangularizeAreasTest(BWColor content_color, std::vector<QRect>& 
 				break;
 			}
 		}
+
+		area = area.intersected(this->rect());
 
 		fill(tmp_area, BLACK);		
 	}

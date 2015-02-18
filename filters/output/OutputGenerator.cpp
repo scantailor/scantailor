@@ -843,7 +843,7 @@ OutputGenerator::processWithoutDewarping(
 			else
 			{
 				std::vector<QRect> areas;
-				bw_mask.rectangularizeAreasTest(WHITE, areas);				
+				bw_mask.rectangularizeAreasQuadro(WHITE, areas);				
 
 				QTransform xform1(m_xform.transform());            
 				xform1 *= QTransform().translate(-small_margins_rect.x(), -small_margins_rect.y());
@@ -1218,7 +1218,7 @@ OutputGenerator::processWithDewarping(
 			else
 			{
 				std::vector<QRect> areas;
-				warped_bw_mask.rectangularizeAreasTest(WHITE, areas);				
+				warped_bw_mask.rectangularizeAreasQuadro(WHITE, areas);				
 
 				QTransform xform1(m_xform.transform());            
 				xform1 *= QTransform().translate(-small_margins_rect.x(), -small_margins_rect.y());

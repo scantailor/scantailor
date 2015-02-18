@@ -206,7 +206,7 @@ public:
 //begin of modified by monday2000
 //Picture_Shape
 	void rectangularizeAreas(BWColor content_color = BLACK);
-	void rectangularizeAreasTest(BWColor content_color, std::vector<QRect>& areas);
+	void rectangularizeAreasQuadro(BWColor content_color, std::vector<QRect>& areas);
 //end of modified by monday2000	
 	int width() const { return m_width; }
 	
@@ -255,6 +255,14 @@ public:
 	 * Opaque (black) pixels take the specified color.  Colors with alpha channel are supported.
 	 */
 	QImage toAlphaMask(QColor const& color) const;
+
+//begin of modified by monday2000
+//Quadro_Zoner
+//Marginal_Dewarping
+	void setPixel(int x, int y, BWColor color);
+	BWColor getPixel(int x, int y);
+//end of modified by monday2000
+
 private:
 	class SharedData;
 	
@@ -293,11 +301,6 @@ private:
 	
 	static int rightmostBitOffset(
 		uint32_t const* line, int offset_limit, uint32_t modifier);
-
-//begin of modified by monday2000
-	void setPixel(int x, int y, BWColor color);
-	BWColor getPixel(int x, int y);
-//end of modified by monday2000
 	
 	SharedData* m_pData;
 	int m_width;
