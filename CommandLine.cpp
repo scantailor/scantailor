@@ -155,6 +155,10 @@ CommandLine::setup()
 	m_layoutType = fetchLayoutType();
 	m_layoutDirection = fetchLayoutDirection();
 	m_colorMode = fetchColorMode();
+//begin of modified by monday2000
+//Picture_Shape
+	m_pictureShape = fetchPictureShape();
+//end of modified by monday2000
 	m_dpi = fetchDpi();
 	m_outputDpi = fetchDpi("output-dpi");
 	m_margins = fetchMargins();
@@ -224,6 +228,10 @@ CommandLine::printHelp()
 	std::cout << "\t\t--output-dpi-x=<number>" << "\n";
 	std::cout << "\t\t--output-dpi-y=<number>" << "\n";
 	std::cout << "\t--color-mode=<black_and_white|color_grayscale|mixed>\n\t\t\t\t\t\t-- default: black_and_white" << "\n";
+//begin of modified by monday2000
+//Picture_Shape
+	std::cout << "\t--picture-shape=<free|rectangular>\n\t\t\t\t\t\t-- default: free" << std::endl;
+//end of modified by monday2000
 	std::cout << "\t--white-margins\t\t\t\t-- default: false" << "\n";
 	std::cout << "\t--normalize-illumination\t\t-- default: false" << "\n";
 	std::cout << "\t--threshold=<n>\t\t\t\t-- n<0 thinner, n>0 thicker; default: 0" << "\n";
@@ -302,6 +310,22 @@ CommandLine::fetchColorMode()
 	return output::ColorParams::BLACK_AND_WHITE;
 }
 
+//begin of modified by monday2000
+//Picture_Shape
+output::PictureShape
+CommandLine::fetchPictureShape()
+{
+	if (! hasPictureShape())
+		return output::FREE_SHAPE;
+	
+	QString ps = m_options["picture-shape"].toLower();
+	
+	if (ps == "rectangular")
+		return output::RECTANGULAR_SHAPE;
+
+	return output::FREE_SHAPE;
+}
+//end of modified by monday2000
 
 Margins
 CommandLine::fetchMargins()

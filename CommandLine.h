@@ -35,6 +35,11 @@
 #include "ImageFileInfo.h"
 #include "Margins.h"
 #include "Despeckle.h"
+//begin of modified by monday2000
+//Picture_Shape
+#include "filters/output/Params.h"
+#include "filters/page_layout/Settings.h"
+//end of modified by monday2000
 
 /**
  * CommandLine is a singleton simulation.
@@ -75,6 +80,10 @@ public:
 	bool hasDeskew() const { return contains("deskew"); }
 	bool hasContentRect() const { return contains("content-box"); }
 	bool hasColorMode() const { return contains("color-mode"); }
+//begin of modified by monday2000
+//Picture_Shape
+	bool hasPictureShape() const { return contains("picture-shape") && !m_options["picture-shape"].isEmpty(); }
+//end of modified by monday2000
 	bool hasWhiteMargins() const { return contains("white-margins"); }
 	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
 	bool hasThreshold() const { return contains("threshold"); }
@@ -85,6 +94,10 @@ public:
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
 	output::ColorParams::ColorMode getColorMode() const { return m_colorMode; }
+//begin of modified by monday2000
+//Picture_Shape
+	output::PictureShape getPictureShape() const { return m_pictureShape; }
+//end of modified by monday2000
 	Dpi getInputDpi() const { return m_dpi; }
 	Dpi getOutputDpi() const { return m_outputDpi; }
 	Margins getMargins() const { return m_margins; }
@@ -126,6 +139,10 @@ private:
 	page_split::LayoutType m_layoutType;
 	Qt::LayoutDirection m_layoutDirection;
 	output::ColorParams::ColorMode m_colorMode;
+//begin of modified by monday2000
+//Picture_Shape
+	output::PictureShape m_pictureShape;
+//end of modified by monday2000
 	Dpi m_dpi;
 	Dpi m_outputDpi;
 	Margins m_margins;
@@ -146,6 +163,10 @@ private:
 	void setup();
 	page_split::LayoutType fetchLayoutType();
 	output::ColorParams::ColorMode fetchColorMode();
+//begin of modified by monday2000
+//Picture_Shape	
+	output::PictureShape fetchPictureShape();
+//end of modified by monday2000
 	Qt::LayoutDirection fetchLayoutDirection();
 	Dpi fetchDpi(QString oname="dpi");
 	Margins fetchMargins();

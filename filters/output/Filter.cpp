@@ -171,7 +171,14 @@ Filter::loadSettings(ProjectReader const& reader, QDomElement const& filters_el)
 		
 		QDomElement const output_params_el(el.namedItem("output-params").toElement());
 		if (!output_params_el.isNull()) {
-			OutputParams const output_params(output_params_el);
+//begin of modified by monday2000
+//Picture_Shape_Bug
+//added:
+			Params tmp_params = m_ptrSettings->getParams(page_id);
+			int picture_shape_int = (int)tmp_params.pictureShape();
+			//OutputParams const output_params(output_params_el);			
+			OutputParams const output_params(output_params_el, picture_shape_int);
+//end of modified by monday2000
 			m_ptrSettings->setOutputParams(page_id, output_params);
 		}
 	}
@@ -182,7 +189,15 @@ Filter::createTask(
 	PageId const& page_id,
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	OutputFileNameGenerator const& out_file_name_gen,
-	bool const batch, bool const debug)
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+	//bool const batch, bool const debug)
+	bool const batch, bool const debug,	
+	bool dont_equalize_illumination_pic_zones,
+	bool keep_orig_fore_subscan,
+//Original_Foreground_Mixed
+	QImage* p_orig_fore_subscan)
+//end of modified by monday2000
 {
 	ImageViewTab lastTab(TAB_OUTPUT);
 	if (m_ptrOptionsWidget.get() != 0)
@@ -191,7 +206,14 @@ Filter::createTask(
 		new Task(
 			IntrusivePtr<Filter>(this), m_ptrSettings,
 			thumbnail_cache, page_id, out_file_name_gen,
-			lastTab, batch, debug
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+			//lastTab, batch, debug
+			lastTab, batch, debug, dont_equalize_illumination_pic_zones,
+			keep_orig_fore_subscan, 
+//Original_Foreground_Mixed
+			p_orig_fore_subscan
+//end of modified by monday2000
 		)
 	);
 }
