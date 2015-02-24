@@ -32,6 +32,10 @@
 #include "ImageViewTab.h"
 #include "Params.h"
 #include <set>
+//begin of modified by monday2000
+//Picture_Shape
+#include "Params.h"
+//end of modified by monday2000
 
 namespace dewarping
 {

@@ -55,7 +55,12 @@ DraggablePoint::dragInitiated(QPointF const& mouse_pos)
 }
 
 void
-DraggablePoint::dragContinuation(QPointF const& mouse_pos)
+//begin of modified by monday2000
+//Blue_Dewarp_Line_Vert_Drag
+//DraggablePoint::dragContinuation(QPointF const& mouse_pos)
+DraggablePoint::dragContinuation(QPointF const& mouse_pos, Qt::KeyboardModifiers mask)
 {
-	pointMoveRequest(mouse_pos + m_pointRelativeToMouse);
+	//pointMoveRequest(mouse_pos + m_pointRelativeToMouse);
+	pointMoveRequest(mouse_pos + m_pointRelativeToMouse, mask);
+//end of modified by monday2000
 }

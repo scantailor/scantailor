@@ -43,6 +43,7 @@ SET(
 	ConnectivityMap.cpp ConnectivityMap.h
 	InfluenceMap.cpp InfluenceMap.h
 	MaxWhitespaceFinder.cpp MaxWhitespaceFinder.h
+	RastLineFinder.cpp RastLineFinder.h
 	ColorInterpolation.cpp ColorInterpolation.h
 	LocalMinMaxGeneric.h
 	SeedFillGeneric.cpp SeedFillGeneric.h

@@ -39,6 +39,11 @@
 #include "AutoManualMode.h"
 #include "Margins.h"
 #include "Despeckle.h"
+//begin of modified by monday2000
+//Picture_Shape
+#include "filters/output/Params.h"
+#include "filters/page_layout/Settings.h"
+//end of modified by monday2000
 
 namespace page_layout {
     class Alignment;

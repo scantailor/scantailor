@@ -4,9 +4,8 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="14"/>
-        <source>About Scan Tailor &quot;Enhanced&quot;</source>
-        <translation>O Scan Tailor-u &quot;Enhanced&quot;</translation>
+        <source>About Scan Tailor</source>
+        <translation type="obsolete">O Scan Tailor-u</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="27"/>
@@ -16,7 +15,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="33"/>
         <source>Scan Tailor is an interactive post-processing tool for scanned pages. It performs operations such as page splitting, skew correction, adding/removing margins, and others. You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.  Scanning and optical character recognition is out of scope of this project.</source>
-        <translation>Scan Tailor je interaktivni post-procesni alat za obradu skeniranih stranica. On izvodi operacije kao što su dijeljenje duplih stranice, ispravljanje iskrivljenja, dodavanje / uklanjanje margine i drugo. Možete mu dati sirovu skeniranu stranicu i dobiti ćete stranice spremne za ispis ili stavljanje u PDF ili DJVU datoteke. Skeniranje i optičko prepoznavanje znakova ne dolazi u okviru ovog projekta.</translation>
+        <translation>Scan Tailor je interaktivni post-processing alat za obradu skeniranih stranica. On izvodi operacije kao što su dijeljenje duplih stranice, ispravljanje iskrivljenja i dodavanje / uklanjanje margine, i drugo. Možete mu dati sirovu skeniranu stranicu, i dobiti ćete stranice spremne za ispis ili stavljanje u PDF ili DJVU datoteke. Skeniranje i optičko prepoznavanje znakova ne dolazi u okviru ovog projekta.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="101"/>
@@ -34,116 +33,137 @@
         <translation>Joseph Artsimovich</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="157"/>
+        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <source>Fork Developer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="149"/>
+        <source>monday2000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="174"/>
         <source>U235 - Picture auto-detection algorithm.</source>
         <translation>U234 - Auto-detekcijski algoritam slika.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="164"/>
+        <location filename="../ui/AboutDialog.ui" line="181"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
         <translation>Robert B. -Prva generacija dewarping algoritama.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="171"/>
+        <location filename="../ui/AboutDialog.ui" line="188"/>
         <source>Andrey Bergman - System load adjustment.</source>
         <translation>Andrey Bergman - Podešavanje opterećenja sustava.</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="178"/>
+        <location filename="../ui/AboutDialog.ui" line="195"/>
         <source>Petr Kovář - Command line interface.</source>
         <translation>Petr Kovář - Sučelje komandne linije.</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="212"/>
+        <location filename="../ui/AboutDialog.ui" line="222"/>
+        <source>Neco Torquato - Brazilian Portuguese</source>
+        <translation>Neco Torquato - Brazilski Portugalski</translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="229"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
         <translation>Svetoslav Sashkov, Mandor - Bugarski</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="205"/>
-        <source>Neco Torquato - Brazilian Portuguese</source>
-        <translation>Neco Torquato - Brazilski portugalski</translation>
-    </message>
-    <message utf8="true">
+        <location filename="../ui/AboutDialog.ui" line="236"/>
         <source>Damir13 - Croatian</source>
-        <translation type="obsolete">Damir13 - Hrvatski</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="219"/>
+        <location filename="../ui/AboutDialog.ui" line="243"/>
         <source>Petr Kovář - Czech</source>
         <translation>Petr Kovář - Češki</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="226"/>
+        <location filename="../ui/AboutDialog.ui" line="250"/>
         <source>Stefan Birkner - German</source>
-        <translation>Stefan Birkner - Njemački</translation>
+        <translation>Marián Hvolka - Slovački</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="233"/>
+        <location filename="../ui/AboutDialog.ui" line="257"/>
         <source>Angelo Gemmi - Italian</source>
         <translation>Angelo Gemmi - Talijanski</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="240"/>
+        <location filename="../ui/AboutDialog.ui" line="264"/>
         <source>Masahiro Kitagawa - Japanese</source>
         <translation>Masahiro Kitagawa - Japanski</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="247"/>
+        <location filename="../ui/AboutDialog.ui" line="271"/>
         <source>Patrick Pascal - French</source>
         <translation>Patrick Pascal - Francuski</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="254"/>
+        <location filename="../ui/AboutDialog.ui" line="278"/>
         <source>Daniel Koć - Polish</source>
         <translation>Daniel Koć - Poljski</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="261"/>
+        <location filename="../ui/AboutDialog.ui" line="285"/>
         <source>Joseph Artsimovich - Russian</source>
         <translation>Joseph Artsimovich - Ruski</translation>
     </message>
     <message utf8="true">
-        <location filename="../ui/AboutDialog.ui" line="268"/>
+        <location filename="../ui/AboutDialog.ui" line="292"/>
         <source>Marián Hvolka - Slovak</source>
         <translation>Marián Hvolka - Slovački</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="275"/>
+        <location filename="../ui/AboutDialog.ui" line="299"/>
         <source>Flavio Benelli - Spanish</source>
         <translation>Flavio Benelli - Španjolski</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="282"/>
+        <location filename="../ui/AboutDialog.ui" line="306"/>
         <source>Davidson Wang - Traditional Chinese</source>
-        <translation>Davidson Wang - Tradicionalni kineski</translation>
+        <translation>Davidson Wang - Kineski Tradicionalni</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="289"/>
+        <location filename="../ui/AboutDialog.ui" line="313"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation>Yuri Chornoivan - Ukrainski</translation>
+        <translation>Yuri Chornoivan - Ukrajinski</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="316"/>
+        <location filename="../ui/AboutDialog.ui" line="320"/>
+        <source>Hxcan Cai - Simplified Chinese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="347"/>
         <source>denver 22</source>
         <translation>denver 22</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="190"/>
+        <location filename="../ui/AboutDialog.ui" line="207"/>
         <source>Translators</source>
         <translation>Prevodioci</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="142"/>
+        <location filename="../ui/AboutDialog.ui" line="14"/>
+        <source>About Scan Tailor &quot;Enhanced&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/AboutDialog.ui" line="159"/>
         <source>Contributors</source>
         <translation>Suradnici</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="301"/>
+        <location filename="../ui/AboutDialog.ui" line="332"/>
         <source>Documentation</source>
         <translation>Dokumentacija</translation>
     </message>
     <message>
-        <location filename="../ui/AboutDialog.ui" line="357"/>
+        <location filename="../ui/AboutDialog.ui" line="388"/>
         <source>License</source>
         <translation>Dozvola</translation>
     </message>
@@ -192,10 +212,16 @@
         <translation>Ova stranica i koje slijede</translation>
     </message>
     <message>
+        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="50"/>
+        <source>This page and the following every other page</source>
+        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="57"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sve druge stranice</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="67"/>
@@ -208,24 +234,14 @@
         <translation>Koristite Ctrl+Click / Shift+Click za izbor više stranica.</translation>
     </message>
     <message>
-        <source>Every other page from the first one</source>
-        <translation type="obsolete">Svaka druga stranica od prve</translation>
-    </message>
-    <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="106"/>
         <source>Every other selected page</source>
-        <translation>Svaka druga izabrana stranica</translation>
+        <translation type="unfinished">Sve druge odabrane stranice</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="136"/>
         <source>The current page will be included.</source>
-        <translation>Trenutna stranica će biti uključena.</translation>
-    </message>
-    <message>
-        <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="50"/>
-        <source>This page and the following every other page</source>
-        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Ova stranica i slijedeća svaka druga stranica</translation>
+        <translation type="unfinished">Trenutna stranica će biti uključena.</translation>
     </message>
 </context>
 <context>
@@ -267,8 +283,140 @@
 <context>
     <name>ErrorWidget</name>
     <message>
+        <location filename="../ui/ErrorWidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="obsolete">Oblik</translation>
+        <translation>Oblik</translation>
+    </message>
+</context>
+<context>
+    <name>ExportDialog</name>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="14"/>
+        <location filename="../ui/ExportDialog.ui" line="136"/>
+        <location filename="../ExportDialog.cpp" line="53"/>
+        <location filename="../ExportDialog.cpp" line="209"/>
+        <location filename="../ExportDialog.cpp" line="215"/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="85"/>
+        <source>Split mixed output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="98"/>
+        <source>Default export folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="30"/>
+        <source>Tab 1</source>
+        <translation type="unfinished">Tablica 1</translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="111"/>
+        <source>Output Directory</source>
+        <translation type="unfinished">Izlazna putanja</translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="120"/>
+        <source>Browse</source>
+        <translation type="unfinished">Pretraži</translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="149"/>
+        <location filename="../ExportDialog.cpp" line="54"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="162"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="170"/>
+        <source>Tab 2</source>
+        <translation type="unfinished">Tablica 2</translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="182"/>
+        <source>Generate blank background subscans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="195"/>
+        <source>Keep the original color and illumination in foreground subscans (lengthy)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="55"/>
+        <source>Main</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="56"/>
+        <source>Rare options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="95"/>
+        <location filename="../ExportDialog.cpp" line="119"/>
+        <location filename="../ExportDialog.cpp" line="129"/>
+        <source>Error</source>
+        <translation type="unfinished">Greška</translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="96"/>
+        <source>The export output directory is empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="108"/>
+        <source>Create Directory?</source>
+        <translation type="unfinished">Stvoriti putanju?</translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="109"/>
+        <source>The export output directory doesn&apos;t exist.  Create it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="120"/>
+        <source>Unable to create the export output directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="130"/>
+        <source>The export output directory is not set or doesn&apos;t exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="139"/>
+        <location filename="../ExportDialog.cpp" line="225"/>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="156"/>
+        <source>Export output directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="187"/>
+        <source>Processed file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="187"/>
+        <source>of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ExportDialog.cpp" line="224"/>
+        <source>Starting the export...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -309,35 +457,43 @@
         <translation>Prihvati</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="241"/>
         <source>Need Fixing</source>
-        <translation type="obsolete">Potrebno popraviti</translation>
+        <translation>Potrebno popraviti</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="242"/>
+        <location filename="../FixDpiDialog.cpp" line="708"/>
         <source>All Pages</source>
-        <translation type="obsolete">Sve stranice</translation>
+        <translation>Sve stranice</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="477"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="obsolete">DPI je preveliki, izgleda kao da je krivi.</translation>
+        <translation>DPI je preveliki, izgleda kao da je krivi.</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="480"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation type="obsolete">DPI je premali. Čak i ako je ispravan, s njim nećete dobiti prihvatljivi rezultat.</translation>
+        <translation>DPI je premali. Čak i ako je ispravan, s njim nećete dobiti prihvatljivi rezultat.</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="483"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation type="obsolete">DPI je premali za ovu veličinu piksela. Takva kombinacija najvjerojatnije će uzrokovati  stanje izvan memorije.</translation>
+        <translation>DPI je premali za ovu veličinu piksela. Takva kombinacija najvjerojatnije će uzrokovati  stanje izvan memorije.</translation>
     </message>
     <message>
+        <location filename="../FixDpiDialog.cpp" line="734"/>
         <source>%1 (page %2)</source>
-        <translation type="obsolete">%1 (stranica %2)</translation>
+        <translation>%1 (stranica %2)</translation>
     </message>
 </context>
 <context>
     <name>ImageViewBase</name>
     <message>
+        <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
-        <translation type="obsolete">Koristite kotačić miša ili + / - da bi povećali ili smanjili. Kad zumiranja, moguće je povlačenje.</translation>
+        <translation>Koristite kotačić miša ili + / - da bi povećali ili smanjili. Kad zumiranja, moguće je povlačenje.</translation>
     </message>
 </context>
 <context>
@@ -348,12 +504,12 @@
         <translation>Kliknite za stvaranje nove točke.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
         <source>This point can be dragged.</source>
         <translation>Ova točka se može povlačitii.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="79"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation>Povucite ovu točku ili ju možete ukloniti pritiskom na tipku Del ili D.</translation>
     </message>
@@ -361,14 +517,16 @@
 <context>
     <name>LoadFileTask</name>
     <message>
+        <location filename="../LoadFileTask.cpp" line="157"/>
         <source>The following file could not be loaded:
 %1</source>
-        <translation type="obsolete">Sljedeću datoteku nije moguće učitati:
+        <translation>Sljedeću datoteku nije moguće učitati:
 %1</translation>
     </message>
     <message>
+        <location filename="../LoadFileTask.cpp" line="160"/>
         <source>The following file doesn&apos;t exist:&lt;br&gt;%1&lt;br&gt;&lt;br&gt;Use the &lt;a href=&quot;#relink&quot;&gt;Relinking Tool&lt;/a&gt; to locate it.</source>
-        <translation type="obsolete">Sljedeća datoteka ne postoji:&lt;br&gt;%1&lt;br&gt;&lt;br&gt;Koristite &lt;a href=&quot;#relink&quot;&gt; Alat Ponovno pronađi&lt;/a&gt; kako bi ga pronašli.</translation>
+        <translation>Sljedeća datoteka ne postoji:&lt;br&gt;%1&lt;br&gt;&lt;br&gt;Koristite &lt;a href=&quot;#relink&quot;&gt; Alat Ponovno pronađi&lt;/a&gt; kako bi ga pronašli.</translation>
     </message>
 </context>
 <context>
@@ -392,7 +550,8 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../ui/MainWindow.ui" line="276"/>
+        <location filename="../ui/MainWindow.ui" line="277"/>
+        <location filename="../MainWindow.cpp" line="651"/>
         <source>Save Project</source>
         <translation>Spremi projekt</translation>
     </message>
@@ -402,12 +561,12 @@
         <translation>Glavni prozor</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="128"/>
+        <location filename="../ui/MainWindow.ui" line="129"/>
         <source>Keep current page in view.</source>
         <translation>Zadrži pogled na trenutnoj stranici.</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="166"/>
+        <location filename="../ui/MainWindow.ui" line="167"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
         <translation>Koristite Home, End, PgUp (or Q), PgDown (or W) za kretanje po stranicama.</translation>
     </message>
@@ -417,229 +576,370 @@
         <translation>Alati</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="76"/>
+        <location filename="../ui/MainWindow.ui" line="77"/>
         <source>File</source>
         <translation>Datoteka</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="90"/>
+        <location filename="../ui/MainWindow.ui" line="91"/>
         <source>Help</source>
         <translation>Pomoć</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="271"/>
+        <location filename="../ui/MainWindow.ui" line="108"/>
+        <source>Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="200"/>
+        <source>Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="272"/>
         <source>Debug Mode</source>
         <translation>Debug način</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="279"/>
+        <location filename="../ui/MainWindow.ui" line="280"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="284"/>
+        <location filename="../ui/MainWindow.ui" line="285"/>
         <source>Save Project As ...</source>
         <translation>Spremi projekt kao...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="289"/>
-        <location filename="../ui/MainWindow.ui" line="338"/>
+        <location filename="../ui/MainWindow.ui" line="290"/>
+        <location filename="../ui/MainWindow.ui" line="339"/>
         <source>Next Page</source>
         <translation>Slijedeća stranica</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="292"/>
+        <location filename="../ui/MainWindow.ui" line="293"/>
         <source>PgDown</source>
         <translation>Dolje</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="300"/>
-        <location filename="../ui/MainWindow.ui" line="327"/>
+        <location filename="../ui/MainWindow.ui" line="301"/>
+        <location filename="../ui/MainWindow.ui" line="328"/>
         <source>Previous Page</source>
         <translation>Prethodna stranica</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="303"/>
+        <location filename="../ui/MainWindow.ui" line="304"/>
         <source>PgUp</source>
         <translation>Gore</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="311"/>
+        <location filename="../ui/MainWindow.ui" line="312"/>
         <source>New Project ...</source>
         <translation>Novi projekt...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="314"/>
+        <location filename="../ui/MainWindow.ui" line="315"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="319"/>
+        <location filename="../ui/MainWindow.ui" line="320"/>
         <source>Open Project ...</source>
         <translation>Otvori projekt...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="322"/>
+        <location filename="../ui/MainWindow.ui" line="323"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="330"/>
+        <location filename="../ui/MainWindow.ui" line="331"/>
         <source>Q</source>
         <translation>Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="341"/>
+        <location filename="../ui/MainWindow.ui" line="342"/>
         <source>W</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="349"/>
+        <location filename="../ui/MainWindow.ui" line="350"/>
         <source>Close Project</source>
         <translation>Zatvori projekt</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="352"/>
+        <location filename="../ui/MainWindow.ui" line="353"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="357"/>
+        <location filename="../ui/MainWindow.ui" line="358"/>
         <source>Quit</source>
         <translation>Izlaz</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="360"/>
+        <location filename="../ui/MainWindow.ui" line="361"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="370"/>
+        <location filename="../ui/MainWindow.ui" line="371"/>
         <source>First Page</source>
         <translation>Prva stranica</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="373"/>
+        <location filename="../ui/MainWindow.ui" line="374"/>
         <source>Home</source>
         <translation>Početak</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="378"/>
+        <location filename="../ui/MainWindow.ui" line="379"/>
         <source>Last Page</source>
         <translation>Zadnja stranica</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="381"/>
+        <location filename="../ui/MainWindow.ui" line="382"/>
         <source>End</source>
         <translation>Kraj</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="386"/>
+        <location filename="../ui/MainWindow.ui" line="387"/>
         <source>About</source>
         <translation>O programu</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="391"/>
+        <location filename="../ui/MainWindow.ui" line="392"/>
         <source>Fix DPI ...</source>
         <translation>Popravi DPI ...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="396"/>
+        <location filename="../ui/MainWindow.ui" line="397"/>
         <source>Relinking ...</source>
         <translation>Ponovno pronađi...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="365"/>
+        <location filename="../ui/MainWindow.ui" line="402"/>
+        <location filename="../ui/MainWindow.ui" line="410"/>
+        <location filename="../ui/MainWindow.ui" line="421"/>
+        <location filename="../ui/MainWindow.ui" line="432"/>
+        <location filename="../ui/MainWindow.ui" line="443"/>
+        <location filename="../ui/MainWindow.ui" line="454"/>
+        <source>Switch filter to orientation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="405"/>
+        <source>O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="413"/>
+        <source>Switch filter to split pages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="416"/>
+        <source>E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="424"/>
+        <source>Switch filter to deskew</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="427"/>
+        <source>N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="435"/>
+        <source>Switch filter to select content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="438"/>
+        <source>V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="446"/>
+        <source>Switch filter to margins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="449"/>
+        <source>K</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="457"/>
+        <source>Switch filter to output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="460"/>
+        <source>P</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="465"/>
+        <source>Export...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ui/MainWindow.ui" line="366"/>
         <source>Settings ...</source>
         <translation>Postavke...</translation>
     </message>
     <message>
-        <location filename="../ui/MainWindow.ui" line="107"/>
-        <source>Thumbnails</source>
-        <translation>Minijature</translation>
-    </message>
-    <message>
-        <location filename="../ui/MainWindow.ui" line="199"/>
-        <source>Filters</source>
-        <translation>Filteri</translation>
-    </message>
-    <message>
+        <location filename="../MainWindow.cpp" line="538"/>
         <source>Stop batch processing</source>
-        <translation type="obsolete">Zaustavite skupne obrade</translation>
+        <translation>Zaustavite skupne obrade</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="618"/>
+        <source>The files export is finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="618"/>
+        <location filename="../MainWindow.cpp" line="2118"/>
+        <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="651"/>
         <source>Save this project?</source>
-        <translation type="obsolete">Spremiti ovaj projekt?</translation>
+        <translation>Spremiti ovaj projekt?</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1127"/>
         <source>Insert before ...</source>
-        <translation type="obsolete">Umetni prije...</translation>
+        <translation>Umetni prije...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1130"/>
         <source>Insert after ...</source>
-        <translation type="obsolete">Umetni poslije...</translation>
+        <translation>Umetni poslije...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1136"/>
         <source>Remove from project ...</source>
-        <translation type="obsolete">Ukloni iz projekta...</translation>
+        <translation>Ukloni iz projekta...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1157"/>
         <source>Insert here ...</source>
-        <translation type="obsolete">Umetni ovdije...</translation>
+        <translation>Umetni ovdije...</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1540"/>
+        <location filename="../MainWindow.cpp" line="1608"/>
         <source>Scan Tailor Projects</source>
-        <translation type="obsolete">Scan Tailor projekti</translation>
+        <translation>Scan Tailor projekti</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1607"/>
         <source>Open Project</source>
-        <translation type="obsolete">Otvori projekt</translation>
+        <translation>Otvori projekt</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1625"/>
+        <location filename="../MainWindow.cpp" line="1634"/>
+        <location filename="../MainWindow.cpp" line="1908"/>
+        <location filename="../MainWindow.cpp" line="1986"/>
+        <location filename="../MainWindow.cpp" line="1993"/>
+        <location filename="../MainWindow.cpp" line="2126"/>
+        <location filename="../MainWindow.cpp" line="2133"/>
+        <location filename="../MainWindow.cpp" line="2411"/>
+        <location filename="../MainWindow.cpp" line="2442"/>
         <source>Error</source>
-        <translation type="obsolete">Greška</translation>
+        <translation>Greška</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1626"/>
         <source>Unable to open the project file.</source>
-        <translation type="obsolete">Ne mogu otvoriti projekt datoteku.</translation>
+        <translation>Ne mogu otvoriti projekt datoteku.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1635"/>
         <source>The project file is broken.</source>
-        <translation type="obsolete">Datoteka projekta je neispravna.</translation>
+        <translation>Datoteka projekta je neispravna.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="1908"/>
+        <source>The file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1908"/>
+        <source>is not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1986"/>
+        <location filename="../MainWindow.cpp" line="2126"/>
+        <source>Batch processing is in the progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="1993"/>
+        <location filename="../MainWindow.cpp" line="2133"/>
+        <source>No project is loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="2118"/>
+        <source>The files export is stopped by the user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="2303"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="obsolete">Izlaz još nije moguć jer  konačna veličina stranice nije poznata.
+        <translation>Izlaz još nije moguć jer  konačna veličina stranice nije poznata.
 Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &quot;Margine&quot;.</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="2338"/>
         <source>Unnamed</source>
-        <translation type="obsolete">Nema imena</translation>
+        <translation>Nema imena</translation>
     </message>
     <message>
-        <source>%2 - Scan Tailor \&quot;Enhanced\&quot; build from %3 [%1bit]&quot;</source>
-        <translation type="obsolete">%2 - Scan Tailor \&quot;Enhanced\&quot; izrada %3 [%1bit]</translation>
+        <location filename="../MainWindow.cpp" line="2345"/>
+        <source>%2 - Scan Tailor &quot;Enhanced&quot; build from %3 [%1bit]</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>%2 - Scan Tailor %3 [%1bit]</source>
+        <translation type="obsolete">%2 - Scan Tailor %3 [%1bit]</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="2412"/>
+        <location filename="../MainWindow.cpp" line="2443"/>
         <source>Error saving the project file!</source>
-        <translation type="obsolete">Greška spremanja projekt datpteke!</translation>
+        <translation>Greška spremanja projekt datpteke!</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="2494"/>
         <source>Files to insert</source>
-        <translation type="obsolete">Datoteke za umetnuti</translation>
+        <translation>Datoteke ze umetnuti</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="2500"/>
         <source>Images not in project (%1)</source>
-        <translation type="obsolete">Slike koje nisu u projektu (%1)</translation>
+        <translation>Slike koje nisu u projektu (%1)</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="2549"/>
         <source>Skip failed files</source>
-        <translation type="obsolete">Preskoči neispravne datoteke</translation>
+        <translation>Preskoči neispravne datoteke</translation>
     </message>
     <message>
+        <location filename="../MainWindow.cpp" line="2596"/>
         <source>Remove</source>
-        <translation type="obsolete">Ukloni</translation>
+        <translation>Ukloni</translation>
     </message>
 </context>
 <context>
@@ -690,20 +990,20 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="46"/>
         <source>This page and the following ones</source>
-        <translation>Ova stranica i koje slijede</translation>
+        <translation>Ova stranica i sve koje slijede</translation>
     </message>
     <message>
-        <source>This and every other following pages</source>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
+        <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translatorcomment>sve parane ili neparane stranice ovise o trenutnoj stranici, je li parana ili neparana</translatorcomment>
-        <translation type="obsolete">Ova i svaka druga slijedeća stranica</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="93"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translatorcomment>sve parane ili neparane stranice ovise o trenutnoj stranici, je li parana ili neparana</translatorcomment>
-        <translation>Svaka druga stranica</translation>
+        <translatorcomment>sve parane ili neparane stranice ovise o trenutnoj stranici, je lii parana ili neparana</translatorcomment>
+        <translation>Sve druge stranice</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="181"/>
@@ -716,12 +1016,6 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Odbrane stranice</translation>
     </message>
     <message>
-        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
-        <source>This page and the following every other page</source>
-        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Ova stranica i slijedeća svaka druga stranica</translation>
-    </message>
-    <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="130"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Koristite Ctrl+Click / Shift+Click za izbor više stranica.</translation>
@@ -729,7 +1023,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="151"/>
         <source>Every other selected page</source>
-        <translation>Svaka druga odabrana stranica</translation>
+        <translation>Sve druge odabrane stranice</translation>
     </message>
 </context>
 <context>
@@ -860,16 +1154,19 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Imajte na umu, Scan Tailor pokušava uhvatiti stanje prije stanja nedostatka memorije i dati vam priliku da spremite svoj ​​projekt, to nije uvijek moguće. Ovaj put je to uspio, ali idući put se može srušiti.</translation>
     </message>
     <message>
+        <location filename="../OutOfMemoryDialog.cpp" line="88"/>
         <source>Scan Tailor Projects</source>
-        <translation type="obsolete">Scan Tailor projekti</translation>
+        <translation>Scan Tailor projekti</translation>
     </message>
     <message>
+        <location filename="../OutOfMemoryDialog.cpp" line="123"/>
         <source>Error</source>
-        <translation type="obsolete">Greška</translation>
+        <translation>Greška</translation>
     </message>
     <message>
+        <location filename="../OutOfMemoryDialog.cpp" line="124"/>
         <source>Error saving the project file!</source>
-        <translation type="obsolete">Greška spremanja projekt datpteke!</translation>
+        <translation>Greška spremanja projekt datpteke!</translation>
     </message>
 </context>
 <context>
@@ -877,7 +1174,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="17"/>
         <source>Apply Mode</source>
-        <translation>Primjena načina</translation>
+        <translation>Primijena</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="23"/>
@@ -933,37 +1230,42 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Auto (probno)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="49"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="52"/>
         <source>Manual</source>
         <translation>Ručno</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="62"/>
+        <source>Marginal (experimental)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="72"/>
         <source>Scope</source>
         <translation>Područje</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="78"/>
         <source>This page only</source>
         <translation>Samo ova stranica</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="75"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="88"/>
         <source>All pages</source>
         <translation>Sve stranice</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="82"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="95"/>
         <source>This page and the following ones</source>
-        <translation>Ova stranica i koje slijede</translation>
+        <translation>Ova stranica i sve koje slijede</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="98"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="111"/>
         <source>Selected pages</source>
         <translation>Odabrane stranice</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="131"/>
+        <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="144"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Koristite Ctrl+Click / Shift+Click za izbor više stranica.</translation>
     </message>
@@ -993,7 +1295,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="91"/>
         <source>This page and the following ones</source>
-        <translation>Ova stranica i koje slijede</translation>
+        <translation>Ova stranica i sve koje slijede</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="107"/>
@@ -1025,7 +1327,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="78"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="560"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="569"/>
         <source>Change ...</source>
         <translation>Promijeni...</translation>
     </message>
@@ -1045,51 +1347,61 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Izjednači osvjetljenje</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="502"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="348"/>
+        <source>Picture Shape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="511"/>
         <source>Dewarping</source>
         <translation>Poravnanje (Warp)</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="437"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="794"/>
+        <source>Tiff Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="446"/>
         <source>Depth perception</source>
         <translation>Dubina percepcije</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="609"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="618"/>
         <source>No despeckling</source>
         <translation>Bez čišćenja</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="412"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="477"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="742"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="486"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="751"/>
         <source>Apply To ...</source>
         <translation>Primijeni na...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="585"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="594"/>
         <source>Despeckling</source>
         <translation>Čišćenje</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="634"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="643"/>
         <source>Cautious despeckling</source>
         <translation>Čišćenje - oprezno</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="637"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="663"/>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="689"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="646"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="672"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="698"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="660"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="669"/>
         <source>Normal despeckling</source>
         <translation>Čišćenje - normalno</translation>
     </message>
     <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="686"/>
+        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="695"/>
         <source>Aggressive despeckling</source>
         <translation>Čišćenje - jako</translation>
     </message>
@@ -1102,16 +1414,6 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="306"/>
         <source>Thicker</source>
         <translation>Deblje</translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="339"/>
-        <source>Picture Shape</source>
-        <translation>Oblik slike</translation>
-    </message>
-    <message>
-        <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="785"/>
-        <source>Tiff Compression</source>
-        <translation>Tiff komprimiranje</translation>
     </message>
 </context>
 <context>
@@ -1137,10 +1439,10 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Ova stranica i koje slijede</translation>
     </message>
     <message>
-        <source>This page and following every other ones</source>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
+        <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translatorcomment>Sve parne i neparne stranice ovise o tome je li trenutna stranica parna ili neparna.</translatorcomment>
-        <translation type="obsolete">Ova stranica i slijedeća svaka druga stranica</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="69"/>
@@ -1160,12 +1462,6 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Odbrane stranice</translation>
     </message>
     <message>
-        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
-        <source>This page and the following every other page</source>
-        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Ova stranica i slijedeća svaka druga stranica</translation>
-    </message>
-    <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="118"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Koristite Ctrl+Click / Shift+Click za izbor više stranica.</translation>
@@ -1173,7 +1469,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="139"/>
         <source>Every other selected page</source>
-        <translation>Svaka druga odabrana stranica</translation>
+        <translation>Sve druge odabrane stranice</translation>
     </message>
 </context>
 <context>
@@ -1260,25 +1556,18 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="313"/>
         <source>Original</source>
         <comment>original</comment>
-        <translation type="unfinished">Izvorno</translation>
-    </message>
-    <message>
-        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="331"/>
-        <source>Match size with other pages</source>
-        <translation>Prilagodi veličinu  ostalim stranicama</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="321"/>
         <source>Auto Margins</source>
-        <translation>Auto margine</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manual</source>
-        <translation type="obsolete">Ručno</translation>
-    </message>
-    <message>
-        <source>Original</source>
-        <translation type="obsolete">Izvorno</translation>
+        <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="331"/>
+        <source>Match size with other pages</source>
+        <translation>Prilagodi veličinu 
+ostalim stranicama</translation>
     </message>
 </context>
 <context>
@@ -1286,7 +1575,7 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="17"/>
         <source>Split Pages</source>
-        <translation>Podjela stranica</translation>
+        <translation>Podijela stranica</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="65"/>
@@ -1304,6 +1593,16 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Ručno</translation>
     </message>
     <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="91"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="97"/>
+        <source>Apply cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="122"/>
         <source>Scope</source>
         <translation>Područje</translation>
@@ -1319,6 +1618,16 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Ova stranica i koje slijede</translation>
     </message>
     <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="152"/>
+        <source>This page and the following every other page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="159"/>
+        <source>Every other page</source>
+        <translation type="unfinished">Sve druge stranice</translation>
+    </message>
+    <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="175"/>
         <source>Selected pages</source>
         <translation>Izabrane stranice</translation>
@@ -1329,34 +1638,14 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
         <translation>Koristite Ctrl+Click / Shift+Click za izbor više stranica.</translation>
     </message>
     <message>
+        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="217"/>
+        <source>Every other selected page</source>
+        <translation type="unfinished">Sve druge odabrane stranice</translation>
+    </message>
+    <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="138"/>
         <source>All pages</source>
         <translation>Sve stranice</translation>
-    </message>
-    <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="97"/>
-        <source>Apply cut</source>
-        <translation>Primijeni izrezivanje</translation>
-    </message>
-    <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="91"/>
-        <source>Options</source>
-        <translation>Mogućnosti</translation>
-    </message>
-    <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="159"/>
-        <source>Every other page</source>
-        <translation>Svaka druga stranica</translation>
-    </message>
-    <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="152"/>
-        <source>This page and the following every other page</source>
-        <translation>Ova stranica i slijedeća svaka druga stranica</translation>
-    </message>
-    <message>
-        <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="217"/>
-        <source>Every other selected page</source>
-        <translation>Svaka druga izabrana stranica</translation>
     </message>
 </context>
 <context>
@@ -1424,11 +1713,13 @@ Da bi to odredili, pokrenite skupne obrade u &quot;Odredi sadržaja&quot; ili &q
     <name>ProjectFilesDialog</name>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="20"/>
+        <location filename="../ProjectFilesDialog.cpp" line="334"/>
         <source>Input Directory</source>
         <translation>Ulazna putanja</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="43"/>
+        <location filename="../ProjectFilesDialog.cpp" line="354"/>
         <source>Output Directory</source>
         <translation>Izlazna putanja</translation>
     </message>
@@ -1502,42 +1793,56 @@ p, li { white-space: pre-wrap; }
         <translation>Popravi DPI, iako izgledaju OK</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="526"/>
+        <location filename="../ProjectFilesDialog.cpp" line="534"/>
+        <location filename="../ProjectFilesDialog.cpp" line="543"/>
+        <location filename="../ProjectFilesDialog.cpp" line="565"/>
+        <location filename="../ProjectFilesDialog.cpp" line="574"/>
+        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Error</source>
-        <translation type="obsolete">Greška</translation>
+        <translation>Greška</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="526"/>
         <source>No files in project!</source>
-        <translation type="obsolete">Nema datoteka u projektu!</translation>
+        <translation>Nema datoteka u projektu!</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="535"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
-        <translation type="obsolete">Izlazna putanja nije izabrana ili ne postoji.</translation>
+        <translation>Izlazna putanja nije izabrana ili ne postoji.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation type="obsolete">Izlazna i ulazna putanja ne mogu biti iste.</translation>
+        <translation>Izlazna i ulazna putanja ne mogu biti iste.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="554"/>
         <source>Create Directory?</source>
-        <translation type="obsolete">Stvoriti putanju?</translation>
+        <translation>Stvoriti putanju?</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
-        <translation type="obsolete">Izlazna putanja ne postoji. Stvoriti ju?</translation>
+        <translation>Izlazna putanja ne postoji. Stvoriti ju?</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="566"/>
         <source>Unable to create output directory.</source>
-        <translation type="obsolete">Ne mogu stvoriti izlaznu putanj.</translation>
+        <translation>Ne mogu stvoriti izlaznu putanj.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="575"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
-        <translation type="obsolete">Izlazna putanja nije izabrana ili ne postoji.</translation>
+        <translation>Izlazna putanja nije izabrana ili ne postoji.</translation>
     </message>
     <message>
+        <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
-        <translation type="obsolete">Neke datoteke nisu učitane.
+        <translation>Neke datoteke nisu učitane.
 Ili mi ne podržavamo njihov format, ili su neispravne.
 Trebali bi ih uklonili iz projekta.</translation>
     </message>
@@ -1545,12 +1850,14 @@ Trebali bi ih uklonili iz projekta.</translation>
 <context>
     <name>ProjectOpeningContext</name>
     <message>
+        <location filename="../ProjectOpeningContext.cpp" line="51"/>
         <source>Error</source>
-        <translation type="obsolete">Greška</translation>
+        <translation>Greška</translation>
     </message>
     <message>
+        <location filename="../ProjectOpeningContext.cpp" line="52"/>
         <source>Unable to interpret the project file.</source>
-        <translation type="obsolete">Ne mogu interpretirati projekt datoteku.</translation>
+        <translation>Ne mogu interpretirati projekt datoteku.</translation>
     </message>
 </context>
 <context>
@@ -1571,16 +1878,19 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>...</translation>
     </message>
     <message>
+        <location filename="../RelinkingDialog.cpp" line="95"/>
         <source>Substitution File for %1</source>
-        <translation type="obsolete">Zamjena datoteke za %1</translation>
+        <translation>Zamjena datoteke za %1</translation>
     </message>
     <message>
+        <location filename="../RelinkingDialog.cpp" line="102"/>
         <source>Substitution Directory for %1</source>
-        <translation type="obsolete">Zamjena putanje za %1</translation>
+        <translation>Zamjena putanje za %1</translation>
     </message>
     <message>
+        <location filename="../RelinkingDialog.cpp" line="130"/>
         <source>This change would merge several files into one.</source>
-        <translation type="obsolete">Ova promijena će spojiti nekoliko datoteka u jednu.</translation>
+        <translation>Ova promijena će spojiti nekoliko datoteka u jednu.</translation>
     </message>
 </context>
 <context>
@@ -1611,12 +1921,12 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
         <source>Options</source>
-        <translation>Mogućnosti</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>Apply content box</source>
-        <translation>Primijeni sadržajni okvir</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
@@ -1626,7 +1936,7 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="45"/>
         <source>This page only (already applied)</source>
-        <translation>Samo ova stranica (već primjenjeno)</translation>
+        <translation>Samo ova stranica (već primijenjeno)</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="55"/>
@@ -1636,20 +1946,20 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="62"/>
         <source>This page and the following ones</source>
-        <translation>Ova stranica i koje slijede</translation>
+        <translation>Ova stranica i sve koje slijede</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="87"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translatorcomment>Sve parne ili neparne stranice ovise je li ova stranica parna ili neparna</translatorcomment>
-        <translation>Ova stranica i slijedeća svaka druga stranica</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Every other page for all pages (include this page)</source>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="109"/>
+        <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
         <translatorcomment>Sve parne ili neparne stranice ovise je li ova stranica parna ili neparna</translatorcomment>
-        <translation type="obsolete">Svaka druga za sve stranice (uključuje ovu)</translation>
+        <translation>Sve druge stranice</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="197"/>
@@ -1662,12 +1972,6 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>Odbrane stranice</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="109"/>
-        <source>Every other page</source>
-        <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="146"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
         <translation>Koristite Ctrl+Click / Shift+Click za izbor više stranica.</translation>
@@ -1675,7 +1979,7 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="167"/>
         <source>Every other selected page</source>
-        <translation>Svaka druga odabrana stranica</translation>
+        <translation>Sve druge odabrane stranice</translation>
     </message>
 </context>
 <context>
@@ -1691,25 +1995,56 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>Sadržajni okvir</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="73"/>
-        <source>Borders in MM</source>
-        <translation>Obrubi u mm</translation>
-    </message>
-    <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="56"/>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="191"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="20"/>
+        <source>Page Box</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="28"/>
+        <source>Shift with corners while they are in black. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="31"/>
+        <source>Fine Tune Page Corners</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="40"/>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="178"/>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="73"/>
+        <source>Borders in MM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="96"/>
         <source>Left</source>
-        <translation>Lijevo</translation>
+        <translation type="unfinished">Lijevo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="106"/>
         <source>Top</source>
-        <translation>Gore</translation>
+        <translation type="unfinished">Vrh</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="116"/>
+        <source>Right</source>
+        <translation type="unfinished">Desno</translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="126"/>
+        <source>Bottom</source>
+        <translation type="unfinished">Dno</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="207"/>
@@ -1717,45 +2052,14 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>Ručno</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="116"/>
-        <source>Right</source>
-        <translation>Desno</translation>
-    </message>
-    <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="126"/>
-        <source>Bottom</source>
-        <translation>Dolje</translation>
-    </message>
-    <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="236"/>
         <source>Scope</source>
         <translation>Područje</translation>
     </message>
     <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="20"/>
-        <source>Page Box</source>
-        <translation>Okvir stranice</translation>
-    </message>
-    <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="257"/>
         <source>Apply to ...</source>
         <translation>Primijeni na...</translation>
-    </message>
-    <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="28"/>
-        <source>Shift with corners while they are in black. </source>
-        <translation>Pomak kutova dok su crni.</translation>
-    </message>
-    <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="31"/>
-        <source>Fine Tune Page Corners</source>
-        <translation>Fino ugađanje kutova stranice</translation>
-    </message>
-    <message>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="40"/>
-        <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="178"/>
-        <source>Disable</source>
-        <translation>Onemogući</translation>
     </message>
 </context>
 <context>
@@ -1771,42 +2075,55 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>Koristitite 3D ubrzanje za korisničko sučelje</translation>
     </message>
     <message>
-        <source>Compiled without OpenGL support.</source>
-        <translation type="obsolete">Sastavljen bez OpenGL podrške.</translation>
+        <location filename="../ui/SettingsDialog.ui" line="27"/>
+        <source>Auto-save the existing project</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../ui/SettingsDialog.ui" line="34"/>
+        <source>Don&apos;t equalize the illumination in picture zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SettingsDialog.cpp" line="36"/>
+        <source>Compiled without OpenGL support.</source>
+        <translation>Sastavljen bez OpenGL podrške.</translation>
+    </message>
+    <message>
+        <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation type="obsolete">Vaš hardware / driver ne osigurava potrebne značajke.</translation>
+        <translation>Vaš hardware / driver ne osigurava potrebne značajke.</translation>
     </message>
 </context>
 <context>
     <name>StageListView</name>
     <message>
+        <location filename="../StageListView.cpp" line="130"/>
         <source>Launch batch processing</source>
-        <translation type="obsolete">Pokrenite skupne obrade</translation>
+        <translation>Pokrenite skupne obrade</translation>
     </message>
 </context>
 <context>
     <name>StartBatchProcessingDialog</name>
     <message>
+        <location filename="../ui/StartBatchProcessingDialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="26"/>
         <source>Batch Process</source>
-        <translation>Serijski postupak</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="33"/>
         <source>All pages</source>
-        <translation>Sve stranice</translation>
+        <translation type="unfinished">Sve stranice</translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="43"/>
         <source>Start from selected</source>
-        <translation>Počni od izabrane</translation>
-    </message>
-    <message>
-        <location filename="../ui/StartBatchProcessingDialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation>Izbor</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1828,19 +2145,37 @@ Trebali bi ih uklonili iz projekta.</translation>
         <translation>...</translation>
     </message>
     <message>
+        <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation type="obsolete">Minimalno</translation>
+        <translation>Minimalno</translation>
     </message>
     <message>
+        <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation type="obsolete">Normalno</translation>
+        <translation>Normalno</translation>
     </message>
 </context>
 <context>
     <name>ThumbnailSequence</name>
     <message>
+        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <source>The file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <source>is not ready for output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ThumbnailSequence.cpp" line="1320"/>
         <source>%1 (page %2)</source>
-        <translation type="obsolete">%1 (stranica %2)</translation>
+        <translation>%1 (stranica %2)</translation>
     </message>
 </context>
 <context>
@@ -1869,17 +2204,17 @@ Trebali bi ih uklonili iz projekta.</translation>
 <context>
     <name>ZoneCreationInteraction</name>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="206"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="362"/>
         <source>Click to finish this zone.  ESC to cancel.</source>
         <translation>Klikni za završetak zone. ESC za otkazati.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="208"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="364"/>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
         <translation>Spojite prvu i zadnju točku za završetak zone. ESC za otkazati.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="211"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="367"/>
         <source>Zones need to have at least 3 points.  ESC to cancel.</source>
         <translation>Zona mora imati najmanje tri točke. ESC za otkazati.</translation>
     </message>
@@ -1910,12 +2245,12 @@ Trebali bi ih uklonili iz projekta.</translation>
 <context>
     <name>ZoneVertexDragInteraction</name>
     <message>
-        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="160"/>
+        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="194"/>
         <source>Merge these two vertices.</source>
         <translation>Spojite ta dva vrha.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="162"/>
+        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="196"/>
         <source>Move the vertex to one of its neighbors to merge them.</source>
         <translation>Pomaknite vrh do najbližeg da bi se spojili.</translation>
     </message>
@@ -1931,12 +2266,12 @@ Trebali bi ih uklonili iz projekta.</translation>
 <context>
     <name>deskew::ImageView</name>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="62"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="63"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
         <translation>Koristite Ctrl + Kotačić za okretanje ili Ctrl + Shift +Kotačić za još osjetljivije okretanje.</translation>
     </message>
     <message>
-        <location filename="../filters/deskew/ImageView.cpp" line="65"/>
+        <location filename="../filters/deskew/ImageView.cpp" line="66"/>
         <source>Drag this handle to rotate the image.</source>
         <translation>Povucite točku za rotaciju slike.</translation>
     </message>
@@ -2030,98 +2365,118 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="68"/>
         <source>Free</source>
-        <translation>Slobodan</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Rectangular</source>
-        <translation>Pravokutan</translation>
-    </message>
-    <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
-        <source>None</source>
-        <translation>Ne</translation>
-    </message>
-    <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
-        <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="73"/>
-        <source>Deflate</source>
+        <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
+        <source>Surrounded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
+        <source>Quadro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
+        <source>Picture Shape</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
-        <source>Packbits</source>
+        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
+        <source>LZW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="76"/>
+        <source>Deflate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="77"/>
+        <source>Packbits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="78"/>
         <source>JPEG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="442"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="458"/>
         <source>Apply Despeckling Level</source>
         <translation>Prihvati razinu čišćenja</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="522"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="543"/>
         <source>Apply Depth Perception</source>
         <translation>Prihvati dubinu percepcije</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="706"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="732"/>
         <source>Off</source>
         <translation>Isključeno</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="709"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="735"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="712"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="738"/>
         <source>Manual</source>
         <translation>Ručno</translation>
+    </message>
+    <message>
+        <location filename="../filters/output/OptionsWidget.cpp" line="743"/>
+        <source>Marginal</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="512"/>
+        <location filename="../filters/output/Task.cpp" line="615"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Zone slike su jedino moguće u mješanom načinu.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="564"/>
+        <location filename="../filters/output/Task.cpp" line="667"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Čišćenje se  ne može koristiti kod slika u boji / u sivim tonovima.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="581"/>
+        <location filename="../filters/output/Task.cpp" line="684"/>
         <source>Output</source>
         <translation>Izlaz</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="582"/>
+        <location filename="../filters/output/Task.cpp" line="685"/>
         <source>Picture Zones</source>
         <translation>Zone slike</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="583"/>
+        <location filename="../filters/output/Task.cpp" line="686"/>
         <source>Fill Zones</source>
         <translation>Popuni zone</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="584"/>
+        <location filename="../filters/output/Task.cpp" line="687"/>
         <source>Dewarping</source>
         <translation>Poravnanje</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="585"/>
+        <location filename="../filters/output/Task.cpp" line="688"/>
         <source>Despeckling</source>
         <translation>Čišćenje</translation>
     </message>
@@ -2192,7 +2547,7 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
         <source>Split Pages</source>
-        <translation>Podjela stranica</translation>
+        <translation>Podijela stranica</translation>
     </message>
 </context>
 <context>
@@ -2262,7 +2617,7 @@ Trebali bi ih uklonili iz projekta.</translation>
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="59"/>
         <source>Use the context menu to enable / disable the content box.</source>
-        <translation>Upotrijebite kontekstni izbornik za uključivanje / isključivanje sadržajnog okvira.</translation>
+        <translation>Upotrijebite kontekstni izbornik za uključivanje / isključivanje la sadržajnog okvira.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ImageView.cpp" line="62"/>

@@ -67,6 +67,9 @@ OptionsWidget::OptionsWidget(
 	
 	pictureShapeSelector->addItem(tr("Free"), FREE_SHAPE);
 	pictureShapeSelector->addItem(tr("Rectangular"), RECTANGULAR_SHAPE);
+	pictureShapeSelector->addItem(tr("Surrounded"), RECTANGULAR_SHAPE);
+	pictureShapeSelector->addItem(tr("Quadro"), QUADRO_SHAPE);
+	labePictureShape->setText(tr("Picture Shape"));
 
 	tiffCompression->addItem(tr("None"), COMPRESSION_NONE);
 	tiffCompression->addItem(tr("LZW"), COMPRESSION_LZW);
@@ -94,6 +97,13 @@ OptionsWidget::OptionsWidget(
 		colorModeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(colorModeChanged(int))
 	);
+//begin of modified by monday2000
+//Picture_Shape
+	connect(
+		pictureShapeSelector, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(pictureShapeChanged(int))
+	);
+//end of modified by monday2000	
 	connect(
 		pictureShapeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(pictureShapeChanged(int))
@@ -217,7 +227,12 @@ OptionsWidget::distortionModelChanged(dewarping::DistortionModel const& model)
 	m_ptrSettings->setDistortionModel(m_pageId, model);
 	
 	// Note that OFF remains OFF while AUTO becomes MANUAL.
-	if (m_dewarpingMode == DewarpingMode::AUTO) {
+//begin of modified by monday2000
+// Manual_Dewarp_Auto_Switch
+// OFF becomes MANUAL too.
+// Commented the code below.
+	/*if (m_dewarpingMode == DewarpingMode::AUTO)*/ {
+//end of modified by monday2000
 		m_ptrSettings->setDewarpingMode(m_pageId, DewarpingMode::MANUAL);
 		m_dewarpingMode = DewarpingMode::MANUAL;
 		updateDewarpingDisplay();
@@ -383,6 +398,7 @@ OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setColorParams(page_id, m_colorParams);
 		m_ptrSettings->setPictureShape(page_id, m_pictureShape);
+		emit invalidateThumbnail(page_id);
 	}
 	emit invalidateAllThumbnails();
 	
@@ -494,7 +510,12 @@ OptionsWidget::dewarpingChanged(std::set<PageId> const& pages, DewarpingMode con
 			// we reload not just on TAB_FILL_ZONES but on all tabs except TAB_DEWARPING.
 			// PS: the static original <-> dewarped mappings are constructed
 			// in Task::UiUpdater::updateUI().  Look for "new DewarpingPointMapper" there.
-			if (mode == DewarpingMode::AUTO || m_lastTab != TAB_DEWARPING) {
+			if (mode == DewarpingMode::AUTO || m_lastTab != TAB_DEWARPING
+//begin of modified by monday2000
+//Marginal_Dewarping
+				|| mode == DewarpingMode::MARGINAL
+//end of modified by monday2000
+				) {
 				// Switch to the Output tab after reloading.
 				m_lastTab = TAB_OUTPUT; 
 
@@ -601,6 +622,11 @@ OptionsWidget::reloadIfNecessary()
 		return;
 	} else if (saved_dewarping_mode == DewarpingMode::AUTO && params.dewarpingMode() == DewarpingMode::AUTO) {
 		// The check below doesn't matter in this case.
+//begin of modified by monday2000
+//Marginal_Dewarping
+	} else if (saved_dewarping_mode == DewarpingMode::MARGINAL && params.dewarpingMode() == DewarpingMode::MARGINAL) {
+		// The check below doesn't matter in this case.
+//end of modified by monday2000
 	} else if (!saved_distortion_model.matches(params.distortionModel())) {
 		emit reloadRequested();
 		return;
@@ -711,6 +737,12 @@ OptionsWidget::updateDewarpingDisplay()
 		case DewarpingMode::MANUAL:
 			dewarpingStatusLabel->setText(tr("Manual"));
 			break;
+//begin of modified by monday2000
+//Marginal_Dewarping
+		case DewarpingMode::MARGINAL:
+			dewarpingStatusLabel->setText(tr("Marginal"));
+			break;
+//end of modified by monday2000
 	}
 
 	depthPerceptionSlider->blockSignals(true);

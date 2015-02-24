@@ -536,6 +536,7 @@ SET(
 	RelinkingListView.cpp RelinkingListView.h
 	RelinkingDialog.cpp RelinkingDialog.h
 	SettingsDialog.cpp SettingsDialog.h
+	ExportDialog.cpp ExportDialog.h
 	FixDpiDialog.cpp FixDpiDialog.h
 	LoadFilesStatusDialog.cpp LoadFilesStatusDialog.h
 	StartBatchProcessingDialog.cpp StartBatchProcessingDialog.h
@@ -557,7 +558,7 @@ SET(
 )
 
 SOURCE_GROUP("Sources" FILES ${common_sources} ${gui_only_sources} ${cli_only_sources})
-QT4_AUTOMOC(${sources} ${common_sources} ${gui_only_sources} ${cli_only_sources})
+QT4_AUTOMOC(${common_sources} ${gui_only_sources} ${cli_only_sources})
 
 SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
 
@@ -649,7 +650,11 @@ IF(ENABLE_CRASH_REPORTER)
 ENDIF(ENABLE_CRASH_REPORTER)
 
 # Translations
-TRANSLATION_SOURCES(scantailor ${sources} ${ui_files})
+TRANSLATION_SOURCES(
+	scantailor
+	${common_sources} ${gui_only_sources} ${cli_only_sources}
+	${common_ui_files} ${gui_only_ui_files}
+)
 FILE(GLOB TRANSLATION_FILES translations/scantailor_*.ts)
 FILE(GLOB CR_TRANSLATION_FILES translations/crashreporter_*.ts)
 
