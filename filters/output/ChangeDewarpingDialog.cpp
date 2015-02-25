@@ -54,12 +54,10 @@ ChangeDewarpingDialog::ChangeDewarpingDialog(
 		case DewarpingMode::AUTO:
 			ui.autoRB->setChecked(true);
 			break;
-//begin of modified by monday2000
 //Marginal_Dewarping
 		case DewarpingMode::MARGINAL:
 			ui.marginalRB->setChecked(true);
 			break;
-//end of modified by monday2000
 		case DewarpingMode::MANUAL:
 			ui.manualRB->setChecked(true);
 			break;
@@ -69,10 +67,8 @@ ChangeDewarpingDialog::ChangeDewarpingDialog(
 	new QtSignalForwarder(ui.offRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::OFF);
 	new QtSignalForwarder(ui.autoRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::AUTO);
 	new QtSignalForwarder(ui.manualRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::MANUAL);
-//begin of modified by monday2000
 //Marginal_Dewarping
 	new QtSignalForwarder(ui.marginalRB, SIGNAL(clicked(bool)), var(m_mode) = DewarpingMode::MARGINAL);
-//end of modified by monday2000
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }

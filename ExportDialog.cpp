@@ -15,7 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-//begin of modified by monday2000
 //Export_Subscans
 // This file was added by monday2000
 
@@ -233,7 +232,6 @@ ExportDialog::setStartExport(void)
 //{
 //
 //}
-//end of modified by monday2000
 
 
 void

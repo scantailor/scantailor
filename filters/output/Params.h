@@ -82,10 +82,8 @@ private:
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;	
-//begin of modified by monday2000
 //Picture_Shape
 	PictureShape m_pictureShape;
-//end of modified by monday2000	
 };
 
 } // namespace output

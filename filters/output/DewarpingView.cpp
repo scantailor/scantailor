@@ -84,17 +84,13 @@ DewarpingView::DewarpingView(
 		
 		XSpline new_top_spline;
 		if (polyline.size() < 2) {			
-//begin of modified by monday2000
 //Marginal_Dewarping
 			//initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1]);
 			initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1], &dewarping_mode);
-//end of modified by monday2000
 		} else {
-//begin of modified by monday2000
 //Marginal_Dewarping
 			//initNewSpline(new_top_spline, polyline.front(), polyline.back());
 			initNewSpline(new_top_spline, polyline.front(), polyline.back(), &dewarping_mode);
-//end of modified by monday2000			
 			fitSpline(new_top_spline, polyline);
 		}
 
@@ -105,17 +101,13 @@ DewarpingView::DewarpingView(
 
 		XSpline new_bottom_spline;
 		if (polyline.size() < 2) {
-//begin of modified by monday2000
 //Marginal_Dewarping
 			//initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2]);
 			initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2], &dewarping_mode);
-//end of modified by monday2000			
 		} else {
-//begin of modified by monday2000
 //Marginal_Dewarping
 			//initNewSpline(new_bottom_spline, polyline.front(), polyline.back());
 			initNewSpline(new_bottom_spline, polyline.front(), polyline.back(), &dewarping_mode);
-//end of modified by monday2000			
 			fitSpline(new_bottom_spline, polyline);
 		}
 
@@ -151,15 +143,12 @@ DewarpingView::~DewarpingView()
 }
 
 void
-//begin of modified by monday2000
 //Marginal_Dewarping
 //DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2)
 DewarpingView::initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2, DewarpingMode const* p_dewarpingMode)
-//end of modified by monday2000
 {
 	QLineF const line(p1, p2);
 	spline.appendControlPoint(line.p1(), 0);
-//begin of modified by monday2000
 // Delete_3_Red_Points
 // Deleting 3 unnecessary red points on the top-most and bottom-most
 // blue horizontal lines of the dewarping mesh.
@@ -169,7 +158,6 @@ if (*p_dewarpingMode == DewarpingMode::AUTO)
 	spline.appendControlPoint(line.pointAt(2.0/4.0), 1);
 	spline.appendControlPoint(line.pointAt(3.0/4.0), 1);
 }
-//end of modified by monday2000
 	spline.appendControlPoint(line.p2(), 0);
 }
 
@@ -354,10 +342,8 @@ void
 DewarpingView::dragFinished()
 {
 	if (m_dewarpingMode == DewarpingMode::AUTO
-//begin of modified by monday2000
 //Marginal_Dewarping
 		|| m_dewarpingMode == DewarpingMode::MARGINAL
-//end of modified by monday2000		
 		) {
 		m_dewarpingMode = DewarpingMode::MANUAL;
 	}

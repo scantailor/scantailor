@@ -45,13 +45,11 @@ ZoneCreationInteraction::ZoneCreationInteraction(
 	);
 	QTransform const from_screen(m_rContext.imageView().widgetToImage());
 	m_nextVertexImagePos = from_screen.map(screen_mouse_pos);
-//begin of modified by monday2000
 //Square_Picture_Zones
 //added:
 	m_nextVertexImagePos_mid1 = m_nextVertexImagePos;
 	m_nextVertexImagePos_mid2 = m_nextVertexImagePos;
 	m_ctrl = false;
-//end of modified by monday2000
 
 	makeLastFollower(m_dragHandler);
 	m_dragHandler.makeFirstFollower(m_dragWatcher);
@@ -90,7 +88,6 @@ ZoneCreationInteraction::onPaint(QPainter& painter, InteractionState const& inte
 	painter.setPen(solid_line_pen);
 	painter.setBrush(Qt::NoBrush);
 
-//begin of modified by monday2000
 //Square_Picture_Zones
 //added:
 
@@ -165,7 +162,6 @@ ZoneCreationInteraction::onPaint(QPainter& painter, InteractionState const& inte
 	}
 	else
 	{
-//end of modified by monday2000
 
 	for (EditableSpline::SegmentIterator it(*m_ptrSpline); it.hasNext(); ) {
 		SplineSegment const segment(it.next());
@@ -193,11 +189,9 @@ ZoneCreationInteraction::onPaint(QPainter& painter, InteractionState const& inte
 	painter.setPen(gradient_pen);
 	painter.drawLine(line);
 
-//begin of modified by monday2000
 //Square_Picture_Zones
 //added:
     }
-//end of modified by monday2000
 
 	m_visualizer.drawVertex(
 		painter, to_screen.map(m_nextVertexImagePos), m_visualizer.highlightBrightColor()
@@ -231,7 +225,6 @@ ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionStat
 	QPointF const screen_mouse_pos(event->pos() + QPointF(0.5, 0.5));
 	QPointF const image_mouse_pos(from_screen.map(screen_mouse_pos));
 
-//begin of modified by monday2000
 //Square_Picture_Zones
 //added:
 
@@ -255,7 +248,6 @@ ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionStat
 	}
 	else
 	{
-//end of modified by monday2000
 
 	if (m_ptrSpline->hasAtLeastSegments(2) &&
 			m_nextVertexImagePos == m_ptrSpline->firstVertex()->point()) {
@@ -286,11 +278,9 @@ ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionStat
 		}
 	}
 
-//begin of modified by monday2000
 //Square_Picture_Zones
 //added:
     }
-//end of modified by monday2000
 
 	event->accept();
 }
@@ -306,7 +296,6 @@ ZoneCreationInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& 
 
 	QPointF const last(to_screen.map(m_ptrSpline->lastVertex()->point()));
 
-//begin of modified by monday2000
 //Square_Picture_Zones
 
 	Qt::KeyboardModifiers mask = event->modifiers();
@@ -337,7 +326,6 @@ ZoneCreationInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& 
 			m_nextVertexImagePos_mid1 = from_screen.map(screen_mouse_pos_mid2);
 		}
 	}
-//end of modified by monday2000
 
 	if (Proximity(last, screen_mouse_pos) <= interaction.proximityThreshold()) {
 		m_nextVertexImagePos = m_ptrSpline->lastVertex()->point();

@@ -168,7 +168,6 @@ MainWindow::MainWindow()
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
 	m_debug(false),
-//begin of modified by monday2000
 //added:
 //Picture_Shape_Bug
 	//m_closing(false)
@@ -178,7 +177,6 @@ MainWindow::MainWindow()
 	m_exportTimerId(0),
 	m_keep_orig_fore_subscan(0),
 	m_dont_equalize_illumination_pic_zones(0)	
-//end of modified by monday2000
 
 {
 	m_maxLogicalThumbSize = QSize(250, 160);
@@ -190,10 +188,8 @@ MainWindow::MainWindow()
 #if !defined(ENABLE_OPENGL)
 	// Right now the only setting is 3D acceleration, so get rid of
 	// the whole Settings dialog, if it's inaccessible.
-//begin of modified by monday2000
 //Auto_Save_Project
 	//actionSettings->setVisible(false); // commented by monday2000
-//end of modified by monday2000
 #endif
 
 	createBatchProcessingWidget();
@@ -303,14 +299,12 @@ MainWindow::MainWindow()
 		actionSettings, SIGNAL(triggered(bool)),
 		this, SLOT(openSettingsDialog())
 	);
-//begin of modified by monday2000
 //Export_Subscans
 //added:
 	connect(
 		actionExport, SIGNAL(triggered(bool)),
 		this, SLOT(openExportDialog())
 	);
-//end of modified by monday2000
 	connect(
 		actionNewProject, SIGNAL(triggered(bool)),
 		this, SLOT(newProject())
@@ -349,12 +343,10 @@ MainWindow::MainWindow()
 			resize(1014, 689); // A sensible value.
 		}
 	}
-//begin of modified by monday2000
 //Auto_Save_Project
 	m_auto_save_project = settings.value("settings/auto_save_project").toBool();
 //Dont_Equalize_Illumination_Pic_Zones
 	m_dont_equalize_illumination_pic_zones = settings.value("settings/dont_equalize_illumination_pic_zones").toBool();
-//end of modified by monday2000
 }
 
 
@@ -597,7 +589,6 @@ MainWindow::closeEvent(QCloseEvent* const event)
 void
 MainWindow::timerEvent(QTimerEvent* const event)
 {
-//begin of modified by monday2000
 //Export_Subscans
 //added:
 
@@ -621,7 +612,6 @@ MainWindow::timerEvent(QTimerEvent* const event)
 	}
 	else
 	{
-//end of modified by monday2000
 
 	// We only use the timer event for delayed closing of the window.
 	killTimer(event->timerId());
@@ -637,11 +627,9 @@ MainWindow::timerEvent(QTimerEvent* const event)
 		}
 		close();
 	}
-//begin of modified by monday2000
 //Export_Subscans
 //added:
 	}
-//end of modified by monday2000
 }
 
 MainWindow::SavePromptResult
@@ -1043,10 +1031,8 @@ MainWindow::goToPage(PageId const& page_id)
 	// That's by design.
 	updateMainArea();
 
-//begin of modified by monday2000
 //Auto_Save_Project
 	autoSaveProject();
-//end of modified by monday2000
 }
 
 void
@@ -1071,14 +1057,11 @@ MainWindow::currentPageChanged(
 		}
 	}
 
-//begin of modified by monday2000
 //Auto_Save_Project
 	if (flags & ThumbnailSequence::SELECTED_BY_USER)
 		autoSaveProject();
-//end of modified by monday2000
 }
 
-//begin of modified by monday2000
 //Auto_Save_Project
 void
 MainWindow::autoSaveProject()
@@ -1104,7 +1087,6 @@ MainWindow::DontEqualizeIlluminationPicZones(bool state)
 {
 	m_dont_equalize_illumination_pic_zones = state;
 }
-//end of modified by monday2000
 
 void
 MainWindow::pageContextMenuRequested(
@@ -1677,16 +1659,13 @@ MainWindow::openSettingsDialog()
 	SettingsDialog* dialog = new SettingsDialog(this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
-//begin of modified by monday2000
 //Auto_Save_Project
 	connect(dialog, SIGNAL(AutoSaveProjectStateSignal(bool)), this, SLOT(AutoSaveProjectState(bool)));
 //Dont_Equalize_Illumination_Pic_Zones
 	connect(dialog, SIGNAL(DontEqualizeIlluminationPicZonesSignal(bool)), this, SLOT(DontEqualizeIlluminationPicZones(bool)));
-//end of modified by monday2000
 	dialog->show();
 }
 
-//begin of modified by monday2000
 //Export_Subscans
 //Original_Foreground_Mixed
 //added:
@@ -2137,7 +2116,6 @@ MainWindow::SetStartExport()
 
 	m_p_export_dialog->setStartExport();
 }
-//end of modified by monday2000
 
 void
 MainWindow::showAboutDialog()
@@ -2693,14 +2671,12 @@ MainWindow::createCompositeTask(
 
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
 		output_task = m_ptrStages->outputFilter()->createTask(
-//begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //Original_Foreground_Mixed
 			//page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
 			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug,
 			m_dont_equalize_illumination_pic_zones,
 			m_keep_orig_fore_subscan, &m_orig_fore_subscan
-//end of modified by monday2000
 		);
 		debug = false;
 	}

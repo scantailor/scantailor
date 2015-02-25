@@ -27,11 +27,9 @@
 #include "OutputFileNameGenerator.h"
 #include <QColor>
 #include <memory>
-//begin of modified by monday2000
 //Original_Foreground_Mixed
 //added:
 #include <QImage>
-//end of modified by monday2000
 
 class DebugImages;
 class TaskStatus;
@@ -62,7 +60,6 @@ public:
 		IntrusivePtr<Settings> const& settings,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
-//begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 		//ImageViewTab last_tab, bool batch, bool debug);
 		ImageViewTab last_tab, bool batch, bool debug,
@@ -70,7 +67,6 @@ public:
 		bool keep_orig_fore_subscan = false,
 //Original_Foreground_Mixed
 		QImage* p_orig_fore_subscan = NULL);
-//end of modified by monday2000
 	
 	virtual ~Task();
 	
@@ -92,14 +88,12 @@ private:
 	ImageViewTab m_lastTab;
 	bool m_batchProcessing;
 	bool m_debug;
-//begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //added:
 	bool m_dont_equalize_illumination_pic_zones;
 	bool m_keep_orig_fore_subscan;
 //Original_Foreground_Mixed
 	QImage* m_p_orig_fore_subscan;
-//end of modified by monday2000
 };
 
 } // namespace output

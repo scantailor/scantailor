@@ -96,13 +96,11 @@ OptionsWidget::OptionsWidget(
 		colorModeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(colorModeChanged(int))
 	);
-//begin of modified by monday2000
 //Picture_Shape
 	connect(
 		pictureShapeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(pictureShapeChanged(int))
 	);
-//end of modified by monday2000	
 	connect(
 		pictureShapeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(pictureShapeChanged(int))
@@ -226,12 +224,10 @@ OptionsWidget::distortionModelChanged(dewarping::DistortionModel const& model)
 	m_ptrSettings->setDistortionModel(m_pageId, model);
 	
 	// Note that OFF remains OFF while AUTO becomes MANUAL.
-//begin of modified by monday2000
 // Manual_Dewarp_Auto_Switch
 // OFF becomes MANUAL too.
 // Commented the code below.
 	/*if (m_dewarpingMode == DewarpingMode::AUTO)*/ {
-//end of modified by monday2000
 		m_ptrSettings->setDewarpingMode(m_pageId, DewarpingMode::MANUAL);
 		m_dewarpingMode = DewarpingMode::MANUAL;
 		updateDewarpingDisplay();
@@ -510,10 +506,8 @@ OptionsWidget::dewarpingChanged(std::set<PageId> const& pages, DewarpingMode con
 			// PS: the static original <-> dewarped mappings are constructed
 			// in Task::UiUpdater::updateUI().  Look for "new DewarpingPointMapper" there.
 			if (mode == DewarpingMode::AUTO || m_lastTab != TAB_DEWARPING
-//begin of modified by monday2000
 //Marginal_Dewarping
 				|| mode == DewarpingMode::MARGINAL
-//end of modified by monday2000
 				) {
 				// Switch to the Output tab after reloading.
 				m_lastTab = TAB_OUTPUT; 
@@ -621,11 +615,9 @@ OptionsWidget::reloadIfNecessary()
 		return;
 	} else if (saved_dewarping_mode == DewarpingMode::AUTO && params.dewarpingMode() == DewarpingMode::AUTO) {
 		// The check below doesn't matter in this case.
-//begin of modified by monday2000
 //Marginal_Dewarping
 	} else if (saved_dewarping_mode == DewarpingMode::MARGINAL && params.dewarpingMode() == DewarpingMode::MARGINAL) {
 		// The check below doesn't matter in this case.
-//end of modified by monday2000
 	} else if (!saved_distortion_model.matches(params.distortionModel())) {
 		emit reloadRequested();
 		return;
@@ -736,12 +728,10 @@ OptionsWidget::updateDewarpingDisplay()
 		case DewarpingMode::MANUAL:
 			dewarpingStatusLabel->setText(tr("Manual"));
 			break;
-//begin of modified by monday2000
 //Marginal_Dewarping
 		case DewarpingMode::MARGINAL:
 			dewarpingStatusLabel->setText(tr("Marginal"));
 			break;
-//end of modified by monday2000
 	}
 
 	depthPerceptionSlider->blockSignals(true);

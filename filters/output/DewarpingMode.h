@@ -28,10 +28,8 @@ class DewarpingMode
 {
 public:
 	enum Mode { OFF, AUTO, MANUAL 
-//begin of modified by monday2000
 //Marginal_Dewarping
 				, MARGINAL
-//end of modified by monday2000
 	};
 
 	DewarpingMode(Mode mode = OFF) : m_mode(mode) {}

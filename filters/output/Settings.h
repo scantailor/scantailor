@@ -34,10 +34,8 @@
 #include <QMutex>
 #include <map>
 #include <memory>
-//begin of modified by monday2000
 //Picture_Shape
 #include "Params.h"
-//end of modified by monday2000
 
 class AbstractRelinker;
 

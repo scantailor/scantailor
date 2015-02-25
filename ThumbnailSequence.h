@@ -207,11 +207,9 @@ public:
 	
 	std::vector<PageRange> selectedRanges() const;
 
-//begin of modified by monday2000
 //Export_Subscans
 //added:
 	bool AllThumbnailsComplete();
-//end of modified by monday2000
 signals:
 	void newSelectionLeader(
 		PageInfo const& page_info, QRectF const& thumb_rect,

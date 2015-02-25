@@ -18,10 +18,8 @@
 
 #include "PictureZonePropFactory.h"
 #include "PictureLayerProperty.h"
-//begin of modified by monday2000
 //Quadro_Zoner
 #include "ZoneCategoryProperty.h"
-//end of modified by monday2000	
 
 namespace output
 {
@@ -29,10 +27,8 @@ namespace output
 PictureZonePropFactory::PictureZonePropFactory()
 {
 	PictureLayerProperty::registerIn(*this);
-//begin of modified by monday2000
 //Quadro_Zoner
 	ZoneCategoryProperty::registerIn(*this);
-//end of modified by monday2000	
 }
 
 } // namespace output

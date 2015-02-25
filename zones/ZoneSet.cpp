@@ -55,7 +55,6 @@ ZoneSet::toXml(QDomDocument& doc, QString const& name) const
 	return el;
 }
 
-//begin of modified by monday2000
 //Quadro_Zoner
 void
 ZoneSet::remove_auto_zones()
@@ -87,4 +86,3 @@ ZoneSet::auto_zones_found()
 	}
 	return false;
 }
-//end of modified by monday2000

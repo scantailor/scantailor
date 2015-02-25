@@ -22,11 +22,9 @@
 #include "SerializableSpline.h"
 #include "IntrusivePtr.h"
 #include "PropertySet.h"
-//begin of modified by monday2000
 //Quadro_Zoner
 #include "filters/output/PictureLayerProperty.h"
 #include "filters/output/ZoneCategoryProperty.h"
-//end of modified by monday2000
 
 class PropertyFactory;
 class QDomDocument;
@@ -40,10 +38,8 @@ public:
 	Zone(SerializableSpline const& spline, PropertySet const& props = PropertySet());
 	
 	Zone(QDomElement const& el, PropertyFactory const& prop_factory);
-//begin of modified by monday2000
 //Quadro_Zoner
 	Zone(QPolygonF const& polygon);
-//end of modified by monday2000	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
 	SerializableSpline const& spline() const { return m_spline; }

@@ -130,11 +130,9 @@ public:
 	/**
 	 * \brief Handles a request to move to a particular position in widget coordinates.
 	 */
-//begin of modified by monday2000
 //Blue_Dewarp_Line_Vert_Drag
 	//virtual void dragContinuation(QPointF const& mouse_pos) {
 	virtual void dragContinuation(QPointF const& mouse_pos, Qt::KeyboardModifiers mask) {
-//end of modified by monday2000
 		m_dragContinuationCallback(mouse_pos);
 	}
 

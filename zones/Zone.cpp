@@ -33,7 +33,6 @@ Zone::Zone(QDomElement const& el, PropertyFactory const& prop_factory)
 {
 }
 
-//begin of modified by monday2000
 //Quadro_Zoner
 Zone::Zone(QPolygonF const& polygon)
 : m_spline(polygon)
@@ -44,7 +43,6 @@ Zone::Zone(QPolygonF const& polygon)
 	m_props.locateOrCreate<output::ZoneCategoryProperty>()->
 		setZoneCategory(output::ZoneCategoryProperty::RECTANGULAR_OUTLINE);
 }
-//end of modified by monday2000	
 
 QDomElement
 Zone::toXml(QDomDocument& doc, QString const& name) const

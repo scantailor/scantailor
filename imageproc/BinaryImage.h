@@ -25,10 +25,8 @@
 #include <QSize>
 #include <QColor>
 #include <stdint.h>
-//begin of modified by monday2000
 //Quadro_Zoner
 #include <vector>
-//end of modified by monday2000	
 
 class QImage;
 
@@ -253,12 +251,10 @@ public:
 	 */
 	QImage toAlphaMask(QColor const& color) const;
 
-//begin of modified by monday2000
 //Quadro_Zoner
 //Marginal_Dewarping
 	void setPixel(int x, int y, BWColor color);
 	BWColor getPixel(int x, int y);
-//end of modified by monday2000
 
 private:
 	class SharedData;

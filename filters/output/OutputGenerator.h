@@ -38,7 +38,6 @@
 #include <vector>
 #include <utility>
 #include <stdint.h>
-//begin of modified by monday2000
 //Picture_Shape
 #include "Params.h"
 //Quadro_Zoner
@@ -51,7 +50,6 @@
 #include <QtCore/qmath.h>
 #include <QFile>
 #include "imageproc/SkewFinder.h"
-//end of modified by monday2000
 
 class TaskStatus;
 class DebugImages;
@@ -72,10 +70,8 @@ namespace dewarping
 	class DistortionModel;
 	class CylindricalSurfaceDewarper;
 }
-//begin of modified by monday2000
 //Marginal_Dewarping
 using namespace imageproc;
-//end of modified by monday2000
 namespace output
 {
 
@@ -120,23 +116,19 @@ public:
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
-//begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //Original_Foreground_Mixed
 //added:		
 		bool dont_equalize_illumination_pic_zones,
 		bool keep_orig_fore_subscan = false,
-//end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-//begin of modified by monday2000
 //Picture_Shape
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
 //Quadro_Zoner
 		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
-//end of modified by monday2000
 	
 	QSize outputImageSize() const;
 	
@@ -147,7 +139,6 @@ public:
 private:
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input,
-//begin of modified by monday2000
 //Quadro_Zoner
 		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		ZoneSet& picture_zones, ZoneSet const& fill_zones,
@@ -159,10 +150,8 @@ private:
 //added:		
 		bool dont_equalize_illumination_pic_zones,
 		bool keep_orig_fore_subscan = false,
-//end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-//begin of modified by monday2000
 //Picture_Shape
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0, 
@@ -170,7 +159,6 @@ private:
 //Quadro_Zoner
 		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
-//end of modified by monday2000
 
 	QImage processAsIs(
 		FilterData const& input, TaskStatus const& status,
@@ -180,24 +168,20 @@ private:
 
 	QImage processWithoutDewarping(
 		TaskStatus const& status, FilterData const& input,
-//begin of modified by monday2000
 //Quadro_Zoner
 		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
 		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 //Dont_Equalize_Illumination_Pic_Zones
 //added:		
 		bool dont_equalize_illumination_pic_zones,
-//end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-//begin of modified by monday2000
 //Picture_Shape
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
 //Quadro_Zoner
 		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
-//end of modified by monday2000
 
 	QImage processWithDewarping(
 		TaskStatus const& status, FilterData const& input,
@@ -207,15 +191,12 @@ private:
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
-//begin of modified by monday2000
 //Dont_Equalize_Illumination_Pic_Zones
 //added:		
 		bool dont_equalize_illumination_pic_zones,
 		bool keep_orig_fore_subscan = false,
-//end of modified by monday2000
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-//begin of modified by monday2000
 //Picture_Shape
 		//DebugImages* dbg = 0) const;
 		DebugImages* dbg = 0,
@@ -223,9 +204,7 @@ private:
 //Quadro_Zoner
 		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
 		) const;
-//end of modified by monday2000
 
-//begin of modified by monday2000
 //Marginal_Dewarping
 	void movePointToTopMargin(BinaryImage& bw_image, XSpline& spline, int idx) const;
 	void movePointToBottomMargin(BinaryImage& bw_image, XSpline& spline, int idx) const;
@@ -235,7 +214,6 @@ private:
 	void movePointToTopMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const;
 	void movePointToBottomMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const;
 	float vert_border_skew_angle(QPointF const& top, QPointF const& bottom) const;
-//end of modified by monday2000
 	
 	void setupTrivialDistortionModel(dewarping::DistortionModel& distortion_model) const;
 

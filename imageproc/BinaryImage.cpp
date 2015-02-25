@@ -32,10 +32,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-//begin of modified by monday2000
 //Picture_Shape
 #include <boost/foreach.hpp>
-//end of modified by monday2000
 
 namespace imageproc
 {
