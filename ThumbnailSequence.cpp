@@ -701,7 +701,6 @@ ThumbnailSequence::AllThumbnailsComplete()
 {
 	return m_ptrImpl->AllThumbnailsComplete();
 }
-// end of modified by monday2000
 
 bool
 ThumbnailSequence::Impl::setSelection(PageId const& page_id)

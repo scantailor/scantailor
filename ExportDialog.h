@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 //Export_Subscans
-// This file was added by monday2000
 
 #ifndef EXPORT_DIALOG_H_
 #define EXPORT_DIALOG_H_

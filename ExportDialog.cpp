@@ -16,7 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 //Export_Subscans
-// This file was added by monday2000
 
 #include "ExportDialog.h"
 #include "ExportDialog.h.moc"

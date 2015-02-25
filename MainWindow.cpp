@@ -189,7 +189,7 @@ MainWindow::MainWindow()
 	// Right now the only setting is 3D acceleration, so get rid of
 	// the whole Settings dialog, if it's inaccessible.
 //Auto_Save_Project
-	//actionSettings->setVisible(false); // commented by monday2000
+	//actionSettings->setVisible(false);
 #endif
 
 	createBatchProcessingWidget();
