@@ -2548,71 +2548,66 @@ text-indent:0px;&quot;&gt;Rimuovi i file selezionati dal progetto.&lt;/p&gt;&lt;
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
-        <source>Surrounded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Quadro</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
         <source>Picture Shape</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="73"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
         <source>LZW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="76"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
         <source>Deflate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="77"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="76"/>
         <source>Packbits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="78"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="77"/>
         <source>JPEG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="458"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="457"/>
         <source>Apply Despeckling Level</source>
         <translation>Applica livello di despeckling</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="543"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="542"/>
         <source>Apply Depth Perception</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="732"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="735"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
         <source>Auto</source>
         <translation type="unfinished">Automatico</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="738"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="737"/>
         <source>Manual</source>
         <translation type="unfinished">Manuale</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="743"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="742"/>
         <source>Marginal</source>
         <translation type="unfinished"></translation>
     </message>

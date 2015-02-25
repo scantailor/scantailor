@@ -1963,10 +1963,6 @@ You should remove them from the project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Surrounded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Quadro</source>
         <translation type="unfinished"></translation>
     </message>

@@ -2447,75 +2447,70 @@ Měli byste je z projektu vyjmout.</translation>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Rectangular</source>
-        <translation>Čtverec</translation>
+        <translation>Čtvercový</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
-        <source>Surrounded</source>
-        <translation>Obklopující</translation>
+        <source>Quadro</source>
+        <translation>Polygon</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
-        <source>Quadro</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
         <source>Picture Shape</source>
         <translation>Tvar obrázků</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="73"/>
         <source>None</source>
         <translation>Žádná</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
         <source>LZW</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="76"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
         <source>Deflate</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="77"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="76"/>
         <source>Packbits</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="78"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="77"/>
         <source>JPEG</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="458"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="457"/>
         <source>Apply Despeckling Level</source>
         <translation>Aplikovat úroveň čištění</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="543"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="542"/>
         <source>Apply Depth Perception</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="732"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
         <source>Off</source>
         <translation>Vypnuto</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="735"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
         <source>Auto</source>
         <translation>Automaticky</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="738"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="737"/>
         <source>Manual</source>
         <translation>Ručně</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="743"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="742"/>
         <source>Marginal</source>
         <translation>Okrajový</translation>
     </message>
