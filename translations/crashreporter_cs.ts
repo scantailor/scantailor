@@ -6,7 +6,7 @@
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="71"/>
         <source>This file contains the internal state of the program when it crashed</source>
-        <translation>Tento soubor obsahuje stav programu, kdy došlo k havárii.</translation>
+        <translation>Tento soubor obsahuje interní stav programu v okamžiku havárie</translation>
     </message>
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="77"/>
@@ -21,17 +21,17 @@
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="136"/>
         <source>Unexpected response (code %1) from dispatcher</source>
-        <translation>Dispečer hlásí neočekávaný kód %1.</translation>
+        <translation>Neočekávaná odpověď (kód %1) od dispečera</translation>
     </message>
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="161"/>
         <source>Unexpected response from dispatcher</source>
-        <translation>Neočekávaná odpověď od dispečera.</translation>
+        <translation>Neočekávaná odpověď od dispečera</translation>
     </message>
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="221"/>
         <source>Unexpected response (code %1) from the receiving side</source>
-        <translation>Neočekávaná odpověď (kód %1) od příjemce.</translation>
+        <translation>Neočekávaná odpověď (kód %1) od příjemce</translation>
     </message>
     <message>
         <location filename="../crash_reporter/CrashReportDialog.cpp" line="227"/>
@@ -57,12 +57,12 @@
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="63"/>
         <source>If you have additional information, for example you know how to reproduce the crash, please provide it here.
 English or Russian please.</source>
-        <translation>Pokud máte nějaké další informace (např. víte jak havárii zopakovat) napište to zde (Anglicky nebo Rusky).</translation>
+        <translation>Pokud máte nějaké další informace, např. víte, jak havárii zopakovat, napište to prosím zde (anglicky nebo rusky).</translation>
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="71"/>
         <source>If you are willing to provide further assistance to developers to help fix this problem, please provide your email address.</source>
-        <translation>Pokud jste ochotni asistovat vývojářum při opravě tohoto problému, napište sem svoji emailovou adresu. </translation>
+        <translation>Pokud jste ochotni asistovat vývojářum při opravě tohoto problému, napište sem prosím svoji emailovou adresu. </translation>
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="81"/>

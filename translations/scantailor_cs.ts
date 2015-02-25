@@ -29,12 +29,12 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="142"/>
         <source>Fork Developer</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="149"/>
         <source>monday2000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="174"/>
@@ -64,7 +64,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="222"/>
         <source>Neco Torquato - Brazilian Portuguese</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="229"/>
@@ -74,7 +74,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="236"/>
         <source>Damir13 - Croatian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="243"/>
@@ -134,7 +134,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="14"/>
         <source>About Scan Tailor &quot;Enhanced&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>O programu Scan Tailor &quot;Enhanced&quot;</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="313"/>
@@ -144,7 +144,7 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="320"/>
         <source>Hxcan Cai - Simplified Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="332"/>
@@ -190,7 +190,7 @@
     <message>
         <location filename="../filters/output/ColorPickupInteraction.cpp" line="47"/>
         <source>Click on an area to pick up its color, or ESC to cancel.</source>
-        <translation>Klikněte do obrázku k získání  barvy nebo stikněte klávesu ESC pro zrušení</translation>
+        <translation>Klikněte do obrázku pro získání barvy, anebo stikněte klávesu ESC pro zrušení.</translation>
     </message>
 </context>
 <context>
@@ -263,13 +263,13 @@ English or Russian please.</source>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="50"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="57"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">Každá druhá strana</translation>
+        <translation>Každá druhá strana</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="67"/>
@@ -279,17 +279,17 @@ English or Russian please.</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="97"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik.</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="106"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Každá druhá vybraná strana</translation>
+        <translation>Každá druhá vybraná strana</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="136"/>
         <source>The current page will be included.</source>
-        <translation type="unfinished">Současná strana bude zahrnuta.</translation>
+        <translation>Současná strana bude zahrnuta.</translation>
     </message>
 </context>
 <context>
@@ -317,7 +317,7 @@ English or Russian please.</source>
     <message>
         <location filename="../filters/deskew/ui/DeskewOptionsWidget.ui" line="140"/>
         <source>Apply To ...</source>
-        <translation>Aplikovat na</translation>
+        <translation>Aplikovat na ...</translation>
     </message>
 </context>
 <context>
@@ -333,7 +333,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/ErrorWidget.ui" line="14"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Formulář</translation>
     </message>
 </context>
 <context>
@@ -345,7 +345,12 @@ English or Russian please.</source>
         <location filename="../ExportDialog.cpp" line="209"/>
         <location filename="../ExportDialog.cpp" line="215"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportovat</translation>
+    </message>
+    <message>
+        <location filename="../ui/ExportDialog.ui" line="30"/>
+        <source>Tab 1</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="85"/>
@@ -355,38 +360,33 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/ExportDialog.ui" line="98"/>
         <source>Default export folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ui/ExportDialog.ui" line="30"/>
-        <source>Tab 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Výchozí adresář pro export</translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="111"/>
         <source>Output Directory</source>
-        <translation type="unfinished">Výstupní adresář</translation>
+        <translation>Výstupní adresář</translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="120"/>
         <source>Browse</source>
-        <translation type="unfinished">Procházet</translation>
+        <translation>Procházet</translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="149"/>
         <location filename="../ExportDialog.cpp" line="54"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Zavřít</translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="162"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="170"/>
         <source>Tab 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="182"/>
@@ -401,70 +401,70 @@ English or Russian please.</source>
     <message>
         <location filename="../ExportDialog.cpp" line="55"/>
         <source>Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Hlavní</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="56"/>
         <source>Rare options</source>
-        <translation type="unfinished"></translation>
+        <translation>Málo užívaná nastavení</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="95"/>
         <location filename="../ExportDialog.cpp" line="119"/>
         <location filename="../ExportDialog.cpp" line="129"/>
         <source>Error</source>
-        <translation type="unfinished">Chyba</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="96"/>
         <source>The export output directory is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výstupní adresář je prázdný.</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="108"/>
         <source>Create Directory?</source>
-        <translation type="unfinished">Vytvořit adresář?</translation>
+        <translation>Vytvořit adresář?</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="109"/>
         <source>The export output directory doesn&apos;t exist.  Create it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Výstupní adresář neexistuje. Vytvořit?</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="120"/>
         <source>Unable to create the export output directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepodařilo se vytvořit výstupní adresář.</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="130"/>
         <source>The export output directory is not set or doesn&apos;t exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Výstupní adresář není zadán nebo neexistuje.</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="139"/>
         <location filename="../ExportDialog.cpp" line="225"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastavit</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="156"/>
         <source>Export output directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Výstupní adresář</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="187"/>
         <source>Processed file</source>
-        <translation type="unfinished"></translation>
+        <translation>Zpracováno souborů</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="187"/>
         <source>of</source>
-        <translation type="unfinished"></translation>
+        <translation>z</translation>
     </message>
     <message>
         <location filename="../ExportDialog.cpp" line="224"/>
         <source>Starting the export...</source>
-        <translation type="unfinished"></translation>
+        <translation>Zahájit export...</translation>
     </message>
 </context>
 <context>
@@ -477,27 +477,27 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="23"/>
         <source>Tab 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="33"/>
         <source>Tab 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="46"/>
         <source>DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>DPI</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="69"/>
         <source>Custom</source>
-        <translation type="unfinished">Vlastní</translation>
+        <translation>Vlastní</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="90"/>
         <source>x</source>
-        <translation type="unfinished"></translation>
+        <translation>×</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="113"/>
@@ -507,33 +507,33 @@ English or Russian please.</source>
     <message>
         <location filename="../FixDpiDialog.cpp" line="241"/>
         <source>Need Fixing</source>
-        <translation type="unfinished">Nutná oprava</translation>
+        <translation>Vyžaduje opravu</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="242"/>
         <location filename="../FixDpiDialog.cpp" line="708"/>
         <source>All Pages</source>
-        <translation type="unfinished">Všechny strany</translation>
+        <translation>Všechny strany</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="477"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="unfinished">DPI je příliš vysoké a pravděpodobně špatně</translation>
+        <translation>DPI je příliš vysoké a pravděpodobně špatně.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="480"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation type="unfinished">DPI je příliš nízké. Ikdyž může být správné, dostanete neakceptovatelný výsledek.</translation>
+        <translation>DPI je příliš nízké. I pokud je to správně, tak nedostanene přijatelné výsledky.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="483"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation type="unfinished">DPI je příliš nízké vzhledem k počtu pixelů a povede pravděpodobně k problémům s nedostatkem paměti.</translation>
+        <translation>DPI je příliš nízké vzhledem k počtu pixelů. Taková kombinace pravděpodobně povede k problémům s nedostatkem paměti.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="734"/>
         <source>%1 (page %2)</source>
-        <translation type="unfinished">%1 (strana %2)</translation>
+        <translation>%1 (strana %2)</translation>
     </message>
 </context>
 <context>
@@ -572,7 +572,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ImageViewBase.cpp" line="211"/>
         <source>Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible.</source>
-        <translation type="unfinished">Pro přiblížení použijte kolečko myši nebo klávesy + resp. -. Při zvětšení je možné stránkou tažením posouvat.</translation>
+        <translation>Pro přiblížení/oddálení použijte kolečko myši nebo klávesy +/-. Při přibližení je možné stránkou tažením posouvat.</translation>
     </message>
 </context>
 <context>
@@ -599,12 +599,13 @@ English or Russian please.</source>
         <location filename="../LoadFileTask.cpp" line="157"/>
         <source>The following file could not be loaded:
 %1</source>
-        <translation type="unfinished">Tento soubor nemohl být nahrán:</translation>
+        <translation>Tento soubor nemohl být nahrán:
+%1</translation>
     </message>
     <message>
         <location filename="../LoadFileTask.cpp" line="160"/>
         <source>The following file doesn&apos;t exist:&lt;br&gt;%1&lt;br&gt;&lt;br&gt;Use the &lt;a href=&quot;#relink&quot;&gt;Relinking Tool&lt;/a&gt; to locate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tento soubor neexistuje:&lt;br&gt;%1&lt;br&gt;&lt;br&gt;Použijte &lt;a href=&quot;#relink&quot;&gt;Nástroj pro opravu cest&lt;/a&gt; k jeho nalezení.</translation>
     </message>
 </context>
 <context>
@@ -630,22 +631,22 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="20"/>
         <source>MainWindow</source>
-        <translation></translation>
+        <translation>Hlavní okno</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="108"/>
         <source>Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Náhledy</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="129"/>
         <source>Keep current page in view.</source>
-        <translation>Ponechat zobrazenou současnou stránku</translation>
+        <translation>Ponechat zobrazenou současnou stránku.</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="167"/>
         <source>Use Home, End, PgUp (or Q), PgDown (or W) to navigate between pages.</source>
-        <translation>K navigaci mezi stránkami slouží klávesy Home, End PgUp (or Q), PgDown (or W)</translation>
+        <translation>K navigaci mezi stránkami použijte klávesy Home, End, PgUp (nebo Q) a PgDown (nebo W).</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="65"/>
@@ -669,7 +670,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="200"/>
         <source>Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtry</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="272"/>
@@ -757,7 +758,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="358"/>
         <source>Quit</source>
-        <translation>Konec</translation>
+        <translation>Ukončit</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="361"/>
@@ -777,7 +778,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="374"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="379"/>
@@ -802,7 +803,7 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/MainWindow.ui" line="397"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Opravit cesty ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="402"/>
@@ -812,119 +813,119 @@ English or Russian please.</source>
         <location filename="../ui/MainWindow.ui" line="443"/>
         <location filename="../ui/MainWindow.ui" line="454"/>
         <source>Switch filter to orientation</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout filtr na orientaci</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="405"/>
         <source>O</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="413"/>
         <source>Switch filter to split pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout filtr na řezání stran</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="416"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="424"/>
         <source>Switch filter to deskew</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout filtr na vyrovnávání</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="427"/>
         <source>N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="435"/>
         <source>Switch filter to select content</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout filtr na výběr obsahu</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="438"/>
         <source>V</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="446"/>
         <source>Switch filter to margins</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout filtr na okraje</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="449"/>
         <source>K</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="457"/>
         <source>Switch filter to output</source>
-        <translation type="unfinished"></translation>
+        <translation>Přepnout filtr na výstup</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="460"/>
         <source>P</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="465"/>
         <source>Export...</source>
-        <translation type="unfinished"></translation>
+        <translation>Export...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="538"/>
         <source>Stop batch processing</source>
-        <translation type="unfinished">Zastavit dávkové zpracování</translation>
-    </message>
-    <message>
-        <location filename="../MainWindow.cpp" line="618"/>
-        <source>The files export is finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zastavit dávkové zpracování</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="618"/>
         <location filename="../MainWindow.cpp" line="2118"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informace</translation>
+    </message>
+    <message>
+        <location filename="../MainWindow.cpp" line="618"/>
+        <source>The files export is finished.</source>
+        <translation>Export souborů je dokončen.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="651"/>
         <source>Save this project?</source>
-        <translation type="unfinished">Uložit projekt?</translation>
+        <translation>Uložit tento projekt?</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1127"/>
         <source>Insert before ...</source>
-        <translation type="unfinished">Vložit před ...</translation>
+        <translation>Vložit před ...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1130"/>
         <source>Insert after ...</source>
-        <translation type="unfinished">Vložit za ...</translation>
+        <translation>Vložit za ...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1136"/>
         <source>Remove from project ...</source>
-        <translation type="unfinished">Odstranit z projektu</translation>
+        <translation>Odstranit z projektu...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1157"/>
         <source>Insert here ...</source>
-        <translation type="unfinished">Vložit sem ...</translation>
+        <translation>Vložit sem ...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1540"/>
         <location filename="../MainWindow.cpp" line="1608"/>
         <source>Scan Tailor Projects</source>
-        <translation type="unfinished">Seznam projektů</translation>
+        <translation>Scan Tailor projekty</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1607"/>
         <source>Open Project</source>
-        <translation type="unfinished">Otevřít projekt</translation>
+        <translation>Otevřít projekt</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1625"/>
@@ -937,77 +938,77 @@ English or Russian please.</source>
         <location filename="../MainWindow.cpp" line="2411"/>
         <location filename="../MainWindow.cpp" line="2442"/>
         <source>Error</source>
-        <translation type="unfinished">Chyba</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1626"/>
         <source>Unable to open the project file.</source>
-        <translation type="unfinished">Nelze otevřít soubor s projektem.</translation>
+        <translation>Nelze otevřít soubor s projektem.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1635"/>
         <source>The project file is broken.</source>
-        <translation type="unfinished">Soubor s projektem je poškozen.</translation>
+        <translation>Soubor s projektem je poškozen.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1908"/>
         <source>The file</source>
-        <translation type="unfinished"></translation>
+        <translation>Soubor</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1908"/>
         <source>is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>nebyl nalezen</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1986"/>
         <location filename="../MainWindow.cpp" line="2126"/>
         <source>Batch processing is in the progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Probíhá dávkové zpracování.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1993"/>
         <location filename="../MainWindow.cpp" line="2133"/>
         <source>No project is loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Žádný projekt není načten.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2118"/>
         <source>The files export is stopped by the user.</source>
-        <translation type="unfinished"></translation>
+        <translation>Export souborů byl zastaven uživatelem.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2303"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="unfinished">Výstup zatim není možný, protože ještě není známa konečná velikost stránek.
-Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat Obsah&quot; nebo &quot;Okraje&quot;.</translation>
+        <translation>Výstup zatim není možný, protože ještě není známa konečná velikost stránek.
+Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat obsah&quot; nebo &quot;Okraje&quot;.</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2338"/>
         <source>Unnamed</source>
-        <translation type="unfinished">Nepojmenovaný</translation>
+        <translation>Nepojmenovaný</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2345"/>
         <source>%2 - Scan Tailor &quot;Enhanced&quot; build from %3 [%1bit]</source>
-        <translation type="unfinished"></translation>
+        <translation>%2 - Scan Tailor „Enhanced“ sestavení z %3 [%1bitové]</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2412"/>
         <location filename="../MainWindow.cpp" line="2443"/>
         <source>Error saving the project file!</source>
-        <translation type="unfinished">Chyba při ukládání souboru s projektem!</translation>
+        <translation>Chyba při ukládání souboru s projektem!</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2494"/>
         <source>Files to insert</source>
-        <translation type="unfinished"></translation>
+        <translation>Soubory ke vložení</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="2549"/>
         <source>Skip failed files</source>
-        <translation type="unfinished"></translation>
+        <translation>Přeskočit soubory, u kterých zpracování selhalo</translation>
     </message>
     <message>
         <source>File to insert</source>
@@ -1016,7 +1017,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../MainWindow.cpp" line="2500"/>
         <source>Images not in project (%1)</source>
-        <translation type="unfinished">Obrázky, které nejsou v projektu (%1)</translation>
+        <translation>Obrázky, které nejsou v projektu (%1)</translation>
     </message>
     <message>
         <source>Error opening the image file.</source>
@@ -1025,7 +1026,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../MainWindow.cpp" line="2596"/>
         <source>Remove</source>
-        <translation type="unfinished">Vyjmout</translation>
+        <translation>Vyjmout</translation>
     </message>
 </context>
 <context>
@@ -1082,7 +1083,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="93"/>
@@ -1103,7 +1104,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="130"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="151"/>
@@ -1142,7 +1143,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationOptionsWidget.ui" line="188"/>
         <source>Apply to ...</source>
-        <translation>Aplikovat na</translation>
+        <translation>Aplikovat na...</translation>
     </message>
 </context>
 <context>
@@ -1241,17 +1242,17 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../OutOfMemoryDialog.cpp" line="88"/>
         <source>Scan Tailor Projects</source>
-        <translation type="unfinished">Seznam projektů</translation>
+        <translation>Scan Tailor Projekty</translation>
     </message>
     <message>
         <location filename="../OutOfMemoryDialog.cpp" line="123"/>
         <source>Error</source>
-        <translation type="unfinished">Chyba</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <location filename="../OutOfMemoryDialog.cpp" line="124"/>
         <source>Error saving the project file!</source>
-        <translation type="unfinished">Chyba při ukládání souboru s projektem!</translation>
+        <translation>Chyba při ukládání souboru s projektem!</translation>
     </message>
 </context>
 <context>
@@ -1289,7 +1290,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputApplyColorsDialog.ui" line="95"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
 </context>
 <context>
@@ -1322,7 +1323,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="62"/>
         <source>Marginal (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Okraje (experimentální)</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="72"/>
@@ -1352,7 +1353,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="144"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
 </context>
 <context>
@@ -1395,7 +1396,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="140"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
 </context>
 <context>
@@ -1444,7 +1445,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="348"/>
         <source>Picture Shape</source>
-        <translation type="unfinished"></translation>
+        <translation>Tvar obrázků</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="421"/>
@@ -1461,7 +1462,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="794"/>
         <source>Tiff Compression</source>
-        <translation type="unfinished"></translation>
+        <translation>TIFF Komprese</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="446"/>
@@ -1527,7 +1528,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="69"/>
@@ -1548,7 +1549,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="118"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="139"/>
@@ -1628,24 +1629,24 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="303"/>
         <source>Auto</source>
         <comment>auto</comment>
-        <translation type="unfinished">Automaticky</translation>
+        <translation>Automaticky</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="308"/>
         <source>Manual</source>
         <comment>manual</comment>
-        <translation type="unfinished">Ručně</translation>
+        <translation>Ručně</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="313"/>
         <source>Original</source>
         <comment>original</comment>
-        <translation type="unfinished"></translation>
+        <translation>Původní</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="321"/>
         <source>Auto Margins</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatické okraje</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutOptionsWidget.ui" line="331"/>
@@ -1678,12 +1679,12 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="91"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="97"/>
         <source>Apply cut</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplikovat řez</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="122"/>
@@ -1708,12 +1709,12 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="152"/>
         <source>This page and the following every other page</source>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="159"/>
         <source>Every other page</source>
-        <translation type="unfinished">Každá druhá strana</translation>
+        <translation>Každá druhá strana</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="175"/>
@@ -1723,12 +1724,12 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="208"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitModeDialog.ui" line="217"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">Každá druhá vybraná strana</translation>
+        <translation>Každá druhá vybraná strana</translation>
     </message>
 </context>
 <context>
@@ -1741,7 +1742,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat O
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="26"/>
         <source>Page Layout</source>
-        <translation>Layout strany</translation>
+        <translation>Rozvržení strany</translation>
     </message>
     <message>
         <location filename="../filters/page_split/ui/PageSplitOptionsWidget.ui" line="134"/>
@@ -1877,51 +1878,51 @@ p, li { white-space: pre-wrap; }
         <location filename="../ProjectFilesDialog.cpp" line="574"/>
         <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Error</source>
-        <translation type="unfinished">Chyba</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="526"/>
         <source>No files in project!</source>
-        <translation type="unfinished">Projekt nemá žádné soubory!</translation>
+        <translation>V projektu nejsou žádné soubory!</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="535"/>
         <source>Input directory is not set or doesn&apos;t exist.</source>
-        <translation type="unfinished">Vstupní adresář není nastaven nebo neexistuje.</translation>
+        <translation>Vstupní adresář není nastaven nebo neexistuje.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="544"/>
         <source>Input and output directories can&apos;t be the same.</source>
-        <translation type="unfinished">Vstupní a výstupní adresáře musejí být různé.</translation>
+        <translation>Vstupní a výstupní adresáře musejí být různé.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="554"/>
         <source>Create Directory?</source>
-        <translation type="unfinished">Vytvořit adresář?</translation>
+        <translation>Vytvořit adresář?</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="555"/>
         <source>Output directory doesn&apos;t exist.  Create it?</source>
-        <translation type="unfinished">Výstupní adresář neexistuje. Vytvořit?</translation>
+        <translation>Výstupní adresář neexistuje. Vytvořit?</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="566"/>
         <source>Unable to create output directory.</source>
-        <translation type="unfinished">Nelze vytvořit výstupní adresář.</translation>
+        <translation>Nelze vytvořit výstupní adresář.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="575"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
-        <translation type="unfinished">Výstupní adresář není nastaven nebo neexistuje.</translation>
+        <translation>Výstupní adresář není nastaven nebo neexistuje.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="647"/>
         <source>Some of the files failed to load.
 Either we don&apos;t support their format, or they are broken.
 You should remove them from the project.</source>
-        <translation type="unfinished">Některé soubory se nepodařilo nahrát.
-Buď nepodporujeme jejich formát, nebo jsou poškozeny.
-Vyjměte je z projektu.</translation>
+        <translation>Některé soubory se nepodařilo načíst.
+Buď jsou v nepodporovaném formátu, anebo jsou poškozeny.
+Měli byste je z projektu vyjmout.</translation>
     </message>
 </context>
 <context>
@@ -1929,12 +1930,12 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="51"/>
         <source>Error</source>
-        <translation type="unfinished">Chyba</translation>
+        <translation>Chyba</translation>
     </message>
     <message>
         <location filename="../ProjectOpeningContext.cpp" line="52"/>
         <source>Unable to interpret the project file.</source>
-        <translation type="unfinished">Chyba při čtení souboru s projektem.</translation>
+        <translation>Chyba při čtení souboru s projektem.</translation>
     </message>
 </context>
 <context>
@@ -1942,7 +1943,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="14"/>
         <source>Relinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Opravit cesty</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
@@ -1952,22 +1953,22 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../RelinkingDialog.cpp" line="95"/>
         <source>Substitution File for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Náhradní soubor pro %1</translation>
     </message>
     <message>
         <location filename="../RelinkingDialog.cpp" line="102"/>
         <source>Substitution Directory for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Náhradní adresář pro %1</translation>
     </message>
     <message>
         <location filename="../RelinkingDialog.cpp" line="130"/>
         <source>This change would merge several files into one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tato změna by sloučila více souborů do jednoho.</translation>
     </message>
 </context>
 <context>
@@ -1998,12 +1999,12 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="23"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>Apply content box</source>
-        <translation type="unfinished"></translation>
+        <translation>Aplikovat obsah strany</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
@@ -2029,7 +2030,7 @@ Vyjměte je z projektu.</translation>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="87"/>
         <source>This page and the following every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tato a každá druhá následující strana</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="109"/>
@@ -2050,7 +2051,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="146"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Pro výběr více stran použijte Ctr+Klik nebo Shift+Klik</translation>
+        <translation>Pro výběr více stran použijte Ctr+Klik/Shift+Klik.</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="167"/>
@@ -2079,48 +2080,48 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="20"/>
         <source>Page Box</source>
-        <translation type="unfinished"></translation>
+        <translation>Strana</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="28"/>
         <source>Shift with corners while they are in black. </source>
-        <translation type="unfinished"></translation>
+        <translation>Posouvá rohy strany dokud jsou v černém okraji. </translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="31"/>
         <source>Fine Tune Page Corners</source>
-        <translation type="unfinished"></translation>
+        <translation>Doladit rohy strany</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="40"/>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="178"/>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>Vypnout</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="73"/>
         <source>Borders in MM</source>
-        <translation type="unfinished"></translation>
+        <translation>Vnějsí okraj v milimetrech</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="96"/>
         <source>Left</source>
-        <translation type="unfinished">Vlevo</translation>
+        <translation>Vlevo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="106"/>
         <source>Top</source>
-        <translation type="unfinished">Nahoře</translation>
+        <translation>Nahoře</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="116"/>
         <source>Right</source>
-        <translation type="unfinished">Vpravo</translation>
+        <translation>Vpravo</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="126"/>
         <source>Bottom</source>
-        <translation type="unfinished">Dole</translation>
+        <translation>Dole</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="207"/>
@@ -2153,22 +2154,22 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="27"/>
         <source>Auto-save the existing project</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaticky uložit existující projekt</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="34"/>
         <source>Don&apos;t equalize the illumination in picture zones</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../SettingsDialog.cpp" line="36"/>
         <source>Compiled without OpenGL support.</source>
-        <translation type="unfinished">Zkompilováno bez podpory OpenGL</translation>
+        <translation>Zkompilováno bez podpory OpenGL.</translation>
     </message>
     <message>
         <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation type="unfinished">Vaše zařízení nemá potřebné vlastnosti.</translation>
+        <translation>Váš hardware/ovladač neposkytuje potřebné funkce.</translation>
     </message>
 </context>
 <context>
@@ -2176,7 +2177,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../StageListView.cpp" line="130"/>
         <source>Launch batch processing</source>
-        <translation type="unfinished">Spustit dávkové zpracování</translation>
+        <translation>Spustit dávkové zpracování</translation>
     </message>
 </context>
 <context>
@@ -2184,22 +2185,22 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Dialog</translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="26"/>
         <source>Batch Process</source>
-        <translation type="unfinished"></translation>
+        <translation>Hromadně zpracovat</translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="33"/>
         <source>All pages</source>
-        <translation type="unfinished">Všechny strany</translation>
+        <translation>Všechny strany</translation>
     </message>
     <message>
         <location filename="../ui/StartBatchProcessingDialog.ui" line="43"/>
         <source>Start from selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Začít vybranou stranou</translation>
     </message>
 </context>
 <context>
@@ -2207,7 +2208,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="14"/>
         <source>Form</source>
-        <translation></translation>
+        <translation>Formulář</translation>
     </message>
     <message>
         <location filename="../ui/SystemLoadWidget.ui" line="23"/>
@@ -2223,12 +2224,12 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../SystemLoadWidget.cpp" line="98"/>
         <source>Minimal</source>
-        <translation type="unfinished">Minimálně</translation>
+        <translation>Minimální</translation>
     </message>
     <message>
         <location filename="../SystemLoadWidget.cpp" line="100"/>
         <source>Normal</source>
-        <translation type="unfinished">Normálně</translation>
+        <translation>Normální</translation>
     </message>
 </context>
 <context>
@@ -2236,22 +2237,22 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../ThumbnailSequence.cpp" line="695"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Varování</translation>
     </message>
     <message>
         <location filename="../ThumbnailSequence.cpp" line="695"/>
         <source>The file</source>
-        <translation type="unfinished"></translation>
+        <translation>Soubor</translation>
     </message>
     <message>
         <location filename="../ThumbnailSequence.cpp" line="695"/>
         <source>is not ready for output.</source>
-        <translation type="unfinished"></translation>
+        <translation>není připraven pro výstup.</translation>
     </message>
     <message>
         <location filename="../ThumbnailSequence.cpp" line="1320"/>
         <source>%1 (page %2)</source>
-        <translation type="unfinished">%1 (strana %2)</translation>
+        <translation>%1 (strana %2)</translation>
     </message>
 </context>
 <context>
@@ -2300,7 +2301,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="45"/>
         <source>Drag the vertex.</source>
-        <translation>Posuout vrchol</translation>
+        <translation>Posuout vrchol.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="46"/>
@@ -2344,12 +2345,12 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="63"/>
         <source>Use Ctrl+Wheel to rotate or Ctrl+Shift+Wheel for finer rotation.</source>
-        <translation>Otáčení: Ctrl+Kolečko nebo Ctr+Shift+Kolečko pro jemné natočení.</translation>
+        <translation>Použijte Ctrl+Kolečko pro natočení nebo Ctr+Shift+Kolečko pro jemné natočení.</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="66"/>
         <source>Drag this handle to rotate the image.</source>
-        <translation>Táhněte tímto madlem pro natočení obrázku</translation>
+        <translation>Táhněte tímto ovladačem pro natočení obrázku.</translation>
     </message>
 </context>
 <context>
@@ -2441,17 +2442,17 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="68"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Volný</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="69"/>
         <source>Rectangular</source>
-        <translation type="unfinished"></translation>
+        <translation>Čtverec</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="70"/>
         <source>Surrounded</source>
-        <translation type="unfinished"></translation>
+        <translation>Obklopující</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="71"/>
@@ -2461,32 +2462,32 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="72"/>
         <source>Picture Shape</source>
-        <translation type="unfinished"></translation>
+        <translation>Tvar obrázků</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="74"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Žádná</translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="75"/>
         <source>LZW</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="76"/>
         <source>Deflate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="77"/>
         <source>Packbits</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="78"/>
         <source>JPEG</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="458"/>
@@ -2516,7 +2517,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/output/OptionsWidget.cpp" line="743"/>
         <source>Marginal</source>
-        <translation type="unfinished"></translation>
+        <translation>Okrajový</translation>
     </message>
 </context>
 <context>
@@ -2618,7 +2619,7 @@ Vyjměte je z projektu.</translation>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="66"/>
         <source>Order by split type</source>
-        <translation type="unfinished">Řadit podle typu řezu</translation>
+        <translation>Řadit podle typu řezu</translation>
     </message>
     <message>
         <location filename="../filters/page_split/Filter.cpp" line="76"/>
