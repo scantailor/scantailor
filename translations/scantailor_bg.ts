@@ -372,9 +372,9 @@ Taxman</translation>
     <message>
         <location filename="../ui/ExportDialog.ui" line="14"/>
         <location filename="../ui/ExportDialog.ui" line="136"/>
-        <location filename="../ExportDialog.cpp" line="53"/>
-        <location filename="../ExportDialog.cpp" line="209"/>
-        <location filename="../ExportDialog.cpp" line="215"/>
+        <location filename="../ExportDialog.cpp" line="51"/>
+        <location filename="../ExportDialog.cpp" line="207"/>
+        <location filename="../ExportDialog.cpp" line="213"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
@@ -405,7 +405,7 @@ Taxman</translation>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="149"/>
-        <location filename="../ExportDialog.cpp" line="54"/>
+        <location filename="../ExportDialog.cpp" line="52"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -430,70 +430,70 @@ Taxman</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="55"/>
+        <location filename="../ExportDialog.cpp" line="53"/>
         <source>Main</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="56"/>
+        <location filename="../ExportDialog.cpp" line="54"/>
         <source>Rare options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="95"/>
-        <location filename="../ExportDialog.cpp" line="119"/>
-        <location filename="../ExportDialog.cpp" line="129"/>
+        <location filename="../ExportDialog.cpp" line="93"/>
+        <location filename="../ExportDialog.cpp" line="117"/>
+        <location filename="../ExportDialog.cpp" line="127"/>
         <source>Error</source>
         <translation type="unfinished">Грешка</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="96"/>
+        <location filename="../ExportDialog.cpp" line="94"/>
         <source>The export output directory is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="108"/>
+        <location filename="../ExportDialog.cpp" line="106"/>
         <source>Create Directory?</source>
         <translation type="unfinished">Създаване на папка?</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="109"/>
+        <location filename="../ExportDialog.cpp" line="107"/>
         <source>The export output directory doesn&apos;t exist.  Create it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="120"/>
+        <location filename="../ExportDialog.cpp" line="118"/>
         <source>Unable to create the export output directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="130"/>
+        <location filename="../ExportDialog.cpp" line="128"/>
         <source>The export output directory is not set or doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="139"/>
-        <location filename="../ExportDialog.cpp" line="225"/>
+        <location filename="../ExportDialog.cpp" line="137"/>
+        <location filename="../ExportDialog.cpp" line="223"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="156"/>
+        <location filename="../ExportDialog.cpp" line="154"/>
         <source>Export output directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="187"/>
+        <location filename="../ExportDialog.cpp" line="185"/>
         <source>Processed file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="187"/>
+        <location filename="../ExportDialog.cpp" line="185"/>
         <source>of</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="224"/>
+        <location filename="../ExportDialog.cpp" line="222"/>
         <source>Starting the export...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -618,12 +618,12 @@ Taxman</translation>
         <translation>Цъкнете, за да създадете нова контролна точка.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>This point can be dragged.</source>
         <translation>Тази точка може да бъде влачена.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="79"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation>Преместете тази точка или я изтрийте чрез клавишите Del или D.</translation>
     </message>
@@ -669,126 +669,126 @@ Taxman</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="277"/>
-        <location filename="../MainWindow.cpp" line="651"/>
+        <location filename="../MainWindow.cpp" line="639"/>
         <source>Save Project</source>
         <translation>Запазване на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="618"/>
+        <location filename="../MainWindow.cpp" line="609"/>
         <source>The files export is finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="618"/>
-        <location filename="../MainWindow.cpp" line="2118"/>
+        <location filename="../MainWindow.cpp" line="609"/>
+        <location filename="../MainWindow.cpp" line="2097"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="651"/>
+        <location filename="../MainWindow.cpp" line="639"/>
         <source>Save this project?</source>
         <translation type="unfinished">Да се запази ли този проект?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1127"/>
+        <location filename="../MainWindow.cpp" line="1109"/>
         <source>Insert before ...</source>
         <translation type="unfinished">Вмъкни преди...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1130"/>
+        <location filename="../MainWindow.cpp" line="1112"/>
         <source>Insert after ...</source>
         <translation type="unfinished">Вмъкни след...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1136"/>
+        <location filename="../MainWindow.cpp" line="1118"/>
         <source>Remove from project ...</source>
         <translation type="unfinished">Премахване от проекта...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1157"/>
+        <location filename="../MainWindow.cpp" line="1139"/>
         <source>Insert here ...</source>
         <translation type="unfinished">Вмъкни тук ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1540"/>
-        <location filename="../MainWindow.cpp" line="1608"/>
+        <location filename="../MainWindow.cpp" line="1522"/>
+        <location filename="../MainWindow.cpp" line="1590"/>
         <source>Scan Tailor Projects</source>
         <translation type="unfinished">Проекти на Scan Tailor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1607"/>
+        <location filename="../MainWindow.cpp" line="1589"/>
         <source>Open Project</source>
         <translation type="unfinished">Отваряне на проект</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1625"/>
-        <location filename="../MainWindow.cpp" line="1634"/>
-        <location filename="../MainWindow.cpp" line="1908"/>
-        <location filename="../MainWindow.cpp" line="1986"/>
-        <location filename="../MainWindow.cpp" line="1993"/>
-        <location filename="../MainWindow.cpp" line="2126"/>
-        <location filename="../MainWindow.cpp" line="2133"/>
-        <location filename="../MainWindow.cpp" line="2411"/>
-        <location filename="../MainWindow.cpp" line="2442"/>
+        <location filename="../MainWindow.cpp" line="1607"/>
+        <location filename="../MainWindow.cpp" line="1616"/>
+        <location filename="../MainWindow.cpp" line="1887"/>
+        <location filename="../MainWindow.cpp" line="1965"/>
+        <location filename="../MainWindow.cpp" line="1972"/>
+        <location filename="../MainWindow.cpp" line="2105"/>
+        <location filename="../MainWindow.cpp" line="2112"/>
+        <location filename="../MainWindow.cpp" line="2389"/>
+        <location filename="../MainWindow.cpp" line="2420"/>
         <source>Error</source>
         <translation type="unfinished">Грешка</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1626"/>
+        <location filename="../MainWindow.cpp" line="1608"/>
         <source>Unable to open the project file.</source>
         <translation type="unfinished">Проектният файл не може да бъде отворен.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1635"/>
+        <location filename="../MainWindow.cpp" line="1617"/>
         <source>The project file is broken.</source>
         <translation type="unfinished">Проектният файл е повреден.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1908"/>
+        <location filename="../MainWindow.cpp" line="1887"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1908"/>
+        <location filename="../MainWindow.cpp" line="1887"/>
         <source>is not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1986"/>
-        <location filename="../MainWindow.cpp" line="2126"/>
+        <location filename="../MainWindow.cpp" line="1965"/>
+        <location filename="../MainWindow.cpp" line="2105"/>
         <source>Batch processing is in the progress.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1993"/>
-        <location filename="../MainWindow.cpp" line="2133"/>
+        <location filename="../MainWindow.cpp" line="1972"/>
+        <location filename="../MainWindow.cpp" line="2112"/>
         <source>No project is loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2118"/>
+        <location filename="../MainWindow.cpp" line="2097"/>
         <source>The files export is stopped by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2303"/>
+        <location filename="../MainWindow.cpp" line="2281"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation type="unfinished">Изходният резулат все още не е възможен, тъй като не се знае крайният размер на страниците.
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2345"/>
+        <location filename="../MainWindow.cpp" line="2323"/>
         <source>%2 - Scan Tailor &quot;Enhanced&quot; build from %3 [%1bit]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2494"/>
+        <location filename="../MainWindow.cpp" line="2472"/>
         <source>Files to insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2549"/>
+        <location filename="../MainWindow.cpp" line="2527"/>
         <source>Skip failed files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -799,13 +799,13 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
 За да го определите, изпълнете масова обработка на страниците в &quot;Избор на съдържание&quot; или &quot;Оформление на страница&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2338"/>
+        <location filename="../MainWindow.cpp" line="2316"/>
         <source>Unnamed</source>
         <translation type="unfinished">Без име</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2412"/>
-        <location filename="../MainWindow.cpp" line="2443"/>
+        <location filename="../MainWindow.cpp" line="2390"/>
+        <location filename="../MainWindow.cpp" line="2421"/>
         <source>Error saving the project file!</source>
         <translation type="unfinished">Грешка при запазване на проектния файл!</translation>
     </message>
@@ -814,7 +814,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">Файл за вмъкване</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2500"/>
+        <location filename="../MainWindow.cpp" line="2478"/>
         <source>Images not in project (%1)</source>
         <translation type="unfinished">Изображения, които не са в проекта (%1)</translation>
     </message>
@@ -827,7 +827,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="obsolete">%1 (страница %2)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2596"/>
+        <location filename="../MainWindow.cpp" line="2574"/>
         <source>Remove</source>
         <translation type="unfinished">Премахване</translation>
     </message>
@@ -1078,7 +1078,7 @@ To determine it, run batch processing at &quot;Select Content&quot; or &quot;Pag
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="538"/>
+        <location filename="../MainWindow.cpp" line="530"/>
         <source>Stop batch processing</source>
         <translation type="unfinished">Спиране на масовата обработка</translation>
     </message>
@@ -2353,22 +2353,22 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <location filename="../ThumbnailSequence.cpp" line="690"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <location filename="../ThumbnailSequence.cpp" line="690"/>
         <source>The file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <location filename="../ThumbnailSequence.cpp" line="690"/>
         <source>is not ready for output.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1320"/>
+        <location filename="../ThumbnailSequence.cpp" line="1314"/>
         <source>%1 (page %2)</source>
         <translation type="unfinished">%1 (страница %2)</translation>
     </message>
@@ -2399,17 +2399,17 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ZoneCreationInteraction</name>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="362"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="350"/>
         <source>Click to finish this zone.  ESC to cancel.</source>
         <translation>Цъкнете, за да завършите тази зона.  ESC за отказ.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="364"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="352"/>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
         <translation>Свържете първата и последната точка, за да завършите тази зона.  ESC за отказ.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="367"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="355"/>
         <source>Zones need to have at least 3 points.  ESC to cancel.</source>
         <translation>Зоните трябва да имат поне 3 точки.  ESC за отказ.</translation>
     </message>
@@ -2459,12 +2459,12 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>ZoneVertexDragInteraction</name>
     <message>
-        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="194"/>
+        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="192"/>
         <source>Merge these two vertices.</source>
         <translation>Сливане на тези два върха.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="196"/>
+        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="194"/>
         <source>Move the vertex to one of its neighbors to merge them.</source>
         <translation>Преместете върхът към един от съседите му, за да ги слеете.</translation>
     </message>
@@ -2622,32 +2622,32 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="457"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="453"/>
         <source>Apply Despeckling Level</source>
         <translation>Прилагане почистването на шум</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="542"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="536"/>
         <source>Apply Depth Perception</source>
         <translation>Прилагане на дълбочина</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="723"/>
         <source>Off</source>
         <translation>Изключено</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="726"/>
         <source>Auto</source>
         <translation>Автоматично</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="737"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="729"/>
         <source>Manual</source>
         <translation>Ръчно</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="742"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="733"/>
         <source>Marginal</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2655,37 +2655,37 @@ text-indent:0px;&quot;&gt;Премахване на избраните стра�
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="615"/>
+        <location filename="../filters/output/Task.cpp" line="601"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Зоните за изображения са налични само в Смесен режим.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="667"/>
+        <location filename="../filters/output/Task.cpp" line="653"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Не е възможно почистване на шум в режим «Цветно / Степени на сивото»</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="684"/>
+        <location filename="../filters/output/Task.cpp" line="670"/>
         <source>Output</source>
         <translation>Краен резултат</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="685"/>
+        <location filename="../filters/output/Task.cpp" line="671"/>
         <source>Picture Zones</source>
         <translation>Зони за изображения</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="686"/>
+        <location filename="../filters/output/Task.cpp" line="672"/>
         <source>Fill Zones</source>
         <translation>Запълване на зони</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="687"/>
+        <location filename="../filters/output/Task.cpp" line="673"/>
         <source>Dewarping</source>
         <translation>Корекция изкривявания</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="688"/>
+        <location filename="../filters/output/Task.cpp" line="674"/>
         <source>Despeckling</source>
         <translation>Почистване на шум</translation>
     </message>

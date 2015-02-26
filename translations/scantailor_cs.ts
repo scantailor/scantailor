@@ -341,9 +341,9 @@ English or Russian please.</source>
     <message>
         <location filename="../ui/ExportDialog.ui" line="14"/>
         <location filename="../ui/ExportDialog.ui" line="136"/>
-        <location filename="../ExportDialog.cpp" line="53"/>
-        <location filename="../ExportDialog.cpp" line="209"/>
-        <location filename="../ExportDialog.cpp" line="215"/>
+        <location filename="../ExportDialog.cpp" line="51"/>
+        <location filename="../ExportDialog.cpp" line="207"/>
+        <location filename="../ExportDialog.cpp" line="213"/>
         <source>Export</source>
         <translation>Exportovat</translation>
     </message>
@@ -374,7 +374,7 @@ English or Russian please.</source>
     </message>
     <message>
         <location filename="../ui/ExportDialog.ui" line="149"/>
-        <location filename="../ExportDialog.cpp" line="54"/>
+        <location filename="../ExportDialog.cpp" line="52"/>
         <source>Close</source>
         <translation>Zavřít</translation>
     </message>
@@ -399,70 +399,70 @@ English or Russian please.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="55"/>
+        <location filename="../ExportDialog.cpp" line="53"/>
         <source>Main</source>
         <translation>Hlavní</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="56"/>
+        <location filename="../ExportDialog.cpp" line="54"/>
         <source>Rare options</source>
         <translation>Málo užívaná nastavení</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="95"/>
-        <location filename="../ExportDialog.cpp" line="119"/>
-        <location filename="../ExportDialog.cpp" line="129"/>
+        <location filename="../ExportDialog.cpp" line="93"/>
+        <location filename="../ExportDialog.cpp" line="117"/>
+        <location filename="../ExportDialog.cpp" line="127"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="96"/>
+        <location filename="../ExportDialog.cpp" line="94"/>
         <source>The export output directory is empty.</source>
         <translation>Výstupní adresář je prázdný.</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="108"/>
+        <location filename="../ExportDialog.cpp" line="106"/>
         <source>Create Directory?</source>
         <translation>Vytvořit adresář?</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="109"/>
+        <location filename="../ExportDialog.cpp" line="107"/>
         <source>The export output directory doesn&apos;t exist.  Create it?</source>
         <translation>Výstupní adresář neexistuje. Vytvořit?</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="120"/>
+        <location filename="../ExportDialog.cpp" line="118"/>
         <source>Unable to create the export output directory.</source>
         <translation>Nepodařilo se vytvořit výstupní adresář.</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="130"/>
+        <location filename="../ExportDialog.cpp" line="128"/>
         <source>The export output directory is not set or doesn&apos;t exist.</source>
         <translation>Výstupní adresář není zadán nebo neexistuje.</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="139"/>
-        <location filename="../ExportDialog.cpp" line="225"/>
+        <location filename="../ExportDialog.cpp" line="137"/>
+        <location filename="../ExportDialog.cpp" line="223"/>
         <source>Stop</source>
         <translation>Zastavit</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="156"/>
+        <location filename="../ExportDialog.cpp" line="154"/>
         <source>Export output directory</source>
         <translation>Výstupní adresář</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="187"/>
+        <location filename="../ExportDialog.cpp" line="185"/>
         <source>Processed file</source>
         <translation>Zpracováno souborů</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="187"/>
+        <location filename="../ExportDialog.cpp" line="185"/>
         <source>of</source>
         <translation>z</translation>
     </message>
     <message>
-        <location filename="../ExportDialog.cpp" line="224"/>
+        <location filename="../ExportDialog.cpp" line="222"/>
         <source>Starting the export...</source>
         <translation>Zahájit export...</translation>
     </message>
@@ -583,12 +583,12 @@ English or Russian please.</source>
         <translation>Nový kontrolní bod vytvoříte kliknutím.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="75"/>
         <source>This point can be dragged.</source>
         <translation>S tímto bodem lze hýbat.</translation>
     </message>
     <message>
-        <location filename="../interaction/InteractiveXSpline.cpp" line="79"/>
+        <location filename="../interaction/InteractiveXSpline.cpp" line="77"/>
         <source>Drag this point or delete it by pressing Del or D.</source>
         <translation>Posuňte tento bod nebo jej smažte klávesou Del nebo D.</translation>
     </message>
@@ -679,7 +679,7 @@ English or Russian please.</source>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="277"/>
-        <location filename="../MainWindow.cpp" line="651"/>
+        <location filename="../MainWindow.cpp" line="639"/>
         <source>Save Project</source>
         <translation>Uložit projekt</translation>
     </message>
@@ -876,137 +876,137 @@ English or Russian please.</source>
         <translation>Export...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="538"/>
+        <location filename="../MainWindow.cpp" line="530"/>
         <source>Stop batch processing</source>
         <translation>Zastavit dávkové zpracování</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="618"/>
-        <location filename="../MainWindow.cpp" line="2118"/>
+        <location filename="../MainWindow.cpp" line="609"/>
+        <location filename="../MainWindow.cpp" line="2097"/>
         <source>Information</source>
         <translation>Informace</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="618"/>
+        <location filename="../MainWindow.cpp" line="609"/>
         <source>The files export is finished.</source>
         <translation>Export souborů je dokončen.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="651"/>
+        <location filename="../MainWindow.cpp" line="639"/>
         <source>Save this project?</source>
         <translation>Uložit tento projekt?</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1127"/>
+        <location filename="../MainWindow.cpp" line="1109"/>
         <source>Insert before ...</source>
         <translation>Vložit před ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1130"/>
+        <location filename="../MainWindow.cpp" line="1112"/>
         <source>Insert after ...</source>
         <translation>Vložit za ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1136"/>
+        <location filename="../MainWindow.cpp" line="1118"/>
         <source>Remove from project ...</source>
         <translation>Odstranit z projektu...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1157"/>
+        <location filename="../MainWindow.cpp" line="1139"/>
         <source>Insert here ...</source>
         <translation>Vložit sem ...</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1540"/>
-        <location filename="../MainWindow.cpp" line="1608"/>
+        <location filename="../MainWindow.cpp" line="1522"/>
+        <location filename="../MainWindow.cpp" line="1590"/>
         <source>Scan Tailor Projects</source>
         <translation>Scan Tailor projekty</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1607"/>
+        <location filename="../MainWindow.cpp" line="1589"/>
         <source>Open Project</source>
         <translation>Otevřít projekt</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1625"/>
-        <location filename="../MainWindow.cpp" line="1634"/>
-        <location filename="../MainWindow.cpp" line="1908"/>
-        <location filename="../MainWindow.cpp" line="1986"/>
-        <location filename="../MainWindow.cpp" line="1993"/>
-        <location filename="../MainWindow.cpp" line="2126"/>
-        <location filename="../MainWindow.cpp" line="2133"/>
-        <location filename="../MainWindow.cpp" line="2411"/>
-        <location filename="../MainWindow.cpp" line="2442"/>
+        <location filename="../MainWindow.cpp" line="1607"/>
+        <location filename="../MainWindow.cpp" line="1616"/>
+        <location filename="../MainWindow.cpp" line="1887"/>
+        <location filename="../MainWindow.cpp" line="1965"/>
+        <location filename="../MainWindow.cpp" line="1972"/>
+        <location filename="../MainWindow.cpp" line="2105"/>
+        <location filename="../MainWindow.cpp" line="2112"/>
+        <location filename="../MainWindow.cpp" line="2389"/>
+        <location filename="../MainWindow.cpp" line="2420"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1626"/>
+        <location filename="../MainWindow.cpp" line="1608"/>
         <source>Unable to open the project file.</source>
         <translation>Nelze otevřít soubor s projektem.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1635"/>
+        <location filename="../MainWindow.cpp" line="1617"/>
         <source>The project file is broken.</source>
         <translation>Soubor s projektem je poškozen.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1908"/>
+        <location filename="../MainWindow.cpp" line="1887"/>
         <source>The file</source>
         <translation>Soubor</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1908"/>
+        <location filename="../MainWindow.cpp" line="1887"/>
         <source>is not found</source>
         <translation>nebyl nalezen</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1986"/>
-        <location filename="../MainWindow.cpp" line="2126"/>
+        <location filename="../MainWindow.cpp" line="1965"/>
+        <location filename="../MainWindow.cpp" line="2105"/>
         <source>Batch processing is in the progress.</source>
         <translation>Probíhá dávkové zpracování.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1993"/>
-        <location filename="../MainWindow.cpp" line="2133"/>
+        <location filename="../MainWindow.cpp" line="1972"/>
+        <location filename="../MainWindow.cpp" line="2112"/>
         <source>No project is loaded.</source>
         <translation>Žádný projekt není načten.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2118"/>
+        <location filename="../MainWindow.cpp" line="2097"/>
         <source>The files export is stopped by the user.</source>
         <translation>Export souborů byl zastaven uživatelem.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2303"/>
+        <location filename="../MainWindow.cpp" line="2281"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
         <translation>Výstup zatim není možný, protože ještě není známa konečná velikost stránek.
 Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat obsah&quot; nebo &quot;Okraje&quot;.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2338"/>
+        <location filename="../MainWindow.cpp" line="2316"/>
         <source>Unnamed</source>
         <translation>Nepojmenovaný</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2345"/>
+        <location filename="../MainWindow.cpp" line="2323"/>
         <source>%2 - Scan Tailor &quot;Enhanced&quot; build from %3 [%1bit]</source>
         <translation>%2 - Scan Tailor „Enhanced“ sestavení z %3 [%1bitové]</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2412"/>
-        <location filename="../MainWindow.cpp" line="2443"/>
+        <location filename="../MainWindow.cpp" line="2390"/>
+        <location filename="../MainWindow.cpp" line="2421"/>
         <source>Error saving the project file!</source>
         <translation>Chyba při ukládání souboru s projektem!</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2494"/>
+        <location filename="../MainWindow.cpp" line="2472"/>
         <source>Files to insert</source>
         <translation>Soubory ke vložení</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2549"/>
+        <location filename="../MainWindow.cpp" line="2527"/>
         <source>Skip failed files</source>
         <translation>Přeskočit soubory, u kterých zpracování selhalo</translation>
     </message>
@@ -1015,7 +1015,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat o
         <translation type="obsolete">Soubor pro vložení</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2500"/>
+        <location filename="../MainWindow.cpp" line="2478"/>
         <source>Images not in project (%1)</source>
         <translation>Obrázky, které nejsou v projektu (%1)</translation>
     </message>
@@ -1024,7 +1024,7 @@ Pro určení velikosti stránek spusťte dávkové zpracování u &quot;Vybrat o
         <translation type="obsolete">Chyba při otevírání souboru s obrázkem.</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2596"/>
+        <location filename="../MainWindow.cpp" line="2574"/>
         <source>Remove</source>
         <translation>Vyjmout</translation>
     </message>
@@ -2235,22 +2235,22 @@ Měli byste je z projektu vyjmout.</translation>
 <context>
     <name>ThumbnailSequence</name>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <location filename="../ThumbnailSequence.cpp" line="690"/>
         <source>Warning</source>
         <translation>Varování</translation>
     </message>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <location filename="../ThumbnailSequence.cpp" line="690"/>
         <source>The file</source>
         <translation>Soubor</translation>
     </message>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="695"/>
+        <location filename="../ThumbnailSequence.cpp" line="690"/>
         <source>is not ready for output.</source>
         <translation>není připraven pro výstup.</translation>
     </message>
     <message>
-        <location filename="../ThumbnailSequence.cpp" line="1320"/>
+        <location filename="../ThumbnailSequence.cpp" line="1314"/>
         <source>%1 (page %2)</source>
         <translation>%1 (strana %2)</translation>
     </message>
@@ -2281,17 +2281,17 @@ Měli byste je z projektu vyjmout.</translation>
 <context>
     <name>ZoneCreationInteraction</name>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="362"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="350"/>
         <source>Click to finish this zone.  ESC to cancel.</source>
         <translation>Klikněte pro uzavření zóny. ESC pro zrušení.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="364"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="352"/>
         <source>Connect first and last points to finish this zone.  ESC to cancel.</source>
         <translation>Spojit první a poslední bod k uzavření zóny. ESC pro zrušení.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneCreationInteraction.cpp" line="367"/>
+        <location filename="../zones/ZoneCreationInteraction.cpp" line="355"/>
         <source>Zones need to have at least 3 points.  ESC to cancel.</source>
         <translation>Zóna musí mít aspoň 3 body. ESC ke zrušení.</translation>
     </message>
@@ -2322,12 +2322,12 @@ Měli byste je z projektu vyjmout.</translation>
 <context>
     <name>ZoneVertexDragInteraction</name>
     <message>
-        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="194"/>
+        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="192"/>
         <source>Merge these two vertices.</source>
         <translation>Sloučit vrcholy.</translation>
     </message>
     <message>
-        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="196"/>
+        <location filename="../zones/ZoneVertexDragInteraction.cpp" line="194"/>
         <source>Move the vertex to one of its neighbors to merge them.</source>
         <translation>Sloučit vrchol s jedním z jeho sousedů.</translation>
     </message>
@@ -2485,32 +2485,32 @@ Měli byste je z projektu vyjmout.</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="457"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="453"/>
         <source>Apply Despeckling Level</source>
         <translation>Aplikovat úroveň čištění</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="542"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="536"/>
         <source>Apply Depth Perception</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="731"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="723"/>
         <source>Off</source>
         <translation>Vypnuto</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="734"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="726"/>
         <source>Auto</source>
         <translation>Automaticky</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="737"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="729"/>
         <source>Manual</source>
         <translation>Ručně</translation>
     </message>
     <message>
-        <location filename="../filters/output/OptionsWidget.cpp" line="742"/>
+        <location filename="../filters/output/OptionsWidget.cpp" line="733"/>
         <source>Marginal</source>
         <translation>Okrajový</translation>
     </message>
@@ -2518,37 +2518,37 @@ Měli byste je z projektu vyjmout.</translation>
 <context>
     <name>output::Task::UiUpdater</name>
     <message>
-        <location filename="../filters/output/Task.cpp" line="615"/>
+        <location filename="../filters/output/Task.cpp" line="601"/>
         <source>Picture zones are only available in Mixed mode.</source>
         <translation>Zóny s obrázky jsou možné pouze ve smíšeném módu.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="667"/>
+        <location filename="../filters/output/Task.cpp" line="653"/>
         <source>Despeckling can&apos;t be done in Color / Grayscale mode.</source>
         <translation>Čištění nelze provést v barevném / černobílém módu.</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="684"/>
+        <location filename="../filters/output/Task.cpp" line="670"/>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="685"/>
+        <location filename="../filters/output/Task.cpp" line="671"/>
         <source>Picture Zones</source>
         <translation>Zóny s obrázky</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="686"/>
+        <location filename="../filters/output/Task.cpp" line="672"/>
         <source>Fill Zones</source>
         <translation>Prázdné zóny</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="687"/>
+        <location filename="../filters/output/Task.cpp" line="673"/>
         <source>Dewarping</source>
         <translation>Deformace</translation>
     </message>
     <message>
-        <location filename="../filters/output/Task.cpp" line="688"/>
+        <location filename="../filters/output/Task.cpp" line="674"/>
         <source>Despeckling</source>
         <translation>Vyčistit</translation>
     </message>
