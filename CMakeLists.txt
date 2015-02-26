@@ -560,7 +560,7 @@ SET(
 SOURCE_GROUP("Sources" FILES ${common_sources} ${gui_only_sources} ${cli_only_sources})
 QT4_AUTOMOC(${common_sources} ${gui_only_sources} ${cli_only_sources})
 
-SOURCE_GROUP("Special Headers" FILES version.h config.h.in)
+SOURCE_GROUP("Special Headers" FILES version.h config.h.in git-rev.h.in)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
 	# There seems to be a bug in either gcc or boost that makes page sorting either crash
@@ -621,6 +621,19 @@ TARGET_LINK_LIBRARIES(
 	${QT_QTGUI_LIBRARY} ${QT_QTXML_LIBRARY} ${QT_QTCORE_LIBRARY} ${EXTRA_LIBS}
 )
 INSTALL(TARGETS scantailor scantailor-cli RUNTIME DESTINATION bin)
+
+SET(gitrev-in git-rev.h.in)
+SET(gitrev git-rev.h)
+CONFIGURE_FILE(${gitrev-in} ${CMAKE_BINARY_DIR}/${gitrev} COPYONLY)
+FIND_PACKAGE(Git)
+IF(GIT_FOUND)
+  ADD_CUSTOM_TARGET(gitrev
+      COMMAND ${GIT_EXECUTABLE} log -1 "--format=format:#define GIT_REV \"%H\"%n" HEAD > ${CMAKE_BINARY_DIR}/${gitrev}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}               # very important, otherwise git repo might not be found in shadow build
+      VERBATIM)
+  ADD_DEPENDENCIES(scantailor gitrev)
+  ADD_DEPENDENCIES(scantailor-cli gitrev)
+ENDIF()
 
 IF(ENABLE_CRASH_REPORTER)
 	FIND_PATH(

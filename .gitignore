@@ -26,6 +26,7 @@ samples/
 # Individual files
 .version.h
 config.h
+git-rev.h
 imageproc/tests/imageproc_tests
 install_manifest.txt
 math/adiff/tests/adiff_tests
