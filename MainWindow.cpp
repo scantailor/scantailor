@@ -179,7 +179,7 @@ MainWindow::MainWindow()
 	m_dont_equalize_illumination_pic_zones(0)	
 
 {
-	m_maxLogicalThumbSize = QSize(250, 160);
+	m_maxLogicalThumbSize = QSize(480, 480);
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
 	
 	setupUi(this);
