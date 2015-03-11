@@ -794,3 +794,27 @@ IF(WIN32)
 	# Installer for Windows.  Must go the last.
 	ADD_SUBDIRECTORY(packaging/windows)
 ENDIF(WIN32)
+
+IF(32BIT)
+	SET_TARGET_PROPERTIES(
+			adiff_tests
+			deskew
+			dewarping
+			fix_orientation
+			foundation
+			imageproc
+			imageproc_tests
+			interaction
+			math
+			output
+			page_layout
+			page_split
+			scantailor
+			scantailor-cli
+			select_content
+			spfit_tests
+			stcore
+			tests
+			zones
+		PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
+ENDIF(32BIT)
