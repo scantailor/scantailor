@@ -62,7 +62,9 @@ InteractiveXSpline::setSpline(XSpline const& spline)
 			boost::bind(&InteractiveXSpline::controlPointPosition, this, i)
 		);
 		new_control_points[i].point.setMoveRequestCallback(
-			boost::bind(&InteractiveXSpline::controlPointMoveRequest, this, i, _1)
+//Blue_Dewarp_Line_Vert_Drag
+			//boost::bind(&InteractiveXSpline::controlPointMoveRequest, this, i, _1)
+			boost::bind(&InteractiveXSpline::controlPointMoveRequest, this, i, _1, _2)
 		);
 		new_control_points[i].point.setDragFinishedCallback(
 			boost::bind(&InteractiveXSpline::dragFinished, this)
@@ -209,7 +211,9 @@ InteractiveXSpline::controlPointPosition(int idx) const
 }
 
 void
-InteractiveXSpline::controlPointMoveRequest(int idx, QPointF const& pos)
+//Blue_Dewarp_Line_Vert_Drag
+//InteractiveXSpline::controlPointMoveRequest(int idx, QPointF const& pos)
+InteractiveXSpline::controlPointMoveRequest(int idx, QPointF const& pos, Qt::KeyboardModifiers mask)
 {
 	QPointF const storage_pt(m_toStorage(pos));
 
@@ -231,7 +235,17 @@ InteractiveXSpline::controlPointMoveRequest(int idx, QPointF const& pos)
 				Vec2d pt(m_spline.controlPointPosition(i) - origin);
 				MatrixCalc<double> mc;
 				(mc(mat, 2, 2)*mc(pt, 2, 1)).write(pt);
-				m_spline.moveControlPoint(i, pt + origin);
+//Blue_Dewarp_Line_Vert_Drag
+				//m_spline.moveControlPoint(i, pt + origin); // original line - now commented
+				if (mask != Qt::ControlModifier) // default behavior				
+					m_spline.moveControlPoint(i, pt + origin);
+				else // Shift is currently held down
+				{
+					Vec2d shift_y = storage_pt - old_pos;
+					QPointF new_position = m_spline.controlPointPosition(i) + shift_y;
+					new_position.setX(m_spline.controlPointPosition(i).x());
+					m_spline.moveControlPoint(i, new_position);
+				}
 			}
 		} else {
 			// Move the endpoint and distribute midpoints uniformly.

@@ -44,10 +44,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (cli.hasHelp() || cli.outputDirectory().isEmpty() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
+	if (cli.hasHelp() || (cli.images().size()==0 && cli.projectFile().isEmpty())) {
 		cli.printHelp();
 		return 0;
 	}
+
 
 	std::auto_ptr<ConsoleBatch> cbatch;
 

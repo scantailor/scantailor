@@ -39,6 +39,9 @@
 #include "AutoManualMode.h"
 #include "Margins.h"
 #include "Despeckle.h"
+//Picture_Shape
+#include "filters/output/Params.h"
+#include "filters/page_layout/Settings.h"
 
 namespace page_layout {
     class Alignment;

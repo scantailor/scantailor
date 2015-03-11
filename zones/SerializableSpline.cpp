@@ -53,6 +53,14 @@ SerializableSpline::SerializableSpline(QDomElement const& el)
 	}
 }
 
+//Quadro_Zoner
+SerializableSpline::SerializableSpline(QPolygonF const& polygon)
+{
+	for (int i = (int)polygon.size()-1; i>=0; i--)
+		m_points.push_back(polygon[i]);
+}
+
+
 QDomElement
 SerializableSpline::toXml(QDomDocument& doc, QString const& name) const
 {

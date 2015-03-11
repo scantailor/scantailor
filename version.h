@@ -16,10 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "git-rev.h"
+
 #ifndef SCANTAILOR_VERSION_H_
 #define SCANTAILOR_VERSION_H_
 
-#define VERSION __DATE__
+#ifdef GIT_REV
+  #define VERSION __DATE__" "__TIME__" (git commit "GIT_REV")"
+#else
+  #define VERSION __DATE__" "__TIME__
+#endif
+
 #define VERSION_QUAD "" // Must be "x.x.x.x" or an empty string.
 
 #endif

@@ -27,7 +27,10 @@ namespace output
 class DewarpingMode
 {
 public:
-	enum Mode { OFF, AUTO, MANUAL };
+	enum Mode { OFF, AUTO, MANUAL 
+//Marginal_Dewarping
+				, MARGINAL
+	};
 
 	DewarpingMode(Mode mode = OFF) : m_mode(mode) {}
 

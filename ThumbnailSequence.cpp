@@ -69,6 +69,9 @@
 #include <algorithm>
 #include <stddef.h>
 #include <assert.h>
+//Export_Subscans
+//added:
+#include <QMessageBox>
 
 using namespace ::boost::multi_index;
 using namespace ::boost::lambda;
@@ -171,6 +174,9 @@ public:
 		PageInfo const& page_info, QPoint const& screen_pos, bool selected);
 		
 	void itemSelectedByUser(CompositeItem* item, Qt::KeyboardModifiers modifiers);
+//Export_Subscans
+//added:
+	bool AllThumbnailsComplete();
 private:
 	class ItemsByIdTag;
 	class ItemsInOrderTag;
@@ -660,6 +666,40 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	}
 	
 	commitSceneRect();
+}
+
+//Export_Subscans
+//added:
+bool
+ThumbnailSequence::Impl::AllThumbnailsComplete()
+{
+	ItemsInOrder::iterator ord_it(m_itemsInOrder.begin());
+	ItemsInOrder::iterator const ord_end(m_itemsInOrder.end());
+	for (; ord_it != ord_end; ++ord_it) 
+	{
+		if (ord_it->composite->incompleteThumbnail())
+		{
+			PageInfo page = ord_it->pageInfo;
+
+			QString name(QFileInfo(page.imageId().filePath()).completeBaseName());
+
+			QString sub_page = page.id().subPageAsString();
+
+			QString show_name = name + ".tif - " + sub_page;
+
+			QMessageBox::warning(0, tr("Warning"), tr("The file") + " \"" + show_name + "\" " + tr("is not ready for output."));
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool
+ThumbnailSequence::AllThumbnailsComplete()
+{
+	return m_ptrImpl->AllThumbnailsComplete();
 }
 
 bool

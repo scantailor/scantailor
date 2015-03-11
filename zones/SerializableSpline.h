@@ -37,6 +37,9 @@ public:
 
 	explicit SerializableSpline(QDomElement const& el);
 
+//Quadro_Zoner
+	SerializableSpline(QPolygonF const& polygon);
+
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
 	SerializableSpline transformed(QTransform const& xform) const;

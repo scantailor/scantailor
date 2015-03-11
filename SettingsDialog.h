@@ -29,8 +29,17 @@ public:
 	SettingsDialog(QWidget* parent = 0);
 	
 	virtual ~SettingsDialog();
+signals:
+//Auto_Save_Project
+	void AutoSaveProjectStateSignal(bool auto_save);
+//Dont_Equalize_Illumination_Pic_Zones
+	void DontEqualizeIlluminationPicZonesSignal(bool state);
 private slots:
 	void commitChanges();
+//Auto_Save_Project
+	void OnCheckAutoSaveProject(bool);
+//Dont_Equalize_Illumination_Pic_Zones
+	void OnCheckDontEqualizeIlluminationPicZones(bool);
 private:
 	Ui::SettingsDialog ui;
 };

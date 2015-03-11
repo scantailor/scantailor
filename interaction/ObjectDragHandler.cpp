@@ -119,6 +119,8 @@ ObjectDragHandler::onMouseMoveEvent(
 	QMouseEvent* event, InteractionState& interaction)
 {
 	if (interaction.capturedBy(m_interaction)) {
-		m_pObj->dragContinuation(QPointF(0.5, 0.5) + event->pos());
+//Blue_Dewarp_Line_Vert_Drag
+		//m_pObj->dragContinuation(QPointF(0.5, 0.5) + event->pos());
+		m_pObj->dragContinuation(QPointF(0.5, 0.5) + event->pos(), event->modifiers());
 	}
 }

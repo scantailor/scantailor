@@ -28,6 +28,9 @@ DewarpingMode::DewarpingMode(QString const& str)
 		m_mode = AUTO;
 	} else if (str == "manual") {
 		m_mode = MANUAL;
+//Marginal_Dewarping
+	} else if (str == "marginal") {
+		m_mode = MARGINAL;
 	} else {
 		m_mode = OFF;
 	}
@@ -43,6 +46,9 @@ DewarpingMode::toString() const
 			return "auto";
 		case MANUAL:
 			return "manual";
+//Marginal_Dewarping
+		case MARGINAL:
+			return "marginal";
 	}
 
 	assert(!"Unreachable");

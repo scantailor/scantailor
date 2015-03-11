@@ -38,8 +38,9 @@ public:
 		OutputFileParams const& automask_file_params,
 		OutputFileParams const& speckles_file_params,
 		ZoneSet const& picture_zones, ZoneSet const& fill_zones);
-	
-	explicit OutputParams(QDomElement const& el);
+//Picture_Shape_Bug	
+	//explicit OutputParams(QDomElement const& el);
+	explicit OutputParams(QDomElement const& el, int picture_shape_int=0);
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	

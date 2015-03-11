@@ -206,6 +206,10 @@ public:
 	std::set<PageId> selectedItems() const;
 	
 	std::vector<PageRange> selectedRanges() const;
+
+//Export_Subscans
+//added:
+	bool AllThumbnailsComplete();
 signals:
 	void newSelectionLeader(
 		PageInfo const& page_info, QRectF const& thumb_rect,

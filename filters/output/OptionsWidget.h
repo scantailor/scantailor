@@ -32,6 +32,8 @@
 #include "ImageViewTab.h"
 #include "Params.h"
 #include <set>
+//Picture_Shape
+#include "Params.h"
 
 namespace dewarping
 {

@@ -31,7 +31,7 @@ class QDomElement;
 
 namespace output
 {
-	enum PictureShape { FREE_SHAPE, RECTANGULAR_SHAPE };
+	enum PictureShape { FREE_SHAPE, RECTANGULAR_SHAPE, QUADRO_SHAPE };
 
 class Params
 {
@@ -75,13 +75,15 @@ private:
 	
 	static QString formatColorMode(ColorParams::ColorMode mode);
 	
-	Dpi m_dpi;
 	ColorParams m_colorParams;
-	PictureShape m_pictureShape;
+
+	Dpi m_dpi;
 	dewarping::DistortionModel m_distortionModel;
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
-	DespeckleLevel m_despeckleLevel;
+	DespeckleLevel m_despeckleLevel;	
+//Picture_Shape
+	PictureShape m_pictureShape;
 };
 
 } // namespace output

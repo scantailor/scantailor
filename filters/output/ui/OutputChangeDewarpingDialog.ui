@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>287</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,8 +22,8 @@
      <property name="title">
       <string>Mode</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
        <widget class="QRadioButton" name="offRB">
         <property name="text">
          <string>Off</string>
@@ -33,7 +33,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QRadioButton" name="autoRB">
         <property name="enabled">
          <bool>true</bool>
@@ -43,10 +43,23 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QRadioButton" name="manualRB">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Manual</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="marginalRB">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Marginal (experimental)</string>
         </property>
        </widget>
       </item>
@@ -58,7 +71,7 @@
      <property name="title">
       <string>Scope</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
        <widget class="QRadioButton" name="thisPageRB">
         <property name="text">

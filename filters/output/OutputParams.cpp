@@ -40,9 +40,11 @@ OutputParams::OutputParams(
 	m_fillZones(fill_zones)
 {
 }
-
-OutputParams::OutputParams(QDomElement const& el)
-:	m_outputImageParams(el.namedItem("image").toElement()),
+//Picture_Shape_Bug	
+//OutputParams::OutputParams(QDomElement const& el)
+OutputParams::OutputParams(QDomElement const& el, int picture_shape_int)
+//:	m_outputImageParams(el.namedItem("image").toElement()),
+:	m_outputImageParams(el.namedItem("image").toElement(), picture_shape_int),
 	m_outputFileParams(el.namedItem("file").toElement()),
 	m_automaskFileParams(el.namedItem("automask").toElement()),
 	m_specklesFileParams(el.namedItem("speckles").toElement()),

@@ -27,6 +27,9 @@
 #include "SafeDeletingQObjectPtr.h"
 #include "PictureZonePropFactory.h"
 #include "FillZonePropFactory.h"
+//Original_Foreground_Mixed
+//added:
+#include <QImage>
 
 class PageId;
 class PageSelectionAccessor;
@@ -68,8 +71,13 @@ public:
 		PageId const& page_id,
 		IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 		OutputFileNameGenerator const& out_file_name_gen,
-		bool batch, bool debug);
-	
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+		//bool batch, bool debug);
+		bool batch, bool debug, bool dont_equalize_illumination_pic_zones = false, // "false" as cli workaround
+		bool keep_orig_fore_subscan = false, 
+		QImage* p_orig_fore_subscan = NULL);
+
 	IntrusivePtr<CacheDrivenTask> createCacheDrivenTask(
 		OutputFileNameGenerator const& out_file_name_gen);
 	

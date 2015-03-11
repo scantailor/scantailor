@@ -71,6 +71,9 @@ public:
 	const_iterator begin() const { return const_iterator(m_zones.begin()); }
 
 	const_iterator end() const { return const_iterator(m_zones.end()); }
+//Quadro_Zoner
+	void remove_auto_zones();
+	bool auto_zones_found();
 private:
 	std::list<Zone> m_zones;
 };

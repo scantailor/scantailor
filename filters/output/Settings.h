@@ -34,6 +34,8 @@
 #include <QMutex>
 #include <map>
 #include <memory>
+//Picture_Shape
+#include "Params.h"
 
 class AbstractRelinker;
 

@@ -29,16 +29,6 @@
         <translation>Neočekivani odgovor od strane primatelja</translation>
     </message>
     <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="221"/>
-        <source>Unexpected response (code %1) from the receiving side</source>
-        <translation>Neočekivani odgovor (kod %1) od strane primatelja</translation>
-    </message>
-    <message>
-        <location filename="../crash_reporter/CrashReportDialog.cpp" line="227"/>
-        <source>Successfully sent</source>
-        <translation>Uspješno poslano</translation>
-    </message>
-    <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="14"/>
         <source>Crash Report</source>
         <translation>Izvješće o rušenju</translation>
@@ -49,9 +39,24 @@
         <translation>Scan Tailor se srušio. To je obično uzrokovano greškama u programu. Možete nam pomoći pronaći i riješiti problem slanjem ovog izvješće.</translation>
     </message>
     <message>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="221"/>
+        <source>Unexpected response (code %1) from the receiving side</source>
+        <translation>Neočekivani odgovor (kod %1) od strane primatelja</translation>
+    </message>
+    <message>
+        <location filename="../crash_reporter/CrashReportDialog.cpp" line="227"/>
+        <source>Successfully sent</source>
+        <translation>Uspješno poslano</translation>
+    </message>
+    <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="30"/>
         <source>Information to be sent</source>
         <translation>Informacije koje će se poslati</translation>
+    </message>
+    <message>
+        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="81"/>
+        <source>Email [optional]</source>
+        <translation>e-pošta [po izboru]</translation>
     </message>
     <message>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="63"/>
@@ -64,11 +69,6 @@ Engleski ili ruski molim.</translation>
         <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="71"/>
         <source>If you are willing to provide further assistance to developers to help fix this problem, please provide your email address.</source>
         <translation>Ako hoćete pružiti daljnju pomoć programerima koja bi pomogla riješiti ovaj problem, molimo navedite vašu email adresu.</translation>
-    </message>
-    <message>
-        <location filename="../crash_reporter/ui/CrashReportDialog.ui" line="81"/>
-        <source>Email [optional]</source>
-        <translation>e-pošta [po izboru]</translation>
     </message>
 </context>
 </TS>

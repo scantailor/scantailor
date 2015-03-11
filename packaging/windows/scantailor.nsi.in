@@ -3,7 +3,7 @@
 !define LICENSE_FILE "@LICENSE_FILE@"
 !define INSTALLER_FILENAME "@INSTALLER_FILENAME@"
 !define STAGING_DIR "@STAGING_DIR@"
-!define UNINST_REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scan Tailor"
+!define UNINST_REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Scan Tailor Featured"
 
 # The window identifier of the main Scan Tailor window.
 !define WNDCLASS "ScanTailor_Window"
@@ -16,14 +16,14 @@
 BrandingText " " # To remove the mention of NullSoft.
 #LoadLanguageFile "${NSISDIR}\Contrib\Language files\Russian.nlf"
 
-Name "Scan Tailor version ${VERSION}"
+Name "Scan Tailor Featured version ${VERSION}"
 
 OutFile "${INSTALLER_FILENAME}"
 
 !if "@SIZEOF_VOID_PTR@" == "8"
-InstallDir "$PROGRAMFILES64\Scan Tailor"
+InstallDir "$PROGRAMFILES64\Scan Tailor Featured"
 !else
-InstallDir "$PROGRAMFILES\Scan Tailor"
+InstallDir "$PROGRAMFILES\Scan Tailor Featured"
 !endif
 
 InstallDirRegKey HKLM "${UNINST_REGKEY}" "InstallLocation"
@@ -37,12 +37,12 @@ AllowSkipFiles off
 SetCompressor /SOLID /FINAL lzma
 
 !if "${VERSION_QUAD}" != ""
-  VIAddVersionKey "ProductName" "Scan Tailor"
+  VIAddVersionKey "ProductName" "Scan Tailor Featured"
   VIAddVersionKey "ProductVersion" "${VERSION}"
   VIAddVersionKey "Comments" "Interactive post-processing tool for scanned pages."
   VIAddVersionKey "CompanyName" "Joseph Artsimovich"
   VIAddVersionKey "LegalTrademarks" ""
-  VIAddVersionKey "LegalCopyright" "� Joseph Artsimovich et al."
+  VIAddVersionKey "LegalCopyright" "� Joseph Artsimovich et al, monday2000"
   VIAddVersionKey "FileDescription" "Post-processing tool for scanned pages."
   VIAddVersionKey "FileVersion" "${VERSION}"
   VIProductVersion "${VERSION_QUAD}"
@@ -76,14 +76,14 @@ Section
   WriteUninstaller $INSTDIR\Uninstaller.exe
   
   # Write uninstall registry records.
-  WriteRegStr HKLM "${UNINST_REGKEY}" "DisplayName" "Scan Tailor"
+  WriteRegStr HKLM "${UNINST_REGKEY}" "DisplayName" "Scan Tailor Featured"
   WriteRegStr HKLM "${UNINST_REGKEY}" "UninstallString" "$INSTDIR\Uninstaller.exe"
   
   # Create menu shortcuts.
   SetShellVarContext all
-  CreateDirectory "$SMPROGRAMS\Scan Tailor"
-  CreateShortcut "$SMPROGRAMS\Scan Tailor\Scan Tailor.lnk" "$INSTDIR\scantailor.exe"
-  CreateShortcut "$SMPROGRAMS\Scan Tailor\Uninstall.lnk" "$INSTDIR\Uninstaller.exe"  
+  CreateDirectory "$SMPROGRAMS\Scan Tailor Featured"
+  CreateShortcut "$SMPROGRAMS\Scan Tailor Featured\Scan Tailor Featured.lnk" "$INSTDIR\scantailor.exe"
+  CreateShortcut "$SMPROGRAMS\Scan Tailor Featured\Uninstall.lnk" "$INSTDIR\Uninstaller.exe"  
 
   # Register the ".ScanTailor" file extension.
   ${registerExtension} "$INSTDIR\scantailor.exe" ".ScanTailor" \
@@ -137,5 +137,5 @@ Section "Uninstall"
 
   # Remove menu entries
   SetShellVarContext all
-  RMDir /r "$SMPROGRAMS\Scan Tailor"
+  RMDir /r "$SMPROGRAMS\Scan Tailor Featured"
 SectionEnd

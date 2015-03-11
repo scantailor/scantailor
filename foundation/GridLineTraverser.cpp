@@ -19,6 +19,7 @@
 #include "GridLineTraverser.h"
 #include "LineIntersectionScalar.h"
 #include <algorithm>
+#include <cstdlib>
 
 GridLineTraverser::GridLineTraverser(QLineF const& line)
 {

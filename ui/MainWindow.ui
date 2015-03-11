@@ -70,6 +70,7 @@
     <addaction name="actionDebug"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
+    <addaction name="actionExport"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -283,6 +284,9 @@
    <property name="text">
     <string>Save Project As ...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="actionNextPage">
    <property name="text">
@@ -457,6 +461,11 @@
    </property>
    <property name="shortcut">
     <string>P</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export...</string>
    </property>
   </action>
  </widget>

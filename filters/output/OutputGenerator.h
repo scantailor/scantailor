@@ -38,6 +38,18 @@
 #include <vector>
 #include <utility>
 #include <stdint.h>
+//Picture_Shape
+#include "Params.h"
+//Quadro_Zoner
+#include "PageId.h"
+#include "IntrusivePtr.h"
+#include "Settings.h"
+//Marginal_Dewarping
+#include <QMessageBox>
+#include "TiffWriter.h"
+#include <QtCore/qmath.h>
+#include <QFile>
+#include "imageproc/SkewFinder.h"
 
 class TaskStatus;
 class DebugImages;
@@ -58,7 +70,8 @@ namespace dewarping
 	class DistortionModel;
 	class CylindricalSurfaceDewarper;
 }
-
+//Marginal_Dewarping
+using namespace imageproc;
 namespace output
 {
 
@@ -97,13 +110,25 @@ public:
 	 */
 	QImage process(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+//added:		
+		bool dont_equalize_illumination_pic_zones,
+		bool keep_orig_fore_subscan = false,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE) const;
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
+		) const;
 	
 	QSize outputImageSize() const;
 	
@@ -114,13 +139,26 @@ public:
 private:
 	QImage processImpl(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+//added:		
+		bool dont_equalize_illumination_pic_zones,
+		bool keep_orig_fore_subscan = false,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE) const;
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0, 
+		PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
+		) const;
 
 	QImage processAsIs(
 		FilterData const& input, TaskStatus const& status,
@@ -130,20 +168,52 @@ private:
 
 	QImage processWithoutDewarping(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
+//Dont_Equalize_Illumination_Pic_Zones
+//added:		
+		bool dont_equalize_illumination_pic_zones,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE) const;
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
+		) const;
 
 	QImage processWithDewarping(
 		TaskStatus const& status, FilterData const& input,
-		ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+		//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+		ZoneSet& picture_zones, ZoneSet const& fill_zones,
 		DewarpingMode dewarping_mode,
 		dewarping::DistortionModel& distortion_model,
 		DepthPerception const& depth_perception,
+//Dont_Equalize_Illumination_Pic_Zones
+//added:		
+		bool dont_equalize_illumination_pic_zones,
+		bool keep_orig_fore_subscan = false,
 		imageproc::BinaryImage* auto_picture_mask = 0,
 		imageproc::BinaryImage* speckles_image = 0,
-		DebugImages* dbg = 0, PictureShape picture_shape=FREE_SHAPE) const;
+//Picture_Shape
+		//DebugImages* dbg = 0) const;
+		DebugImages* dbg = 0,
+		PictureShape picture_shape=FREE_SHAPE
+//Quadro_Zoner
+		, PageId* p_pageId = NULL, IntrusivePtr<Settings>* p_settings = NULL
+		) const;
+
+//Marginal_Dewarping
+	void movePointToTopMargin(BinaryImage& bw_image, XSpline& spline, int idx) const;
+	void movePointToBottomMargin(BinaryImage& bw_image, XSpline& spline, int idx) const;
+	void drawPoint(QImage& image, QPointF const& pt) const;	
+	void maybe_deskew(QImage* p_dewarped, DewarpingMode dewarping_mode) const;
+//Auto_Dewarping_Vert_Half_Correction
+	void movePointToTopMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const;
+	void movePointToBottomMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const;
+	float vert_border_skew_angle(QPointF const& top, QPointF const& bottom) const;
 	
 	void setupTrivialDistortionModel(dewarping::DistortionModel& distortion_model) const;
 
