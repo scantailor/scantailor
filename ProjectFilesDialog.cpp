@@ -217,6 +217,7 @@ ProjectFilesDialog::ProjectFilesDialog(QWidget* parent)
 {
 	m_supportedExtensions.insert("png");
 	m_supportedExtensions.insert("jpg");
+	m_supportedExtensions.insert("jp2");
 	m_supportedExtensions.insert("jpeg");
 	m_supportedExtensions.insert("tif");
 	m_supportedExtensions.insert("tiff");

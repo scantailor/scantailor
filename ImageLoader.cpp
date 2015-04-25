@@ -18,6 +18,7 @@
 
 #include "ImageLoader.h"
 #include "TiffReader.h"
+#include "JP2Reader.h"
 #include "ImageId.h"
 #include <QImage>
 #include <QString>
@@ -52,6 +53,10 @@ ImageLoader::load(QIODevice& io_dev, int const page_num)
 		return QImage();
 	}
 	
+	if (JP2Reader::peekMagic(io_dev)) {
+		return JP2Reader::readImage(io_dev);
+	}
+
 	QImage image;
 	image.load(&io_dev, 0);
 	return image;

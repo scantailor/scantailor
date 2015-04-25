@@ -22,6 +22,7 @@
 #include "PngMetadataLoader.h"
 #include "TiffMetadataLoader.h"
 #include "JpegMetadataLoader.h"
+#include "JP2MetadataLoader.h"
 #include <QMetaType>
 #include <QtPlugin>
 #include <QLocale>
@@ -183,6 +184,7 @@ int main(int argc, char** argv)
 	PngMetadataLoader::registerMyself();
 	TiffMetadataLoader::registerMyself();
 	JpegMetadataLoader::registerMyself();
+	JP2MetadataLoader::registerMyself();
 	
 	MainWindow* main_wnd = new MainWindow();
 	main_wnd->setAttribute(Qt::WA_DeleteOnClose);
