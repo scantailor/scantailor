@@ -483,7 +483,7 @@
         <location filename="../MainWindow.cpp" line="1673"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="unfinished">Generar la salida aún no es posible debido a que el tamaño final de las páginas todavía es desconocido.
+        <translation>Generar la salida aún no es posible debido a que el tamaño final de las páginas todavía es desconocido.
 Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &quot;Márgenes&quot;.</translation>
     </message>
     <message>
