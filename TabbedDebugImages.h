@@ -21,7 +21,9 @@
 
 #include "DebugImageView.h"
 #include <QTabWidget>
+#ifndef Q_MOC_RUN
 #include <boost/intrusive/list.hpp>
+#endif
 
 class TabbedDebugImages : public QTabWidget
 {

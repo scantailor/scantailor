@@ -94,9 +94,11 @@
 #include "ui_StartBatchProcessingDialog.h"
 #include "config.h"
 #include "version.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QApplication>
 #include <QLineF>
 #include <QPointer>

@@ -59,8 +59,10 @@
 #include "ErrorWidget.h"
 #include "imageproc/BinaryImage.h"
 #include "imageproc/PolygonUtils.h"
+#ifndef Q_MOC_RUN
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#endif
 #include <QImage>
 #include <QString>
 #include <QObject>

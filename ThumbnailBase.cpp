@@ -23,7 +23,9 @@
 #include "AbstractCommand.h"
 #include "PixmapRenderer.h"
 #include "imageproc/PolygonUtils.h"
+#ifndef Q_MOC_RUN
 #include <boost/weak_ptr.hpp>
+#endif
 #include <QPixmap>
 #include <QPixmapCache>
 #include <QPainter>

@@ -26,7 +26,9 @@
 #include <QTransform>
 #include <QString>
 #include <QPointF>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 SerializableSpline::SerializableSpline(EditableSpline const& spline)
 {

@@ -29,6 +29,7 @@
 #include <QRectF>
 #include <QMutex>
 #include <QMutexLocker>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -36,6 +37,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/composite_key.hpp>
+#endif
 #include <algorithm>
 #include <functional> // for std::greater<>
 #include <vector>

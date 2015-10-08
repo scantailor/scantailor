@@ -28,7 +28,9 @@
 #include "imageproc/MorphGradientDetect.h"
 #include "imageproc/HoughLineDetector.h"
 #include "imageproc/Constants.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <QLineF>
 #include <QSizeF>
 #include <QColor>

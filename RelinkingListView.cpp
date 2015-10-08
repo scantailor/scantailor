@@ -27,7 +27,9 @@
 #include <QBrush>
 #include <QColor>
 #include <QVariant>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <vector>
 
 class RelinkingListView::Delegate : public QStyledItemDelegate

@@ -22,7 +22,9 @@
 #include "EditableSpline.h"
 #include "SplineVertex.h"
 #include "EditableZoneSet.h"
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 class InteractionHandler;
 class InteractionState;

@@ -23,7 +23,9 @@
 #include <QPoint>
 #include <QRect>
 #include <QSize>
+#ifndef Q_MOC_RUN
 #include <boost/cstdint.hpp>
+#endif
 #include <stdexcept>
 #include <assert.h>
 

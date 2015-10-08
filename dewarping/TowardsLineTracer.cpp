@@ -23,9 +23,11 @@
 #include "imageproc/SEDM.h"
 #include <QRect>
 #include <QtGlobal>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <algorithm>
 #include <math.h>
 #include <assert.h>
