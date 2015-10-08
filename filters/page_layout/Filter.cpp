@@ -32,8 +32,10 @@
 #include "OrderByWidthProvider.h"
 #include "OrderByHeightProvider.h"
 #include "Utils.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QRectF>
 #include <QSizeF>
 #include <QString>

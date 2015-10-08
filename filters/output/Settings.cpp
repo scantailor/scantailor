@@ -23,7 +23,9 @@
 #include "RelinkablePath.h"
 #include "AbstractRelinker.h"
 #include "../../Utils.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <Qt>
 #include <QColor>
 #include <QMutexLocker>

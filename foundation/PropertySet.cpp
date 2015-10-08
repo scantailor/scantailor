@@ -21,7 +21,9 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QString>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 PropertySet::PropertySet(QDomElement const& el, PropertyFactory const& factory)
 {

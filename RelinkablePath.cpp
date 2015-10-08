@@ -18,7 +18,9 @@
 
 #include "RelinkablePath.h"
 #include <QStringList>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 RelinkablePath::RelinkablePath(QString const& path, Type type)
 :	m_normalizedPath(normalize(path))

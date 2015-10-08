@@ -21,7 +21,9 @@
 #include <QPainter>
 #include <QBrush>
 #include <Qt>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 BasicSplineVisualizer::BasicSplineVisualizer()
 :	m_solidColor(0xcc1420),

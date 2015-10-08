@@ -22,7 +22,9 @@
 #include <QDomNode>
 #include <QDomElement>
 #include <QString>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <assert.h>
 
 EditableSpline::EditableSpline()

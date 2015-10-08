@@ -37,8 +37,10 @@
 #include <QColor>
 #include <QDebug>
 #include <Qt>
+#ifndef Q_MOC_RUN
 #include <boost/bind.hpp>
 #include <boost/lambda/lambda.hpp>
+#endif
 #include <algorithm>
 #include <math.h>
 #include <assert.h>

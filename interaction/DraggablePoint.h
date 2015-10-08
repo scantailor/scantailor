@@ -21,7 +21,9 @@
 
 #include "DraggableObject.h"
 #include <QPointF>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 class DraggablePoint : public DraggableObject
 {

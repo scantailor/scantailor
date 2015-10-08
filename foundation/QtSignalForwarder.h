@@ -21,7 +21,9 @@
 
 #include "NonCopyable.h"
 #include <QObject>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 /**
  * \brief Connects to a Qt signal and forwards it to a boost::function.

@@ -25,11 +25,13 @@
 #include "PageSequence.h"
 #include "RelinkablePath.h"
 #include "AbstractRelinker.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
+#endif
 #include <QMutexLocker>
 #include <QFileInfo>
 #include <QSize>

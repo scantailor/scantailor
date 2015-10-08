@@ -19,7 +19,9 @@
 #include "ConnCompEraserExt.h"
 #include "RasterOp.h"
 #include <QRect>
+#ifndef Q_MOC_RUN
 #include <boost/cstdint.hpp>
+#endif
 #include <string.h>
 #include <stddef.h>
 #include <assert.h>

@@ -26,7 +26,9 @@
 #include "DespeckleLevel.h"
 #include "DewarpingMode.h"
 #include "ImageTransformation.h"
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 #include <QSize>
 #include <QRect>
 #include <QTransform>

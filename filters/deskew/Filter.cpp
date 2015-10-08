@@ -27,8 +27,10 @@
 #include "PageId.h"
 #include "RelinkablePath.h"
 #include "AbstractRelinker.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QString>
 #include <QObject>
 #include <QCoreApplication>

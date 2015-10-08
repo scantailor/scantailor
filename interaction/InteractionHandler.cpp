@@ -24,9 +24,11 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QContextMenuEvent>
+#ifndef Q_MOC_RUn
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/construct.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <assert.h>
 
 #define DISPATCH(list, call) {                    \

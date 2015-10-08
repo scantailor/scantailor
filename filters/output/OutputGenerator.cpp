@@ -61,9 +61,11 @@
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/InfluenceMap.h"
 #include "config.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
+#endif
 #include <QImage>
 #include <QSize>
 #include <QPoint>

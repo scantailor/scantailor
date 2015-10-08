@@ -22,7 +22,9 @@
 #include <QVector>
 #include <QPointF>
 #include <QPolygonF>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 class EditableSpline;
 class QTransform;

@@ -24,9 +24,11 @@
 #include "PropertySet.h"
 #include "IntrusivePtr.h"
 #include <QObject>
+#ifndef Q_MOC_RUN
 #include <boost/mpl/bool.hpp>
 #include <boost/foreach.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+#endif
 #include <map>
 
 class EditableZoneSet : public QObject
