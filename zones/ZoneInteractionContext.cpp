@@ -21,7 +21,9 @@
 #include "ZoneCreationInteraction.h"
 #include "ZoneVertexDragInteraction.h"
 #include "ZoneContextMenuInteraction.h"
+#ifndef Q_MOC_RUN
 #include <boost/bind.hpp>
+#endif
 
 ZoneInteractionContext::ZoneInteractionContext(
 	ImageViewBase& image_view, EditableZoneSet& zones)

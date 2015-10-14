@@ -25,7 +25,9 @@
 #include "InteractionState.h"
 #include <QPoint>
 #include <QCoreApplication>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 class ImageViewBase;
 

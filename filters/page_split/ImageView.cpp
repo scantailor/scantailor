@@ -29,8 +29,10 @@
 #include <QColor>
 #include <QtGlobal>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 
 namespace page_split

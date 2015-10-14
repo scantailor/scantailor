@@ -26,7 +26,9 @@
 #include <QString>
 #include <QDomDocument>
 #include <QDomElement>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 
 namespace dewarping

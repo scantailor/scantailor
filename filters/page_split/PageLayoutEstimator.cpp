@@ -47,9 +47,11 @@
 #include "imageproc/Grayscale.h"
 #include "imageproc/GrayRasterOp.h"
 #include "imageproc/PolygonRasterizer.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QRect>
 #include <QRectF>
 #include <QSize>

@@ -32,7 +32,9 @@
 #include "EditableZoneSet.h"
 #include "ZoomHandler.h"
 #include "DragHandler.h"
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 #include <QPoint>
 #include <QPointF>
 #include <QColor>

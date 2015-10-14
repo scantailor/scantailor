@@ -27,7 +27,9 @@
 #include <QLinearGradient>
 #include <Qt>
 #include <QLineF>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 ZoneVertexDragInteraction::ZoneVertexDragInteraction(
 	ZoneInteractionContext& context, InteractionState& interaction,

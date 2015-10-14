@@ -19,7 +19,9 @@
 #include "MaxWhitespaceFinder.h"
 #include <QPoint>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 #include <limits>
 #include <stddef.h>

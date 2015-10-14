@@ -42,9 +42,11 @@
 #include <QTransform>
 #include <QDebug>
 #include <Qt>
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/control_structures.hpp>
+#endif
 #include <vector>
 #include <algorithm>
 #include <stdint.h>

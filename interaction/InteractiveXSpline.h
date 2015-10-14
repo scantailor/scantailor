@@ -26,8 +26,10 @@
 #include "VecNT.h"
 #include <QPointF>
 #include <QCoreApplication>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
 #include <boost/scoped_array.hpp>
+#endif
 #include <stddef.h>
 
 class InteractiveXSpline : public InteractionHandler

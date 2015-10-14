@@ -25,7 +25,9 @@
 #include <QPointF>
 #include <QPixmap>
 #include <QCoreApplication>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 namespace page_split
 {

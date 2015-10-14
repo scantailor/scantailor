@@ -42,7 +42,9 @@
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/InfluenceMap.h"
 #include "imageproc/SEDM.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <QRect>
 #include <QRectF>
 #include <QPolygonF>

@@ -28,8 +28,10 @@
 #include "CacheDrivenTask.h"
 #include "OrderByWidthProvider.h"
 #include "OrderByHeightProvider.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QString>
 #include <QObject>
 #include <QDomDocument>

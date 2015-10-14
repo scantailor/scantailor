@@ -25,7 +25,9 @@
 #include <QSize>
 #include <QRect>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <vector>
 #include <stdexcept>
 #include <algorithm>

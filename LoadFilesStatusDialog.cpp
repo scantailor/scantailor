@@ -18,7 +18,9 @@
 
 #include "LoadFilesStatusDialog.h"
 #include <QPushButton>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 LoadFilesStatusDialog::LoadFilesStatusDialog(QWidget* parent)
 :	QDialog(parent)

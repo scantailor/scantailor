@@ -19,8 +19,10 @@
 #include "NewOpenProjectPanel.h.moc"
 #include "RecentProjects.h"
 #include "Utils.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QPalette>

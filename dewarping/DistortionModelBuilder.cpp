@@ -39,7 +39,9 @@
 #include <QPen>
 #include <QColor>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 #include <exception>
 #include <iterator>

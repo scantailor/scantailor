@@ -31,7 +31,9 @@
 #include "../../Utils.h"
 #include "ScopedIncDec.h"
 #include "config.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <QtGlobal>
 #include <QVariant>
 #include <QColorDialog>

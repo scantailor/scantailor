@@ -33,9 +33,11 @@
 #include <QCursor>
 #include <QMessageBox>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#endif
 #include <vector>
 #include <assert.h>
 

@@ -32,9 +32,11 @@
 #include <QColor>
 #include <Qt>
 #include <QtGlobal>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <vector>
 #include <deque>
 #include <algorithm>
