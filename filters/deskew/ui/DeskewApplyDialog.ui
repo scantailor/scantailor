@@ -9,19 +9,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>195</height>
+    <width>364</width>
+    <height>316</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <property name="windowTitle">
+   <string>Deskew</string>
+  </property>
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Apply to</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
-       <widget class="QRadioButton" name="thisPageRB">
+       <widget class="QRadioButton" name="thisPageOnlyRB">
         <property name="text">
          <string>This page only (already applied)</string>
         </property>
@@ -45,8 +48,71 @@
        </widget>
       </item>
       <item>
+       <widget class="QWidget" name="everyOtherPageWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QWidget" name="everyOtherWidget" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QRadioButton" name="everyOtherRB">
+              <property name="text">
+               <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>30</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="font">
+                 <font>
+                  <pointsize>7</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>The current page will be included.</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QWidget" name="selectedPagesWidget" native="true">
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -61,12 +127,9 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="spacing">
-            <number>0</number>
-           </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <spacer name="horizontalSpacer_5">
+            <spacer name="horizontalSpacer_6">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -98,17 +161,68 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QWidget" name="everyOtherSelectedWidget" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QRadioButton" name="everyOtherSelectedRB">
+           <property name="text">
+            <string>Every other selected page</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="everyOtherSelectedHint">
+             <property name="font">
+              <font>
+               <pointsize>7</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>The current page will be included.</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
+    <spacer>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>20</width>
+       <width>17</width>
        <height>0</height>
       </size>
      </property>
@@ -135,12 +249,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>319</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
-     <y>274</y>
+     <y>256</y>
     </hint>
    </hints>
   </connection>

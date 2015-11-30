@@ -19,6 +19,7 @@
 #include "ApplyDialog.h.moc"
 #include "PageSelectionAccessor.h"
 #include <QButtonGroup>
+#include <boost/foreach.hpp>
 
 namespace deskew
 {
@@ -29,17 +30,23 @@ ApplyDialog::ApplyDialog(QWidget* parent, PageId const& cur_page,
 	m_pages(page_selection_accessor.allPages()),
 	m_curPage(cur_page),
 	m_selectedPages(page_selection_accessor.selectedPages()),
+	m_selectedRanges(page_selection_accessor.selectedRanges()),
 	m_pScopeGroup(new QButtonGroup(this))
 {
 	setupUi(this);
-	m_pScopeGroup->addButton(thisPageRB);
+	m_pScopeGroup->addButton(thisPageOnlyRB);
 	m_pScopeGroup->addButton(allPagesRB);
 	m_pScopeGroup->addButton(thisPageAndFollowersRB);
 	m_pScopeGroup->addButton(selectedPagesRB);
+    m_pScopeGroup->addButton(everyOtherRB);
+	m_pScopeGroup->addButton(everyOtherSelectedRB);
+
 	if (m_selectedPages.size() <= 1) {
 		selectedPagesWidget->setEnabled(false);
+        everyOtherSelectedWidget->setEnabled(false);
+		everyOtherSelectedHint->setText(selectedPagesHint->text());
 	}
-	
+
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }
 
@@ -49,9 +56,9 @@ ApplyDialog::~ApplyDialog()
 
 void
 ApplyDialog::onSubmit()
-{	
+{
 	std::set<PageId> pages;
-	
+
 	// thisPageRB is intentionally not handled.
 	if (allPagesRB->isChecked()) {
 		m_pages.selectAll().swap(pages);
@@ -61,7 +68,18 @@ ApplyDialog::onSubmit()
 		emit appliedTo(pages);
 	} else if (selectedPagesRB->isChecked()) {
 		emit appliedTo(m_selectedPages);
+	} else if (everyOtherRB->isChecked()) {
+		m_pages.selectEveryOther(m_curPage).swap(pages);
+        emit appliedTo(pages);
+	} else if (everyOtherSelectedRB->isChecked()) {
+		PageRange range;
+        BOOST_FOREACH(PageRange next_range, m_selectedRanges) {
+            range.append(next_range);
+        }
+		range.selectEveryOther(m_curPage).swap(pages);
+        emit appliedTo(pages);
 	}
+
 	accept();
 }
 

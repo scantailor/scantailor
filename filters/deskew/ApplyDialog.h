@@ -20,6 +20,7 @@
 
 #include "ui_DeskewApplyDialog.h"
 #include "PageId.h"
+#include "PageRange.h"
 #include "PageSequence.h"
 #include "IntrusivePtr.h"
 #include <QDialog>
@@ -37,7 +38,7 @@ class ApplyDialog : public QDialog, private Ui::DeskewApplyDialog
 public:
 	ApplyDialog(QWidget* parent, PageId const& cur_page,
 		PageSelectionAccessor const& page_selection_accessor);
-	
+
 	virtual ~ApplyDialog();
 signals:
 	void appliedTo(std::set<PageId> const& pages);
@@ -48,7 +49,8 @@ private:
 	PageSequence m_pages;
 	PageId m_curPage;
 	std::set<PageId> m_selectedPages;
-	QButtonGroup* m_pScopeGroup;
+	std::vector<PageRange> m_selectedRanges;
+    QButtonGroup* m_pScopeGroup;
 };
 
 } // namespace deskew
