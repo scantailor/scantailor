@@ -23,7 +23,7 @@ std::set<PageId>
 PageRange::selectEveryOther(PageId const& base) const
 {
 	std::set<PageId> selection;
-	
+
 	std::vector<PageId>::const_iterator it(pages.begin());
 	std::vector<PageId>::const_iterator const end(pages.end());
 	for (; it != end && *it != base; ++it) {
@@ -43,4 +43,10 @@ PageRange::selectEveryOther(PageId const& base) const
 	}
 
 	return selection;
+}
+
+void
+PageRange::append(PageRange const& other)
+{
+    pages.insert(pages.end(), other.pages.begin(), other.pages.end());
 }
