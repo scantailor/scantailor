@@ -21,7 +21,7 @@
 #include "PageSelectionAccessor.h"
 #include <QButtonGroup>
 #include <QDebug>
-#include <assert.h>
+#include <boost/foreach.hpp>
 
 namespace fix_orientation
 {
@@ -43,16 +43,13 @@ ApplyDialog::ApplyDialog(
 	m_pBtnGroup->addButton(selectedPagesRB);
 	m_pBtnGroup->addButton(everyOtherRB);
 	m_pBtnGroup->addButton(everyOtherSelectedRB);
-	
+
 	if (m_selectedPages.size() <= 1) {
 		selectedPagesWidget->setEnabled(false);
 		everyOtherSelectedWidget->setEnabled(false);
 		everyOtherSelectedHint->setText(selectedPagesHint->text());
-	} else if (m_selectedRanges.size() > 1) {
-		everyOtherSelectedWidget->setEnabled(false);
-		everyOtherSelectedHint->setText(tr("Can't do: more than one group is selected."));
 	}
-	
+
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }
 
@@ -64,7 +61,7 @@ void
 ApplyDialog::onSubmit()
 {
 	std::set<PageId> pages;
-	
+
 	// thisPageOnlyRB is intentionally not handled.
 	if (allPagesRB->isChecked()) {
 		m_pages.selectAll().swap(pages);
@@ -80,13 +77,15 @@ ApplyDialog::onSubmit()
 	} else if (everyOtherRB->isChecked()) {
 		m_pages.selectEveryOther(m_curPage).swap(pages);
 	} else if (everyOtherSelectedRB->isChecked()) {
-		assert(m_selectedRanges.size() == 1);
-		PageRange const& range = m_selectedRanges.front();
+		PageRange range;
+        BOOST_FOREACH(PageRange next_range, m_selectedRanges) {
+            range.append(next_range);
+        }
 		range.selectEveryOther(m_curPage).swap(pages);
 	}
-	
+
 	emit appliedTo(pages);
-	
+
 	// We assume the default connection from accept() to accepted() was removed.
 	accept();
 }
