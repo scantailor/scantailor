@@ -127,9 +127,9 @@ Filter::saveSettings(
 	filter_el.setAttribute("pageDetectionTolerance", m_ptrSettings->pageDetectionTolerance());
 
 	writer.enumPages(
-		bind(
+		boost::lambda::bind(
 			&Filter::writePageSettings,
-			this, boost::ref(doc), var(filter_el), _1, _2
+			this, boost::ref(doc), var(filter_el), boost::lambda::_1, boost::lambda::_2
 		)
 	);
 	
