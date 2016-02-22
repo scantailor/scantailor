@@ -190,6 +190,7 @@
     <addaction name="actionDebug"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
+    <addaction name="actionExport"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -353,6 +354,11 @@
   <action name="actionRelinking">
    <property name="text">
     <string>Relinking ...</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export...</string>
    </property>
   </action>
  </widget>

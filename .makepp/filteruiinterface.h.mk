@@ -1,0 +1,5 @@
+LIBS=
+INCLUDES=AbstractCommand.h IntrusivePtr.h PageId.h
+SIGNATURE=1456113530,1702
+SYSTEM_INCLUDES=
+END=

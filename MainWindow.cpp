@@ -165,7 +165,18 @@ MainWindow::MainWindow()
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
 	m_debug(false),
-	m_closing(false)
+//begin of modified by monday2000
+//added:
+//Picture_Shape_Bug
+	//m_closing(false)
+	m_closing(false),
+//Export_Subscans
+	m_outpaths_vector(0),
+	m_exportTimerId(0),
+	m_keep_orig_fore_subscan(0),
+	m_dont_equalize_illumination_pic_zones(0)	
+//end of modified by monday2000
+
 {
 	m_maxLogicalThumbSize = QSize(250, 160);
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
@@ -176,7 +187,10 @@ MainWindow::MainWindow()
 #if !defined(ENABLE_OPENGL)
 	// Right now the only setting is 3D acceleration, so get rid of
 	// the whole Settings dialog, if it's inaccessible.
-	actionSettings->setVisible(false);
+//begin of modified by monday2000
+//Auto_Save_Project
+	//actionSettings->setVisible(false); // commented by monday2000
+//end of modified by monday2000
 #endif
 
 	createBatchProcessingWidget();
@@ -272,7 +286,14 @@ MainWindow::MainWindow()
 		actionSettings, SIGNAL(triggered(bool)),
 		this, SLOT(openSettingsDialog())
 	);
-	
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+	connect(
+		actionExport, SIGNAL(triggered(bool)),
+		this, SLOT(openExportDialog())
+	);
+//end of modified by monday2000
 	connect(
 		actionNewProject, SIGNAL(triggered(bool)),
 		this, SLOT(newProject())
@@ -311,6 +332,12 @@ MainWindow::MainWindow()
 			resize(1014, 689); // A sensible value.
 		}
 	}
+//begin of modified by monday2000
+//Auto_Save_Project
+	m_auto_save_project = settings.value("settings/auto_save_project").toBool();
+//Dont_Equalize_Illumination_Pic_Zones
+	m_dont_equalize_illumination_pic_zones = settings.value("settings/dont_equalize_illumination_pic_zones").toBool();
+//end of modified by monday2000
 }
 
 
@@ -543,6 +570,32 @@ MainWindow::closeEvent(QCloseEvent* const event)
 void
 MainWindow::timerEvent(QTimerEvent* const event)
 {
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+
+	if (event->timerId() == m_exportTimerId)
+	{
+		int res = ExportNextFile();
+
+		if (res)
+		{
+			killTimer(m_exportTimerId);
+
+			m_exportTimerId = 0;			
+
+			if (res == 1)
+			{
+				m_p_export_dialog->setExportLabel();
+
+				QMessageBox::information(0, tr("Information"), tr("The files export is finished."));
+			}
+		}		
+	}
+	else
+	{
+//end of modified by monday2000
+
 	// We only use the timer event for delayed closing of the window.
 	killTimer(event->timerId());
 	
@@ -557,6 +610,11 @@ MainWindow::timerEvent(QTimerEvent* const event)
 		}
 		close();
 	}
+//begin of modified by monday2000
+//Export_Subscans
+//added:
+	}
+//end of modified by monday2000
 }
 
 MainWindow::SavePromptResult
@@ -957,6 +1015,11 @@ MainWindow::goToPage(PageId const& page_id)
 	// If the page was already selected, it will be reloaded.
 	// That's by design.
 	updateMainArea();
+
+//begin of modified by monday2000
+//Auto_Save_Project
+	autoSaveProject();
+//end of modified by monday2000
 }
 
 void
@@ -980,7 +1043,41 @@ MainWindow::currentPageChanged(
 			updateMainArea();
 		}
 	}
+
+//begin of modified by monday2000
+//Auto_Save_Project
+	if (flags & ThumbnailSequence::SELECTED_BY_USER)
+		autoSaveProject();
+//end of modified by monday2000
 }
+
+//begin of modified by monday2000
+//Auto_Save_Project
+void
+MainWindow::autoSaveProject()
+{
+	if (m_projectFile.isEmpty()) 
+		return;	
+
+	if (!m_auto_save_project)
+		return;
+
+	saveProjectWithFeedback(m_projectFile);
+}
+
+void 
+MainWindow::AutoSaveProjectState(bool auto_save)
+{
+	m_auto_save_project = auto_save;
+}
+
+//Dont_Equalize_Illumination_Pic_Zones
+void 
+MainWindow::DontEqualizeIlluminationPicZones(bool state)
+{
+	m_dont_equalize_illumination_pic_zones = state;
+}
+//end of modified by monday2000
 
 void
 MainWindow::pageContextMenuRequested(
@@ -1508,8 +1605,467 @@ MainWindow::openSettingsDialog()
 	SettingsDialog* dialog = new SettingsDialog(this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setWindowModality(Qt::WindowModal);
+//begin of modified by monday2000
+//Auto_Save_Project
+	connect(dialog, SIGNAL(AutoSaveProjectStateSignal(bool)), this, SLOT(AutoSaveProjectState(bool)));
+//Dont_Equalize_Illumination_Pic_Zones
+	connect(dialog, SIGNAL(DontEqualizeIlluminationPicZonesSignal(bool)), this, SLOT(DontEqualizeIlluminationPicZones(bool)));
+//end of modified by monday2000
 	dialog->show();
 }
+
+//begin of modified by monday2000
+//Export_Subscans
+//Original_Foreground_Mixed
+//added:
+void
+MainWindow::openExportDialog()
+{
+	m_p_export_dialog = new ExportDialog(this);	
+
+	m_p_export_dialog->setAttribute(Qt::WA_DeleteOnClose);
+	m_p_export_dialog->setWindowModality(Qt::WindowModal);
+	m_p_export_dialog->show();
+
+	connect(m_p_export_dialog, SIGNAL(ExportOutputSignal(QString, bool, bool, bool, bool)), this, SLOT(ExportOutput(QString, bool, bool, bool, bool)));
+	connect(m_p_export_dialog, SIGNAL(ExportStopSignal()), this, SLOT(ExportStop()));
+	connect(m_p_export_dialog, SIGNAL(SetStartExportSignal()), this, SLOT(SetStartExport()));
+}
+
+
+template<typename MixedPixel>
+bool GenerateSubscans(QImage& source_img, QImage& subscan1, QImage& subscan2, bool keep_orig_fore_subscan = false, QImage* p_orig_fore_subscan = NULL)
+{
+	int const width = source_img.width();
+	int const height = source_img.height();
+
+	MixedPixel* source_line = reinterpret_cast<MixedPixel*>(source_img.bits());
+	int const source_stride = source_img.bytesPerLine() / sizeof(MixedPixel);
+
+	QImage::Format format;
+
+	if (keep_orig_fore_subscan)
+		format = source_img.format();
+	else
+		format = QImage::Format_Mono;
+
+	subscan1 = QImage(source_img.width(),source_img.height(),format);
+	subscan2 = QImage(source_img.width(),source_img.height(),source_img.format());
+
+	subscan1.setDotsPerMeterX(source_img.dotsPerMeterX());
+	subscan1.setDotsPerMeterY(source_img.dotsPerMeterY());
+	subscan2.setDotsPerMeterX(source_img.dotsPerMeterX());
+	subscan2.setDotsPerMeterY(source_img.dotsPerMeterY());
+
+	if (keep_orig_fore_subscan)
+	{
+		if (subscan1.format() == QImage::Format_Indexed8) 
+		{	//createGrayscalePalette() from C:\build\scantailor-0.9.11.1\imageproc\Grayscale.cpp
+			QVector<QRgb> palette(256);
+			for (int i = 0; i < 256; ++i) palette[i] = qRgb(i, i, i);
+			subscan1.setColorTable(palette);
+		}
+	}
+	else
+	{
+		QVector<QRgb> bw_palette(2);	
+		bw_palette[0] = qRgb(0, 0, 0);
+		bw_palette[1] = qRgb(255, 255, 255);
+		subscan1.setColorTable(bw_palette);
+	}
+
+	if (subscan2.format() == QImage::Format_Indexed8) 
+	{	//createGrayscalePalette() from C:\build\scantailor-0.9.11.1\imageproc\Grayscale.cpp
+		QVector<QRgb> palette(256);
+		for (int i = 0; i < 256; ++i) palette[i] = qRgb(i, i, i);
+		subscan2.setColorTable(palette);
+	}
+
+	MixedPixel* subscan1_line = reinterpret_cast<MixedPixel*>(subscan1.bits());	
+	int subscan1_stride = subscan1.bytesPerLine() / sizeof(MixedPixel);
+
+	uchar* subscan1_bw_line = subscan1.bits();
+	int const subscan1_bw_stride = subscan1.bytesPerLine();
+
+	MixedPixel* subscan2_line = reinterpret_cast<MixedPixel*>(subscan2.bits());
+	int const subscan2_stride = subscan2.bytesPerLine() / sizeof(MixedPixel);
+
+	MixedPixel* orig_fore_line = NULL;
+	int orig_fore_stride = 0;
+
+	if (keep_orig_fore_subscan)
+	{
+		orig_fore_line = reinterpret_cast<MixedPixel*>(p_orig_fore_subscan->bits());
+		orig_fore_stride = p_orig_fore_subscan->bytesPerLine() / sizeof(MixedPixel);
+	}
+
+	uint32_t tmp_white_pixel = 0xffffffff;
+	uint32_t mask_pixel = 0x00ffffff;
+	
+	MixedPixel mask = static_cast<MixedPixel>(mask_pixel);
+
+	bool mixed_detected = false;
+
+	for (int y = 0; y < height; ++y) 
+	{
+		for (int x = 0; x < width; ++x)
+		{	//this line of code was suggested by Tulon:		
+			if ((source_line[x] & mask) == 0 || (source_line[x] & mask) == mask) // BW
+			{
+				if (keep_orig_fore_subscan)
+				{
+					subscan1_line[x] = orig_fore_line[x];
+				}
+				else
+				{
+				uint8_t value1 = static_cast<uint8_t>(source_line[x]);
+				//BW SetPixel from http://djvu-soft.narod.ru/bookscanlib/023.htm
+				value1 ? subscan1_bw_line[x >> 3] |= (0x80 >> (x & 0x7)) : subscan1_bw_line[x >> 3] &= (0xFF7F >> (x & 0x7));
+				}
+
+				subscan2_line[x] = static_cast<MixedPixel>(tmp_white_pixel);
+
+				mixed_detected = true;
+			}
+			else // non-BW
+			{				
+				if (keep_orig_fore_subscan)
+				{
+					subscan1_line[x] = static_cast<MixedPixel>(tmp_white_pixel);
+				}
+				else
+				{
+				uint8_t value = static_cast<uint8_t>(tmp_white_pixel);
+				//BW SetPixel from http://djvu-soft.narod.ru/bookscanlib/023.htm
+				value ? subscan1_bw_line[x >> 3] |= (0x80 >> (x & 0x7)) : subscan1_bw_line[x >> 3] &= (0xFF7F >> (x & 0x7));
+				}
+
+				subscan2_line[x] = source_line[x];
+			}			
+		}
+		source_line += source_stride;		
+		subscan2_line += subscan2_stride;
+		if (keep_orig_fore_subscan)
+		{
+			subscan1_line += subscan1_stride;
+			orig_fore_line += orig_fore_stride;
+		}
+		else
+			subscan1_bw_line += subscan1_bw_stride;
+	}
+
+	return mixed_detected;
+}
+
+QImage GenerateBlankImage(QImage& out_img, QImage::Format format)
+{
+	QImage blank_img = QImage(out_img.width(), out_img.height(), format);
+
+	blank_img.setDotsPerMeterX(out_img.dotsPerMeterX());
+	blank_img.setDotsPerMeterY(out_img.dotsPerMeterY());
+
+	blank_img.fill(0xFF);
+
+	if (format == QImage::Format_Mono)
+	{
+		QVector<QRgb> bw_palette(2);	
+		bw_palette[0] = qRgb(0, 0, 0);
+		bw_palette[1] = qRgb(255, 255, 255);
+		blank_img.setColorTable(bw_palette);		
+
+		return blank_img;
+	}
+
+	else if (format == QImage::Format_Indexed8)
+	{
+		QVector<QRgb> palette(256);
+		for (int i = 0; i < 256; ++i) palette[i] = qRgb(i, i, i);		
+		blank_img.setColorTable(palette);
+
+		return blank_img;
+	}
+	else
+		return blank_img;
+}
+
+int 
+MainWindow::ExportNextFile()
+{
+	if (m_pos_export == m_outpaths_vector.size())
+		return 1; //all the files are processed
+
+	if (m_keep_orig_fore_subscan)
+	{
+		killTimer(m_exportTimerId);
+
+		PageSequence page_sec = m_ptrThumbSequence_export->toPageSequence();		
+
+		PageInfo page = page_sec.pageAt(m_pos_export);		
+
+		assert(m_ptrThumbnailCache.get());	
+
+		m_ptrInteractiveQueue->cancelAndClear();
+
+		BackgroundTaskPtr task = createCompositeTask(page, 5, false, m_debug);
+		FilterResultPtr result = (*task)();		
+	}
+
+	QImage subscan1;
+	QImage subscan2;
+
+	QString text_dir = m_export_dir + QDir::separator() + "1"; //folder for foreground subscans
+	QString pic_dir = m_export_dir + QDir::separator() + "2"; //folder for background subscans
+
+	QString out_file_path = m_outpaths_vector[m_pos_export];
+
+	QString st_num = QString::number(m_pos_export+1);
+
+	QString name;
+
+	for(int j=0;j<4-st_num.length();j++) name += "0";
+
+	name += st_num;
+
+	QString out_file_path1 = text_dir + QDir::separator() + name + ".tif";
+	QString out_file_path2 = pic_dir + QDir::separator() + name + ".tif";
+
+	QString out_file_path_no_split = m_export_dir + QDir::separator() + name + ".tif";
+
+	if (!QFile().exists(out_file_path))
+	{
+		QMessageBox::critical(0, tr("Error"), tr("The file") + " \"" + out_file_path + "\" " + tr("is not found") + ".");
+
+		return -1;
+	}
+
+	QImage out_img = ImageLoader::load(out_file_path);
+
+	if (m_split_subscans)
+	{
+		bool mixed_detected;		
+
+		if (out_img.format() == QImage::Format_Indexed8)
+		{
+			if (m_keep_orig_fore_subscan)
+				mixed_detected = GenerateSubscans<uint8_t>(out_img, subscan1, subscan2, m_keep_orig_fore_subscan, &m_orig_fore_subscan);
+			else				
+				mixed_detected = GenerateSubscans<uint8_t>(out_img, subscan1, subscan2);
+
+			if (mixed_detected)
+			{
+				TiffWriter::writeImage(out_file_path1, subscan1);
+				TiffWriter::writeImage(out_file_path2, subscan2);
+			}
+			else
+			{
+				TiffWriter::writeImage(out_file_path1, GenerateBlankImage(out_img, QImage::Format_Mono));
+				TiffWriter::writeImage(out_file_path2, out_img);
+			}
+		}
+		else if(out_img.format() == QImage::Format_RGB32 
+			|| out_img.format() == QImage::Format_ARGB32)
+		{
+			if (m_keep_orig_fore_subscan)			
+				mixed_detected = GenerateSubscans<uint32_t>(out_img, subscan1, subscan2, m_keep_orig_fore_subscan, &m_orig_fore_subscan);
+			else
+				mixed_detected = GenerateSubscans<uint32_t>(out_img, subscan1, subscan2);
+
+			if (mixed_detected)
+			{
+				TiffWriter::writeImage(out_file_path1, subscan1);
+				TiffWriter::writeImage(out_file_path2, subscan2);
+			}
+			else
+			{
+				TiffWriter::writeImage(out_file_path1, GenerateBlankImage(out_img, QImage::Format_Mono));
+				TiffWriter::writeImage(out_file_path2, out_img);
+			}
+		}
+		else if(out_img.format() == QImage::Format_Mono)
+		{
+			TiffWriter::writeImage(out_file_path1, out_img);
+
+			if(m_generate_blank_back_subscans)
+				TiffWriter::writeImage(out_file_path2, GenerateBlankImage(out_img, QImage::Format_Indexed8));
+		}
+	}
+	else
+	{
+		TiffWriter::writeImage(out_file_path_no_split, out_img);			
+	}			
+
+	m_p_export_dialog->StepProgress();
+
+	m_pos_export++;
+
+	if (m_keep_orig_fore_subscan)	
+		m_exportTimerId = startTimer(0);
+
+	return 0;
+}
+
+void 
+MainWindow::ExportOutput(QString export_dir_path, bool default_out_dir, bool split_subscans,
+						 bool generate_blank_back_subscans, 
+						 bool keep_orig_fore_subscan)
+{
+	if (isBatchProcessingInProgress())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("Batch processing is in the progress."));
+
+		return;	
+	}
+
+	if (!isProjectLoaded())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("No project is loaded."));
+
+		return;	
+	}
+
+	m_ptrInteractiveQueue->cancelAndClear();
+	if (m_ptrBatchQueue.get()) // Should not happen, but just in case.		
+		m_ptrBatchQueue->cancelAndClear();	
+
+// Checking whether all the output thumbnails don't have a question mark on them
+
+	m_ptrThumbSequence_export.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
+
+	if (m_ptrThumbnailCache.get()) {
+		IntrusivePtr<CompositeCacheDrivenTask> const task(
+			createCompositeCacheDrivenTask(5)
+		);
+
+		m_ptrThumbSequence_export->setThumbnailFactory(
+			IntrusivePtr<ThumbnailFactory>(
+				new ThumbnailFactory(
+					m_ptrThumbnailCache,
+					m_maxLogicalThumbSize, task
+				)
+			)
+		);
+	}
+	
+	m_ptrThumbSequence_export->reset(
+		m_ptrPages->toPageSequence(m_ptrStages->filterAt(5)->getView()),
+		ThumbnailSequence::RESET_SELECTION, currentPageOrderProvider()
+	);
+
+	if (!m_ptrThumbSequence_export->AllThumbnailsComplete()) 
+	{
+		m_p_export_dialog->reset();
+
+		return;
+	}
+
+// Getting the output filenames	
+
+	if (default_out_dir)
+	{
+		m_export_dir = m_outFileNameGen.outDir() + QDir::separator() + "export";
+	}
+	else
+	{
+		m_export_dir = export_dir_path + QDir::separator() + "export";
+	}
+	QDir().mkdir(m_export_dir);
+
+	QString text_dir = m_export_dir + QDir::separator() + "1"; //folder for foreground subscans
+	QString pic_dir = m_export_dir + QDir::separator() + "2"; //folder for background subscans					
+
+	m_split_subscans = split_subscans;
+	m_generate_blank_back_subscans = generate_blank_back_subscans;
+	m_keep_orig_fore_subscan = keep_orig_fore_subscan;
+	
+	if (split_subscans) 
+	{
+		QDir().mkdir(text_dir);
+		QDir().mkdir(pic_dir);
+	}
+
+	std::vector<PageId::SubPage> erase_variations; 
+	erase_variations.reserve(3);
+
+	PageSequence const& pages = allPages(); // get all the pages (input pages)	
+
+	unsigned const count = pages.numPages(); // input pages number	
+
+	PageId page_id;	
+
+	m_outpaths_vector.clear();
+
+	for (unsigned i = 0; i < count; ++i)
+	{
+		page_id = pages.pageAt(i).id();
+
+		erase_variations.clear();
+
+		switch (page_id.subPage()) 
+		{
+		case PageId::SINGLE_PAGE:
+			erase_variations.push_back(PageId::SINGLE_PAGE);
+			erase_variations.push_back(PageId::LEFT_PAGE); //added
+			erase_variations.push_back(PageId::RIGHT_PAGE); //added
+			break;
+		case PageId::LEFT_PAGE:
+			erase_variations.push_back(PageId::SINGLE_PAGE); //added
+			erase_variations.push_back(PageId::LEFT_PAGE);
+			break;
+		case PageId::RIGHT_PAGE:
+			erase_variations.push_back(PageId::SINGLE_PAGE); //added
+			erase_variations.push_back(PageId::RIGHT_PAGE);
+			break;
+		}
+
+		BOOST_FOREACH(PageId::SubPage subpage, erase_variations)
+		{	
+			QString out_file_path = m_outFileNameGen.filePathFor(PageId(page_id.imageId(), subpage));
+			if (QFile().exists(out_file_path))			
+				m_outpaths_vector.append(out_file_path);
+		}
+	}	
+
+	// exporting pages
+	
+	m_pos_export = 0;
+
+	m_p_export_dialog->setCount(m_outpaths_vector.size());
+
+	m_exportTimerId = startTimer(0);
+}
+
+void 
+MainWindow::ExportStop()
+{
+	killTimer(m_exportTimerId);
+
+	m_exportTimerId = 0;
+
+	m_p_export_dialog->reset();
+
+	QMessageBox::information(0, tr("Information"), tr("The files export is stopped by the user."));
+}
+
+void
+MainWindow::SetStartExport()
+{
+	if (isBatchProcessingInProgress())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("Batch processing is in the progress."));
+
+		return;	
+	}
+
+	if (!isProjectLoaded())
+	{
+		QMessageBox::critical(0, tr("Error"), tr("No project is loaded."));
+
+		return;	
+	}
+
+	m_p_export_dialog->setStartExport();
+}
+//end of modified by monday2000
 
 void
 MainWindow::showAboutDialog()
@@ -1710,7 +2266,10 @@ MainWindow::updateWindowTitle()
 		project_name = QFileInfo(m_projectFile).baseName();
 	}
 	QString const version(QString::fromUtf8(VERSION));
-	setWindowTitle(tr("%2 - Scan Tailor %3 [%1bit]").arg(sizeof(void*)*8).arg(project_name, version));
+//begin of modified by monday2000
+	//setWindowTitle(tr("%2 - Scan Tailor %3 [%1bit]").arg(sizeof(void*)*8).arg(project_name, version));
+	setWindowTitle(tr("%2 - Scan Tailor Featured %3 [%1bit]").arg(sizeof(void*)*8).arg(project_name, version));	
+//end of modified by monday2000
 }
 
 /**
@@ -2061,7 +2620,14 @@ MainWindow::createCompositeTask(
 
 	if (last_filter_idx >= m_ptrStages->outputFilterIdx()) {
 		output_task = m_ptrStages->outputFilter()->createTask(
-			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+			//page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug
+			page.id(), m_ptrThumbnailCache, m_outFileNameGen, batch, debug,
+			m_dont_equalize_illumination_pic_zones,
+			m_keep_orig_fore_subscan, &m_orig_fore_subscan
+//end of modified by monday2000
 		);
 		debug = false;
 	}

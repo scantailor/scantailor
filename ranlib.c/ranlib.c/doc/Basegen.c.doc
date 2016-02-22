@@ -1,0 +1,402 @@
+
+
+
+
+
+
+
+
+
+
+
+                                     RANLIB.C
+
+               Library of C Routines for Random Number Generation
+
+
+
+
+
+
+
+
+                          Base Generator Documentation
+
+
+
+
+
+
+
+
+                            Compiled and Written by:
+
+                                 Barry W. Brown
+                                  James Lovato
+                                   
+
+
+
+
+
+
+
+
+
+                     Department of Biomathematics, Box 237
+                     The University of Texas, M.D. Anderson Cancer Center
+                     1515 Holcombe Boulevard
+                     Houston, TX      77030
+
+
+ This work was supported by grant CA-16672 from the National Cancer Institute.
+
+
+
+
+                     Base Random Number Generator
+
+
+
+I. OVERVIEW AND DEFAULT BEHAVIOR
+
+This   set of programs contains   32 virtual random number generators.
+Each generator can provide 1,048,576 blocks of numbers, and each block
+is of length 1,073,741,824.  Any generator can be set to the beginning
+or end of the current block or to its starting value.  The methods are
+from the paper  cited  immediately below, and  most of the  code  is a
+transliteration from the Pascal of the paper into Fortran.
+
+P.  L'Ecuyer and S. Cote.   Implementing a Random  Number Package with
+Splitting Facilities.  ACM Transactions on Mathematical Software 17:1,
+pp 98-111.
+
+Most users won't need the sophisticated  capabilities of this package,
+and will desire a single generator.  This single generator (which will
+have a non-repeating length  of 2.3 X  10^18 numbers) is the  default.
+In order to accommodate this use, the concept of the current generator
+is added to those of the  cited paper;  references to a  generator are
+always to the current generator.  The  current generator  is initially
+generator number  1; it  can  be  changed by   setcgn, and the ordinal
+number of the current generator can be obtained from getcgn.
+
+The user of the default can set the  initial values of the two integer
+seeds with setall.   If the user does  not set the   seeds, the random
+number   generation will  use   the  default   values, 1234567890  and
+123456789.  The values of the current seeds can be  achieved by a call
+to GETSD.  Random number may be obtained as integers ranging from 1 to
+a large integer by reference to function ignlgi or as a floating point
+number between 0 and 1 by a reference to function ranf.  These are the
+only routines  needed by a user desiring   a single stream   of random
+numbers.
+
+II. CONCEPTS
+
+A stream of pseudo-random numbers is a sequence, each member  of which
+can be obtained either as an integer in  the range 1..2,147,483,563 or
+as a floating point number in the range [0..1].  The user is in charge
+of which representation is desired.
+
+The method contains an algorithm  for generating a  stream with a very
+long period, 2.3 X 10^18.   This  stream  in  partitioned into G (=32)
+virtual generators.  Each virtual generator contains 2^20 (=1,048,576)
+blocks   of non-overlapping   random  numbers.   Each  block is   2^30
+(=1,073,741,824) in length.
+
+
+
+Base Random Number Generator Page 2
+
+
+The state of a generator  is determined by two  integers called seeds.
+The seeds can be  initialized  by the  user; the initial values of the
+first must lie between 1 and 2,147,483,562, that of the second between
+1 and 2,147,483,398.  Each time a number is generated,  the  values of
+the seeds  change.   Three  values   of seeds are remembered   by  the
+generators  at all times:  the   value with  which the  generator  was
+initialized, the value at the beginning of the current block,  and the
+value at the beginning of the next block.   The seeds of any generator
+can be set to any of these three values at any time.
+
+Of the  32 virtual   generators, exactly one    will  be  the  current
+generator, i.e., that one will  be used to  generate values for ignlgi
+and randf.   Initially, the current generator is   set to number  one.
+The current generator may be changed by calling setcgn, and the number
+of the current generator can be obtained using getcgn.
+
+III. AN EXAMPLE
+
+An example of  the  need  for these capabilities   is as follows.  Two
+statistical techniques are being compared on  data of different sizes.
+The first  technique uses   bootstrapping  and is  thought to   be  as
+accurate using less data   than the second method  which  employs only
+brute force.
+
+For the first method, a data set of size uniformly distributed between
+25 and 50 will be generated.  Then the data set  of the specified size
+will be generated and alalyzed.  The second method will  choose a data
+set size between 100 and 200, generate the data  and alalyze it.  This
+process will be repeated 1000 times.
+
+For  variance reduction, we  want the  random numbers  used in the two
+methods to be the  same for each of  the 1000 comparisons.  But method
+two will  use more random  numbers than   method one and  without this
+package, synchronization might be difficult.
+
+With the package, it is a snap.  Use generator 1 to obtain  the sample
+size for  method one and generator 2  to obtain the  data.  Then reset
+the state to the beginning  of the current  block and do the same  for
+the second method.  This assures that the initial data  for method two
+is that used by  method  one.  When both  have concluded,  advance the
+block for both generators.
+
+IV.  THE INTERFACE
+
+A random number is obtained either  as a random  integer between 1 and
+2,147,483,562  by invoking integer  function  ignlgi (I GeNerate LarGe
+Integer)  or as a  random  floating point  number  between 0 and 1  by
+invoking real function RANF.  Neither function has arguments.
+
+The  seed of the  first generator  can  be set by invoking  subroutine
+SETALL;   the values of   the seeds  of   the other 31 generators  are
+calculated from this value.
+
+
+
+Base Random Number Generator Page 3
+
+
+The number of  the current generator  can be set by calling subroutine
+SETCGN, which takes a single argument, the integer generator number in
+the range 1..32.  The number of the current  generator can be obtained
+by invoking subroutine getcgn  which returns the number  in its single
+integer argument.
+
+
+V. CALLING SEQUENCES
+
+      A. SETTING THE SEED OF ALL GENERATORS
+
+**********************************************************************
+     void setall(long iseed1,long iseed2)
+               SET ALL random number generators
+
+     Sets the initial seed of generator 1 to ISEED1 and ISEED2. The
+     initial seeds of the other generators are set accordingly, and
+     all generators states are set to these seeds.
+
+     This is a transcription from Pascal to Fortran of routine
+     Set_Initial_Seed from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     iseed1 -> First of two integer seeds
+
+     iseed2 -> Second of two integer seeds
+**********************************************************************
+
+
+      B. OBTAINING RANDOM NUMBERS
+
+**********************************************************************
+     long ignlgi(void)
+               GeNerate LarGe Integer
+
+     Returns a random integer following a uniform distribution over
+     (1, 2147483562) using the current generator.
+
+     This is a transcription from Pascal to Fortran of routine
+     Random from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+**********************************************************************
+
+
+
+Base Random Number Generator                                    Page 4
+
+
+
+**********************************************************************
+     float ranf(void)
+                RANDom number generator as a Function
+
+     Returns a random floating point number from a uniform distribution
+     over 0 - 1 (endpoints of this interval are not returned) using the
+     current generator
+
+     This is a transcription from Pascal to Fortran of routine
+     Uniform_01 from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+**********************************************************************
+
+      C. SETTING AND OBTAINING THE NUMBER OF THE CURRENT GENERATOR
+
+**********************************************************************
+     void gscgn(long getset,long *g)
+                         Get/Set GeNerator
+
+     Gets or returns in G the number of the current generator
+
+                              Arguments
+
+     getset --> 0 Get
+                1 Set
+
+     g <-- Number of the current random number generator (1..32)
+**********************************************************************
+  
+      D. OBTAINING OR CHANGING SEEDS IN CURRENT GENERATOR
+
+***********************************************************************
+     void advnst(long k)
+               ADV-a-N-ce ST-ate
+
+     Advances the state  of  the current  generator  by 2^K values  and
+     resets the initial seed to that value.
+
+     This is  a  transcription from   Pascal to  Fortran    of  routine
+     Advance_State from the paper
+
+     L'Ecuyer, P. and  Cote, S. "Implementing  a  Random Number Package
+     with  Splitting   Facilities."  ACM  Transactions  on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     k -> The generator is advanced by2^K values
+**********************************************************************
+
+
+
+Base Random Number Generator                                    Page 5
+
+
+**********************************************************************
+     void getsd(long *iseed1,long *iseed2)
+               GET SeeD
+
+     Returns the value of two integer seeds of the current generator
+
+     This  is   a  transcription from  Pascal   to  Fortran  of routine
+     Get_State from the paper
+
+     L'Ecuyer, P. and  Cote,  S. "Implementing a Random Number  Package
+     with   Splitting Facilities."  ACM  Transactions   on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     iseed1 <- First integer seed of generator G
+
+     iseed2 <- Second integer seed of generator G
+**********************************************************************
+
+**********************************************************************
+     void initgn(long isdtyp)
+          INIT-ialize current G-e-N-erator
+
+     Reinitializes the state of the current generator
+
+     This is a transcription from Pascal to Fortran of routine
+     Init_Generator from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     isdtyp -> The state to which the generator is to be set
+          isdtyp = -1  => sets the seeds to their initial value
+          isdtyp =  0  => sets the seeds to the first value of
+                          the current block
+          isdtyp =  1  => sets the seeds to the first value of
+                          the next block
+**********************************************************************
+
+
+
+Base Random Number Generator                                    Page 6
+
+
+
+**********************************************************************
+     void setsd(long iseed1,long iseed2)
+               SET S-ee-D of current generator
+
+     Resets the initial  seed of  the current  generator to  ISEED1 and
+     ISEED2. The seeds of the other generators remain unchanged.
+
+     This is a transcription from Pascal to Fortran of routine
+     Set_Seed from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     iseed1 -> First integer seed
+
+     iseed2 -> Second integer seed
+**********************************************************************
+
+      E. MISCELLANY
+
+**********************************************************************
+     long mltmod(long a,long s,long m)
+                    Returns (A*S) MOD M
+
+     This is a transcription from Pascal to Fortran of routine
+     MULtMod_Decompos from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     a, s, m  -->
+**********************************************************************
+
+
+
+Base Random Number Generator                                    Page 7
+
+
+
+
+**********************************************************************
+     void setant(long qvalue)
+               SET ANTithetic
+
+     Sets whether the current generator produces antithetic values.  If
+     X   is  the value  normally returned  from  a uniform [0,1] random
+     number generator then 1  - X is the antithetic  value. If X is the
+     value  normally  returned  from a   uniform  [0,N]  random  number
+     generator then N - 1 - X is the antithetic value.
+
+     All generators are initialized to NOT generate antithetic values.
+
+     This is a transcription from Pascal to Fortran of routine
+     Set_Antithetic from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     qvalue -> nonzero if generator G is to generating antithetic
+                    values, otherwise zero
+**********************************************************************

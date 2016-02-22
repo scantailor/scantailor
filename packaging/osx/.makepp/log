@@ -1,0 +1,7 @@
+3/usr/local/bin/makepp
+VERSION2.05.18.2darwin-thread-multi-2level
+LOAD_DEFAULT140535677270392osx140535677269864/users/pod/scantailor/packaging
+LOAD_INCL140535681813208makepp_builtin_rules.mk140535685080552/usr/local/cellar/makepp/2.0/share/makepp140535685199816makepp_default_makefile.mk140535685080552
+LOAD_END140535685199816
+*** error: no targets specified and no default target in makefile `/usr/local/cellar/makepp/2.0/share/makepp/makepp_default_makefile.mk'
+N_FILES000

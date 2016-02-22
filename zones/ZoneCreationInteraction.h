@@ -78,6 +78,13 @@ private:
 	InteractionState::Captor m_interaction;
 	EditableSpline::Ptr m_ptrSpline;
 	QPointF m_nextVertexImagePos;
+//begin of modified by monday2000
+//Square_Picture_Zones
+//added
+	bool m_ctrl;
+	QPointF m_nextVertexImagePos_mid1;
+	QPointF m_nextVertexImagePos_mid2;
+//end of modified by monday2000
 };
 
 #endif
