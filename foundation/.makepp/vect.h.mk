@@ -1,0 +1,6 @@
+SIGNATURE=1456113531,5021
+SYSTEM_INCLUDES=assert.h boost/scoped_array.hpp stddef.h
+INCLUDES=
+C_MD5_SUM=yLm7r3bPt5d9xSE4eBd4Ew
+LIBS=
+END=

@@ -56,3 +56,37 @@ ZoneSet::toXml(QDomDocument& doc, QString const& name) const
 	}
 	return el;
 }
+
+//begin of modified by monday2000
+//Quadro_Zoner
+void
+ZoneSet::remove_auto_zones()
+{
+	typedef output::ZoneCategoryProperty ZLP;
+
+	for (std::list<Zone>::iterator it=m_zones.begin(); it!=m_zones.end();)
+	{
+		if (it->properties().locateOrDefault<ZLP>()->zone_category() ==  
+			ZLP::RECTANGULAR_OUTLINE)
+			m_zones.erase(it++);	 
+		else 
+			++it;
+	}
+}
+
+bool 
+ZoneSet::auto_zones_found()
+{
+	typedef output::ZoneCategoryProperty ZLP;
+
+	for (std::list<Zone>::iterator it=m_zones.begin(); it!=m_zones.end();)
+	{
+		if (it->properties().locateOrDefault<ZLP>()->zone_category() ==  
+			ZLP::RECTANGULAR_OUTLINE)			
+			return true;
+		else 
+			it++;
+	}
+	return false;
+}
+//end of modified by monday2000

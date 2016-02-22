@@ -90,9 +90,11 @@ private:
 	};
 
 	QPointF controlPointPosition(int idx) const;
-
-	void controlPointMoveRequest(int idx, QPointF const& pos);
-
+//begin of modified by monday2000
+//Blue_Dewarp_Line_Vert_Drag
+	//void controlPointMoveRequest(int idx, QPointF const& pos);
+	void controlPointMoveRequest(int idx, QPointF const& pos, Qt::KeyboardModifiers mask);
+//end of modified by monday2000
 	void dragFinished();
 
 	static Vec4d rotationAndScale(QPointF const& from, QPointF const& to);

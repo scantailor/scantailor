@@ -42,7 +42,7 @@ ENDIF()
 
 MATH(EXPR bits "${CMAKE_SIZEOF_VOID_P} * 8")
 SET(LICENSE_FILE "${CMAKE_SOURCE_DIR}/GPL3.txt")
-SET(INSTALLER_FILENAME "scantailor-${VERSION}-${bits}bit-install.exe")
+SET(INSTALLER_FILENAME "scantailor-featured-${VERSION}-${bits}bit-install.exe")
 SET(REGISTER_EXTENSION_NSH "${CMAKE_CURRENT_SOURCE_DIR}/registerExtension.nsh")
 
 SET(

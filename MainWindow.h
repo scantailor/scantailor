@@ -44,6 +44,14 @@
 #include <memory>
 #include <vector>
 #include <set>
+//begin of modified by monday2000
+//Export_Subscans
+#include <QMessageBox>
+#include "stdint.h"
+#include "TiffWriter.h"
+#include "ImageLoader.h"
+#include "ExportDialog.h"
+//end of modified by monday2000
 
 class AbstractFilter;
 class AbstractRelinker;
@@ -91,14 +99,33 @@ public:
 	std::set<PageId> selectedPages() const;
 	
 	std::vector<PageRange> selectedRanges() const;
+//begin of modified by monday2000
+	QImage m_orig_fore_subscan;	
+//end of modified by monday2000
 protected:
 	virtual void closeEvent(QCloseEvent* event);
 	
 	virtual void timerEvent(QTimerEvent* event);
 public slots:
 	void openProject(QString const& project_file);
+//begin of modified by monday2000
+//Export_Subscans
+	void ExportOutput(QString export_dir_path, bool default_out_dir, bool split_subscans,
+		bool generate_blank_back_subscans, bool orig_fore_subscan);
+	void ExportStop();
+	void SetStartExport();
+//Auto_Save_Project
+	void AutoSaveProjectState(bool auto_save);
+//Dont_Equalize_Illumination_Pic_Zones
+	void DontEqualizeIlluminationPicZones(bool);
+//end of modified by monday2000
 private:
 	enum MainAreaAction { UPDATE_MAIN_AREA, CLEAR_MAIN_AREA };
+//begin of modified by monday2000
+//Original_Foreground_Mixed
+signals:
+	void StartExportTimerSignal();
+//end of modified by monday2000
 private slots:
 	void goFirstPage();
 
@@ -170,6 +197,10 @@ private slots:
 	void showAboutDialog();
 
 	void handleOutOfMemorySituation();
+//begin of modified by monday2000
+//Export_Subscans
+	void openExportDialog();
+//end of modified by monday2000
 private:
 	class PageSelectionProviderImpl;
 	enum SavePromptResult { SAVE, DONT_SAVE, CANCEL };
@@ -302,6 +333,25 @@ private:
 	bool m_debug;
 	bool m_closing;
 	bool m_beepOnBatchProcessingCompletion;
+//begin of modified by monday2000
+//Export_Subscans
+	ExportDialog* m_p_export_dialog;
+	QVector<QString> m_outpaths_vector;
+	int ExportNextFile();
+	int m_exportTimerId;
+	QString m_export_dir;
+	bool m_split_subscans;
+	bool m_generate_blank_back_subscans;
+	int m_pos_export;
+//Original_Foreground_Mixed
+	bool m_keep_orig_fore_subscan;
+	std::auto_ptr<ThumbnailSequence> m_ptrThumbSequence_export;	
+//Auto_Save_Project
+	void autoSaveProject();
+	bool m_auto_save_project;
+//Dont_Equalize_Illumination_Pic_Zones
+	bool m_dont_equalize_illumination_pic_zones;
+//end of modified by monday2000
 };
 
 #endif

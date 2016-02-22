@@ -33,6 +33,10 @@
 #include <QMutex>
 #include <map>
 #include <memory>
+//begin of modified by monday2000
+//Picture_Shape
+#include "Params.h"
+//end of modified by monday2000
 
 class AbstractRelinker;
 
@@ -58,7 +62,10 @@ public:
 	void setParams(PageId const& page_id, Params const& params);
 
 	void setColorParams(PageId const& page_id, ColorParams const& prms);
-
+//begin of modified by monday2000
+//Picture_Shape
+	void setPictureShape(PageId const& page_id, PictureShape picture_shape);
+//end of modified by monday2000
 	void setDpi(PageId const& page_id, Dpi const& dpi);
 
 	void setDewarpingMode(PageId const& page_id, DewarpingMode const& mode);

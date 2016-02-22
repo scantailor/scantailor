@@ -1,0 +1,6 @@
+C_MD5_SUM=X0WkTNvLPvSWPA+NXV9U3g
+INCLUDES=NonCopyable.h PageId.h Params.h RefCountable.h
+SIGNATURE=1456113530,1658
+SYSTEM_INCLUDES=QMutex map memory set
+LIBS=
+END=

@@ -1,0 +1,42 @@
+Start testing: Feb 21 23:52 PST
+----------------------------------------------------------
+1/2 Testing: ImageProcTests
+1/2 Test: ImageProcTests
+Command: "/Users/pod/scantailor/imageproc/tests/imageproc_tests" "--log_level=message"
+Directory: /Users/pod/scantailor
+"ImageProcTests" start time: Feb 21 23:52 PST
+Output:
+----------------------------------------------------------
+Running 87 test cases...
+Test case SeedFillTestSuite/test_gray4_random did not check any assertions
+Test case SeedFillTestSuite/test_gray8_random did not check any assertions
+Test case SeedFillTestSuite/test_gray_vs_binary did not check any assertions
+
+*** No errors detected
+<end of output>
+Test time =   3.84 sec
+----------------------------------------------------------
+Test Passed.
+"ImageProcTests" end time: Feb 21 23:52 PST
+"ImageProcTests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+2/2 Testing: ScanTaylorTests
+2/2 Test: ScanTaylorTests
+Command: "/Users/pod/scantailor/tests/tests" "--log_level=message"
+Directory: /Users/pod/scantailor
+"ScanTaylorTests" start time: Feb 21 23:52 PST
+Output:
+----------------------------------------------------------
+Running 14 test cases...
+
+*** No errors detected
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"ScanTaylorTests" end time: Feb 21 23:52 PST
+"ScanTaylorTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Feb 21 23:52 PST

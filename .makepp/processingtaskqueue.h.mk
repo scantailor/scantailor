@@ -1,0 +1,6 @@
+C_MD5_SUM=16NkYkWbq3j3JVU4ksxvIA
+INCLUDES=BackgroundTask.h NonCopyable.h PageId.h PageInfo.h
+SYSTEM_INCLUDES=list set
+SIGNATURE=1456113530,2331
+LIBS=
+END=

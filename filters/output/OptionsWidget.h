@@ -31,6 +31,10 @@
 #include "Dpi.h"
 #include "ImageViewTab.h"
 #include <set>
+//begin of modified by monday2000
+//Picture_Shape
+#include "Params.h"
+//end of modified by monday2000
 
 namespace dewarping
 {
@@ -78,7 +82,10 @@ private slots:
 	void applyColorsConfirmed(std::set<PageId> const& pages);
 
 	void colorModeChanged(int idx);
-	
+//begin of modified by monday2000
+//Picture_Shape
+	void pictureShapeChanged(int idx);
+//end of modified by monday2000	
 	void whiteMarginsToggled(bool checked);
 	
 	void equalizeIlluminationToggled(bool checked);
@@ -128,6 +135,10 @@ private:
 	PageId m_pageId;
 	Dpi m_outputDpi;
 	ColorParams m_colorParams;
+//begin of modified by monday2000
+//Picture_Shape
+	PictureShape m_pictureShape;
+//end of modified by monday2000
 	DepthPerception m_depthPerception;
 	DewarpingMode m_dewarpingMode;
 	DespeckleLevel m_despeckleLevel;
