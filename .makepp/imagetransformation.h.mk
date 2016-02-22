@@ -1,0 +1,6 @@
+SYSTEM_INCLUDES=QPolygonF QRectF QTransform
+SIGNATURE=1456113530,7752
+INCLUDES=Dpi.h OrthogonalRotation.h
+C_MD5_SUM=RY7yq0rpfUKFkhOLGGjfWw
+LIBS=
+END=

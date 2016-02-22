@@ -1,0 +1,6 @@
+LIBS=
+SIGNATURE=1456113530,1588
+SYSTEM_INCLUDES=QDialog set
+INCLUDES=IntrusivePtr.h PageId.h PageSequence.h ui_DeskewApplyDialog.h
+C_MD5_SUM=33CLRVWaNCiMgYh998yBoA
+END=

@@ -1,0 +1,6 @@
+LIBS=
+SYSTEM_INCLUDES=QString
+SIGNATURE=1456113531,1601
+INCLUDES=AutoManualMode.h Dependencies.h PageLayout.h
+C_MD5_SUM=4crmhztDdc2LbNIayhGXtA
+END=
