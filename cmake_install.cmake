@@ -34,9 +34,6 @@ if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspeci
     execute_process(COMMAND /usr/bin/install_name_tool
       -delete_rpath "/usr/local/Cellar/qt/4.8.7_2/lib"
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/scantailor")
-    if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/scantailor")
-    endif()
   endif()
 endif()
 
@@ -47,9 +44,6 @@ if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspeci
     execute_process(COMMAND /usr/bin/install_name_tool
       -delete_rpath "/usr/local/Cellar/qt/4.8.7_2/lib"
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/scantailor-cli")
-    if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/scantailor-cli")
-    endif()
   endif()
 endif()
 

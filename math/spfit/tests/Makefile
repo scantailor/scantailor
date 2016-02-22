@@ -144,17 +144,6 @@ install/fast: preinstall/fast
 	/usr/local/Cellar/cmake/3.4.3/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/local/Cellar/cmake/3.4.3/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-
-.PHONY : install/strip/fast
-
 # The main all target
 all: cmake_check_build_system
 	cd /Users/pod/scantailor && $(CMAKE_COMMAND) -E cmake_progress_start /Users/pod/scantailor/CMakeFiles /Users/pod/scantailor/math/spfit/tests/CMakeFiles/progress.marks
@@ -270,7 +259,6 @@ help:
 	@echo "... install/local"
 	@echo "... list_install_components"
 	@echo "... install"
-	@echo "... install/strip"
 	@echo "... spfit_tests"
 	@echo "... TestSqDistApproximant.o"
 	@echo "... TestSqDistApproximant.i"
