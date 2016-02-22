@@ -1,0 +1,6 @@
+SIGNATURE=1456113531,3878
+SYSTEM_INCLUDES=QPointF vector
+INCLUDES=FlagOps.h NumericTraits.h VirtualFunction.h
+C_MD5_SUM=G35o/i/8oBGXQ+cnBWc47Q
+LIBS=
+END=

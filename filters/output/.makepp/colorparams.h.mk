@@ -1,0 +1,6 @@
+LIBS=
+SIGNATURE=1456113530,1975
+SYSTEM_INCLUDES=
+INCLUDES=BlackWhiteOptions.h ColorGrayscaleOptions.h
+C_MD5_SUM=knzPsI8s9S0cjGJALuvxyw
+END=

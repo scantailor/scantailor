@@ -1,0 +1,6 @@
+LIBS=
+C_MD5_SUM=Y2TbY9CBRZIggisi51Keiw
+INCLUDES=CommandLine.h ConsoleBatch.h FileNameDisambiguator.h ImageFileInfo.h ImageId.h ImageInfo.h LoadFileTask.h OrthogonalRotation.h OutputFileNameGenerator.h PageInfo.h PageSelectionAccessor.h PageSequence.h ProcessingTaskQueue.h ProjectPages.h ProjectReader.h ProjectWriter.h SelectedPage.h StageSequence.h ThumbnailPixmapCache.h Utils.h filters/deskew/CacheDrivenTask.h filters/deskew/Filter.h filters/deskew/Settings.h filters/deskew/Task.h filters/fix_orientation/CacheDrivenTask.h filters/fix_orientation/Filter.h filters/fix_orientation/Settings.h filters/fix_orientation/Task.h filters/output/CacheDrivenTask.h filters/output/Filter.h filters/output/Params.h filters/output/Settings.h filters/output/Task.h filters/page_layout/CacheDrivenTask.h filters/page_layout/Filter.h filters/page_layout/Settings.h filters/page_layout/Task.h filters/page_split/CacheDrivenTask.h filters/page_split/Filter.h filters/page_split/Settings.h filters/page_split/Task.h filters/select_content/CacheDrivenTask.h filters/select_content/Filter.h filters/select_content/Settings.h filters/select_content/Task.h
+SYSTEM_INCLUDES=QDomDocument QMap assert.h iostream vector
+SIGNATURE=1456113606,13033
+END=
