@@ -47,10 +47,13 @@ DraggableLineSegment::dragInitiated(QPointF const& mouse_pos)
 	m_initialMousePos = mouse_pos;
 	m_initialLinePos = lineSegmentPosition();
 }
-
+//begin of modified by monday2000
+//Blue_Dewarp_Line_Vert_Drag
 void
-DraggableLineSegment::dragContinuation(QPointF const& mouse_pos)
+//DraggableLineSegment::dragContinuation(QPointF const& mouse_pos)
+DraggableLineSegment::dragContinuation(QPointF const& mouse_pos, Qt::KeyboardModifiers mask)
 {
-	lineSegmentMoveRequest(m_initialLinePos.translated(mouse_pos - m_initialMousePos));
+	//lineSegmentMoveRequest(m_initialLinePos.translated(mouse_pos - m_initialMousePos));
+	lineSegmentMoveRequest(m_initialLinePos.translated(mouse_pos - m_initialMousePos), mask);
 }
-
+//end of modified by monday2000

@@ -126,7 +126,15 @@ Task::Task(IntrusivePtr<Filter> const& filter,
 	IntrusivePtr<Settings> const& settings,
 	IntrusivePtr<ThumbnailPixmapCache> const& thumbnail_cache,
 	PageId const& page_id, OutputFileNameGenerator const& out_file_name_gen,
-	ImageViewTab const last_tab, bool const batch, bool const debug)
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+	//ImageViewTab const last_tab, bool const batch, bool const debug)
+	ImageViewTab const last_tab, bool const batch, bool const debug,
+	bool const dont_equalize_illumination_pic_zones,
+	bool const keep_orig_fore_subscan,
+//Original_Foreground_Mixed
+	QImage* const p_orig_fore_subscan)
+//end of modified by monday2000
 :	m_ptrFilter(filter),
 	m_ptrSettings(settings),
 	m_ptrThumbnailCache(thumbnail_cache),
@@ -134,7 +142,15 @@ Task::Task(IntrusivePtr<Filter> const& filter,
 	m_outFileNameGen(out_file_name_gen),
 	m_lastTab(last_tab),
 	m_batchProcessing(batch),
-	m_debug(debug)
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+	//m_debug(debug)
+	m_debug(debug),
+	m_dont_equalize_illumination_pic_zones(dont_equalize_illumination_pic_zones),
+	m_keep_orig_fore_subscan(keep_orig_fore_subscan),
+//Original_Foreground_Mixed
+	m_p_orig_fore_subscan(p_orig_fore_subscan)
+//end of modified by monday2000
 {
 	if (debug) {
 		m_ptrDbg.reset(new DebugImages);
@@ -185,11 +201,70 @@ Task::process(
 		generator.outputImageSize(), generator.outputContentRect(),
 		new_xform, params.outputDpi(), params.colorParams(),
 		params.dewarpingMode(), params.distortionModel(),
+//begin of modified by monday2000
+//Picture_Shape
 		params.depthPerception(), params.despeckleLevel() 
+		, params.pictureShape()
+//end of modified by monday2000
 	);
 
-	ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
+//begin of modified by monday2000
+//Quadro_Zoner
+	//ZoneSet const new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
+	ZoneSet new_picture_zones(m_ptrSettings->pictureZonesForPage(m_pageId));
+//end of modified by monday2000
 	ZoneSet const new_fill_zones(m_ptrSettings->fillZonesForPage(m_pageId));
+
+//begin of modified by monday2000
+//Original_Foreground_Mixed
+//added:
+
+	if (m_keep_orig_fore_subscan) {
+
+		QImage out_img;	
+		BinaryImage automask_img;	
+		BinaryImage speckles_img;
+
+		// Even in batch processing mode we should still write automask, because it
+		// will be needed when we view the results back in interactive mode.
+		// The same applies even more to speckles file, as we need it not only
+		// for visualization purposes, but also for re-doing despeckling at
+		// different levels without going through the whole output generation process.
+		bool const write_automask = render_params.mixedOutput();
+		bool const write_speckles_file = params.despeckleLevel() != DESPECKLE_OFF &&
+			params.colorParams().colorMode() != ColorParams::COLOR_GRAYSCALE; 
+
+		automask_img = BinaryImage();
+		speckles_img = BinaryImage();
+
+		DistortionModel distortion_model;
+		if (params.dewarpingMode() == DewarpingMode::MANUAL) {
+			distortion_model = params.distortionModel();
+		}
+		// OutputGenerator will write a new distortion model
+		// there, if dewarping mode is AUTO.
+
+		out_img = generator.process(
+			status, data, new_picture_zones, new_fill_zones,
+			params.dewarpingMode(), distortion_model,
+			params.depthPerception(),
+			m_dont_equalize_illumination_pic_zones,
+			m_keep_orig_fore_subscan,
+			write_automask ? &automask_img : 0,
+			write_speckles_file ? &speckles_img : 0,
+			m_ptrDbg.get()
+//begin of modified by monday2000
+//Picture_Shape
+			, params.pictureShape()
+//end of modified by monday2000
+		);	
+
+//Original_Foreground_Mixed
+		*m_p_orig_fore_subscan = out_img;
+		
+		return FilterResultPtr(0);
+	}
+//end of modified by monday2000
 	
 	bool need_reprocess = false;
 	do { // Just to be able to break from it.
@@ -305,12 +380,29 @@ Task::process(
 			status, data, new_picture_zones, new_fill_zones,
 			params.dewarpingMode(), distortion_model,
 			params.depthPerception(),
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+			m_dont_equalize_illumination_pic_zones,
+			false,
+//end of modified by monday2000
 			write_automask ? &automask_img : 0,
 			write_speckles_file ? &speckles_img : 0,
 			m_ptrDbg.get()
+//begin of modified by monday2000
+//Picture_Shape
+			, params.pictureShape()
+//Quadro_Zoner
+            , &m_pageId, &m_ptrSettings
+//end of modified by monday2000
 		);
 
-		if (params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid()) {
+		if ((params.dewarpingMode() == DewarpingMode::AUTO && distortion_model.isValid())
+//begin of modified by monday2000
+//Marginal_Dewarping
+			|| (params.dewarpingMode() == DewarpingMode::MARGINAL && distortion_model.isValid())
+//end of modified by monday2000
+			) {
 			// A new distortion model was generated.
 			// We need to save it to be able to modify it manually.
 			params.setDistortionModel(distortion_model);

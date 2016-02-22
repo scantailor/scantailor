@@ -65,7 +65,14 @@ OptionsWidget::OptionsWidget(
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
-	
+
+//begin of modified by monday2000
+//Picture_Shape
+	pictureShapeSelector->addItem(tr("Free"), FREE_SHAPE);
+	pictureShapeSelector->addItem(tr("Surrounded"), RECTANGULAR_SHAPE);
+	pictureShapeSelector->addItem(tr("Quadro"), QUADRO_SHAPE);
+	labePictureShape->setText(tr("Picture Shape"));
+//end of modified by monday2000	
 	darkerThresholdLink->setText(
 		Utils::richTextForLink(darkerThresholdLink->text())
 	);
@@ -86,6 +93,13 @@ OptionsWidget::OptionsWidget(
 		colorModeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(colorModeChanged(int))
 	);
+//begin of modified by monday2000
+//Picture_Shape
+	connect(
+		pictureShapeSelector, SIGNAL(currentIndexChanged(int)),
+		this, SLOT(pictureShapeChanged(int))
+	);
+//end of modified by monday2000	
 	connect(
 		whiteMarginsCB, SIGNAL(clicked(bool)),
 		this, SLOT(whiteMarginsToggled(bool))
@@ -171,6 +185,10 @@ OptionsWidget::preUpdateUI(PageId const& page_id)
 	m_pageId = page_id;
 	m_outputDpi = params.outputDpi();
 	m_colorParams = params.colorParams();
+//begin of modified by monday2000
+//Picture_Shape
+	m_pictureShape = params.pictureShape();
+//end of modified by monday2000
 	m_dewarpingMode = params.dewarpingMode();
 	m_depthPerception = params.depthPerception();
 	m_despeckleLevel = params.despeckleLevel();
@@ -200,7 +218,12 @@ OptionsWidget::distortionModelChanged(dewarping::DistortionModel const& model)
 	m_ptrSettings->setDistortionModel(m_pageId, model);
 	
 	// Note that OFF remains OFF while AUTO becomes MANUAL.
-	if (m_dewarpingMode == DewarpingMode::AUTO) {
+//begin of modified by monday2000
+// Manual_Dewarp_Auto_Switch
+// OFF becomes MANUAL too.
+// Commented the code below.
+	/*if (m_dewarpingMode == DewarpingMode::AUTO)*/ {
+//end of modified by monday2000
 		m_ptrSettings->setDewarpingMode(m_pageId, DewarpingMode::MANUAL);
 		m_dewarpingMode = DewarpingMode::MANUAL;
 		updateDewarpingDisplay();
@@ -216,6 +239,17 @@ OptionsWidget::colorModeChanged(int const idx)
 	updateColorsDisplay();
 	emit reloadRequested();
 }
+
+//begin of modified by monday2000
+//Picture_Shape
+void
+OptionsWidget::pictureShapeChanged(int const idx)
+{
+	m_pictureShape = (PictureShape)(pictureShapeSelector->itemData(idx).toInt());
+	m_ptrSettings->setPictureShape(m_pageId, m_pictureShape);
+	emit reloadRequested();
+}
+//end of modified by monday2000
 
 void
 OptionsWidget::whiteMarginsToggled(bool const checked)
@@ -350,6 +384,10 @@ OptionsWidget::applyColorsConfirmed(std::set<PageId> const& pages)
 {
 	BOOST_FOREACH(PageId const& page_id, pages) {
 		m_ptrSettings->setColorParams(page_id, m_colorParams);
+//begin of modified by monday2000
+//Picture_Shape
+		m_ptrSettings->setPictureShape(page_id, m_pictureShape);
+//end of modified by monday2000
 		emit invalidateThumbnail(page_id);
 	}
 	
@@ -461,7 +499,12 @@ OptionsWidget::dewarpingChanged(std::set<PageId> const& pages, DewarpingMode con
 			// we reload not just on TAB_FILL_ZONES but on all tabs except TAB_DEWARPING.
 			// PS: the static original <-> dewarped mappings are constructed
 			// in Task::UiUpdater::updateUI().  Look for "new DewarpingPointMapper" there.
-			if (mode == DewarpingMode::AUTO || m_lastTab != TAB_DEWARPING) {
+			if (mode == DewarpingMode::AUTO || m_lastTab != TAB_DEWARPING
+//begin of modified by monday2000
+//Marginal_Dewarping
+				|| mode == DewarpingMode::MARGINAL
+//end of modified by monday2000
+				) {
 				// Switch to the Output tab after reloading.
 				m_lastTab = TAB_OUTPUT; 
 
@@ -568,6 +611,11 @@ OptionsWidget::reloadIfNecessary()
 		return;
 	} else if (saved_dewarping_mode == DewarpingMode::AUTO && params.dewarpingMode() == DewarpingMode::AUTO) {
 		// The check below doesn't matter in this case.
+//begin of modified by monday2000
+//Marginal_Dewarping
+	} else if (saved_dewarping_mode == DewarpingMode::MARGINAL && params.dewarpingMode() == DewarpingMode::MARGINAL) {
+		// The check below doesn't matter in this case.
+//end of modified by monday2000
 	} else if (!saved_distortion_model.matches(params.distortionModel())) {
 		emit reloadRequested();
 		return;
@@ -601,6 +649,10 @@ OptionsWidget::updateColorsDisplay()
 	
 	bool color_grayscale_options_visible = false;
 	bool bw_options_visible = false;
+//begin of modified by monday2000
+//Picture_Shape
+	bool picture_shape_visible = false;
+//end of modified by monday2000
 	switch (color_mode) {
 		case ColorParams::BLACK_AND_WHITE:
 			bw_options_visible = true;
@@ -610,6 +662,10 @@ OptionsWidget::updateColorsDisplay()
 			break;
 		case ColorParams::MIXED:
 			bw_options_visible = true;
+//begin of modified by monday2000
+//Picture_Shape
+			picture_shape_visible = true;
+//end of modified by monday2000
 			break;
 	}
 	
@@ -624,8 +680,20 @@ OptionsWidget::updateColorsDisplay()
 	}
 	
 	modePanel->setVisible(m_lastTab != TAB_DEWARPING);
+//begin of modified by monday2000
+//Picture_Shape
+	pictureShapeOptions->setVisible(picture_shape_visible);
+//end of modified by monday2000
 	bwOptions->setVisible(bw_options_visible);
 	despecklePanel->setVisible(bw_options_visible && m_lastTab != TAB_DEWARPING);
+
+//begin of modified by monday2000
+//Picture_Shape
+	if (picture_shape_visible) {
+		int const picture_shape_idx = pictureShapeSelector->findData(m_pictureShape);
+		pictureShapeSelector->setCurrentIndex(picture_shape_idx);
+	}
+//end of modified by monday2000
 
 	if (bw_options_visible) {
 		switch (m_despeckleLevel) {
@@ -667,6 +735,12 @@ OptionsWidget::updateDewarpingDisplay()
 		case DewarpingMode::MANUAL:
 			dewarpingStatusLabel->setText(tr("Manual"));
 			break;
+//begin of modified by monday2000
+//Marginal_Dewarping
+		case DewarpingMode::MARGINAL:
+			dewarpingStatusLabel->setText(tr("Marginal"));
+			break;
+//end of modified by monday2000
 	}
 
 	depthPerceptionSlider->blockSignals(true);
