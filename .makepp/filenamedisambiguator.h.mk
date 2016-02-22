@@ -1,0 +1,6 @@
+LIBS=
+SYSTEM_INCLUDES=boost/function.hpp memory set
+SIGNATURE=1456113530,2837
+INCLUDES=NonCopyable.h RefCountable.h
+C_MD5_SUM=uF9O2PfFM6TFPsgZrBRxBw
+END=

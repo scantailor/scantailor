@@ -22,6 +22,20 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="AutoSaveProject">
+     <property name="text">
+      <string>Auto-save the existing project</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="DontEqualizeIlluminationPicZones">
+     <property name="text">
+      <string>Don't equalize the illumination in picture zones</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

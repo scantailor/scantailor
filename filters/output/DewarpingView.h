@@ -59,8 +59,11 @@ public slots:
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
 private:
-	static void initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2);
-
+//begin of modified by monday2000
+//Marginal_Dewarping
+	//static void initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2);
+	static void initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2, DewarpingMode const* p_dewarpingMode = NULL);
+//end of modified by monday2000
 	static void fitSpline(XSpline& spline, std::vector<QPointF> const& polyline);
 
 	void paintXSpline(

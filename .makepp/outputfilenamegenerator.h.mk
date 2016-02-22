@@ -1,0 +1,6 @@
+LIBS=
+SYSTEM_INCLUDES=QString Qt
+SIGNATURE=1456113530,1850
+INCLUDES=FileNameDisambiguator.h IntrusivePtr.h
+C_MD5_SUM=PqJvrFU9hv8xoIgfgTkt5Q
+END=

@@ -39,6 +39,11 @@ public:
 
 	explicit SerializableSpline(QDomElement const& el);
 
+//begin of modified by monday2000
+//Quadro_Zoner
+	SerializableSpline(QPolygonF const& polygon);
+//end of modified by monday2000	
+
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
 	SerializableSpline transformed(QTransform const& xform) const;

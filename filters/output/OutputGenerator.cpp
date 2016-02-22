@@ -87,6 +87,10 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
+//begin of modified by monday2000
+//Marginal_Dewarping
+#include "imageproc/OrthogonalRotation.h"
+//end of modified by monday2000
 
 using namespace imageproc;
 using namespace dewarping;
@@ -196,7 +200,15 @@ void reserveBlackAndWhite(QImage& img)
 template<typename MixedPixel>
 void combineMixed(
 	QImage& mixed, BinaryImage const& bw_content,
-	BinaryImage const& bw_mask)
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+	//BinaryImage const& bw_mask)
+	BinaryImage const& bw_mask,
+//added:
+	QImage& original_image,
+	bool dont_equalize_illumination_pic_zones
+	)
+//end of modified by monday2000
 {
 	MixedPixel* mixed_line = reinterpret_cast<MixedPixel*>(mixed.bits());
 	int const mixed_stride = mixed.bytesPerLine() / sizeof(MixedPixel);
@@ -207,7 +219,13 @@ void combineMixed(
 	int const width = mixed.width();
 	int const height = mixed.height();
 	uint32_t const msb = uint32_t(1) << 31;
-	
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:	
+	MixedPixel* original_image_line = reinterpret_cast<MixedPixel*>(original_image.bits());	
+	int const original_image_stride = original_image.bytesPerLine() / sizeof(MixedPixel);
+//end of modified by monday2000
+
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 			if (bw_mask_line[x >> 5] & (msb >> (x & 31))) {
@@ -225,12 +243,24 @@ void combineMixed(
 				mixed_line[x] = static_cast<MixedPixel>(tmp);
 			} else {
 				// Non-B/W content.
-				mixed_line[x] = reserveBlackAndWhite<MixedPixel>(mixed_line[x]);
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+				//mixed_line[x] = reserveBlackAndWhite<MixedPixel>(mixed_line[x]);
+				if (dont_equalize_illumination_pic_zones)
+					mixed_line[x] = reserveBlackAndWhite<MixedPixel>(original_image_line[x]);
+				else
+					mixed_line[x] = reserveBlackAndWhite<MixedPixel>(mixed_line[x]);
+//end of modified by monday2000
 			}
 		}
 		mixed_line += mixed_stride;
 		bw_content_line += bw_content_stride;
 		bw_mask_line += bw_mask_stride;
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+		original_image_line += original_image_stride;
+//end of modified by monday2000
 	}
 }
 
@@ -258,19 +288,51 @@ OutputGenerator::OutputGenerator(
 QImage
 OutputGenerator::process(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 	DewarpingMode dewarping_mode,
 	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+//added:	
+	bool dont_equalize_illumination_pic_zones,
+	bool keep_orig_fore_subscan,
+//end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* const dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* const dbg) const
+	DebugImages* const dbg,
+	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
+	) const
+//end of modified by monday2000
 {
 	QImage image(
 		processImpl(
 			status, input, picture_zones, fill_zones,
 			dewarping_mode, distortion_model, depth_perception,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+//added:		
+			dont_equalize_illumination_pic_zones,
+			keep_orig_fore_subscan,
+//end of modified by monday2000
 			auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+			, picture_shape
+//Quadro_Zoner
+			, p_pageId,
+			p_settings
+//end of modified by monday2000
 		)
 	);
 	assert(!image.isNull());
@@ -310,7 +372,7 @@ OutputGenerator::normalizeIlluminationGray(
 	if (dbg) {
 		dbg->add(to_be_normalized, "to_be_normalized");
 	}
-	
+
 	status.throwIfCancelled();
 	
 	QPolygonF transformed_consideration_area(xform.map(area_to_consider));
@@ -447,22 +509,89 @@ OutputGenerator::modifyBinarizationMask(
 QImage
 OutputGenerator::processImpl(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 	DewarpingMode dewarping_mode,
 	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+//added:	
+	bool dont_equalize_illumination_pic_zones,
+	bool keep_orig_fore_subscan,
+//end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* const dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* const dbg) const
+	DebugImages* const dbg,
+	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
+	) const
+//end of modified by monday2000
 {
 	RenderParams const render_params(m_colorParams);
 
+//begin of modified by monday2000
+//Original_Foreground_Mixed
+//added:
+
+	if (keep_orig_fore_subscan)
+	{
+		if (dewarping_mode == DewarpingMode::AUTO ||
+//begin of modified by monday2000
+//Marginal_Dewarping
+			dewarping_mode == DewarpingMode::MARGINAL ||
+//end of modified by monday2000
+			(dewarping_mode == DewarpingMode::MANUAL && distortion_model.isValid())) {
+				return processWithDewarping(
+					status, input, picture_zones, fill_zones,
+					dewarping_mode, distortion_model, depth_perception,
+					dont_equalize_illumination_pic_zones,
+					keep_orig_fore_subscan,
+					auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+					, picture_shape
+//Quadro_Zoner
+					, p_pageId,
+					p_settings
+//end of modified by monday2000
+					);
+		} else return processAsIs(
+			input, status, fill_zones, depth_perception, dbg
+			);
+	}
+//end of modified by monday2000
+
 	if (dewarping_mode == DewarpingMode::AUTO ||
+//begin of modified by monday2000
+//Marginal_Dewarping
+		dewarping_mode == DewarpingMode::MARGINAL ||
+//end of modified by monday2000
 		(dewarping_mode == DewarpingMode::MANUAL && distortion_model.isValid())) {
 		return processWithDewarping(
 			status, input, picture_zones, fill_zones,
 			dewarping_mode, distortion_model, depth_perception,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:			
+			dont_equalize_illumination_pic_zones,
+			false,
+//end of modified by monday2000
 			auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+			, picture_shape
+//Quadro_Zoner
+			, p_pageId,
+			p_settings
+//end of modified by monday2000
 		);
 	} else if (!render_params.whiteMargins()) {
 		return processAsIs(
@@ -471,7 +600,19 @@ OutputGenerator::processImpl(
 	} else {
 		return processWithoutDewarping(
 			status, input, picture_zones, fill_zones,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:			
+			dont_equalize_illumination_pic_zones,
+//end of modified by monday2000
 			auto_picture_mask, speckles_image, dbg
+//begin of modified by monday2000
+//Picture_Shape
+			, picture_shape
+//Quadro_Zoner
+			, p_pageId,
+			p_settings
+//end of modified by monday2000
 		);
 	}
 }
@@ -530,10 +671,26 @@ OutputGenerator::processAsIs(
 QImage
 OutputGenerator::processWithoutDewarping(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:	
+	bool dont_equalize_illumination_pic_zones,
+//end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* dbg) const
+	DebugImages* dbg,
+	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
+	) const
+//end of modified by monday2000
 {
 	RenderParams const render_params(m_colorParams);
 	
@@ -543,8 +700,12 @@ OutputGenerator::processWithoutDewarping(
 	);
 	
 	// For various reasons, we need some whitespace around the content
-	// area.  This is the number of pixels of such whitespace.
-	int const content_margin = m_dpi.vertical() * 20 / 300;
+	// area.  This is the number of pixels of such whitespace.	
+//begin of modified by monday2000
+//Marginal_Dewarping
+	//int const content_margin = m_dpi.vertical() * 20 / 300;
+	int const content_margin = 40;
+//end of modified by monday2000
 	
 	// The content area (in output image coordinates) extended
 	// with content_margin.  Note that we prevent that extension
@@ -593,6 +754,26 @@ OutputGenerator::processWithoutDewarping(
 			normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
 		);
 	}
+
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+        QImage maybe_normalized_Dont_Equalize_Illumination_Pic_Zones;
+
+		bool const color_original = !input.origImage().allGray();
+
+        if (!color_original)
+
+                maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transformToGray(
+                input.grayImage(), m_xform.transform(),
+                normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
+                );
+        else
+                maybe_normalized_Dont_Equalize_Illumination_Pic_Zones = transform(
+                input.origImage(), m_xform.transform(),
+                normalize_illumination_rect, OutsidePixels::assumeColor(Qt::white)
+                );
+//end of modified by monday2000
 
 	status.throwIfCancelled();
 	
@@ -662,6 +843,53 @@ OutputGenerator::processWithoutDewarping(
 			normalize_illumination_rect,
 			small_margins_rect, dbg
 		);
+//begin of modified by monday2000
+//Picture_Shape
+//Quadro_Zoner
+		if (picture_shape == RECTANGULAR_SHAPE)
+		{
+			bw_mask.rectangularizeAreas(WHITE);
+
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+		}		
+		else if (picture_shape == QUADRO_SHAPE)
+		{
+			if (picture_zones.auto_zones_found())
+				bw_mask.fill(BLACK);
+			else
+			{
+				std::vector<QRect> areas;
+				bw_mask.rectangularizeAreasQuadro(WHITE, areas);				
+
+				QTransform xform1(m_xform.transform());            
+				xform1 *= QTransform().translate(-small_margins_rect.x(), -small_margins_rect.y());
+
+				QTransform inv_xform(xform1.inverted()); 
+
+				for (int i=0; i<(int)areas.size(); i++)
+				{				
+					QRectF area0(areas[i]);
+					QPolygonF area1(area0);
+					QPolygonF area(inv_xform.map(area1));
+
+					Zone zone1(area);
+
+					picture_zones.add(zone1);
+				}
+
+				(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+			}
+		}
+		else
+		{
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+		}
+//end of modified by monday2000
+
 		if (dbg) {
 			dbg->add(bw_mask, "bw_mask");
 		}
@@ -747,14 +975,26 @@ OutputGenerator::processWithoutDewarping(
 		
 		if (maybe_normalized.format() == QImage::Format_Indexed8) {
 			combineMixed<uint8_t>(
-				maybe_normalized, bw_content, bw_mask
+				maybe_normalized, bw_content, bw_mask,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+				maybe_normalized_Dont_Equalize_Illumination_Pic_Zones,
+				dont_equalize_illumination_pic_zones
+//end of modified by monday2000
 			);
 		} else {
 			assert(maybe_normalized.format() == QImage::Format_RGB32
 				|| maybe_normalized.format() == QImage::Format_ARGB32);
-			
+
 			combineMixed<uint32_t>(
-				maybe_normalized, bw_content, bw_mask
+				maybe_normalized, bw_content, bw_mask,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+				maybe_normalized_Dont_Equalize_Illumination_Pic_Zones,				
+				dont_equalize_illumination_pic_zones
+//end of modified by monday2000
 			);
 		}
 	}
@@ -793,13 +1033,31 @@ OutputGenerator::processWithoutDewarping(
 QImage
 OutputGenerator::processWithDewarping(
 	TaskStatus const& status, FilterData const& input,
-	ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+//Quadro_Zoner
+	//ZoneSet const& picture_zones, ZoneSet const& fill_zones,
+	ZoneSet& picture_zones, ZoneSet const& fill_zones,
 	DewarpingMode dewarping_mode,
 	DistortionModel& distortion_model,
 	DepthPerception const& depth_perception,
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//Original_Foreground_Mixed
+//added:	
+	bool dont_equalize_illumination_pic_zones,
+	bool keep_orig_fore_subscan,
+//end of modified by monday2000
 	imageproc::BinaryImage* auto_picture_mask,
 	imageproc::BinaryImage* speckles_image,
-	DebugImages* dbg) const
+//begin of modified by monday2000
+//Picture_Shape
+	//DebugImages* dbg) const
+	DebugImages* dbg,
+	PictureShape picture_shape
+//Quadro_Zoner
+	, PageId* p_pageId,
+	IntrusivePtr<Settings>* p_settings
+	) const
+//end of modified by monday2000
 {
 	QSize const target_size(m_outRect.size().expandedTo(QSize(1, 1)));
 	if (m_outRect.isEmpty()) {
@@ -814,8 +1072,12 @@ OutputGenerator::processWithDewarping(
 	);
 	
 	// For various reasons, we need some whitespace around the content
-	// area.  This is the number of pixels of such whitespace.
-	int const content_margin = m_dpi.vertical() * 20 / 300;
+	// area.  This is the number of pixels of such whitespace.	
+//begin of modified by monday2000
+//Marginal_Dewarping
+	//int const content_margin = m_dpi.vertical() * 20 / 300;
+	int const content_margin = 40;
+//end of modified by monday2000
 	
 	// The content area (in output image coordinates) extended
 	// with content_margin.  Note that we prevent that extension
@@ -875,13 +1137,31 @@ OutputGenerator::processWithDewarping(
 		) * m_xform.transformBack()
 	);
 
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:	
+	QImage normalized_original_Dont_Equalize_Illumination_Pic_Zones;
+
+		if (color_original) {
+			normalized_original_Dont_Equalize_Illumination_Pic_Zones
+				= convertToRGBorRGBA(input.origImage());
+		} else {
+			normalized_original_Dont_Equalize_Illumination_Pic_Zones = input.grayImage();
+		}
+//end of modified by monday2000
+
 	if (!render_params.normalizeIllumination()) {
 		if (color_original) {
 			normalized_original = convertToRGBorRGBA(input.origImage());
 		} else {
 			normalized_original = input.grayImage();
 		}
-		if (dewarping_mode == DewarpingMode::AUTO) {
+		if (dewarping_mode == DewarpingMode::AUTO
+//begin of modified by monday2000
+//Marginal_Dewarping
+			|| dewarping_mode == DewarpingMode::MARGINAL
+//end of modified by monday2000			
+			) {
 			warped_gray_output = transformToGray(
 				input.grayImage(), m_xform.transform(), normalize_illumination_rect,
 				OutsidePixels::assumeWeakColor(Qt::white)
@@ -947,6 +1227,53 @@ OutputGenerator::processWithDewarping(
 			dbg->add(warped_bw_mask, "warped_bw_mask");
 		}
 
+//begin of modified by monday2000
+//Picture_Shape
+//Quadro_Zoner
+		if (picture_shape == RECTANGULAR_SHAPE)
+		{
+			warped_bw_mask.rectangularizeAreas(WHITE);
+
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+		}		
+		else if (picture_shape == QUADRO_SHAPE)
+		{
+			if (picture_zones.auto_zones_found())
+				warped_bw_mask.fill(BLACK);
+			else
+			{
+				std::vector<QRect> areas;
+				warped_bw_mask.rectangularizeAreasQuadro(WHITE, areas);				
+
+				QTransform xform1(m_xform.transform());            
+				xform1 *= QTransform().translate(-small_margins_rect.x(), -small_margins_rect.y());
+
+				QTransform inv_xform(xform1.inverted()); 
+
+				for (int i=0; i<(int)areas.size(); i++)
+				{				
+					QRectF area0(areas[i]);
+					QPolygonF area1(area0);
+					QPolygonF area(inv_xform.map(area1));
+
+					Zone zone1(area);
+
+					picture_zones.add(zone1);
+				}			
+
+				(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+			}
+		}
+		else
+		{
+			picture_zones.remove_auto_zones();
+
+			(*p_settings)->setPictureZones(*p_pageId, picture_zones);
+		}
+//end of modified by monday2000
+
 		status.throwIfCancelled();
 
 		if (auto_picture_mask) {
@@ -996,9 +1323,230 @@ OutputGenerator::processWithDewarping(
 		);
 		
 		distortion_model = model_builder.tryBuildModel(dbg, &input.grayImage().toQImage());
+
+//begin of modified by monday2000
+//Auto_Dewarping_Vert_Half_Correction
+
+		BinaryThreshold bw_threshold(64);	
+		BinaryImage bw_image(input.grayImage(), bw_threshold);
+
+		QTransform transform = m_xform.preRotation().transform(bw_image.size());
+		QTransform inv_transform = transform.inverted();
+
+		int degrees = m_xform.preRotation().toDegrees();
+		bw_image = orthogonalRotation(bw_image, degrees);
+
+		std::vector<QPointF> const& top_polyline0 = distortion_model.topCurve().polyline();
+		std::vector<QPointF> const& bottom_polyline0 = distortion_model.bottomCurve().polyline();
+
+		std::vector<QPointF> top_polyline;
+		std::vector<QPointF> bottom_polyline;
+
+		for (int i=0; i<(int)top_polyline0.size(); i++)
+			top_polyline.push_back(transform.map(top_polyline0[i]));
+
+		for (int i=0; i<(int)bottom_polyline0.size(); i++)
+			bottom_polyline.push_back(transform.map(bottom_polyline0[i]));
+
+		//QImage out_image(bw_image.toQImage().convertToFormat(QImage::Format_RGB32));
+		//for (int i=0; i<(int)top_polyline.size(); i++) drawPoint(out_image, top_polyline[i]);
+		//for (int i=0; i<(int)bottom_polyline.size(); i++) drawPoint(out_image, bottom_polyline[i]);
+		//TiffWriter::writeImage("C:\\bw_dewarp.tif", out_image);
+
+		PageId const& pageId = *p_pageId;
+
+		QString stAngle;
+
+		float max_angle = 2.75; // chosen empirically
+
+		//QFile file("C:\\st_angle.txt");
+		//file.open(QIODevice::WriteOnly | QIODevice::Text);
+		//QTextStream out(&file);
+		//out << "degrees = " << QString::number(degrees) << endl;
+
+		if (pageId.subPage() == PageId::SINGLE_PAGE || pageId.subPage() == PageId::LEFT_PAGE)
+		{
+			float vert_skew_angle_left = vert_border_skew_angle(top_polyline.front(), bottom_polyline.front());
+
+			stAngle.setNum(vert_skew_angle_left);
+
+			//out << "vert_skew_angle_left = " << stAngle << endl;
+
+			if (vert_skew_angle_left > max_angle)
+			{
+				//out << "vert_skew_angle_left correction" << endl;
+
+				float top_x = top_polyline.front().x();
+				float bottom_x = bottom_polyline.front().x();
+
+				if (top_x < bottom_x)
+				{
+					std::vector<QPointF> new_bottom_polyline;
+
+					QPointF pt(top_x, bottom_polyline.front().y());
+
+					new_bottom_polyline.push_back(pt);
+
+					for (int i=0; i<(int)bottom_polyline.size(); i++)
+						new_bottom_polyline.push_back(inv_transform.map(bottom_polyline[i]));
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_bottom_polyline));
+				}
+				else
+				{
+					std::vector<QPointF> new_top_polyline;
+
+					QPointF pt(bottom_x, top_polyline.front().y());
+
+					new_top_polyline.push_back(pt);
+
+					for (int i=0; i<(int)top_polyline.size(); i++)
+						new_top_polyline.push_back(inv_transform.map(top_polyline[i]));
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_top_polyline));
+				}
+			}
+		}
+		else
+		{
+			float vert_skew_angle_right = vert_border_skew_angle(top_polyline.back(), bottom_polyline.back());
+
+			stAngle.setNum(vert_skew_angle_right);
+			
+			//out << "vert_skew_angle_right = " << stAngle << endl;
+
+			if (vert_skew_angle_right > max_angle)
+			{				
+				//out << "vert_skew_angle_right correction" << endl;
+
+				float top_x = top_polyline.back().x();
+				float bottom_x = bottom_polyline.back().x();
+
+				if (top_x > bottom_x)
+				{
+					std::vector<QPointF> new_bottom_polyline;
+
+					QPointF pt(top_x, bottom_polyline.back().y());
+
+					for (int i=0; i<(int)bottom_polyline.size(); i++)
+						new_bottom_polyline.push_back(inv_transform.map(bottom_polyline[i]));
+
+					new_bottom_polyline.push_back(pt);
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_bottom_polyline));
+				}
+				else
+				{
+					std::vector<QPointF> new_top_polyline;
+
+					QPointF pt(bottom_x, top_polyline.back().y());					
+
+					for (int i=0; i<(int)top_polyline.size(); i++)
+						new_top_polyline.push_back(inv_transform.map(top_polyline[i]));
+
+					new_top_polyline.push_back(pt);
+
+					distortion_model.setBottomCurve(dewarping::Curve(new_top_polyline));
+				}			
+			}	
+		}
+
+		//file.close();
+
+//end of modified by monday2000
+
 		if (!distortion_model.isValid()) {
 			setupTrivialDistortionModel(distortion_model);
 		}
+//begin of modified by monday2000
+//Marginal_Dewarping
+	}
+	else if (dewarping_mode == DewarpingMode::MARGINAL)
+	{
+		BinaryThreshold bw_threshold(64);	
+		BinaryImage bw_image(input.grayImage(), bw_threshold);
+
+		QTransform transform = m_xform.preRotation().transform(bw_image.size());
+		QTransform inv_transform = transform.inverted();
+
+		int degrees = m_xform.preRotation().toDegrees();
+		bw_image = orthogonalRotation(bw_image, degrees);
+
+		setupTrivialDistortionModel(distortion_model);
+
+		PageId const& pageId = *p_pageId;		
+
+		int max_red_points = 5; //the more the curling the more this value
+		
+		XSpline top_spline;
+
+		std::vector<QPointF> const& top_polyline = distortion_model.topCurve().polyline();
+
+		QLineF const top_line(transform.map(top_polyline.front()), transform.map(top_polyline.back()));
+
+		top_spline.appendControlPoint(top_line.p1(), 0);
+
+		if (pageId.subPage() == PageId::SINGLE_PAGE || pageId.subPage() == PageId::LEFT_PAGE)
+		{
+			for (int i=29-max_red_points; i<29; i++)
+				top_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}
+		else
+		{
+			for (int i=1; i<=max_red_points; i++)
+				top_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}		
+
+		top_spline.appendControlPoint(top_line.p2(), 0);
+
+		for (int i=0; i<=top_spline.numSegments(); i++) movePointToTopMargin(bw_image, top_spline, i);
+
+		for (int i=0; i<=top_spline.numSegments(); i++)
+			top_spline.moveControlPoint(i,inv_transform.map(top_spline.controlPointPosition(i)));
+
+		distortion_model.setTopCurve(dewarping::Curve(top_spline));
+
+//bottom:
+
+		XSpline bottom_spline;
+
+		std::vector<QPointF> const& bottom_polyline = distortion_model.bottomCurve().polyline();
+
+		QLineF const bottom_line(transform.map(bottom_polyline.front()), transform.map(bottom_polyline.back()));
+
+		bottom_spline.appendControlPoint(bottom_line.p1(), 0);
+
+		if (pageId.subPage() == PageId::SINGLE_PAGE || pageId.subPage() == PageId::LEFT_PAGE)
+		{
+			for (int i=29-max_red_points; i<29; i++)
+				bottom_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}
+		else
+		{
+			for (int i=1; i<=max_red_points; i++)
+				bottom_spline.appendControlPoint(top_line.pointAt((float)i/29.0), 1);
+		}
+
+		bottom_spline.appendControlPoint(bottom_line.p2(), 0);
+
+		for (int i=0; i<=bottom_spline.numSegments(); i++) movePointToBottomMargin(bw_image, bottom_spline, i);
+
+		for (int i=0; i<=bottom_spline.numSegments(); i++)
+			bottom_spline.moveControlPoint(i,inv_transform.map(bottom_spline.controlPointPosition(i)));
+
+		distortion_model.setBottomCurve(dewarping::Curve(bottom_spline));
+
+		if (!distortion_model.isValid()) {		
+			setupTrivialDistortionModel(distortion_model);
+		}
+
+		if (dbg) {
+			QImage out_image(bw_image.toQImage().convertToFormat(QImage::Format_RGB32));
+			for (int i=0; i<=top_spline.numSegments(); i++) drawPoint(out_image, top_spline.controlPointPosition(i));
+			for (int i=0; i<=bottom_spline.numSegments(); i++) drawPoint(out_image, bottom_spline.controlPointPosition(i));
+			dbg->add(out_image, "marginal dewarping");
+		}
+//end of modified by monday2000
 	}
 
 	warped_gray_output = GrayImage(); // Save memory.
@@ -1021,6 +1569,49 @@ OutputGenerator::processWithDewarping(
 		);
 		bg_color = QColor(dominant_gray, dominant_gray, dominant_gray);
 	}
+
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+
+	QImage dewarped_Dont_Equalize_Illumination_Pic_Zones;
+	try {
+		dewarped_Dont_Equalize_Illumination_Pic_Zones = dewarp(
+			QTransform(), normalized_original_Dont_Equalize_Illumination_Pic_Zones,
+			m_xform.transform(),
+			distortion_model, depth_perception, bg_color
+		);
+	} catch (std::runtime_error const&) {
+		// Probably an impossible distortion model.  Let's fall back to a trivial one.
+		setupTrivialDistortionModel(distortion_model);
+		dewarped_Dont_Equalize_Illumination_Pic_Zones = dewarp(
+			QTransform(), normalized_original_Dont_Equalize_Illumination_Pic_Zones,
+			m_xform.transform(),
+			distortion_model, depth_perception, bg_color
+		);
+	}
+	normalized_original_Dont_Equalize_Illumination_Pic_Zones = QImage(); // Save memory.
+
+//Original_Foreground_Mixed
+	if (keep_orig_fore_subscan)
+	{
+
+	boost::shared_ptr<DewarpingPointMapper> mapper(
+		new DewarpingPointMapper(
+			distortion_model, depth_perception.value(),
+			m_xform.transform(), m_contentRect
+		)
+	);
+	boost::function<QPointF(QPointF const&)> const orig_to_output(
+		boost::bind(&DewarpingPointMapper::mapToDewarpedSpace, mapper, _1)
+	);
+
+		applyFillZonesInPlace(dewarped_Dont_Equalize_Illumination_Pic_Zones, fill_zones, orig_to_output);
+//Marginal_Dewarping
+		maybe_deskew(&dewarped_Dont_Equalize_Illumination_Pic_Zones, dewarping_mode);
+		return dewarped_Dont_Equalize_Illumination_Pic_Zones;
+	}
+//end of modified by monday2000
 
 	QImage dewarped;
 	try {
@@ -1090,8 +1681,11 @@ OutputGenerator::processWithDewarping(
 		);
 
 		applyFillZonesInPlace(dewarped_bw_content, fill_zones, orig_to_output);
-
-		return dewarped_bw_content.toQImage();
+//begin of modified by monday2000
+		QImage tmp_image(dewarped_bw_content.toQImage()); 
+		maybe_deskew(&tmp_image, dewarping_mode);		
+		return tmp_image;		
+//end of modified by monday2000
 	}
 
 	if (!render_params.mixedOutput()) {
@@ -1158,21 +1752,42 @@ OutputGenerator::processWithDewarping(
 		
 		if (dewarped.format() == QImage::Format_Indexed8) {
 			combineMixed<uint8_t>(
-				dewarped, dewarped_bw_content, dewarped_bw_mask
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+				//dewarped, dewarped_bw_content, dewarped_bw_mask
+				dewarped, dewarped_bw_content, dewarped_bw_mask,
+				dewarped_Dont_Equalize_Illumination_Pic_Zones,
+				dont_equalize_illumination_pic_zones
+//end of modified by monday2000
 			);
 		} else {
 			assert(dewarped.format() == QImage::Format_RGB32
 				|| dewarped.format() == QImage::Format_ARGB32);
 			
 			combineMixed<uint32_t>(
-				dewarped, dewarped_bw_content, dewarped_bw_mask
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+				//dewarped, dewarped_bw_content, dewarped_bw_mask
+				dewarped, dewarped_bw_content, dewarped_bw_mask,
+				dewarped_Dont_Equalize_Illumination_Pic_Zones,
+				dont_equalize_illumination_pic_zones
+//end of modified by monday2000
 			);
 		}
 	}
 
-	applyFillZonesInPlace(dewarped, fill_zones, orig_to_output);
+//begin of modified by monday2000
+//Dont_Equalize_Illumination_Pic_Zones
+//added:
+	dewarped_Dont_Equalize_Illumination_Pic_Zones = QImage(); // Save memory.
+//end of modified by monday2000
 
+	applyFillZonesInPlace(dewarped, fill_zones, orig_to_output);
+//begin of modified by monday2000
+//Marginal_Dewarping	
+	maybe_deskew(&dewarped, dewarping_mode);
 	return dewarped;
+//end of modified by monday2000
 }
 
 /**
@@ -1852,5 +2467,192 @@ OutputGenerator::applyFillZonesInPlace(
 		img, zones, boost::bind((MapPointFunc)&QTransform::map, m_xform.transform(), _1)
 	);
 }
+
+//begin of modified by monday2000
+//Marginal_Dewarping
+void 
+OutputGenerator::movePointToTopMargin(BinaryImage& bw_image, XSpline& spline, int idx) const //added
+{
+	QPointF pos = spline.controlPointPosition(idx);
+
+	for (int j=0; j<pos.y(); j++)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj<(j+check_num); jj++)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;			
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);
+
+				spline.moveControlPoint(idx,pos);
+
+				break;
+			}
+		}
+	}
+}
+
+void 
+OutputGenerator::movePointToBottomMargin(BinaryImage& bw_image, XSpline& spline, int idx) const //added
+{
+	QPointF pos = spline.controlPointPosition(idx);
+
+	for (int j=bw_image.height()-1; j>pos.y(); j--)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj>(j-check_num); jj--)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);
+
+				spline.moveControlPoint(idx,pos);
+
+				break;
+			}
+		}
+	}
+}
+
+void
+OutputGenerator::drawPoint(QImage& image, QPointF const& pt) const
+{
+	QPoint pts = pt.toPoint();
+
+	for (int i=pts.x()-10;i<pts.x()+10;i++)
+	{
+		for (int j=pts.y()-10;j<pts.y()+10;j++)
+		{		
+		
+		QPoint p1(i,j);	
+		
+		image.setPixel(p1, qRgb(255, 0, 0));
+
+		}
+	}
+}
+
+void 
+OutputGenerator::movePointToTopMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const //added
+{
+	QPointF& pos = polyline[idx];
+
+	for (int j=0; j<pos.y(); j++)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj<(j+check_num); jj++)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;			
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);			
+
+				break;
+			}
+		}
+	}
+}
+
+void 
+OutputGenerator::movePointToBottomMargin(BinaryImage& bw_image, std::vector<QPointF>& polyline, int idx) const //added
+{
+	QPointF& pos = polyline[idx];
+
+	for (int j=bw_image.height()-1; j>pos.y(); j--)
+	{
+		if (bw_image.getPixel(pos.x(),j) == WHITE)
+		{
+			int count = 0;
+			int check_num = 16;
+
+			for (int jj=j; jj>(j-check_num); jj--)
+			{
+				if (bw_image.getPixel(pos.x(),jj) == WHITE)
+					count++;
+			}
+
+			if (count == check_num)
+			{
+				pos.setY(j);				
+
+				break;
+			}
+		}
+	}
+}
+
+float
+OutputGenerator::vert_border_skew_angle(QPointF const& top, QPointF const& bottom) const
+{
+	 return qFabs(qAtan((bottom.x() - top.x()) / (bottom.y() - top.y())) * 180/M_PI);
+}
+
+void
+OutputGenerator::maybe_deskew(QImage* p_dewarped, DewarpingMode dewarping_mode) const
+{
+	if (dewarping_mode == DewarpingMode::MARGINAL 
+		|| dewarping_mode == DewarpingMode::MANUAL
+		)
+	{
+		//TiffWriter::writeImage("C:\\st\\dewarped.tif", dewarped);
+
+		BinaryThreshold bw_threshold(128);	
+		BinaryImage bw_image(*p_dewarped, bw_threshold);
+
+		SkewFinder skew_finder;
+		Skew const skew(skew_finder.findSkew(bw_image));
+		if (skew.angle() != 0.0 && skew.confidence() >= Skew::GOOD_CONFIDENCE)
+		{
+			double const angle_deg = skew.angle();
+
+			//QFile file("C:\\st\\scan_tailor.txt");
+			//file.open(QIODevice::WriteOnly | QIODevice::Text);
+			//QTextStream out(&file);
+			//QString stDeskewAngle;	
+			//stDeskewAngle.setNum(angle_deg);
+			//out << "deskew angle: " << stDeskewAngle << endl;
+			//QMessageBox::information(0,"i",stDeskewAngle);
+
+			QPointF center(p_dewarped->width()/2, p_dewarped->height()/2);
+
+			QTransform rot;		
+			rot.translate(center.x(),center.y());
+			rot.rotate(-angle_deg);		
+			rot.translate(-center.x(),-center.y());
+
+			*p_dewarped = imageproc::transform(*p_dewarped, rot, p_dewarped->rect(), OutsidePixels::assumeWeakColor(Qt::white));
+
+			//TiffWriter::writeImage("C:\\st\\dewarped2.tif", dewarped);
+			
+			//file.close();
+		}
+	}
+
+	//return dewarped;
+}
+//end of modified by monday2000
 
 } // namespace output

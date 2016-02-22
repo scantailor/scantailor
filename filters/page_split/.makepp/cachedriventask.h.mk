@@ -1,0 +1,6 @@
+C_MD5_SUM=dpIqlUUjO9tWapljAbBWzQ
+INCLUDES=IntrusivePtr.h NonCopyable.h RefCountable.h
+SIGNATURE=1456113531,1638
+SYSTEM_INCLUDES=
+LIBS=
+END=
