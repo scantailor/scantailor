@@ -1,0 +1,660 @@
+
+
+
+
+
+
+
+
+
+
+
+                                    RANLIB.C
+
+            Library of C Routines for Random Number Generation
+
+
+
+
+
+
+
+
+                       Full Documentation of Each Routine
+
+
+
+
+
+
+
+
+                            Compiled and Written by:
+
+                                 Barry W. Brown
+                                  James Lovato
+                                   
+
+
+
+
+
+
+
+
+
+                     Department of Biomathematics, Box 237
+                     The University of Texas, M.D. Anderson Cancer Center
+                     1515 Holcombe Boulevard
+                     Houston, TX      77030
+
+
+ This work was supported by grant CA-16672 from the National Cancer Institute.
+
+***********************************************************************
+     void advnst(long k)
+               ADV-a-N-ce ST-ate
+
+     Advances the state  of  the current  generator  by 2^K values  and
+     resets the initial seed to that value.
+
+     This is  a  transcription from   Pascal to  Fortran    of  routine
+     Advance_State from the paper
+
+     L'Ecuyer, P. and  Cote, S. "Implementing  a  Random Number Package
+     with  Splitting   Facilities."  ACM  Transactions  on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     k -> The generator is advanced by2^K values
+**********************************************************************
+**********************************************************************
+     float genbet(float aa,float bb)
+               GeNerate BETa random deviate
+
+                              Function
+
+     Returns a single random deviate from the beta distribution with
+     parameters A and B.  The density of the beta is
+               x^(a-1) * (1-x)^(b-1) / B(a,b) for 0 < x < 1
+
+                              Arguments
+
+     aa --> First parameter of the beta distribution
+       
+     bb --> Second parameter of the beta distribution
+       
+                              Method
+
+     R. C. H. Cheng
+     Generating Beta Variatew with Nonintegral Shape Parameters
+     Communications of the ACM, 21:317-322  (1978)
+     (Algorithms BB and BC)
+**********************************************************************
+**********************************************************************
+     float genchi(float df)
+                Generate random value of CHIsquare variable
+
+                              Function
+
+     Generates random deviate from the distribution of a chisquare
+     with DF degrees of freedom random variable.
+
+                              Arguments
+
+     df --> Degrees of freedom of the chisquare
+            (Must be positive)
+       
+
+                              Method
+
+     Uses relation between chisquare and gamma.
+**********************************************************************
+**********************************************************************
+     float genexp(float av)
+                    GENerate EXPonential random deviate
+
+                              Function
+
+     Generates a single random deviate from an exponential
+     distribution with mean AV.
+
+                              Arguments
+
+     av --> The mean of the exponential distribution from which
+            a random deviate is to be generated.
+
+                              Method
+
+     Renames SEXPO from TOMS as slightly modified by BWB to use RANF
+     instead of SUNIF.
+     For details see:
+               Ahrens, J.H. and Dieter, U.
+               Computer Methods for Sampling From the
+               Exponential and Normal Distributions.
+               Comm. ACM, 15,10 (Oct. 1972), 873 - 882.
+**********************************************************************
+**********************************************************************
+     float genf(float dfn,float dfd)
+                GENerate random deviate from the F distribution
+
+                              Function
+
+     Generates a random deviate from the F (variance ratio)
+     distribution with DFN degrees of freedom in the numerator
+     and DFD degrees of freedom in the denominator.
+
+                              Arguments
+
+     dfn --> Numerator degrees of freedom
+             (Must be positive)
+
+     dfd --> Denominator degrees of freedom
+             (Must be positive)
+
+                              Method
+
+     Directly generates ratio of chisquare variates
+**********************************************************************
+**********************************************************************
+     float gengam(float a,float r)
+           GENerates random deviates from GAMma distribution
+
+                              Function
+
+     Generates random deviates from the gamma distribution whose
+     density is
+          (A**R)/Gamma(R) * X**(R-1) * Exp(-A*X)
+
+                              Arguments
+
+     a --> Location parameter of Gamma distribution
+
+     r --> Shape parameter of Gamma distribution
+
+                              Method
+
+     Renames SGAMMA from TOMS as slightly modified by BWB to use RANF
+     instead of SUNIF.
+     For details see:
+               (Case R >= 1.0)
+               Ahrens, J.H. and Dieter, U.
+               Generating Gamma Variates by a
+               Modified Rejection Technique.
+               Comm. ACM, 25,1 (Jan. 1982), 47 - 54.
+     Algorithm GD
+               (Case 0.0 <= R <= 1.0)
+               Ahrens, J.H. and Dieter, U.
+               Computer Methods for Sampling from Gamma,
+               Beta, Poisson and Binomial Distributions.
+               Computing, 12 (1974), 223-246/
+     Adapted algorithm GS.
+**********************************************************************
+**********************************************************************
+     void genmn(float *parm,float *x,float *work)
+              GENerate Multivariate Normal random deviate
+
+                              Arguments
+
+     parm --> Parameters needed to generate multivariate normal
+               deviates (MEANV and Cholesky decomposition of
+               COVM). Set by a previous call to SETGMN.
+               1 : 1                - size of deviate, P
+               2 : P + 1            - mean vector
+               P+2 : P*(P+3)/2 + 1  - upper half of cholesky
+                                       decomposition of cov matrix
+
+     x    <-- Vector deviate generated.
+
+     work <--> Scratch array
+
+                              Method
+
+     1) Generate P independent standard normal deviates - Ei ~ N(0,1)
+     2) Using Cholesky decomposition find A s.t. trans(A)*A = COVM
+     3) trans(A)E + MEANV ~ N(MEANV,COVM)
+**********************************************************************
+**********************************************************************
+
+     void genmul(int n,float *p,int ncat,int *ix)
+     GENerate an observation from the MULtinomial distribution
+
+                              Arguments
+
+     N --> Number of events that will be classified into one of
+           the categories 1..NCAT
+
+     P --> Vector of probabilities.  P(i) is the probability that
+           an event will be classified into category i.  Thus, P(i)
+           must be [0,1]. Only the first NCAT-1 P(i) must be defined
+           since P(NCAT) is 1.0 minus the sum of the first
+           NCAT-1 P(i).
+
+     NCAT --> Number of categories.  Length of P and IX.
+     IX <-- Observation from multinomial distribution.  All IX(i)
+            will be nonnegative and their sum will be N.
+
+                              Method
+
+     Algorithm from page 559 of
+
+     Devroye, Luc
+
+     Non-Uniform Random Variate Generation.  Springer-Verlag,
+     New York, 1986.
+
+**********************************************************************
+**********************************************************************
+     float gennch(float df,float xnonc)
+           Generate random value of Noncentral CHIsquare variable
+
+                              Function
+
+     Generates random deviate  from the  distribution  of a  noncentral
+     chisquare with DF degrees  of freedom and noncentrality  parameter
+     xnonc.
+
+                              Arguments
+
+     df --> Degrees of freedom of the chisquare
+            (Must be > 1.0)
+
+     xnonc --> Noncentrality parameter of the chisquare
+               (Must be >= 0.0)
+
+                              Method
+
+     Uses fact that  noncentral chisquare  is  the  sum of a  chisquare
+     deviate with DF-1  degrees of freedom plus the  square of a normal
+     deviate with mean XNONC and standard deviation 1.
+**********************************************************************
+**********************************************************************
+     float gennf(float dfn,float dfd,float xnonc)
+           GENerate random deviate from the Noncentral F distribution
+
+                              Function
+
+     Generates a random deviate from the  noncentral F (variance ratio)
+     distribution with DFN degrees of freedom in the numerator, and DFD
+     degrees of freedom in the denominator, and noncentrality parameter
+     XNONC.
+
+                              Arguments
+
+     dfn --> Numerator degrees of freedom
+             (Must be >= 1.0)
+
+     dfd --> Denominator degrees of freedom
+             (Must be positive)
+
+     xnonc --> Noncentrality parameter
+               (Must be nonnegative)
+
+                              Method
+
+     Directly generates ratio of noncentral numerator chisquare variate
+     to central denominator chisquare variate.
+**********************************************************************
+**********************************************************************
+     float gennor(float av,float sd)
+         GENerate random deviate from a NORmal distribution
+
+                              Function
+
+     Generates a single random deviate from a normal distribution
+     with mean, AV, and standard deviation, SD.
+
+                              Arguments
+
+     av --> Mean of the normal distribution.
+
+     sd --> Standard deviation of the normal distribution.
+
+                              Method
+
+     Renames SNORM from TOMS as slightly modified by BWB to use RANF
+     instead of SUNIF.
+     For details see:
+               Ahrens, J.H. and Dieter, U.
+               Extensions of Forsythe's Method for Random
+               Sampling from the Normal Distribution.
+               Math. Comput., 27,124 (Oct. 1973), 927 - 937.
+**********************************************************************
+**********************************************************************
+    void genprm(long *iarray,int larray)
+               GENerate random PeRMutation of iarray
+
+                              Arguments
+
+     iarray <--> On output IARRAY is a random permutation of its
+                 value on input
+
+     larray <--> Length of IARRAY
+**********************************************************************
+**********************************************************************
+     float genunf(float low,float high)
+               GeNerate Uniform Real between LOW and HIGH
+
+                              Function
+
+     Generates a real uniformly distributed between LOW and HIGH.
+
+                              Arguments
+
+     low --> Low bound (exclusive) on real value to be generated
+
+     high --> High bound (exclusive) on real value to be generated
+**********************************************************************
+**********************************************************************
+     void getsd(long *iseed1,long *iseed2)
+               GET SeeD
+
+     Returns the value of two integer seeds of the current generator
+
+     This  is   a  transcription from  Pascal   to  Fortran  of routine
+     Get_State from the paper
+
+     L'Ecuyer, P. and  Cote,  S. "Implementing a Random Number  Package
+     with   Splitting Facilities."  ACM  Transactions   on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     iseed1 <- First integer seed of generator G
+
+     iseed2 <- Second integer seed of generator G
+**********************************************************************
+**********************************************************************
+     void gscgn(long getset,long *g)
+                         Get/Set GeNerator
+
+     Gets or returns in G the number of the current generator
+
+                              Arguments
+
+     getset --> 0 Get
+                1 Set
+
+     g <-- Number of the current random number generator (1..32)
+**********************************************************************
+**********************************************************************
+     long ignbin(long n,float pp)
+                    GENerate BINomial random deviate
+
+                              Function
+
+     Generates a single random deviate from a binomial
+     distribution whose number of trials is N and whose
+     probability of an event in each trial is P.
+
+                              Arguments
+
+     n  --> The number of trials in the binomial distribution
+            from which a random deviate is to be generated.
+
+     p  --> The probability of an event in each trial of the
+            binomial distribution from which a random deviate
+            is to be generated.
+
+     ignbin <-- A random deviate yielding the number of events
+                from N independent trials, each of which has
+                a probability of event P.
+
+                              Method
+
+     This is algorithm BTPE from:
+         Kachitvichyanukul, V. and Schmeiser, B. W.
+         Binomial Random Variate Generation.
+         Communications of the ACM, 31, 2
+         (February, 1988) 216.
+**********************************************************************
+**********************************************************************
+
+     long ignnbn(long n,float p)
+                GENerate Negative BiNomial random deviate
+
+                              Function
+
+     Generates a single random deviate from a negative binomial
+     distribution.
+
+                              Arguments
+
+     N  --> The number of trials in the negative binomial distribution
+            from which a random deviate is to be generated.
+
+     P  --> The probability of an event.
+
+                              Method
+
+     Algorithm from page 480 of
+
+     Devroye, Luc
+
+     Non-Uniform Random Variate Generation.  Springer-Verlag,
+     New York, 1986.
+**********************************************************************
+**********************************************************************
+     long ignlgi(void)
+               GeNerate LarGe Integer
+
+     Returns a random integer following a uniform distribution over
+     (1, 2147483562) using the current generator.
+
+     This is a transcription from Pascal to Fortran of routine
+     Random from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+**********************************************************************
+**********************************************************************
+     long ignpoi(float mu)
+                    GENerate POIsson random deviate
+
+                              Function
+
+     Generates a single random deviate from a Poisson
+     distribution with mean AV.
+
+                              Arguments
+
+     mu --> The mean of the Poisson distribution from which
+            a random deviate is to be generated.
+
+                              Method
+
+     Renames KPOIS from TOMS as slightly modified by BWB to use RANF
+     instead of SUNIF.
+     For details see:
+               Ahrens, J.H. and Dieter, U.
+               Computer Generation of Poisson Deviates
+               From Modified Normal Distributions.
+               ACM Trans. Math. Software, 8, 2
+               (June 1982),163-179
+**********************************************************************
+**********************************************************************
+     long ignuin(long low,long high)
+               GeNerate Uniform INteger
+
+                              Function
+
+     Generates an integer uniformly distributed between LOW and HIGH.
+
+                              Arguments
+
+     low --> Low bound (inclusive) on integer value to be generated
+
+     high --> High bound (inclusive) on integer value to be generated
+                              Note
+     If (HIGH-LOW) > 2,147,483,561 prints error message on * unit and
+     stops the program.
+**********************************************************************
+**********************************************************************
+     void initgn(long isdtyp)
+          INIT-ialize current G-e-N-erator
+
+     Reinitializes the state of the current generator
+
+     This is a transcription from Pascal to Fortran of routine
+     Init_Generator from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     isdtyp -> The state to which the generator is to be set
+          isdtyp = -1  => sets the seeds to their initial value
+          isdtyp =  0  => sets the seeds to the first value of
+                          the current block
+          isdtyp =  1  => sets the seeds to the first value of
+                          the next block
+**********************************************************************
+**********************************************************************
+     long mltmod(long a,long s,long m)
+                    Returns (A*S) MOD M
+
+     This is a transcription from Pascal to Fortran of routine
+     MULtMod_Decompos from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     a, s, m  -->
+**********************************************************************
+**********************************************************************
+     void phrtsd(char* phrase,long *seed1,long *seed2)
+               PHRase To SeeDs
+
+                              Function
+
+     Uses a phrase (character string) to generate two seeds for the RGN
+     random number generator.
+
+                              Arguments
+
+     phrase --> Phrase to be used for random number generation
+      
+     seed1 <-- First seed for generator
+                        
+     seed2 <-- Second seed for generator
+                        
+                              Note
+
+     Trailing blanks are eliminated before the seeds are generated.
+     Generated seed values will fall in the range 1..2^30
+     (1..1,073,741,824)
+**********************************************************************
+**********************************************************************
+     float ranf(void)
+                RANDom number generator as a Function
+
+     Returns a random floating point number from a uniform distribution
+     over 0 - 1 (endpoints of this interval are not returned) using the
+     current generator
+
+     This is a transcription from Pascal to Fortran of routine
+     Uniform_01 from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+**********************************************************************
+**********************************************************************
+     void setall(long iseed1,long iseed2)
+               SET ALL random number generators
+
+     Sets the initial seed of generator 1 to ISEED1 and ISEED2. The
+     initial seeds of the other generators are set accordingly, and
+     all generators states are set to these seeds.
+
+     This is a transcription from Pascal to Fortran of routine
+     Set_Initial_Seed from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     iseed1 -> First of two integer seeds
+
+     iseed2 -> Second of two integer seeds
+**********************************************************************
+**********************************************************************
+     void setant(long qvalue)
+               SET ANTithetic
+
+     Sets whether the current generator produces antithetic values.  If
+     X   is  the value  normally returned  from  a uniform [0,1] random
+     number generator then 1  - X is the antithetic  value. If X is the
+     value  normally  returned  from a   uniform  [0,N]  random  number
+     generator then N - 1 - X is the antithetic value.
+
+     All generators are initialized to NOT generate antithetic values.
+
+     This is a transcription from Pascal to Fortran of routine
+     Set_Antithetic from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     qvalue -> nonzero if generator G is to generating antithetic
+                    values, otherwise zero
+**********************************************************************
+**********************************************************************
+     void setgmn(float *meanv,float *covm,long p,float *parm)
+            SET Generate Multivariate Normal random deviate
+
+                              Function
+
+      Places P, MEANV, and the Cholesky factoriztion of COVM
+      in GENMN.
+
+                              Arguments
+
+     meanv --> Mean vector of multivariate normal distribution.
+
+     covm   <--> (Input) Covariance   matrix    of  the  multivariate
+                 normal distribution
+                 (Output) Destroyed on output
+
+     p     --> Dimension of the normal, or length of MEANV.
+
+     parm <-- Array of parameters needed to generate multivariate norma
+                deviates (P, MEANV and Cholesky decomposition of
+                COVM).
+                1 : 1                - P
+                2 : P + 1            - MEANV
+                P+2 : P*(P+3)/2 + 1  - Cholesky decomposition of COVM
+               Needed dimension is (p*(p+3)/2 + 1)
+**********************************************************************
+**********************************************************************
+     void setsd(long iseed1,long iseed2)
+               SET S-ee-D of current generator
+
+     Resets the initial  seed of  the current  generator to  ISEED1 and
+     ISEED2. The seeds of the other generators remain unchanged.
+
+     This is a transcription from Pascal to Fortran of routine
+     Set_Seed from the paper
+
+     L'Ecuyer, P. and Cote, S. "Implementing a Random Number Package
+     with Splitting Facilities." ACM Transactions on Mathematical
+     Software, 17:98-111 (1991)
+
+                              Arguments
+
+     iseed1 -> First integer seed
+
+     iseed2 -> Second integer seed
+**********************************************************************
