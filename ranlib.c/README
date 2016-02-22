@@ -1,0 +1,339 @@
+
+
+
+
+
+
+
+
+
+
+
+                                    RANLIB.C
+
+               Library of C Routines for Random Number Generation
+
+
+
+
+
+
+
+
+                                     README
+
+
+
+
+
+
+
+
+                            Compiled and Written by:
+
+                                 Barry W. Brown
+                                  James Lovato
+                                   
+
+
+
+
+
+
+
+
+
+                     Department of Biomathematics, Box 237
+                     The University of Texas, M.D. Anderson Cancer Center
+                     1515 Holcombe Boulevard
+                     Houston, TX      77030
+
+
+ This work was supported by grant CA-16672 from the National Cancer Institute.
+
+
+
+
+                       THANKS TO OUR SUPPORTERS
+
+This work  was supported  in part by  grant CA-16672 from the National
+Cancer Institute.  We are grateful  to Larry and  Pat McNeil of Corpus
+Cristi for their generous support.  Some equipment used in this effort
+was provided by IBM as part of a cooperative study agreement; we thank
+them.
+
+                          SUMMARY OF RANLIB
+
+The bottom level routines provide 32 virtual random number generators.
+Each generator can provide 1,048,576 blocks of numbers, and each block
+is of length 1,073,741,824.  Any generator can be set to the beginning
+or end  of the current  block or to  its starting value.  Packaging is
+provided   so  that  if  these capabilities  are not  needed, a single
+generator with period 2.3 X 10^18 is seen.
+
+Using this base, routines are provided that return:
+    (1)  Beta random deviates
+    (2)  Chi-square random deviates
+    (3)  Exponential random deviates
+    (4)  F random deviates
+    (5)  Gamma random deviates
+    (6)  Multivariate normal random deviates (mean and covariance
+         matrix specified)
+    (7)  Noncentral chi-square random deviates
+    (8)  Noncentral F random deviates
+    (9)  Univariate normal random deviates
+    (10) Random permutations of an integer array
+    (11) Real uniform random deviates between specified limits
+    (12) Binomial random deviates
+    (13) Negative Binomial random deviates
+    (14) Multinomial random deviates
+    (15) Poisson random deviates
+    (16) Integer uniform deviates between specified limits
+    (17) Seeds for the random number generator calculated from a
+         character string
+
+
+
+
+                 COMMENTS ON THE C VERSION OF RANLIB
+
+The C version was  obtained by converting the original  Fortran RANLIB
+to C using PROMULA.FORTRAN  and performing  some hand  crafting of the
+result.  Information on PROMULA.FORTRAN can be obtained from
+
+                   PROMULA Development Corporation
+                    3620 N. High Street, Suite 301
+                         Columbus, Ohio 43214
+                            (614) 263-5454
+
+RANLIB.C  was tested  using the xlc  compiler under AIX  3.1 on an IBM
+RS/6000.  The code  was  also examined  with lint  on the same system.
+The RANLIB test  programs were also  successfully run using   the  gcc
+compiler (see below) on a Solbourne.
+
+RANLIB.C can be  obtained from  statlib.  Send mail  whose message  is
+'send ranlib.c.shar from general' to statlib@lib.stat.cmu.edu.
+
+RANLIB.C can also be obtained by anonymous ftp  to odin.mda.uth.tmc.edu
+(129.106.3.17) where is is available as
+                        /pub/unix/ranlib.c.tar.Z
+
+For  obvious   reasons, the   original   RANLIB  (in    Fortran)   has
+been renamed to
+                        /pub/unix/ranlib.f.tar.Z
+on the same machine.
+
+
+
+
+
+
+                                 CAVEAT
+
+RANLIB.C is written in ANSI C and makes  heavy use  of prototypes.  It
+will not compile under old style (KR) C compilers (such as the default
+Sun cc compiler). The decision to  distribute in  ANSI C was mine; the
+version of Promula that was used --  2.0 --  writes old style headers.
+Converting RANLIB to  old style C  is not a  totally trivial task; the
+type of many arguments to functions will have to be changed from float
+to double.  Also note that all ints have been changed  to longs.  This
+is a result of my being a Fortraner,  a  novice at C, and knowing that
+the underlying generators require at least a 32 bit integer.
+
+I don't  recommend conversion to an  obsolete C dialect.  Instead, get
+the  Free  Software Foundation's  excellent  ANSI C compiler,  gcc. It
+compiles KR C as well as  ANSI C. A  version of gcc that  runs on many
+varieties of Unix is available by anonymous ftp as
+                        /pub/gnu/gcc-1.40.tar.Z
+at prep.ai.mit.edu  (18.71.0.38).   A Vax version  is also  present on
+/pub/gnu.  The compilers  are also available  on tape.  Write the Free
+Software Foundation at:
+
+                    Free Software Foundation, Inc.
+                       675 Massachusetts Avenue
+                         Cambridge, MA  02139
+                        Phone: (617) 876-3296
+
+A MSDOS port of gcc, performed by DJ Delorie is also available by ftp.
+
+File location:
+
+    host:      grape.ecs.clarkson.edu
+    login:     ftp
+    password:  send your e-mail address
+    directory: ~ftp/pub/msdos/djgcc
+
+File in .ZIP format - djgpp.zip - one 2.2M file, contains everything.
+
+
+
+
+
+                             INSTALLATION
+
+Directory src contains the  C source for most   of the routines.   The
+files  com.c   and  ranlib.c  constitute  RANLIB.  The file   ranlib.h
+contains prototypes for  the RANLIB  routines that should be used (and
+not  for  a few internal  routines).    Directory linpack contains two
+linpack routines needed by  the multivariate generator.  If linpack is
+present on your machine,  you  won't need these routines.  The Fortran
+code  from  these   directories should be  compiled  and  placed  in a
+library.  Directory test  contains three test  programs for this code.
+The file ranlib.h in directory test is a copy of that in src.
+
+
+
+                            DOCUMENTATION
+
+Documentation  is  on directory doc on the  distribution.   All of the
+documentation is  in the  form   of  character  (ASCII)    files.   An
+explanation of the concepts involved in the base generator and details
+of its implementation are contained in Basegen.doc.  A summary  of all
+of the  available  routines is  contained  in ranlib.chs  (chs  is  an
+abbreviation of 'cheat sheet').  The 'chs'  file  will probably be the
+reference to ranlib  that is primarily used.   The  file, ranlib.fdoc,
+contains all comments heading  each routine.   There is somewhat  more
+information   in  'fdoc' than  'chs',  but  the additional information
+consists primarily of references to the literature.
+
+
+                               SOURCES
+
+The following routines,  which  were  written by others   and  lightly
+modified for consistency in packaging, are included in RANLIB.
+
+                        Bottom Level Routines
+
+These routines are a transliteration of the Pascal in the reference to
+Fortran.
+
+L'Ecuyer, P. and  Cote, S. "Implementing  a Random Number Package with
+Splitting  Facilities."  ACM  Transactions   on Mathematical Software,
+17:98-111 (1991)
+
+
+
+
+                             Exponential
+
+This code was obtained from Netlib.
+
+Ahrens,  J.H. and  Dieter, U.   Computer Methods for Sampling From the
+Exponential and Normal  Distributions.  Comm. ACM,  15,10 (Oct. 1972),
+873 - 882.
+
+                                Gamma
+
+(Case R >= 1.0)                                          
+
+Ahrens, J.H. and Dieter, U.  Generating Gamma  Variates by  a Modified
+Rejection Technique.  Comm. ACM, 25,1 (Jan. 1982), 47 - 54.
+Algorithm GD                                                       
+
+(Case 0.0 <= R <= 1.0)                                   
+
+Ahrens, J.H. and Dieter, U.  Computer Methods for Sampling from Gamma,
+Beta,  Poisson  and Binomial   Distributions.    Computing, 12 (1974),
+223-246.  Adaptation of algorithm GS.
+
+                                Normal
+
+This code was obtained from netlib.
+
+Ahrens, J.H.  and  Dieter, U.    Extensions of   Forsythe's Method for
+Random Sampling  from  the Normal Distribution.  Math. Comput., 27,124
+(Oct. 1973), 927 - 937.
+
+                               Binomial
+
+This code was kindly sent me by Dr. Kachitvichyanukul.
+
+Kachitvichyanukul,  V. and Schmeiser, B.   W.  Binomial Random Variate
+Generation.  Communications of the ACM, 31, 2 (February, 1988) 216.
+
+                               Poisson
+
+This code was obtained from netlib.
+
+Ahrens,  J.H. and Dieter, U.   Computer Generation of Poisson Deviates
+From Modified  Normal Distributions.  ACM Trans.  Math. Software, 8, 2
+(June 1982),163-179
+
+
+
+
+                                 Beta
+
+This code was written by us following the recipe in the following.
+
+R. C.  H.   Cheng Generating  Beta Variables  with  Nonintegral  Shape
+Parameters. Communications of  the ACM,  21:317-322 (1978) (Algorithms
+BB and BC)
+
+                               Linpack
+
+Routines SPOFA and SDOT are used to perform the Cholesky decomposition
+of  the covariance  matrix  in  SETGMN  (used  for  the  generation of
+multivariate normal deviates).
+
+Dongarra, J.  J., Moler,   C.  B., Bunch, J.   R. and  Stewart, G.  W.
+Linpack User's Guide.  SIAM Press, Philadelphia.  (1979)
+
+
+
+
+
+
+
+                              LEGALITIES
+
+Code that appeared  in an    ACM  publication  is subject  to    their
+algorithms policy:
+
+     Submittal of  an  algorithm    for publication  in   one of   the  ACM
+     Transactions implies that unrestricted use  of the algorithm within  a
+     computer is permissible.   General permission  to copy and  distribute
+     the algorithm without fee is granted provided that the copies  are not
+     made  or   distributed for  direct   commercial  advantage.    The ACM
+     copyright notice and the title of the publication and its date appear,
+     and  notice is given that copying  is by permission of the Association
+     for Computing Machinery.  To copy otherwise, or to republish, requires
+     a fee and/or specific permission.
+
+     Krogh, F.  Algorithms  Policy.  ACM  Tran.   Math.  Softw.   13(1987),
+     183-186.
+
+We place the Ranlib code that we have written in the public domain.  
+
+                                 NO WARRANTY
+     
+     WE PROVIDE ABSOLUTELY  NO WARRANTY  OF ANY  KIND  EITHER  EXPRESSED OR
+     IMPLIED,  INCLUDING BUT   NOT LIMITED TO,  THE  IMPLIED  WARRANTIES OF
+     MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK
+     AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS  WITH YOU.  SHOULD
+     THIS PROGRAM PROVE  DEFECTIVE, YOU ASSUME  THE COST  OF  ALL NECESSARY
+     SERVICING, REPAIR OR CORRECTION.
+     
+     IN NO  EVENT  SHALL THE UNIVERSITY  OF TEXAS OR  ANY  OF ITS COMPONENT
+     INSTITUTIONS INCLUDING M. D.   ANDERSON HOSPITAL BE LIABLE  TO YOU FOR
+     DAMAGES, INCLUDING ANY  LOST PROFITS, LOST MONIES,   OR OTHER SPECIAL,
+     INCIDENTAL   OR  CONSEQUENTIAL DAMAGES   ARISING   OUT  OF  THE USE OR
+     INABILITY TO USE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA OR
+     ITS ANALYSIS BEING  RENDERED INACCURATE OR  LOSSES SUSTAINED  BY THIRD
+     PARTIES) THE PROGRAM.
+     
+     (Above NO WARRANTY modified from the GNU NO WARRANTY statement.)
+
+
+
+
+
+
+                         WHAT'S NEW IN VERSION 1.1?
+
+  
+Random number generation  for  the Negative Binomial  and  Multinomial
+distributions has been included.
+
+Two errors in the code  which generates random  numbers from the Gamma
+distribution were fixed.
