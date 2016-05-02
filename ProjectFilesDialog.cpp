@@ -279,7 +279,7 @@ ProjectFilesDialog::inProjectFiles() const
 	using namespace boost::lambda;
 	
 	std::vector<ImageFileInfo> files;
-	m_ptrInProjectFiles->items(bind(&pushFileInfo<Item>, boost::ref(files), _1));
+	m_ptrInProjectFiles->items(boost::lambda::bind(&pushFileInfo<Item>, boost::ref(files), _1));
 	
 	std::sort(files.begin(), files.end(), imageFileInfoLess);
 	
@@ -419,8 +419,10 @@ ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 		
 		std::vector<QFileInfo> new_files(files.begin(), files.end());
 		std::vector<QFileInfo> existing_files;
+		void (std::vector<QFileInfo>::*push_back) (const QFileInfo&) =
+			&std::vector<QFileInfo>::push_back;
 		m_ptrInProjectFiles->files(
-			bind(&std::vector<QFileInfo>::push_back, var(existing_files), _1)
+			boost::lambda::bind(push_back, var(existing_files), _1)
 		);
 		std::sort(new_files.begin(), new_files.end(), FileInfoLess());
 		std::sort(existing_files.begin(), existing_files.end(), FileInfoLess());
@@ -437,7 +439,7 @@ ProjectFilesDialog::setInputDir(QString const& dir, bool const auto_add_files)
 	ItemList items;
 	std::for_each(
 		files.begin(), files.end(),
-		bind(
+		boost::lambda::bind(
 			&pushItemWithFlags<Item, ItemList>,
 			_1, boost::ref(items), cref(m_supportedExtensions)
 		)
@@ -471,7 +473,8 @@ ProjectFilesDialog::addToProject()
 	typedef std::vector<Item> ItemList;
 	ItemList items;
 	
-	m_ptrOffProjectFiles->items(selection, bind(&ItemList::push_back, var(items), _1));
+	void (ItemList::*push_back) (const Item&) = &ItemList::push_back;
+	m_ptrOffProjectFiles->items(selection, boost::lambda::bind(push_back, var(items), _1));
 	
 	m_ptrInProjectFiles->append(items.begin(), items.end());
 	m_ptrOffProjectFiles->remove(selection);
@@ -508,7 +511,7 @@ ProjectFilesDialog::removeFromProject()
 	ItemList items;
 	
 	m_ptrInProjectFiles->items(
-		selection, bind(
+		selection, boost::lambda::bind(
 			&pushItemIfSameDir<Item, ItemList>,
 			boost::ref(items), _1, cref(input_dir)
 		)
@@ -691,10 +694,10 @@ ProjectFilesDialog::FileList::remove(QItemSelection const& selection)
 	std::transform(
 		selection.begin(), selection.end(),
 		std::back_inserter(sorted_ranges),
-		bind(
+		boost::lambda::bind(
 			constructor<Range>(),
-			bind(&QItemSelectionRange::top, _1),
-			bind(&QItemSelectionRange::bottom, _1)
+			boost::lambda::bind(&QItemSelectionRange::top, _1),
+			boost::lambda::bind(&QItemSelectionRange::bottom, _1)
 		)
 	);
 	
@@ -703,7 +706,8 @@ ProjectFilesDialog::FileList::remove(QItemSelection const& selection)
 	
 	std::sort(
 		sorted_ranges.begin(), sorted_ranges.end(),
-		bind((IntMemPtr)&Range::first, _1) < bind((IntMemPtr)&Range::first, _2)
+		boost::lambda::bind((IntMemPtr)&Range::first, _1) <
+			boost::lambda::bind((IntMemPtr)&Range::first, _2)
 	);
 	
 	QVectorIterator<Range> it(sorted_ranges);
@@ -765,7 +769,7 @@ ProjectFilesDialog::FileList::prepareForLoadingFiles()
 	
 	std::sort(
 		item_indexes.begin(), item_indexes.end(),
-		bind(
+		boost::lambda::bind(
 			&ItemVisualOrdering::operator(), ItemVisualOrdering(),
 			var(m_items)[_1], var(m_items)[_2]
 		)
@@ -787,10 +791,11 @@ ProjectFilesDialog::FileList::loadNextFile()
 	Item& item = m_items[item_idx];
 	std::vector<ImageMetadata> per_page_metadata;
 	QString const file_path(item.fileInfo().absoluteFilePath());
+	void (std::vector<ImageMetadata>::*push_back) (const ImageMetadata&) =
+		&std::vector<ImageMetadata>::push_back;
 	ImageMetadataLoader::Status const st = ImageMetadataLoader::load(
-		file_path, bind(
-			&std::vector<ImageMetadata>::push_back,
-			var(per_page_metadata), _1
+		file_path, boost::lambda::bind(
+			push_back, var(per_page_metadata), _1
 		)
 	);
 	
