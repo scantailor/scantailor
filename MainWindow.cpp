@@ -133,6 +133,7 @@
 #include <stddef.h>
 #include <math.h>
 #include <assert.h>
+#include <QThread>
 
 class MainWindow::PageSelectionProviderImpl : public PageSelectionProvider
 {
@@ -165,7 +166,9 @@ MainWindow::MainWindow()
 	m_ignoreSelectionChanges(0),
 	m_ignorePageOrderingChanges(0),
 	m_debug(false),
-	m_closing(false)
+    m_closing(false),
+    m_isMultithreaded(false),
+    m_threadCount(2)
 {
 	m_maxLogicalThumbSize = QSize(250, 160);
 	m_ptrThumbSequence.reset(new ThumbnailSequence(m_maxLogicalThumbSize));
@@ -298,6 +301,32 @@ MainWindow::MainWindow()
 		this, SLOT(close())
 	);
 	
+    //Basic Multithreaded Support
+    this->setMultithreaded(false);
+    addAction(actionEnable_Multithreading);
+    connect(actionEnable_Multithreading, SIGNAL(toggled(bool)),
+        this, SLOT(setMultithreaded(bool))
+    );
+
+    // determine number of threads
+    m_threadCount = QThread::idealThreadCount() -1;
+    if (m_threadCount == -1) {
+        m_threadCount = 2;
+    }
+
+    // create WorkerThread Objects
+    for (int i = 0; i < m_threadCount; i++) {
+         m_WorkerThreads.append(new WorkerThread);
+     }
+
+    // connect each WorkerThread to filterResult slot
+     foreach(WorkerThread* w_item, m_WorkerThreads) {
+         connect(w_item,SIGNAL(taskResult(BackgroundTaskPtr const&, FilterResultPtr const&)),
+                 this, SLOT(filterResult(BackgroundTaskPtr const&, FilterResultPtr const&)));
+    }
+
+    //end: Basic Multithread Support
+
 	updateProjectActions();
 	updateWindowTitle();
 	updateMainArea();
@@ -1184,12 +1213,26 @@ MainWindow::startBatchProcessing()
 	filterList->setBatchProcessingInProgress(true);
 	filterList->setEnabled(false);
 
-	BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
-	if (task) {
-		m_ptrWorkerThread->performTask(task);
-	} else {
-		stopBatchProcessing();
-	}
+    // Basic Multithread Support
+    if ( isMultithreaded() ) {
+        foreach(WorkerThread* item, m_WorkerThreads) {
+             BackgroundTaskPtr task(m_ptrBatchQueue->takeForProcessing());
+             if (task) {
+                 item->performTask(task);
+             } else {
+                 stopBatchProcessing();
+                 //exit;
+             }
+        }
+    } else {
+        // Non-Multithreaded
+        BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
+        if (task) {
+            m_ptrWorkerThread->performTask(task);
+        } else {
+            stopBatchProcessing();
+        }
+    }
 
 	page = m_ptrBatchQueue->selectedPage();
 	if (!page.isNull()) {
@@ -1276,10 +1319,24 @@ MainWindow::filterResult(BackgroundTaskPtr const& task, FilterResultPtr const& r
 			return;
 		}
 
-		BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
-		if (task) {
-			m_ptrWorkerThread->performTask(task);
-		}
+        // Basic Multithread Support
+        if ( isMultithreaded() ) {
+            // check all threads, if still running. if not, assign new task
+            foreach (WorkerThread* w_item, m_WorkerThreads) {
+                 if ( !(w_item->isRunning()) ) {
+                     BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
+                     if (task) {
+                         w_item->performTask(task);
+                     }
+                 }
+            }
+        } else {
+            // Non-Multithreaded
+            BackgroundTaskPtr const task(m_ptrBatchQueue->takeForProcessing());
+            if (task) {
+                m_ptrWorkerThread->performTask(task);
+            }
+        }
 
 		PageInfo const page(m_ptrBatchQueue->selectedPage());
 		if (!page.isNull()) {
@@ -1710,7 +1767,13 @@ MainWindow::updateWindowTitle()
 		project_name = QFileInfo(m_projectFile).baseName();
 	}
 	QString const version(QString::fromUtf8(VERSION));
+    // Multithread Indicator
+    if ( isMultithreaded() ) {
+        setWindowTitle(tr("%2 - Scan Tailor %3 [%1bit] [Worker Threads: %4]").arg(sizeof(void*)*8)
+                       .arg(project_name, version).arg(m_threadCount));
+    } else {
 	setWindowTitle(tr("%2 - Scan Tailor %3 [%1bit]").arg(sizeof(void*)*8).arg(project_name, version));
+    }
 }
 
 /**
@@ -2159,4 +2222,16 @@ MainWindow::newPageSelectionAccessor()
 {
 	IntrusivePtr<PageSelectionProvider const> provider(new PageSelectionProviderImpl(this));
 	return PageSelectionAccessor(provider);
+}
+
+//Basic Multithread Support
+bool MainWindow::isMultithreaded()
+{
+    return m_isMultithreaded;
+}
+
+void MainWindow::setMultithreaded(bool v_isMultithreaded)
+{
+    m_isMultithreaded = v_isMultithreaded;
+    updateWindowTitle();
 }

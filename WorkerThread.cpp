@@ -117,6 +117,7 @@ WorkerThread::WorkerThread(QObject* parent)
 :	QObject(parent),
 	m_ptrImpl(new Impl(*this))
 {
+    m_isRunning = false;
 }
 
 WorkerThread::~WorkerThread()
@@ -134,6 +135,7 @@ WorkerThread::performTask(BackgroundTaskPtr const& task)
 {
 	if (m_ptrImpl.get()) {
 		m_ptrImpl->performTask(task);
+        m_isRunning = true;
 	}
 }
 
@@ -142,6 +144,12 @@ WorkerThread::emitTaskResult(
 	BackgroundTaskPtr const& task, FilterResultPtr const& result)
 {
 	emit taskResult(task, result);
+    m_isRunning = false;
+}
+
+bool WorkerThread::isRunning()
+{
+    return m_isRunning;
 }
 
 
