@@ -707,7 +707,7 @@ GrayImage dilateOrErodeGray(
 	}
 	CoordinateSystem const dst_cs(dst_area.topLeft());
 	
-	// Each pixel will be a minumum or maximum of a group of pixels
+	// Each pixel will be a minimum or maximum of a group of pixels
 	// in its neighborhood.  The neighborhood is defined by collect_area.
 	Brick const collect_area(brick.flipped());
 	

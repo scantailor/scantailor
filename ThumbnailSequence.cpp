@@ -1295,7 +1295,7 @@ ThumbnailSequence::Impl::itemInsertPosition(
 	ItemsInOrder::iterator ins_pos(hint);
 	int dist = 0;
 
-	// While the element immediately preceeding ins_pos is supposed to
+	// While the element immediately preceding ins_pos is supposed to
 	// follow the page we are inserting, move ins_pos one element back.
 	while (ins_pos != begin) {
 		ItemsInOrder::iterator prev(ins_pos);

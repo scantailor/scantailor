@@ -327,7 +327,7 @@ PriorityStorageImpl<QualityCompare>::popHeap(
 	
 	// Now raise the node until it's at correct position.  Very little
 	// raising should be necessary, that's why it's faster than adding
-	// an additional comparision to the loop where we lower the node.
+	// an additional comparison to the loop where we lower the node.
 	pushHeap(begin, begin + nodeIdx + 1);
 }
 

@@ -95,7 +95,7 @@ public:
 	/**
 	 * \brief Get the target DPI for pre-scaling.
 	 *
-	 * Note that if the original DPI was assymetric, pre-scaling to
+	 * Note that if the original DPI was asymmetric, pre-scaling to
 	 * a symmetric DPI will be applied implicitly.
 	 */
 	Dpi const& preScaledDpi() const { return m_preScaledDpi; }

@@ -101,7 +101,7 @@ struct CenterComparator
  * \param layout_type The requested layout type.  The layout type of
  *        SINGLE_PAGE_UNCUT is not handled here.
  * \param ltr_lines Folding line candidates sorted from left to right.
- * \param image_size The dimentions of the page image.
+ * \param image_size The dimensions of the page image.
  * \param hor_shadows A downscaled grayscale image that contains
  *        long enough and not too thin horizontal lines.
  * \param dbg An optional sink for debugging images.
@@ -180,7 +180,7 @@ std::auto_ptr<PageLayout> autoDetectSinglePageLayout(
  * \brief Try to auto-detect a page layout for a two-page configuration.
  *
  * \param ltr_lines Folding line candidates sorted from left to right.
- * \param image_size The dimentions of the page image.
+ * \param image_size The dimensions of the page image.
  * \return The page layout detected or a null auto_ptr.
  */
 std::auto_ptr<PageLayout> autoDetectTwoPageLayout(
