@@ -309,7 +309,7 @@ MainWindow::MainWindow()
     );
 
     // determine number of threads
-    m_threadCount = QThread::idealThreadCount() -1;
+    m_threadCount = QThread::idealThreadCount();
     if (m_threadCount == -1) {
         m_threadCount = 2;
     }
