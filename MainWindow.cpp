@@ -164,8 +164,8 @@ MainWindow::MainWindow()
 	m_ptrOutOfMemoryDialog(new OutOfMemoryDialog),
 	m_curFilter(0),
 	m_ignoreSelectionChanges(0),
-	m_ignorePageOrderingChanges(0),
-	m_debug(false),
+    m_ignorePageOrderingChanges(0),
+    m_debug(false),
     m_closing(false),
     m_isMultithreaded(false),
     m_threadCount(2)
