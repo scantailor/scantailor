@@ -1,4 +1,4 @@
-# Scan Tailor - [scantailer.org](http://scantailor.org/)
+# Scan Tailor - [scantailor.org](http://scantailor.org/)
 
 ![ScanTailor logo from scantailor.org](http://scantailor.org/assets/logo_h300-fs8.png) 
 
