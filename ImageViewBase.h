@@ -173,7 +173,7 @@ public:
 	 * \brief Set the focal point in widget coordinates, after adjustring
 	 *        it to avoid wasting of widget space.
 	 *
-	 * This one may be used for resticted dragging (the default one in ST).
+	 * This one may be used for restricted dragging (the default one in ST).
 	 *
 	 * \see getWidgetFocalPoint()
 	 * \see setWidgetFocalPoint()

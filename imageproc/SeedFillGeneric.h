@@ -510,7 +510,7 @@ void seedFill8(
  *
  * \param spread_op A functor or a pointer to a free function that can be called with
  *        two arguments of type T and return the bigger or the smaller of the two.
- * \param mask_op Same as spread_op, but the oposite operation.
+ * \param mask_op Same as spread_op, but the opposite operation.
  * \param conn Determines whether to spread values to 4 or 8 eight immediate neighbors.
  * \param[in,out] seed Pointer to the seed buffer.
  * \param seed_stride The size of a row in the seed buffer, in terms of the number of T objects.
