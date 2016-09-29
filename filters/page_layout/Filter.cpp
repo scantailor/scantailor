@@ -136,9 +136,9 @@ Filter::saveSettings(
 	
 	QDomElement filter_el(doc.createElement("page-layout"));
 	writer.enumPages(
-		bind(
+		boost::lambda::bind(
 			&Filter::writePageSettings,
-			this, boost::ref(doc), var(filter_el), _1, _2
+			this, boost::ref(doc), var(filter_el), boost::lambda::_1, boost::lambda::_2
 		)
 	);
 	

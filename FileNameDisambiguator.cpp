@@ -246,7 +246,7 @@ FileNameDisambiguator::Impl::registerFile(QString const& file_path)
 	ItemsByFileNameLabel::iterator const fn_it(
 		m_itemsByFileNameLabel.upper_bound(boost::make_tuple(file_name))
 	);	
-	// If the item preceeding fn_it has the same file name,
+	// If the item preceding fn_it has the same file name,
 	// the new file belongs to the same disambiguation group.
 	if (fn_it != m_itemsByFileNameLabel.begin()) {
 		ItemsByFileNameLabel::iterator prev(fn_it);

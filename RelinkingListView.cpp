@@ -113,7 +113,7 @@ RelinkingListView::drawStatusLayer(QPainter* painter)
 	}
 
 	if (top_index.row() > 0) {
-		// The appearence of any element actually depends on its neighbours,
+		// The appearance of any element actually depends on its neighbours,
 		// so we start with the element above our topmost visible one.
 		top_index = top_index.sibling(top_index.row() - 1, 0);
 	}
@@ -136,7 +136,7 @@ RelinkingListView::drawStatusLayer(QPainter* painter)
 
 		if (row != top_index.row() && !item_rect.intersects(drawing_rect)) {
 			// Note that we intentionally break *after* processing
-			// the first invisible item. That's because the appearence
+			// the first invisible item. That's because the appearance
 			// of its immediate predecessor depends on it. The topmost item
 			// is allowed to be invisible, as it's processed for the same reason,
 			// that is to make its immediate neighbour to display correctly.
