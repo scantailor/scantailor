@@ -106,7 +106,7 @@ private:
 
 	/**
 	 * Same as ImageViewBase::getVisibleWidgetRect(), except reduced
-	 * vertically to accomodate the height of line endpoint handles.
+	 * vertically to accommodate the height of line endpoint handles.
 	 */
 	QRectF reducedWidgetArea() const;
 

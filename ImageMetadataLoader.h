@@ -35,7 +35,7 @@ public:
 		LOADED, /**< Loaded successfully */
 		NO_IMAGES, /**< File contained no images. */
 		FORMAT_NOT_RECOGNIZED, /**< File format not recognized. */
-		GENERIC_ERROR /**< Some other error has occured. */
+		GENERIC_ERROR /**< Some other error has occurred. */
 	};
 	
 	/**

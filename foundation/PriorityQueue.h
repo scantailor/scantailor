@@ -67,7 +67,7 @@ public:
 
 	/**
 	 * Like push(), but implemented through swapping \p obj with a default
-	 * constructed instance of T. This will make sence if copying a default
+	 * constructed instance of T. This will make sense if copying a default
 	 * constructed instance of T is much cheaper than copying \p obj.
 	 */
 	void pushDestructive(T& obj);

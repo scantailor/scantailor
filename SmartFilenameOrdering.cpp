@@ -77,6 +77,6 @@ SmartFilenameOrdering::operator()(QFileInfo const& lhs, QFileInfo const& rhs) co
 	
 	// OK, the smart comparison indicates the file names are equal.
 	// However, if they aren't symbol-to-symbol equal, we can't treat
-	// them as equal, so let's do a usual comparision now.
+	// them as equal, so let's do a usual comparison now.
 	return lhs_fname < rhs_fname;
 }

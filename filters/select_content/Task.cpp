@@ -114,7 +114,7 @@ Task::process(TaskStatus const& status, FilterData const& data)
 		}
 
 		if ((params->contentSizeMM().isEmpty() && !params->contentRect().isEmpty()) || !params->dependencies().matches(deps)) {
-			// Backwards compatibilty: put the missing data where it belongs.
+			// Backwards compatibility: put the missing data where it belongs.
 			Params const new_params(
 				ui_data.contentRect(), ui_data.contentSizeMM(),
 				deps, params->mode()

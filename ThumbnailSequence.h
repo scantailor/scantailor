@@ -65,7 +65,7 @@ public:
 		 * selected items exist.  In this case, the leader will become unselected, and
 		 * one of the other selected items will be promoted to a selection leader.
 		 * In these circumstances, scrolling to make the new selection leader visible
-		 * is undesireable.
+		 * is undesirable.
 		 */
 		AVOID_SCROLLING_TO = 1 << 2
 	};
@@ -101,7 +101,7 @@ public:
 	PageSequence toPageSequence() const;
 
 	/**
-	 * \brief Updates appearence and possibly position of a thumbnail.
+	 * \brief Updates appearance and possibly position of a thumbnail.
 	 *
 	 * If thumbnail's size or position have changed and this thumbnail
 	 * is a selection leader, newSelectionLeader() signal will be emitted
@@ -122,7 +122,7 @@ public:
 	void invalidateThumbnail(PageInfo const& page_info);
 	
 	/**
-	 * \brief Updates appearence of all thumbnails and possibly their order.
+	 * \brief Updates appearance of all thumbnails and possibly their order.
 	 *
 	 * Whether or not order will be updated depends on whether an order provider
 	 * was specified by the most recent reset() call.
@@ -152,7 +152,7 @@ public:
 	 * \brief Returns the page immediately following the given one.
 	 *
 	 * A null PageInfo is returned if the given page wasn't found or
-	 * there are no pages preceeding it.
+	 * there are no pages preceding it.
 	 */
 	PageInfo prevPage(PageId const& reference_page) const;
 

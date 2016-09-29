@@ -36,7 +36,7 @@ public:
 	/**
 	 * \brief Builds a Frenet frame from an origin and a (non-unit) tangent vector.
 	 *
-	 * The direction of the normal vector is choosen according to \p ydir,
+	 * The direction of the normal vector is chosen according to \p ydir,
 	 * considering the tangent vector to be pointing to the right.  The normal direction
 	 * does matter, as we want the unit normal vector divided by signed curvature give
 	 * us the center of the curvature.  For that to be the case, normal vector's direction

@@ -100,9 +100,9 @@ Filter::saveSettings(
 	
 	QDomElement filter_el(doc.createElement("fix-orientation"));
 	writer.enumImages(
-		bind(
+		boost::lambda::bind(
 			&Filter::writeImageSettings,
-			this, boost::ref(doc), var(filter_el), _1, _2
+			this, boost::ref(doc), var(filter_el), boost::lambda::_1, boost::lambda::_2
 		)
 	);
 	

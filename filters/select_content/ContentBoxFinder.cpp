@@ -1399,7 +1399,7 @@ ContentBoxFinder::filterShadows(
 	
 	status.throwIfCancelled();
 	
-	// Long white vertical lines are definately not spaces between letters.
+	// Long white vertical lines are definitely not spaces between letters.
 	BinaryImage vert_whitespace(
 		closeBrick(reduced_dithering, QSize(1, 150), BLACK)
 	);
