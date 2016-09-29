@@ -20,7 +20,9 @@
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
 #include "VecNT.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <QByteArray>
 #include <QDataStream>
 #include <QDomDocument>

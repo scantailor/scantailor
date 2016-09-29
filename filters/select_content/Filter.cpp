@@ -28,8 +28,10 @@
 #include "CacheDrivenTask.h"
 #include "OrderByWidthProvider.h"
 #include "OrderByHeightProvider.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QString>
 #include <QObject>
 #include <QDomDocument>
@@ -117,9 +119,9 @@ Filter::saveSettings(
 	
 	QDomElement filter_el(doc.createElement("select-content"));
 	writer.enumPages(
-		bind(
+		boost::lambda::bind(
 			&Filter::writePageSettings,
-			this, boost::ref(doc), var(filter_el), _1, _2
+			this, boost::ref(doc), var(filter_el), boost::lambda::_1, boost::lambda::_2
 		)
 	);
 	

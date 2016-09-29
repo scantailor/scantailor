@@ -21,7 +21,9 @@
 #include "Utils.h"
 #include <QImage>
 #include <QSize>
+#ifndef Q_MOC_RUN
 #include <boost/test/auto_unit_test.hpp>
+#endif
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>

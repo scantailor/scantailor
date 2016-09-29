@@ -30,9 +30,11 @@
 #include <QColor>
 #include <Qt>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <vector>
 #include <algorithm>
 #include <assert.h>

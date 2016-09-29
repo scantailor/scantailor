@@ -24,7 +24,9 @@
 #include "ImageTransformation.h"
 #include "IntrusivePtr.h"
 #include "ThumbnailPixmapCache.h"
+#ifndef Q_MOC_RUN
 #include <boost/shared_ptr.hpp>
+#endif
 #include <QTransform>
 #include <QGraphicsItem>
 #include <QSizeF>

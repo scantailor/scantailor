@@ -33,8 +33,10 @@
 #include <QStyleOptionButton>
 #include <QFile>
 #include <QVariant>
+#ifndef Q_MOC_RUN
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#endif
 #include <vector>
 
 struct RelinkablePathVisualization::PathComponent

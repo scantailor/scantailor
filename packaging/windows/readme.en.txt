@@ -181,7 +181,7 @@ latest stable version.
    Select your version of Visual C++ (Visual Studio) instead of "MinGW Makefiles"
 
 9. Now we are going to build Scan Tailor itself.  On subsequent build of the
-   same (possiblity modified) version, you can start right from this step.
+   same (possibly modified) version, you can start right from this step.
    For building a different version, start from step 8.
    
    [VC++]

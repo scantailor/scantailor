@@ -30,7 +30,9 @@
 #include <Qt>
 #include <QLineF>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
+#endif
 
 ZoneCreationInteraction::ZoneCreationInteraction(
 	ZoneInteractionContext& context, InteractionState& interaction)

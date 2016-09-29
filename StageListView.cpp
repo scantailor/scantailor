@@ -36,7 +36,9 @@
 #include <QVariant>
 #include <Qt>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 #include <memory>
 #include <assert.h>

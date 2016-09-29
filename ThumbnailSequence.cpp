@@ -28,6 +28,7 @@
 #include "RefCountable.h"
 #include "IntrusivePtr.h"
 #include "ScopedIncDec.h"
+#ifndef Q_MOC_RUN
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -36,6 +37,7 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/foreach.hpp>
+#endif
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QGraphicsItemGroup>
@@ -489,7 +491,7 @@ ThumbnailSequence::Impl::Impl(
 	m_pSelectionLeader(0)
 {
 	m_graphicsScene.setContextMenuEventCallback(
-		bind(&Impl::sceneContextMenuEvent, this, _1)
+		boost::lambda::bind(&Impl::sceneContextMenuEvent, this, boost::lambda::_1)
 	);
 }
 
@@ -603,7 +605,7 @@ ThumbnailSequence::Impl::invalidateThumbnail(PageInfo const& page_info)
 {
 	ItemsById::iterator const id_it(m_itemsById.find(page_info.id()));
 	if (id_it != m_itemsById.end()) {
-		m_itemsById.modify(id_it, bind(&Item::pageInfo, _1) = page_info);
+		m_itemsById.modify(id_it, boost::lambda::bind(&Item::pageInfo, boost::lambda::_1) = page_info);
 		invalidateThumbnailImpl(id_it);
 	}
 }
@@ -723,10 +725,10 @@ ThumbnailSequence::Impl::invalidateAllThumbnails()
 	// Sort pages in m_itemsInOrder using m_ptrOrderProvider.
 	if (m_ptrOrderProvider.get()) {
 		m_itemsInOrder.sort(
-			bind(
+			boost::lambda::bind(
 				&PageOrderProvider::precedes, m_ptrOrderProvider.get(),
-				bind(&Item::pageId, _1), bind(&Item::incompleteThumbnail, _1),
-				bind(&Item::pageId, _2), bind(&Item::incompleteThumbnail, _2) 
+				boost::lambda::bind(&Item::pageId, boost::lambda::_1), bind(&Item::incompleteThumbnail, boost::lambda::_1),
+				boost::lambda::bind(&Item::pageId, boost::lambda::_2), bind(&Item::incompleteThumbnail, boost::lambda::_2)
 			)
 		);
 	}
@@ -1293,7 +1295,7 @@ ThumbnailSequence::Impl::itemInsertPosition(
 	ItemsInOrder::iterator ins_pos(hint);
 	int dist = 0;
 
-	// While the element immediately preceeding ins_pos is supposed to
+	// While the element immediately preceding ins_pos is supposed to
 	// follow the page we are inserting, move ins_pos one element back.
 	while (ins_pos != begin) {
 		ItemsInOrder::iterator prev(ins_pos);

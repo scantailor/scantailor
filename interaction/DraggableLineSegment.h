@@ -22,7 +22,9 @@
 #include "DraggableObject.h"
 #include <QPointF>
 #include <QLineF>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 class ObjectDragHandler;
 

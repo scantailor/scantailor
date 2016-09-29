@@ -26,7 +26,9 @@
 #include <QPointF>
 #include <QImage>
 #include <QtGlobal>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <vector>
 #include <iterator>
 #include <algorithm>

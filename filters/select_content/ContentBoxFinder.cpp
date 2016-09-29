@@ -42,7 +42,9 @@
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/InfluenceMap.h"
 #include "imageproc/SEDM.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <QRect>
 #include <QRectF>
 #include <QPolygonF>
@@ -1397,7 +1399,7 @@ ContentBoxFinder::filterShadows(
 	
 	status.throwIfCancelled();
 	
-	// Long white vertical lines are definately not spaces between letters.
+	// Long white vertical lines are definitely not spaces between letters.
 	BinaryImage vert_whitespace(
 		closeBrick(reduced_dithering, QSize(1, 150), BLACK)
 	);

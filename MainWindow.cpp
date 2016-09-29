@@ -91,9 +91,11 @@
 #include "ui_BatchProcessingLowerPanel.h"
 #include "config.h"
 #include "version.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QApplication>
 #include <QLineF>
 #include <QPointer>
@@ -1895,9 +1897,11 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 		QFileInfo const file_info(files[i]);
 		ImageFileInfo image_file_info(file_info, std::vector<ImageMetadata>());
 
+		void (std::vector<ImageMetadata>::*push_back) (const ImageMetadata&) =
+			&std::vector<ImageMetadata>::push_back;
 		ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
-			files.at(i), bind(&std::vector<ImageMetadata>::push_back,
-			boost::ref(image_file_info.imageInfo()), _1)
+			files.at(i), boost::lambda::bind(push_back,
+			boost::ref(image_file_info.imageInfo()), boost::lambda::_1)
 		);
 
 		if (status == ImageMetadataLoader::LOADED) {
@@ -1919,7 +1923,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	}
 
 	// Check if there is at least one DPI that's not OK.
-	if (std::find_if(new_files.begin(), new_files.end(), !bind(&ImageFileInfo::isDpiOK, _1)) != new_files.end()) {
+	if (std::find_if(new_files.begin(), new_files.end(), !boost::lambda::bind(&ImageFileInfo::isDpiOK, boost::lambda::_1)) != new_files.end()) {
 
 		std::auto_ptr<FixDpiDialog> dpi_dialog(new FixDpiDialog(new_files, this));
 		dpi_dialog->setWindowModality(Qt::WindowModal);

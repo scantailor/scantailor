@@ -40,92 +40,92 @@
     <message>
         <location filename="../ui/AboutDialog.ui" line="157"/>
         <source>U235 - Picture auto-detection algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">U235 - Automatischer Bilderkennungs-Algorithmus.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="164"/>
         <source>Robert B. - First generation dewarping algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Robert B. - Erste Generation des Dewarping-Algorithmus.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="171"/>
         <source>Andrey Bergman - System load adjustment.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Andrey Bergman - Systemlastanpassung.</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="178"/>
         <source>Petr Kovář - Command line interface.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Petr Kovář - Kommandozeileninterface.</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="205"/>
         <source>Neco Torquato - Brazilian Portuguese</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neco Torquato - Brasilianisches Portugiesisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="212"/>
         <source>Svetoslav Sashkov, Mandor - Bulgarian</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Svetoslav Sashkov, Mandor - Bulgarisch</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="219"/>
         <source>Petr Kovář - Czech</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Petr Kovář - Tschechisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="226"/>
         <source>Stefan Birkner - German</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stefan Birkner - Deutsch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="233"/>
         <source>Angelo Gemmi - Italian</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angelo Gemmi - Italienisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="240"/>
         <source>Masahiro Kitagawa - Japanese</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Masahiro Kitagawa - Japanisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="247"/>
         <source>Patrick Pascal - French</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Patrick Pascal - Französisch</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="254"/>
         <source>Daniel Koć - Polish</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Daniel Koć - Polnisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="261"/>
         <source>Joseph Artsimovich - Russian</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Joseph Artsimovich - Russisch</translation>
     </message>
     <message utf8="true">
         <location filename="../ui/AboutDialog.ui" line="268"/>
         <source>Marián Hvolka - Slovak</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Marián Hvolka - Slowakisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="275"/>
         <source>Flavio Benelli - Spanish</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Flavio Benelli - Spanisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="282"/>
         <source>Davidson Wang - Traditional Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Davidson Wang - Chinesisch (Langzeichen)</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="289"/>
         <source>Yuri Chornoivan - Ukrainian</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yuri Chornoivan - Ukrainisch</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="316"/>
         <source>denver 22</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">denver 22</translation>
     </message>
     <message>
         <location filename="../ui/AboutDialog.ui" line="190"/>
@@ -212,7 +212,7 @@ Taxman</translation>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="26"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nur diese Seite (schon angewandt)</translation>
     </message>
     <message>
         <location filename="../filters/deskew/ui/DeskewApplyDialog.ui" line="36"/>
@@ -430,17 +430,17 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="14"/>
         <source>Some files failed to load</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Manche Dateien konnten nicht geladen werden</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="27"/>
         <source>Loaded successfully: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erfolgreich geladen: %1</translation>
     </message>
     <message>
         <location filename="../ui/LoadFilesStatusDialog.ui" line="87"/>
         <source>Failed to load: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nicht geladen: %1</translation>
     </message>
 </context>
 <context>
@@ -520,7 +520,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../MainWindow.cpp" line="1711"/>
         <source>%2 - Scan Tailor %3 [%1bit]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%2 - Scan Tailor %3 [%1bit]</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1860"/>
@@ -602,7 +602,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="235"/>
         <source>Ctrl+S</source>
-        <translation>Strg+S</translation>
+        <translation type="unfinished">Ctrl+S</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="240"/>
@@ -618,7 +618,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="248"/>
         <source>PgDown</source>
-        <translation>BildAb</translation>
+        <translation type="unfinished">PgDown</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="256"/>
@@ -629,7 +629,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="259"/>
         <source>PgUp</source>
-        <translation>BildAuf</translation>
+        <translation type="unfinished">PgUp</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="267"/>
@@ -639,7 +639,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="270"/>
         <source>Ctrl+N</source>
-        <translation>Strg+N</translation>
+        <translation type="unfinished">Ctrl+N</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="275"/>
@@ -649,7 +649,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="278"/>
         <source>Ctrl+O</source>
-        <translation>Strg+Q</translation>
+        <translation type="unfinished">Ctrl+O</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="286"/>
@@ -669,7 +669,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="308"/>
         <source>Ctrl+W</source>
-        <translation>Strg+W</translation>
+        <translation type="unfinished">Ctrl+W</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="313"/>
@@ -679,7 +679,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="316"/>
         <source>Ctrl+Q</source>
-        <translation>Strg+Q</translation>
+        <translation type="unfinished">Ctrl+Q</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="326"/>
@@ -709,7 +709,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="347"/>
         <source>Fix DPI ...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">DPI korrigieren ...</translation>
     </message>
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
@@ -782,7 +782,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
         <translatorcomment>Alle geraden oder ungeraden Seiten, abhängig davon, ob die aktuelle Seite gerade oder ungerade ist.</translatorcomment>
-        <translation>alle anderen Seiten</translation>
+        <translation type="unfinished">jede zweite Seite</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="101"/>
@@ -804,7 +804,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>alle anderen ausgewählten Seiten</translation>
+        <translation type="unfinished">jede zweite ausgewählte Seite</translation>
     </message>
 </context>
 <context>
@@ -1019,7 +1019,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="59"/>
         <source>Scope</source>
-        <translation>Anwenden auf</translation>
+        <translation type="unfinished">Geltungsbereich</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDewarpingDialog.ui" line="65"/>
@@ -1215,7 +1215,7 @@ zur Auswahl mehrerer Seiten.</translation>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">alle anderen Seiten</translation>
+        <translation type="unfinished">jede zweite Seite</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
@@ -1237,7 +1237,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">alle anderen ausgewählten Seiten</translation>
+        <translation type="unfinished">jede zweite ausgewählte Seite</translation>
     </message>
 </context>
 <context>
@@ -1651,7 +1651,7 @@ Eingabedatei erhalten bleibt.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="29"/>
         <source>This page only (already applied)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">nur diese Seiten (schon angewandt)</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="39"/>
@@ -1667,7 +1667,7 @@ Eingabedatei erhalten bleibt.</translation>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation type="unfinished">alle anderen Seiten</translation>
+        <translation type="unfinished">jede zweite Seite</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
@@ -1689,7 +1689,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation type="unfinished">alle anderen ausgewählten Seiten</translation>
+        <translation type="unfinished">jede zweite ausgewählte Seite</translation>
     </message>
 </context>
 <context>
@@ -1717,7 +1717,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="83"/>
         <source>Scope</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Geltungsbereich</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentOptionsWidget.ui" line="104"/>
@@ -1745,7 +1745,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="20"/>
         <source>Use 3D acceleration for user interface</source>
-        <translation>3D-Beschleunigung für die 
+        <translation>3D-Beschleunigung für die
 Benutzeroberläche verwenden</translation>
     </message>
 </context>

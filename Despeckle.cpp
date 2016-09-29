@@ -24,7 +24,9 @@
 #include "imageproc/BinaryImage.h"
 #include "imageproc/ConnectivityMap.h"
 #include "imageproc/Connectivity.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <QtGlobal>
 #include <QImage>
 #include <QDebug>

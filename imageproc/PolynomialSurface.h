@@ -81,7 +81,7 @@ public:
 	/**
 	 * \brief Visualizes the polynomial surface as a grayscale image.
 	 *
-	 * The surface will be stretched / shrinked to fit the new size.
+	 * The surface will be stretched / shrunk to fit the new size.
 	 */
 	GrayImage render(QSize const& size) const;
 private:

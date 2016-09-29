@@ -92,7 +92,7 @@ void raiseAllButPeaks(
  * \param most_significant A functor or a pointer to a free function that
  *        can be called with two arguments of type T and return the bigger
  *        or the smaller of the two.
- * \param least_significant Same as most_significant, but the oposite operation.
+ * \param least_significant Same as most_significant, but the opposite operation.
  * \param increase_significance A functor or a pointer to a free function that
  *        takes one argument and returns the next most significant value next
  *        to it.  Hint: for floating point data, use the nextafter() family of

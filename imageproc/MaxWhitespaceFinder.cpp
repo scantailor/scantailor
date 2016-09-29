@@ -19,7 +19,9 @@
 #include "MaxWhitespaceFinder.h"
 #include <QPoint>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 #include <limits>
 #include <stddef.h>
@@ -258,7 +260,7 @@ MaxWhitespaceFinder::findBlackPixelCloseToCenter(
 			// This means we are dealing with a horizontal line
 			// and that we only have to check at most two pixels
 			// (the endpoints) and that at least one of them
-			// is definately black and that rect is a 1x1 pixels
+			// is definitely black and that rect is a 1x1 pixels
 			// block pointing to the left endpoint.
 			if (sum != 0) {
 				return outer_rect.topLeft();

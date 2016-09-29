@@ -22,7 +22,9 @@
 #include "Settings.h"
 #include "Params.h"
 #include "ScopedIncDec.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 
 namespace select_content
 {
