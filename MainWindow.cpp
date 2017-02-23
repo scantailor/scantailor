@@ -1857,23 +1857,21 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 		QFileInfoList m_inProjectFiles;
 	};
 	
-	std::auto_ptr<QFileDialog> dialog(
-		new QFileDialog(
-			this, tr("Files to insert"),
-			QFileInfo(existing.filePath()).absolutePath()
-		)
+	QFileDialog dialog(
+		this, tr("Files to insert"),
+		QFileInfo(existing.filePath()).absolutePath()
 	);
-	dialog->setFileMode(QFileDialog::ExistingFiles);
-	dialog->setProxyModel(new ProxyModel(*m_ptrPages));
-	dialog->setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));
+	dialog.setFileMode(QFileDialog::ExistingFiles);
+	dialog.setProxyModel(new ProxyModel(*m_ptrPages));
+	dialog.setNameFilter(tr("Images not in project (%1)").arg("*.png *.tiff *.tif *.jpeg *.jpg"));
 	// XXX: Adding individual pages from a multi-page TIFF where
 	// some of the pages are already in project is not supported right now.
 
-	if (dialog->exec() != QDialog::Accepted) {
+	if (dialog.exec() != QDialog::Accepted) {
 		return;
 	}
 	
-	QStringList files(dialog->selectedFiles());
+	QStringList files(dialog.selectedFiles());
 	if (files.empty()) {
 		return;
 	}
@@ -1892,7 +1890,7 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	std::vector<QString> loaded_files;
 	std::vector<QString> failed_files; // Those we failed to read metadata from.
 
-	// dialog->selectedFiles() returns file list in reverse order.
+	// dialog.selectedFiles() returns file list in reverse order.
 	for (int i = files.size() - 1; i >= 0; --i) {
 		QFileInfo const file_info(files[i]);
 		ImageFileInfo image_file_info(file_info, std::vector<ImageMetadata>());
@@ -1913,11 +1911,11 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	}
 
 	if (!failed_files.empty()) {
-		std::auto_ptr<LoadFilesStatusDialog> err_dialog(new LoadFilesStatusDialog(this));
-		err_dialog->setLoadedFiles(loaded_files);
-		err_dialog->setFailedFiles(failed_files);
-		err_dialog->setOkButtonName(QString(" %1 ").arg(tr("Skip failed files")));
-		if (err_dialog->exec() != QDialog::Accepted || loaded_files.empty()) {
+		LoadFilesStatusDialog err_dialog(this);
+		err_dialog.setLoadedFiles(loaded_files);
+		err_dialog.setFailedFiles(failed_files);
+		err_dialog.setOkButtonName(QString(" %1 ").arg(tr("Skip failed files")));
+		if (err_dialog.exec() != QDialog::Accepted || loaded_files.empty()) {
 			return;
 		}
 	}
@@ -1925,13 +1923,13 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 	// Check if there is at least one DPI that's not OK.
 	if (std::find_if(new_files.begin(), new_files.end(), !boost::lambda::bind(&ImageFileInfo::isDpiOK, boost::lambda::_1)) != new_files.end()) {
 
-		std::auto_ptr<FixDpiDialog> dpi_dialog(new FixDpiDialog(new_files, this));
-		dpi_dialog->setWindowModality(Qt::WindowModal);
-		if (dpi_dialog->exec() != QDialog::Accepted) {
+		FixDpiDialog dpi_dialog(new_files, this);
+		dpi_dialog.setWindowModality(Qt::WindowModal);
+		if (dpi_dialog.exec() != QDialog::Accepted) {
 			return;
 		}
 
-		new_files = dpi_dialog->files();
+		new_files = dpi_dialog.files();
 	}
 
 	// Actually insert the new pages.
