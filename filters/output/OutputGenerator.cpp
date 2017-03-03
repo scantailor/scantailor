@@ -412,36 +412,42 @@ OutputGenerator::estimateBinarizationMask(
 void
 OutputGenerator::modifyBinarizationMask(
 	imageproc::BinaryImage& bw_mask,
-	QRect const& mask_rect, ZoneSet const& zones) const
+    QRect const& mask_rect, ZoneSet const& zones, int filter) const
 {
 	QTransform xform(m_xform.transform());
 	xform *= QTransform().translate(-mask_rect.x(), -mask_rect.y());
 
 	typedef PictureLayerProperty PLP;
 
-	// Pass 1: ERASER1
-	BOOST_FOREACH(Zone const& zone, zones) {
-		if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER1) {
-			QPolygonF const poly(zone.spline().toPolygon());
-			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(poly), Qt::WindingFill);
-		}
-	}
+    // Pass 1: ERASER1
+    if (filter & BINARIZATION_MASK_ERASER1) {
+        BOOST_FOREACH(Zone const& zone, zones) {
+            if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER1) {
+                QPolygonF const poly(zone.spline().toPolygon());
+                PolygonRasterizer::fill(bw_mask, BLACK, xform.map(poly), Qt::WindingFill);
+            }
+        }
+    }
 
 	// Pass 2: PAINTER2
-	BOOST_FOREACH(Zone const& zone, zones) {
-		if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::PAINTER2) {
-			QPolygonF const poly(zone.spline().toPolygon());
-			PolygonRasterizer::fill(bw_mask, WHITE, xform.map(poly), Qt::WindingFill);
-		}
-	}
+    if (filter & BINARIZATION_MASK_PAINTER2) {
+        BOOST_FOREACH(Zone const& zone, zones) {
+            if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::PAINTER2) {
+                QPolygonF const poly(zone.spline().toPolygon());
+                PolygonRasterizer::fill(bw_mask, WHITE, xform.map(poly), Qt::WindingFill);
+            }
+        }
+    }
 
 	// Pass 1: ERASER3
-	BOOST_FOREACH(Zone const& zone, zones) {
-		if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER3) {
-			QPolygonF const poly(zone.spline().toPolygon());
-			PolygonRasterizer::fill(bw_mask, BLACK, xform.map(poly), Qt::WindingFill);
-		}
-	}
+    if (filter & BINARIZATION_MASK_ERASER3) {
+        BOOST_FOREACH(Zone const& zone, zones) {
+            if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER3) {
+                QPolygonF const poly(zone.spline().toPolygon());
+                PolygonRasterizer::fill(bw_mask, BLACK, xform.map(poly), Qt::WindingFill);
+            }
+        }
+    }
 }
 
 QImage
@@ -652,40 +658,54 @@ OutputGenerator::processWithoutDewarping(
 	QSize const target_size(m_outRect.size().expandedTo(QSize(1, 1)));
 
 	BinaryImage bw_mask;
-	if (render_params.mixedOutput()) {
-		// This block should go before the block with
-		// adjustBrightnessGrayscale(), which may convert
-		// maybe_normalized from grayscale to color mode.
-		
-		bw_mask = estimateBinarizationMask(
-			status, GrayImage(maybe_normalized),
-			normalize_illumination_rect,
-			small_margins_rect, dbg
-		);
-		if (dbg) {
-			dbg->add(bw_mask, "bw_mask");
-		}
-		
-		if (auto_picture_mask) {
-			if (auto_picture_mask->size() != target_size) {
-				BinaryImage(target_size).swap(*auto_picture_mask);
-			}
-			auto_picture_mask->fill(BLACK);
+    BinaryImage bw_auto_picture_mask;
+    if (render_params.mixedOutput()) {
+        // This block should go before the block with
+        // adjustBrightnessGrayscale(), which may convert
+        // maybe_normalized from grayscale to color mode.
 
-			if (!m_contentRect.isEmpty()) {
-				QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
-				QRect const dst_rect(m_contentRect);
-				rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_rect.topLeft());
-			}
-		}
+        if (auto_picture_mask) {
+            if (auto_picture_mask->size() != target_size) {
+                BinaryImage(target_size).swap(*auto_picture_mask);
+            }
 
-		status.throwIfCancelled();
+            auto_picture_mask->fill(BLACK);
+        }
 
-		modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);
-		if (dbg) {
-			dbg->add(bw_mask, "bw_mask with zones");
-		}
-	}
+
+        if (render_params.autoLayer())
+        {
+            bw_mask = estimateBinarizationMask(
+                        status, GrayImage(maybe_normalized),
+                        normalize_illumination_rect,
+                        small_margins_rect, dbg
+                        );
+            if (dbg) {
+                dbg->add(bw_mask, "bw_mask");
+            }
+
+            if (render_params.colorLayer()) {
+                bw_auto_picture_mask = bw_mask; // need it later
+            }
+
+            if (!m_contentRect.isEmpty() && !render_params.colorLayer()) {
+                // if colorLayer - will do it later
+                QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
+                QRect const dst_rect(m_contentRect);
+                rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_rect.topLeft());
+            }
+        } else {
+            bw_mask = BinaryImage(maybe_normalized.size(), BLACK);
+        }
+
+        status.throwIfCancelled();
+
+        modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);
+        if (dbg) {
+            dbg->add(bw_mask, "bw_mask with zones");
+        }
+    }
+
 	
 	if (render_params.normalizeIllumination()
 			&& !input.origImage().allGray()) {
@@ -744,7 +764,35 @@ OutputGenerator::processWithoutDewarping(
 		);
 		
 		status.throwIfCancelled();
-		
+
+        if (render_params.colorLayer())
+        {
+            bw_mask = bw_content;
+            bw_mask.invert();
+
+            if (render_params.autoLayer())
+            {
+                modifyBinarizationMask(bw_auto_picture_mask, small_margins_rect, picture_zones, BINARIZATION_MASK_ERASER1 | BINARIZATION_MASK_PAINTER2);
+                rasterOp<RopAnd<RopSrc,RopDst> >(bw_mask, bw_auto_picture_mask);
+                modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones, BINARIZATION_MASK_ERASER3);
+                bw_auto_picture_mask.release();
+            } else {
+                // apply all zones directly to color layer mask as we have no autolayer.
+                modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);
+            }
+
+
+            if (!m_contentRect.isEmpty()) {
+                QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
+                QRect const dst_rect(m_contentRect);
+                rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_rect.topLeft());
+            }
+
+
+
+//            bw_content.fill(WHITE);
+        }
+
 		if (maybe_normalized.format() == QImage::Format_Indexed8) {
 			combineMixed<uint8_t>(
 				maybe_normalized, bw_content, bw_mask

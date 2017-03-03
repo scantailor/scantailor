@@ -31,17 +31,25 @@ namespace output
 class ColorParams
 {
 public:
-	enum ColorMode { BLACK_AND_WHITE, COLOR_GRAYSCALE, MIXED };
+    enum ColorMode { BLACK_AND_WHITE, COLOR_GRAYSCALE, MIXED };
 	
-	ColorParams(): m_colorMode(BLACK_AND_WHITE) {}
+    ColorParams(): m_colorMode(BLACK_AND_WHITE), m_colorLayerEnabled(false), m_autoLayerEnabled(true) {}
 	
-	ColorParams(QDomElement const& el);
+    ColorParams(QDomElement const& el);
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 	
 	ColorMode colorMode() const { return m_colorMode; }
 	
 	void setColorMode(ColorMode mode) { m_colorMode = mode; }
+
+    bool colorLayerEnabled() const { return m_colorLayerEnabled; }
+
+    void setColorLayerEnabled(bool enabled) { m_colorLayerEnabled = enabled; }
+
+    bool autoLayerEnabled() const { return m_autoLayerEnabled; }
+
+    void setAutoLayerEnabled(bool enabled) { m_autoLayerEnabled = enabled; }
 	
 	ColorGrayscaleOptions const& colorGrayscaleOptions() const {
 		return m_colorGrayscaleOptions;
@@ -66,6 +74,8 @@ private:
 	ColorMode m_colorMode;
 	ColorGrayscaleOptions m_colorGrayscaleOptions;
 	BlackWhiteOptions m_bwOptions;
+    bool m_colorLayerEnabled;
+    bool m_autoLayerEnabled;
 };
 
 } // namespace output

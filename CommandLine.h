@@ -75,6 +75,8 @@ public:
 	bool hasDeskew() const { return contains("deskew"); }
 	bool hasContentRect() const { return contains("content-box"); }
 	bool hasColorMode() const { return contains("color-mode"); }
+    bool hasColorLayer() const { return contains("colorLayer"); }
+    bool hasAutoLayer() const { return contains("autoLayer"); }
 	bool hasWhiteMargins() const { return contains("white-margins"); }
 	bool hasNormalizeIllumination() const { return contains("normalize-illumination"); }
 	bool hasThreshold() const { return contains("threshold"); }
@@ -85,6 +87,8 @@ public:
 	page_split::LayoutType getLayout() const { return m_layoutType; }
 	Qt::LayoutDirection getLayoutDirection() const { return m_layoutDirection; }
 	output::ColorParams::ColorMode getColorMode() const { return m_colorMode; }
+    bool getColorLayer() const { return m_colorLayer; }
+    bool getAutoLayer() const { return m_autoLayer; }
 	Dpi getInputDpi() const { return m_dpi; }
 	Dpi getOutputDpi() const { return m_outputDpi; }
 	Margins getMargins() const { return m_margins; }
@@ -126,6 +130,8 @@ private:
 	page_split::LayoutType m_layoutType;
 	Qt::LayoutDirection m_layoutDirection;
 	output::ColorParams::ColorMode m_colorMode;
+    bool m_colorLayer;
+    bool m_autoLayer;
 	Dpi m_dpi;
 	Dpi m_outputDpi;
 	Margins m_margins;
@@ -146,6 +152,8 @@ private:
 	void setup();
 	page_split::LayoutType fetchLayoutType();
 	output::ColorParams::ColorMode fetchColorMode();
+    bool fetchColorLayer();
+    bool fetchAutoLayer();
 	Qt::LayoutDirection fetchLayoutDirection();
 	Dpi fetchDpi(QString oname="dpi");
 	Margins fetchMargins();

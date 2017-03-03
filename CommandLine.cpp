@@ -155,6 +155,8 @@ CommandLine::setup()
 	m_layoutType = fetchLayoutType();
 	m_layoutDirection = fetchLayoutDirection();
 	m_colorMode = fetchColorMode();
+    m_colorLayer =fetchColorLayer();
+    m_autoLayer =fetchAutoLayer();
 	m_dpi = fetchDpi();
 	m_outputDpi = fetchDpi("output-dpi");
 	m_margins = fetchMargins();
@@ -302,6 +304,19 @@ CommandLine::fetchColorMode()
 	return output::ColorParams::BLACK_AND_WHITE;
 }
 
+bool
+CommandLine::fetchColorLayer()
+{
+    QString cm = m_options.value("colorLayer", "false").toLower();
+    return (cm != "false");
+}
+
+bool
+CommandLine::fetchAutoLayer()
+{
+    QString cm = m_options.value("autoLayer", "true").toLower();
+    return (cm != "false");
+}
 
 Margins
 CommandLine::fetchMargins()

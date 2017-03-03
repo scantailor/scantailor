@@ -47,6 +47,14 @@ public:
 
 	void setColorParams(ColorParams const& params) { m_colorParams = params; }
 
+    bool const getColorLayer() { return m_colorParams.colorLayerEnabled(); }
+
+    void setColorLayer(bool const& enabled) { m_colorParams.setColorLayerEnabled(enabled); }
+
+    bool const getAutoLayer() { return m_colorParams.autoLayerEnabled(); }
+
+    void setAutoLayer(bool const& enabled) { m_colorParams.setAutoLayerEnabled(enabled); }
+
 	DewarpingMode const& dewarpingMode() const { return m_dewarpingMode; }
 
 	void setDewarpingMode(DewarpingMode const& mode) { m_dewarpingMode = mode; }
