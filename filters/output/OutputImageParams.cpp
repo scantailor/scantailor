@@ -129,6 +129,12 @@ OutputImageParams::colorParamsMatch(
 	if (cp1.colorMode() != cp2.colorMode()) {
 		return false;
 	}
+
+    if (cp1.colorMode() == ColorParams::MIXED &&
+            ( (cp1.colorLayerEnabled() != cp2.colorLayerEnabled()) ||
+              (cp1.autoLayerEnabled()  != cp2.autoLayerEnabled()) ) ) {
+            return false;
+    }
 	
 	switch (cp1.colorMode()) {
 		case ColorParams::COLOR_GRAYSCALE:
@@ -140,19 +146,19 @@ OutputImageParams::colorParamsMatch(
 		default:;
 	}
 	
-	switch (cp1.colorMode()) {
-		case ColorParams::BLACK_AND_WHITE:
-		case ColorParams::MIXED:
-			if (cp1.blackWhiteOptions() != cp2.blackWhiteOptions()) {
-				return false;
-			}
-			if (dl1 != dl2) {
-				return false;
-			}
-			break;
-		default:;
-	}
-	
+    switch (cp1.colorMode()) {
+            case ColorParams::BLACK_AND_WHITE:
+            case ColorParams::MIXED:
+                if (cp1.blackWhiteOptions() != cp2.blackWhiteOptions()) {
+                    return false;
+                }
+                if (dl1 != dl2) {
+                    return false;
+                }
+                break;
+            default:;
+    }
+
 	return true;
 }
 

@@ -29,8 +29,8 @@ namespace output
 class ColorGrayscaleOptions
 {
 public:
-	ColorGrayscaleOptions()
-	: m_whiteMargins(false), m_normalizeIllumination(false) {}
+    ColorGrayscaleOptions(bool whiteMargins = false, bool normalizeIllumination = false)
+    : m_whiteMargins(whiteMargins), m_normalizeIllumination(normalizeIllumination) {}
 	
 	ColorGrayscaleOptions(QDomElement const& el);
 	

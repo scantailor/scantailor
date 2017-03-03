@@ -48,7 +48,13 @@ RenderParams::RenderParams(ColorParams const& cp)
 			m_mask |= WHITE_MARGINS|NORMALIZE_ILLUMINATION
 					|NEED_BINARIZATION|MIXED_OUTPUT;
 			break;
-	}
+    }
+
+    if (cp.colorLayerEnabled())
+        m_mask |= COLOR_LAYER;
+
+    if (cp.autoLayerEnabled())
+        m_mask |= AUTO_LAYER;
 }
 
 } // namespace output

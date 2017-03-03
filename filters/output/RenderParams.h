@@ -38,7 +38,7 @@ public:
 	}
 	
 	bool needBinarization() const {
-		return (m_mask & NEED_BINARIZATION) != 0;
+        return (m_mask & NEED_BINARIZATION) != 0;
 	}
 	
 	bool mixedOutput() const {
@@ -49,12 +49,22 @@ public:
 		return (m_mask & (NEED_BINARIZATION|MIXED_OUTPUT))
 				== NEED_BINARIZATION;
 	}
+
+    bool colorLayer() const {
+        return (m_mask & COLOR_LAYER) != 0;
+    }
+
+    bool autoLayer() const {
+        return (m_mask & AUTO_LAYER) != 0;
+    }
 private:
 	enum {
 		WHITE_MARGINS = 1,
 		NORMALIZE_ILLUMINATION = 2,
 		NEED_BINARIZATION = 4,
-		MIXED_OUTPUT = 8
+        MIXED_OUTPUT = 8,
+        COLOR_LAYER = 16,
+        AUTO_LAYER = 32
 	};
 	
 	int m_mask;

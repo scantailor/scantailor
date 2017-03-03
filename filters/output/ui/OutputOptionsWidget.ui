@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>228</width>
-    <height>621</height>
+    <width>234</width>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -125,7 +125,28 @@
          </spacer>
         </item>
         <item>
-         <widget class="QComboBox" name="colorModeSelector"/>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <widget class="QComboBox" name="colorModeSelector"/>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="autoLayerCB">
+            <property name="text">
+             <string>Auto layer</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="colorLayerCB">
+            <property name="text">
+             <string>Color / Grayscale layer</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <spacer name="horizontalSpacer_2">
@@ -145,7 +166,16 @@
       <item>
        <widget class="QWidget" name="colorGrayscaleOptions" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>

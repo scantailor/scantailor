@@ -61,7 +61,7 @@ OptionsWidget::OptionsWidget(
 
 	depthPerceptionSlider->setMinimum(qRound(DepthPerception::minValue() * 10));
 	depthPerceptionSlider->setMaximum(qRound(DepthPerception::maxValue() * 10));
-	
+
 	colorModeSelector->addItem(tr("Black and White"), ColorParams::BLACK_AND_WHITE);
 	colorModeSelector->addItem(tr("Color / Grayscale"), ColorParams::COLOR_GRAYSCALE);
 	colorModeSelector->addItem(tr("Mixed"), ColorParams::MIXED);
@@ -86,6 +86,14 @@ OptionsWidget::OptionsWidget(
 		colorModeSelector, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(colorModeChanged(int))
 	);
+    connect(
+        colorLayerCB, SIGNAL(clicked(bool)),
+        this, SLOT(colorLayerCBToggled(bool))
+    );
+    connect(
+        autoLayerCB, SIGNAL(clicked(bool)),
+        this, SLOT(autoLayerCBToggled(bool))
+    );
 	connect(
 		whiteMarginsCB, SIGNAL(clicked(bool)),
 		this, SLOT(whiteMarginsToggled(bool))
@@ -155,8 +163,8 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(depthPerceptionChangedSlot(int))
 	);
 	
-	thresholdSlider->setMinimum(-50);
-	thresholdSlider->setMaximum(50);
+    thresholdSlider->setMinimum(-50);
+    thresholdSlider->setMaximum(50);
 	thresholLabel->setText(QString::number(thresholdSlider->value()));
 }
 
@@ -212,10 +220,35 @@ OptionsWidget::colorModeChanged(int const idx)
 {
 	int const mode = colorModeSelector->itemData(idx).toInt();
 	m_colorParams.setColorMode((ColorParams::ColorMode)mode);
+    m_colorParams.setColorLayerEnabled(false);
+
 	m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+    colorLayerCB->setCheckState(Qt::Unchecked);
+    autoLayerCB->setCheckState(Qt::Checked);
 	updateColorsDisplay();
 	emit reloadRequested();
 }
+
+void
+OptionsWidget::colorLayerCBToggled(bool const checked)
+{
+    m_colorParams.setColorLayerEnabled(checked);
+    m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+
+    updateColorsDisplay();
+    emit reloadRequested();
+}
+
+void
+OptionsWidget::autoLayerCBToggled(bool const checked)
+{
+    m_colorParams.setAutoLayerEnabled(checked);
+    m_ptrSettings->setColorParams(m_pageId, m_colorParams);
+
+    updateColorsDisplay();
+    emit reloadRequested();
+}
+
 
 void
 OptionsWidget::whiteMarginsToggled(bool const checked)
@@ -598,15 +631,15 @@ OptionsWidget::updateColorsDisplay()
 	ColorParams::ColorMode const color_mode = m_colorParams.colorMode();
 	int const color_mode_idx = colorModeSelector->findData(color_mode);
 	colorModeSelector->setCurrentIndex(color_mode_idx);
-	
 	bool color_grayscale_options_visible = false;
 	bool bw_options_visible = false;
+
 	switch (color_mode) {
 		case ColorParams::BLACK_AND_WHITE:
 			bw_options_visible = true;
 			break;
 		case ColorParams::COLOR_GRAYSCALE:
-			color_grayscale_options_visible = true;
+			color_grayscale_options_visible = true;            
 			break;
 		case ColorParams::MIXED:
 			bw_options_visible = true;
@@ -624,6 +657,8 @@ OptionsWidget::updateColorsDisplay()
 	}
 	
 	modePanel->setVisible(m_lastTab != TAB_DEWARPING);
+    autoLayerCB->setVisible(color_mode == ColorParams::MIXED);
+    colorLayerCB->setVisible(color_mode == ColorParams::MIXED);
 	bwOptions->setVisible(bw_options_visible);
 	despecklePanel->setVisible(bw_options_visible && m_lastTab != TAB_DEWARPING);
 
@@ -648,7 +683,10 @@ OptionsWidget::updateColorsDisplay()
 			m_colorParams.blackWhiteOptions().thresholdAdjustment()
 		);
 	}
-	
+	        
+    colorLayerCB->setCheckState(m_colorParams.colorLayerEnabled()? Qt::Checked : Qt::Unchecked);
+    autoLayerCB->setCheckState(m_colorParams.autoLayerEnabled()? Qt::Checked : Qt::Unchecked);
+
 	colorModeSelector->blockSignals(false);
 }
 

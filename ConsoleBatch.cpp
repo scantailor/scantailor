@@ -375,9 +375,12 @@ ConsoleBatch::setupOutput(std::set<PageId> allPages)
 			params.setOutputDpi(outputDpi);
 		}
 
-		output::ColorParams colorParams = params.colorParams();
-		if (cli.hasColorMode())
-			colorParams.setColorMode(cli.getColorMode());
+        output::ColorParams colorParams = params.colorParams();
+        if (cli.hasColorMode())
+            colorParams.setColorMode(cli.getColorMode());
+
+        if (cli.hasColorLayer())
+            colorParams.setColorLayerEnabled(cli.getColorLayer());
 
 		if (cli.hasWhiteMargins() || cli.hasNormalizeIllumination()) {
 			output::ColorGrayscaleOptions cgo;

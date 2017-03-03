@@ -78,6 +78,10 @@ private slots:
 	void applyColorsConfirmed(std::set<PageId> const& pages);
 
 	void colorModeChanged(int idx);
+
+    void colorLayerCBToggled(bool checked);
+
+    void autoLayerCBToggled(bool checked);
 	
 	void whiteMarginsToggled(bool checked);
 	
