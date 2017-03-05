@@ -770,8 +770,12 @@ OutputGenerator::processWithoutDewarping(
             bw_mask = bw_content;
             bw_mask.invert();
 
+            BinaryImage new_auto_picture_mask;
             if (render_params.autoLayer())
             {
+                new_auto_picture_mask = bw_mask;
+                rasterOp<RopAnd<RopSrc,RopDst> >(new_auto_picture_mask, bw_auto_picture_mask);
+
                 modifyBinarizationMask(bw_auto_picture_mask, small_margins_rect, picture_zones, BINARIZATION_MASK_ERASER1 | BINARIZATION_MASK_PAINTER2);
                 rasterOp<RopAnd<RopSrc,RopDst> >(bw_mask, bw_auto_picture_mask);
                 modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones, BINARIZATION_MASK_ERASER3);
@@ -779,13 +783,14 @@ OutputGenerator::processWithoutDewarping(
             } else {
                 // apply all zones directly to color layer mask as we have no autolayer.
                 modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);
+                new_auto_picture_mask = bw_mask;
             }
 
 
             if (!m_contentRect.isEmpty()) {
                 QRect const src_rect(m_contentRect.translated(-small_margins_rect.topLeft()));
                 QRect const dst_rect(m_contentRect);
-                rasterOp<RopSrc>(*auto_picture_mask, dst_rect, bw_mask, src_rect.topLeft());
+                rasterOp<RopSrc>(*auto_picture_mask, dst_rect, new_auto_picture_mask, src_rect.topLeft());
             }
 
 
