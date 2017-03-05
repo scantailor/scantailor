@@ -683,9 +683,11 @@ OptionsWidget::updateColorsDisplay()
 			m_colorParams.blackWhiteOptions().thresholdAdjustment()
 		);
 	}
-	        
-    colorLayerCB->setCheckState(m_colorParams.colorLayerEnabled()? Qt::Checked : Qt::Unchecked);
-    autoLayerCB->setCheckState(m_colorParams.autoLayerEnabled()? Qt::Checked : Qt::Unchecked);
+
+    autoLayerCB->setEnabled(m_dewarpingMode == DewarpingMode::OFF);
+    colorLayerCB->setEnabled(m_dewarpingMode == DewarpingMode::OFF);
+    colorLayerCB->setCheckState(m_colorParams.colorLayerEnabled() && m_dewarpingMode == DewarpingMode::OFF? Qt::Checked : Qt::Unchecked);
+    autoLayerCB->setCheckState(m_colorParams.autoLayerEnabled() || m_dewarpingMode != DewarpingMode::OFF? Qt::Checked : Qt::Unchecked);
 
 	colorModeSelector->blockSignals(false);
 }
