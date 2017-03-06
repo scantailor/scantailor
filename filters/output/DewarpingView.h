@@ -58,6 +58,7 @@ public slots:
 	void depthPerceptionChanged(double val);	
 protected:
 	virtual void onPaint(QPainter& painter, InteractionState const& interaction);
+    virtual void onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction);
 private:
 	static void initNewSpline(XSpline& spline, QPointF const& p1, QPointF const& p2);
 
@@ -86,6 +87,7 @@ private:
 	InteractiveXSpline m_bottomSpline;
 	DragHandler m_dragHandler;
 	ZoomHandler m_zoomHandler;
+    QRectF const m_virt_content_rect;
 };
 
 } // namespace output

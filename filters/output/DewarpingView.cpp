@@ -50,6 +50,8 @@
 #endif
 #include <vector>
 #include <stdexcept>
+#include <QMenu>
+#include <QContextMenuEvent>
 
 namespace output
 {
@@ -69,6 +71,7 @@ DewarpingView::DewarpingView(
 	),
 	m_pageId(page_id),
 	m_virtDisplayArea(virt_display_area),
+    m_virt_content_rect(virt_content_rect),
 	m_dewarpingMode(dewarping_mode),
 	m_distortionModel(distortion_model),
 	m_depthPerception(depth_perception),
@@ -406,6 +409,55 @@ DewarpingView::virtMarginArea(int margin_idx) const
 	poly << vert_boundary.pointAt(min) + normal.pointAt(normal_max) - normal.p1();
 
 	return m_virtDisplayArea.intersected(poly);
+}
+
+void
+DewarpingView::onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction)
+{
+    if (!event) {
+        return;
+    }
+
+    QMenu menu(this);
+    QAction* reset = menu.addAction(tr("Reset distortion model"));
+    QAction* result = menu.exec(event->globalPos());
+    if (result != reset) {
+        return;
+    }
+
+    QPolygonF const source_content_rect(virtualToImage().map(m_virt_content_rect));
+
+    XSpline new_top_spline;
+    initNewSpline(new_top_spline, source_content_rect[0], source_content_rect[1]);
+
+    XSpline new_bottom_spline;
+    initNewSpline(new_bottom_spline, source_content_rect[3], source_content_rect[2]);
+
+    m_topSpline.setSpline(new_top_spline);
+    m_bottomSpline.setSpline(new_bottom_spline);
+
+    InteractiveXSpline* splines[2] = { &m_topSpline, &m_bottomSpline };
+    int curve_idx = -1;
+    BOOST_FOREACH(InteractiveXSpline* spline, splines) {
+        ++curve_idx;
+        spline->setModifiedCallback(boost::bind(&DewarpingView::curveModified, this, curve_idx));
+        spline->setDragFinishedCallback(boost::bind(&DewarpingView::dragFinished, this));
+        spline->setStorageTransform(
+                    boost::bind(&DewarpingView::sourceToWidget, this, _1),
+                    boost::bind(&DewarpingView::widgetToSource, this, _1)
+                    );
+        makeLastFollower(*spline);
+    }
+
+    m_distortionModel.setTopCurve(dewarping::Curve(m_topSpline.spline()));
+    m_distortionModel.setBottomCurve(dewarping::Curve(m_bottomSpline.spline()));
+
+    rootInteractionHandler().makeLastFollower(*this);
+    rootInteractionHandler().makeLastFollower(m_dragHandler);
+    rootInteractionHandler().makeLastFollower(m_zoomHandler);
+
+    emit distortionModelChanged(m_distortionModel);
+
 }
 
 } // namespace output
