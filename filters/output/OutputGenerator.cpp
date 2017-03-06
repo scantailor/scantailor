@@ -782,8 +782,8 @@ OutputGenerator::processWithoutDewarping(
                 bw_auto_picture_mask.release();
             } else {
                 // apply all zones directly to color layer mask as we have no autolayer.
-                modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);
                 new_auto_picture_mask = bw_mask;
+                modifyBinarizationMask(bw_mask, small_margins_rect, picture_zones);                
             }
 
 
