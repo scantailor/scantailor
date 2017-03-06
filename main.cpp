@@ -22,6 +22,7 @@
 #include "PngMetadataLoader.h"
 #include "TiffMetadataLoader.h"
 #include "JpegMetadataLoader.h"
+#include "SettingsDefaults.h"
 #include <QMetaType>
 #include <QtPlugin>
 #include <QLocale>
@@ -179,6 +180,7 @@ int main(int argc, char** argv)
 	app.setOrganizationName("Scan Tailor");
 	app.setOrganizationDomain("scantailor.sourceforge.net");
 	QSettings::setDefaultFormat(QSettings::IniFormat);
+    SettingsDefaults::prepareDefaults(true);
 	QSettings settings;
 	
 	PngMetadataLoader::registerMyself();

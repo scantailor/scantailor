@@ -25,6 +25,7 @@
 
 #include "CommandLine.h"
 #include "ConsoleBatch.h"
+#include "SettingsDefaults.h"
 
 
 int main(int argc, char **argv)
@@ -35,6 +36,7 @@ int main(int argc, char **argv)
     app.setOrganizationName("Scan Tailor");
     app.setOrganizationDomain("scantailor.sourceforge.net");
     QSettings::setDefaultFormat(QSettings::IniFormat);
+    SettingsDefaults::prepareDefaults(false);
 
 #ifdef _WIN32
 	// Get rid of all references to Qt's installation directory.

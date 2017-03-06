@@ -511,6 +511,7 @@ SET(
 	PageRange.cpp PageRange.h
 	SelectedPage.cpp SelectedPage.h
 	Utils.cpp Utils.h
+        SettingsDefaults.h
 	PageView.h
 	AutoManualMode.h
 	AbstractCommand.h
