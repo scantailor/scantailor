@@ -178,6 +178,7 @@ int main(int argc, char** argv)
 	app.setApplicationName("Scan Tailor");
 	app.setOrganizationName("Scan Tailor");
 	app.setOrganizationDomain("scantailor.sourceforge.net");
+	QSettings::setDefaultFormat(QSettings::IniFormat);
 	QSettings settings;
 	
 	PngMetadataLoader::registerMyself();
