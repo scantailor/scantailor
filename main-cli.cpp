@@ -18,6 +18,7 @@
 */
 
 #include <QCoreApplication>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <iostream>
@@ -29,6 +30,11 @@
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
+    // This information is used by QSettings.
+    app.setApplicationName("Scan Tailor");
+    app.setOrganizationName("Scan Tailor");
+    app.setOrganizationDomain("scantailor.sourceforge.net");
+    QSettings::setDefaultFormat(QSettings::IniFormat);
 
 #ifdef _WIN32
 	// Get rid of all references to Qt's installation directory.
