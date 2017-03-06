@@ -19,6 +19,7 @@
 #include "TiffWriter.h"
 #include "Dpm.h"
 #include "imageproc/Constants.h"
+#include "SettingsDefaults.h"
 #include <QtGlobal>
 #include <QFile>
 #include <QIODevice>
@@ -248,13 +249,16 @@ TiffWriter::setDpm(TiffHandle const& tif, Dpm const& dpm)
 	TIFFSetField(tif.handle(), TIFFTAG_RESOLUTIONUNIT, unit);
 }
 
+// forward declaration
+uint16 getTiffCompressionSetting();
+
 bool
 TiffWriter::writeBitonalOrIndexed8Image(
 	TiffHandle const& tif, QImage const& image)
 {
 	TIFFSetField(tif.handle(), TIFFTAG_SAMPLESPERPIXEL, uint16(1));
 	
-	uint16 compression = COMPRESSION_LZW;
+    uint16 compression = getTiffCompressionSetting();
 	uint16 bits_per_sample = 8;
 	uint16 photometric = PHOTOMETRIC_PALETTE;
 	if (image.isGrayscale()) {
@@ -326,7 +330,7 @@ TiffWriter::writeRGB32Image(
 	assert(image.format() == QImage::Format_RGB32);
 	
 	TIFFSetField(tif.handle(), TIFFTAG_SAMPLESPERPIXEL, uint16(3));
-	TIFFSetField(tif.handle(), TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+    TIFFSetField(tif.handle(), TIFFTAG_COMPRESSION, getTiffCompressionSetting());
 	TIFFSetField(tif.handle(), TIFFTAG_BITSPERSAMPLE, uint16(8));
 	TIFFSetField(tif.handle(), TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
 	
@@ -363,7 +367,7 @@ TiffWriter::writeARGB32Image(
 	assert(image.format() == QImage::Format_ARGB32);
 	
 	TIFFSetField(tif.handle(), TIFFTAG_SAMPLESPERPIXEL, uint16(4));
-	TIFFSetField(tif.handle(), TIFFTAG_COMPRESSION, COMPRESSION_LZW);
+    TIFFSetField(tif.handle(), TIFFTAG_COMPRESSION, getTiffCompressionSetting());
 	TIFFSetField(tif.handle(), TIFFTAG_BITSPERSAMPLE, uint16(8));
 	TIFFSetField(tif.handle(), TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
 	
@@ -463,3 +467,55 @@ TiffWriter::writeBinaryLinesReversed(
 	
 	return true;
 }
+
+/*Settings*/
+
+const QString comprSettingHint("Tiff compression method may take following values: NONE, CCITTRLE, CCITTFAX3, CCITT_T4, CCITTFAX4,"
+                   " CCITT_T6, LZW, OJPEG, JPEG, T85, T43, NEXT, CCITTRLEW, PACKBITS, THUNDERSCAN, IT8CTPAD, IT8LW,"
+                   " IT8MP, IT8BL, PIXARFILM, PIXARLOG, DEFLATE, ADOBE_DEFLATE, DCS, JBIG, SGILOG, SGILOG24, JP2000,"
+                   " LZMA. Default value: LZW. Note: not all methods may be implemented by libtiff. The error messages are printed to console.");
+const char* comprDefaultVal = "LZW";
+const int   comprListLen = 29;
+const char* comprList[comprListLen] = {"NONE", "CCITTRLE", "CCITTFAX3", "CCITT_T4", "CCITTFAX4", "CCITT_T6",
+                                           "LZW", "OJPEG", "JPEG", "T85", "T43", "NEXT", "CCITTRLEW", "PACKBITS",
+                                           "THUNDERSCAN", "IT8CTPAD", "IT8LW", "IT8MP", "IT8BL", "PIXARFILM",
+                                           "PIXARLOG", "DEFLATE", "ADOBE_DEFLATE", "DCS", "JBIG", "SGILOG",
+                                           "SGILOG24", "JP2000", "LZMA"};
+const uint16 comprListVals[comprListLen] = {COMPRESSION_NONE, COMPRESSION_CCITTRLE, COMPRESSION_CCITTFAX3,
+                                             COMPRESSION_CCITT_T4, COMPRESSION_CCITTFAX4, COMPRESSION_CCITT_T6,
+                                             COMPRESSION_LZW, COMPRESSION_OJPEG, COMPRESSION_JPEG, COMPRESSION_T85,
+                                             COMPRESSION_T43, COMPRESSION_NEXT, COMPRESSION_CCITTRLEW,
+                                             COMPRESSION_PACKBITS, COMPRESSION_THUNDERSCAN, COMPRESSION_IT8CTPAD,
+                                             COMPRESSION_IT8LW, COMPRESSION_IT8MP, COMPRESSION_IT8BL,
+                                             COMPRESSION_PIXARFILM, COMPRESSION_PIXARLOG, COMPRESSION_DEFLATE,
+                                             COMPRESSION_ADOBE_DEFLATE, COMPRESSION_DCS, COMPRESSION_JBIG,
+                                             COMPRESSION_SGILOG, COMPRESSION_SGILOG24, COMPRESSION_JP2000,
+                                             COMPRESSION_LZMA};
+const QString comprSettingKey("tiff/compressionMethod");
+const QString comprSettingHintKey("tiff/compressionMethod-hint");
+
+uint16 getTiffCompressionSetting()
+{
+    QSettings settings;
+    if (settings.contains(comprSettingKey)) {
+        QString val = settings.value(comprSettingKey, comprDefaultVal).toString().trimmed();
+        for (int i = 0; i < comprListLen; i++)
+            if (val == comprList[i])
+                return comprListVals[i];
+    }
+
+    return COMPRESSION_LZW;
+}
+
+
+bool settingsDefaults(bool /*isGUI*/)
+{
+    QSettings settings;
+    settings.setValue(comprSettingHintKey, comprSettingHint);
+    if (!settings.contains(comprSettingKey)) {
+        settings.setValue(comprSettingKey, comprDefaultVal);
+    }
+    return true;
+}
+
+RegisterSettingsDefaults comprSettingDefaultInit(settingsDefaults);
