@@ -245,8 +245,8 @@ OutputGenerator::OutputGenerator(
 :	m_dpi(dpi),
 	m_colorParams(color_params),
 	m_xform(xform),
-	m_outRect(xform.resultingRect().toRect()),
-	m_contentRect(xform.transform().map(content_rect_phys).boundingRect().toRect()),
+	m_outRect(xform.resultingRect().toAlignedRect()),
+	m_contentRect(xform.transform().map(content_rect_phys).boundingRect().toAlignedRect()),
 	m_despeckleLevel(despeckle_level)
 {	
 	assert(m_outRect.topLeft() == QPoint(0, 0));
