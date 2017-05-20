@@ -245,12 +245,23 @@ OutputGenerator::OutputGenerator(
 :	m_dpi(dpi),
 	m_colorParams(color_params),
 	m_xform(xform),
-	m_outRect(xform.resultingRect().toRect()),
-	m_contentRect(xform.transform().map(content_rect_phys).boundingRect().toRect()),
+	m_outRect(xform.resultingRect().toAlignedRect()),
+	m_contentRect(xform.transform().map(content_rect_phys).boundingRect().toAlignedRect()),
 	m_despeckleLevel(despeckle_level)
 {	
 	assert(m_outRect.topLeft() == QPoint(0, 0));
-
+	if (m_contentRect.left() < 0)
+	{
+ 	    int dx = -1*m_contentRect.left();
+            m_outRect.adjust(0,0,dx,0);      // size increase
+            m_contentRect.adjust(dx,0,dx,0); // shift
+        }
+	if (m_contentRect.top() < 0)
+        {
+            int dy = -1*m_contentRect.top();
+            m_outRect.adjust(0,0,0,dy);      // size increase
+            m_contentRect.adjust(0,dy,0,dy); // shift
+        }
 	// Note that QRect::contains(<empty rect>) always returns false, so we don't use it here.
 	assert(m_outRect.contains(m_contentRect.topLeft()) && m_outRect.contains(m_contentRect.bottomRight()));
 }
