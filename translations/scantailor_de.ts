@@ -291,22 +291,22 @@ zur Auswahl mehrerer Seiten.</translation>
         <location filename="../FixDpiDialog.cpp" line="242"/>
         <location filename="../FixDpiDialog.cpp" line="707"/>
         <source>All Pages</source>
-        <translation type="unfinished">Alles Seiten</translation>
+        <translation type="unfinished">Alle Seiten</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="476"/>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="unfinished">Dpi sind zu groß und sehr wahrscheinlich falsch.</translation>
+        <translation type="unfinished">DPI sind zu groß und sehr wahrscheinlich falsch.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="479"/>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation type="unfinished">Dpi sind zu niedrig. Sogar wenn sie richtig sind, werden Sie damit kein annehmbares Ergebnis erhalten.</translation>
+        <translation type="unfinished">DPI sind zu niedrig. Sogar wenn sie richtig sind, werden Sie damit kein annehmbares Ergebnis erhalten.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="482"/>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation type="unfinished">Dpi sind zu niedrig für diese Pixelgröße. Ein solche Kombination führt wahrscheinlich zu Zuwenig-Speicher-Fehlern.</translation>
+        <translation type="unfinished">DPI sind zu niedrig für diese Pixelgröße. Ein solche Kombination führt wahrscheinlich zu Zuwenig-Speicher-Fehlern.</translation>
     </message>
     <message>
         <location filename="../FixDpiDialog.cpp" line="733"/>
@@ -316,7 +316,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="13"/>
         <source>Fix DPI</source>
-        <translation>Dpi korrigieren</translation>
+        <translation>DPI korrigieren</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="23"/>
@@ -331,7 +331,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="46"/>
         <source>DPI</source>
-        <translation>dpi</translation>
+        <translation>DPI</translation>
     </message>
     <message>
         <location filename="../ui/FixDpiDialog.ui" line="69"/>
@@ -353,11 +353,11 @@ zur Auswahl mehrerer Seiten.</translation>
     <name>FixDpiSinglePageDialog</name>
     <message>
         <source>Fix DPI</source>
-        <translation type="obsolete">Dpi korrigieren</translation>
+        <translation type="obsolete">DPI korrigieren</translation>
     </message>
     <message>
         <source>DPI for %1</source>
-        <translation type="obsolete">Dpi für %1</translation>
+        <translation type="obsolete">DPI für %1</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -373,15 +373,15 @@ zur Auswahl mehrerer Seiten.</translation>
     </message>
     <message>
         <source>DPI is too large and most likely wrong.</source>
-        <translation type="obsolete">Dpi sind zu groß und sehr wahrscheinlich falsch.</translation>
+        <translation type="obsolete">DPI sind zu groß und sehr wahrscheinlich falsch.</translation>
     </message>
     <message>
         <source>DPI is too small. Even if it&apos;s correct, you are not going to get acceptable results with it.</source>
-        <translation type="obsolete">Dpi sind zu niedrig. Sogar wenn sie richtig sind, werden Sie damit kein annehmbares Ergebnis erhalten.</translation>
+        <translation type="obsolete">DPI sind zu niedrig. Auch wenn sie richtig sind, werden Sie damit kein annehmbares Ergebnis erhalten.</translation>
     </message>
     <message>
         <source>DPI is too small for this pixel size. Such combination would probably lead to out of memory errors.</source>
-        <translation type="obsolete">Dpi sind zu niedrig für diese Pixelgröße. Ein solche Kombination führt wahrscheinlich zu Zuwenig-Speicher-Fehlern.</translation>
+        <translation type="obsolete">DPI sind zu niedrig für diese Pixelgröße. Ein solche Kombination führt wahrscheinlich zu Zuwenig-Speicher-Fehlern.</translation>
     </message>
 </context>
 <context>
@@ -397,7 +397,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neuen Kontrollpunkt durch klicken erstellen.</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
@@ -480,7 +480,7 @@ zur Auswahl mehrerer Seiten.</translation>
         <location filename="../MainWindow.cpp" line="1369"/>
         <location filename="../MainWindow.cpp" line="1437"/>
         <source>Scan Tailor Projects</source>
-        <translation type="unfinished">Scan-Tailor-Projekte</translation>
+        <translation type="unfinished">Scan Tailor-Projekte</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1436"/>
@@ -525,7 +525,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../MainWindow.cpp" line="1860"/>
         <source>Files to insert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Einzufügende Dateien</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1915"/>
@@ -714,7 +714,7 @@ Um diese zu ermitteln, starten Sie bitte die Stapelverarbeitung unter „Inhalt 
     <message>
         <location filename="../ui/MainWindow.ui" line="352"/>
         <source>Relinking ...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neuverlinkung ...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="492"/>
@@ -856,7 +856,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="70"/>
         <source>Possible reasons</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mögliche Gründe</translation>
     </message>
     <message>
         <location filename="../ui/OutOfMemoryDialog.ui" line="103"/>
@@ -1058,7 +1058,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="23"/>
         <source>DPI</source>
-        <translation>dpi</translation>
+        <translation>DPI</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputChangeDpiDialog.ui" line="68"/>
@@ -1176,7 +1176,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="610"/>
         <source>Aggressive despeckling</source>
-        <translation>Offensives Despeckling</translation>
+        <translation>Starkes Despeckling</translation>
     </message>
     <message>
         <location filename="../filters/output/ui/OutputOptionsWidget.ui" line="274"/>
@@ -1632,8 +1632,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RemovePagesDialog.ui" line="72"/>
         <source>Corresponding output files will be deleted, while input files will remain.</source>
-        <translation>Die entsprechenden Ausgabedateien werden gelöscht, während die
-Eingabedatei erhalten bleibt.</translation>
+        <translation>Die entsprechenden Ausgabedateien werden gelöscht, die
+Eingabedateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
@@ -1933,17 +1933,17 @@ Benutzeroberläche verwenden</translation>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="132"/>
         <source>DPI is not set.</source>
-        <translation>Dpi sind nicht gesetzt.</translation>
+        <translation>DPI sind nicht gesetzt.</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="141"/>
         <source>DPI is too low!</source>
-        <translation>Dpi sind zu gering!</translation>
+        <translation>DPI sind zu gering!</translation>
     </message>
     <message>
         <location filename="../filters/output/ChangeDpiDialog.cpp" line="149"/>
         <source>DPI is too high!</source>
-        <translation>Dpi sind zu hoch!</translation>
+        <translation>DPI sind zu hoch!</translation>
     </message>
 </context>
 <context>
