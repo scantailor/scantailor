@@ -134,6 +134,10 @@ OptionsWidget::OptionsWidget(
 		this, SLOT(leftRightLinkClicked())
 	);
 	connect(
+		zeroMarginsBtn, SIGNAL(clicked()),
+		this, SLOT(zeroMarginsBtnClicked())
+	);
+	connect(
 		applyMarginsBtn, SIGNAL(clicked()),
 		this, SLOT(showApplyMarginsDialog())
 	);
@@ -271,6 +275,17 @@ OptionsWidget::vertMarginsChanged(double const val)
 	m_marginsMM.setBottom(bottomMarginSpinBox->value() * m_unitToMM);
 	
 	emit marginsSetLocally(m_marginsMM);
+}
+
+void
+OptionsWidget::zeroMarginsBtnClicked()
+{
+	topMarginSpinBox->setValue(0.0);
+	bottomMarginSpinBox->setValue(0.0);
+	leftMarginSpinBox->setValue(0.0);
+	rightMarginSpinBox->setValue(0.0);
+	
+	updateMarginsDisplay();
 }
 
 void

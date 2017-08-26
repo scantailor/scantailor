@@ -239,6 +239,43 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="zeroMarginsBtn">
+          <property name="text">
+           <string>Set to zero</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_51">
+        <item>
+         <spacer name="horizontalSpacer_91">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="QPushButton" name="applyMarginsBtn">
           <property name="text">
            <string>Apply To ...</string>
@@ -246,7 +283,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_10">
+         <spacer name="horizontalSpacer_101">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -622,6 +659,7 @@
   <tabstop>leftRightLink</tabstop>
   <tabstop>leftMarginSpinBox</tabstop>
   <tabstop>rightMarginSpinBox</tabstop>
+  <tabstop>zeroMarginsBtn</tabstop>
   <tabstop>applyMarginsBtn</tabstop>
   <tabstop>alignWithOthersCB</tabstop>
   <tabstop>alignTopLeftBtn</tabstop>

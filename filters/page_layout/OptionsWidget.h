@@ -88,6 +88,8 @@ private slots:
 	
 	void alignWithOthersToggled();
 	
+	void zeroMarginsBtnClicked();
+	
 	void alignmentButtonClicked();
 	
 	void showApplyMarginsDialog();
