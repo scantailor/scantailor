@@ -24,7 +24,9 @@
 
 #include "ValueConv.h"
 #include <QSize>
+#ifndef Q_MOC_RUN
 #include <boost/scoped_array.hpp>
+#endif
 #include <iterator>
 #include <string.h>
 

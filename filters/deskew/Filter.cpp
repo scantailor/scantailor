@@ -27,8 +27,10 @@
 #include "PageId.h"
 #include "RelinkablePath.h"
 #include "AbstractRelinker.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QString>
 #include <QObject>
 #include <QCoreApplication>
@@ -87,10 +89,10 @@ Filter::saveSettings(ProjectWriter const& writer, QDomDocument& doc) const
     filter_el.setAttribute("sigma", m_ptrSettings->std());
     filter_el.setAttribute("maxDeviation", m_ptrSettings->maxDeviation());
 
-    writer.enumPages(
-		bind(
+	writer.enumPages(
+		boost::lambda::bind(
 			&Filter::writePageSettings,
-			this, boost::ref(doc), var(filter_el), _1, _2
+			this, boost::ref(doc), var(filter_el), boost::lambda::_1, boost::lambda::_2
 		)
 	);
 	

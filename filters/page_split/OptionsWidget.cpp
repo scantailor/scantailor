@@ -27,7 +27,9 @@
 #include "ProjectPages.h"
 #include "ScopedIncDec.h"
 #include <QPixmap>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <assert.h>
 
 namespace page_split

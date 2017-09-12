@@ -43,9 +43,11 @@
 #include <QColor>
 #include <Qt>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/array.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#endif
 #include <vector>
 #include <stdexcept>
 

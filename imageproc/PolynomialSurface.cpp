@@ -24,7 +24,9 @@
 #include "Grayscale.h"
 #include "BitOps.h"
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <stdexcept>
 #include <algorithm>
 #include <math.h>

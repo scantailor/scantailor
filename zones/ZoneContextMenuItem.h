@@ -20,7 +20,9 @@
 #define ZONE_CONTEXT_MENU_ITEM_H_
 
 #include <QString>
+#ifndef Q_MOC_RUN
 #include <boost/function.hpp>
+#endif
 
 class InteractionState;
 class InteractionHandler;

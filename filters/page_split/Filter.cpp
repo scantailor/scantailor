@@ -31,8 +31,10 @@
 #include "Params.h"
 #include "CacheDrivenTask.h"
 #include "OrthogonalRotation.h"
+#ifndef Q_MOC_RUN
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QString>
 #include <QObject>
 #include <QCoreApplication>
@@ -108,9 +110,9 @@ Filter::saveSettings(
 	);
 	
 	writer.enumImages(
-		bind(
+		boost::lambda::bind(
 			&Filter::writeImageSettings,
-			this, boost::ref(doc), var(filter_el), _1, _2
+			this, boost::ref(doc), var(filter_el), boost::lambda::_1, boost::lambda::_2
 		)
 	);
 	

@@ -22,7 +22,9 @@
 #include "HomographicTransform.h"
 #include "PolylineIntersector.h"
 #include "ArcLengthMapper.h"
+#ifndef Q_MOC_RUN
 #include <boost/array.hpp>
+#endif
 #include <vector>
 #include <utility>
 #include <QPointF>

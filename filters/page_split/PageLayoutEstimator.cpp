@@ -47,9 +47,11 @@
 #include "imageproc/Grayscale.h"
 #include "imageproc/GrayRasterOp.h"
 #include "imageproc/PolygonRasterizer.h"
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>
+#endif
 #include <QRect>
 #include <QRectF>
 #include <QSize>
@@ -521,7 +523,8 @@ PageLayoutEstimator::cutAtWhitespaceDeskewed150(
 	
 	std::deque<Span> spans;
 	SlicedHistogram hist(cc_img, SlicedHistogram::COLS);
-	span_finder.find(hist, bind(&std::deque<Span>::push_back, var(spans), _1));
+	void (std::deque<Span>::*push_back) (const Span&) = &std::deque<Span>::push_back;
+	span_finder.find(hist, boost::lambda::bind(push_back, var(spans), _1));
 	
 	if (dbg) {
 		visualizeSpans(*dbg, spans, input, "spans");

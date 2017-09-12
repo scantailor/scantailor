@@ -36,7 +36,9 @@
 #include <QColor>
 #include <QPainter>
 #include <QDebug>
+#ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
+#endif
 #include <algorithm>
 #include <new>
 #include <math.h>
