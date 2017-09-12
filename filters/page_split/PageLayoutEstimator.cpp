@@ -523,7 +523,8 @@ PageLayoutEstimator::cutAtWhitespaceDeskewed150(
 	
 	std::deque<Span> spans;
 	SlicedHistogram hist(cc_img, SlicedHistogram::COLS);
-	span_finder.find(hist, bind(&std::deque<Span>::push_back, var(spans), _1));
+	void (std::deque<Span>::*push_back) (const Span&) = &std::deque<Span>::push_back;
+	span_finder.find(hist, boost::lambda::bind(push_back, var(spans), _1));
 	
 	if (dbg) {
 		visualizeSpans(*dbg, spans, input, "spans");

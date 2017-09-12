@@ -1975,8 +1975,10 @@ MainWindow::showInsertFileDialog(BeforeOrAfter before_or_after, ImageId const& e
 		QFileInfo const file_info(files[i]);
 		ImageFileInfo image_file_info(file_info, std::vector<ImageMetadata>());
 
+		void (std::vector<ImageMetadata>::*push_back) (const ImageMetadata&) =
+			&std::vector<ImageMetadata>::push_back;
 		ImageMetadataLoader::Status const status = ImageMetadataLoader::load(
-			files.at(i), boost::lambda::bind(&std::vector<ImageMetadata>::push_back,
+			files.at(i), boost::lambda::bind(push_back,
 			boost::ref(image_file_info.imageInfo()), boost::lambda::_1)
 		);
 
