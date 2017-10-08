@@ -247,7 +247,7 @@ TextLineTracer::isCurvatureConsistent(std::vector<QPointF> const& polyline)
 		prev_normal_sqlen = next_segment_sqlen;
 	}
 
-	return !(significant_positive && significant_positive);
+	return !(significant_negative && significant_positive);
 }
 
 bool
