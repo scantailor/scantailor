@@ -55,6 +55,7 @@ public:
 		m_dewarpingMode = fetchDewarpingMode();    
 		m_despeckleLevel = fetchDespeckleLevel();
 		m_deskewAngle = fetchDeskewAngle();
+		m_threshold = fetchThreshold();
 	}
 
 	bool isGui() const { return m_gui; }
