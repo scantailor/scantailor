@@ -1563,7 +1563,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="171"/>
         <source>Right to left layout (for Hebrew and Arabic)</source>
-        <translation>Schreibrichtung von rechts nach link (für Hebräisch und Arabisch)</translation>
+        <translation>Schreibrichtung von rechts nach links (für Hebräisch und Arabisch)</translation>
     </message>
     <message>
         <location filename="../ui/ProjectFilesDialog.ui" line="178"/>
@@ -1594,7 +1594,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="97"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rückgangig</translation>
     </message>
     <message>
         <location filename="../ui/RelinkingDialog.ui" line="100"/>
@@ -1604,17 +1604,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../RelinkingDialog.cpp" line="95"/>
         <source>Substitution File for %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ersatzdatei für %1</translation>
     </message>
     <message>
         <location filename="../RelinkingDialog.cpp" line="102"/>
         <source>Substitution Directory for %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ersatzordner für %1</translation>
     </message>
     <message>
         <location filename="../RelinkingDialog.cpp" line="130"/>
         <source>This change would merge several files into one.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diese Veränderung würde mehrere Dateien in eine zusammenfügen.</translation>
     </message>
 </context>
 <context>
@@ -1735,7 +1735,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../SettingsDialog.cpp" line="41"/>
         <source>Your hardware / driver don&apos;t provide the necessary features.</source>
-        <translation type="unfinished">Ihre Hardware bzw. ihr Treiber verfügt nicht über die notwendigen Eigenschaften.</translation>
+        <translation type="unfinished">Ihre Hardware bzw. Ihr Treiber verfügt nicht über die notwendigen Eigenschaften.</translation>
     </message>
     <message>
         <location filename="../ui/SettingsDialog.ui" line="14"/>
@@ -1845,7 +1845,7 @@ Benutzeroberläche verwenden</translation>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="46"/>
         <source>Click to create a new vertex here.</source>
-        <translation>Klicken Sie um hier einen neuen Eckpunkt zu erstellen.</translation>
+        <translation>Klicken Sie, um hier einen neuen Eckpunkt zu erstellen.</translation>
     </message>
     <message>
         <location filename="../zones/ZoneDefaultInteraction.cpp" line="47"/>
