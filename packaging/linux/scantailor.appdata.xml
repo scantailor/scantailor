@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.scantailor.ScanTailor</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>ScanTailor</name>
+  <summary>An interactive post-processing tool for scanned pages.</summary>
+  <description>
+    <p>
+      Scan Tailor is an interactive post-processing tool for scanned pages.
+      It performs operations such as page splitting, deskewing, adding/removing borders, and others.
+      You give it raw scans, and you get pages ready to be printed or assembled into a PDF or DJVU file.
+      Scanning, optical character recognition, and assembling multi-page documents are out of scope of this project.
+    </p>
+    <p>
+      Scan Tailor is Free Software (which is more than just freeware).
+      It’s written in C++ with Qt and released under the General Public License version 3.
+      We develop both Windows and GNU/Linux versions.
+    </p>
+    <p>
+      This project started in late 2007 and by mid 2010 it reached production quality. In 2014,
+      the original developer Joseph Artsimovich stepped aside, and Nate Craun took over as the new maintainer.
+    </p>
+    <p>
+      Scan Tailor is being used not just by enthusiasts, but also by libraries and other institutions.
+      A few books processed by Scan Tailor even ended up on Google Books.
+    </p>
+  </description>
+  <launchable type="desktop-id">scantailor.desktop</launchable>
+  <url type="bugtracker">https://github.com/scantailor/scantailor/issues</url>
+  <url type="homepage">http://scantailor.org/</url>
+  <releases>
+    <release version="0.9.12.1" date="2016-05-02" />
+  </releases>
+  <content_rating type="oars-1.1" />
+</component>
