@@ -39,7 +39,7 @@ public:
 
 	FastQueue& operator=(FastQueue const& other);
 
-	bool const empty() const { return m_chunkList.empty(); }
+	bool empty() const { return m_chunkList.empty(); }
 
 	T& front() { return *m_chunkList.front().pBegin; }
 
