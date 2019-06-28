@@ -566,7 +566,7 @@ ImageViewBase::mousePressEvent(QMouseEvent* event)
 	m_rootInteractionHandler.mousePressEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
-	void maybeQueueRedraw();
+	maybeQueueRedraw();
 }
 
 void
