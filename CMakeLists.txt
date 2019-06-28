@@ -292,12 +292,12 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 SET(Boost_USE_MULTITHREADED ON)
-FIND_PACKAGE(Boost 1.35.0 COMPONENTS unit_test_framework prg_exec_monitor)
+FIND_PACKAGE(Boost 1.67 COMPONENTS unit_test_framework prg_exec_monitor)
 IF(NOT Boost_FOUND)
 	MESSAGE(
 		FATAL_ERROR
 		"Could not find boost headers or libraries.\n"
-		"You may need to install a package named libboost1.35-dev or similarly."
+		"You may need to install a package named libboost1.67-dev or similarly."
 	)
 ENDIF(NOT Boost_FOUND)
 
