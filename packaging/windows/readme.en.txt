@@ -153,7 +153,7 @@ latest stable version.
    be ignored.
    
    [MinGW]
-   Launch the Qt Command Promt from the Start menu.
+   Launch the Qt Command Prompt from the Start menu.
    Enter the following there:
 
    C:
@@ -190,7 +190,7 @@ latest stable version.
    then do Build -> Build Solution.
    
    [MinGW]
-   Back to the Qt Command Promt, give the following commands:
+   Back to the Qt Command Prompt, give the following commands:
 
    C:
    cd C:\build\scantailor-build

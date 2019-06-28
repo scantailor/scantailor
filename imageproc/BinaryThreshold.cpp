@@ -96,7 +96,7 @@ BinaryThreshold::mokjiThreshold(
 	unsigned const min_edge_magnitude)
 {
 	if (max_edge_width < 1) {
-		throw std::invalid_argument("mokjiThreshold: invalud max_edge_width");
+		throw std::invalid_argument("mokjiThreshold: invalid max_edge_width");
 	}
 	if (min_edge_magnitude < 1) {
 		throw std::invalid_argument("mokjiThreshold: invalid min_edge_magnitude");

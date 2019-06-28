@@ -438,7 +438,7 @@ TopBottomEdgeTracer::verticalSobelInPlace(Grid<GridNode>& grid)
 		grid_line += grid_stride;
 	}
 
-	// Do a vertical pass and write resuts.
+	// Do a vertical pass and write results.
 	for (int x = 0; x < width; ++x) {
 		GridNode* p_grid = grid.data() + x;
 		float prev = p_grid[-grid_stride].yGrad;

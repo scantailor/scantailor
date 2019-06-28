@@ -57,7 +57,7 @@ ZoomHandler::onWheelEvent(QWheelEvent* event, InteractionState& interaction)
 	double zoom = m_rImageView.zoomLevel();
 
 	if (zoom == 1.0 && event->delta() < 0) {
-		// Alredy zoomed out and trying to zoom out more.
+		// Already zoomed out and trying to zoom out more.
 		
 		// Scroll amount in terms of typical mouse wheel "clicks".
 		double const delta_clicks = event->delta() / 120;

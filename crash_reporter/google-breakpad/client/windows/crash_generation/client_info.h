@@ -96,7 +96,7 @@ class ClientInfo {
   CustomClientInfo GetCustomInfo() const;
 
  private:
-  // Calcualtes the uptime for the client process, converts it to a string and
+  // Calculates the uptime for the client process, converts it to a string and
   // stores it in the last entry of client custom info.
   void SetProcessUptime();
 

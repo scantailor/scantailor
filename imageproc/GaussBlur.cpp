@@ -37,7 +37,7 @@ void find_iir_constants(
 	float* n_p, float *n_m, float *d_p,
 	float* d_m, float *bd_p, float *bd_m, float std_dev)
 {
-	/*  The constants used in the implemenation of a casual sequence
+	/*  The constants used in the implementation of a casual sequence
 	 *  using a 4th order approximation of the gaussian operator
 	 */
 	

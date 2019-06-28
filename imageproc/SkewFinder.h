@@ -105,7 +105,7 @@ public:
 	 * \param reduction The number of times to apply a 2x downscaling
 	 *                  to the image before doing a coarse search.
 	 *                  The default value is recommended for 300 dpi
-	 *                  scans of hight quality material.
+	 *                  scans of high quality material.
 	 */
 	void setCoarseReduction(int reduction = DEFAULT_COARSE_REDUCTION);
 	
@@ -119,7 +119,7 @@ public:
 	 * \param reduction The number of times to apply a 2x downscaling
 	 *                  to the image before doing a fine search.
 	 *                  The default value is recommended for 300 dpi
-	 *                  scans of hight quality material.
+	 *                  scans of high quality material.
 	 */
 	void setFineReduction(int reduction = DEFAULT_FINE_REDUCTION);
 	

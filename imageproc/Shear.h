@@ -62,7 +62,7 @@ void vShearFromTo(
 	double x_origin, BWColor background_color);
 
 /**
- * \brief Horizontal shear returing a new image.
+ * \brief Horizontal shear returning a new image.
  *
  * Same as hShearFromTo(), but creates and returns the destination image.
  */

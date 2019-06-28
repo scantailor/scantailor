@@ -35,7 +35,7 @@ namespace imageproc
  *
  * \param src The source image.  It doesn't have to be grayscale, but
  *        the resulting image will be grayscale anyway.
- * \param window_size The apperture size.  If it doesn't completely
+ * \param window_size The aperture size.  If it doesn't completely
  *        fit the image area, no filtering will take place.
  * \param hor_degree The degree of a polynomial in horizontal direction.
  * \param vert_degree The degree of a polynomial in vertical direction.

@@ -42,7 +42,7 @@ ConnCompEraserExt::nextConnComp()
 	if (!m_lastCC.isNull()) {
 		// Propagate the changes from m_eraser.image() to m_lastImage.
 		// We could copy the whole image, but instead we copy just
-		// the affected area, extending it to word boundries.
+		// the affected area, extending it to word boundaries.
 		QRect const& rect = m_lastCC.rect();
 		BinaryImage const& src = m_eraser.image();
 		size_t const src_wpl = src.wordsPerLine();
