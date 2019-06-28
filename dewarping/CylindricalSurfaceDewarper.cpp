@@ -204,8 +204,8 @@ double
 CylindricalSurfaceDewarper::calcPlnStraightLineY(
 	std::vector<QPointF> const& img_directrix1,
 	std::vector<QPointF> const& img_directrix2,
-	HomographicTransform<2, double> const pln2img,
-	HomographicTransform<2, double> const img2pln)
+	HomographicTransform<2, double> const& pln2img,
+	HomographicTransform<2, double> const& img2pln)
 {	
 	double pln_y_accum = 0;
 	double weight_accum = 0;
