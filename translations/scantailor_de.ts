@@ -397,7 +397,7 @@ zur Auswahl mehrerer Seiten.</translation>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="47"/>
         <source>Click to create a new control point.</source>
-        <translation>Neuen Kontrollpunkt durch klicken erstellen.</translation>
+        <translation>Neuen Kontrollpunkt durch Klicken erstellen.</translation>
     </message>
     <message>
         <location filename="../interaction/InteractiveXSpline.cpp" line="73"/>
