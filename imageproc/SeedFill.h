@@ -32,7 +32,7 @@ class GrayImage;
 /**
  * \brief Spread black pixels from seed as long as mask allows it.
  *
- * This operation retains black connected componets from \p mask that are
+ * This operation retains black connected components from \p mask that are
  * tagged by at least one black pixel in \p seed.  The rest do not appear
  * in the result.
  * \par

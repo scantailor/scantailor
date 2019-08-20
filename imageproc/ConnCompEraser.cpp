@@ -18,7 +18,7 @@
 
 /* The code is based on Paul Heckbert's stack-based seed fill algorithm
  * from "Graphic Gems", ed. Andrew Glassner, Academic Press, 1990.
- * This version is optimized to elliminate all multiplications. */
+ * This version is optimized to eliminate all multiplications. */
 
 #include "ConnCompEraser.h"
 #include "ConnComp.h"

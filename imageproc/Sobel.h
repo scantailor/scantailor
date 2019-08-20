@@ -44,7 +44,7 @@ namespace imageproc
  * \param src_stride The distance from a point on the source grid to the
  *        point directly below it, in terms of iterator difference.
  * \param src_reader A functor that gets passed a dereferenced iterator
- *        to the source grid and returns some type convertable to T.
+ *        to the source grid and returns some type convertible to T.
  *        It's called like this:
  *        \code
  *        SrcIt src_it = ...;
@@ -69,7 +69,7 @@ namespace imageproc
  *        tmp_writer(*tmp_it, val);
  *        \endcode
  * \param tmp_reader A functor that gets passed a dereferenced iterator
- *        to the temporary grid and returns some type convertable to T.
+ *        to the temporary grid and returns some type convertible to T.
  *        See \p src_reader for more info.
  * \param dst Pointer or a random access iterator to the top-left corner
  *        of the destination grid.

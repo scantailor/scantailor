@@ -117,7 +117,7 @@ OptimizationResult
 Optimizer::optimize(double internal_force_weight)
 {
 	// Note: because we are supposed to reset the forces anyway,
-	// we re-use m_internalForce to store the cummulative force.
+	// we re-use m_internalForce to store the cumulative force.
 	m_internalForce *= internal_force_weight;
 	m_internalForce += m_externalForce;
 	

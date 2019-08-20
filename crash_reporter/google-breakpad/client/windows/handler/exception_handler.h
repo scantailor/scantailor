@@ -41,7 +41,7 @@
 // use different minidump callbacks for different call sites.
 //
 // In either case, a callback function is called when a minidump is written,
-// which receives the unqiue id of the minidump.  The caller can use this
+// which receives the unique id of the minidump.  The caller can use this
 // id to collect and write additional application state, and to launch an
 // external crash-reporting application.
 //

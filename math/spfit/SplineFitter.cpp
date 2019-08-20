@@ -31,7 +31,7 @@ namespace spfit
 SplineFitter::SplineFitter(FittableSpline* spline)
 : m_pSpline(spline)
 , m_optimizer(spline->numControlPoints() * 2)
-// Each control point is a pair of (x, y) varaiables.
+// Each control point is a pair of (x, y) variables.
 {
 }
 

@@ -345,7 +345,7 @@ class AutoExceptionHandler {
   AutoExceptionHandler() {
     // Increment handler_stack_index_ so that if another Breakpad handler is
     // registered using this same HandleException function, and it needs to be
-    // called while this handler is running (either becaause this handler
+    // called while this handler is running (either because this handler
     // declines to handle the exception, or an exception occurs during
     // handling), HandleException will find the appropriate ExceptionHandler
     // object in handler_stack_ to deliver the exception to.

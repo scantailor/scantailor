@@ -4,7 +4,7 @@ OURDIR=`dirname $0`
 OURDIR=`cd $OURDIR; pwd`
 STSRC=`cd $OURDIR/../..; pwd`
 STHOME=`cd $OURDIR/../../..; pwd`
-echo -e "Building ScanTailor - Base Direcotry: $STHOME\n\n"
+echo -e "Building ScanTailor - Base Directory: $STHOME\n\n"
 
 export BUILDDIR=$STHOME/scantailor-deps-build
 export STBUILDDIR=$STHOME/scantailor-build

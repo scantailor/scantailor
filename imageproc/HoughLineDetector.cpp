@@ -237,10 +237,10 @@ HoughLineDetector::findHistogramPeaks(
 	// 1. The bin has a lower value than the peak candidate.
 	// 2. The bin has the same value as the peak candidate,
 	//    but it has a greater bin in its neighborhood.
-	// The second case indicates that our candidate is not relly a peak.
+	// The second case indicates that our candidate is not really a peak.
 	// To test for the second case we are going to increment the values
 	// of the bins in the neighborhood of peak candidates, find the peak
-	// candidates again and analize the differences.
+	// candidates again and analyze the differences.
 	std::vector<unsigned> new_hist(hist);
 	incrementBinsMasked(new_hist, width, height, neighborhood_mask);
 	neighborhood_mask.release();

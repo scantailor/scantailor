@@ -331,7 +331,7 @@ ContentBoxFinder::findContentBox(
 		dbg->add(text_mask_visualized, "text_mask");
 	}
 	
-	// Make text_mask strore the actual content pixels that are text.
+	// Make text_mask store the actual content pixels that are text.
 	rasterOp<RopAnd<RopSrc, RopDst> >(text_mask, content);
 	
 	QRect content_rect(content_blocks.contentBoundingBox());

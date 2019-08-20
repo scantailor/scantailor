@@ -144,7 +144,7 @@ ADD_CUSTOM_COMMAND(
 	VERBATIM
 )
 
-OPTION(BUILD_INSTALLER_BY_DEFAULT "Wheter the \"installer\" target gets built by default" ON)
+OPTION(BUILD_INSTALLER_BY_DEFAULT "Whether the \"installer\" target gets built by default" ON)
 SET(maybe_all "")
 IF(BUILD_INSTALLER_BY_DEFAULT)
 	SET(maybe_all ALL)
