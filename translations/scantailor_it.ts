@@ -1224,7 +1224,7 @@ Per determinarla, avvia l&apos;elaborazione automatica a &quot; o &quot; Conform
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="36"/>
         <source>All pages</source>
-        <translation>Tute le pagine</translation>
+        <translation>Tutte le pagine</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="43"/>
