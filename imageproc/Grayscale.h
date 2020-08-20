@@ -100,11 +100,10 @@ GrayImage createFramedImage(
 /**
  * \brief Find the darkest gray level of an image.
  *
- * \param image The image to process.  If it's null, 0xff will
- *        be returned as the darkest image.  If it's not grayscale,
- *        a grayscale copy will be created.
+ * \param image The GrayImage to process.  If it's null, 0xff will
+ *        be returned as the darkest image.
  */
-unsigned char darkestGrayLevel(QImage const& image);
+unsigned char darkestGrayLevel(const GrayImage &image);
 
 } // namespace imageproc
 

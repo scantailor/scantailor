@@ -275,15 +275,14 @@ GrayImage createFramedImage(QSize const& size,
 	return image;
 }
 
-unsigned char darkestGrayLevel(QImage const& image)
+unsigned char darkestGrayLevel(GrayImage const& image)
 {
-	QImage const gray(toGrayscale(image));
 	
 	int const width = image.width();
 	int const height = image.height();
 	
-	unsigned char const* line = image.bits();
-	int const bpl = image.bytesPerLine();
+	unsigned char const* line = image.toQImage().bits();
+	int const bpl = image.toQImage().bytesPerLine();
 	
 	unsigned char darkest = 0xff;
 	
