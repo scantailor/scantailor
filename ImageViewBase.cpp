@@ -72,7 +72,7 @@ public:
 	
 	void cancel() { m_ptrResult->cancel(); }
 	
-	bool const isCancelled() const { return m_ptrResult->isCancelled(); }
+	bool isCancelled() const { return m_ptrResult->isCancelled(); }
 	
 	virtual IntrusivePtr<AbstractCommand0<void> > operator()();
 private:
@@ -566,7 +566,7 @@ ImageViewBase::mousePressEvent(QMouseEvent* event)
 	m_rootInteractionHandler.mousePressEvent(event, m_interactionState);
 	event->setAccepted(true);
 	updateStatusTipAndCursor();
-	void maybeQueueRedraw();
+	maybeQueueRedraw();
 }
 
 void

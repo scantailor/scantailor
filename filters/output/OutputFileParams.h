@@ -43,7 +43,7 @@ public:
 	
 	QDomElement toXml(QDomDocument& doc, QString const& name) const;
 
-	bool const isValid() const { return m_size >= 0; }
+	bool isValid() const { return m_size >= 0; }
 	
 	/**
 	 * \brief Returns true if it's likely we have two identical files.

@@ -98,8 +98,8 @@ private:
 	static double calcPlnStraightLineY(
 		std::vector<QPointF> const& img_directrix1,
 		std::vector<QPointF> const& img_directrix2,
-		HomographicTransform<2, double> pln2img,
-		HomographicTransform<2, double> img2pln);
+		HomographicTransform<2, double> const& pln2img,
+		HomographicTransform<2, double> const& img2pln);
 
 	static HomographicTransform<2, double> fourPoint2DHomography(
 		boost::array<std::pair<QPointF, QPointF>, 4> const& pairs);

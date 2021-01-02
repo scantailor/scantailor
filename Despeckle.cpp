@@ -144,7 +144,7 @@ struct Component
 	
 	Component() : num_pixels(0) {}
 	
-	uint32_t const anchoredToBig() const {
+	uint32_t anchoredToBig() const {
 		return num_pixels & ANCHORED_TO_BIG;
 	}
 	
@@ -152,7 +152,7 @@ struct Component
 		num_pixels |= ANCHORED_TO_BIG;
 	}
 	
-	uint32_t const anchoredToSmall() const {
+	uint32_t anchoredToSmall() const {
 		return num_pixels & ANCHORED_TO_SMALL;
 	}
 	
@@ -160,7 +160,7 @@ struct Component
 		num_pixels |= ANCHORED_TO_SMALL;
 	}
 	
-	bool const anchoredToSmallButNotBig() const {
+	bool anchoredToSmallButNotBig() const {
 		return (num_pixels & TAG_MASK) == ANCHORED_TO_SMALL;
 	}
 	
