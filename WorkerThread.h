@@ -41,6 +41,9 @@ public:
 	 * useful to prematuraly stop task processing.
 	 */
 	void shutdown();
+
+    // Basic Multithread Support
+    bool isRunning();
 public slots:
 	void performTask(BackgroundTaskPtr const& task);
 signals:
@@ -54,6 +57,9 @@ private:
 	class TaskResultEvent;
 	
 	std::auto_ptr<Impl> m_ptrImpl;
+    //Basic Multithread Support
+    volatile bool m_isRunning;
+
 };
 
 #endif

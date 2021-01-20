@@ -177,7 +177,7 @@
      <x>0</x>
      <y>0</y>
      <width>613</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDebug">
@@ -188,6 +188,7 @@
     <addaction name="actionRelinking"/>
     <addaction name="separator"/>
     <addaction name="actionDebug"/>
+    <addaction name="actionEnable_Multithreading"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
    </widget>
@@ -353,6 +354,14 @@
   <action name="actionRelinking">
    <property name="text">
     <string>Relinking ...</string>
+   </property>
+  </action>
+  <action name="actionEnable_Multithreading">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable Multithreading</string>
    </property>
   </action>
  </widget>
