@@ -582,7 +582,7 @@ OutputGenerator::processWithoutDewarping(
 	QPolygonF normalize_illumination_crop_area(m_xform.resultingPreCropArea());
 	normalize_illumination_crop_area.translate(-normalize_illumination_rect.topLeft());
 
-	if (render_params.normalizeIllumination()) {
+	if (render_params.normalizeIllumination() && !render_params.mixedOutput()) {
 		maybe_normalized = normalizeIlluminationGray(
 			status, input.grayImage(), orig_image_crop_area,
 			m_xform.transform(), normalize_illumination_rect, 0, dbg
@@ -688,7 +688,8 @@ OutputGenerator::processWithoutDewarping(
 	}
 	
 	if (render_params.normalizeIllumination()
-			&& !input.origImage().allGray()) {
+			&& !input.origImage().allGray()
+			&& !render_params.mixedOutput()) {
 		assert(maybe_normalized.format() == QImage::Format_Indexed8);
 		QImage tmp(
 			transform(
