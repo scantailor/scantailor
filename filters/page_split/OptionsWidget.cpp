@@ -27,6 +27,7 @@
 #include "ProjectPages.h"
 #include "ScopedIncDec.h"
 #include <QPixmap>
+#include <QButtonGroup>
 #ifndef Q_MOC_RUN
 #include <boost/foreach.hpp>
 #endif
