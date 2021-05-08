@@ -45,7 +45,7 @@ Scan Tailor is being used not just by enthusiasts, but also by libraries and oth
     done with Scan Tailor, but all of the scanned image cleanup was. [[1](scantailor.org/downloads/)]
   - [Oakland Township: Two Hundred Years](http://books.google.com/books?printsec=frontcover&id=o4Q2OlVl61MC) 
       by Stuart A. Rammage (also available: volumes 2, 3, 4.1, 4.2, 5.1, and 5.2) [[2](http://www.diybookscanner.org/forum/viewtopic.php?t=435)]
-  - [Herons and Cobblestones](http://books.google.com/books?printsec=frontcover&id=o4Q2OlVl61MC): A History of Bethel and the Five Oaks Area of Brantford Township, 
+  - [Herons and Cobblestones](http://books.google.com.ng/books?printsec=frontcover&id=sQj6XPKB6ZAC): A History of Bethel and the Five Oaks Area of Brantford Township, 
       County of Brant by the Grand River Heritage Mines Society [[2](http://www.diybookscanner.org/forum/viewtopic.php?t=435)]
 
 
