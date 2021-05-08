@@ -483,7 +483,7 @@
         <location filename="../MainWindow.cpp" line="1673"/>
         <source>Output is not yet possible, as the final size of pages is not yet known.
 To determine it, run batch processing at &quot;Select Content&quot; or &quot;Margins&quot;.</source>
-        <translation type="unfinished">Salida no es aun posible debido a que el tamaño final de la página aun es desconocida.
+        <translation>Generar la salida aún no es posible debido a que el tamaño final de las páginas todavía es desconocido.
 Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &quot;Márgenes&quot;.</translation>
     </message>
     <message>
@@ -754,9 +754,14 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &qu
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
+        <source>This option will apply rotation to either each even or to each odd page in accordance with whether the current page is even or odd.</source>
+        <translation>Esta opción aplicará la rotación a cada página par o impar según si la página actual es par o impar. </translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Todas las demás</translation>
+        <translation>Todas las demás páginas</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="101"/>
@@ -767,17 +772,22 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &qu
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="125"/>
         <source>Selected pages</source>
-        <translation>Página seleccionada</translation>
+        <translation>Páginas seleccionadas</translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="155"/>
         <source>Use Ctrl+Click / Shift+Click to select multiple pages.</source>
-        <translation>Usar Ctrl+Click / Shift+Click para seleccionar múltiples páginas.</translation>
+        <translation>Usar Ctrl+Clic / Shift+Clic para seleccionar múltiples páginas.</translation>
+    </message>
+    <message>
+        <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="179"/>
+        <source>This option will apply rotation to either each even or to each odd selected page in accordance with whether the current page is even or odd.</source>
+        <translation>Esta opción aplicará la rotación a cada página par o impar seleccionada según si la página actual es par o impar. </translation>
     </message>
     <message>
         <location filename="../filters/fix_orientation/ui/OrientationApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>Todas las demás seleccionadas</translation>
+        <translation>Todas las demás páginas seleccionadas</translation>
     </message>
 </context>
 <context>
@@ -1179,9 +1189,14 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &qu
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
+        <source>This option will apply rotation to either each even or to each odd page in accordance with whether the current page is even or odd.</source>
+        <translation>Esta opción aplicará la rotación a cada página par o impar según si la página actual es par o impar. </translation>
+    </message>
+    <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="59"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translation>Todas las páginas pares o impares, dependiendo de la página actual es par o impar</translation>
+        <translation>Todas las demás páginas</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="89"/>
@@ -1192,7 +1207,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &qu
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="110"/>
         <source>Selected pages</source>
-        <translation>Página seleccionada</translation>
+        <translation>Páginas seleccionadas</translation>
     </message>
     <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="143"/>
@@ -1200,9 +1215,14 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &qu
         <translation>Usar Ctrl+Clic / Shift+Clic para seleccionar múltiples páginas.</translation>
     </message>
     <message>
+        <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="167"/>
+        <source>This option will apply rotation to either each even or to each odd selected page in accordance with whether the current page is even or odd.</source>
+        <translation>Esta opción aplicará la rotación a cada página par o impar seleccionada según si la página actual es par o impar. </translation>
+    </message>
+    <message>
         <location filename="../filters/page_layout/ui/PageLayoutApplyDialog.ui" line="164"/>
         <source>Every other selected page</source>
-        <translation>Cada otra página seleccionada</translation>
+        <translation>Todas las demás páginas seleccionadas</translation>
     </message>
 </context>
 <context>
@@ -1451,7 +1471,7 @@ Para determinarlo, ejecute el proceso de &quot;Seleccionar Contenido&quot; o &qu
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="575"/>
         <source>Output directory is not set or doesn&apos;t exist.</source>
-        <translation type="unfinished">La carpeta de salida no está configurada o no existe.</translation>
+        <translation type="unfinished">El directorio de salida no está configurado o no existe.</translation>
     </message>
     <message>
         <location filename="../ProjectFilesDialog.cpp" line="647"/>
@@ -1621,10 +1641,14 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
+        <source>This option will apply rotation to either each even or to each odd page in accordance with whether the current page is even or odd.</source>
+        <translation>Esta opción aplicará la rotación a cada página par o impar según si la página actual es par o impar. </translation>
+    </message>
+    <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="71"/>
         <source>Every other page</source>
         <extracomment>All odd or even pages, depending on the current page being odd or even.</extracomment>
-        <translatorcomment>what should i translate?</translatorcomment>
-        <translation>Todas las pares o impares</translation>
+        <translation>Todas las demás páginas</translation>
     </message>
     <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="101"/>
@@ -1643,9 +1667,14 @@ p, li { white-space: pre-wrap; }
         <translation>Usar Ctrl+Clic / Shift+Clic para seleccionar múltiples páginas.</translation>
     </message>
     <message>
+        <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="179"/>
+        <source>This option will apply rotation to either each even or to each odd selected page in accordance with whether the current page is even or odd.</source>
+        <translation>Esta opción aplicará la rotación a cada página par o impar seleccionada según si la página actual es par o impar. </translation>
+    </message>
+    <message>
         <location filename="../filters/select_content/ui/SelectContentApplyDialog.ui" line="176"/>
         <source>Every other selected page</source>
-        <translation>Todas las demás seleccionadas</translation>
+        <translation>Todas las demás páginas seleccionadas</translation>
     </message>
 </context>
 <context>
@@ -1844,7 +1873,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filters/deskew/ImageView.cpp" line="65"/>
         <source>Drag this handle to rotate the image.</source>
-        <translation>Arrastre esta asa rotar la imagen.</translation>
+        <translation>Arrastre este punto hasta rotar la imagen.</translation>
     </message>
 </context>
 <context>

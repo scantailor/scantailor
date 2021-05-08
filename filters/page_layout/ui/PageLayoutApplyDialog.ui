@@ -55,6 +55,9 @@
          </property>
          <item>
           <widget class="QRadioButton" name="everyOtherRB">
+           <property name="toolTip">
+            <string>This option will apply rotation to either each even or to each odd page in accordance with whether the current page is even or odd.</string>
+           </property>
            <property name="text">
             <string extracomment="All odd or even pages, depending on the current page being odd or even.">Every other page</string>
            </property>
@@ -160,6 +163,9 @@
          </property>
          <item>
           <widget class="QRadioButton" name="everyOtherSelectedRB">
+           <property name="toolTip">
+            <string>This option will apply rotation to either each even or to each odd selected page in accordance with whether the current page is even or odd.</string>
+           </property>
            <property name="text">
             <string>Every other selected page</string>
            </property>
