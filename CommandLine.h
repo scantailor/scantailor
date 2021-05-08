@@ -50,7 +50,13 @@ public:
 	static CommandLine const& get() { return m_globalInstance; }
 	static void set(CommandLine const& cl);
 
-	CommandLine(QStringList const& argv, bool g=true) : m_gui(g), m_global(false) { CommandLine::parseCli(argv); }
+	CommandLine(QStringList const& argv, bool g=true) : m_gui(g), m_global(false) { 
+		CommandLine::parseCli(argv); 
+		m_dewarpingMode = fetchDewarpingMode();    
+		m_despeckleLevel = fetchDespeckleLevel();
+		m_deskewAngle = fetchDeskewAngle();
+		m_threshold = fetchThreshold();
+	}
 
 	bool isGui() const { return m_gui; }
 	bool isVerbose() const { return contains("verbose"); }
