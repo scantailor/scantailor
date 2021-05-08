@@ -141,6 +141,8 @@ OPTION(ENABLE_OPENGL "OpenGL may be used for UI acceleration" ${use_opengl})
 
 FILE(GLOB jpeg_dirs1 "${build_outer_dir}/jpeg-[0-9]*")
 FILE(GLOB jpeg_dirs2 "${source_outer_dir}/jpeg-[0-9]*")
+FILE(GLOB openjpeg_dirs1 "${build_outer_dir}/openjpeg-[0-9]*.[0-9]*.[0-9]*")
+FILE(GLOB openjpeg_dirs2 "${source_outer_dir}/openjpeg-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB zlib_dirs1 "${build_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB zlib_dirs2 "${source_outer_dir}/zlib-[0-9]*.[0-9]*.[0-9]*")
 FILE(GLOB png_dirs1 "${build_outer_dir}/libpng-[0-9]*.[0-9]*.[0-9]*")
@@ -179,6 +181,38 @@ IF(NOT JPEG_LIBRARY)
 		FATAL_ERROR
 		"Could not find jpeg library.\n"
 		"You may need to install a package named libjpeg62-dev or similarly."
+	)
+ENDIF()
+
+
+FIND_PATH(
+	OPENJP2_INCLUDE_DIR openjpeg.h
+	PATHS /usr/local/include /usr/include
+	HINTS ${openjpeg_dirs1} ${openjpeg_dirs2}
+	PATH_SUFFIXES openjpeg-2.1
+	DOC "Path to openjpeg headers."
+)
+IF(NOT OPENJP2_INCLUDE_DIR)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find jpeg headers.\n"
+		"You may need to install a package named libopenjp2-dev or similarly."
+	)
+ENDIF()
+
+INCLUDE_DIRECTORIES("${OPENJP2_INCLUDE_DIR}")
+
+FIND_LIBRARY(
+	OPENJP2_LIBRARY NAMES openjp2
+	PATHS /usr/local/lib /usr/lib
+	HINTS ${openjpeg_dirs1} ${openjpeg_dirs2} ${STAGING_LIBS_DIR}
+	DOC "Path to openjpeg library."
+)
+IF(NOT OPENJP2_LIBRARY)
+	MESSAGE(
+		FATAL_ERROR
+		"Could not find jpeg library.\n"
+		"You may need to install a package named libopenjp2-dev or similarly."
 	)
 ENDIF()
 
@@ -376,7 +410,7 @@ ENDIF()
 
 # Note that ${JPEG_LIBRARY} must go after qjpeg plugin, because otherwise
 # the GNU linker won't resolve symbols qjpeg needs from it.
-LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY})
+LIST(APPEND EXTRA_LIBS ${TIFF_LIBRARY} ${PNG_LIBRARY} ${ZLIB_LIBRARY} ${JPEG_LIBRARY} ${OPENJP2_LIBRARY})
 
 IF(ENABLE_OPENGL)
 	LIST(APPEND EXTRA_LIBS ${QT_QTOPENGL_LIBRARY} ${OPENGL_LIBRARIES})
@@ -486,11 +520,13 @@ SET(
 	ProjectPages.cpp ProjectPages.h
 	FilterData.cpp FilterData.h
 	ImageMetadataLoader.cpp ImageMetadataLoader.h
+	JP2Reader.cpp JP2Reader.h
 	TiffReader.cpp TiffReader.h
 	TiffWriter.cpp TiffWriter.h
 	PngMetadataLoader.cpp PngMetadataLoader.h
 	TiffMetadataLoader.cpp TiffMetadataLoader.h
 	JpegMetadataLoader.cpp JpegMetadataLoader.h
+	JP2MetadataLoader.cpp JP2MetadataLoader.h
 	ImageLoader.cpp ImageLoader.h
 	ErrorWidget.cpp ErrorWidget.h
 	OrthogonalRotation.cpp OrthogonalRotation.h
